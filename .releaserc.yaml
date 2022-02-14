@@ -1,0 +1,20 @@
+branches:
+  - name: stable
+    channel: false
+  - name: main
+    channel: next
+    prerelease: next
+plugins:
+  - - '@semantic-release/commit-analyzer'
+    - preset: conventionalcommits
+  - '@semantic-release/release-notes-generator'
+  - '@semantic-release/github'
+prepare:
+  - - "@semantic-release/exec"
+    - prepareCmd: "dotnet pack -c Release -o ./artifacts /p:Version='${nextRelease.version}' /p:PackageReleaseNotes='${nextRelease.notes}'"
+publish:
+  - - "@semantic-release/exec"
+    - publishCmd: "dotnet nuget push './artifacts/*.nupkg' --source $NUGET_SOURCE --api-key $NUGET_API_KEY"
+  - - '@semantic-release/github'
+    - assets:
+        - path: 'artifacts/*.nupkg'

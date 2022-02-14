@@ -1,0 +1,18 @@
+name: test
+
+on:
+  workflow_call:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-dotnet@v1
+      - run: dotnet tool restore
+      - run: dotnet build /p:TreatWarningsAsErrors=true
+      - run: dotnet format --no-restore --verify-no-changes
+      - run: dotnet test --no-build
