@@ -1,0 +1,40 @@
+name: release
+
+on:
+  workflow_call:
+    inputs:
+      nuget_source:
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+    secrets:
+      nuget_api_key:
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v1
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+      - run: |
+          npm i \
+          semantic-release@19.0.2 \
+          conventional-changelog-conventionalcommits@4.6.3 \
+          @semantic-release/exec@6.0.3 \
+          @semantic-release/commit-analyzer@9.0.2 \
+          @semantic-release/release-notes-generator@10.0.3 \
+          @semantic-release/github@8.0.2
+      - run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUGET_SOURCE: ${{ inputs.nuget_source }}
+          NUGET_API_KEY: ${{ secrets.nuget_api_key }}

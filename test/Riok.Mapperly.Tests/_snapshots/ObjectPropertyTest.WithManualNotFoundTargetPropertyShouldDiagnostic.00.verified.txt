@@ -1,0 +1,17 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG005,
+      Title: Mapping target property not found,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (10,4)-(10,70),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Specified property {0} on mapping target type {1} was not found,
+      Message: Specified property not_found on mapping target type B was not found,
+      Category: Mapper,
+      CustomTags: []
+    }
+  ]
+}

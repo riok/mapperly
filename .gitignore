@@ -1,0 +1,10 @@
+# artifacts / build outputs
+./artifacts
+bin/
+obj/
+
+# verify received files
+*.received.*
+
+# dot user settings
+*.DotSettings.user

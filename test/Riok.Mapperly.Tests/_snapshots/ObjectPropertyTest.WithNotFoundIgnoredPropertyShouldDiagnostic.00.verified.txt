@@ -1,0 +1,17 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG004,
+      Title: Ignored property not found,
+      Severity: Warning,
+      WarningLevel: 1,
+      Location: : (10,4)-(10,48),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Ignored property {0} on {1} was not found,
+      Message: Ignored property not_found on B was not found,
+      Category: Mapper,
+      CustomTags: []
+    }
+  ]
+}

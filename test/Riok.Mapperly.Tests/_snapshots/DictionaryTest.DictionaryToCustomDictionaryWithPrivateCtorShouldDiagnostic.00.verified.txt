@@ -1,0 +1,43 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG002,
+      Title: No accessible parameterless constructor found,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (10,4)-(10,43),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: {0} has no accessible parameterless constructor,
+      Message: A has no accessible parameterless constructor,
+      Category: Mapper,
+      CustomTags: []
+    },
+    {
+      Id: RMG002,
+      Title: No accessible parameterless constructor found,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (10,4)-(10,43),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: {0} has no accessible parameterless constructor,
+      Message: A has no accessible parameterless constructor,
+      Category: Mapper,
+      CustomTags: []
+    },
+    {
+      Id: RMG008,
+      Title: Could not create mapping,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (10,4)-(10,43),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Could not create mapping from {0} to {1}. Consider implementing the mapping manually.,
+      Message: Could not create mapping from System.Collections.Generic.IDictionary<string, int> to A. Consider implementing the mapping manually.,
+      Category: Mapper,
+      CustomTags: []
+    }
+  ]
+}
