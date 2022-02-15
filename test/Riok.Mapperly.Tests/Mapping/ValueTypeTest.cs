@@ -3,12 +3,12 @@ namespace Riok.Mapperly.Tests.Mapping;
 public class ValueTypeTest
 {
     [Fact]
-    public void CustomStructToSameCustomStruct()
+    public void CustomReadOnlyStructToSameCustomReadOnlyStruct()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
             "A",
-            "struct A {}");
+            "readonly struct A {}");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
             .Be("return source;");
@@ -21,18 +21,6 @@ public class ValueTypeTest
             "A",
             "A",
             "readonly struct A {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
-            .Should()
-            .Be("return source;");
-    }
-
-    [Fact]
-    public void CustomRefStructToSameCustomStruct()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "A",
-            "ref struct A {}");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
             .Be("return source;");

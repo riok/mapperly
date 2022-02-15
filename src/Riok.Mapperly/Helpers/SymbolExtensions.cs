@@ -8,6 +8,9 @@ internal static class SymbolExtensions
     internal static bool HasAttribute(this ISymbol symbol, INamedTypeSymbol attributeSymbol)
         => symbol.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, attributeSymbol));
 
+    internal static bool IsImmutable(this ISymbol symbol)
+        => symbol is INamedTypeSymbol namedSymbol && (namedSymbol.IsReadOnly || namedSymbol.SpecialType == SpecialType.System_String);
+
     internal static bool IsAccessible(this ISymbol symbol)
         => symbol.DeclaredAccessibility.HasFlag(Accessibility.Protected)
             || symbol.DeclaredAccessibility.HasFlag(Accessibility.Internal)

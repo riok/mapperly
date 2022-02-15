@@ -20,6 +20,34 @@ public class ObjectPropertyTest
     }
 
     [Fact]
+    public void SameType()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "A",
+            "class A { public string StringValue { get; set; } }");
+
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be(@"var target = new A();
+    target.StringValue = source.StringValue;
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public void CustomRefStructToSameCustomStruct()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "A",
+            "ref struct A {}");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be(@"var target = new A();
+    return target;");
+    }
+
+    [Fact]
     public void StringToIntProperty()
     {
         var source = TestSourceBuilder.Mapping(

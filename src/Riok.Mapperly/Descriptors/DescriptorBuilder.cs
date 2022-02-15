@@ -15,7 +15,7 @@ public class DescriptorBuilder
     private static readonly IReadOnlyCollection<MappingBuilder> _mappingBuilders = new MappingBuilder[]
     {
         SpecialTypeMappingBuilder.TryBuildMapping,
-        ValueTypeMappingBuilder.TryBuildMapping,
+        ImmutableTypeMappingBuilder.TryBuildMapping,
         DictionaryMappingBuilder.TryBuildMapping,
         EnumerableMappingBuilder.TryBuildMapping,
         ImplicitCastMappingBuilder.TryBuildMapping,

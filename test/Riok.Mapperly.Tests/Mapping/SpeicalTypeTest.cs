@@ -47,15 +47,4 @@ public class SpeicalTypeTest
             .Should()
             .Be("return (object)source;");
     }
-
-    [Fact]
-    public void StringToString()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "string",
-            "string");
-        TestHelper.GenerateSingleMapperMethodBody(source)
-            .Should()
-            .Be("return source;");
-    }
 }
