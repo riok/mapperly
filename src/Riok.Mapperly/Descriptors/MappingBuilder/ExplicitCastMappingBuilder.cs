@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Riok.Mapperly.Descriptors.TypeMappings;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilder;
 
@@ -7,6 +8,9 @@ public static class ExplicitCastMappingBuilder
 {
     public static CastMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
+        if (!ctx.Source.IsImmutable() && !ctx.Target.IsImmutable())
+            return null;
+
         var conversion = ctx.Compilation.ClassifyConversion(ctx.Source, ctx.Target);
 
         // only allow user defined explicit reference conversions
