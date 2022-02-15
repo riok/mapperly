@@ -34,12 +34,24 @@ public static class EnumerableMappingBuilder
 
         // true if there is no need to convert elements (eg. the source instances can directly be reused)
         // this is the case if the types are equal and the mapping is a direct assignment.
-        var isDirectMapping = elementMapping is DirectAssignmentMapping;
+        var isDirectElementMapping = elementMapping is DirectAssignmentMapping;
 
         // if element mapping is a direct assignment
         // and target is an IEnumerable, there is no mapping needed at all.
-        if (isDirectMapping && IsType(ctx, _enumerableIntfName, ctx.Target.OriginalDefinition))
+        if (isDirectElementMapping && IsType(ctx, _enumerableIntfName, ctx.Target.OriginalDefinition))
             return new CastMapping(ctx.Source, ctx.Target);
+
+        // if element mapping is a direct assignment
+        // and source type is an array
+        // and the target type is an array or an IReadOnlyCollection,
+        // a single Array.Clone call should be sufficient and fast.
+        if (isDirectElementMapping
+            && ctx.Source.IsArrayType()
+            && (ctx.Target.IsArrayType() || IsType(ctx, _readOnlyCollectionIntfName, ctx.Target.OriginalDefinition))
+            && SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, ctx.Target))
+        {
+            return new ArrayCloneMapping(ctx.Source, ctx.Target);
+        }
 
         // try linq mapping: x.Select(Map).ToArray/ToList
         // if that doesn't work do a foreach with add calls
@@ -47,7 +59,7 @@ public static class EnumerableMappingBuilder
         if (!canMapWithLinq)
             return BuildCustomTypeMapping(ctx, elementMapping);
 
-        return BuildLinqMapping(ctx, isDirectMapping, elementMapping, collectMethodName);
+        return BuildLinqMapping(ctx, isDirectElementMapping, elementMapping, collectMethodName);
     }
 
     private static LinqEnumerableMapping BuildLinqMapping(

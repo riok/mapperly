@@ -23,6 +23,13 @@ public static class TestHelper
             .Body;
     }
 
+    public static string GenerateMapperMethodBody(string source, string methodName = TestSourceBuilder.DefaultMapMethodName, bool allowDiagnostics = false)
+    {
+        return GenerateMapperMethodBodies(source, allowDiagnostics)
+            .Single(x => x.Name == methodName)
+            .Body;
+    }
+
     public static IEnumerable<(string Name, string Body)> GenerateMapperMethodBodies(string source, bool allowDiagnostics = false)
     {
         var result = Generate(source).GetRunResult();

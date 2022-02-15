@@ -71,6 +71,9 @@ public static class SyntaxFactoryHelper
     public static LiteralExpressionSyntax StringLiteral(string content) =>
         LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(content));
 
+    public static LiteralExpressionSyntax NumericLiteral(int v)
+        => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0));
+
     public static AttributeListSyntax ReturnNotNullIfNotNullAttribute(string paramName)
     {
         var attribute = Attribute(IdentifierName(NotNullIfNotNullAttributeName))
@@ -91,6 +94,12 @@ public static class SyntaxFactoryHelper
 
     public static InvocationExpressionSyntax NameOf(ExpressionSyntax expression)
         => Invocation(IdentifierName("nameof"), expression);
+
+    public static ElementAccessExpressionSyntax ArrayElementAccess(ExpressionSyntax array, ExpressionSyntax index)
+    {
+        return ElementAccessExpression(array)
+            .WithArgumentList(BracketedArgumentList(SingletonSeparatedList(Argument(index))));
+    }
 
     public static ThrowExpressionSyntax ThrowArgumentOutOfRangeException(ExpressionSyntax arg)
     {
@@ -141,17 +150,22 @@ public static class SyntaxFactoryHelper
         return FieldDeclaration(variableDeclaration).WithModifiers(modifierTokenList);
     }
 
-    public static LocalDeclarationStatementSyntax DeclareVariable(string variableName, ExpressionSyntax initializationValue)
+    public static VariableDeclarationSyntax DeclareVariable(string variableName, ExpressionSyntax initializationValue)
     {
         var initializer = EqualsValueClause(initializationValue);
         var declarator = VariableDeclarator(Identifier(variableName)).WithInitializer(initializer);
-        var variableDeclaration = VariableDeclaration(VarIdentifier).WithVariables(SingletonSeparatedList(declarator));
+        return VariableDeclaration(VarIdentifier).WithVariables(SingletonSeparatedList(declarator));
+    }
+
+    public static LocalDeclarationStatementSyntax DeclareLocalVariable(string variableName, ExpressionSyntax initializationValue)
+    {
+        var variableDeclaration = DeclareVariable(variableName, initializationValue);
         return LocalDeclarationStatement(variableDeclaration);
     }
 
     public static StatementSyntax CreateInstance(string variableName, ITypeSymbol typeSymbol, params ExpressionSyntax[] args)
     {
-        return DeclareVariable(variableName, CreateInstance(typeSymbol, args));
+        return DeclareLocalVariable(variableName, CreateInstance(typeSymbol, args));
     }
 
     public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, params ExpressionSyntax[] args)
