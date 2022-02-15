@@ -8,7 +8,7 @@ public static class ImplicitCastMappingBuilder
 {
     public static CastMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
-        if (!ctx.Source.IsImmutable() && !ctx.Target.IsImmutable())
+        if (ctx.MapperConfiguration.UseDeepCloning && !ctx.Source.IsImmutable() && !ctx.Target.IsImmutable())
             return null;
 
         var conversion = ctx.Compilation.ClassifyConversion(ctx.Source, ctx.Target);

@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -12,6 +13,8 @@ public class SimpleMappingBuilderContext
     }
 
     public Compilation Compilation => _builder.Compilation;
+
+    public MapperAttribute MapperConfiguration => _builder.MapperConfiguration;
 
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? location, params object[] messageArgs)
         => ReportDiagnostic(descriptor, location?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(), messageArgs);

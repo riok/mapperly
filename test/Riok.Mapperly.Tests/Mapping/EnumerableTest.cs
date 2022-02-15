@@ -10,6 +10,18 @@ public class EnumerableTest
             "int[]");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
+            .Be("return source;");
+    }
+
+    [Fact]
+    public void ArrayToArrayOfPrimitiveTypesDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "int[]",
+            "int[]",
+            TestSourceBuilderOptions.Default with { UseDeepCloning = true });
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
             .Be("return (int[])source.Clone();");
     }
 
@@ -20,6 +32,19 @@ public class EnumerableTest
             "B[]",
             "B[]",
             "class B { public int Value {get; set; }}");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return source;");
+    }
+
+    [Fact]
+    public void ArrayCustomClassToArrayCustomClassDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "B[]",
+            "B[]",
+            TestSourceBuilderOptions.Default with { UseDeepCloning = true },
+            "class B { public int Value { get; set; }}");
         TestHelper.GenerateMapperMethodBody(source)
             .Should()
             .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => MapToB(x)));");
@@ -31,6 +56,18 @@ public class EnumerableTest
         var source = TestSourceBuilder.Mapping(
             "string[]",
             "string[]");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return source;");
+    }
+
+    [Fact]
+    public void ArrayToArrayOfStringDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "string[]",
+            "string[]",
+            TestSourceBuilderOptions.Default with { UseDeepCloning = true });
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
             .Be("return (string[])source.Clone();");
@@ -66,7 +103,7 @@ public class EnumerableTest
             "IEnumerable<int>");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
-            .Be("return (System.Collections.Generic.IEnumerable<int>)source;");
+            .Be("return source;");
     }
 
     [Fact]

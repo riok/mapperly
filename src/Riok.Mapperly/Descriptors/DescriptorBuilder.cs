@@ -15,7 +15,7 @@ public class DescriptorBuilder
     private static readonly IReadOnlyCollection<MappingBuilder> _mappingBuilders = new MappingBuilder[]
     {
         SpecialTypeMappingBuilder.TryBuildMapping,
-        ImmutableTypeMappingBuilder.TryBuildMapping,
+        DirectAssignmentMappingBuilder.TryBuildMapping,
         DictionaryMappingBuilder.TryBuildMapping,
         EnumerableMappingBuilder.TryBuildMapping,
         ImplicitCastMappingBuilder.TryBuildMapping,
@@ -56,14 +56,16 @@ public class DescriptorBuilder
         _context = sourceContext;
         Compilation = compilation;
         _mapperDescriptor = new MapperDescriptor(mapperSymbol.Name);
-        Configure();
+        MapperConfiguration = Configure();
     }
 
     internal IReadOnlyDictionary<Type, Attribute> DefaultConfigurations => _defaultConfigurations;
 
     internal Compilation Compilation { get; }
 
-    private void Configure()
+    public MapperAttribute MapperConfiguration { get; }
+
+    private MapperAttribute Configure()
     {
         var mapperAttribute = AttributeDataAccessor.AccessFirstOrDefault<MapperAttribute>(Compilation, _mapperSymbol) ?? new();
         if (!_mapperSymbol.ContainingNamespace.IsGlobalNamespace)
@@ -77,6 +79,7 @@ public class DescriptorBuilder
         _mapperDescriptor.InstanceName = mapperAttribute.InstanceName;
 
         _defaultConfigurations.Add(typeof(MapEnumAttribute), new MapEnumAttribute(mapperAttribute.EnumMappingStrategy));
+        return mapperAttribute;
     }
 
     private string BuildName()
