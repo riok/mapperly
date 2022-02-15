@@ -125,6 +125,15 @@ public interface IMapper
     public Task WithInvalidSignatureShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "string ToString(T source, string format);");
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithInvalidGenericSignatureShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "string ToString<T>(T source);");
 
         return TestHelper.VerifyGenerator(source);

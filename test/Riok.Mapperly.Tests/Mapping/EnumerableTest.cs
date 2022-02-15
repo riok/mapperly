@@ -10,7 +10,30 @@ public class EnumerableTest
             "int[]");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
-            .Be("return System.Linq.Enumerable.ToArray(source);");
+            .Be("return (int[])source.Clone();");
+    }
+
+    [Fact]
+    public void ArrayCustomClassToArrayCustomClass()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "B[]",
+            "B[]",
+            "class B { public int Value {get; set; }}");
+        TestHelper.GenerateMapperMethodBody(source)
+            .Should()
+            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => MapToB(x)));");
+    }
+
+    [Fact]
+    public void ArrayToArrayOfString()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "string[]",
+            "string[]");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return (string[])source.Clone();");
     }
 
     [Fact]

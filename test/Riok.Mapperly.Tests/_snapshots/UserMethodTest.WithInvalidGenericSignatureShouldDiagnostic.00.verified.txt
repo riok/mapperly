@@ -5,7 +5,7 @@
       Title: Has an unsupported mapping method signature,
       Severity: Error,
       WarningLevel: 0,
-      Location: : (10,4)-(10,45),
+      Location: : (10,4)-(10,33),
       Description: ,
       HelpLink: ,
       MessageFormat: {0} has an unsupported mapping method signature,
