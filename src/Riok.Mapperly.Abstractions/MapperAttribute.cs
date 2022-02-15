@@ -22,4 +22,12 @@ public sealed class MapperAttribute : Attribute
     /// Can be overwritten on specific enums via mapping method configurations.
     /// </summary>
     public EnumMappingStrategy EnumMappingStrategy { get; set; } = EnumMappingStrategy.ByValue;
+
+    /// <summary>
+    /// Whether to always deep copy objects.
+    /// Eg. when the type <c>Person[]</c> should be mapped to the same type <c>Person[]</c>,
+    /// with <c><see cref="UseDeepCloning"/>=true</c>, the same array is reused.
+    /// With <c><see cref="UseDeepCloning"/>=false</c>, the array and each person is cloned.
+    /// </summary>
+    public bool UseDeepCloning { get; set; }
 }

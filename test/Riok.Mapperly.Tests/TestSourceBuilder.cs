@@ -26,12 +26,19 @@ using Riok.Mapperly.Abstractions;
 
 {(options.Namespace != null ? $"namespace {options.Namespace};" : string.Empty)}
 
-[Mapper]
+{BuildAttribute(options)}
 public {(options.AsInterface ? "interface I" : "abstract class ")}Mapper
 {{
     {body}
 }}
 ";
+    }
+
+    private static string BuildAttribute(TestSourceBuilderOptions options)
+    {
+        return options.UseDeepCloning
+            ? "[Mapper(UseDeepCloning = true)]"
+            : "[Mapper]";
     }
 
     public static string MapperWithBodyAndTypes(string body, params string[] types)

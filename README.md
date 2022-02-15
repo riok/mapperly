@@ -43,6 +43,13 @@ The attributes defined in `Riok.Mapperly.Abstractions` can be used to customize 
 The `MapperAttribute` provides options to customize the generated mapper class.
 The generated class name, the instance field name and the default enum mapping strategy is adjustable.
 
+### Copy behaviour
+
+By default, Mapperly does not create deep copies of objects to improve performance.
+If an object can be directly assigned to the target, it will do so
+(eg. if the source and target type are both `Car[]`, the array and its entries will not be cloned).
+To create deep copies, set the `UseDeepCloning` property on the `MapperAttribute` to `true`.
+
 #### Properties
 
 On each mapping method declaration property mappings can be customized.

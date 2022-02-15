@@ -29,6 +29,20 @@ public class ObjectPropertyTest
 
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
+            .Be("return source;");
+    }
+
+    [Fact]
+    public void SameTypeDeepCopies()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "A",
+            TestSourceBuilderOptions.Default with { UseDeepCloning = true },
+            "class A { public string StringValue { get; set; } }");
+
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
             .Be(@"var target = new A();
     target.StringValue = source.StringValue;
     return target;".ReplaceLineEndings());
@@ -43,8 +57,21 @@ public class ObjectPropertyTest
             "ref struct A {}");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
+            .Be("return source;");
+    }
+
+    [Fact]
+    public void CustomRefStructToSameCustomStructDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "A",
+            TestSourceBuilderOptions.Default with { UseDeepCloning = true },
+            "ref struct A {}");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
             .Be(@"var target = new A();
-    return target;");
+    return target;".ReplaceLineEndings());
     }
 
     [Fact]

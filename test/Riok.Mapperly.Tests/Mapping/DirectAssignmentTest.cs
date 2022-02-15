@@ -1,6 +1,6 @@
 namespace Riok.Mapperly.Tests.Mapping;
 
-public class ValueTypeTest
+public class DirectAssignmentTest
 {
     [Fact]
     public void CustomReadOnlyStructToSameCustomReadOnlyStruct()
