@@ -10,7 +10,7 @@ namespace Riok.Mapperly.Descriptors.TypeMappings;
 /// Represents a mapping method declared but not implemented by the user which reuses an existing target object instance.
 /// Is implicitly an <see cref="ObjectPropertyMapping"/>, since no other mappings work with an existing target object instance.
 /// </summary>
-public class UserDefinedExistingInstanceMethodMapping : ObjectPropertyMapping, IHasUserSymbolMapping
+public class UserDefinedExistingInstanceMethodMapping : ObjectPropertyMapping, IUserMapping
 {
     public UserDefinedExistingInstanceMethodMapping(
         IMethodSymbol method,
@@ -20,13 +20,12 @@ public class UserDefinedExistingInstanceMethodMapping : ObjectPropertyMapping, I
         Override = isAbstractMapperDefinition;
         Accessibility = Accessibility.Public;
         Method = method;
+        MethodName = method.Name;
     }
 
     public IMethodSymbol Method { get; }
 
     private IParameterSymbol TargetParameter => Method.Parameters[1];
-
-    protected override string MethodName => Method.Name;
 
     public override bool CallableByOtherMappings => false;
 

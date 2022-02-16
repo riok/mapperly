@@ -122,6 +122,21 @@ public interface IMapper
     }
 
     [Fact]
+    public void WithSameNamesShouldGenerateUniqueMethodNames()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "B MapToB(A source);",
+            TestSourceBuilderOptions.WithDeepCloning,
+            "class A { public B? Value { get; set; } }",
+            "class B { public B? Value { get; set; } }");
+
+        TestHelper.GenerateMapperMethodBodies(source)
+            .Select(x => x.Name)
+            .Should()
+            .BeEquivalentTo("MapToB", "MapToB2");
+    }
+
+    [Fact]
     public Task WithInvalidSignatureShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

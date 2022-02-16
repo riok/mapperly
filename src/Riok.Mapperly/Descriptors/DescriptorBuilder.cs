@@ -49,6 +49,8 @@ public class DescriptorBuilder
     // queue of mappings which don't have the body built yet
     private readonly Queue<(TypeMapping, MappingBuilderContext)> _mappingsToBuildBody = new();
 
+    private readonly MethodNameBuilder _methodNameBuilder = new();
+
     public DescriptorBuilder(
         SourceProductionContext sourceContext,
         Compilation compilation,
@@ -107,7 +109,7 @@ public class DescriptorBuilder
                 this,
                 userMapping.SourceType,
                 userMapping.TargetType,
-                (userMapping as IHasUserSymbolMapping)?.Method);
+                (userMapping as IUserMapping)?.Method);
             _mappingsToBuildBody.Enqueue((userMapping, ctx));
         }
 
@@ -169,6 +171,11 @@ public class DescriptorBuilder
 
     private void BuildMappingBody(MappingBuilderContext ctx, TypeMapping typeMapping)
     {
+        if (typeMapping is not MethodMapping methodMapping)
+            return;
+
+        methodMapping.SetMethodNameIfNeeded(_methodNameBuilder.Build);
+
         switch (typeMapping)
         {
             case ObjectPropertyMapping mapping:
@@ -185,6 +192,7 @@ public class DescriptorBuilder
 
     private void AddUserMapping(TypeMapping mapping)
     {
+        _methodNameBuilder.Add(((IUserMapping)mapping).Method.Name);
         if (mapping.CallableByOtherMappings && FindMapping(mapping.SourceType, mapping.TargetType) is null)
         {
             AddMapping(mapping);
