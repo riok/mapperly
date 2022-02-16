@@ -1,5 +1,6 @@
 namespace Riok.Mapperly.Tests.Mapping;
 
+[UsesVerify]
 public class EnumTest
 {
     [Fact]
@@ -55,7 +56,7 @@ public class EnumTest
     }
 
     [Fact]
-    public void EnumToOtherEnumByValueShouldSwitch()
+    public void EnumToOtherEnumByValueShouldCast()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapEnum(EnumMappingStrategy.ByValue)] E2 ToE1(E1 source);",
@@ -71,9 +72,9 @@ public class EnumTest
     public void EnumToOtherEnumByNameShouldSwitch()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapEnum(EnumMappingStrategy.ByName)] E2 ToE1(E1 source);",
-            "enum E1 {A, B, C}",
-            "enum E2 {A = 100, B, C}");
+            "[MapEnum(EnumMappingStrategy.ByName, IgnoreCase = false)] E2 ToE1(E1 source);",
+            "enum E1 {A, B, C, D, E}",
+            "enum E2 {A = 100, B, C, d, e, E}");
 
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
@@ -82,8 +83,43 @@ public class EnumTest
         E1.A => E2.A,
         E1.B => E2.B,
         E1.C => E2.C,
+        E1.E => E2.E,
         _ => throw new System.ArgumentOutOfRangeException(nameof(source)),
     };".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public void EnumToOtherEnumByNameIgnoreCaseShouldSwitch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)] E2 ToE1(E1 source);",
+            "enum E1 {A, B, C, D, E, f, F}",
+            "enum E2 {A = 100, B, C, d, e, E, f}");
+
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be(@"return source switch
+    {
+        E1.A => E2.A,
+        E1.B => E2.B,
+        E1.C => E2.C,
+        E1.D => E2.d,
+        E1.E => E2.E,
+        E1.f => E2.f,
+        E1.F => E2.f,
+        _ => throw new System.ArgumentOutOfRangeException(nameof(source)),
+    };".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public Task EnumToOtherEnumByNameWithoutOverlap()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByName)] E2 ToE1(E1 source);",
+            "enum E1 {A, B, C}",
+            "enum E2 {D, E, F}");
+
+        return TestHelper.VerifyGenerator(source);
     }
 
     [Fact]
@@ -176,11 +212,27 @@ enum E2 {A = 100, B, C}
     }
 
     [Fact]
+    public void StringToEnumShouldSwitchIgnoreCase()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)] E1 ToE1(string source);",
+            "enum E1 {A, B, C}");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be(@"return source switch
+    {
+        { } s when s.Equals(nameof(E1.A), System.StringComparison.OrdinalIgnoreCase) => E1.A,
+        { } s when s.Equals(nameof(E1.B), System.StringComparison.OrdinalIgnoreCase) => E1.B,
+        { } s when s.Equals(nameof(E1.C), System.StringComparison.OrdinalIgnoreCase) => E1.C,
+        _ => (E1)Enum.Parse(typeof(E1), source, true),
+    };".ReplaceLineEndings());
+    }
+
+    [Fact]
     public void StringToEnumShouldSwitch()
     {
-        var source = TestSourceBuilder.Mapping(
-            "string",
-            "E1",
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByName)] E1 ToE1(string source);",
             "enum E1 {A, B, C}");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
@@ -189,7 +241,7 @@ enum E2 {A = 100, B, C}
         nameof(E1.A) => E1.A,
         nameof(E1.B) => E1.B,
         nameof(E1.C) => E1.C,
-        _ => (E1)Enum.Parse(typeof(E1), source),
+        _ => (E1)Enum.Parse(typeof(E1), source, false),
     };".ReplaceLineEndings());
     }
 }

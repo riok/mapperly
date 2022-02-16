@@ -12,15 +12,15 @@ namespace Riok.Mapperly.Descriptors.TypeMappings;
 /// </summary>
 public class EnumNameMapping : MethodMapping
 {
-    private readonly IReadOnlyCollection<string> _enumMemberNames;
+    private readonly IReadOnlyDictionary<string, string> _enumMemberMappings;
 
     public EnumNameMapping(
         ITypeSymbol source,
         ITypeSymbol target,
-        IReadOnlyCollection<string> enumMemberNames)
+        IReadOnlyDictionary<string, string> enumMemberMappings)
         : base(source, target)
     {
-        _enumMemberNames = enumMemberNames;
+        _enumMemberMappings = enumMemberMappings;
     }
 
     public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
@@ -31,8 +31,8 @@ public class EnumNameMapping : MethodMapping
             ThrowArgumentOutOfRangeException(source));
 
         // switch for each name to the enum value
-        // eg: nameof(Enum1.Value1) => Enum2.Value1,
-        var arms = _enumMemberNames
+        // eg: Enum1.Value1 => Enum2.Value1,
+        var arms = _enumMemberMappings
             .Select(BuildArm)
             .Append(fallbackArm);
 
@@ -42,10 +42,10 @@ public class EnumNameMapping : MethodMapping
         yield return ReturnStatement(switchExpr);
     }
 
-    private SwitchExpressionArmSyntax BuildArm(string memberName)
+    private SwitchExpressionArmSyntax BuildArm(KeyValuePair<string, string> sourceTargetField)
     {
-        var sourceMember = MemberAccess(SourceType.ToDisplayString(), memberName);
-        var targetMember = MemberAccess(TargetType.ToDisplayString(), memberName);
+        var sourceMember = MemberAccess(SourceType.ToDisplayString(), sourceTargetField.Key);
+        var targetMember = MemberAccess(TargetType.ToDisplayString(), sourceTargetField.Value);
         var pattern = ConstantPattern(sourceMember);
         return SwitchExpressionArm(pattern, targetMember);
     }

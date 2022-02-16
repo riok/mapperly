@@ -20,4 +20,9 @@ public sealed class MapEnumAttribute : Attribute
     /// The strategy to be used to map enums.
     /// </summary>
     public EnumMappingStrategy Strategy { get; }
+
+    /// <summary>
+    /// Whether the case should be ignored during mappings.
+    /// </summary>
+    public bool IgnoreCase { get; set; }
 }

@@ -21,6 +21,8 @@ public class DescriptorBuilder
         ImplicitCastMappingBuilder.TryBuildMapping,
         ParseMappingBuilder.TryBuildMapping,
         CtorMappingBuilder.TryBuildMapping,
+        StringToEnumMappingBuilder.TryBuildMapping,
+        EnumToStringMappingBuilder.TryBuildMapping,
         EnumMappingBuilder.TryBuildMapping,
         ExplicitCastMappingBuilder.TryBuildMapping,
         ToStringMappingBuilder.TryBuildMapping,
@@ -32,7 +34,9 @@ public class DescriptorBuilder
     private readonly SyntaxNode _mapperSyntax;
     private readonly MapperDescriptor _mapperDescriptor;
 
-    // default configurations
+    // default configurations, used a configuration is needed but no configuration is provided by the user
+    // these are the default configurations registered for each configuration attribute.
+    // Usually these are derived from the mapper attribute or default values.
     private readonly Dictionary<Type, Attribute> _defaultConfigurations = new();
 
     // this includes mappings to build and already built mappings
@@ -78,7 +82,9 @@ public class DescriptorBuilder
         _mapperDescriptor.Name = mapperAttribute.ImplementationName ?? BuildName();
         _mapperDescriptor.InstanceName = mapperAttribute.InstanceName;
 
-        _defaultConfigurations.Add(typeof(MapEnumAttribute), new MapEnumAttribute(mapperAttribute.EnumMappingStrategy));
+        _defaultConfigurations.Add(
+            typeof(MapEnumAttribute),
+            new MapEnumAttribute(mapperAttribute.EnumMappingStrategy) { IgnoreCase = mapperAttribute.EnumMappingIgnoreCase });
         return mapperAttribute;
     }
 

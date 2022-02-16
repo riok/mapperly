@@ -24,6 +24,11 @@ public sealed class MapperAttribute : Attribute
     public EnumMappingStrategy EnumMappingStrategy { get; set; } = EnumMappingStrategy.ByValue;
 
     /// <summary>
+    /// Whether the case should be ignored for enum mappings.
+    /// </summary>
+    public bool EnumMappingIgnoreCase { get; set; }
+
+    /// <summary>
     /// Whether to always deep copy objects.
     /// Eg. when the type <c>Person[]</c> should be mapped to the same type <c>Person[]</c>,
     /// with <c><see cref="UseDeepCloning"/>=true</c>, the same array is reused.

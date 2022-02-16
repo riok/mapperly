@@ -60,13 +60,16 @@ If a property should be ignored, the `MapperIgnoreAttribute` can be used.
 #### Enum
 
 The enum mapping can be customized by setting the strategy to use.
-Apply the `MapEnumAttribute` and pass the strategy to be used.
+Apply the `MapEnumAttribute` and pass the strategy to be used for this enum.
+It is also possible to set the strategy for the entire mapper via the `MapperAttribute`.
 Available strategies:
 
 | Name    | Description                               |
 |---------|-------------------------------------------|
 | ByValue | Matches enum entries by their values      |
 | ByName  | Matches enum entries by their exact names |
+
+The `IgnoreCase` property allows to opt in for case ignored mappings.
 
 ## Void mapping methods
 
