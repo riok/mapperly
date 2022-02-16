@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -13,7 +12,7 @@ namespace Riok.Mapperly.Descriptors.TypeMappings;
 public abstract class MethodMapping : TypeMapping
 {
     private const string SourceParamName = "source";
-    private const string MappingMethodNamePrefix = "MapTo";
+    private string? _methodName;
 
     protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType) : base(sourceType, targetType)
     {
@@ -23,7 +22,11 @@ public abstract class MethodMapping : TypeMapping
 
     protected bool Override { get; set; }
 
-    protected virtual string MethodName => MappingMethodNamePrefix + TargetType.NonNullable().Name;
+    protected string MethodName
+    {
+        get => _methodName ?? throw new InvalidOperationException();
+        set => _methodName = value;
+    }
 
     public override ExpressionSyntax Build(ExpressionSyntax source)
         => Invocation(MethodName, source);
@@ -42,6 +45,11 @@ public abstract class MethodMapping : TypeMapping
     }
 
     public abstract IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source);
+
+    internal void SetMethodNameIfNeeded(Func<MethodMapping, string> methodNameBuilder)
+    {
+        _methodName ??= methodNameBuilder(this);
+    }
 
     protected virtual ITypeSymbol? ReturnType => TargetType;
 

@@ -8,7 +8,7 @@ namespace Riok.Mapperly.Descriptors.TypeMappings;
 /// <summary>
 /// Represents a mapping method declared but not implemented by the user which results in a new target object instance.
 /// </summary>
-public class UserDefinedNewInstanceMethodMapping : MethodMapping, IHasUserSymbolMapping
+public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
 {
     private const string NoMappingComment = "// Could not generate mapping";
 
@@ -18,13 +18,12 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IHasUserSymbol
         Override = isAbstractMapperDefinition;
         Accessibility = Accessibility.Public;
         Method = method;
+        MethodName = method.Name;
     }
 
     public IMethodSymbol Method { get; }
 
     public TypeMapping? DelegateMapping { get; set; }
-
-    protected override string MethodName => Method.Name;
 
     public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
     {

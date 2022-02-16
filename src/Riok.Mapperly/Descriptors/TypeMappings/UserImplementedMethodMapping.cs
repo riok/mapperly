@@ -8,7 +8,7 @@ namespace Riok.Mapperly.Descriptors.TypeMappings;
 /// <summary>
 /// Represents a mapping method on the mapper which is implemented by the user.
 /// </summary>
-public class UserImplementedMethodMapping : TypeMapping, IHasUserSymbolMapping
+public class UserImplementedMethodMapping : TypeMapping, IUserMapping
 {
     public UserImplementedMethodMapping(IMethodSymbol method)
         : base(method.Parameters.Single().Type, method.ReturnType)
