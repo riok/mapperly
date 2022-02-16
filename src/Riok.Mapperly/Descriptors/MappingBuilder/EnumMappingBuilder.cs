@@ -21,7 +21,7 @@ public static class EnumMappingBuilder
         if (!sourceIsEnum || !targetIsEnum)
         {
             return ctx.FindOrBuildMapping(sourceEnumType ?? ctx.Source, targetEnumType ?? ctx.Target) is { } delegateMapping
-                ? new EnumDelegateMapping(ctx.Source, ctx.Target, delegateMapping)
+                ? new CastMapping(ctx.Source, ctx.Target, delegateMapping)
                 : null;
         }
 
