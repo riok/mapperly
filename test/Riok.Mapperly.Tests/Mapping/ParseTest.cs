@@ -26,7 +26,7 @@ public class ParseTest
         var source = TestSourceBuilder.Mapping("string?", "int?");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
-            .Be("return int.Parse(source);");
+            .Be("return source == null ? default : int.Parse(source);");
     }
 
     [Fact]

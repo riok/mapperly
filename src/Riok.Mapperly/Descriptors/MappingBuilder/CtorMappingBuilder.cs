@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.TypeMappings;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilder;
 
@@ -14,7 +15,8 @@ public static class CtorMappingBuilder
         var ctorMethod = namedTarget.InstanceConstructors
             .FirstOrDefault(m =>
                 m.Parameters.Length == 1
-                && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type, ctx.Source));
+                && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type, ctx.Source)
+                && ctx.Source.HasSameOrStricterNullability(m.Parameters[0].Type));
 
         return ctorMethod == null
             ? null

@@ -26,15 +26,15 @@ public static class EnumMappingBuilder
         }
 
         // since enums are immutable they can be directly assigned if they are of the same type
-        if (SymbolEqualityComparer.Default.Equals(ctx.Source, ctx.Target))
-            return new NullDelegateMapping(ctx.Source, ctx.Target, new DirectAssignmentMapping(ctx.Source.NonNullable()));
+        if (SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, ctx.Target))
+            return new DirectAssignmentMapping(ctx.Source);
 
         // map enums by strategy
         var config = ctx.GetConfigurationOrDefault<MapEnumAttribute>();
         return config.Strategy switch
         {
             EnumMappingStrategy.ByName => BuildNameMapping(ctx, config.IgnoreCase),
-            _ => new NullDelegateMapping(ctx.Source, ctx.Target, new CastMapping(ctx.Source.NonNullable(), ctx.Target.NonNullable())),
+            _ => new CastMapping(ctx.Source, ctx.Target),
         };
     }
 

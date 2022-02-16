@@ -7,6 +7,41 @@ public static class NullableSymbolExtensions
 {
     private const string NullableGenericTypeName = "System.Nullable<T>";
 
+    internal static bool HasSameOrStricterNullability(this ITypeSymbol symbol, ITypeSymbol other)
+    {
+        return symbol.NullableAnnotation == NullableAnnotation.NotAnnotated
+            || symbol.UpgradeNullable().NullableAnnotation == other.UpgradeNullable().NullableAnnotation;
+    }
+
+    /// <summary>
+    /// Upgrade the nullability of a symbol from <see cref="NullableAnnotation.None"/> to <see cref="NullableAnnotation.Annotated"/>.
+    /// </summary>
+    /// <param name="symbol">The symbol to upgrade.</param>
+    /// <returns>The upgraded symbol</returns>
+    internal static ITypeSymbol UpgradeNullable(this ITypeSymbol symbol)
+    {
+        TryUpgradeNullable(symbol, out var upgradedSymbol);
+        return upgradedSymbol ?? symbol;
+    }
+
+    /// <summary>
+    /// Tries to upgrade the nullability of a symbol from <see cref="NullableAnnotation.None"/> to <see cref="NullableAnnotation.Annotated"/>.
+    /// </summary>
+    /// <param name="symbol">The symbol.</param>
+    /// <param name="upgradedSymbol">The upgraded symbol, if an upgrade has taken place, <c>null</c> otherwise.</param>
+    /// <returns>Whether an upgrade has taken place.</returns>
+    internal static bool TryUpgradeNullable(this ITypeSymbol symbol, [NotNullWhen(true)] out ITypeSymbol? upgradedSymbol)
+    {
+        if (symbol.NullableAnnotation != NullableAnnotation.None)
+        {
+            upgradedSymbol = default;
+            return false;
+        }
+
+        upgradedSymbol = symbol.WithNullableAnnotation(NullableAnnotation.Annotated);
+        return true;
+    }
+
     internal static bool TryGetNonNullable(this ITypeSymbol symbol, [NotNullWhen(true)] out ITypeSymbol? nonNullable)
     {
         if (symbol.NonNullableValueType() is { } t)

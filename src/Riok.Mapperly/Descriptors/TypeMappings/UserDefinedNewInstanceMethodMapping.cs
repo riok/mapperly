@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -13,7 +14,7 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
     private const string NoMappingComment = "// Could not generate mapping";
 
     public UserDefinedNewInstanceMethodMapping(IMethodSymbol method, bool isAbstractMapperDefinition)
-        : base(method.Parameters.Single().Type, method.ReturnType)
+        : base(method.Parameters.Single().Type.UpgradeNullable(), method.ReturnType.UpgradeNullable())
     {
         Override = isAbstractMapperDefinition;
         Accessibility = Accessibility.Public;

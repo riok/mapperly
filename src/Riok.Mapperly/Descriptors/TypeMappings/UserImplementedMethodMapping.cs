@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -11,7 +12,7 @@ namespace Riok.Mapperly.Descriptors.TypeMappings;
 public class UserImplementedMethodMapping : TypeMapping, IUserMapping
 {
     public UserImplementedMethodMapping(IMethodSymbol method)
-        : base(method.Parameters.Single().Type, method.ReturnType)
+        : base(method.Parameters.Single().Type.UpgradeNullable(), method.ReturnType.UpgradeNullable())
     {
         Method = method;
     }

@@ -9,32 +9,38 @@ public static class TestHelper
 {
     public static Task VerifyGenerator(
         string source,
-        NullableContextOptions nullableOption = NullableContextOptions.Enable,
-        LanguageVersion languageVersion = LanguageVersion.Default)
+        TestHelperOptions? options = null)
     {
-        var driver = Generate(source, nullableOption, languageVersion);
+        var driver = Generate(source, options);
         return Verify(driver).ToTask();
     }
 
-    public static string GenerateSingleMapperMethodBody(string source, bool allowDiagnostics = false)
+    public static string GenerateSingleMapperMethodBody(string source, TestHelperOptions? options = null)
     {
-        return GenerateMapperMethodBodies(source, allowDiagnostics)
+        return GenerateMapperMethodBodies(source, options)
             .Single()
             .Body;
     }
 
-    public static string GenerateMapperMethodBody(string source, string methodName = TestSourceBuilder.DefaultMapMethodName, bool allowDiagnostics = false)
+    public static string GenerateMapperMethodBody(
+        string source,
+        string methodName = TestSourceBuilder.DefaultMapMethodName,
+        TestHelperOptions? options = null)
     {
-        return GenerateMapperMethodBodies(source, allowDiagnostics)
+        return GenerateMapperMethodBodies(source, options)
             .Single(x => x.Name == methodName)
             .Body;
     }
 
-    public static IEnumerable<(string Name, string Body)> GenerateMapperMethodBodies(string source, bool allowDiagnostics = false)
+    public static IEnumerable<(string Name, string Body)> GenerateMapperMethodBodies(
+        string source,
+        TestHelperOptions? options = null)
     {
-        var result = Generate(source).GetRunResult();
+        options ??= TestHelperOptions.Default;
 
-        if (!allowDiagnostics)
+        var result = Generate(source, options).GetRunResult();
+
+        if (!options.AllowDiagnostics)
         {
             result.Diagnostics.Should().HaveCount(0);
         }
@@ -62,11 +68,12 @@ public static class TestHelper
 
     private static GeneratorDriver Generate(
         string source,
-        NullableContextOptions nullableOption = NullableContextOptions.Enable,
-        LanguageVersion languageVersion = LanguageVersion.Default)
+        TestHelperOptions? options)
     {
-        var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default.WithLanguageVersion(languageVersion));
-        var compilation = BuildCompilation(nullableOption, syntaxTree);
+        options ??= TestHelperOptions.Default;
+
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default.WithLanguageVersion(options.LanguageVersion));
+        var compilation = BuildCompilation(options.NullableOption, syntaxTree);
         var generator = new MapperGenerator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);

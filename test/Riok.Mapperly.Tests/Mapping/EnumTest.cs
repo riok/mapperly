@@ -163,7 +163,7 @@ enum E2 {A = 100, B, C}
 
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
-            .Be("return source == null ? default : (E2)source.Value;");
+            .Be("return source == null ? throw new System.ArgumentNullException(nameof(source)) : (E2)source.Value;");
     }
 
     [Fact]

@@ -15,7 +15,7 @@ public class UserDefinedExistingInstanceMethodMapping : ObjectPropertyMapping, I
     public UserDefinedExistingInstanceMethodMapping(
         IMethodSymbol method,
         bool isAbstractMapperDefinition)
-        : base(method.Parameters[0].Type, method.Parameters[1].Type)
+        : base(method.Parameters[0].Type.UpgradeNullable(), method.Parameters[1].Type.UpgradeNullable())
     {
         Override = isAbstractMapperDefinition;
         Accessibility = Accessibility.Public;

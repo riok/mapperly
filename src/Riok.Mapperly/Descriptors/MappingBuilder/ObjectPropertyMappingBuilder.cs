@@ -16,7 +16,7 @@ public static class ObjectPropertyMappingBuilder
         if (ctx.Target.SpecialType != SpecialType.None || ctx.Source.SpecialType != SpecialType.None)
             return null;
 
-        return new NewInstanceObjectPropertyMapping(ctx.Source, ctx.Target);
+        return new NewInstanceObjectPropertyMapping(ctx.Source, ctx.Target.NonNullable());
     }
 
     public static void BuildMappingBody(MappingBuilderContext ctx, ObjectPropertyMapping mapping)
@@ -99,7 +99,7 @@ public static class ObjectPropertyMappingBuilder
             .FirstOrDefault(p => !p.IsStatic);
     }
 
-    private static PropertyMappingDescriptor? BuildPropertyMapping(
+    private static PropertyMapping? BuildPropertyMapping(
         MappingBuilderContext ctx,
         ObjectPropertyMapping mapping,
         IPropertySymbol sourceProperty,
@@ -111,26 +111,20 @@ public static class ObjectPropertyMappingBuilder
         if (sourceProperty.IsWriteOnly)
             return null;
 
-        var propertyMapping = ctx.FindOrBuildMapping(sourceProperty.Type.NonNullable(), targetProperty.Type.NonNullable());
-        if (propertyMapping == null)
-        {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.CouldNotMapProperty,
-                mapping.SourceType,
-                sourceProperty.Name,
-                sourceProperty.Type,
-                mapping.TargetType,
-                targetProperty.Name,
-                targetProperty.Type);
-            return null;
-        }
+        // nullability is handled inside the property mapping
+        var delegateMapping = ctx.FindMapping(sourceProperty.Type.UpgradeNullable(), targetProperty.Type.UpgradeNullable())
+            ?? ctx.FindOrBuildMapping(sourceProperty.Type.NonNullable(), targetProperty.Type.NonNullable());
+        if (delegateMapping != null)
+            return new PropertyMapping(sourceProperty, targetProperty, delegateMapping, ctx.MapperConfiguration.ThrowOnPropertyMappingNullMismatch);
 
-        var nullDelegateMapping = new NullDelegateMapping(
-            sourceProperty.IsNullable(),
-            targetProperty.IsNullable(),
+        ctx.ReportDiagnostic(
+            DiagnosticDescriptors.CouldNotMapProperty,
+            mapping.SourceType,
+            sourceProperty.Name,
             sourceProperty.Type,
-            targetProperty.Type,
-            propertyMapping);
-        return new PropertyMappingDescriptor(sourceProperty, targetProperty, nullDelegateMapping);
+            mapping.TargetType,
+            targetProperty.Name,
+            targetProperty.Type);
+        return null;
     }
 }

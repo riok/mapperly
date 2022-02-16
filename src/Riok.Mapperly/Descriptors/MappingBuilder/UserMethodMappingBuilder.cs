@@ -24,7 +24,7 @@ public static class UserMethodMappingBuilder
 
     public static void BuildMappingBody(MappingBuilderContext ctx, UserDefinedNewInstanceMethodMapping mapping)
     {
-        mapping.DelegateMapping = ctx.TryBuildNewMapping(mapping.SourceType, mapping.TargetType);
+        mapping.DelegateMapping = ctx.BuildDelegateMapping(mapping.SourceType, mapping.TargetType);
         if (mapping.DelegateMapping == null)
         {
             ctx.ReportDiagnostic(
@@ -80,7 +80,7 @@ public static class UserMethodMappingBuilder
         // and is accessible it is a user implemented method mapping
         if (!methodSymbol.IsAbstract)
         {
-            return methodSymbol.IsAccessible()
+            return methodSymbol.IsAccessible(true)
                 ? new UserImplementedMethodMapping(methodSymbol)
                 : null;
         }
