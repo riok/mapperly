@@ -23,6 +23,15 @@ internal static class SymbolExtensions
     internal static bool IsArrayType(this ITypeSymbol symbol)
         => symbol is IArrayTypeSymbol;
 
+    internal static bool IsEnum(this ITypeSymbol t)
+        => TryGetEnumUnderlyingType(t, out _);
+
+    internal static bool TryGetEnumUnderlyingType(this ITypeSymbol t, [NotNullWhen(true)] out INamedTypeSymbol? enumType)
+    {
+        enumType = (t.NonNullable() as INamedTypeSymbol)?.EnumUnderlyingType;
+        return enumType != null;
+    }
+
     internal static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol, string name)
     {
         var members = symbol.GetMembers(name);

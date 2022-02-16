@@ -13,9 +13,12 @@ public static class EnumerableExtensions
         return set;
     }
 
-    public static IEnumerable<T> DistinctBy<T, TProp>(this IEnumerable<T> enumerable, Func<T, TProp> selector)
+    public static IEnumerable<T> DistinctBy<T, TProp>(
+        this IEnumerable<T> enumerable,
+        Func<T, TProp> selector,
+        IEqualityComparer<TProp>? equalityComparer = null)
     {
-        var set = new HashSet<TProp>();
+        var set = new HashSet<TProp>(equalityComparer);
         foreach (var item in enumerable)
         {
             if (set.Add(selector(item)))

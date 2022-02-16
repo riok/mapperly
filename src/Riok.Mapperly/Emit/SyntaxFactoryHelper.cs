@@ -48,7 +48,7 @@ public static class SyntaxFactoryHelper
             return DefaultLiteral();
 
         if (t.SpecialType == SpecialType.System_String)
-            return LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(string.Empty));
+            return StringLiteral(string.Empty);
 
         return t.HasAccessibleParameterlessConstructor()
             ? CreateInstance(t)
@@ -71,8 +71,8 @@ public static class SyntaxFactoryHelper
     public static LiteralExpressionSyntax StringLiteral(string content) =>
         LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(content));
 
-    public static LiteralExpressionSyntax NumericLiteral(int v)
-        => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0));
+    public static LiteralExpressionSyntax BooleanLiteral(bool b)
+        => LiteralExpression(b ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression);
 
     public static AttributeListSyntax ReturnNotNullIfNotNullAttribute(string paramName)
     {

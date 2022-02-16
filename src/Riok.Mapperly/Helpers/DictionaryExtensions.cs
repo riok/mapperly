@@ -14,13 +14,11 @@ public static class DictionaryExtensions
         return true;
     }
 
-    public static TValue GetOrAdd<TKey, TValue>(
+    public static TValue? GetValueOrDefault<TKey, TValue>(
         this IDictionary<TKey, TValue> dict,
-        TKey key,
-        Func<TValue> valueProvider)
+        TKey key)
     {
-        return dict.TryGetValue(key, out var value)
-            ? value
-            : dict[key] = valueProvider();
+        dict.TryGetValue(key, out var value);
+        return value;
     }
 }
