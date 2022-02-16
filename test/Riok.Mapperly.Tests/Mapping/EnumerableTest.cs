@@ -19,7 +19,7 @@ public class EnumerableTest
         var source = TestSourceBuilder.Mapping(
             "int[]",
             "int[]",
-            TestSourceBuilderOptions.Default with { UseDeepCloning = true });
+            TestSourceBuilderOptions.WithDeepCloning);
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
             .Be("return (int[])source.Clone();");
@@ -43,7 +43,7 @@ public class EnumerableTest
         var source = TestSourceBuilder.Mapping(
             "B[]",
             "B[]",
-            TestSourceBuilderOptions.Default with { UseDeepCloning = true },
+            TestSourceBuilderOptions.WithDeepCloning,
             "class B { public int Value { get; set; }}");
         TestHelper.GenerateMapperMethodBody(source)
             .Should()
@@ -67,10 +67,60 @@ public class EnumerableTest
         var source = TestSourceBuilder.Mapping(
             "string[]",
             "string[]",
-            TestSourceBuilderOptions.Default with { UseDeepCloning = true });
+            TestSourceBuilderOptions.WithDeepCloning);
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
             .Be("return (string[])source.Clone();");
+    }
+
+    [Fact]
+    public void ArrayToArrayOfReadonlyStruct()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A[]",
+            "A[]",
+            "readonly struct A{}");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return source;");
+    }
+
+    [Fact]
+    public void ArrayToArrayOfReadonlyStructDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A[]",
+            "A[]",
+            TestSourceBuilderOptions.WithDeepCloning,
+            "readonly struct A{}");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return (A[])source.Clone();");
+    }
+
+    [Fact]
+    public void ArrayToArrayOfMutableStruct()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A[]",
+            "A[]",
+            "struct A{}");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return source;");
+    }
+
+    [Fact]
+    public void ArrayToArrayOfMutableStructDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A[]",
+            "A[]",
+            TestSourceBuilderOptions.WithDeepCloning,
+            "struct A{}");
+        TestHelper.GenerateMapperMethodBody(source)
+            .Should()
+            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => MapToA(x)));");
     }
 
     [Fact]

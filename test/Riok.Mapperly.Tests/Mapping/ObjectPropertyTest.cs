@@ -33,12 +33,12 @@ public class ObjectPropertyTest
     }
 
     [Fact]
-    public void SameTypeDeepCopies()
+    public void SameTypeDeepCloning()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
             "A",
-            TestSourceBuilderOptions.Default with { UseDeepCloning = true },
+            TestSourceBuilderOptions.WithDeepCloning,
             "class A { public string StringValue { get; set; } }");
 
         TestHelper.GenerateSingleMapperMethodBody(source)
@@ -66,7 +66,7 @@ public class ObjectPropertyTest
         var source = TestSourceBuilder.Mapping(
             "A",
             "A",
-            TestSourceBuilderOptions.Default with { UseDeepCloning = true },
+            TestSourceBuilderOptions.WithDeepCloning,
             "ref struct A {}");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()

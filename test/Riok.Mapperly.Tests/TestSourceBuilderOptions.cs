@@ -6,4 +6,5 @@ public record TestSourceBuilderOptions(
     bool UseDeepCloning = false)
 {
     public static readonly TestSourceBuilderOptions Default = new();
+    public static readonly TestSourceBuilderOptions WithDeepCloning = new(UseDeepCloning: true);
 }
