@@ -69,10 +69,11 @@ public class PropertyMapping
 
     private (ExpressionSyntax? Condition, ExpressionSyntax SourceAccess) BuildPreMappingCondition(ExpressionSyntax sourceAccess)
     {
-        if (!_source.IsNullable() || _mapping.SourceType.IsNullable())
+        if (!_source.IsNullable() || _mapping.SourceType.IsNullable() || (_mapping is DirectAssignmentMapping && _target.IsNullable()))
             return (null, sourceAccess);
 
         // if source is nullable but the mapping does not accept nulls
+        // and is also not a direct assignment where the target is also nullable
         // add not null condition
         var condition = IsNotNull(sourceAccess);
 
