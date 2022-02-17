@@ -146,6 +146,22 @@ public class ObjectPropertyTest
     }
 
     [Fact]
+    public void NullableStringToNullableStringProperty()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string? Value { get; set; } }",
+            "class B { public string? Value { get; set; } }");
+
+        TestHelper.GenerateMapperMethodBody(source)
+            .Should()
+            .Be(@"var target = new B();
+    target.Value = source.Value;
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
     public void NonNullableClassToNullableClassProperty()
     {
         var source = TestSourceBuilder.Mapping(
@@ -344,8 +360,7 @@ D UserImplementedMap(C source) => new D();";
             .Be(@"if (source == null)
         return default;
     var target = new B();
-    if (source.StringValue != null)
-        target.StringValue = source.StringValue;
+    target.StringValue = source.StringValue;
     target.NestedValue = ((IMapper)this).UserImplementedMap(source.NestedValue);
     return target;".ReplaceLineEndings());
     }
