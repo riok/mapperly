@@ -1,3 +1,5 @@
+using Microsoft.CodeAnalysis;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 [UsesVerify]
@@ -122,5 +124,13 @@ public class NullableTest
             .Be(@"if (source == null)
         return;
     target.StringValue = source.StringValue;".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public Task ShouldUpgradeNullabilityInDisabledNullableContext()
+    {
+        var source = TestSourceBuilder.Mapping("A", "B", "class A {}", "class B {}");
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.Default with { NullableOption = NullableContextOptions.Disable });
     }
 }
