@@ -11,14 +11,14 @@ internal static class SymbolExtensions
     internal static bool IsImmutable(this ISymbol symbol)
         => symbol is INamedTypeSymbol namedSymbol && (namedSymbol.IsReadOnly || namedSymbol.SpecialType == SpecialType.System_String);
 
-    internal static bool IsAccessible(this ISymbol symbol)
-        => symbol.DeclaredAccessibility.HasFlag(Accessibility.Protected)
-            || symbol.DeclaredAccessibility.HasFlag(Accessibility.Internal)
-            || symbol.DeclaredAccessibility.HasFlag(Accessibility.Public);
+    internal static bool IsAccessible(this ISymbol symbol, bool allowProtected = false)
+        => symbol.DeclaredAccessibility.HasFlag(Accessibility.Internal)
+            || symbol.DeclaredAccessibility.HasFlag(Accessibility.Public)
+            || (symbol.DeclaredAccessibility.HasFlag(Accessibility.Protected) && allowProtected);
 
-    internal static bool HasAccessibleParameterlessConstructor(this ITypeSymbol symbol)
+    internal static bool HasAccessibleParameterlessConstructor(this ITypeSymbol symbol, bool allowProtected = false)
         => symbol is INamedTypeSymbol { IsAbstract: false } namedTypeSymbol
-            && namedTypeSymbol.Constructors.Any(c => c.Parameters.IsDefaultOrEmpty && c.IsAccessible());
+            && namedTypeSymbol.Constructors.Any(c => c.Parameters.IsDefaultOrEmpty && c.IsAccessible(allowProtected));
 
     internal static bool IsArrayType(this ITypeSymbol symbol)
         => symbol is IArrayTypeSymbol;

@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.TypeMappings;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -13,7 +14,6 @@ public static class SyntaxFactoryHelper
     private const string ArgumentNullExceptionClassName = "System.ArgumentNullException";
 
     private const string NotImplementedExceptionClassName = "System.NotImplementedException";
-    private const string NotNullIfNotNullAttributeName = "System.Diagnostics.CodeAnalysis.NotNullIfNotNull";
 
     public static readonly IdentifierNameSyntax VarIdentifier = IdentifierName("var");
 
@@ -42,24 +42,34 @@ public static class SyntaxFactoryHelper
     public static BinaryExpressionSyntax IsNull(ExpressionSyntax expression)
         => BinaryExpression(SyntaxKind.EqualsExpression, expression, NullLiteral());
 
-    public static ExpressionSyntax NullSubstitute(ITypeSymbol t, ExpressionSyntax argument)
+    public static BinaryExpressionSyntax IsNotNull(ExpressionSyntax expression)
+        => BinaryExpression(SyntaxKind.NotEqualsExpression, expression, NullLiteral());
+
+    public static ExpressionSyntax NullSubstitute(ITypeSymbol t, ExpressionSyntax argument, NullFallbackValue nullFallbackValue)
     {
-        if (!t.IsReferenceType || t.IsNullable())
-            return DefaultLiteral();
-
-        if (t.SpecialType == SpecialType.System_String)
-            return StringLiteral(string.Empty);
-
-        return t.HasAccessibleParameterlessConstructor()
-            ? CreateInstance(t)
-            : ThrowNewArgumentNullException(argument);
+        return nullFallbackValue switch
+        {
+            NullFallbackValue.Default => DefaultLiteral(),
+            NullFallbackValue.EmptyString => StringLiteral(string.Empty),
+            NullFallbackValue.CreateInstance => CreateInstance(t),
+            _ => ThrowNewArgumentNullException(argument),
+        };
     }
 
-    public static StatementSyntax IfNullReturn(ExpressionSyntax expression, ExpressionSyntax? returnExpression = null)
+    public static StatementSyntax IfNullReturn(ExpressionSyntax expression)
+        => IfStatement(IsNull(expression), ReturnStatement());
+
+    public static StatementSyntax IfNullReturnOrThrow(ExpressionSyntax expression, ExpressionSyntax? returnOrThrowExpression = null)
     {
+        StatementSyntax ifExpression = returnOrThrowExpression switch
+        {
+            ThrowExpressionSyntax throwSyntax => ThrowStatement(throwSyntax.Expression),
+            _ => ReturnStatement(returnOrThrowExpression),
+        };
+
         return IfStatement(
             IsNull(expression),
-            ReturnStatement(returnExpression));
+            ifExpression);
     }
 
     public static LiteralExpressionSyntax DefaultLiteral()
@@ -74,15 +84,6 @@ public static class SyntaxFactoryHelper
     public static LiteralExpressionSyntax BooleanLiteral(bool b)
         => LiteralExpression(b ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression);
 
-    public static AttributeListSyntax ReturnNotNullIfNotNullAttribute(string paramName)
-    {
-        var attribute = Attribute(IdentifierName(NotNullIfNotNullAttributeName))
-            .WithArgumentList(AttributeArgumentList(SingletonSeparatedList(AttributeArgument(StringLiteral(paramName)))));
-
-        return AttributeList(SingletonSeparatedList(attribute))
-            .WithTarget(AttributeTargetSpecifier(Token(SyntaxKind.ReturnKeyword)));
-    }
-
     public static StatementSyntax ReturnVariable(string identifierName)
         => ReturnStatement(IdentifierName(identifierName));
 
@@ -94,12 +95,6 @@ public static class SyntaxFactoryHelper
 
     public static InvocationExpressionSyntax NameOf(ExpressionSyntax expression)
         => Invocation(IdentifierName("nameof"), expression);
-
-    public static ElementAccessExpressionSyntax ArrayElementAccess(ExpressionSyntax array, ExpressionSyntax index)
-    {
-        return ElementAccessExpression(array)
-            .WithArgumentList(BracketedArgumentList(SingletonSeparatedList(Argument(index))));
-    }
 
     public static ThrowExpressionSyntax ThrowArgumentOutOfRangeException(ExpressionSyntax arg)
     {

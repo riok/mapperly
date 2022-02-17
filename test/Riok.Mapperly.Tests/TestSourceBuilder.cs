@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Riok.Mapperly.Tests;
 
 public static class TestSourceBuilder
@@ -36,9 +38,22 @@ public {(options.AsInterface ? "interface I" : "abstract class ")}Mapper
 
     private static string BuildAttribute(TestSourceBuilderOptions options)
     {
-        return options.UseDeepCloning
-            ? "[Mapper(UseDeepCloning = true)]"
-            : "[Mapper]";
+        var attrs = new[]
+        {
+            Attribute(options.UseDeepCloning),
+            Attribute(options.ThrowOnMappingNullMismatch),
+            Attribute(options.ThrowOnPropertyMappingNullMismatch),
+        };
+
+        return $"[Mapper({string.Join(", ", attrs)})]";
+    }
+
+    private static string Attribute(bool value, [CallerArgumentExpression("value")] string? expression = null)
+    {
+        if (expression == null)
+            throw new ArgumentNullException(nameof(expression));
+
+        return $"{expression.Split(".").Last()} = {(value ? "true" : "false")}";
     }
 
     public static string MapperWithBodyAndTypes(string body, params string[] types)

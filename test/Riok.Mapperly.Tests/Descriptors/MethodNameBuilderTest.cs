@@ -12,7 +12,7 @@ public class MethodNameBuilderTest
     public void ShouldGenerateUniqueMethodNames()
     {
         var builder = new MethodNameBuilder();
-        builder.Add("MapToA");
+        builder.Reserve("MapToA");
         builder.Build(NewMethodMappingMock("A"))
             .Should()
             .BeEquivalentTo("MapToA1");

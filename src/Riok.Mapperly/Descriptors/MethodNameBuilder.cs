@@ -8,7 +8,7 @@ internal class MethodNameBuilder
     private const string MethodNamePrefix = "MapTo";
     private readonly HashSet<string> _usedNames = new();
 
-    internal void Add(string name)
+    internal void Reserve(string name)
         => _usedNames.Add(name);
 
     internal string Build(MethodMapping mapping)

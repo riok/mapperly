@@ -40,8 +40,7 @@ public abstract class MethodMapping : TypeMapping
         return MethodDeclaration(returnType, Identifier(MethodName))
             .WithModifiers(TokenList(BuildModifiers()))
             .WithParameterList(BuildParameterList())
-            .WithBody(Block(BuildBody(IdentifierName(SourceParamName))))
-            .WithAttributeLists(List(BuildAttributes(SourceParamName)));
+            .WithBody(Block(BuildBody(IdentifierName(SourceParamName))));
     }
 
     public abstract IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source);
@@ -72,15 +71,5 @@ public abstract class MethodMapping : TypeMapping
     private ParameterListSyntax BuildParameterList()
     {
         return ParameterList(CommaSeparatedList(BuildParameters()));
-    }
-
-    private IEnumerable<AttributeListSyntax> BuildAttributes(string sourceParamName)
-    {
-        // if target and source types are nullable we add a [return: NotNullIfNotNull("source")] annotation
-        if (TargetType.NullableAnnotation == NullableAnnotation.Annotated
-            && SourceType.NullableAnnotation == NullableAnnotation.Annotated)
-        {
-            yield return ReturnNotNullIfNotNullAttribute(sourceParamName);
-        }
     }
 }

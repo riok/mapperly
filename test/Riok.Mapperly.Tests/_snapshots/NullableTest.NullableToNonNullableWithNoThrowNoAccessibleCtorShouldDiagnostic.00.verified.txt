@@ -1,0 +1,17 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG002,
+      Title: No accessible parameterless constructor found,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (10,4)-(10,26),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: {0} has no accessible parameterless constructor,
+      Message: B has no accessible parameterless constructor,
+      Category: Mapper,
+      CustomTags: []
+    }
+  ]
+}

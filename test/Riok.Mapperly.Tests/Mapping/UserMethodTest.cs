@@ -73,21 +73,6 @@ public interface IMapper
     }
 
     [Fact]
-    public void WithExistingInstanceNullableSource()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "void Map(A? source, B target)",
-            "class A { public string StringValue { get; set; } }",
-            "class B { public string StringValue { get; set; } }");
-
-        TestHelper.GenerateSingleMapperMethodBody(source)
-            .Should()
-            .Be(@"if (source == null)
-        return;
-    target.StringValue = source.StringValue;".ReplaceLineEndings());
-    }
-
-    [Fact]
     public void WithMultipleUserDefinedMethodShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBody(
@@ -133,7 +118,7 @@ public interface IMapper
         TestHelper.GenerateMapperMethodBodies(source)
             .Select(x => x.Name)
             .Should()
-            .BeEquivalentTo("MapToB", "MapToB2");
+            .BeEquivalentTo("MapToB", "MapToB1");
     }
 
     [Fact]

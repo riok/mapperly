@@ -14,6 +14,7 @@ public class DescriptorBuilder
 
     private static readonly IReadOnlyCollection<MappingBuilder> _mappingBuilders = new MappingBuilder[]
     {
+        NullableMappingBuilder.TryBuildMapping,
         SpecialTypeMappingBuilder.TryBuildMapping,
         DirectAssignmentMappingBuilder.TryBuildMapping,
         DictionaryMappingBuilder.TryBuildMapping,
@@ -40,7 +41,7 @@ public class DescriptorBuilder
     private readonly Dictionary<Type, Attribute> _defaultConfigurations = new();
 
     // this includes mappings to build and already built mappings
-    private readonly Dictionary<(ITypeSymbol SourceType, ITypeSymbol TargetType), TypeMapping> _mappings = new();
+    private readonly Dictionary<(ITypeSymbol SourceType, ITypeSymbol TargetType), TypeMapping> _mappings = new(new MappingTupleEqualityComparer());
 
     // additional user defined mappings
     // (with same signature as already defined mappings but with different names)
@@ -131,24 +132,47 @@ public class DescriptorBuilder
             _mapperDescriptor.AddTypeMapping(extraMapping);
         }
 
+        // set method names
+        foreach (var methodMapping in _mapperDescriptor.MethodTypeMappings)
+        {
+            methodMapping.SetMethodNameIfNeeded(_methodNameBuilder.Build);
+        }
+
         return _mapperDescriptor;
     }
 
-    internal TypeMapping? FindOrBuildMapping(
+    public TypeMapping? FindOrBuildMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType)
     {
         if (FindMapping(sourceType, targetType) is { } foundMapping)
             return foundMapping;
 
-        if (TryBuildNewMapping(null, sourceType, targetType) is not { } mapping)
+        if (BuildDelegateMapping(null, sourceType, targetType) is not { } mapping)
             return null;
 
         AddMapping(mapping);
         return mapping;
     }
 
-    public TypeMapping? TryBuildNewMapping(
+    public TypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    {
+        _mappings.TryGetValue((sourceType, targetType), out var mapping);
+        return mapping;
+    }
+
+    public TypeMapping? FindOrBuildDelegateMapping(
+        ISymbol? userSymbol,
+        ITypeSymbol sourceType,
+        ITypeSymbol targetType)
+    {
+        if (FindMapping(sourceType, targetType) is { } foundMapping)
+            return foundMapping;
+
+        return BuildDelegateMapping(userSymbol, sourceType, targetType);
+    }
+
+    public TypeMapping? BuildDelegateMapping(
         ISymbol? userSymbol,
         ITypeSymbol sourceType,
         ITypeSymbol targetType)
@@ -171,11 +195,6 @@ public class DescriptorBuilder
 
     private void BuildMappingBody(MappingBuilderContext ctx, TypeMapping typeMapping)
     {
-        if (typeMapping is not MethodMapping methodMapping)
-            return;
-
-        methodMapping.SetMethodNameIfNeeded(_methodNameBuilder.Build);
-
         switch (typeMapping)
         {
             case ObjectPropertyMapping mapping:
@@ -192,7 +211,7 @@ public class DescriptorBuilder
 
     private void AddUserMapping(TypeMapping mapping)
     {
-        _methodNameBuilder.Add(((IUserMapping)mapping).Method.Name);
+        _methodNameBuilder.Reserve(((IUserMapping)mapping).Method.Name);
         if (mapping.CallableByOtherMappings && FindMapping(mapping.SourceType, mapping.TargetType) is null)
         {
             AddMapping(mapping);
@@ -202,9 +221,23 @@ public class DescriptorBuilder
         _extraMappings.Add(mapping);
     }
 
-    private TypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    private class MappingTupleEqualityComparer : IEqualityComparer<(ITypeSymbol Source, ITypeSymbol Target)>
     {
-        _mappings.TryGetValue((sourceType, targetType), out var mapping);
-        return mapping;
+        public bool Equals((ITypeSymbol Source, ITypeSymbol Target) x, (ITypeSymbol Source, ITypeSymbol Target) y)
+        {
+            return Equals(x.Source, y.Source)
+                && Equals(x.Target, y.Target);
+        }
+
+        public int GetHashCode((ITypeSymbol Source, ITypeSymbol Target) obj)
+        {
+            unchecked
+            {
+                return (SymbolEqualityComparer.Default.GetHashCode(obj.Source) * 397) ^ SymbolEqualityComparer.Default.GetHashCode(obj.Target);
+            }
+        }
+
+        private bool Equals(ITypeSymbol x, ITypeSymbol y)
+            => SymbolEqualityComparer.IncludeNullability.Equals(x, y);
     }
 }
