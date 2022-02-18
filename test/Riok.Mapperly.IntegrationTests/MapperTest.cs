@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Riok.Mapperly.IntegrationTests.Dto;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using Riok.Mapperly.IntegrationTests.Models;
@@ -8,19 +9,29 @@ namespace Riok.Mapperly.IntegrationTests;
 public class MapperTest
 {
     [Fact]
-    public Task WithInterfaceMapper()
+    public Task SnapshotGeneratedSource()
     {
-        var model = NewTestObj();
-        var dto = MyInterfaceMapper.Instance.MapToDto(model);
-        return Verify(dto);
+        var path = GetGeneratedMapperFilePath();
+        return VerifyFile(path);
     }
 
     [Fact]
-    public Task WithAbstractClassMapper()
+    public Task RunMappingShouldWork()
     {
         var model = NewTestObj();
-        var dto = MyClassMapper.Instance.MapToDto(model);
+        var dto = new TestMapper().MapToDto(model);
         return Verify(dto);
+    }
+
+    private string GetGeneratedMapperFilePath([CallerFilePath] string filePath = "")
+    {
+        return Path.Join(
+            Path.GetDirectoryName(filePath),
+            "obj",
+            "GeneratedFiles",
+            "Riok.Mapperly",
+            "Riok.Mapperly.MapperGenerator",
+            "TestMapper.g.cs");
     }
 
     private TestObject NewTestObj()

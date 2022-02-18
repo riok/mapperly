@@ -1,6 +1,5 @@
 ﻿//HintName: Mapper.g.cs
 #nullable enable
-public sealed class Mapper : IMapper
+public partial class Mapper
 {
-    public static readonly IMapper Instance = new Mapper();
 }

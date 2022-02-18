@@ -5,7 +5,7 @@
       Title: Mapping source property not found,
       Severity: Error,
       WarningLevel: 0,
-      Location: : (10,4)-(10,71),
+      Location: : (10,4)-(10,79),
       Description: ,
       HelpLink: ,
       MessageFormat: Specified property {0} on source type {1} was not found,

@@ -14,23 +14,22 @@ dotnet add package Riok.Mapperly
 
 ### Create your first mapper
 
-Create a mapper declaration as an interface or abstract class
+Create a mapper declaration as a partial class
 and apply the `Riok.Mapperly.Abstractions.MapperAttribute` attribute.
 Mapperly generates mapping method implementations for the defined mapping methods in the mapper.
-The default implementation name is built removing the leading `I` if it is an interface (`IDtoMapper` => `DtoMapper`) and appending `Impl` if the mapper definition is an abstract class or the interface name does not start with an `I`.
-A mapper instance is available through the `Instance` field on the generated implementation.
 
 ```c#
 // mapper declaration
 [Mapper]
-public interface IDtoMapper
+public partial class DtoMapper
 {
-    CarDto CarToCarDto(Car car);
+    public partial CarDto CarToCarDto(Car car);
 }
 
 // mapper usage
+var mapper = new DtoMapper();
 var car = new Car { NumberOfSeats = 10, ... };
-var dto = DtoMapper.Instance.CarToCarDto();
+var dto = mapper.CarToCarDto();
 dto.NumberOfSeats.Should().Be(10);
 ```
 
@@ -78,15 +77,16 @@ If an existing object instance should be used as target you can define the mappi
 ```c#
 // mapper declaration
 [Mapper]
-public interface IDtoMapper
+public partial class DtoMapper
 {
-    void CarToCarDto(Car car, CarDto dto);
+    public partial void CarToCarDto(Car car, CarDto dto);
 }
 
 // mapper usage
+var mapper = new DtoMapper();
 var car = new Car { NumberOfSeats = 10, ... };
 var dto = new CarDto();
-DtoMapperImpl.Instance.CarToCarDto(car, dto);
+mapper.CarToCarDto(car, dto);
 dto.NumberOfSeats.Should().Be(10);
 ```
 
@@ -96,12 +96,32 @@ If Mapperly cannot generate a mapping, one can implement it manually simply by p
 
 ```c#
 [Mapper]
-public interface IDtoMapper
+public partial class DtoMapper
 {
-    CarDto CarToCarDto(Car car);
+    public partial CarDto CarToCarDto(Car car);
 
-    DateOnly DateTimeToDateOnly(DateTime dt) => DateOnly.FromDateTime(dt);
+    private DateOnly DateTimeToDateOnly(DateTime dt) => DateOnly.FromDateTime(dt);
 }
 ```
 
-Whenever Mapperly needs a mapping from `DateTime` to `DateOnly` inside the `IDtoMapper` implementation it will use the provided implementation.
+Whenever Mapperly needs a mapping from `DateTime` to `DateOnly` inside the `DtoMapper` implementation it will use the provided implementation.
+
+## Before / after map
+
+To run custom code before or after a mapping, the generated map method can be wrapped in a custom method:
+
+```c#
+[Mapper]
+public partial class DtoMapper
+{
+    public CarDto MapCarToCarDto(Car car)
+    {
+        // custom before map code...
+        var dto = CarToCarDto(car);
+        // custom after map code...
+        return dto;
+    }
+
+    private partial CarDto CarToCarDto(Car car);
+}
+```

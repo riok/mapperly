@@ -14,56 +14,22 @@ public class UserMethodTest
     }
 
     [Fact]
-    public Task WithImplementationNameShouldWork()
-    {
-        var source = @"
-using System;
-using System.Collections.Generic;
-using Riok.Mapperly.Abstractions;
-
-[Mapper(ImplementationName = ""MyMapper"")]
-public interface IMapper
-{
-    int Map(string source);
-}
-";
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task WithInstanceNameShouldWork()
-    {
-        var source = @"
-using System;
-using System.Collections.Generic;
-using Riok.Mapperly.Abstractions;
-
-[Mapper(InstanceName = ""MyMapperInstance"")]
-public interface IMapper
-{
-    int Map(string source);
-}
-";
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
     public void WithMultipleUserImplementedMethodShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBody(
-            "int ToInt(string i);" +
+            "partial int ToInt(string i);" +
             "int ToInt2(string i) => int.Parse(i);");
 
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
-            .Be("return int.Parse(source);");
+            .Be("return int.Parse(i);");
     }
 
     [Fact]
     public void WithExistingInstance()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "void Map(A source, B target)",
+            "partial void Map(A source, B target)",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 
@@ -89,8 +55,8 @@ public interface IMapper
     public void WithMultipleUserDefinedMethodDifferentConfigShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapperIgnore(nameof(B.IntValue))] B Map(A source);" +
-            "[MapperIgnore(nameof(B.StringValue))] B Map2(A source);",
+            "[MapperIgnore(nameof(B.IntValue))] partial B Map(A source);" +
+            "[MapperIgnore(nameof(B.StringValue))] partial B Map2(A source);",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }");
 
@@ -110,7 +76,7 @@ public interface IMapper
     public void WithSameNamesShouldGenerateUniqueMethodNames()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "B MapToB(A source);",
+            "partial B MapToB(A source);",
             TestSourceBuilderOptions.WithDeepCloning,
             "class A { public B? Value { get; set; } }",
             "class B { public B? Value { get; set; } }");
@@ -125,7 +91,7 @@ public interface IMapper
     public Task WithInvalidSignatureShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "string ToString(T source, string format);");
+            "partial string ToString(T source, string format);");
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -134,46 +100,8 @@ public interface IMapper
     public Task WithInvalidGenericSignatureShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "string ToString<T>(T source);");
+            "partial string ToString<T>(T source);");
 
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task WithInterfaceBaseTypeShouldWork()
-    {
-        var source = @"
-using System;
-using System.Collections.Generic;
-using Riok.Mapperly.Abstractions;
-
-public interface BaseMapper : BaseMapper3
-{{
-    string MyMapping(int value)
-        => $""my-to-string-{{value}}"";
-}}
-
-public interface BaseMapper2 : BaseMapper3
-{
-    long MyMapping2(int value)
-        => (long)value;
-}
-
-public interface BaseMapper3
-{{
-    decimal MyMapping3(int value)
-        => (decimal)value;
-}}
-
-[Mapper]
-public interface IMapper : BaseMapper, BaseMapper2
-{
-    B Map(A source);
-}
-
-class A { public int Value { get; set; } public int Value2 { get; set; } public int Value3 { get; set; } }
-class B { public string Value { get; set; } public long Value2 { get; set; } public decimal Value3 { get; set; } }
-";
         return TestHelper.VerifyGenerator(source);
     }
 
@@ -186,10 +114,10 @@ using System.Collections.Generic;
 using Riok.Mapperly.Abstractions;
 
 public class BaseMapper : BaseMapper3
-{{
+{
     public string MyMapping(int value)
         => $""my-to-string-{{value}}"";
-}}
+}
 
 public interface BaseMapper2 : BaseMapper3
 {
@@ -198,15 +126,15 @@ public interface BaseMapper2 : BaseMapper3
 }
 
 public interface BaseMapper3
-{{
+{
     decimal MyMapping3(int value)
         => (decimal)value;
-}}
+}
 
 [Mapper]
-public abstract class MyMapper : BaseMapper, BaseMapper2
+public partial class MyMapper : BaseMapper, BaseMapper2
 {
-    public abstract B Map(A source);
+    public partial B Map(A source);
 }
 
 class A { public int Value { get; set; } public int Value2 { get; set; } public int Value3 { get; set; } }

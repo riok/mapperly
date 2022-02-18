@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBuilder;
@@ -80,10 +79,7 @@ public class DescriptorBuilder
             _mapperDescriptor.Namespace = _mapperSymbol.ContainingNamespace.ToDisplayString();
         }
 
-        _mapperDescriptor.IsAbstractClassDefinition = _mapperSyntax is not InterfaceDeclarationSyntax;
         _mapperDescriptor.Accessibility = _mapperSymbol.DeclaredAccessibility;
-        _mapperDescriptor.Name = mapperAttribute.ImplementationName ?? BuildName();
-        _mapperDescriptor.InstanceName = mapperAttribute.InstanceName;
 
         _defaultConfigurations.Add(
             typeof(MapEnumAttribute),
@@ -91,53 +87,13 @@ public class DescriptorBuilder
         return mapperAttribute;
     }
 
-    private string BuildName()
-    {
-        return !_mapperDescriptor.IsAbstractClassDefinition && _mapperSymbol.Name.StartsWith(MapperDescriptor.InterfaceNamePrefix)
-            ? _mapperSymbol.Name.Substring(MapperDescriptor.InterfaceNamePrefix.Length)
-            : _mapperSymbol.Name + MapperDescriptor.ImplClassNameSuffix;
-    }
-
     public MapperDescriptor Build()
     {
-        // extract mappings from declarations
-        var defaultContext = new SimpleMappingBuilderContext(this);
-        foreach (var userMapping in UserMethodMappingBuilder.ExtractUserMappings(defaultContext, _mapperSymbol))
-        {
-            AddUserMapping(userMapping);
-
-            var ctx = new MappingBuilderContext(
-                this,
-                userMapping.SourceType,
-                userMapping.TargetType,
-                (userMapping as IUserMapping)?.Method);
-            _mappingsToBuildBody.Enqueue((userMapping, ctx));
-        }
-
-        // build mapping bodies
-        foreach (var (mapping, ctx) in _mappingsToBuildBody.DequeueAll())
-        {
-            BuildMappingBody(ctx, mapping);
-        }
-
-        // add generated mappings to the mapper
-        foreach (var mapping in _mappings.Values)
-        {
-            _mapperDescriptor.AddTypeMapping(mapping);
-        }
-
-        // add extra mappings to the mapper
-        foreach (var extraMapping in _extraMappings)
-        {
-            _mapperDescriptor.AddTypeMapping(extraMapping);
-        }
-
-        // set method names
-        foreach (var methodMapping in _mapperDescriptor.MethodTypeMappings)
-        {
-            methodMapping.SetMethodNameIfNeeded(_methodNameBuilder.Build);
-        }
-
+        ReserveMethodNames();
+        ExtractUserMappings();
+        BuildMappingBodies();
+        BuildMappingMethodNames();
+        AddMappingsToDescriptor();
         return _mapperDescriptor;
     }
 
@@ -193,16 +149,43 @@ public class DescriptorBuilder
     internal void ReportDiagnostic(DiagnosticDescriptor descriptor, Location? location, params object[] messageArgs)
         => _context.ReportDiagnostic(Diagnostic.Create(descriptor, location ?? _mapperSyntax.GetLocation(), messageArgs));
 
-    private void BuildMappingBody(MappingBuilderContext ctx, TypeMapping typeMapping)
+    private void ExtractUserMappings()
     {
-        switch (typeMapping)
+        var defaultContext = new SimpleMappingBuilderContext(this);
+        foreach (var userMapping in UserMethodMappingBuilder.ExtractUserMappings(defaultContext, _mapperSymbol))
         {
-            case ObjectPropertyMapping mapping:
-                ObjectPropertyMappingBuilder.BuildMappingBody(ctx, mapping);
-                break;
-            case UserDefinedNewInstanceMethodMapping mapping:
-                UserMethodMappingBuilder.BuildMappingBody(ctx, mapping);
-                break;
+            AddUserMapping(userMapping);
+
+            var ctx = new MappingBuilderContext(
+                this,
+                userMapping.SourceType,
+                userMapping.TargetType,
+                (userMapping as IUserMapping)?.Method);
+            _mappingsToBuildBody.Enqueue((userMapping, ctx));
+        }
+    }
+
+    private void ReserveMethodNames()
+    {
+        foreach (var methodSymbol in _mapperSymbol.GetAllMembers().OfType<IMethodSymbol>())
+        {
+            _methodNameBuilder.Reserve(methodSymbol.Name);
+        }
+    }
+
+    private void BuildMappingBodies()
+    {
+        foreach (var (typeMapping, ctx) in _mappingsToBuildBody.DequeueAll())
+        {
+            switch (typeMapping)
+            {
+                case ObjectPropertyMapping mapping:
+                    ObjectPropertyMappingBuilder.BuildMappingBody(ctx, mapping);
+                    break;
+                case UserDefinedNewInstanceMethodMapping mapping:
+                    UserMethodMappingBuilder.BuildMappingBody(ctx, mapping);
+                    break;
+            }
         }
     }
 
@@ -211,7 +194,6 @@ public class DescriptorBuilder
 
     private void AddUserMapping(TypeMapping mapping)
     {
-        _methodNameBuilder.Reserve(((IUserMapping)mapping).Method.Name);
         if (mapping.CallableByOtherMappings && FindMapping(mapping.SourceType, mapping.TargetType) is null)
         {
             AddMapping(mapping);
@@ -219,6 +201,29 @@ public class DescriptorBuilder
         }
 
         _extraMappings.Add(mapping);
+    }
+
+    private void BuildMappingMethodNames()
+    {
+        foreach (var methodMapping in _mappings.Values.Concat(_extraMappings).OfType<MethodMapping>())
+        {
+            methodMapping.SetMethodNameIfNeeded(_methodNameBuilder.Build);
+        }
+    }
+
+    private void AddMappingsToDescriptor()
+    {
+        // add generated mappings to the mapper
+        foreach (var mapping in _mappings.Values)
+        {
+            _mapperDescriptor.AddTypeMapping(mapping);
+        }
+
+        // add extra mappings to the mapper
+        foreach (var extraMapping in _extraMappings)
+        {
+            _mapperDescriptor.AddTypeMapping(extraMapping);
+        }
     }
 
     private class MappingTupleEqualityComparer : IEqualityComparer<(ITypeSymbol Source, ITypeSymbol Target)>

@@ -2,10 +2,9 @@
 #nullable enable
 namespace MyCompany.MyMapper
 {
-    public sealed class Mapper : IMapper
+    public partial class Mapper
     {
-        public static readonly IMapper Instance = new Mapper();
-        public string Map(int source)
+        private partial string Map(int source)
         {
             return source.ToString();
         }

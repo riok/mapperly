@@ -1,9 +1,8 @@
-﻿//HintName: MyMapperImpl.g.cs
+﻿//HintName: MyMapper.g.cs
 #nullable enable
-public sealed class MyMapperImpl : MyMapper
+public partial class MyMapper
 {
-    public static readonly MyMapper Instance = new MyMapperImpl();
-    public override B Map(A source)
+    public partial B Map(A source)
     {
         var target = new B();
         target.Value = MyMapping(source.Value);

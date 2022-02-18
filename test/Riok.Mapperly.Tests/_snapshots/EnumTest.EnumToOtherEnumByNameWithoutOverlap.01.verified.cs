@@ -1,9 +1,8 @@
 ﻿//HintName: Mapper.g.cs
 #nullable enable
-public sealed class Mapper : IMapper
+public partial class Mapper
 {
-    public static readonly IMapper Instance = new Mapper();
-    public E2 ToE1(E1 source)
+    private partial E2 ToE1(E1 source)
     {
         return source switch
         {

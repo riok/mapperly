@@ -1,7 +1,6 @@
 namespace Riok.Mapperly.Tests;
 
 public record TestSourceBuilderOptions(
-    bool AsInterface = true,
     string? Namespace = null,
     bool UseDeepCloning = false,
     bool ThrowOnMappingNullMismatch = true,

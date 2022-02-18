@@ -13,12 +13,12 @@ namespace Riok.Mapperly.Descriptors.TypeMappings;
 public class UserDefinedExistingInstanceMethodMapping : ObjectPropertyMapping, IUserMapping
 {
     public UserDefinedExistingInstanceMethodMapping(
-        IMethodSymbol method,
-        bool isAbstractMapperDefinition)
+        IMethodSymbol method)
         : base(method.Parameters[0].Type.UpgradeNullable(), method.Parameters[1].Type.UpgradeNullable())
     {
-        Override = isAbstractMapperDefinition;
-        Accessibility = Accessibility.Public;
+        Partial = true;
+        Accessibility = method.DeclaredAccessibility;
+        MappingSourceParameterName = method.Parameters[0].Name;
         Method = method;
         MethodName = method.Name;
     }

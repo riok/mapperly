@@ -115,7 +115,7 @@ public class NullableTest
     public void WithExistingInstanceNullableSource()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "void Map(A? source, B target)",
+            "partial void Map(A? source, B target)",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 

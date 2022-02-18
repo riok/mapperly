@@ -179,12 +179,6 @@ public static class SyntaxFactoryHelper
         );
     }
 
-    public static BaseListSyntax BaseList(params string[] baseName)
-    {
-        var simpleBaseNames = baseName.Select(x => SimpleBaseType(IdentifierName(x)));
-        return SyntaxFactory.BaseList(CommaSeparatedList<BaseTypeSyntax>(simpleBaseNames));
-    }
-
     public static NamespaceDeclarationSyntax Namespace(string ns)
         => NamespaceDeclaration(IdentifierName(ns));
 
