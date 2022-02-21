@@ -11,7 +11,7 @@ namespace Riok.Mapperly.Descriptors.TypeMappings;
 /// </summary>
 public abstract class MethodMapping : TypeMapping
 {
-    private const string SourceParamName = "source";
+    private const string DefaultSourceParamName = "source";
     private string? _methodName;
 
     protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType) : base(sourceType, targetType)
@@ -20,13 +20,19 @@ public abstract class MethodMapping : TypeMapping
 
     protected Accessibility Accessibility { get; set; } = Accessibility.Private;
 
-    protected bool Override { get; set; }
+    protected bool Partial { get; set; }
 
     protected string MethodName
     {
         get => _methodName ?? throw new InvalidOperationException();
         set => _methodName = value;
     }
+
+    protected string MappingSourceParameterName
+    {
+        get;
+        set;
+    } = DefaultSourceParamName;
 
     public override ExpressionSyntax Build(ExpressionSyntax source)
         => Invocation(MethodName, source);
@@ -40,7 +46,7 @@ public abstract class MethodMapping : TypeMapping
         return MethodDeclaration(returnType, Identifier(MethodName))
             .WithModifiers(TokenList(BuildModifiers()))
             .WithParameterList(BuildParameterList())
-            .WithBody(Block(BuildBody(IdentifierName(SourceParamName))));
+            .WithBody(Block(BuildBody(IdentifierName(MappingSourceParameterName))));
     }
 
     public abstract IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source);
@@ -56,7 +62,7 @@ public abstract class MethodMapping : TypeMapping
     {
         return new[]
         {
-            Parameter(Identifier(SourceParamName)).WithType(IdentifierName(SourceType.ToDisplayString())),
+            Parameter(Identifier(MappingSourceParameterName)).WithType(IdentifierName(SourceType.ToDisplayString())),
         };
     }
 
@@ -64,8 +70,8 @@ public abstract class MethodMapping : TypeMapping
     {
         yield return Accessibility(Accessibility);
 
-        if (Override)
-            yield return Token(SyntaxKind.OverrideKeyword);
+        if (Partial)
+            yield return Token(SyntaxKind.PartialKeyword);
     }
 
     private ParameterListSyntax BuildParameterList()

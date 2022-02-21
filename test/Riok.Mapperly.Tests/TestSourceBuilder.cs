@@ -12,7 +12,7 @@ public static class TestSourceBuilder
     public static string Mapping(string fromTypeName, string toTypeName, TestSourceBuilderOptions? options, params string[] types)
     {
         return MapperWithBodyAndTypes(
-            $"{toTypeName} {DefaultMapMethodName}({fromTypeName} source);",
+            $"partial {toTypeName} {DefaultMapMethodName}({fromTypeName} source);",
             options,
             types);
     }
@@ -29,7 +29,7 @@ using Riok.Mapperly.Abstractions;
 {(options.Namespace != null ? $"namespace {options.Namespace};" : string.Empty)}
 
 {BuildAttribute(options)}
-public {(options.AsInterface ? "interface I" : "abstract class ")}Mapper
+public partial class Mapper
 {{
     {body}
 }}

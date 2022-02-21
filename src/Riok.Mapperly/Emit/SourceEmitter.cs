@@ -12,8 +12,7 @@ public static class SourceEmitter
     public static string Build(MapperDescriptor descriptor)
     {
         var classDeclaration = ClassDeclaration(descriptor.Name)
-            .WithModifiers(TokenList(Accessibility(descriptor.Accessibility), Token(SyntaxKind.SealedKeyword)))
-            .WithBaseList(BaseList(descriptor.BaseName))
+            .WithModifiers(TokenList(Accessibility(descriptor.Accessibility), Token(SyntaxKind.PartialKeyword)))
             .WithMembers(List(BuildMembers(descriptor)));
         var compilationUnit = CompilationUnit()
             .WithMembers(SingletonList(WrapInNamespaceIfNeeded(descriptor.Namespace, classDeclaration)))
@@ -24,24 +23,7 @@ public static class SourceEmitter
 
     private static IEnumerable<MemberDeclarationSyntax> BuildMembers(MapperDescriptor descriptor)
     {
-        // public static readonly MyMapper Instance = new MyMapper();
-        if (!string.IsNullOrEmpty(descriptor.InstanceName))
-        {
-            var ctor = ObjectCreationExpression(IdentifierName(descriptor.Name)).WithArgumentList(ArgumentList());
-            yield return DeclareField(
-                descriptor.BaseName,
-                descriptor.InstanceName!,
-                ctor,
-                SyntaxKind.PublicKeyword,
-                SyntaxKind.StaticKeyword,
-                SyntaxKind.ReadOnlyKeyword);
-        }
-
-        // mapping methods
-        foreach (var mapping in descriptor.MethodTypeMappings)
-        {
-            yield return mapping.BuildMethod();
-        }
+        return descriptor.MethodTypeMappings.Select(mapping => mapping.BuildMethod());
     }
 
     private static MemberDeclarationSyntax WrapInNamespaceIfNeeded(string? namespaceName, MemberDeclarationSyntax classDeclaration)

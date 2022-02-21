@@ -28,16 +28,11 @@ public class MapperGenerator : IIncrementalGenerator
     }
 
     private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
-        => node
-            is InterfaceDeclarationSyntax { AttributeLists.Count: > 0 }
-            or ClassDeclarationSyntax { AttributeLists.Count: > 0 };
+        => node is ClassDeclarationSyntax { AttributeLists.Count: > 0 };
 
     private static SyntaxNode? GetSemanticTargetForGeneration(GeneratorSyntaxContext ctx)
     {
-        var attributeList = ctx.Node is InterfaceDeclarationSyntax intfDecl
-            ? intfDecl.AttributeLists
-            : ((ClassDeclarationSyntax)ctx.Node).AttributeLists;
-
+        var attributeList = ((ClassDeclarationSyntax)ctx.Node).AttributeLists;
         foreach (var attributeListSyntax in attributeList)
         {
             foreach (var attributeSyntax in attributeListSyntax.Attributes)

@@ -7,17 +7,6 @@ namespace Riok.Mapperly.Abstractions;
 public sealed class MapperAttribute : Attribute
 {
     /// <summary>
-    /// Name of the generated mapper class.
-    /// <c>null</c> to fallback to the default name.
-    /// </summary>
-    public string? ImplementationName { get; set; }
-
-    /// <summary>
-    /// Name of the instance field, <c>null</c> if none should be generated.
-    /// </summary>
-    public string? InstanceName { get; set; } = "Instance";
-
-    /// <summary>
     /// The default enum mapping strategy.
     /// Can be overwritten on specific enums via mapping method configurations.
     /// </summary>

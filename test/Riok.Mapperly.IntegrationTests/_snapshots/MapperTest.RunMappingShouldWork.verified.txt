@@ -1,6 +1,6 @@
 ﻿{
   IntValue: 10,
-  StringValue: fooBar,
+  StringValue: fooBar+after-map,
   RenamedStringValue2: fooBar2,
   NestedNullable: {
     IntValue: 100
@@ -8,7 +8,7 @@
   NestedNullableTargetNotNullable: {},
   StringNullableTargetNotNullable: fooBar3,
   RecursiveObject: {
-    StringValue: ,
+    StringValue: +after-map,
     RenamedStringValue2: ,
     NestedNullableTargetNotNullable: {},
     StringNullableTargetNotNullable: ,

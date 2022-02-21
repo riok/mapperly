@@ -59,7 +59,7 @@ public class EnumTest
     public void EnumToOtherEnumByValueShouldCast()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapEnum(EnumMappingStrategy.ByValue)] E2 ToE1(E1 source);",
+            "[MapEnum(EnumMappingStrategy.ByValue)] partial E2 ToE1(E1 source);",
             "enum E1 {A, B, C}",
             "enum E2 {A = 100, B, C}");
 
@@ -72,7 +72,7 @@ public class EnumTest
     public void EnumToOtherEnumByNameShouldSwitch()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapEnum(EnumMappingStrategy.ByName, IgnoreCase = false)] E2 ToE1(E1 source);",
+            "[MapEnum(EnumMappingStrategy.ByName, IgnoreCase = false)] partial E2 ToE1(E1 source);",
             "enum E1 {A, B, C, D, E}",
             "enum E2 {A = 100, B, C, d, e, E}");
 
@@ -92,7 +92,7 @@ public class EnumTest
     public void EnumToOtherEnumByNameIgnoreCaseShouldSwitch()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)] E2 ToE1(E1 source);",
+            "[MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)] partial E2 ToE1(E1 source);",
             "enum E1 {A, B, C, D, E, f, F}",
             "enum E2 {A = 100, B, C, d, e, E, f}");
 
@@ -115,7 +115,7 @@ public class EnumTest
     public Task EnumToOtherEnumByNameWithoutOverlap()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapEnum(EnumMappingStrategy.ByName)] E2 ToE1(E1 source);",
+            "[MapEnum(EnumMappingStrategy.ByName)] partial E2 ToE1(E1 source);",
             "enum E1 {A, B, C}",
             "enum E2 {D, E, F}");
 
@@ -131,9 +131,9 @@ using System.Collections.Generic;
 using Riok.Mapperly.Abstractions;
 
 [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
-public interface IMapper
+public partial class Mapper
 {
-    E2 ToE1(E1 source);
+    partial E2 ToE1(E1 source);
 }
 
 enum E1 {A, B, C}
@@ -215,7 +215,7 @@ enum E2 {A = 100, B, C}
     public void StringToEnumShouldSwitchIgnoreCase()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)] E1 ToE1(string source);",
+            "[MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)] partial E1 ToE1(string source);",
             "enum E1 {A, B, C}");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
@@ -232,7 +232,7 @@ enum E2 {A = 100, B, C}
     public void StringToEnumShouldSwitch()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapEnum(EnumMappingStrategy.ByName)] E1 ToE1(string source);",
+            "[MapEnum(EnumMappingStrategy.ByName)] partial E1 ToE1(string source);",
             "enum E1 {A, B, C}");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()

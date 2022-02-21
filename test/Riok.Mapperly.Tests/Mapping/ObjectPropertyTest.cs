@@ -291,7 +291,7 @@ public class ObjectPropertyTest
     public void WithIgnoredProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapperIgnore(nameof(B.IntValue))] B Map(A source);",
+            "[MapperIgnore(nameof(B.IntValue))] partial B Map(A source);",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }");
 
@@ -306,7 +306,7 @@ public class ObjectPropertyTest
     public void WithManualMappedProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty(nameof(A.StringValue), nameof(B.StringValue2)] B Map(A source);",
+            "[MapProperty(nameof(A.StringValue), nameof(B.StringValue2)] partial B Map(A source);",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue2 { get; set; } }");
 
@@ -318,24 +318,31 @@ public class ObjectPropertyTest
     }
 
     [Fact]
-    public void ShouldUseUserProvidedMappingAsInterface()
+    public void ShouldUseUserImplementedMapping()
     {
         var mapperBody = @"
-B Map(A source);
-D UserImplementedMap(C source) => new D();";
+public partial B Map(A source);
+private D UserImplementedMap(C source)
+{
+  var target = Map(source);
+  target.StringValue += ""ok"";
+  return target;
+}
+private partial D MapToD(C source);
+";
 
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             mapperBody,
             "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",
             "class B { public string StringValue { get; set; } public D NestedValue { get; set; } }",
-            "class C {}",
-            "class D {}");
+            "class C { public string StringValue { get; set; } }",
+            "class D { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapperMethodBody(source)
             .Should()
             .Be(@"var target = new B();
     target.StringValue = source.StringValue;
-    target.NestedValue = ((IMapper)this).UserImplementedMap(source.NestedValue);
+    target.NestedValue = UserImplementedMap(source.NestedValue);
     return target;".ReplaceLineEndings());
     }
 
@@ -343,7 +350,7 @@ D UserImplementedMap(C source) => new D();";
     public void ShouldUseUserProvidedMappingWithDisabledNullability()
     {
         var mapperBody = @"
-B Map(A source);
+partial B Map(A source);
 D UserImplementedMap(C source) => new D();";
 
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -360,29 +367,6 @@ D UserImplementedMap(C source) => new D();";
             .Be(@"if (source == null)
         return default;
     var target = new B();
-    target.StringValue = source.StringValue;
-    target.NestedValue = ((IMapper)this).UserImplementedMap(source.NestedValue);
-    return target;".ReplaceLineEndings());
-    }
-
-    [Fact]
-    public void ShouldUseUserProvidedMappingAsAbstractClass()
-    {
-        var mapperBody = @"
-public abstract B Map(A source);
-public D UserImplementedMap(C source) => new D();";
-
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            mapperBody,
-            TestSourceBuilderOptions.Default with { AsInterface = false },
-            "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",
-            "class B { public string StringValue { get; set; } public D NestedValue { get; set; } }",
-            "class C {}",
-            "class D {}");
-
-        TestHelper.GenerateSingleMapperMethodBody(source)
-            .Should()
-            .Be(@"var target = new B();
     target.StringValue = source.StringValue;
     target.NestedValue = UserImplementedMap(source.NestedValue);
     return target;".ReplaceLineEndings());
@@ -415,7 +399,7 @@ public D UserImplementedMap(C source) => new D();";
     public Task WithManualNotFoundSourcePropertyShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty(\"not_found\", nameof(B.StringValue2))] B Map(A source);",
+            "[MapProperty(\"not_found\", nameof(B.StringValue2))] partial B Map(A source);",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue2 { get; set; } }");
 
@@ -426,7 +410,7 @@ public D UserImplementedMap(C source) => new D();";
     public Task WithNotFoundIgnoredPropertyShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapperIgnore(\"not_found\")] B Map(A source);",
+            "[MapperIgnore(\"not_found\")] partial B Map(A source);",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue2 { get; set; } }");
 

@@ -13,11 +13,12 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
 {
     private const string NoMappingComment = "// Could not generate mapping";
 
-    public UserDefinedNewInstanceMethodMapping(IMethodSymbol method, bool isAbstractMapperDefinition)
+    public UserDefinedNewInstanceMethodMapping(IMethodSymbol method)
         : base(method.Parameters.Single().Type.UpgradeNullable(), method.ReturnType.UpgradeNullable())
     {
-        Override = isAbstractMapperDefinition;
-        Accessibility = Accessibility.Public;
+        Partial = true;
+        Accessibility = method.DeclaredAccessibility;
+        MappingSourceParameterName = method.Parameters[0].Name;
         Method = method;
         MethodName = method.Name;
     }

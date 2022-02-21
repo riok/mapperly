@@ -11,14 +11,20 @@ public static class UserMethodMappingBuilder
         SimpleMappingBuilderContext ctx,
         ITypeSymbol mapperSymbol)
     {
-        var isAbstractMapperSyntax = mapperSymbol.TypeKind == TypeKind.Class;
-        foreach (var methodSymbol in ExtractMethods(ctx.Compilation.ObjectType, mapperSymbol))
+        // extract user implemented and user defined mappings from mapper
+        foreach (var methodSymbol in ExtractMethods(mapperSymbol))
         {
-            var mapping = BuilderUserMapping(ctx, isAbstractMapperSyntax, methodSymbol);
-            if (mapping == null)
-                continue;
+            var mapping = BuilderUserDefinedMapping(ctx, methodSymbol) ?? BuildUserImplementedMapping(methodSymbol);
+            if (mapping != null)
+                yield return mapping;
+        }
 
-            yield return mapping;
+        // extract user implemented mappings from base methods
+        foreach (var method in ExtractBaseMethods(ctx.Compilation.ObjectType, mapperSymbol))
+        {
+            var mapping = BuildUserImplementedMapping(method);
+            if (mapping != null)
+                yield return mapping;
         }
     }
 
@@ -34,58 +40,62 @@ public static class UserMethodMappingBuilder
         }
     }
 
-    private static IEnumerable<IMethodSymbol> ExtractMethods(INamedTypeSymbol objectType, ITypeSymbol mapperSymbol)
+    private static IEnumerable<IMethodSymbol> ExtractMethods(ITypeSymbol mapperSymbol)
+        => mapperSymbol.GetMembers().OfType<IMethodSymbol>();
+
+    private static IEnumerable<IMethodSymbol> ExtractBaseMethods(INamedTypeSymbol objectType, ITypeSymbol mapperSymbol)
     {
-        return mapperSymbol.GetAllMembers()
-            .Concat(mapperSymbol.AllInterfaces.SelectMany(x => x.GetAllMembers()))
+        var baseMethods = mapperSymbol.BaseType?.GetAllMembers() ?? Enumerable.Empty<ISymbol>();
+        var intfMethods = mapperSymbol.AllInterfaces.SelectMany(x => x.GetAllMembers());
+        return baseMethods
+            .Concat(intfMethods)
             .OfType<IMethodSymbol>()
 
             // ignore all non ordinary methods (eg. ctor, operators, etc.) and methods declared on the object type (eg. ToString)
             .Where(x =>
                 x.MethodKind == MethodKind.Ordinary
+                && x.IsAccessible(true)
                 && !SymbolEqualityComparer.Default.Equals(x.ReceiverType, objectType));
     }
 
-    private static TypeMapping? BuilderUserMapping(
+    private static TypeMapping? BuildUserImplementedMapping(IMethodSymbol m)
+    {
+        return IsNewInstanceMappingMethod(m) && !m.IsAbstract && !m.IsPartialDefinition
+            ? new UserImplementedMethodMapping(m)
+            : null;
+    }
+
+    private static TypeMapping? BuilderUserDefinedMapping(
         SimpleMappingBuilderContext ctx,
-        bool isAbstractMapperDefinition,
         IMethodSymbol methodSymbol)
     {
-        // async and generic methods are not supported
-        if (methodSymbol.IsAsync || methodSymbol.IsGenericMethod)
-        {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.UnsupportedMappingMethodSignature,
-                methodSymbol,
-                methodSymbol.Name);
+        if (!methodSymbol.IsPartialDefinition)
             return null;
-        }
 
-        // if the method has exactly two parameters, returns void, and has no body (is abstract)
-        // it is handled as a user defined mapping method which maps to an existing instance.
-        if (methodSymbol.Parameters.Length == 2 && methodSymbol.ReturnsVoid && methodSymbol.IsAbstract)
-            return new UserDefinedExistingInstanceMethodMapping(methodSymbol, isAbstractMapperDefinition);
+        if (IsExistingInstanceMappingMethod(methodSymbol))
+            return new UserDefinedExistingInstanceMethodMapping(methodSymbol);
 
-        // all other mappings only support non-void single parameter methods
-        if (methodSymbol.Parameters.Length != 1 || methodSymbol.ReturnsVoid)
-        {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.UnsupportedMappingMethodSignature,
-                methodSymbol,
-                methodSymbol.Name);
-            return null;
-        }
+        if (IsNewInstanceMappingMethod(methodSymbol))
+            return new UserDefinedNewInstanceMethodMapping(methodSymbol);
 
-        // if the method has a body (is not abstract)
-        // and is accessible it is a user implemented method mapping
-        if (!methodSymbol.IsAbstract)
-        {
-            return methodSymbol.IsAccessible(true)
-                ? new UserImplementedMethodMapping(methodSymbol)
-                : null;
-        }
-
-        // else it is a user defined mapping which creates a new instance of the target class
-        return new UserDefinedNewInstanceMethodMapping(methodSymbol, isAbstractMapperDefinition);
+        ctx.ReportDiagnostic(
+            DiagnosticDescriptors.UnsupportedMappingMethodSignature,
+            methodSymbol,
+            methodSymbol.Name);
+        return null;
     }
+
+    private static bool IsExistingInstanceMappingMethod(IMethodSymbol m)
+        => m.Parameters.Length == 2
+            && m.ReturnsVoid
+            && !m.IsAsync
+            && !m.IsStatic
+            && !m.IsGenericMethod;
+
+    private static bool IsNewInstanceMappingMethod(IMethodSymbol m)
+        => m.Parameters.Length == 1
+            && !m.ReturnsVoid
+            && !m.IsAsync
+            && !m.IsStatic
+            && !m.IsGenericMethod;
 }
