@@ -1,5 +1,5 @@
 using Microsoft.CodeAnalysis.CSharp;
-using Riok.Mapperly.Descriptors.TypeMappings;
+using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilder;

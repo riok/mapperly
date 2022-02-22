@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riok.Mapperly.Abstractions"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riok.Mapperly.Tests", "test\Riok.Mapperly.Tests\Riok.Mapperly.Tests.csproj", "{284E2122-CE48-4A5A-A045-3A3F941DA5C3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riok.Mapperly.Abstractions.Test", "test\Riok.Mapperly.Abstractions.Test\Riok.Mapperly.Abstractions.Test.csproj", "{C3C40A0A-168F-4A66-B9F9-FC80D2F26306}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,11 +42,16 @@ Global
 		{284E2122-CE48-4A5A-A045-3A3F941DA5C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{284E2122-CE48-4A5A-A045-3A3F941DA5C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{284E2122-CE48-4A5A-A045-3A3F941DA5C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3C40A0A-168F-4A66-B9F9-FC80D2F26306}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3C40A0A-168F-4A66-B9F9-FC80D2F26306}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3C40A0A-168F-4A66-B9F9-FC80D2F26306}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3C40A0A-168F-4A66-B9F9-FC80D2F26306}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CB991FD7-B9B7-47C0-A060-66EBE136DBDA} = {B65AF89A-4A3B-473C-83C8-5F0CB0EED30E}
 		{FDA97A46-DB21-4B72-9958-6D61C508B1CD} = {3598BE50-28D5-4BF4-BEA7-09E5FEA2910C}
 		{E45D5E6D-8CC9-4DAD-8E1C-723625475744} = {B65AF89A-4A3B-473C-83C8-5F0CB0EED30E}
 		{284E2122-CE48-4A5A-A045-3A3F941DA5C3} = {3598BE50-28D5-4BF4-BEA7-09E5FEA2910C}
+		{C3C40A0A-168F-4A66-B9F9-FC80D2F26306} = {3598BE50-28D5-4BF4-BEA7-09E5FEA2910C}
 	EndGlobalSection
 EndGlobal

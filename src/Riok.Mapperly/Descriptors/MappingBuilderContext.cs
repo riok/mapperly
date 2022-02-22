@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Configuration;
-using Riok.Mapperly.Descriptors.TypeMappings;
+using Riok.Mapperly.Descriptors.Mappings;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -43,19 +43,6 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
     public TypeMapping? FindOrBuildMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
         => _builder.FindOrBuildMapping(sourceType, targetType);
-
-    /// <summary>
-    /// Tries to find an existing mapping for the provided types.
-    /// If none is found, a new one is created.
-    /// If a new mapping is created, it is not added to the mapping descriptor (should only be used as a delegate to another mapping)
-    /// and is therefore not accessible by other mappings.
-    /// Configuration / the user symbol is passed from the caller.
-    /// </summary>
-    /// <param name="source">The source type.</param>
-    /// <param name="target">The target type.</param>
-    /// <returns>The created mapping or <c>null</c> if none could be created.</returns>
-    public TypeMapping? FindOrBuildDelegateMapping(ITypeSymbol source, ITypeSymbol target)
-        => _builder.FindOrBuildDelegateMapping(_userSymbol, source, target);
 
     /// <summary>
     /// Tries to build a new mapping for the given types.

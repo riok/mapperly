@@ -45,7 +45,7 @@ The attributes defined in `Riok.Mapperly.Abstractions` can be used to customize 
 The `MapperAttribute` provides options to customize the generated mapper class.
 The generated class name, the instance field name and the default enum mapping strategy is adjustable.
 
-### Copy behaviour
+####  Copy behaviour
 
 By default, Mapperly does not create deep copies of objects to improve performance.
 If an object can be directly assigned to the target, it will do so
@@ -56,8 +56,15 @@ To create deep copies, set the `UseDeepCloning` property on the `MapperAttribute
 
 On each mapping method declaration property mappings can be customized.
 If a property on the target has a different name than on the source, the `MapPropertyAttribute` can be applied.
-Flattening is not yet supported.
 If a property should be ignored, the `MapperIgnoreAttribute` can be used.
+
+#### Flattening and unflattening
+
+It is pretty common to flatten objects during mapping, e.g. `Car.Make.Id => Car.MakeId`.
+Mapperly tries to figure out flattenings automatically by making use of the pascal case c# notation.
+If Mapperly can't resolve the target or source property correctly, it is possible to manually configure it by applying the `MapPropertyAttribute`
+by either using the source and target property path names as arrays or using a dot separated property access path string (e.g. `[MapProperty(Source = new[] { nameof(Car), nameof(Car.Make), nameof(Car.Make.Id) }, Target = new[] { nameof(Car), nameof(Car.MakeId) })]` or `[MapProperty(Source = "Car.Make.Id", Target = "Car.MakeId")]`).
+Note: unflattening is not yet automatically configured by Mapperly and needs to be configured manually via `MapPropertyAttribute`.
 
 #### Enum
 

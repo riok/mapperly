@@ -2,6 +2,15 @@
   IntValue: 10,
   StringValue: fooBar+after-map,
   RenamedStringValue2: fooBar2,
+  FlatteningIdValue: 10,
+  NullableFlatteningIdValue: 100,
+  Unflattening: {
+    IdValue: 20
+  },
+  NullableUnflattening: {
+    IdValue: 200
+  },
+  NestedNullableIntValue: 100,
   NestedNullable: {
     IntValue: 100
   },
@@ -10,6 +19,7 @@
   RecursiveObject: {
     StringValue: +after-map,
     RenamedStringValue2: ,
+    Unflattening: {},
     NestedNullableTargetNotNullable: {},
     StringNullableTargetNotNullable: ,
     EnumValue: DtoValue1,
@@ -21,6 +31,7 @@
     IntValue: 99,
     StringValue: ,
     RenamedStringValue: ,
+    Flattening: {},
     EnumReverseStringValue: 
   },
   NullableReadOnlyObjectCollection: [

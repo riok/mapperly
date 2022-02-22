@@ -51,6 +51,10 @@ public class MapperTest
             StringNullableTargetNotNullable = "fooBar3",
             EnumReverseStringValue = nameof(TestEnumDtoByValue.DtoValue3),
             NestedNullableTargetNotNullable = new(),
+            Flattening = new() { IdValue = 10 },
+            NullableFlattening = new() { IdValue = 100 },
+            UnflatteningIdValue = 20,
+            NullableUnflatteningIdValue = 200,
             RecursiveObject =
                 new()
                 {

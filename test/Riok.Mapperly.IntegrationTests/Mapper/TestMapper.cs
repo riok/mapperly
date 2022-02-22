@@ -32,6 +32,12 @@ public partial class TestMapper
 
     [MapperIgnore(nameof(TestObjectDto.IgnoredStringValue))]
     [MapProperty(nameof(TestObject.RenamedStringValue), nameof(TestObjectDto.RenamedStringValue2))]
+    [MapProperty(
+        new[] { nameof(TestObject.UnflatteningIdValue) },
+        new[] { nameof(TestObjectDto.Unflattening), nameof(TestObjectDto.Unflattening.IdValue) })]
+    [MapProperty(
+        nameof(TestObject.NullableUnflatteningIdValue),
+        $"{nameof(TestObjectDto.NullableUnflattening)}.{nameof(TestObjectDto.NullableUnflattening.IdValue)}")]
     private partial TestObjectDto MapToDtoInternal(TestObject testObject);
 
     [MapperIgnore(nameof(TestObject.IgnoredStringValue))]

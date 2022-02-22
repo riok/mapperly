@@ -8,6 +8,14 @@ public class TestObject
 
     public string RenamedStringValue { get; set; } = string.Empty;
 
+    public IdObject Flattening { get; set; } = new();
+
+    public IdObject? NullableFlattening { get; set; }
+
+    public int UnflatteningIdValue { get; set; }
+
+    public int? NullableUnflatteningIdValue { get; set; }
+
     public TestObjectNested? NestedNullable { get; set; }
 
     public TestObjectNested? NestedNullableTargetNotNullable { get; set; }

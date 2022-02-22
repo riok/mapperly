@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Descriptors.TypeMappings;
+using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -16,6 +16,8 @@ public static class SyntaxFactoryHelper
     private const string NotImplementedExceptionClassName = "System.NotImplementedException";
 
     public static readonly IdentifierNameSyntax VarIdentifier = IdentifierName("var");
+
+    private static readonly IdentifierNameSyntax _nameofIdentifier = IdentifierName("nameof");
 
     public static SyntaxToken Accessibility(Accessibility accessibility)
     {
@@ -93,8 +95,11 @@ public static class SyntaxFactoryHelper
     public static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax idExpression, string propertyIdentifierName)
         => MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, idExpression, IdentifierName(propertyIdentifierName));
 
+    public static ConditionalAccessExpressionSyntax ConditionalAccess(ExpressionSyntax idExpression, string propertyIdentifierName)
+        => ConditionalAccessExpression(idExpression, MemberBindingExpression(IdentifierName(propertyIdentifierName)));
+
     public static InvocationExpressionSyntax NameOf(ExpressionSyntax expression)
-        => Invocation(IdentifierName("nameof"), expression);
+        => Invocation(_nameofIdentifier, expression);
 
     public static ThrowExpressionSyntax ThrowArgumentOutOfRangeException(ExpressionSyntax arg)
     {

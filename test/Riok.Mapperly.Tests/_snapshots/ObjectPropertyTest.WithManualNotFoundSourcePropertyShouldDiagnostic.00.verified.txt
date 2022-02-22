@@ -9,7 +9,7 @@
       Description: ,
       HelpLink: ,
       MessageFormat: Specified property {0} on source type {1} was not found,
-      Message: Specified property not_found on source type B was not found,
+      Message: Specified property not_found on source type A was not found,
       Category: Mapper,
       CustomTags: []
     }

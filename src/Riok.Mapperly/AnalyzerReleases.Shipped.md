@@ -12,3 +12,7 @@ RMG005  | Mapper   | Error    | Mapping target property not found.
 RMG006  | Mapper   | Error    | Mapping source property not found.
 RMG007  | Mapper   | Error    | Could not map property.
 RMG008  | Mapper   | Error    | Could not create mapping.
+RMG009  | Mapper   | Info     | Can not map to read only property.
+RMG010  | Mapper   | Info     | Can not map from write only property.
+RMG011  | Mapper   | Info     | Can not map to write only property path.
+RMG012  | Mapper   | Info     | Mapping source property not found.

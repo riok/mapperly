@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Moq;
 using Riok.Mapperly.Descriptors;
-using Riok.Mapperly.Descriptors.TypeMappings;
+using Riok.Mapperly.Descriptors.Mappings;
 
 namespace Riok.Mapperly.Tests.Descriptors;
 

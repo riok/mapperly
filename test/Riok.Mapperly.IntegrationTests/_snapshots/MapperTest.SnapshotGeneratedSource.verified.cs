@@ -48,22 +48,40 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             var target = new Riok.Mapperly.IntegrationTests.Models.TestObject();
             target.IntValue = DirectInt(dto.IntValue);
             target.StringValue = dto.StringValue;
+            target.UnflatteningIdValue = DirectInt(dto.Unflattening.IdValue);
+            if (dto.NullableUnflattening != null)
+            {
+                target.NullableUnflatteningIdValue = CastIntNullable(dto.NullableUnflattening.IdValue);
+            }
+
             if (dto.NestedNullable != null)
+            {
                 target.NestedNullable = MapToTestObjectNested(dto.NestedNullable);
+            }
+
             target.NestedNullableTargetNotNullable = MapToTestObjectNested(dto.NestedNullableTargetNotNullable);
             target.StringNullableTargetNotNullable = dto.StringNullableTargetNotNullable;
             if (dto.RecursiveObject != null)
+            {
                 target.RecursiveObject = MapFromDto(dto.RecursiveObject);
+            }
+
             target.SourceTargetSameObjectType = dto.SourceTargetSameObjectType;
             if (dto.NullableReadOnlyObjectCollection != null)
+            {
                 target.NullableReadOnlyObjectCollection = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(dto.NullableReadOnlyObjectCollection, x => MapToTestObjectNested(x)));
+            }
+
             target.EnumValue = (Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumValue;
             target.EnumName = (Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumName;
             target.EnumRawValue = (Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumRawValue;
             target.EnumStringValue = MapToTestEnum(dto.EnumStringValue);
             target.EnumReverseStringValue = MapToString1(dto.EnumReverseStringValue);
             if (dto.SubObject != null)
+            {
                 target.SubObject = MapToInheritanceSubObject(dto.SubObject);
+            }
+
             return target;
         }
 
@@ -158,24 +176,56 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.IntValue = DirectInt(testObject.IntValue);
             target.StringValue = testObject.StringValue;
             target.RenamedStringValue2 = testObject.RenamedStringValue;
+            target.FlatteningIdValue = DirectInt(testObject.Flattening.IdValue);
+            if (testObject.NullableFlattening != null)
+            {
+                target.NullableFlatteningIdValue = CastIntNullable(testObject.NullableFlattening.IdValue);
+            }
+
+            target.Unflattening.IdValue = DirectInt(testObject.UnflatteningIdValue);
+            if (testObject.NullableUnflatteningIdValue != null)
+            {
+                target.NullableUnflattening ??= new();
+                target.NullableUnflattening.IdValue = DirectInt(testObject.NullableUnflatteningIdValue.Value);
+            }
+
             if (testObject.NestedNullable != null)
+            {
+                target.NestedNullableIntValue = DirectInt(testObject.NestedNullable.IntValue);
                 target.NestedNullable = MapToTestObjectNestedDto(testObject.NestedNullable);
+            }
+
             if (testObject.NestedNullableTargetNotNullable != null)
+            {
                 target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(testObject.NestedNullableTargetNotNullable);
+            }
+
             if (testObject.StringNullableTargetNotNullable != null)
+            {
                 target.StringNullableTargetNotNullable = testObject.StringNullableTargetNotNullable;
+            }
+
             if (testObject.RecursiveObject != null)
+            {
                 target.RecursiveObject = MapToDto(testObject.RecursiveObject);
+            }
+
             target.SourceTargetSameObjectType = testObject.SourceTargetSameObjectType;
             if (testObject.NullableReadOnlyObjectCollection != null)
+            {
                 target.NullableReadOnlyObjectCollection = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(testObject.NullableReadOnlyObjectCollection, x => MapToTestObjectNestedDto(x)));
+            }
+
             target.EnumValue = (Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)testObject.EnumValue;
             target.EnumName = MapToEnumDtoByName(testObject.EnumName);
             target.EnumRawValue = (byte)testObject.EnumRawValue;
             target.EnumStringValue = MapToString(testObject.EnumStringValue);
             target.EnumReverseStringValue = MapToTestEnumDtoByValue(testObject.EnumReverseStringValue);
             if (testObject.SubObject != null)
+            {
                 target.SubObject = MapToInheritanceSubObjectDto(testObject.SubObject);
+            }
+
             return target;
         }
 
@@ -183,24 +233,49 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         {
             target.IntValue = DirectInt(source.IntValue);
             target.StringValue = source.StringValue;
+            target.FlatteningIdValue = DirectInt(source.Flattening.IdValue);
+            if (source.NullableFlattening != null)
+            {
+                target.NullableFlatteningIdValue = CastIntNullable(source.NullableFlattening.IdValue);
+            }
+
             if (source.NestedNullable != null)
+            {
+                target.NestedNullableIntValue = DirectInt(source.NestedNullable.IntValue);
                 target.NestedNullable = MapToTestObjectNestedDto(source.NestedNullable);
+            }
+
             if (source.NestedNullableTargetNotNullable != null)
+            {
                 target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(source.NestedNullableTargetNotNullable);
+            }
+
             if (source.StringNullableTargetNotNullable != null)
+            {
                 target.StringNullableTargetNotNullable = source.StringNullableTargetNotNullable;
+            }
+
             if (source.RecursiveObject != null)
+            {
                 target.RecursiveObject = MapToDto(source.RecursiveObject);
+            }
+
             target.SourceTargetSameObjectType = source.SourceTargetSameObjectType;
             if (source.NullableReadOnlyObjectCollection != null)
+            {
                 target.NullableReadOnlyObjectCollection = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source.NullableReadOnlyObjectCollection, x => MapToTestObjectNestedDto(x)));
+            }
+
             target.EnumValue = (Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)source.EnumValue;
             target.EnumName = MapToEnumDtoByName(source.EnumName);
             target.EnumRawValue = (byte)source.EnumRawValue;
             target.EnumStringValue = MapToString(source.EnumStringValue);
             target.EnumReverseStringValue = MapToTestEnumDtoByValue(source.EnumReverseStringValue);
             if (source.SubObject != null)
+            {
                 target.SubObject = MapToInheritanceSubObjectDto(source.SubObject);
+            }
+
             target.IgnoredStringValue = source.IgnoredStringValue;
         }
 

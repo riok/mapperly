@@ -10,6 +10,16 @@ public class TestObjectDto
 
     public string RenamedStringValue2 { get; set; } = string.Empty;
 
+    public int FlatteningIdValue { get; set; }
+
+    public int? NullableFlatteningIdValue { get; set; }
+
+    public IdObjectDto Unflattening { get; set; } = new();
+
+    public IdObjectDto? NullableUnflattening { get; set; }
+
+    public int NestedNullableIntValue { get; set; }
+
     public TestObjectNestedDto? NestedNullable { get; set; }
 
     public TestObjectNestedDto NestedNullableTargetNotNullable { get; set; } = new();
