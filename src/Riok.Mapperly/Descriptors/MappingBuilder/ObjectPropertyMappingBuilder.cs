@@ -103,7 +103,7 @@ public static class ObjectPropertyMappingBuilder
             return validationResult;
 
         // nullability is handled inside the property mapping
-        var delegateMapping = ctx.BuilderContext.FindMapping(sourcePropertyPath.Member.Type.UpgradeNullable(), targetPropertyPath.Member.Type.UpgradeNullable())
+        var delegateMapping = ctx.BuilderContext.FindMapping(sourcePropertyPath.Member.Type, targetPropertyPath.Member.Type)
             ?? ctx.BuilderContext.FindOrBuildMapping(sourcePropertyPath.Member.Type.NonNullable(), targetPropertyPath.Member.Type.NonNullable());
 
         // couldn't build the mapping

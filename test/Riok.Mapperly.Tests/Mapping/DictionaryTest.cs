@@ -4,6 +4,35 @@ namespace Riok.Mapperly.Tests.Mapping;
 public class DictionaryTest
 {
     [Fact]
+    public void DictionaryToSameDictionaryShouldAssign()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "Dictionary<string, long>",
+            "Dictionary<string, long>");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return source;");
+    }
+
+    [Fact]
+    public void DictionaryToSameDictionaryDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "Dictionary<string, long>",
+            "Dictionary<string, long>",
+            TestSourceBuilderOptions.WithDeepCloning);
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be(@"var target = new System.Collections.Generic.Dictionary<string, long>(source.Count);
+    foreach (var item in source)
+    {
+        target.Add(item.Key, item.Value);
+    }
+
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
     public void DictionaryToDictionaryExplicitCastedValue()
     {
         var source = TestSourceBuilder.Mapping(
@@ -15,6 +44,41 @@ public class DictionaryTest
     foreach (var item in source)
     {
         target.Add(item.Key, (int)item.Value);
+    }
+
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public void DictionaryToDictionaryNullableToNonNullable()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "Dictionary<string, int?>",
+            "Dictionary<string, int>");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+    foreach (var item in source)
+    {
+        target.Add(item.Key, item.Value == null ? throw new System.ArgumentNullException(nameof(item.Value)) : item.Value.Value);
+    }
+
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public void DictionaryToDictionaryNullableToNonNullableWithNoThrow()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "Dictionary<string, int?>",
+            "Dictionary<string, int>",
+            TestSourceBuilderOptions.Default with { ThrowOnMappingNullMismatch = false });
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+    foreach (var item in source)
+    {
+        target.Add(item.Key, item.Value == null ? default : item.Value.Value);
     }
 
     return target;".ReplaceLineEndings());

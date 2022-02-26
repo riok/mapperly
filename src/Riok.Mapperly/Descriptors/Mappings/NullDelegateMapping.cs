@@ -29,8 +29,17 @@ public class NullDelegateMapping : TypeMapping
 
     public override ExpressionSyntax Build(ExpressionSyntax source)
     {
-        if (!SourceType.IsNullable() || _delegateMapping.SourceType.IsNullable())
+        if (_delegateMapping.SourceType.IsNullable())
             return _delegateMapping.Build(source);
+
+        if (!SourceType.IsNullable())
+        {
+            // if the target type is a nullable value type, there needs to be an additional cast
+            // eg. int => int? needs to be casted.
+            return TargetType.IsNullableValueType()
+                ? CastExpression(IdentifierName(TargetType.ToDisplayString()), _delegateMapping.Build(source))
+                : _delegateMapping.Build(source);
+        }
 
         // source is nullable and the mapping method cannot handle nulls,
         // call mapping only if source is not null.

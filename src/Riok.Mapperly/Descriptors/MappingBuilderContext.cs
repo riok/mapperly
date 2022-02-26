@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -27,7 +28,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     public ITypeSymbol Target { get; }
 
     public TypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        => _builder.FindMapping(sourceType, targetType);
+        => _builder.FindMapping(sourceType.UpgradeNullable(), targetType.UpgradeNullable());
 
     /// <summary>
     /// Tries to find an existing mapping for the provided types.
@@ -42,7 +43,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="targetType">The target type.</param>
     /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
     public TypeMapping? FindOrBuildMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        => _builder.FindOrBuildMapping(sourceType, targetType);
+        => _builder.FindOrBuildMapping(sourceType.UpgradeNullable(), targetType.UpgradeNullable());
 
     /// <summary>
     /// Tries to build a new mapping for the given types.
@@ -54,7 +55,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="target">The target type.</param>
     /// <returns>The created mapping or <c>null</c> if none could be created.</returns>
     public TypeMapping? BuildDelegateMapping(ITypeSymbol source, ITypeSymbol target)
-        => _builder.BuildDelegateMapping(_userSymbol, source, target);
+        => _builder.BuildDelegateMapping(_userSymbol, source.UpgradeNullable(), target.UpgradeNullable());
 
     public T GetConfigurationOrDefault<T>() where T : Attribute
     {
