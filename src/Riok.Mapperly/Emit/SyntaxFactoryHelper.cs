@@ -86,6 +86,9 @@ public static class SyntaxFactoryHelper
     public static LiteralExpressionSyntax BooleanLiteral(bool b)
         => LiteralExpression(b ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression);
 
+    public static LiteralExpressionSyntax IntLiteral(int i)
+        => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(i));
+
     public static StatementSyntax ReturnVariable(string identifierName)
         => ReturnStatement(IdentifierName(identifierName));
 
@@ -94,6 +97,9 @@ public static class SyntaxFactoryHelper
 
     public static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax idExpression, string propertyIdentifierName)
         => MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, idExpression, IdentifierName(propertyIdentifierName));
+
+    public static ElementAccessExpressionSyntax ElementAccess(ExpressionSyntax idExpression, ExpressionSyntax index)
+        => ElementAccessExpression(idExpression).WithArgumentList(BracketedArgumentList(SingletonSeparatedList(Argument(index))));
 
     public static ConditionalAccessExpressionSyntax ConditionalAccess(ExpressionSyntax idExpression, string propertyIdentifierName)
         => ConditionalAccessExpression(idExpression, MemberBindingExpression(IdentifierName(propertyIdentifierName)));
@@ -137,17 +143,20 @@ public static class SyntaxFactoryHelper
             .WithArgumentList(ArgumentList(arguments));
     }
 
-    public static FieldDeclarationSyntax DeclareField(
-        string fieldType,
-        string fieldName,
-        ExpressionSyntax initializationValue,
-        params SyntaxKind[] modifiers)
+    public static ForStatementSyntax IncrementalForLoop(string counterName, StatementSyntax body, ExpressionSyntax maxValueExclusive)
     {
-        var modifierTokenList = TokenList(modifiers.Select(Token));
-        var initializer = EqualsValueClause(initializationValue);
-        var variableDeclarator = VariableDeclarator(Identifier(fieldName)).WithInitializer(initializer);
-        var variableDeclaration = VariableDeclaration(IdentifierName(fieldType)).WithVariables(SingletonSeparatedList(variableDeclarator));
-        return FieldDeclaration(variableDeclaration).WithModifiers(modifierTokenList);
+        var counterDeclaration = DeclareVariable(counterName, IntLiteral(0));
+        var counterIncrement = PostfixUnaryExpression(
+            SyntaxKind.PostIncrementExpression,
+            IdentifierName(counterName));
+        var condition = BinaryExpression(
+            SyntaxKind.LessThanExpression,
+            IdentifierName(counterName),
+            maxValueExclusive);
+        return ForStatement(body)
+            .WithDeclaration(counterDeclaration)
+            .WithCondition(condition)
+            .WithIncrementors(SingletonSeparatedList<ExpressionSyntax>(counterIncrement));
     }
 
     public static VariableDeclarationSyntax DeclareVariable(string variableName, ExpressionSyntax initializationValue)

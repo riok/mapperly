@@ -11,13 +11,6 @@ public static class EnumerableMappingBuilder
     private const string ToArrayMethodName = nameof(Enumerable.ToArray);
     private const string ToListMethodName = nameof(Enumerable.ToList);
 
-    private static readonly string _enumerableIntfName = typeof(IEnumerable<>).FullName;
-    private static readonly string _readOnlyCollectionIntfName = typeof(IReadOnlyCollection<>).FullName;
-    private static readonly string _collectionIntfName = typeof(ICollection<>).FullName;
-
-    private static readonly string _listClassName = typeof(List<>).FullName;
-    private static readonly string _linqEnumerableClassName = typeof(Enumerable).FullName;
-
     public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         var enumeratedSourceType = GetEnumeratedType(ctx, ctx.Source);
@@ -38,18 +31,19 @@ public static class EnumerableMappingBuilder
 
         // if element mapping is a direct assignment
         // and target is an IEnumerable, there is no mapping needed at all.
-        if (isDirectElementMapping && IsType(ctx, _enumerableIntfName, ctx.Target.OriginalDefinition))
+        if (isDirectElementMapping && ctx.IsType(ctx.Target.OriginalDefinition, typeof(IEnumerable<>)))
             return new CastMapping(ctx.Source, ctx.Target);
 
-        // if element mapping is a direct assignment
-        // and source type is an array
-        // and the target type is an array or an IReadOnlyCollection,
-        // a single Array.Clone call should be sufficient and fast.
-        if (isDirectElementMapping
-            && ctx.Source.IsArrayType()
-            && (ctx.Target.IsArrayType() || IsType(ctx, _readOnlyCollectionIntfName, ctx.Target.OriginalDefinition))
-            && SymbolEqualityComparer.Default.Equals(ctx.Source, ctx.Target))
+        // if source is an array and target is an array or IReadOnlyCollection faster mappings can be applied
+        if (ctx.Source.IsArrayType()
+            && (ctx.Target.IsArrayType() || ctx.IsType(ctx.Target.OriginalDefinition, typeof(IReadOnlyCollection<>))))
         {
+            // if element mapping is a direct assignment
+            // a single Array.Clone / cast mapping call should be sufficient and fast,
+            // use a for loop mapping otherwise.
+            if (!isDirectElementMapping)
+                return new ArrayForMapping(ctx.Source, ctx.Target, elementMapping, enumeratedTargetType);
+
             return ctx.MapperConfiguration.UseDeepCloning
                 ? new ArrayCloneMapping(ctx.Source, ctx.Target)
                 : new CastMapping(ctx.Source, ctx.Target);
@@ -91,10 +85,7 @@ public static class EnumerableMappingBuilder
             return null;
         }
 
-        if (ctx.Compilation.GetTypeByMetadataName(_collectionIntfName) is not { } collectionSymbol)
-            return null;
-
-        return ctx.Target.ImplementsGeneric(collectionSymbol, out _)
+        return ctx.Target.ImplementsGeneric(ctx.GetTypeSymbol(typeof(ICollection<>)), out _)
             ? new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping)
             : null;
     }
@@ -106,46 +97,32 @@ public static class EnumerableMappingBuilder
             return (true, ToArrayMethodName);
 
         // if the target is an IEnumerable<T> don't collect at all.
-        if (IsType(ctx, _enumerableIntfName, ctx.Target.OriginalDefinition))
+        if (ctx.IsType(ctx.Target.OriginalDefinition, typeof(IEnumerable<>)))
             return (true, null);
 
         // if the target is IReadOnlyCollection<T>
         // and the count of the source is known (array, IReadOnlyCollection<T>, ICollection<T>) we collect to array
         // for performance/space reasons
-        var targetIsReadOnlyCollection = IsType(ctx, _readOnlyCollectionIntfName, ctx.Target.OriginalDefinition);
-        if (ctx.Compilation.GetTypeByMetadataName(_readOnlyCollectionIntfName) is not { } readOnlyCollectionSymbol
-            || ctx.Compilation.GetTypeByMetadataName(_collectionIntfName) is not { } collectionSymbol)
-        {
-            return (false, null);
-        }
-
+        var targetIsReadOnlyCollection = ctx.IsType(ctx.Target.OriginalDefinition, typeof(IReadOnlyCollection<>));
         var sourceCountIsKnown =
             ctx.Source.IsArrayType()
-            || ctx.Source.ImplementsGeneric(readOnlyCollectionSymbol, out _)
-            || ctx.Source.ImplementsGeneric(collectionSymbol, out _);
+            || ctx.Source.ImplementsGeneric(ctx.GetTypeSymbol(typeof(IReadOnlyCollection<>)), out _)
+            || ctx.Source.ImplementsGeneric(ctx.GetTypeSymbol(typeof(ICollection<>)), out _);
         if (targetIsReadOnlyCollection && sourceCountIsKnown)
             return (true, ToArrayMethodName);
 
         // if target is a list, ICollection<T> or IReadOnlyCollection<T> collect with ToList()
         return targetIsReadOnlyCollection
-            || IsType(ctx, _collectionIntfName, ctx.Target.OriginalDefinition)
-            || IsType(ctx, _listClassName, ctx.Target.OriginalDefinition)
+            || ctx.IsType(ctx.Target.OriginalDefinition, typeof(ICollection<>))
+            || ctx.IsType(ctx.Target.OriginalDefinition, typeof(List<>))
             ? (true, ToListMethodName)
             : (false, null);
     }
 
-    private static bool IsType(MappingBuilderContext ctx, string typeFqn, ITypeSymbol? t)
-    {
-        var typeSymbol = ctx.Compilation.GetTypeByMetadataName(typeFqn);
-        return SymbolEqualityComparer.Default.Equals(t, typeSymbol);
-    }
-
     private static IMethodSymbol? ResolveLinqMethod(MappingBuilderContext ctx, string methodName)
     {
-        if (ctx.Compilation.GetTypeByMetadataName(_linqEnumerableClassName) is not ITypeSymbol arrayType)
-            return null;
-
-        var method = arrayType.GetMembers(methodName)
+        var method = ctx.GetTypeSymbol(typeof(Enumerable))
+            .GetMembers(methodName)
             .OfType<IMethodSymbol>()
             .FirstOrDefault(m =>
                 m.IsStatic
@@ -156,10 +133,7 @@ public static class EnumerableMappingBuilder
 
     private static ITypeSymbol? GetEnumeratedType(MappingBuilderContext ctx, ITypeSymbol type)
     {
-        if (ctx.Compilation.GetTypeByMetadataName(_enumerableIntfName) is not { } enumerableSymbol)
-            return null;
-
-        return type.ImplementsGeneric(enumerableSymbol, out var enumerableIntf)
+        return type.ImplementsGeneric(ctx.GetTypeSymbol(typeof(IEnumerable<>)), out var enumerableIntf)
             ? enumerableIntf.TypeArguments[0]
             : null;
     }
