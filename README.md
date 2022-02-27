@@ -1,5 +1,8 @@
 # Mapperly
 
+![Nuget](https://img.shields.io/nuget/v/Riok.Mapperly?style=flat-square)
+![GitHub](https://img.shields.io/github/license/riok/mapperly?style=flat-square)
+
 A .NET source generator for generating object mappings.
 Inspired by MapStruct.
 
