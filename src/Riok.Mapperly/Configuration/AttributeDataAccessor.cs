@@ -31,7 +31,7 @@ internal static class AttributeDataAccessor
         {
             var attr = (T)Activator.CreateInstance(
                 attrType,
-                BuildConstructorArguments(attrData));
+                BuildArgumentValues(attrData.ConstructorArguments).ToArray());
 
             foreach (var namedArgument in attrData.NamedArguments)
             {
@@ -46,24 +46,50 @@ internal static class AttributeDataAccessor
         }
     }
 
-    private static object?[] BuildConstructorArguments(AttributeData attrData)
+    private static IEnumerable<object?> BuildArgumentValues(IEnumerable<TypedConstant> values)
     {
-        return attrData.ConstructorArguments
-            .Select(arg =>
-            {
-                if (arg.Value == null)
-                    return null;
-
-                // box enum values to resolve correct ctor
-                if (arg.Type is not INamedTypeSymbol namedType || namedType.EnumUnderlyingType == null)
-                    return arg.Value;
-
-                var assemblyName = arg.Type!.ContainingAssembly.Name;
-                var qualifiedTypeName = Assembly.CreateQualifiedName(assemblyName, arg.Type.ToDisplayString());
-                return Type.GetType(qualifiedTypeName) is { } type
-                    ? Enum.ToObject(type, arg.Value)
-                    : arg.Value;
-            })
-            .ToArray();
+        return values.Select(arg => arg.Kind switch
+        {
+            _ when arg.IsNull => null,
+            TypedConstantKind.Enum => GetEnumValue(arg),
+            TypedConstantKind.Array => BuildArrayValue(arg),
+            TypedConstantKind.Primitive => arg.Value,
+            _ => throw new ArgumentOutOfRangeException(
+                $"{nameof(AttributeDataAccessor)} does not support constructor arguments of kind {arg.Kind.ToString()}"),
+        });
     }
+
+    private static object?[] BuildArrayValue(TypedConstant arg)
+    {
+        var arrayTypeSymbol = arg.Type as IArrayTypeSymbol
+            ?? throw new InvalidOperationException("Array typed constant is not of type " + nameof(IArrayTypeSymbol));
+
+        var elementType = GetReflectionType(arrayTypeSymbol.ElementType);
+
+        var values = BuildArgumentValues(arg.Values).ToArray();
+        var typedValues = Array.CreateInstance(elementType, values.Length);
+        Array.Copy(values, typedValues, values.Length);
+        return (object?[])typedValues;
+    }
+
+    private static object? GetEnumValue(TypedConstant arg)
+    {
+        var enumType = GetReflectionType(arg.Type ?? throw new InvalidOperationException("Type is null"));
+        return arg.Value == null
+            ? null
+            : Enum.ToObject(enumType, arg.Value);
+    }
+
+    private static Type GetReflectionType(ITypeSymbol type)
+    {
+        // other special types not yet supported since they are not used yet.
+        if (type.SpecialType == SpecialType.System_String)
+            return typeof(string);
+
+        var assemblyName = type.ContainingAssembly.Name;
+        var qualifiedTypeName = Assembly.CreateQualifiedName(assemblyName, type.ToDisplayString());
+        return Type.GetType(qualifiedTypeName)
+            ?? throw new InvalidOperationException($"Type {qualifiedTypeName} not found");
+    }
+
 }

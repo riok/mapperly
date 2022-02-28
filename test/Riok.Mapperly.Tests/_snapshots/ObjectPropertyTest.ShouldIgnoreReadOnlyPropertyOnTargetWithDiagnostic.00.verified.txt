@@ -1,0 +1,17 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG009,
+      Title: Can not map to read only property,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (10,4)-(10,28),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Can not map property {0}.{1} of type {2} to read only property {3}.{4} of type {5},
+      Message: Can not map property A.StringValue2 of type string to read only property B.StringValue2 of type string,
+      Category: Mapper,
+      CustomTags: []
+    }
+  ]
+}

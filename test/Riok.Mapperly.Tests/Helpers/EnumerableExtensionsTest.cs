@@ -1,0 +1,71 @@
+using Riok.Mapperly.Helpers;
+
+namespace Riok.Mapperly.Tests.Helpers;
+
+public class EnumerableExtensionsTest
+{
+    [Fact]
+    public void ToHashSetShouldWork()
+    {
+        var items = new[] { 1, 1, 2, 3, 4, 5, 5 };
+
+        // can't use extension method due to ambiguous method reference.
+        // (no support for this method in netstandard2.0)
+        var hashSet = EnumerableExtensions.ToHashSet(items);
+        hashSet.Should().BeEquivalentTo(new[] { 1, 2, 3, 4, 5 });
+    }
+
+    [Fact]
+    public void DistinctByShouldWork()
+    {
+        var items = new[]
+        {
+            ("item10", 10),
+            ("item11", 10),
+            ("item12", 10),
+            ("item20", 20),
+            ("item30", 30),
+            ("item31", 30),
+        };
+
+        items
+            .DistinctBy(x => x.Item2)
+            .Select(x => x.Item1)
+            .Should()
+            .BeEquivalentTo(new[] { "item10", "item20", "item30" });
+    }
+
+    [Fact]
+    public void ChunkShouldWork()
+    {
+        Enumerable
+            .Range(0, 5)
+            .Chunk((_, index) => index % 2 == 1)
+            .Should()
+            .BeEquivalentTo(new[]
+            {
+                new[] { 0, 1 },
+                new[] { 2, 3 },
+                new[] { 4 }
+            });
+    }
+
+    [Fact]
+    public void SkipLastShouldWork()
+    {
+        var items = new[] { 1, 2, 5, 6, 7 };
+        items
+            .SkipLast()
+            .Should()
+            .BeEquivalentTo(items.Take(items.Length - 1));
+    }
+
+    [Fact]
+    public void AggregateWithPrevious()
+    {
+        var items = new[] { 1, 2, 5, 6, 7 };
+        items.AggregateWithPrevious(100, (agg, prev, item) => agg - prev + item)
+            .Should()
+            .Be(107);
+    }
+}

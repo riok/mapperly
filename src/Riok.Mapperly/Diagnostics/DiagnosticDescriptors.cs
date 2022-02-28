@@ -67,4 +67,36 @@ internal static class DiagnosticDescriptors
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true);
+
+    public static readonly DiagnosticDescriptor CanNotMapToReadOnlyProperty = new(
+        "RMG009",
+        "Can not map to read only property",
+        "Can not map property {0}.{1} of type {2} to read only property {3}.{4} of type {5}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Info,
+        true);
+
+    public static readonly DiagnosticDescriptor CanNotMapFromWriteOnlyProperty = new(
+        "RMG010",
+        "Can not map from write only property",
+        "Can not map from write only property {0}.{1} of type {2} to property {3}.{4} of type {5}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Info,
+        true);
+
+    public static readonly DiagnosticDescriptor CanNotMapToWriteOnlyPropertyPath = new(
+        "RMG011",
+        "Can not map to write only property path",
+        "Can not map from property {0}.{1} of type {2} to write only property path {3}.{4} of type {5}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Info,
+        true);
+
+    public static readonly DiagnosticDescriptor MappingSourcePropertyNotFound = new(
+        "RMG012",
+        "Mapping source property not found",
+        "Property {0} on source type {1} was not found",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Info,
+        true);
 }

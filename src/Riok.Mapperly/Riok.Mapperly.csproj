@@ -22,7 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Riok.Mapperly.Abstractions\Riok.Mapperly.Abstractions.csproj" PrivateAssets="All" />
   </ItemGroup>
-
+  
   <!-- This ensures the library will be packaged as a source generator when we use `dotnet pack` -->
   <ItemGroup>
     <None Include="../../README.md" Pack="true" PackagePath="\" />

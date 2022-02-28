@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBuilder;
-using Riok.Mapperly.Descriptors.TypeMappings;
+using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;

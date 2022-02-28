@@ -1,0 +1,17 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG011,
+      Title: Can not map to write only property path,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (10,4)-(10,68),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Can not map from property {0}.{1} of type {2} to write only property path {3}.{4} of type {5},
+      Message: Can not map from property A.MyValueId of type string to write only property path B.Value.Id of type string,
+      Category: Mapper,
+      CustomTags: []
+    }
+  ]
+}

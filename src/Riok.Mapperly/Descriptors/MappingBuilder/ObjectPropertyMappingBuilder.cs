@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Descriptors.TypeMappings;
+using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 
@@ -21,12 +22,15 @@ public static class ObjectPropertyMappingBuilder
 
     public static void BuildMappingBody(MappingBuilderContext ctx, ObjectPropertyMapping mapping)
     {
+        var mappingCtx = new ObjectPropertyMappingBuilderContext(ctx, mapping);
+
         var ignoredTargetProperties = ctx.ListConfiguration<MapperIgnoreAttribute>()
             .Select(x => x.Target)
             .ToHashSet();
 
-        var nameMappings = ctx.ListConfiguration<MapPropertyAttribute>()
-            .ToDictionary(x => x.Target, x => x.Source);
+        var propertyConfigsByRootTargetName = ctx.ListConfiguration<MapPropertyAttribute>()
+            .GroupBy(x => x.Target.First())
+            .ToDictionary(x => x.Key, x => x.ToList());
 
         var targetProperties = mapping.TargetType
             .GetAllMembers()
@@ -38,93 +42,246 @@ public static class ObjectPropertyMappingBuilder
             if (ignoredTargetProperties.Remove(targetProperty.Name))
                 continue;
 
-            var mappingNameWasManuallyConfigured = nameMappings.Remove(targetProperty.Name, out var sourcePropertyName);
-            sourcePropertyName ??= targetProperty.Name;
-
-            var sourceProperty = FindSourceProperty(mapping.SourceType, sourcePropertyName);
-            if (sourceProperty != null)
+            if (propertyConfigsByRootTargetName.Remove(targetProperty.Name, out var propertyConfigs))
             {
-                if (BuildPropertyMapping(ctx, mapping, sourceProperty, targetProperty) is { } propertyMapping)
+                // add all configured mappings
+                // order by target path count to map less nested items first (otherwise they would overwrite all others)
+                // eg. target.A = source.B should be mapped before target.A.Id = source.B.Id
+                foreach (var config in propertyConfigs.OrderBy(x => x.Target.Count))
                 {
-                    mapping.AddPropertyMapping(propertyMapping);
+                    BuildPropertyMapping(mappingCtx, config.Source, config.Target, true);
                 }
+
                 continue;
             }
 
-            if (mappingNameWasManuallyConfigured)
+            // only try other namings if the property was not found,
+            // ignore all other results
+            var targetPropertyPath = new[] { targetProperty.Name };
+            var targetPropFound = false;
+            foreach (var sourcePropertyCandidate in MemberPathCandidateBuilder.BuildMemberPathCandidates(targetProperty.Name))
+            {
+                if (BuildPropertyMapping(mappingCtx, sourcePropertyCandidate.ToList(), targetPropertyPath) is not ValidationResult.PropertyNotFound)
+                {
+                    targetPropFound = true;
+                    break;
+                }
+            }
+
+            // target property couldn't be found
+            // add a diagnostic.
+            if (!targetPropFound)
             {
                 ctx.ReportDiagnostic(
-                    DiagnosticDescriptors.ConfiguredMappingSourcePropertyNotFound,
-                    sourcePropertyName,
-                    mapping.TargetType);
+                    DiagnosticDescriptors.MappingSourcePropertyNotFound,
+                    targetProperty.Name,
+                    mapping.SourceType);
             }
         }
 
-        AddUnmatchedIgnoredPropertiesDiagnostics(ctx, ignoredTargetProperties, mapping);
-        AddUnmatchedTargetPropertiesDiagnostics(ctx, nameMappings.Keys, mapping);
+        AddUnmatchedIgnoredPropertiesDiagnostics(mappingCtx, ignoredTargetProperties);
+        AddUnmatchedTargetPropertiesDiagnostics(mappingCtx, propertyConfigsByRootTargetName.Values.SelectMany(x => x));
     }
 
-    private static void AddUnmatchedTargetPropertiesDiagnostics(
-        MappingBuilderContext ctx,
-        IEnumerable<string> propertyNames,
-        ObjectPropertyMapping mapping)
+    private static ValidationResult BuildPropertyMapping(
+        ObjectPropertyMappingBuilderContext ctx,
+        IReadOnlyCollection<string> sourcePath,
+        IReadOnlyCollection<string> targetPath,
+        bool configuredTargetPropertyPath = false)
     {
-        foreach (var propertyName in propertyNames)
+        var targetPropertyPath = new PropertyPath(FindPropertyPath(ctx.Mapping.TargetType, targetPath).ToList());
+        var sourcePropertyPath = new PropertyPath(FindPropertyPath(ctx.Mapping.SourceType, sourcePath).ToList());
+
+        var validationResult = ValidateMapping(
+            ctx,
+            sourcePropertyPath,
+            targetPropertyPath,
+            sourcePath,
+            targetPath,
+            configuredTargetPropertyPath);
+        if (validationResult != ValidationResult.Ok)
+            return validationResult;
+
+        // nullability is handled inside the property mapping
+        var delegateMapping = ctx.BuilderContext.FindMapping(sourcePropertyPath.Member.Type.UpgradeNullable(), targetPropertyPath.Member.Type.UpgradeNullable())
+            ?? ctx.BuilderContext.FindOrBuildMapping(sourcePropertyPath.Member.Type.NonNullable(), targetPropertyPath.Member.Type.NonNullable());
+
+        // couldn't build the mapping
+        if (delegateMapping == null)
         {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.ConfiguredMappingTargetPropertyNotFound,
-                propertyName,
-                mapping.TargetType);
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CouldNotMapProperty,
+                ctx.Mapping.SourceType,
+                sourcePropertyPath.FullName,
+                sourcePropertyPath.Member.Type,
+                ctx.Mapping.TargetType,
+                targetPropertyPath.FullName,
+                targetPropertyPath.Member.Type);
+            return ValidationResult.CannotMapTypes;
+        }
+
+        // no member of the source path is nullable, no null handling needed
+        if (!sourcePropertyPath.IsAnyNullable())
+        {
+            ctx.AddPropertyMapping(new PropertyMapping(
+                sourcePropertyPath,
+                targetPropertyPath,
+                delegateMapping,
+                false));
+            return ValidationResult.Ok;
+        }
+
+        // the source is nullable, or the mapping is a direct assignment and the target allows nulls
+        // access the source in a null save matter (via ?.) but no other special handling required.
+        if (delegateMapping.SourceType.IsNullable() || delegateMapping is DirectAssignmentMapping && targetPropertyPath.Member.IsNullable())
+        {
+            ctx.AddPropertyMapping(new PropertyMapping(
+                sourcePropertyPath,
+                targetPropertyPath,
+                delegateMapping,
+                true));
+            return ValidationResult.Ok;
+        }
+
+        // additional null condition check
+        // (only map if source is not null, else may throw depending on settings)
+        ctx.AddNullDelegatePropertyMapping(new PropertyMapping(
+            sourcePropertyPath,
+            targetPropertyPath,
+            delegateMapping,
+            false));
+        return ValidationResult.Ok;
+    }
+
+    private static ValidationResult ValidateMapping(
+        ObjectPropertyMappingBuilderContext ctx,
+        PropertyPath sourcePropertyPath,
+        PropertyPath targetPropertyPath,
+        IReadOnlyCollection<string> configuredSourcePropertyPath,
+        IReadOnlyCollection<string> configuredTargetPropertyPath,
+        bool reportDiagnosticIfPropertyNotFound)
+    {
+        // the path parts don't match, not all target properties could be found
+        if (configuredTargetPropertyPath.Count != targetPropertyPath.Path.Count)
+        {
+            if (reportDiagnosticIfPropertyNotFound)
+            {
+                ctx.BuilderContext.ReportDiagnostic(
+                    DiagnosticDescriptors.ConfiguredMappingTargetPropertyNotFound,
+                    string.Join(PropertyPath.PropertyAccessSeparator, configuredTargetPropertyPath),
+                    ctx.Mapping.TargetType);
+            }
+            return ValidationResult.PropertyNotFound;
+        }
+
+        // the path parts don't match, not all source properties could be found
+        if (configuredSourcePropertyPath.Count != sourcePropertyPath.Path.Count)
+        {
+            if (reportDiagnosticIfPropertyNotFound)
+            {
+                ctx.BuilderContext.ReportDiagnostic(
+                    DiagnosticDescriptors.ConfiguredMappingSourcePropertyNotFound,
+                    string.Join(PropertyPath.PropertyAccessSeparator, configuredSourcePropertyPath),
+                    ctx.Mapping.SourceType);
+            }
+            return ValidationResult.PropertyNotFound;
+        }
+
+        // the target property path is readonly
+        if (targetPropertyPath.Member.IsReadOnly)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CanNotMapToReadOnlyProperty,
+                ctx.Mapping.SourceType,
+                sourcePropertyPath.FullName,
+                sourcePropertyPath.Member.Type,
+                ctx.Mapping.TargetType,
+                targetPropertyPath.FullName,
+                targetPropertyPath.Member.Type);
+            return ValidationResult.PropertyHasUnexpectedSpecification;
+        }
+
+        // a target property path part is write only
+        if (targetPropertyPath.ObjectPath.Any(p => p.IsWriteOnly))
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CanNotMapToWriteOnlyPropertyPath,
+                ctx.Mapping.SourceType,
+                sourcePropertyPath.FullName,
+                sourcePropertyPath.Member.Type,
+                ctx.Mapping.TargetType,
+                targetPropertyPath.FullName,
+                targetPropertyPath.Member.Type);
+            return ValidationResult.PropertyHasUnexpectedSpecification;
+        }
+
+        // a source property path is write only
+        if (sourcePropertyPath.Path.Any(p => p.IsWriteOnly))
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CanNotMapFromWriteOnlyProperty,
+                ctx.Mapping.SourceType,
+                sourcePropertyPath.FullName,
+                sourcePropertyPath.Member.Type,
+                ctx.Mapping.TargetType,
+                targetPropertyPath.FullName,
+                targetPropertyPath.Member.Type);
+            return ValidationResult.PropertyHasUnexpectedSpecification;
+        }
+
+        return ValidationResult.Ok;
+    }
+
+    private static IEnumerable<IPropertySymbol> FindPropertyPath(ITypeSymbol type, IEnumerable<string> path)
+    {
+        foreach (var name in path)
+        {
+            if (FindProperty(type, name) is not { } property)
+                break;
+
+            type = property.Type;
+            yield return property;
         }
     }
 
-    private static void AddUnmatchedIgnoredPropertiesDiagnostics(
-        MappingBuilderContext ctx,
-        HashSet<string> ignoredTargetProperties,
-        ObjectPropertyMapping mapping)
+    private static IPropertySymbol? FindProperty(ITypeSymbol type, string name)
     {
-        foreach (var notFoundIgnoredProperty in ignoredTargetProperties)
-        {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.IgnoredPropertyNotFound,
-                notFoundIgnoredProperty,
-                mapping.TargetType);
-        }
-    }
-
-    private static IPropertySymbol? FindSourceProperty(ITypeSymbol source, string name)
-    {
-        return source.GetAllMembers(name)
+        return type.GetAllMembers(name)
             .OfType<IPropertySymbol>()
             .FirstOrDefault(p => !p.IsStatic);
     }
 
-    private static PropertyMapping? BuildPropertyMapping(
-        MappingBuilderContext ctx,
-        ObjectPropertyMapping mapping,
-        IPropertySymbol sourceProperty,
-        IPropertySymbol targetProperty)
+    private static void AddUnmatchedTargetPropertiesDiagnostics(
+        ObjectPropertyMappingBuilderContext ctx,
+        IEnumerable<MapPropertyAttribute> unmatchedConfiguredProperties)
     {
-        if (targetProperty.IsReadOnly)
-            return null;
+        foreach (var propertyConfig in unmatchedConfiguredProperties)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.ConfiguredMappingTargetPropertyNotFound,
+                propertyConfig.TargetFullName,
+                ctx.Mapping.TargetType);
+        }
+    }
 
-        if (sourceProperty.IsWriteOnly)
-            return null;
+    private static void AddUnmatchedIgnoredPropertiesDiagnostics(
+        ObjectPropertyMappingBuilderContext ctx,
+        HashSet<string> ignoredTargetProperties)
+    {
+        foreach (var notFoundIgnoredProperty in ignoredTargetProperties)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.IgnoredPropertyNotFound,
+                notFoundIgnoredProperty,
+                ctx.Mapping.TargetType);
+        }
+    }
 
-        // nullability is handled inside the property mapping
-        var delegateMapping = ctx.FindMapping(sourceProperty.Type.UpgradeNullable(), targetProperty.Type.UpgradeNullable())
-            ?? ctx.FindOrBuildMapping(sourceProperty.Type.NonNullable(), targetProperty.Type.NonNullable());
-        if (delegateMapping != null)
-            return new PropertyMapping(sourceProperty, targetProperty, delegateMapping, ctx.MapperConfiguration.ThrowOnPropertyMappingNullMismatch);
-
-        ctx.ReportDiagnostic(
-            DiagnosticDescriptors.CouldNotMapProperty,
-            mapping.SourceType,
-            sourceProperty.Name,
-            sourceProperty.Type,
-            mapping.TargetType,
-            targetProperty.Name,
-            targetProperty.Type);
-        return null;
+    private enum ValidationResult
+    {
+        Ok,
+        PropertyNotFound,
+        PropertyHasUnexpectedSpecification,
+        CannotMapTypes,
     }
 }

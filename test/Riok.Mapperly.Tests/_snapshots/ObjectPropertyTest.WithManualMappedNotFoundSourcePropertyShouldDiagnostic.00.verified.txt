@@ -1,0 +1,17 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG006,
+      Title: Mapping source property not found,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (10,4)-(10,89),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Specified property {0} on source type {1} was not found,
+      Message: Specified property StringValue9 on source type A was not found,
+      Category: Mapper,
+      CustomTags: []
+    }
+  ]
+}
