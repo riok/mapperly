@@ -3,8 +3,22 @@
 ![Nuget](https://img.shields.io/nuget/v/Riok.Mapperly?style=flat-square)
 ![GitHub](https://img.shields.io/github/license/riok/mapperly?style=flat-square)
 
-A .NET source generator for generating object mappings.
-Inspired by MapStruct.
+Mapperly is a .NET source generator for generating object mappings. Inspired by MapStruct.
+
+Because Mapperly creates the mapping code at build time, there is minimal overhead at runtime.
+Even better, the generated code is perfectly readable, allowing you to verify the generated mapping code easily.
+
+Mapperly is the fastet .NET object mapper out there, surpassing even the naive manual mapping approach! The benchmark was generated with https://github.com/mjebrahimi/Benchmark.netCoreMappers.
+
+|        Method |       Mean |   Error |  StdDev |  Gen 0 | Allocated |
+|-------------- |-----------:|--------:|--------:|-------:|----------:|
+|   AgileMapper | 1,523.8 ns | 3.90 ns | 3.25 ns | 1.5106 |   3,160 B |
+|    TinyMapper | 4,094.3 ns | 3.90 ns | 3.05 ns | 1.0300 |   2,160 B |
+| ExpressMapper | 2,595.8 ns | 5.49 ns | 5.14 ns | 2.3422 |   4,904 B |
+|    AutoMapper | 1,203.9 ns | 2.30 ns | 2.15 ns | 0.9098 |   1,904 B |
+| ManualMapping |   529.6 ns | 0.52 ns | 0.44 ns | 0.5541 |   1,160 B |
+|       Mapster |   562.1 ns | 1.14 ns | 0.89 ns | 0.9098 |   1,904 B |
+|      Mapperly |   338.5 ns | 0.95 ns | 0.84 ns | 0.4396 |     920 B |
 
 ## Quickstart
 
@@ -22,28 +36,28 @@ and apply the `Riok.Mapperly.Abstractions.MapperAttribute` attribute.
 Mapperly generates mapping method implementations for the defined mapping methods in the mapper.
 
 ```c#
-// mapper declaration
+// Mapper declaration
 [Mapper]
 public partial class DtoMapper
 {
     public partial CarDto CarToCarDto(Car car);
 }
 
-// mapper usage
+// Mapper usage
 var mapper = new DtoMapper();
 var car = new Car { NumberOfSeats = 10, ... };
-var dto = mapper.CarToCarDto();
+var dto = mapper.CarToCarDto(car);
 dto.NumberOfSeats.Should().Be(10);
 ```
 
-### Configuration
+## Configuration
 
 The attributes defined in `Riok.Mapperly.Abstractions` can be used to customize different aspects of the generated mapper.
 
-#### Mapper
+### Mapper
 
 The `MapperAttribute` provides options to customize the generated mapper class.
-The generated class name, the instance field name and the default enum mapping strategy is adjustable.
+The default enum mapping and null handling strategy are adjustable.
 
 ####  Copy behaviour
 
@@ -52,21 +66,26 @@ If an object can be directly assigned to the target, it will do so
 (eg. if the source and target type are both `Car[]`, the array and its entries will not be cloned).
 To create deep copies, set the `UseDeepCloning` property on the `MapperAttribute` to `true`.
 
-#### Properties
+### Properties
 
-On each mapping method declaration property mappings can be customized.
+On each mapping method declaration, property mappings can be customized.
 If a property on the target has a different name than on the source, the `MapPropertyAttribute` can be applied.
 If a property should be ignored, the `MapperIgnoreAttribute` can be used.
 
 #### Flattening and unflattening
 
-It is pretty common to flatten objects during mapping, e.g. `Car.Make.Id => Car.MakeId`.
-Mapperly tries to figure out flattenings automatically by making use of the pascal case c# notation.
+It is pretty common to flatten objects during mapping, eg. `Car.Make.Id => CarDto.MakeId`.
+Mapperly tries to figure out flattenings automatically by making use of the pascal case C# notation.
 If Mapperly can't resolve the target or source property correctly, it is possible to manually configure it by applying the `MapPropertyAttribute`
-by either using the source and target property path names as arrays or using a dot separated property access path string (e.g. `[MapProperty(Source = new[] { nameof(Car), nameof(Car.Make), nameof(Car.Make.Id) }, Target = new[] { nameof(Car), nameof(Car.MakeId) })]` or `[MapProperty(Source = "Car.Make.Id", Target = "Car.MakeId")]`).
-Note: unflattening is not yet automatically configured by Mapperly and needs to be configured manually via `MapPropertyAttribute`.
+by either using the source and target property path names as arrays or using a dot separated property access path string
+```c#
+[MapProperty(Source = new[] { nameof(Car), nameof(Car.Make), nameof(Car.Make.Id) }, Target = new[] { nameof(CarDto), nameof(CarDto.MakeId) })]
+// Or alternatively
+[MapProperty(Source = "Car.Make.Id", Target = "CarDto.MakeId")]
+```
+Note: Unflattening is not yet automatically configured by Mapperly and needs to be configured manually via `MapPropertyAttribute`.
 
-#### Enum
+### Enum
 
 The enum mapping can be customized by setting the strategy to use.
 Apply the `MapEnumAttribute` and pass the strategy to be used for this enum.
@@ -78,27 +97,7 @@ Available strategies:
 | ByValue | Matches enum entries by their values      |
 | ByName  | Matches enum entries by their exact names |
 
-The `IgnoreCase` property allows to opt in for case ignored mappings.
-
-## Void mapping methods
-
-If an existing object instance should be used as target you can define the mapping method as void with the target as second parameter:
-
-```c#
-// mapper declaration
-[Mapper]
-public partial class DtoMapper
-{
-    public partial void CarToCarDto(Car car, CarDto dto);
-}
-
-// mapper usage
-var mapper = new DtoMapper();
-var car = new Car { NumberOfSeats = 10, ... };
-var dto = new CarDto();
-mapper.CarToCarDto(car, dto);
-dto.NumberOfSeats.Should().Be(10);
-```
+The `IgnoreCase` property allows to opt in for case insensitive mappings.
 
 ## User implemented mapping methods
 
@@ -114,7 +113,7 @@ public partial class DtoMapper
 }
 ```
 
-Whenever Mapperly needs a mapping from `DateTime` to `DateOnly` inside the `DtoMapper` implementation it will use the provided implementation.
+Whenever Mapperly needs a mapping from `DateTime` to `DateOnly` inside the `DtoMapper` implementation, it will use the provided implementation.
 
 ## Before / after map
 
@@ -134,4 +133,24 @@ public partial class DtoMapper
 
     private partial CarDto CarToCarDto(Car car);
 }
+```
+
+## Void mapping methods
+
+If an existing object instance should be used as target, you can define the mapping method as void with the target as second parameter:
+
+```c#
+// Mapper declaration
+[Mapper]
+public partial class DtoMapper
+{
+    public partial void CarToCarDto(Car car, CarDto dto);
+}
+
+// Mapper usage
+var mapper = new DtoMapper();
+var car = new Car { NumberOfSeats = 10, ... };
+var dto = new CarDto();
+mapper.CarToCarDto(car, dto);
+dto.NumberOfSeats.Should().Be(10);
 ```
