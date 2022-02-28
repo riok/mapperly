@@ -27,6 +27,13 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public ITypeSymbol Target { get; }
 
+    public INamedTypeSymbol GetTypeSymbol(Type type)
+        => Compilation.GetTypeByMetadataName(type.FullName ?? throw new InvalidOperationException("Could not get name of type " + type))
+            ?? throw new InvalidOperationException("Could not get type " + type.FullName);
+
+    public bool IsType(ITypeSymbol symbol, Type type)
+        => SymbolEqualityComparer.Default.Equals(symbol, GetTypeSymbol(type));
+
     public TypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
         => _builder.FindMapping(sourceType.UpgradeNullable(), targetType.UpgradeNullable());
 

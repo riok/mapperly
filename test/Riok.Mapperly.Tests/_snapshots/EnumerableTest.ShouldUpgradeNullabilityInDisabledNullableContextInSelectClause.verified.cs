@@ -9,7 +9,7 @@ public partial class Mapper
         var target = new B();
         if (source.Value != null)
         {
-            target.Value = System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source.Value, x => MapToD(x)));
+            target.Value = MapToDArray(source.Value);
         }
 
         return target;
@@ -21,6 +21,17 @@ public partial class Mapper
             return default;
         var target = new D();
         target.Value = source.Value;
+        return target;
+    }
+
+    private D[] MapToDArray(C[] source)
+    {
+        var target = new D[source.Length];
+        for (var i = 0; i < source.Length; i++)
+        {
+            target[i] = MapToD(source[i]);
+        }
+
         return target;
     }
 }

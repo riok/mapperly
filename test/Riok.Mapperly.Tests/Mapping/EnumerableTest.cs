@@ -24,7 +24,13 @@ public class EnumerableTest
             "int[]");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
-            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => x == null ? throw new System.ArgumentNullException(nameof(x)) : x.Value));");
+            .Be(@"var target = new int[source.Length];
+    for (var i = 0; i < source.Length; i++)
+    {
+        target[i] = source[i] == null ? throw new System.ArgumentNullException(nameof(source[i])) : source[i].Value;
+    }
+
+    return target;".ReplaceLineEndings());
     }
 
     [Fact]
@@ -35,7 +41,13 @@ public class EnumerableTest
             "int?[]");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
-            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => (int? )x));");
+            .Be(@"var target = new int? [source.Length];
+    for (var i = 0; i < source.Length; i++)
+    {
+        target[i] = (int? )source[i];
+    }
+
+    return target;".ReplaceLineEndings());
     }
 
     [Fact]
@@ -59,7 +71,13 @@ public class EnumerableTest
             TestSourceBuilderOptions.WithDeepCloning);
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
-            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => x == null ? throw new System.ArgumentNullException(nameof(x)) : x.Value));");
+            .Be(@"var target = new int[source.Length];
+    for (var i = 0; i < source.Length; i++)
+    {
+        target[i] = source[i] == null ? throw new System.ArgumentNullException(nameof(source[i])) : source[i].Value;
+    }
+
+    return target;".ReplaceLineEndings());
     }
 
     [Fact]
@@ -71,7 +89,13 @@ public class EnumerableTest
             TestSourceBuilderOptions.WithDeepCloning);
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
-            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => (int? )x));");
+            .Be(@"var target = new int? [source.Length];
+    for (var i = 0; i < source.Length; i++)
+    {
+        target[i] = (int? )source[i];
+    }
+
+    return target;".ReplaceLineEndings());
     }
 
     [Fact]
@@ -95,7 +119,13 @@ public class EnumerableTest
             "class B { public int Value {get; set; }}");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
-            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => x == null ? throw new System.ArgumentNullException(nameof(x)) : x));");
+            .Be(@"var target = new B[source.Length];
+    for (var i = 0; i < source.Length; i++)
+    {
+        target[i] = source[i] == null ? throw new System.ArgumentNullException(nameof(source[i])) : source[i];
+    }
+
+    return target;".ReplaceLineEndings());
     }
 
     [Fact]
@@ -120,8 +150,17 @@ public class EnumerableTest
             "class B { public int Value { get; set; }}");
         TestHelper.GenerateMapperMethodBody(source)
             .Should()
-            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => MapToB(x)));");
+            .Be(@"var target = new B[source.Length];
+    for (var i = 0; i < source.Length; i++)
+    {
+        target[i] = MapToB(source[i]);
     }
+
+    return target;".ReplaceLineEndings());
+    }
+
+    // TODO
+    // array as void mapping method
 
     [Fact]
     public void ArrayToArrayOfString()
@@ -216,7 +255,13 @@ public class EnumerableTest
             "struct A{}");
         TestHelper.GenerateMapperMethodBody(source)
             .Should()
-            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => MapToA(x)));");
+            .Be(@"var target = new A[source.Length];
+    for (var i = 0; i < source.Length; i++)
+    {
+        target[i] = MapToA(source[i]);
+    }
+
+    return target;".ReplaceLineEndings());
     }
 
     [Fact]
@@ -227,7 +272,13 @@ public class EnumerableTest
             "int[]");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
-            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => (int)x));");
+            .Be(@"var target = new int[source.Length];
+    for (var i = 0; i < source.Length; i++)
+    {
+        target[i] = (int)source[i];
+    }
+
+    return target;".ReplaceLineEndings());
     }
 
     [Fact]

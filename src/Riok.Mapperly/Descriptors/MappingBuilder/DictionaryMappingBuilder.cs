@@ -7,22 +7,11 @@ namespace Riok.Mapperly.Descriptors.MappingBuilder;
 
 public static class DictionaryMappingBuilder
 {
-    private static readonly string _enumerableIntfName = typeof(IEnumerable<>).FullName;
-    private static readonly string _dictionaryClassName = typeof(Dictionary<,>).FullName;
-    private static readonly string _dictionaryIntfName = typeof(IDictionary<,>).FullName;
-    private static readonly string _readOnlyDictionaryIntfName = typeof(IReadOnlyDictionary<,>).FullName;
-    private static readonly string _keyValuePairName = typeof(KeyValuePair<,>).FullName;
     private static readonly string _countPropertyName = "Count";
 
     public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
-        if (ctx.Compilation.GetTypeByMetadataName(_readOnlyDictionaryIntfName) is not { } readOnlyDictionaryIntfSymbol)
-            return null;
-
-        if (ctx.Compilation.GetTypeByMetadataName(_dictionaryIntfName) is not { } dictionaryIntfSymbol)
-            return null;
-
-        if (GetDictionaryKeyValueTypes(ctx.Target, dictionaryIntfSymbol, readOnlyDictionaryIntfSymbol) is not var (targetKeyType, targetValueType))
+        if (GetDictionaryKeyValueTypes(ctx.Target, ctx.GetTypeSymbol(typeof(IDictionary<,>)), ctx.GetTypeSymbol(typeof(IReadOnlyDictionary<,>))) is not var (targetKeyType, targetValueType))
             return null;
 
         if (GetEnumerableKeyValueTypes(ctx, ctx.Source) is not var (sourceKeyType, sourceValueType))
@@ -36,15 +25,15 @@ public static class DictionaryMappingBuilder
         if (valueMapping == null)
             return null;
 
-        // target is of type IDictionary<,> or IReadOnlyDictionary<,>. The constructed type should be Dictionary<,>
-        if (ctx.Compilation.GetTypeByMetadataName(_dictionaryClassName) is { } dictionaryClassSymbol
-            && (IsDictionaryInterface(ctx.Target, dictionaryIntfSymbol, readOnlyDictionaryIntfSymbol) || ctx.Target.ImplementsGeneric(dictionaryClassSymbol, out _)))
+        // target is of type IDictionary<,> or IReadOnlyDictionary<,>.
+        // The constructed type should be Dictionary<,>
+        if (IsDictionaryType(ctx, ctx.Target))
         {
             var sourceHasCount = ctx.Source.GetAllMembers(_countPropertyName)
                 .OfType<IPropertySymbol>()
                 .Any(x => !x.IsStatic && !x.IsIndexer && !x.IsWriteOnly && x.Type.SpecialType == SpecialType.System_Int32);
 
-            var targetDictionarySymbol = dictionaryClassSymbol.Construct(targetKeyType, targetValueType);
+            var targetDictionarySymbol = ctx.GetTypeSymbol(typeof(Dictionary<,>)).Construct(targetKeyType, targetValueType);
             return new ForEachAddDictionaryMapping(ctx.Source, ctx.Target, keyMapping, valueMapping, sourceHasCount, targetDictionarySymbol);
         }
 
@@ -59,13 +48,14 @@ public static class DictionaryMappingBuilder
         return new ForEachAddDictionaryMapping(ctx.Source, ctx.Target, keyMapping, valueMapping, false);
     }
 
-    private static bool IsDictionaryInterface(ITypeSymbol symbol, ISymbol dictionaryIntfSymbol, ISymbol readOnlyDictionaryIntfSymbol)
+    private static bool IsDictionaryType(MappingBuilderContext ctx, ITypeSymbol symbol)
     {
         if (symbol is not INamedTypeSymbol namedSymbol)
             return false;
 
-        return SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, readOnlyDictionaryIntfSymbol)
-            || SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, dictionaryIntfSymbol);
+        return SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.GetTypeSymbol(typeof(Dictionary<,>)))
+            || SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.GetTypeSymbol(typeof(IDictionary<,>)))
+            || SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.GetTypeSymbol(typeof(IReadOnlyDictionary<,>)));
     }
 
     private static (ITypeSymbol, ITypeSymbol)? GetDictionaryKeyValueTypes(
@@ -88,19 +78,13 @@ public static class DictionaryMappingBuilder
 
     private static (ITypeSymbol, ITypeSymbol)? GetEnumerableKeyValueTypes(MappingBuilderContext ctx, ITypeSymbol t)
     {
-        if (ctx.Compilation.GetTypeByMetadataName(_enumerableIntfName) is not { } enumerableSymbol
-            || ctx.Compilation.GetTypeByMetadataName(_keyValuePairName) is not { } keyValueSymbol)
-        {
-            return null;
-        }
-
-        if (!t.ImplementsGeneric(enumerableSymbol, out var enumerableImpl))
+        if (!t.ImplementsGeneric(ctx.GetTypeSymbol(typeof(IEnumerable<>)), out var enumerableImpl))
             return null;
 
         if (enumerableImpl.TypeArguments[0] is not INamedTypeSymbol enumeratedType)
             return null;
 
-        if (!SymbolEqualityComparer.Default.Equals(enumeratedType.ConstructedFrom, keyValueSymbol))
+        if (!SymbolEqualityComparer.Default.Equals(enumeratedType.ConstructedFrom, ctx.GetTypeSymbol(typeof(KeyValuePair<,>))))
             return null;
 
         return (enumeratedType.TypeArguments[0], enumeratedType.TypeArguments[1]);
