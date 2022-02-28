@@ -190,7 +190,7 @@ enum E2 {A = 100, B, C}
             "enum E2 {A, B, C}");
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
-            .Be("return (E2)source;");
+            .Be("return (E2? )(E2)source;");
     }
 
     [Fact]

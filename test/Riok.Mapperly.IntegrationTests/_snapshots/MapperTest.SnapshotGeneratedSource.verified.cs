@@ -20,7 +20,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public partial int? CastIntNullable(int value)
         {
-            return value;
+            return (int?)value;
         }
 
         public partial System.Guid ParseableGuid(string id)

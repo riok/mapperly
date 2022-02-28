@@ -1,5 +1,8 @@
+using Microsoft.CodeAnalysis;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
+[UsesVerify]
 public class EnumerableTest
 {
     [Fact]
@@ -11,6 +14,28 @@ public class EnumerableTest
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
             .Be("return source;");
+    }
+
+    [Fact]
+    public void ArrayOfNullablePrimitiveTypesToNonNullableArray()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "int?[]",
+            "int[]");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => x == null ? throw new System.ArgumentNullException(nameof(x)) : x.Value));");
+    }
+
+    [Fact]
+    public void ArrayOfPrimitiveTypesToNullablePrimitiveTypesArray()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "int[]",
+            "int?[]");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => (int? )x));");
     }
 
     [Fact]
@@ -26,6 +51,30 @@ public class EnumerableTest
     }
 
     [Fact]
+    public void ArrayOfNullablePrimitiveTypesToNonNullableArrayDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "int?[]",
+            "int[]",
+            TestSourceBuilderOptions.WithDeepCloning);
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => x == null ? throw new System.ArgumentNullException(nameof(x)) : x.Value));");
+    }
+
+    [Fact]
+    public void ArrayOfPrimitiveTypesToNullablePrimitiveTypesArrayDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "int[]",
+            "int?[]",
+            TestSourceBuilderOptions.WithDeepCloning);
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => (int? )x));");
+    }
+
+    [Fact]
     public void ArrayCustomClassToArrayCustomClass()
     {
         var source = TestSourceBuilder.Mapping(
@@ -35,6 +84,30 @@ public class EnumerableTest
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
             .Be("return source;");
+    }
+
+    [Fact]
+    public void ArrayCustomClassNullableToArrayCustomClassNonNullable()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "B?[]",
+            "B[]",
+            "class B { public int Value {get; set; }}");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(source, x => x == null ? throw new System.ArgumentNullException(nameof(x)) : x));");
+    }
+
+    [Fact]
+    public void ArrayCustomClassNonNullableToArrayCustomClassNullable()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "B[]",
+            "B?[]",
+            "class B { public int Value {get; set; }}");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return (B? [])source;");
     }
 
     [Fact]
@@ -62,6 +135,17 @@ public class EnumerableTest
     }
 
     [Fact]
+    public void ArrayToArrayOfNullableString()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "string[]",
+            "string?[]");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return (string? [])source;");
+    }
+
+    [Fact]
     public void ArrayToArrayOfStringDeepCloning()
     {
         var source = TestSourceBuilder.Mapping(
@@ -71,6 +155,18 @@ public class EnumerableTest
         TestHelper.GenerateSingleMapperMethodBody(source)
             .Should()
             .Be("return (string[])source.Clone();");
+    }
+
+    [Fact]
+    public void ArrayToArrayOfNullableStringDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "string[]",
+            "string?[]",
+            TestSourceBuilderOptions.WithDeepCloning);
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return (string? [])source.Clone();");
     }
 
     [Fact]
@@ -216,5 +312,19 @@ public class EnumerableTest
     }
 
     return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public Task ShouldUpgradeNullabilityInDisabledNullableContextInSelectClause()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public C[] Value { get; set;} }",
+            "class B { public D[] Value { get; set; } }",
+            "class C { public string Value { get; set; } }",
+            "class D { public string Value { get; set; } }");
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.Default with { NullableOption = NullableContextOptions.Disable });
     }
 }

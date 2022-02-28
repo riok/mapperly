@@ -615,4 +615,18 @@ D UserImplementedMap(C source) => new D();";
 
     return target;".ReplaceLineEndings());
     }
+
+    [Fact]
+    public Task ShouldUpgradeNullabilityInDisabledNullableContextInNestedProperty()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public C Value { get; set;} }",
+            "class B { public D Value { get; set; } }",
+            "class C { public string Value { get; set; } }",
+            "class D { public string Value { get; set; } }");
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.Default with { NullableOption = NullableContextOptions.Disable });
+    }
 }

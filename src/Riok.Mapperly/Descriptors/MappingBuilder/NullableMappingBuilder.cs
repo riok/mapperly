@@ -14,6 +14,11 @@ public static class NullableMappingBuilder
         if (!sourceIsNullable && !targetIsNullable)
             return null;
 
+        // if only the target is nullable and is not a nullable value type
+        // no conversion / null handling is needed at all.
+        if (!sourceIsNullable && targetIsNullable && !ctx.Target.IsNullableValueType())
+            return ctx.BuildDelegateMapping(ctx.Source, targetNonNullable!);
+
         var delegateMapping = ctx.BuildDelegateMapping(sourceNonNullable ?? ctx.Source, targetNonNullable ?? ctx.Target);
         return delegateMapping == null
             ? null

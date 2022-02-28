@@ -48,9 +48,11 @@ public static class EnumerableMappingBuilder
         if (isDirectElementMapping
             && ctx.Source.IsArrayType()
             && (ctx.Target.IsArrayType() || IsType(ctx, _readOnlyCollectionIntfName, ctx.Target.OriginalDefinition))
-            && SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, ctx.Target))
+            && SymbolEqualityComparer.Default.Equals(ctx.Source, ctx.Target))
         {
-            return new ArrayCloneMapping(ctx.Source, ctx.Target);
+            return ctx.MapperConfiguration.UseDeepCloning
+                ? new ArrayCloneMapping(ctx.Source, ctx.Target)
+                : new CastMapping(ctx.Source, ctx.Target);
         }
 
         // try linq mapping: x.Select(Map).ToArray/ToList
