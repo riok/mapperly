@@ -9,16 +9,16 @@ namespace Riok.Mapperly.Emit;
 
 public static class SourceEmitter
 {
-    public static string Build(MapperDescriptor descriptor)
+    public static CompilationUnitSyntax Build(MapperDescriptor descriptor)
     {
-        var classDeclaration = ClassDeclaration(descriptor.Name)
-            .WithModifiers(TokenList(Accessibility(descriptor.Accessibility), Token(SyntaxKind.PartialKeyword)))
+        var classDeclaration = ClassDeclaration(descriptor.Syntax.Identifier)
+            .WithModifiers(descriptor.Syntax.Modifiers)
             .WithMembers(List(BuildMembers(descriptor)));
-        var compilationUnit = CompilationUnit()
+
+        return CompilationUnit()
             .WithMembers(SingletonList(WrapInNamespaceIfNeeded(descriptor.Namespace, classDeclaration)))
             .WithLeadingTrivia(Nullable(true))
             .NormalizeWhitespace();
-        return compilationUnit.ToFullString();
     }
 
     private static IEnumerable<MemberDeclarationSyntax> BuildMembers(MapperDescriptor descriptor)

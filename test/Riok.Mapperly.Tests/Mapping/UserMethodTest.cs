@@ -145,4 +145,28 @@ class B { public string Value { get; set; } public long Value2 { get; set; } pub
 ";
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task WithMapperClassModifiersShouldCopyModifiersToMapper()
+    {
+        var source = @"
+using System;
+using System.Collections.Generic;
+using Riok.Mapperly.Abstractions;
+
+[Mapper]
+internal sealed abstract partial class BaseMapper
+{
+    public partial B AToB(A source);
+
+    protected partial short IntToShort(int value);
+
+    protected abstract string IntToString(int value);
+}
+
+class A { public int Value { get; set; } public int Value2 { get; set; } }
+class B { public string Value { get; set; } public short Value2 { get; set; } }
+";
+        return TestHelper.VerifyGenerator(source);
+    }
 }

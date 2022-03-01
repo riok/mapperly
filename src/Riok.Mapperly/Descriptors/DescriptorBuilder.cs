@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBuilder;
@@ -31,7 +32,6 @@ public class DescriptorBuilder
 
     private readonly SourceProductionContext _context;
     private readonly ITypeSymbol _mapperSymbol;
-    private readonly SyntaxNode _mapperSyntax;
     private readonly MapperDescriptor _mapperDescriptor;
 
     // default configurations, used a configuration is needed but no configuration is provided by the user
@@ -54,14 +54,13 @@ public class DescriptorBuilder
     public DescriptorBuilder(
         SourceProductionContext sourceContext,
         Compilation compilation,
-        SyntaxNode mapperSyntax,
+        ClassDeclarationSyntax mapperSyntax,
         ITypeSymbol mapperSymbol)
     {
-        _mapperSyntax = mapperSyntax;
         _mapperSymbol = mapperSymbol;
         _context = sourceContext;
         Compilation = compilation;
-        _mapperDescriptor = new MapperDescriptor(mapperSymbol.Name);
+        _mapperDescriptor = new MapperDescriptor(mapperSymbol.Name, mapperSyntax);
         MapperConfiguration = Configure();
     }
 
@@ -78,8 +77,6 @@ public class DescriptorBuilder
         {
             _mapperDescriptor.Namespace = _mapperSymbol.ContainingNamespace.ToDisplayString();
         }
-
-        _mapperDescriptor.Accessibility = _mapperSymbol.DeclaredAccessibility;
 
         _defaultConfigurations.Add(
             typeof(MapEnumAttribute),
@@ -117,17 +114,6 @@ public class DescriptorBuilder
         return mapping;
     }
 
-    public TypeMapping? FindOrBuildDelegateMapping(
-        ISymbol? userSymbol,
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType)
-    {
-        if (FindMapping(sourceType, targetType) is { } foundMapping)
-            return foundMapping;
-
-        return BuildDelegateMapping(userSymbol, sourceType, targetType);
-    }
-
     public TypeMapping? BuildDelegateMapping(
         ISymbol? userSymbol,
         ITypeSymbol sourceType,
@@ -147,7 +133,7 @@ public class DescriptorBuilder
     }
 
     internal void ReportDiagnostic(DiagnosticDescriptor descriptor, Location? location, params object[] messageArgs)
-        => _context.ReportDiagnostic(Diagnostic.Create(descriptor, location ?? _mapperSyntax.GetLocation(), messageArgs));
+        => _context.ReportDiagnostic(Diagnostic.Create(descriptor, location ?? _mapperDescriptor.Syntax.GetLocation(), messageArgs));
 
     private void ExtractUserMappings()
     {
