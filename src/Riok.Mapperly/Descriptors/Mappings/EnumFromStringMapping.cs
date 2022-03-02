@@ -12,7 +12,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public class EnumFromStringMapping : MethodMapping
 {
-    private const string EnumClassName = "Enum";
+    private const string EnumClassName = "System.Enum";
     private const string ParseMethodName = "Parse";
     private const string IgnoreCaseSwitchDesignatedVariableName = "s";
     private const string StringEqualsMethodName = nameof(string.Equals);
@@ -34,7 +34,7 @@ public class EnumFromStringMapping : MethodMapping
 
     public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
     {
-        // fallback switch arm: _ => (TargetType)Enum.Parse(typeof(TargetType), source, ignoreCase)
+        // fallback switch arm: _ => (TargetType)System.Enum.Parse(typeof(TargetType), source, ignoreCase)
         var enumParseInvocation = Invocation(
             MemberAccess(EnumClassName, ParseMethodName),
             TypeOfExpression(IdentifierName(TargetType.ToDisplayString())), source, BooleanLiteral(_ignoreCase));
