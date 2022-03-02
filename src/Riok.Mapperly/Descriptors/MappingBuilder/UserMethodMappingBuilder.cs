@@ -14,7 +14,7 @@ public static class UserMethodMappingBuilder
         // extract user implemented and user defined mappings from mapper
         foreach (var methodSymbol in ExtractMethods(mapperSymbol))
         {
-            var mapping = BuilderUserDefinedMapping(ctx, methodSymbol) ?? BuildUserImplementedMapping(methodSymbol);
+            var mapping = BuilderUserDefinedMapping(ctx, methodSymbol) ?? BuildUserImplementedMapping(methodSymbol, false);
             if (mapping != null)
                 yield return mapping;
         }
@@ -22,7 +22,11 @@ public static class UserMethodMappingBuilder
         // extract user implemented mappings from base methods
         foreach (var method in ExtractBaseMethods(ctx.Compilation.ObjectType, mapperSymbol))
         {
-            var mapping = BuildUserImplementedMapping(method);
+            // Partial method declarations are allowed for base classes,
+            // but still treated as user implemented methods,
+            //  since the user should provide an implementation elsewhere.
+            //  This is the case if a partial mapper class is extended.
+            var mapping = BuildUserImplementedMapping(method, true);
             if (mapping != null)
                 yield return mapping;
         }
@@ -58,9 +62,9 @@ public static class UserMethodMappingBuilder
                 && !SymbolEqualityComparer.Default.Equals(x.ReceiverType, objectType));
     }
 
-    private static TypeMapping? BuildUserImplementedMapping(IMethodSymbol m)
+    private static TypeMapping? BuildUserImplementedMapping(IMethodSymbol m, bool allowPartial)
     {
-        return IsNewInstanceMappingMethod(m) && !m.IsAbstract && !m.IsPartialDefinition
+        return IsNewInstanceMappingMethod(m) && (allowPartial || !m.IsPartialDefinition)
             ? new UserImplementedMethodMapping(m)
             : null;
     }

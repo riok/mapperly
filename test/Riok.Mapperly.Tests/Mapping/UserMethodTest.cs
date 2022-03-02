@@ -106,17 +106,20 @@ public class UserMethodTest
     }
 
     [Fact]
-    public Task WitClassBaseTypeShouldWork()
+    public Task WithClassBaseTypeShouldWork()
     {
         var source = @"
 using System;
 using System.Collections.Generic;
 using Riok.Mapperly.Abstractions;
 
-public class BaseMapper : BaseMapper3
+[Mapper]
+public partial class BaseMapper : BaseMapper3
 {
     public string MyMapping(int value)
         => $""my-to-string-{{value}}"";
+
+    protected partial short MyIntToShortMapping(int value);
 }
 
 public interface BaseMapper2 : BaseMapper3
@@ -137,8 +140,8 @@ public partial class MyMapper : BaseMapper, BaseMapper2
     public partial B Map(A source);
 }
 
-class A { public int Value { get; set; } public int Value2 { get; set; } public int Value3 { get; set; } }
-class B { public string Value { get; set; } public long Value2 { get; set; } public decimal Value3 { get; set; } }
+class A { public int Value { get; set; } public int Value2 { get; set; } public int Value3 { get; set; } public int Value4 { get; set; } }
+class B { public string Value { get; set; } public long Value2 { get; set; } public decimal Value3 { get; set; } public short Value4 { get; set; } }
 ";
         return TestHelper.VerifyGenerator(source);
     }
