@@ -30,10 +30,10 @@ public class MapperGenerator : IIncrementalGenerator
     private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
         => node is ClassDeclarationSyntax { AttributeLists.Count: > 0 };
 
-    private static SyntaxNode? GetSemanticTargetForGeneration(GeneratorSyntaxContext ctx)
+    private static ClassDeclarationSyntax? GetSemanticTargetForGeneration(GeneratorSyntaxContext ctx)
     {
-        var attributeList = ((ClassDeclarationSyntax)ctx.Node).AttributeLists;
-        foreach (var attributeListSyntax in attributeList)
+        var classDeclaration = (ClassDeclarationSyntax)ctx.Node;
+        foreach (var attributeListSyntax in classDeclaration.AttributeLists)
         {
             foreach (var attributeSyntax in attributeListSyntax.Attributes)
             {
@@ -43,14 +43,14 @@ public class MapperGenerator : IIncrementalGenerator
                 var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
                 var fullName = attributeContainingTypeSymbol.ToDisplayString();
                 if (fullName == _mapperAttributeName)
-                    return ctx.Node;
+                    return classDeclaration;
             }
         }
 
         return null;
     }
 
-    private static void Execute(Compilation compilation, ImmutableArray<SyntaxNode> mappers, SourceProductionContext ctx)
+    private static void Execute(Compilation compilation, ImmutableArray<ClassDeclarationSyntax> mappers, SourceProductionContext ctx)
     {
         if (mappers.IsDefaultOrEmpty)
             return;
@@ -75,7 +75,7 @@ public class MapperGenerator : IIncrementalGenerator
 
             ctx.AddSource(
                 descriptor.FileName,
-                SourceText.From(SourceEmitter.Build(descriptor), Encoding.UTF8));
+                SourceText.From(SourceEmitter.Build(descriptor).ToFullString(), Encoding.UTF8));
         }
     }
 }

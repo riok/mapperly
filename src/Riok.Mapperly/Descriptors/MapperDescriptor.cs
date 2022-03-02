@@ -1,4 +1,4 @@
-using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings;
 
 namespace Riok.Mapperly.Descriptors;
@@ -9,18 +9,17 @@ public class MapperDescriptor
 
     private readonly List<TypeMapping> _mappings = new();
 
-    public MapperDescriptor(string name)
+    public MapperDescriptor(string name, ClassDeclarationSyntax syntax)
     {
-        Name = name;
+        FileName = name + FileNameSuffix;
+        Syntax = syntax;
     }
 
     public string? Namespace { get; set; }
 
-    public string Name { get; }
+    public string FileName { get; }
 
-    public string FileName => Name + FileNameSuffix;
-
-    public Accessibility Accessibility { get; set; } = Accessibility.Public;
+    public ClassDeclarationSyntax Syntax { get; }
 
     public IEnumerable<MethodMapping> MethodTypeMappings
         => _mappings.OfType<MethodMapping>();
