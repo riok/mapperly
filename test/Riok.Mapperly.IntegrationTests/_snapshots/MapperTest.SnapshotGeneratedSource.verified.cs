@@ -121,7 +121,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 nameof(Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue1) => Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue1,
                 nameof(Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue2) => Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue2,
                 nameof(Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue3) => Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue3,
-                _ => (Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)Enum.Parse(typeof(Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue), source, false),
+                _ => (Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)System.Enum.Parse(typeof(Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue), source, false),
             };
         }
 
@@ -158,7 +158,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 nameof(Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10) => Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10,
                 nameof(Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20) => Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20,
                 nameof(Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30) => Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
-                _ => (Riok.Mapperly.IntegrationTests.Models.TestEnum)Enum.Parse(typeof(Riok.Mapperly.IntegrationTests.Models.TestEnum), source, false),
+                _ => (Riok.Mapperly.IntegrationTests.Models.TestEnum)System.Enum.Parse(typeof(Riok.Mapperly.IntegrationTests.Models.TestEnum), source, false),
             };
         }
 
