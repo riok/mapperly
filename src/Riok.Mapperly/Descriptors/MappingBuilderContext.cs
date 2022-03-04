@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
@@ -79,4 +80,26 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, params object[] messageArgs)
         => base.ReportDiagnostic(descriptor, _userSymbol, messageArgs);
+
+    public NullFallbackValue GetNullFallbackValue(ITypeSymbol? targetType = null)
+    {
+        targetType ??= Target;
+        if (targetType.IsNullable())
+            return NullFallbackValue.Default;
+
+        if (MapperConfiguration.ThrowOnMappingNullMismatch)
+            return NullFallbackValue.ThrowArgumentNullException;
+
+        if (!targetType.IsReferenceType || targetType.IsNullable())
+            return NullFallbackValue.Default;
+
+        if (targetType.SpecialType == SpecialType.System_String)
+            return NullFallbackValue.EmptyString;
+
+        if (targetType.HasAccessibleParameterlessConstructor())
+            return NullFallbackValue.CreateInstance;
+
+        ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, targetType);
+        return NullFallbackValue.ThrowArgumentNullException;
+    }
 }

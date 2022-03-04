@@ -1,4 +1,6 @@
 ﻿{
+  CtorValue: 7,
+  CtorValue2: 100,
   IntValue: 10,
   StringValue: fooBar+after-map,
   RenamedStringValue2: fooBar2,
@@ -17,6 +19,8 @@
   NestedNullableTargetNotNullable: {},
   StringNullableTargetNotNullable: fooBar3,
   RecursiveObject: {
+    CtorValue: 5,
+    CtorValue2: 100,
     StringValue: +after-map,
     RenamedStringValue2: ,
     Unflattening: {},
@@ -28,6 +32,8 @@
     EnumReverseStringValue: DtoValue3
   },
   SourceTargetSameObjectType: {
+    CtorValue: 8,
+    CtorValue2: 100,
     IntValue: 99,
     StringValue: ,
     RenamedStringValue: ,

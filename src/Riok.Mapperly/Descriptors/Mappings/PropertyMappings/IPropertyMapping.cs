@@ -3,11 +3,12 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 
 /// <summary>
-/// Represents a property mapping or a container of property mappings.
+/// Represents a property mapping which accesses a source property and maps it to a certain type.
+/// (eg. <c>MapToC(source.A.B)</c>)
 /// </summary>
 public interface IPropertyMapping
 {
-    StatementSyntax Build(
-        ExpressionSyntax sourceAccess,
-        ExpressionSyntax targetAccess);
+    PropertyPath SourcePath { get; }
+
+    ExpressionSyntax Build(ExpressionSyntax source);
 }

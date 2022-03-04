@@ -23,6 +23,14 @@ public class DictionaryExtensionsTest
     }
 
     [Fact]
+    public void RemoveRangeShouldRemoveEntries()
+    {
+        var d = new Dictionary<string, int> { ["a"] = 10, ["b"] = 20, ["c"] = 30 };
+        d.RemoveRange(new[] { "a", "c" });
+        d.Keys.Should().BeEquivalentTo("b");
+    }
+
+    [Fact]
     public void GetValueOrDefaultShouldReturnValueIfFound()
     {
         var d = new Dictionary<string, int> { ["a"] = 10, ["b"] = 20, };

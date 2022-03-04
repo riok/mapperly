@@ -1,0 +1,17 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG013,
+      Title: No accessible constructor with mappable arguments found,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (10,4)-(10,28),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: {0} has no accessible constructor with mappable arguments,
+      Message: B has no accessible constructor with mappable arguments,
+      Category: Mapper,
+      CustomTags: []
+    }
+  ]
+}

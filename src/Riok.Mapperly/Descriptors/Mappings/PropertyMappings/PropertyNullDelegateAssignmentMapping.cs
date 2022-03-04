@@ -9,16 +9,16 @@ namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 /// a property mapping container, which performs a null check before the mappings.
 /// </summary>
 [DebuggerDisplay("PropertyNullDelegateMapping({_nullConditionalSourcePath} != null)")]
-public class PropertyNullDelegateMapping : IPropertyMapping, IPropertyMappingContainer
+public class PropertyNullDelegateAssignmentMapping : IPropertyAssignmentMapping, IPropertyAssignmentMappingContainer
 {
     private readonly PropertyPath _nullConditionalSourcePath;
     private readonly bool _throwInsteadOfConditionalNullMapping;
-    private readonly HashSet<IPropertyMapping> _delegateMappings = new();
-    private readonly IPropertyMappingContainer _parent;
+    private readonly HashSet<IPropertyAssignmentMapping> _delegateMappings = new();
+    private readonly IPropertyAssignmentMappingContainer _parent;
 
-    public PropertyNullDelegateMapping(
+    public PropertyNullDelegateAssignmentMapping(
         PropertyPath nullConditionalSourcePath,
-        IPropertyMappingContainer parent,
+        IPropertyAssignmentMappingContainer parent,
         bool throwInsteadOfConditionalNullMapping)
     {
         _nullConditionalSourcePath = nullConditionalSourcePath;
@@ -44,7 +44,7 @@ public class PropertyNullDelegateMapping : IPropertyMapping, IPropertyMappingCon
         return IfStatement(condition, Block(mappings), elseClause);
     }
 
-    public void AddPropertyMappings(IEnumerable<IPropertyMapping> mappings)
+    public void AddPropertyMappings(IEnumerable<IPropertyAssignmentMapping> mappings)
     {
         foreach (var mapping in mappings)
         {
@@ -52,7 +52,7 @@ public class PropertyNullDelegateMapping : IPropertyMapping, IPropertyMappingCon
         }
     }
 
-    public void AddPropertyMapping(IPropertyMapping mapping)
+    public void AddPropertyMapping(IPropertyAssignmentMapping mapping)
     {
         if (!HasPropertyMapping(mapping))
         {
@@ -60,7 +60,7 @@ public class PropertyNullDelegateMapping : IPropertyMapping, IPropertyMappingCon
         }
     }
 
-    public bool HasPropertyMapping(IPropertyMapping mapping)
+    public bool HasPropertyMapping(IPropertyAssignmentMapping mapping)
         => _delegateMappings.Contains(mapping) || _parent.HasPropertyMapping(mapping);
 
     public override bool Equals(object? obj)
@@ -74,7 +74,7 @@ public class PropertyNullDelegateMapping : IPropertyMapping, IPropertyMappingCon
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((PropertyNullDelegateMapping)obj);
+        return Equals((PropertyNullDelegateAssignmentMapping)obj);
     }
 
     public override int GetHashCode()
@@ -85,13 +85,13 @@ public class PropertyNullDelegateMapping : IPropertyMapping, IPropertyMappingCon
         }
     }
 
-    public static bool operator ==(PropertyNullDelegateMapping? left, PropertyNullDelegateMapping? right)
+    public static bool operator ==(PropertyNullDelegateAssignmentMapping? left, PropertyNullDelegateAssignmentMapping? right)
         => Equals(left, right);
 
-    public static bool operator !=(PropertyNullDelegateMapping? left, PropertyNullDelegateMapping? right)
+    public static bool operator !=(PropertyNullDelegateAssignmentMapping? left, PropertyNullDelegateAssignmentMapping? right)
         => !Equals(left, right);
 
-    protected bool Equals(PropertyNullDelegateMapping other)
+    protected bool Equals(PropertyNullDelegateAssignmentMapping other)
     {
         return _nullConditionalSourcePath.Equals(other._nullConditionalSourcePath)
             && _throwInsteadOfConditionalNullMapping == other._throwInsteadOfConditionalNullMapping;

@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
@@ -9,102 +8,83 @@ namespace Riok.Mapperly.Descriptors.MappingBuilder;
 
 public static class ObjectPropertyMappingBuilder
 {
-    public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
-    {
-        if (!ctx.Target.HasAccessibleParameterlessConstructor())
-            return null;
-
-        if (ctx.Target.SpecialType != SpecialType.None || ctx.Source.SpecialType != SpecialType.None)
-            return null;
-
-        return new NewInstanceObjectPropertyMapping(ctx.Source, ctx.Target.NonNullable());
-    }
-
     public static void BuildMappingBody(MappingBuilderContext ctx, ObjectPropertyMapping mapping)
     {
-        var mappingCtx = new ObjectPropertyMappingBuilderContext(ctx, mapping);
+        var mappingCtx = new ObjectPropertyMappingBuilderContext<ObjectPropertyMapping>(ctx, mapping);
+        BuildMappingBody(mappingCtx);
+    }
 
-        var ignoredTargetProperties = ctx.ListConfiguration<MapperIgnoreAttribute>()
-            .Select(x => x.Target)
-            .ToHashSet();
-
-        var propertyConfigsByRootTargetName = ctx.ListConfiguration<MapPropertyAttribute>()
-            .GroupBy(x => x.Target.First())
-            .ToDictionary(x => x.Key, x => x.ToList());
-
-        var targetProperties = mapping.TargetType
-            .GetAllMembers()
-            .OfType<IPropertySymbol>()
-            .DistinctBy(x => x.Name);
-
-        foreach (var targetProperty in targetProperties)
+    public static void BuildMappingBody(ObjectPropertyMappingBuilderContext ctx)
+    {
+        foreach (var targetProperty in ctx.TargetProperties.Values)
         {
-            if (ignoredTargetProperties.Remove(targetProperty.Name))
-                continue;
-
-            if (propertyConfigsByRootTargetName.Remove(targetProperty.Name, out var propertyConfigs))
+            if (ctx.PropertyConfigsByRootTargetName.Remove(targetProperty.Name, out var propertyConfigs))
             {
                 // add all configured mappings
                 // order by target path count to map less nested items first (otherwise they would overwrite all others)
                 // eg. target.A = source.B should be mapped before target.A.Id = source.B.Id
                 foreach (var config in propertyConfigs.OrderBy(x => x.Target.Count))
                 {
-                    BuildPropertyMapping(mappingCtx, config.Source, config.Target, true);
+                    BuildPropertyAssignmentMapping(ctx, config);
                 }
 
                 continue;
             }
 
-            // only try other namings if the property was not found,
-            // ignore all other results
-            var targetPropertyPath = new[] { targetProperty.Name };
-            var targetPropFound = false;
-            foreach (var sourcePropertyCandidate in MemberPathCandidateBuilder.BuildMemberPathCandidates(targetProperty.Name))
+            if (!PropertyPath.TryFind(
+                ctx.Mapping.SourceType,
+                MemberPathCandidateBuilder.BuildMemberPathCandidates(targetProperty.Name),
+                out var sourcePropertyPath))
             {
-                if (BuildPropertyMapping(mappingCtx, sourcePropertyCandidate.ToList(), targetPropertyPath) is not ValidationResult.PropertyNotFound)
-                {
-                    targetPropFound = true;
-                    break;
-                }
-            }
-
-            // target property couldn't be found
-            // add a diagnostic.
-            if (!targetPropFound)
-            {
-                ctx.ReportDiagnostic(
+                ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.MappingSourcePropertyNotFound,
                     targetProperty.Name,
-                    mapping.SourceType);
+                    ctx.Mapping.SourceType);
+                continue;
             }
+
+            BuildPropertyAssignmentMapping(ctx, sourcePropertyPath, new PropertyPath(new[] { targetProperty }));
         }
 
-        AddUnmatchedIgnoredPropertiesDiagnostics(mappingCtx, ignoredTargetProperties);
-        AddUnmatchedTargetPropertiesDiagnostics(mappingCtx, propertyConfigsByRootTargetName.Values.SelectMany(x => x));
+        ctx.AddUnmatchedIgnoredPropertiesDiagnostics();
+        ctx.AddUnmatchedTargetPropertiesDiagnostics();
     }
 
-    private static ValidationResult BuildPropertyMapping(
-        ObjectPropertyMappingBuilderContext ctx,
-        IReadOnlyCollection<string> sourcePath,
-        IReadOnlyCollection<string> targetPath,
-        bool configuredTargetPropertyPath = false)
+    private static void BuildPropertyAssignmentMapping(ObjectPropertyMappingBuilderContext ctx, MapPropertyAttribute config)
     {
-        var targetPropertyPath = new PropertyPath(FindPropertyPath(ctx.Mapping.TargetType, targetPath).ToList());
-        var sourcePropertyPath = new PropertyPath(FindPropertyPath(ctx.Mapping.SourceType, sourcePath).ToList());
+        if (!PropertyPath.TryFind(ctx.Mapping.TargetType, config.Target, out var targetPropertyPath))
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.ConfiguredMappingTargetPropertyNotFound,
+                string.Join(PropertyPath.PropertyAccessSeparator, config.Target),
+                ctx.Mapping.TargetType);
+            return;
+        }
 
-        var validationResult = ValidateMapping(
-            ctx,
-            sourcePropertyPath,
-            targetPropertyPath,
-            sourcePath,
-            targetPath,
-            configuredTargetPropertyPath);
-        if (validationResult != ValidationResult.Ok)
-            return validationResult;
+        if (!PropertyPath.TryFind(ctx.Mapping.SourceType, config.Source, out var sourcePropertyPath))
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.ConfiguredMappingSourcePropertyNotFound,
+                string.Join(PropertyPath.PropertyAccessSeparator, config.Source),
+                ctx.Mapping.SourceType);
+            return;
+        }
+
+        BuildPropertyAssignmentMapping(ctx, sourcePropertyPath, targetPropertyPath);
+    }
+
+    private static void BuildPropertyAssignmentMapping(
+        ObjectPropertyMappingBuilderContext ctx,
+        PropertyPath sourcePropertyPath,
+        PropertyPath targetPropertyPath)
+    {
+        if (!ValidateMappingSpecification(ctx, sourcePropertyPath, targetPropertyPath))
+            return;
 
         // nullability is handled inside the property mapping
         var delegateMapping = ctx.BuilderContext.FindMapping(sourcePropertyPath.Member.Type, targetPropertyPath.Member.Type)
-            ?? ctx.BuilderContext.FindOrBuildMapping(sourcePropertyPath.Member.Type.NonNullable(), targetPropertyPath.Member.Type.NonNullable());
+            ?? ctx.BuilderContext.FindOrBuildMapping(sourcePropertyPath.Member.Type.NonNullable(),
+                targetPropertyPath.Member.Type.NonNullable());
 
         // couldn't build the mapping
         if (delegateMapping == null)
@@ -117,76 +97,44 @@ public static class ObjectPropertyMappingBuilder
                 ctx.Mapping.TargetType,
                 targetPropertyPath.FullName,
                 targetPropertyPath.Member.Type);
-            return ValidationResult.CannotMapTypes;
+            return;
         }
 
         // no member of the source path is nullable, no null handling needed
         if (!sourcePropertyPath.IsAnyNullable())
         {
-            ctx.AddPropertyMapping(new PropertyMapping(
-                sourcePropertyPath,
-                targetPropertyPath,
+            var propertyMapping = new PropertyMapping(
                 delegateMapping,
-                false));
-            return ValidationResult.Ok;
+                sourcePropertyPath,
+                false);
+            ctx.AddPropertyAssignmentMapping(new PropertyAssignmentMapping(targetPropertyPath, propertyMapping));
+            return;
         }
 
         // the source is nullable, or the mapping is a direct assignment and the target allows nulls
         // access the source in a null save matter (via ?.) but no other special handling required.
         if (delegateMapping.SourceType.IsNullable() || delegateMapping is DirectAssignmentMapping && targetPropertyPath.Member.IsNullable())
         {
-            ctx.AddPropertyMapping(new PropertyMapping(
-                sourcePropertyPath,
-                targetPropertyPath,
+            var propertyMapping = new PropertyMapping(
                 delegateMapping,
-                true));
-            return ValidationResult.Ok;
+                sourcePropertyPath,
+                false);
+            ctx.AddPropertyAssignmentMapping(new PropertyAssignmentMapping(targetPropertyPath, propertyMapping));
+            return;
         }
 
         // additional null condition check
         // (only map if source is not null, else may throw depending on settings)
-        ctx.AddNullDelegatePropertyMapping(new PropertyMapping(
-            sourcePropertyPath,
+        ctx.AddNullDelegatePropertyAssignmentMapping(new PropertyAssignmentMapping(
             targetPropertyPath,
-            delegateMapping,
-            false));
-        return ValidationResult.Ok;
+            new PropertyMapping(delegateMapping, sourcePropertyPath, false)));
     }
 
-    private static ValidationResult ValidateMapping(
+    private static bool ValidateMappingSpecification(
         ObjectPropertyMappingBuilderContext ctx,
         PropertyPath sourcePropertyPath,
-        PropertyPath targetPropertyPath,
-        IReadOnlyCollection<string> configuredSourcePropertyPath,
-        IReadOnlyCollection<string> configuredTargetPropertyPath,
-        bool reportDiagnosticIfPropertyNotFound)
+        PropertyPath targetPropertyPath)
     {
-        // the path parts don't match, not all target properties could be found
-        if (configuredTargetPropertyPath.Count != targetPropertyPath.Path.Count)
-        {
-            if (reportDiagnosticIfPropertyNotFound)
-            {
-                ctx.BuilderContext.ReportDiagnostic(
-                    DiagnosticDescriptors.ConfiguredMappingTargetPropertyNotFound,
-                    string.Join(PropertyPath.PropertyAccessSeparator, configuredTargetPropertyPath),
-                    ctx.Mapping.TargetType);
-            }
-            return ValidationResult.PropertyNotFound;
-        }
-
-        // the path parts don't match, not all source properties could be found
-        if (configuredSourcePropertyPath.Count != sourcePropertyPath.Path.Count)
-        {
-            if (reportDiagnosticIfPropertyNotFound)
-            {
-                ctx.BuilderContext.ReportDiagnostic(
-                    DiagnosticDescriptors.ConfiguredMappingSourcePropertyNotFound,
-                    string.Join(PropertyPath.PropertyAccessSeparator, configuredSourcePropertyPath),
-                    ctx.Mapping.SourceType);
-            }
-            return ValidationResult.PropertyNotFound;
-        }
-
         // the target property path is readonly
         if (targetPropertyPath.Member.IsReadOnly)
         {
@@ -198,7 +146,7 @@ public static class ObjectPropertyMappingBuilder
                 ctx.Mapping.TargetType,
                 targetPropertyPath.FullName,
                 targetPropertyPath.Member.Type);
-            return ValidationResult.PropertyHasUnexpectedSpecification;
+            return false;
         }
 
         // a target property path part is write only
@@ -212,7 +160,7 @@ public static class ObjectPropertyMappingBuilder
                 ctx.Mapping.TargetType,
                 targetPropertyPath.FullName,
                 targetPropertyPath.Member.Type);
-            return ValidationResult.PropertyHasUnexpectedSpecification;
+            return false;
         }
 
         // a source property path is write only
@@ -226,62 +174,9 @@ public static class ObjectPropertyMappingBuilder
                 ctx.Mapping.TargetType,
                 targetPropertyPath.FullName,
                 targetPropertyPath.Member.Type);
-            return ValidationResult.PropertyHasUnexpectedSpecification;
+            return false;
         }
 
-        return ValidationResult.Ok;
-    }
-
-    private static IEnumerable<IPropertySymbol> FindPropertyPath(ITypeSymbol type, IEnumerable<string> path)
-    {
-        foreach (var name in path)
-        {
-            if (FindProperty(type, name) is not { } property)
-                break;
-
-            type = property.Type;
-            yield return property;
-        }
-    }
-
-    private static IPropertySymbol? FindProperty(ITypeSymbol type, string name)
-    {
-        return type.GetAllMembers(name)
-            .OfType<IPropertySymbol>()
-            .FirstOrDefault(p => !p.IsStatic);
-    }
-
-    private static void AddUnmatchedTargetPropertiesDiagnostics(
-        ObjectPropertyMappingBuilderContext ctx,
-        IEnumerable<MapPropertyAttribute> unmatchedConfiguredProperties)
-    {
-        foreach (var propertyConfig in unmatchedConfiguredProperties)
-        {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.ConfiguredMappingTargetPropertyNotFound,
-                propertyConfig.TargetFullName,
-                ctx.Mapping.TargetType);
-        }
-    }
-
-    private static void AddUnmatchedIgnoredPropertiesDiagnostics(
-        ObjectPropertyMappingBuilderContext ctx,
-        HashSet<string> ignoredTargetProperties)
-    {
-        foreach (var notFoundIgnoredProperty in ignoredTargetProperties)
-        {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.IgnoredPropertyNotFound,
-                notFoundIgnoredProperty,
-                ctx.Mapping.TargetType);
-        }
-    }
-
-    private enum ValidationResult
-    {
-        Ok,
-        PropertyNotFound,
-        PropertyHasUnexpectedSpecification,
-        CannotMapTypes,
+        return true;
     }
 }

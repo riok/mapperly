@@ -17,6 +17,17 @@ public class EnumerableTest
     }
 
     [Fact]
+    public void NullableArrayToNonNullableArray()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "int[]?",
+            "int[]");
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be("return source == null ? throw new System.ArgumentNullException(nameof(source)) : source;");
+    }
+
+    [Fact]
     public void ArrayOfNullablePrimitiveTypesToNonNullableArray()
     {
         var source = TestSourceBuilder.Mapping(
@@ -158,9 +169,6 @@ public class EnumerableTest
 
     return target;".ReplaceLineEndings());
     }
-
-    // TODO
-    // array as void mapping method
 
     [Fact]
     public void ArrayToArrayOfString()

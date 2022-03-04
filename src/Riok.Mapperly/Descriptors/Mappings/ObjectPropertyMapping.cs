@@ -8,18 +8,18 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// Represents a complex object mapping implemented in its own method.
 /// Maps each property from the source to the target.
 /// </summary>
-public abstract class ObjectPropertyMapping : MethodMapping, IPropertyMappingContainer
+public abstract class ObjectPropertyMapping : MethodMapping, IPropertyAssignmentMappingContainer
 {
-    private readonly HashSet<IPropertyMapping> _mappings = new();
+    private readonly HashSet<IPropertyAssignmentMapping> _mappings = new();
 
     protected ObjectPropertyMapping(ITypeSymbol sourceType, ITypeSymbol targetType) : base(sourceType, targetType)
     {
     }
 
-    public void AddPropertyMapping(IPropertyMapping mapping)
+    public void AddPropertyMapping(IPropertyAssignmentMapping mapping)
         => _mappings.Add(mapping);
 
-    public void AddPropertyMappings(IEnumerable<IPropertyMapping> mappings)
+    public void AddPropertyMappings(IEnumerable<IPropertyAssignmentMapping> mappings)
     {
         foreach (var mapping in mappings)
         {
@@ -27,9 +27,9 @@ public abstract class ObjectPropertyMapping : MethodMapping, IPropertyMappingCon
         }
     }
 
-    public bool HasPropertyMapping(IPropertyMapping mapping)
+    public bool HasPropertyMapping(IPropertyAssignmentMapping mapping)
         => _mappings.Contains(mapping);
 
-    internal IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source, ExpressionSyntax target)
+    protected IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source, ExpressionSyntax target)
         => _mappings.Select(x => x.Build(source, target));
 }

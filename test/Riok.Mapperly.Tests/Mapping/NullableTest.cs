@@ -40,6 +40,18 @@ public class NullableTest
     }
 
     [Fact]
+    public void NullablePrimitiveToOtherNullablePrimitiveShouldWork()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "decimal?",
+            "int?");
+
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be(@"return source == null ? default : (int)source.Value;".ReplaceLineEndings());
+    }
+
+    [Fact]
     public void NonNullableToNullableShouldWork()
     {
         var source = TestSourceBuilder.Mapping(
@@ -79,7 +91,6 @@ public class NullableTest
             "string?",
             "B",
             TestSourceBuilderOptions.Default with { ThrowOnMappingNullMismatch = false },
-            "class A { }",
             "class B { protected B(){} public static B Parse(string v) => new B(); }");
         return TestHelper.VerifyGenerator(source);
     }

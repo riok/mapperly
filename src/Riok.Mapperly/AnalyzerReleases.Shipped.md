@@ -16,3 +16,5 @@ RMG009  | Mapper   | Info     | Can not map to read only property.
 RMG010  | Mapper   | Info     | Can not map from write only property.
 RMG011  | Mapper   | Info     | Can not map to write only property path.
 RMG012  | Mapper   | Info     | Mapping source property not found.
+RMG013  | Mapper   | Error    | No accessible constructor with mappable arguments found
+RMG014  | Mapper   | Warning  | Cannot map to the configured constructor to be used by Mapperly
