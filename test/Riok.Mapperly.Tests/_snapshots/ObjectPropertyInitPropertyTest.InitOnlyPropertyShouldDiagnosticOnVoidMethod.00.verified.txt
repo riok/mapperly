@@ -1,0 +1,17 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG015,
+      Title: Cannot map to init only property path,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (10,4)-(10,41),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Cannot map from property {0}.{1} of type {2} to init only property path {3}.{4} of type {5},
+      Message: Cannot map from property A.StringValue of type string to init only property path B.StringValue of type string,
+      Category: Mapper,
+      CustomTags: []
+    }
+  ]
+}

@@ -10,6 +10,7 @@ public class NewInstanceObjectPropertyMapping : ObjectPropertyMapping
 {
     private const string TargetVariableName = "target";
     private readonly HashSet<ConstructorParameterMapping> _constructorPropertyMappings = new();
+    private readonly HashSet<PropertyAssignmentMapping> _initPropertyMappings = new();
 
     public NewInstanceObjectPropertyMapping(
         ITypeSymbol sourceType,
@@ -21,11 +22,26 @@ public class NewInstanceObjectPropertyMapping : ObjectPropertyMapping
     public void AddConstructorParameterMapping(ConstructorParameterMapping mapping)
         => _constructorPropertyMappings.Add(mapping);
 
+    public void AddInitPropertyMapping(PropertyAssignmentMapping mapping)
+        => _initPropertyMappings.Add(mapping);
+
     public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
     {
-        // var target = new T();
+        // new T() { ... };
         var ctorArgs = _constructorPropertyMappings.Select(x => x.BuildArgument(source)).ToArray();
-        yield return CreateInstance(TargetVariableName, TargetType, ctorArgs);
+        var objectCreationExpression = CreateInstance(TargetType, ctorArgs);
+
+        // add initializer
+        if (_initPropertyMappings.Count > 0)
+        {
+            var initMappings = _initPropertyMappings
+                .Select(x => x.BuildExpression(source, null))
+                .ToArray();
+            objectCreationExpression = objectCreationExpression.WithInitializer(ObjectInitializer(initMappings));
+        }
+
+        // var target = new T() { ... };
+        yield return DeclareLocalVariable(TargetVariableName, objectCreationExpression);
 
         // map properties
         foreach (var expression in BuildBody(source, IdentifierName(TargetVariableName)))

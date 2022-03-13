@@ -14,6 +14,8 @@ public class TestObject
 
     public int IntValue { get; set; }
 
+    public int IntInitOnlyValue { get; init; }
+
     public string StringValue { get; set; } = string.Empty;
 
     public string RenamedStringValue { get; set; } = string.Empty;

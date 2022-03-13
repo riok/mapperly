@@ -38,7 +38,111 @@ public static class NewInstanceObjectPropertyMappingBuilder
             ctx.ReportDiagnostic(DiagnosticDescriptors.NoConstructorFound, ctx.Target);
         }
 
+        BuildInitOnlyPropertyMappings(mappingCtx);
         ObjectPropertyMappingBuilder.BuildMappingBody(mappingCtx);
+    }
+
+    private static void BuildInitOnlyPropertyMappings(NewInstanceMappingBuilderContext ctx)
+    {
+        foreach (var targetProperty in ctx.TargetProperties.Values.Where(x => x.IsInitOnly()))
+        {
+            ctx.TargetProperties.Remove(targetProperty.Name);
+
+            if (ctx.PropertyConfigsByRootTargetName.Remove(targetProperty.Name, out var propertyConfigs))
+            {
+                BuildInitPropertyMapping(ctx, targetProperty, propertyConfigs);
+                continue;
+            }
+
+            if (!PropertyPath.TryFind(
+                ctx.Mapping.SourceType,
+                MemberPathCandidateBuilder.BuildMemberPathCandidates(targetProperty.Name),
+                out var sourcePropertyPath))
+            {
+                ctx.BuilderContext.ReportDiagnostic(
+                    DiagnosticDescriptors.MappingSourcePropertyNotFound,
+                    targetProperty.Name,
+                    ctx.Mapping.SourceType);
+                continue;
+            }
+
+            BuildInitPropertyMapping(ctx, targetProperty, sourcePropertyPath);
+        }
+    }
+
+    private static void BuildInitPropertyMapping(
+        NewInstanceMappingBuilderContext ctx,
+        IPropertySymbol targetProperty,
+        IReadOnlyCollection<MapPropertyAttribute> propertyConfigs)
+    {
+        // add configured mapping
+        // target paths are not supported (yet), only target properties
+        if (propertyConfigs.Count > 1)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.MultipleConfigurationsForInitOnlyProperty,
+                targetProperty.Type,
+                targetProperty.Name);
+        }
+
+        var propertyConfig = propertyConfigs.First();
+        if (propertyConfig.Target.Count > 1)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.InitOnlyPropertyDoesNotSupportPaths,
+                targetProperty.Type,
+                string.Join(".", propertyConfig.Target));
+            return;
+        }
+
+        if (!PropertyPath.TryFind(
+            ctx.Mapping.SourceType,
+            propertyConfig.Source,
+            out var sourcePropertyPath))
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.MappingSourcePropertyNotFound,
+                targetProperty.Name,
+                ctx.Mapping.SourceType);
+            return;
+        }
+
+        BuildInitPropertyMapping(ctx, targetProperty, sourcePropertyPath);
+    }
+
+    private static void BuildInitPropertyMapping(
+        NewInstanceMappingBuilderContext ctx,
+        IPropertySymbol targetProperty,
+        PropertyPath sourcePath)
+    {
+        var targetPath = new PropertyPath(new[] { targetProperty });
+        if (!ObjectPropertyMappingBuilder.ValidateMappingSpecification(ctx, sourcePath, targetPath, true))
+            return;
+
+        var delegateMapping = ctx.BuilderContext.FindMapping(sourcePath.MemberType, targetProperty.Type)
+            ?? ctx.BuilderContext.FindOrBuildMapping(sourcePath.MemberType.NonNullable(), targetProperty.Type);
+
+        if (delegateMapping == null)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CouldNotMapProperty,
+                ctx.Mapping.SourceType,
+                sourcePath.FullName,
+                sourcePath.Member.Type,
+                ctx.Mapping.TargetType,
+                targetPath.FullName,
+                targetPath.Member.Type);
+            return;
+        }
+
+        var propertyMapping = new NullPropertyMapping(
+            delegateMapping,
+            sourcePath,
+            ctx.BuilderContext.GetNullFallbackValue(targetProperty.Type));
+        var propertyAssignmentMapping = new PropertyAssignmentMapping(
+            targetPath,
+            propertyMapping);
+        ctx.Mapping.AddInitPropertyMapping(propertyAssignmentMapping);
     }
 
     private static bool TryBuildConstructorMapping(
