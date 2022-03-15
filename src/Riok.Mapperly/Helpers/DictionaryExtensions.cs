@@ -14,6 +14,14 @@ public static class DictionaryExtensions
         return true;
     }
 
+    public static void RemoveRange<TKey, TValue>(this IDictionary<TKey, TValue> dict, IEnumerable<TKey> keys)
+    {
+        foreach (var key in keys)
+        {
+            dict.Remove(key);
+        }
+    }
+
     public static TValue? GetValueOrDefault<TKey, TValue>(
         this IDictionary<TKey, TValue> dict,
         TKey key)

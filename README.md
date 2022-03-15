@@ -115,6 +115,17 @@ public partial class DtoMapper
 
 Whenever Mapperly needs a mapping from `DateTime` to `DateOnly` inside the `DtoMapper` implementation, it will use the provided implementation.
 
+## Constructor mappings
+
+Mapperly supports using parameterized constructors of mapping target types.
+Mapperly resolves the constructor to be used by the following priorities:
+* accessible constructors annotated with `MapperConstructor`
+* accessible parameterless constructors
+* accessible constructors ordered in descending by their parameter count
+
+The first constructor which allows the mapping of all parameters is used.
+Constructor parameters are mapped in a case insensitive matter.
+
 ## Before / after map
 
 To run custom code before or after a mapping, the generated map method can be wrapped in a custom method:

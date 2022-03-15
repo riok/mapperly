@@ -6,14 +6,14 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 
 /// <summary>
-/// A property initializer which initializes null properties to a new objects.
+/// A property initializer which initializes null properties to new objects.
 /// </summary>
-[DebuggerDisplay("PropertyNullInitializerDelegateMapping({_pathToInitialize} ??= new())")]
-public class PropertyNullInitializerDelegateMapping : IPropertyMapping
+[DebuggerDisplay("PropertyNullInitializerMapping({_pathToInitialize} ??= new())")]
+public class PropertyNullAssignmentInitializerMapping : IPropertyAssignmentMapping
 {
     private readonly PropertyPath _pathToInitialize;
 
-    public PropertyNullInitializerDelegateMapping(PropertyPath pathToInitialize)
+    public PropertyNullAssignmentInitializerMapping(PropertyPath pathToInitialize)
     {
         _pathToInitialize = pathToInitialize;
     }
@@ -39,18 +39,18 @@ public class PropertyNullInitializerDelegateMapping : IPropertyMapping
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((PropertyNullInitializerDelegateMapping)obj);
+        return Equals((PropertyNullAssignmentInitializerMapping)obj);
     }
 
     public override int GetHashCode()
         => _pathToInitialize.GetHashCode();
 
-    public static bool operator ==(PropertyNullInitializerDelegateMapping? left, PropertyNullInitializerDelegateMapping? right)
+    public static bool operator ==(PropertyNullAssignmentInitializerMapping? left, PropertyNullAssignmentInitializerMapping? right)
         => Equals(left, right);
 
-    public static bool operator !=(PropertyNullInitializerDelegateMapping? left, PropertyNullInitializerDelegateMapping? right)
+    public static bool operator !=(PropertyNullAssignmentInitializerMapping? left, PropertyNullAssignmentInitializerMapping? right)
         => !Equals(left, right);
 
-    protected bool Equals(PropertyNullInitializerDelegateMapping other)
+    protected bool Equals(PropertyNullAssignmentInitializerMapping other)
         => _pathToInitialize.Equals(other._pathToInitialize);
 }

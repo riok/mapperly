@@ -36,7 +36,7 @@ public class MapperTest
 
     private TestObject NewTestObj()
     {
-        return new TestObject
+        return new TestObject(7)
         {
             IntValue = 10,
             EnumName = TestEnum.Value10,
@@ -56,7 +56,7 @@ public class MapperTest
             UnflatteningIdValue = 20,
             NullableUnflatteningIdValue = 200,
             RecursiveObject =
-                new()
+                new(5)
                 {
                     EnumValue = TestEnum.Value10,
                     EnumName = TestEnum.Value30,
@@ -64,7 +64,7 @@ public class MapperTest
                 },
             NullableReadOnlyObjectCollection =
                 new[] { new TestObjectNested { IntValue = 10 }, new TestObjectNested { IntValue = 20 }, },
-            SourceTargetSameObjectType = new TestObject { IntValue = 99, }
+            SourceTargetSameObjectType = new TestObject(8) { IntValue = 99, }
         };
     }
 }

@@ -45,7 +45,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public partial Riok.Mapperly.IntegrationTests.Models.TestObject MapFromDto(Riok.Mapperly.IntegrationTests.Dto.TestObjectDto dto)
         {
-            var target = new Riok.Mapperly.IntegrationTests.Models.TestObject();
+            var target = new Riok.Mapperly.IntegrationTests.Models.TestObject(DirectInt(dto.CtorValue), ctorValue2: DirectInt(dto.CtorValue2));
             target.IntValue = DirectInt(dto.IntValue);
             target.StringValue = dto.StringValue;
             target.UnflatteningIdValue = DirectInt(dto.Unflattening.IdValue);
@@ -183,7 +183,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         private partial Riok.Mapperly.IntegrationTests.Dto.TestObjectDto MapToDtoInternal(Riok.Mapperly.IntegrationTests.Models.TestObject testObject)
         {
-            var target = new Riok.Mapperly.IntegrationTests.Dto.TestObjectDto();
+            var target = new Riok.Mapperly.IntegrationTests.Dto.TestObjectDto(DirectInt(testObject.CtorValue), ctorValue2: DirectInt(testObject.CtorValue2));
             target.IntValue = DirectInt(testObject.IntValue);
             target.StringValue = testObject.StringValue;
             target.RenamedStringValue2 = testObject.RenamedStringValue;
@@ -242,6 +242,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public partial void UpdateDto(Riok.Mapperly.IntegrationTests.Models.TestObject source, Riok.Mapperly.IntegrationTests.Dto.TestObjectDto target)
         {
+            target.CtorValue = DirectInt(source.CtorValue);
+            target.CtorValue2 = DirectInt(source.CtorValue2);
             target.IntValue = DirectInt(source.IntValue);
             target.StringValue = source.StringValue;
             target.FlatteningIdValue = DirectInt(source.Flattening.IdValue);

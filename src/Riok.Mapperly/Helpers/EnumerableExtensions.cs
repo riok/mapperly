@@ -2,9 +2,9 @@ namespace Riok.Mapperly.Helpers;
 
 public static class EnumerableExtensions
 {
-    public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable)
+    public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable, IEqualityComparer<T>? comparer = null)
     {
-        var set = new HashSet<T>();
+        var set = new HashSet<T>(comparer);
         foreach (var item in enumerable)
         {
             set.Add(item);

@@ -122,7 +122,7 @@ public static class SyntaxFactoryHelper
     public static ThrowExpressionSyntax ThrowNotImplementedException()
     {
         return ThrowExpression(ObjectCreationExpression(IdentifierName(NotImplementedExceptionClassName))
-            .WithArgumentList(ArgumentList()));
+            .WithArgumentList(SyntaxFactory.ArgumentList()));
     }
 
     public static InvocationExpressionSyntax Invocation(string methodName, params ExpressionSyntax[] arguments)
@@ -172,12 +172,28 @@ public static class SyntaxFactoryHelper
         return LocalDeclarationStatement(variableDeclaration);
     }
 
+    public static StatementSyntax CreateInstance(string variableName, ITypeSymbol typeSymbol)
+        => DeclareLocalVariable(variableName, CreateInstance(typeSymbol));
+
     public static StatementSyntax CreateInstance(string variableName, ITypeSymbol typeSymbol, params ExpressionSyntax[] args)
+        => DeclareLocalVariable(variableName, CreateInstance(typeSymbol, args));
+
+    public static StatementSyntax CreateInstance(string variableName, ITypeSymbol typeSymbol, params ArgumentSyntax[] args)
+        => DeclareLocalVariable(variableName, CreateInstance(typeSymbol, args));
+
+    public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol)
     {
-        return DeclareLocalVariable(variableName, CreateInstance(typeSymbol, args));
+        var type = NonNullableIdentifier(typeSymbol);
+        return ObjectCreationExpression(type).WithArgumentList(SyntaxFactory.ArgumentList());
     }
 
     public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, params ExpressionSyntax[] args)
+    {
+        var type = NonNullableIdentifier(typeSymbol);
+        return ObjectCreationExpression(type).WithArgumentList(ArgumentList(args));
+    }
+
+    public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, params ArgumentSyntax[] args)
     {
         var type = NonNullableIdentifier(typeSymbol);
         return ObjectCreationExpression(type).WithArgumentList(ArgumentList(args));
@@ -197,10 +213,10 @@ public static class SyntaxFactoryHelper
         => NamespaceDeclaration(IdentifierName(ns));
 
     public static ArgumentListSyntax ArgumentList(params ExpressionSyntax[] argSyntaxes)
-    {
-        var args = argSyntaxes.Select(Argument);
-        return SyntaxFactory.ArgumentList(CommaSeparatedList(args));
-    }
+        => SyntaxFactory.ArgumentList(CommaSeparatedList(argSyntaxes.Select(Argument)));
+
+    public static ArgumentListSyntax ArgumentList(params ArgumentSyntax[] args)
+        => SyntaxFactory.ArgumentList(CommaSeparatedList(args));
 
     public static SeparatedSyntaxList<T> CommaSeparatedList<T>(IEnumerable<T> nodes, bool insertTrailingComma = false)
         where T : SyntaxNode

@@ -99,4 +99,20 @@ internal static class DiagnosticDescriptors
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
         true);
+
+    public static readonly DiagnosticDescriptor NoConstructorFound = new(
+        "RMG013",
+        "No accessible constructor with mappable arguments found",
+        "{0} has no accessible constructor with mappable arguments",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true);
+
+    public static readonly DiagnosticDescriptor CannotMapToConfiguredConstructor = new(
+        "RMG014",
+        "Cannot map to the configured constructor to be used by Mapperly",
+        "Cannot map from {0} to the configured constructor {1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        true);
 }

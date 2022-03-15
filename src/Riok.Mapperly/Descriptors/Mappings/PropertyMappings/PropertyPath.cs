@@ -1,7 +1,9 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
@@ -40,6 +42,14 @@ public class PropertyPath
     }
 
     /// <summary>
+    /// Gets the type of the <see cref="Member"/>. If any part of the path is nullable, this type will be nullable too.
+    /// </summary>
+    public ITypeSymbol MemberType =>
+        IsAnyNullable()
+            ? Member.Type.WithNullableAnnotation(NullableAnnotation.Annotated)
+            : Member.Type;
+
+    /// <summary>
     /// Gets the full name of the path (eg. A.B.C).
     /// </summary>
     public string FullName { get; }
@@ -73,26 +83,32 @@ public class PropertyPath
         => Path.Any(p => p.IsNullable());
 
     public ExpressionSyntax BuildAccess(
-        ExpressionSyntax baseAccess,
+        ExpressionSyntax? baseAccess,
         bool addValuePropertyOnNullable = false,
         bool nullConditional = false,
         bool skipTrailingNonNullable = false)
     {
+        var path = skipTrailingNonNullable
+            ? PathWithoutTrailingNonNullable()
+            : Path;
+
+        if (baseAccess == null)
+        {
+            baseAccess = IdentifierName(path.First().Name);
+            path = path.Skip(1);
+        }
+
         if (!nullConditional)
         {
             if (addValuePropertyOnNullable)
             {
-                return Path.Aggregate(baseAccess, (a, b) => b.Type.IsNullableValueType()
+                return path.Aggregate(baseAccess, (a, b) => b.Type.IsNullableValueType()
                     ? MemberAccess(MemberAccess(a, b.Name), NullableValueProperty)
                     : MemberAccess(a, b.Name));
             }
 
-            return Path.Aggregate(baseAccess, (a, b) => MemberAccess(a, b.Name));
+            return path.Aggregate(baseAccess, (a, b) => MemberAccess(a, b.Name));
         }
-
-        var path = skipTrailingNonNullable
-            ? PathWithoutTrailingNonNullable()
-            : Path;
 
         return path.AggregateWithPrevious(
             baseAccess,
@@ -134,4 +150,74 @@ public class PropertyPath
 
     private bool Equals(PropertyPath other)
         => Path.SequenceEqual(other.Path, SymbolEqualityComparer.IncludeNullability);
+
+    public static bool TryFind(
+        ITypeSymbol type,
+        IEnumerable<IEnumerable<string>> pathCandidates,
+        [NotNullWhen(true)] out PropertyPath? propertyPath)
+        => TryFind(type, pathCandidates, StringComparer.Ordinal, out propertyPath);
+
+    public static bool TryFind(
+        ITypeSymbol type,
+        IEnumerable<IEnumerable<string>> pathCandidates,
+        IEqualityComparer<string> comparer,
+        [NotNullWhen(true)] out PropertyPath? propertyPath)
+    {
+        foreach (var pathCandidate in pathCandidates)
+        {
+            if (TryFind(type, pathCandidate.ToList(), comparer, out propertyPath))
+                return true;
+        }
+
+        propertyPath = null;
+        return false;
+    }
+
+    public static bool TryFind(
+        ITypeSymbol type,
+        IReadOnlyCollection<string> path,
+        [NotNullWhen(true)] out PropertyPath? propertyPath)
+        => TryFind(type, path, StringComparer.Ordinal, out propertyPath);
+
+    public static bool TryFind(
+        ITypeSymbol type,
+        IReadOnlyCollection<string> path,
+        IEqualityComparer<string> comparer,
+        [NotNullWhen(true)] out PropertyPath? propertyPath)
+    {
+        var foundPath = Find(type, path, comparer).ToList();
+        if (foundPath.Count != path.Count)
+        {
+            propertyPath = null;
+            return false;
+        }
+
+        propertyPath = new(foundPath);
+        return true;
+    }
+
+    private static IEnumerable<IPropertySymbol> Find(
+        ITypeSymbol type,
+        IEnumerable<string> path,
+        IEqualityComparer<string> comparer)
+    {
+        foreach (var name in path)
+        {
+            if (FindProperty(type, name, comparer) is not { } property)
+                break;
+
+            type = property.Type;
+            yield return property;
+        }
+    }
+
+    private static IPropertySymbol? FindProperty(
+        ITypeSymbol type,
+        string name,
+        IEqualityComparer<string> comparer)
+    {
+        return type.GetAllMembers(name, comparer)
+            .OfType<IPropertySymbol>()
+            .FirstOrDefault(p => !p.IsStatic);
+    }
 }

@@ -27,7 +27,7 @@ public class DescriptorBuilder
         EnumMappingBuilder.TryBuildMapping,
         ExplicitCastMappingBuilder.TryBuildMapping,
         ToStringMappingBuilder.TryBuildMapping,
-        ObjectPropertyMappingBuilder.TryBuildMapping,
+        NewInstanceObjectPropertyMappingBuilder.TryBuildMapping,
     };
 
     private readonly SourceProductionContext _context;
@@ -165,6 +165,9 @@ public class DescriptorBuilder
         {
             switch (typeMapping)
             {
+                case NewInstanceObjectPropertyMapping mapping:
+                    NewInstanceObjectPropertyMappingBuilder.BuildMappingBody(ctx, mapping);
+                    break;
                 case ObjectPropertyMapping mapping:
                     ObjectPropertyMappingBuilder.BuildMappingBody(ctx, mapping);
                     break;

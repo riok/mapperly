@@ -1,6 +1,4 @@
-using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
-using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilder;
@@ -27,7 +25,7 @@ public static class NullableMappingBuilder
 
     private static TypeMapping BuildNullDelegateMapping(MappingBuilderContext ctx, TypeMapping mapping)
     {
-        var nullFallback = GetNullFallbackValue(ctx);
+        var nullFallback = ctx.GetNullFallbackValue();
         return mapping switch
         {
             MethodMapping methodMapping => new NullDelegateMethodMapping(
@@ -37,26 +35,5 @@ public static class NullableMappingBuilder
                 nullFallback),
             _ => new NullDelegateMapping(ctx.Source, ctx.Target, mapping, nullFallback),
         };
-    }
-
-    private static NullFallbackValue GetNullFallbackValue(MappingBuilderContext ctx)
-    {
-        if (ctx.Target.IsNullable())
-            return NullFallbackValue.Default;
-
-        if (ctx.MapperConfiguration.ThrowOnMappingNullMismatch)
-            return NullFallbackValue.ThrowArgumentNullException;
-
-        if (!ctx.Target.IsReferenceType || ctx.Target.IsNullable())
-            return NullFallbackValue.Default;
-
-        if (ctx.Target.SpecialType == SpecialType.System_String)
-            return NullFallbackValue.EmptyString;
-
-        if (ctx.Target.HasAccessibleParameterlessConstructor())
-            return NullFallbackValue.CreateInstance;
-
-        ctx.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, ctx.Target);
-        return NullFallbackValue.ThrowArgumentNullException;
     }
 }

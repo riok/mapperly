@@ -2,6 +2,16 @@ namespace Riok.Mapperly.IntegrationTests.Models;
 
 public class TestObject
 {
+    public TestObject(int ctorValue, int unknownValue = 10, int ctorValue2 = 100)
+    {
+        CtorValue = ctorValue;
+        CtorValue2 = ctorValue2;
+    }
+
+    public int CtorValue { get; set; }
+
+    public int CtorValue2 { get; set; }
+
     public int IntValue { get; set; }
 
     public string StringValue { get; set; } = string.Empty;
