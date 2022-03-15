@@ -178,9 +178,6 @@ public static class SyntaxFactoryHelper
     public static StatementSyntax CreateInstance(string variableName, ITypeSymbol typeSymbol, params ExpressionSyntax[] args)
         => DeclareLocalVariable(variableName, CreateInstance(typeSymbol, args));
 
-    public static StatementSyntax CreateInstance(string variableName, ITypeSymbol typeSymbol, params ArgumentSyntax[] args)
-        => DeclareLocalVariable(variableName, CreateInstance(typeSymbol, args));
-
     public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol)
     {
         var type = NonNullableIdentifier(typeSymbol);
@@ -197,6 +194,14 @@ public static class SyntaxFactoryHelper
     {
         var type = NonNullableIdentifier(typeSymbol);
         return ObjectCreationExpression(type).WithArgumentList(ArgumentList(args));
+    }
+
+    public static InitializerExpressionSyntax ObjectInitializer(params ExpressionSyntax[] expressions)
+    {
+        return InitializerExpression(
+            SyntaxKind.ObjectInitializerExpression,
+            CommaSeparatedList(
+                expressions));
     }
 
     public static SyntaxTrivia Nullable(bool enabled)

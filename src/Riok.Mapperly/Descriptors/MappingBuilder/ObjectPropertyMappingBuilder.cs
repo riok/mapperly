@@ -73,6 +73,72 @@ public static class ObjectPropertyMappingBuilder
         BuildPropertyAssignmentMapping(ctx, sourcePropertyPath, targetPropertyPath);
     }
 
+    public static bool ValidateMappingSpecification(
+        ObjectPropertyMappingBuilderContext ctx,
+        PropertyPath sourcePropertyPath,
+        PropertyPath targetPropertyPath,
+        bool allowInitOnlyMember = false)
+    {
+        // the target property path is readonly
+        if (targetPropertyPath.Member.IsReadOnly)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CannotMapToReadOnlyProperty,
+                ctx.Mapping.SourceType,
+                sourcePropertyPath.FullName,
+                sourcePropertyPath.Member.Type,
+                ctx.Mapping.TargetType,
+                targetPropertyPath.FullName,
+                targetPropertyPath.Member.Type);
+            return false;
+        }
+
+        // a target property path part is write only
+        if (targetPropertyPath.ObjectPath.Any(p => p.IsWriteOnly))
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CannotMapToWriteOnlyPropertyPath,
+                ctx.Mapping.SourceType,
+                sourcePropertyPath.FullName,
+                sourcePropertyPath.Member.Type,
+                ctx.Mapping.TargetType,
+                targetPropertyPath.FullName,
+                targetPropertyPath.Member.Type);
+            return false;
+        }
+
+        // a target property path part is init only
+        var noInitOnlyPath = allowInitOnlyMember ? targetPropertyPath.ObjectPath : targetPropertyPath.Path;
+        if (noInitOnlyPath.Any(p => p.IsInitOnly()))
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CannotMapToInitOnlyPropertyPath,
+                ctx.Mapping.SourceType,
+                sourcePropertyPath.FullName,
+                sourcePropertyPath.Member.Type,
+                ctx.Mapping.TargetType,
+                targetPropertyPath.FullName,
+                targetPropertyPath.Member.Type);
+            return false;
+        }
+
+        // a source property path is write only
+        if (sourcePropertyPath.Path.Any(p => p.IsWriteOnly))
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CannotMapFromWriteOnlyProperty,
+                ctx.Mapping.SourceType,
+                sourcePropertyPath.FullName,
+                sourcePropertyPath.Member.Type,
+                ctx.Mapping.TargetType,
+                targetPropertyPath.FullName,
+                targetPropertyPath.Member.Type);
+            return false;
+        }
+
+        return true;
+    }
+
     private static void BuildPropertyAssignmentMapping(
         ObjectPropertyMappingBuilderContext ctx,
         PropertyPath sourcePropertyPath,
@@ -128,55 +194,5 @@ public static class ObjectPropertyMappingBuilder
         ctx.AddNullDelegatePropertyAssignmentMapping(new PropertyAssignmentMapping(
             targetPropertyPath,
             new PropertyMapping(delegateMapping, sourcePropertyPath, false)));
-    }
-
-    private static bool ValidateMappingSpecification(
-        ObjectPropertyMappingBuilderContext ctx,
-        PropertyPath sourcePropertyPath,
-        PropertyPath targetPropertyPath)
-    {
-        // the target property path is readonly
-        if (targetPropertyPath.Member.IsReadOnly)
-        {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.CanNotMapToReadOnlyProperty,
-                ctx.Mapping.SourceType,
-                sourcePropertyPath.FullName,
-                sourcePropertyPath.Member.Type,
-                ctx.Mapping.TargetType,
-                targetPropertyPath.FullName,
-                targetPropertyPath.Member.Type);
-            return false;
-        }
-
-        // a target property path part is write only
-        if (targetPropertyPath.ObjectPath.Any(p => p.IsWriteOnly))
-        {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.CanNotMapToWriteOnlyPropertyPath,
-                ctx.Mapping.SourceType,
-                sourcePropertyPath.FullName,
-                sourcePropertyPath.Member.Type,
-                ctx.Mapping.TargetType,
-                targetPropertyPath.FullName,
-                targetPropertyPath.Member.Type);
-            return false;
-        }
-
-        // a source property path is write only
-        if (sourcePropertyPath.Path.Any(p => p.IsWriteOnly))
-        {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.CanNotMapFromWriteOnlyProperty,
-                ctx.Mapping.SourceType,
-                sourcePropertyPath.FullName,
-                sourcePropertyPath.Member.Type,
-                ctx.Mapping.TargetType,
-                targetPropertyPath.FullName,
-                targetPropertyPath.Member.Type);
-            return false;
-        }
-
-        return true;
     }
 }

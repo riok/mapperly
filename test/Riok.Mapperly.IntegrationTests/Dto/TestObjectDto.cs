@@ -16,6 +16,8 @@ public class TestObjectDto
 
     public int IntValue { get; set; }
 
+    public int IntInitOnlyValue { get; init; }
+
     public string StringValue { get; set; } = string.Empty;
 
     public string RenamedStringValue2 { get; set; } = string.Empty;

@@ -1,0 +1,17 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG016,
+      Title: Init only property cannot handle target paths,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (10,4)-(10,74),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Cannot map to init only property path {0}.{1},
+      Message: Cannot map to init only property path C.Nested.Value,
+      Category: Mapper,
+      CustomTags: []
+    }
+  ]
+}

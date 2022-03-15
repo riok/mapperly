@@ -68,26 +68,26 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true);
 
-    public static readonly DiagnosticDescriptor CanNotMapToReadOnlyProperty = new(
+    public static readonly DiagnosticDescriptor CannotMapToReadOnlyProperty = new(
         "RMG009",
-        "Can not map to read only property",
-        "Can not map property {0}.{1} of type {2} to read only property {3}.{4} of type {5}",
+        "Cannot map to read only property",
+        "Cannot map property {0}.{1} of type {2} to read only property {3}.{4} of type {5}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
         true);
 
-    public static readonly DiagnosticDescriptor CanNotMapFromWriteOnlyProperty = new(
+    public static readonly DiagnosticDescriptor CannotMapFromWriteOnlyProperty = new(
         "RMG010",
-        "Can not map from write only property",
-        "Can not map from write only property {0}.{1} of type {2} to property {3}.{4} of type {5}",
+        "Cannot map from write only property",
+        "Cannot map from write only property {0}.{1} of type {2} to property {3}.{4} of type {5}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
         true);
 
-    public static readonly DiagnosticDescriptor CanNotMapToWriteOnlyPropertyPath = new(
+    public static readonly DiagnosticDescriptor CannotMapToWriteOnlyPropertyPath = new(
         "RMG011",
-        "Can not map to write only property path",
-        "Can not map from property {0}.{1} of type {2} to write only property path {3}.{4} of type {5}",
+        "Cannot map to write only property path",
+        "Cannot map from property {0}.{1} of type {2} to write only property path {3}.{4} of type {5}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
         true);
@@ -112,6 +112,30 @@ internal static class DiagnosticDescriptors
         "RMG014",
         "Cannot map to the configured constructor to be used by Mapperly",
         "Cannot map from {0} to the configured constructor {1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        true);
+
+    public static readonly DiagnosticDescriptor CannotMapToInitOnlyPropertyPath = new(
+        "RMG015",
+        "Cannot map to init only property path",
+        "Cannot map from property {0}.{1} of type {2} to init only property path {3}.{4} of type {5}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Info,
+        true);
+
+    public static readonly DiagnosticDescriptor InitOnlyPropertyDoesNotSupportPaths = new(
+        "RMG016",
+        "Init only property cannot handle target paths",
+        "Cannot map to init only property path {0}.{1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true);
+
+    public static readonly DiagnosticDescriptor MultipleConfigurationsForInitOnlyProperty = new(
+        "RMG017",
+        "An init only property can have one configuration at max",
+        "The init only property {0}.{1} can have one configuration at max",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true);
