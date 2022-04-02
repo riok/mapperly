@@ -17,6 +17,8 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
         : base(method.Parameters.Single().Type.UpgradeNullable(), method.ReturnType.UpgradeNullable())
     {
         Partial = true;
+        IsStatic = method.IsStatic;
+        IsExtensionMethod = method.IsExtensionMethod;
         Accessibility = method.DeclaredAccessibility;
         MappingSourceParameterName = method.Parameters[0].Name;
         Method = method;

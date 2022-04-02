@@ -93,13 +93,11 @@ public static class UserMethodMappingBuilder
         => m.Parameters.Length == 2
             && m.ReturnsVoid
             && !m.IsAsync
-            && !m.IsStatic
             && !m.IsGenericMethod;
 
     private static bool IsNewInstanceMappingMethod(IMethodSymbol m)
         => m.Parameters.Length == 1
             && !m.ReturnsVoid
             && !m.IsAsync
-            && !m.IsStatic
             && !m.IsGenericMethod;
 }
