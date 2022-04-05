@@ -172,7 +172,8 @@ public static class ObjectPropertyMappingBuilder
             var propertyMapping = new PropertyMapping(
                 delegateMapping,
                 sourcePropertyPath,
-                false);
+                false,
+                true);
             ctx.AddPropertyAssignmentMapping(new PropertyAssignmentMapping(targetPropertyPath, propertyMapping));
             return;
         }
@@ -184,6 +185,7 @@ public static class ObjectPropertyMappingBuilder
             var propertyMapping = new PropertyMapping(
                 delegateMapping,
                 sourcePropertyPath,
+                false,
                 false);
             ctx.AddPropertyAssignmentMapping(new PropertyAssignmentMapping(targetPropertyPath, propertyMapping));
             return;
@@ -193,6 +195,6 @@ public static class ObjectPropertyMappingBuilder
         // (only map if source is not null, else may throw depending on settings)
         ctx.AddNullDelegatePropertyAssignmentMapping(new PropertyAssignmentMapping(
             targetPropertyPath,
-            new PropertyMapping(delegateMapping, sourcePropertyPath, false)));
+            new PropertyMapping(delegateMapping, sourcePropertyPath, false, true)));
     }
 }
