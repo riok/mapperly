@@ -173,7 +173,7 @@ public class ObjectPropertyNullableTest
     }
 
     [Fact]
-    public void ShouldUseUserProvidedMappingWithDisabledNullability()
+    public void ShouldUseUserImplementedMappingWithDisabledNullability()
     {
         var mapperBody = @"
 partial B Map(A source);
@@ -195,6 +195,78 @@ D UserImplementedMap(C source) => new D();";
     var target = new B();
     target.StringValue = source.StringValue;
     target.NestedValue = UserImplementedMap(source.NestedValue);
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public void ShouldUseUserImplementedMappingWithNullableValueType()
+    {
+        var mapperBody = @"
+partial NotNullableType? To(TypeWithNullableProperty? y);
+public Wrapper Map(double? source) => source.HasValue ? new() { Test = source.Value } : new();";
+
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            mapperBody,
+            "public class Wrapper { public double Test { get; set; } }",
+            "public class TypeWithNullableProperty { public double? Test { get; set; } }",
+            "public class NotNullableType { public Wrapper Test { get; set; } = new(); }");
+
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be(@"if (y == null)
+        return default;
+    var target = new NotNullableType();
+    target.Test = Map(y.Test);
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public void ShouldUseUserImplementedMappingWithNonNullableValueType()
+    {
+        var mapperBody = @"
+partial NotNullableType? To(TypeWithNullableProperty? y);
+public Wrapper Map(double source) => new() { Test = source.Value };";
+
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            mapperBody,
+            "public class Wrapper { public double Test { get; set; } }",
+            "public class TypeWithNullableProperty { public double? Test { get; set; } }",
+            "public class NotNullableType { public Wrapper Test { get; set; } = new(); }");
+
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be(@"if (y == null)
+        return default;
+    var target = new NotNullableType();
+    if (y.Test != null)
+    {
+        target.Test = Map(y.Test.Value);
+    }
+
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public void ShouldUseUserImplementedMappingWithNonNullableValueTypeAndNullableValueTypeShouldChooseCorrect()
+    {
+        var mapperBody = @"
+partial NotNullableType? To(TypeWithNullableProperty? y);
+public Wrapper MapNonNullable(double source) => new() { Test = source.Value };
+public Wrapper MapNullable(double? source) => source.HasValue ? new() { Test = source.Value } : new();";
+
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            mapperBody,
+            "public class Wrapper { public double Test { get; set; } }",
+            "public class TypeWithNullableProperty { public double? Test { get; set; } public double Test2 { get; set; } }",
+            "public class NotNullableType { public Wrapper Test { get; set; } = new(); public Wrapper Test2 { get; set; } = new(); }");
+
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be(@"if (y == null)
+        return default;
+    var target = new NotNullableType();
+    target.Test = MapNullable(y.Test);
+    target.Test2 = MapNonNullable(y.Test2);
     return target;".ReplaceLineEndings());
     }
 

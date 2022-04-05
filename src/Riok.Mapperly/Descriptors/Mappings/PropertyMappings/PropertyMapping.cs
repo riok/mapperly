@@ -10,16 +10,18 @@ public class PropertyMapping : IPropertyMapping
 {
     private readonly TypeMapping _delegateMapping;
     private readonly bool _nullConditionalAccess;
+    private readonly bool _addValuePropertyOnNullable;
 
-    public PropertyMapping(TypeMapping delegateMapping, PropertyPath sourcePath, bool nullConditionalAccess)
+    public PropertyMapping(TypeMapping delegateMapping, PropertyPath sourcePath, bool nullConditionalAccess, bool addValuePropertyOnNullable)
     {
         _delegateMapping = delegateMapping;
         SourcePath = sourcePath;
         _nullConditionalAccess = nullConditionalAccess;
+        _addValuePropertyOnNullable = addValuePropertyOnNullable;
     }
 
     public PropertyPath SourcePath { get; }
 
     public ExpressionSyntax Build(ExpressionSyntax source)
-        => _delegateMapping.Build(SourcePath.BuildAccess(source, true, _nullConditionalAccess));
+        => _delegateMapping.Build(SourcePath.BuildAccess(source, _addValuePropertyOnNullable, _nullConditionalAccess));
 }
