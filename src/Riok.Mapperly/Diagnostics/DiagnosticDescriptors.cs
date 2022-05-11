@@ -139,4 +139,20 @@ internal static class DiagnosticDescriptors
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true);
+
+    public static readonly DiagnosticDescriptor PartialStaticMethodInInstanceMapper = new(
+        "RMG018",
+        "Partial static mapping method in an instance mapper",
+        "{0} is a partial static mapping method in an instance mapper. Static mapping methods are only supported in static mappers.",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true);
+
+    public static readonly DiagnosticDescriptor PartialInstanceMethodInStaticMapper = new(
+        "RMG019",
+        "Partial instance mapping method in a static mapper",
+        "{0} is a partial instance mapping method in a static mapper. Instance mapping methods are only supported in instance (non-static) mappers.",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true);
 }

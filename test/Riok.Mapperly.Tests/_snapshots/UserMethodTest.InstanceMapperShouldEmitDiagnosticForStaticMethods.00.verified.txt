@@ -1,0 +1,17 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG018,
+      Title: Partial static mapping method in an instance mapper,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (8,4)-(8,58),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: {0} is a partial static mapping method in an instance mapper. Static mapping methods are only supported in static mappers.,
+      Message: StaticToObject is a partial static mapping method in an instance mapper. Static mapping methods are only supported in static mappers.,
+      Category: Mapper,
+      CustomTags: []
+    }
+  ]
+}

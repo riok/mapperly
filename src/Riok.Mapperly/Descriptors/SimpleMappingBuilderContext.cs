@@ -3,6 +3,9 @@ using Riok.Mapperly.Abstractions;
 
 namespace Riok.Mapperly.Descriptors;
 
+/// <summary>
+/// A simple mapping context which does not allow to access and build other mappings.
+/// </summary>
 public class SimpleMappingBuilderContext
 {
     private readonly DescriptorBuilder _builder;

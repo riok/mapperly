@@ -21,3 +21,12 @@ RMG014  | Mapper   | Warning  | Cannot map to the configured constructor to be u
 RMG015  | Mapper   | Info     | Cannot map to init only property path
 RMG016  | Mapper   | Error    | Init only property cannot handle target paths
 RMG017  | Mapper   | Warning  | An init only property can have one configuration at max
+
+## Release 2.3
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|--------------------
+RMG018  | Mapper   | Error    | Partial static mapping method in an instance mapper
+RMG019  | Mapper   | Error    | Partial instance mapping method in a static mapper

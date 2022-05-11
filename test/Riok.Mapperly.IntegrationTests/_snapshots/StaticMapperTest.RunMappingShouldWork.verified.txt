@@ -1,0 +1,60 @@
+﻿{
+  CtorValue: 7,
+  CtorValue2: 100,
+  IntValue: 10,
+  StringValue: fooBar+after-map,
+  RenamedStringValue2: fooBar2,
+  FlatteningIdValue: 10,
+  NullableFlatteningIdValue: 100,
+  Unflattening: {
+    IdValue: 20
+  },
+  NullableUnflattening: {
+    IdValue: 200
+  },
+  NestedNullableIntValue: 100,
+  NestedNullable: {
+    IntValue: 100
+  },
+  NestedNullableTargetNotNullable: {},
+  StringNullableTargetNotNullable: fooBar3,
+  RecursiveObject: {
+    CtorValue: 5,
+    CtorValue2: 100,
+    StringValue: ,
+    RenamedStringValue2: ,
+    Unflattening: {},
+    NestedNullableTargetNotNullable: {},
+    StringNullableTargetNotNullable: ,
+    EnumValue: DtoValue1,
+    EnumName: Value30,
+    EnumStringValue: 0,
+    EnumReverseStringValue: DtoValue3
+  },
+  SourceTargetSameObjectType: {
+    CtorValue: 8,
+    CtorValue2: 100,
+    IntValue: 99,
+    StringValue: ,
+    RenamedStringValue: ,
+    Flattening: {},
+    EnumReverseStringValue: 
+  },
+  NullableReadOnlyObjectCollection: [
+    {
+      IntValue: 10
+    },
+    {
+      IntValue: 20
+    }
+  ],
+  EnumValue: DtoValue1,
+  EnumName: Value10,
+  EnumRawValue: 20,
+  EnumStringValue: Value30,
+  EnumReverseStringValue: DtoValue3,
+  SubObject: {
+    SubIntValue: 2,
+    BaseIntValue: 1
+  }
+}
