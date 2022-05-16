@@ -30,3 +30,4 @@ Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
 RMG018  | Mapper   | Error    | Partial static mapping method in an instance mapper
 RMG019  | Mapper   | Error    | Partial instance mapping method in a static mapper
+RMG020  | Mapper   | Info     | Source property is not mapped to any target property

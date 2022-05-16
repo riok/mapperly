@@ -12,6 +12,19 @@
       Message: Cannot map to init only property path C.Nested.Value,
       Category: Mapper,
       CustomTags: []
+    },
+    {
+      Id: RMG020,
+      Title: Source property is not mapped to any target property,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (10,4)-(10,74),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},
+      Message: The property NestedValue on the mapping source type A is not mapped to any property on the mapping target type B,
+      Category: Mapper,
+      CustomTags: []
     }
   ]
 }

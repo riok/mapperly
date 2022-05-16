@@ -99,6 +99,14 @@ Available strategies:
 
 The `IgnoreCase` property allows to opt in for case insensitive mappings.
 
+### Strict mappings
+
+To enforce strict mappings (all source properties have to be mapped to a target property and all target properties have to be mapped from a source property) set the following two editorconfig settings:
+```editorconfig
+dotnet_diagnostic.RMG012.severity = error # Unmapped target property
+dotnet_diagnostic.RMG020.severity = error # Unmapped source property
+```
+
 ## Static mappers and extension methods
 
 Mapperly supports static mappers and extension methods:

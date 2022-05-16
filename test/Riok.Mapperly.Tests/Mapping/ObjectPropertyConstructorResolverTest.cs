@@ -20,6 +20,18 @@ public class ObjectPropertyConstructorResolverTest
     }
 
     [Fact]
+    public Task ClassToClassWithOneMatchingCtorAndUnmatchedSourcePropertyShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
+            "class B { public B(string stringValue) {} { }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public void ClassToClassWithOneMatchingCtorWithMatchedOptional()
     {
         var source = TestSourceBuilder.Mapping(
@@ -100,7 +112,7 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { public B(string StringValue9){} }");
+            "class B { public B(string StringValue9){} public int IntValue { get; set; } }");
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -112,7 +124,7 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { [MapperConstructor] public B(string StringValue9){} public B(string StringValue) {} }");
+            "class B { [MapperConstructor] public B(string StringValue9){} public B(string StringValue) {} public int IntValue { get; set; } }");
 
         return TestHelper.VerifyGenerator(source);
     }

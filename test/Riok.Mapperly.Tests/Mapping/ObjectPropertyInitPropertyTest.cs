@@ -130,7 +130,7 @@ public class ObjectPropertyInitPropertyTest
     }
 
     [Fact]
-    public Task InitOnlyPropertySourceNotFoundShoulDiagnostic()
+    public Task InitOnlyPropertySourceNotFoundShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
             "A",

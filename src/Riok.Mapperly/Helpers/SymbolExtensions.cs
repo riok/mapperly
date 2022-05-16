@@ -51,6 +51,15 @@ internal static class SymbolExtensions
             : members.Concat(symbol.BaseType.GetAllMembers());
     }
 
+    internal static IEnumerable<IPropertySymbol> GetAllAccessibleProperties(this ITypeSymbol symbol)
+    {
+        return symbol
+            .GetAllMembers()
+            .OfType<IPropertySymbol>()
+            .Where(x => x.IsAccessible())
+            .DistinctBy(x => x.Name);
+    }
+
     internal static bool ImplementsGeneric(
         this ITypeSymbol t,
         INamedTypeSymbol genericInterfaceSymbol,

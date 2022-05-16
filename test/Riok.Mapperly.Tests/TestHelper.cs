@@ -40,10 +40,10 @@ public static class TestHelper
 
         var result = Generate(source, options).GetRunResult();
 
-        if (!options.AllowDiagnostics)
-        {
-            result.Diagnostics.Should().HaveCount(0);
-        }
+        result.Diagnostics
+            .FirstOrDefault(d => options.AllowedDiagnostics?.Contains(d.Severity) != true)
+            .Should()
+            .BeNull();
 
         var mapperClassImpl = result.GeneratedTrees.Single()
             .GetRoot() // compilation
