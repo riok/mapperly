@@ -14,10 +14,15 @@ public static class UserMethodMappingBuilder
         // extract user implemented and user defined mappings from mapper
         foreach (var methodSymbol in ExtractMethods(mapperSymbol))
         {
-            var mapping = BuilderUserDefinedMapping(ctx, methodSymbol) ?? BuildUserImplementedMapping(methodSymbol, false);
+            var mapping = BuilderUserDefinedMapping(ctx, methodSymbol, mapperSymbol.IsStatic)
+                ?? BuildUserImplementedMapping(methodSymbol, false, mapperSymbol.IsStatic);
             if (mapping != null)
                 yield return mapping;
         }
+
+        // static mapper cannot have base methods
+        if (mapperSymbol.IsStatic)
+            yield break;
 
         // extract user implemented mappings from base methods
         foreach (var method in ExtractBaseMethods(ctx.Compilation.ObjectType, mapperSymbol))
@@ -26,7 +31,7 @@ public static class UserMethodMappingBuilder
             // but still treated as user implemented methods,
             //  since the user should provide an implementation elsewhere.
             //  This is the case if a partial mapper class is extended.
-            var mapping = BuildUserImplementedMapping(method, true);
+            var mapping = BuildUserImplementedMapping(method, true, mapperSymbol.IsStatic);
             if (mapping != null)
                 yield return mapping;
         }
@@ -62,19 +67,29 @@ public static class UserMethodMappingBuilder
                 && !SymbolEqualityComparer.Default.Equals(x.ReceiverType, objectType));
     }
 
-    private static TypeMapping? BuildUserImplementedMapping(IMethodSymbol m, bool allowPartial)
+    private static TypeMapping? BuildUserImplementedMapping(IMethodSymbol m, bool allowPartial, bool isStatic)
     {
-        return IsNewInstanceMappingMethod(m) && (allowPartial || !m.IsPartialDefinition)
+        return IsNewInstanceMappingMethod(m) && (allowPartial || !m.IsPartialDefinition) && (isStatic == m.IsStatic)
             ? new UserImplementedMethodMapping(m)
             : null;
     }
 
     private static TypeMapping? BuilderUserDefinedMapping(
         SimpleMappingBuilderContext ctx,
-        IMethodSymbol methodSymbol)
+        IMethodSymbol methodSymbol,
+        bool isStatic)
     {
         if (!methodSymbol.IsPartialDefinition)
             return null;
+
+        if (isStatic != methodSymbol.IsStatic)
+        {
+            ctx.ReportDiagnostic(
+                isStatic ? DiagnosticDescriptors.PartialInstanceMethodInStaticMapper : DiagnosticDescriptors.PartialStaticMethodInInstanceMapper,
+                methodSymbol,
+                methodSymbol.Name);
+            return null;
+        }
 
         if (IsExistingInstanceMappingMethod(methodSymbol))
             return new UserDefinedExistingInstanceMethodMapping(methodSymbol);
@@ -93,13 +108,11 @@ public static class UserMethodMappingBuilder
         => m.Parameters.Length == 2
             && m.ReturnsVoid
             && !m.IsAsync
-            && !m.IsStatic
             && !m.IsGenericMethod;
 
     private static bool IsNewInstanceMappingMethod(IMethodSymbol m)
         => m.Parameters.Length == 1
             && !m.ReturnsVoid
             && !m.IsAsync
-            && !m.IsStatic
             && !m.IsGenericMethod;
 }

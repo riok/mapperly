@@ -14,6 +14,44 @@ public class UserMethodTest
     }
 
     [Fact]
+    public Task StaticMapperShouldEmitDiagnosticForInstanceMethods()
+    {
+        var source = @"
+using System;
+using System.Collections.Generic;
+using Riok.Mapperly.Abstractions;
+
+[Mapper]
+public static partial class MyStaticMapper
+{
+    public partial static object StaticToObject(string s);
+
+    public partial object InstanceToObject(string s);
+}
+";
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task InstanceMapperShouldEmitDiagnosticForStaticMethods()
+    {
+        var source = @"
+using System;
+using System.Collections.Generic;
+using Riok.Mapperly.Abstractions;
+
+[Mapper]
+public partial class MyMapper
+{
+    public partial static object StaticToObject(string s);
+
+    public partial object InstanceToObject(string s);
+}
+";
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public void WithMultipleUserImplementedMethodShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBody(

@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Emit;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -20,7 +21,9 @@ public abstract class MethodMapping : TypeMapping
 
     protected Accessibility Accessibility { get; set; } = Accessibility.Private;
 
-    protected bool Partial { get; set; }
+    protected bool IsPartial { get; set; }
+
+    protected bool IsExtensionMethod { get; set; }
 
     protected string MethodName
     {
@@ -37,14 +40,14 @@ public abstract class MethodMapping : TypeMapping
     public override ExpressionSyntax Build(ExpressionSyntax source)
         => Invocation(MethodName, source);
 
-    public MethodDeclarationSyntax BuildMethod()
+    public MethodDeclarationSyntax BuildMethod(SourceEmitterContext context)
     {
         TypeSyntax returnType = ReturnType == null
             ? PredefinedType(Token(SyntaxKind.VoidKeyword))
             : IdentifierName(TargetType.ToDisplayString());
 
         return MethodDeclaration(returnType, Identifier(MethodName))
-            .WithModifiers(TokenList(BuildModifiers()))
+            .WithModifiers(TokenList(BuildModifiers(context.IsStatic)))
             .WithParameterList(BuildParameterList())
             .WithBody(Block(BuildBody(IdentifierName(MappingSourceParameterName))));
     }
@@ -62,15 +65,26 @@ public abstract class MethodMapping : TypeMapping
     {
         return new[]
         {
-            Parameter(Identifier(MappingSourceParameterName)).WithType(IdentifierName(SourceType.ToDisplayString())),
+            Parameter(Identifier(MappingSourceParameterName))
+                .WithType(IdentifierName(SourceType.ToDisplayString()))
+                .WithModifiers(TokenList(BuildParameterModifiers())),
         };
     }
 
-    private IEnumerable<SyntaxToken> BuildModifiers()
+    private IEnumerable<SyntaxToken> BuildParameterModifiers()
+    {
+        if (IsExtensionMethod)
+            yield return Token(SyntaxKind.ThisKeyword);
+    }
+
+    private IEnumerable<SyntaxToken> BuildModifiers(bool isStatic)
     {
         yield return Accessibility(Accessibility);
 
-        if (Partial)
+        if (isStatic)
+            yield return Token(SyntaxKind.StaticKeyword);
+
+        if (IsPartial)
             yield return Token(SyntaxKind.PartialKeyword);
     }
 

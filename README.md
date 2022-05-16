@@ -99,6 +99,21 @@ Available strategies:
 
 The `IgnoreCase` property allows to opt in for case insensitive mappings.
 
+## Static mappers and extension methods
+
+Mapperly supports static mappers and extension methods:
+```c#
+[Mapper]
+public static partial class DtoMapper
+{
+    public static partial CarDto CarToCarDto(this Car car);
+
+    private static DateOnly DateTimeToDateOnly(DateTime dt) => DateOnly.FromDateTime(dt);
+}
+```
+
+> Mapperly does not support static partial mapping methods in non-static mapper classes (yet).
+
 ## User implemented mapping methods
 
 If Mapperly cannot generate a mapping, one can implement it manually simply by providing a method body in the mapper declaration:

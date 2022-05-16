@@ -90,7 +90,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         if (MapperConfiguration.ThrowOnMappingNullMismatch)
             return NullFallbackValue.ThrowArgumentNullException;
 
-        if (!targetType.IsReferenceType || targetType.IsNullable())
+        if (!targetType.IsReferenceType)
             return NullFallbackValue.Default;
 
         if (targetType.SpecialType == SpecialType.System_String)

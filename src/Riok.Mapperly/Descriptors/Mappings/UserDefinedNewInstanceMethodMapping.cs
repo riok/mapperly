@@ -16,7 +16,8 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
     public UserDefinedNewInstanceMethodMapping(IMethodSymbol method)
         : base(method.Parameters.Single().Type.UpgradeNullable(), method.ReturnType.UpgradeNullable())
     {
-        Partial = true;
+        IsPartial = true;
+        IsExtensionMethod = method.IsExtensionMethod;
         Accessibility = method.DeclaredAccessibility;
         MappingSourceParameterName = method.Parameters[0].Name;
         Method = method;

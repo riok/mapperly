@@ -16,7 +16,8 @@ public class UserDefinedExistingInstanceMethodMapping : ObjectPropertyMapping, I
         IMethodSymbol method)
         : base(method.Parameters[0].Type.UpgradeNullable(), method.Parameters[1].Type.UpgradeNullable())
     {
-        Partial = true;
+        IsPartial = true;
+        IsExtensionMethod = method.IsExtensionMethod;
         Accessibility = method.DeclaredAccessibility;
         MappingSourceParameterName = method.Parameters[0].Name;
         Method = method;

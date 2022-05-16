@@ -11,9 +11,10 @@ public static class SourceEmitter
 {
     public static CompilationUnitSyntax Build(MapperDescriptor descriptor)
     {
+        var sourceEmitterContext = new SourceEmitterContext(descriptor.IsStatic);
         var classDeclaration = ClassDeclaration(descriptor.Syntax.Identifier)
             .WithModifiers(descriptor.Syntax.Modifiers)
-            .WithMembers(List(BuildMembers(descriptor)));
+            .WithMembers(List(BuildMembers(descriptor, sourceEmitterContext)));
 
         return CompilationUnit()
             .WithMembers(SingletonList(WrapInNamespaceIfNeeded(descriptor.Namespace, classDeclaration)))
@@ -21,9 +22,11 @@ public static class SourceEmitter
             .NormalizeWhitespace();
     }
 
-    private static IEnumerable<MemberDeclarationSyntax> BuildMembers(MapperDescriptor descriptor)
+    private static IEnumerable<MemberDeclarationSyntax> BuildMembers(
+        MapperDescriptor descriptor,
+        SourceEmitterContext sourceEmitterContext)
     {
-        return descriptor.MethodTypeMappings.Select(mapping => mapping.BuildMethod());
+        return descriptor.MethodTypeMappings.Select(mapping => mapping.BuildMethod(sourceEmitterContext));
     }
 
     private static MemberDeclarationSyntax WrapInNamespaceIfNeeded(string? namespaceName, MemberDeclarationSyntax classDeclaration)
