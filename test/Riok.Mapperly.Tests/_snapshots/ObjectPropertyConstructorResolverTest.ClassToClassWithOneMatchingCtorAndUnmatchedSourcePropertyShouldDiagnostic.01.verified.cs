@@ -4,8 +4,7 @@ public partial class Mapper
 {
     private partial B Map(A source)
     {
-        var target = new B();
-        target.IntValue = source.IntValue;
+        var target = new B(source.StringValue);
         return target;
     }
 }

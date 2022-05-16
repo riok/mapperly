@@ -12,6 +12,19 @@
       Message: Could not map property A.Value of type System.DateTime to B.Value of type System.Version,
       Category: Mapper,
       CustomTags: []
+    },
+    {
+      Id: RMG020,
+      Title: Source property is not mapped to any target property,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (10,4)-(10,28),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},
+      Message: The property Value on the mapping source type A is not mapped to any property on the mapping target type B,
+      Category: Mapper,
+      CustomTags: []
     }
   ]
 }

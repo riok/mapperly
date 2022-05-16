@@ -17,19 +17,21 @@ public class ObjectPropertyMappingBuilderContext<T>
         Mapping = mapping;
     }
 
-    public new T Mapping { get; }
+    protected new T Mapping { get; }
 }
 
 public class ObjectPropertyMappingBuilderContext
 {
     private readonly Dictionary<PropertyPath, PropertyNullDelegateAssignmentMapping> _nullDelegateMappings = new();
+    private readonly HashSet<string> _unmappedSourcePropertyNames;
 
     public ObjectPropertyMappingBuilderContext(MappingBuilderContext builderContext, ObjectPropertyMapping mapping)
     {
         BuilderContext = builderContext;
         Mapping = mapping;
 
-        IgnoredTargetProperties = GetIgnoredTargetProperties();
+        IgnoredTargetPropertyNames = GetIgnoredTargetProperties();
+        _unmappedSourcePropertyNames = GetSourcePropertyNames(IgnoredTargetPropertyNames);
         TargetProperties = GetTargetProperties();
         PropertyConfigsByRootTargetName = GetPropertyConfigurations();
     }
@@ -38,18 +40,15 @@ public class ObjectPropertyMappingBuilderContext
 
     public ObjectPropertyMapping Mapping { get; }
 
-    public HashSet<string> IgnoredTargetProperties { get; }
+    public HashSet<string> IgnoredTargetPropertyNames { get; }
 
     public Dictionary<string, IPropertySymbol> TargetProperties { get; }
 
     public Dictionary<string, List<MapPropertyAttribute>> PropertyConfigsByRootTargetName { get; }
 
-    public void AddPropertyAssignmentMapping(PropertyAssignmentMapping propertyMapping)
-        => AddPropertyAssignmentMapping(Mapping, propertyMapping);
-
     public void AddUnmatchedIgnoredPropertiesDiagnostics()
     {
-        foreach (var notFoundIgnoredProperty in IgnoredTargetProperties)
+        foreach (var notFoundIgnoredProperty in IgnoredTargetPropertyNames)
         {
             BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.IgnoredPropertyNotFound,
@@ -69,6 +68,21 @@ public class ObjectPropertyMappingBuilderContext
         }
     }
 
+    public void AddUnmatchedSourcePropertiesDiagnostics()
+    {
+        foreach (var sourcePropertyName in _unmappedSourcePropertyNames)
+        {
+            BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.SourcePropertyNotMapped,
+                sourcePropertyName,
+                Mapping.SourceType,
+                Mapping.TargetType);
+        }
+    }
+
+    public void AddPropertyAssignmentMapping(PropertyAssignmentMapping propertyMapping)
+        => AddPropertyAssignmentMapping(Mapping, propertyMapping);
+
     public void AddNullDelegatePropertyAssignmentMapping(PropertyAssignmentMapping propertyMapping)
     {
         var nullConditionSourcePath = new PropertyPath(propertyMapping.SourcePath.PathWithoutTrailingNonNullable().ToList());
@@ -78,9 +92,13 @@ public class ObjectPropertyMappingBuilderContext
 
     private void AddPropertyAssignmentMapping(IPropertyAssignmentMappingContainer container, PropertyAssignmentMapping mapping)
     {
+        SetSourcePropertyMapped(mapping.SourcePath);
         container.AddPropertyMappings(BuildNullPropertyInitializers(mapping.TargetPath));
         container.AddPropertyMapping(mapping);
     }
+
+    protected void SetSourcePropertyMapped(PropertyPath sourcePath)
+        => _unmappedSourcePropertyNames.Remove(sourcePath.Path.First().Name);
 
     private IEnumerable<PropertyNullAssignmentInitializerMapping> BuildNullPropertyInitializers(PropertyPath path)
     {
@@ -134,14 +152,20 @@ public class ObjectPropertyMappingBuilderContext
             .ToHashSet();
     }
 
+    private HashSet<string> GetSourcePropertyNames(IReadOnlyCollection<string> ignoredPropertyNames)
+    {
+        return Mapping.SourceType
+            .GetAllAccessibleProperties()
+            .Where(x => !ignoredPropertyNames.Contains(x.Name))
+            .Select(x => x.Name)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+    }
+
     private Dictionary<string, IPropertySymbol> GetTargetProperties()
     {
         return Mapping.TargetType
-            .GetAllMembers()
-            .OfType<IPropertySymbol>()
-            .Where(x => x.IsAccessible())
-            .DistinctBy(x => x.Name)
-            .Where(x => !IgnoredTargetProperties.Remove(x.Name))
+            .GetAllAccessibleProperties()
+            .Where(x => !IgnoredTargetPropertyNames.Remove(x.Name))
             .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
     }
 

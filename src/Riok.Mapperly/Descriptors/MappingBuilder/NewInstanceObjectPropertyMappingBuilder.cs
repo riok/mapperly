@@ -5,9 +5,6 @@ using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
-using NewInstanceMappingBuilderContext =
-    Riok.Mapperly.Descriptors.MappingBuilder.ObjectPropertyMappingBuilderContext<
-        Riok.Mapperly.Descriptors.Mappings.NewInstanceObjectPropertyMapping>;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilder;
 
@@ -142,7 +139,7 @@ public static class NewInstanceObjectPropertyMappingBuilder
         var propertyAssignmentMapping = new PropertyAssignmentMapping(
             targetPath,
             propertyMapping);
-        ctx.Mapping.AddInitPropertyMapping(propertyAssignmentMapping);
+        ctx.AddInitPropertyMapping(propertyAssignmentMapping);
     }
 
     private static bool TryBuildConstructorMapping(
@@ -186,7 +183,7 @@ public static class NewInstanceObjectPropertyMappingBuilder
 
             foreach (var constructorParameterMapping in constructorParameterMappings)
             {
-                ctx.Mapping.AddConstructorParameterMapping(constructorParameterMapping);
+                ctx.AddConstructorParameterMapping(constructorParameterMapping);
             }
 
             return true;

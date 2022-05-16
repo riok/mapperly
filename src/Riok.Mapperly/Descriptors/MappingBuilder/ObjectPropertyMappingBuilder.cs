@@ -48,6 +48,7 @@ public static class ObjectPropertyMappingBuilder
 
         ctx.AddUnmatchedIgnoredPropertiesDiagnostics();
         ctx.AddUnmatchedTargetPropertiesDiagnostics();
+        ctx.AddUnmatchedSourcePropertiesDiagnostics();
     }
 
     private static void BuildPropertyAssignmentMapping(ObjectPropertyMappingBuilderContext ctx, MapPropertyAttribute config)

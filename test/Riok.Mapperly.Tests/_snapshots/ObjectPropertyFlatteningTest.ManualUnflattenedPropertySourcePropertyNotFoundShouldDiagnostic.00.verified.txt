@@ -12,6 +12,19 @@
       Message: Specified property MyValueIdXXX on source type A was not found,
       Category: Mapper,
       CustomTags: []
+    },
+    {
+      Id: RMG020,
+      Title: Source property is not mapped to any target property,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (10,4)-(10,71),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},
+      Message: The property MyValueId on the mapping source type A is not mapped to any property on the mapping target type B,
+      Category: Mapper,
+      CustomTags: []
     }
   ]
 }
