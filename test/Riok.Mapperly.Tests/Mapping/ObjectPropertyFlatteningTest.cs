@@ -1,3 +1,5 @@
+using Microsoft.CodeAnalysis;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 [UsesVerify]
@@ -54,6 +56,71 @@ public class ObjectPropertyFlatteningTest
         target.ValueId = source.Value.Id;
     }
 
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public void AutoFlattenedMultiplePropertiesNullablePath()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public C? Value { get; set; } }",
+            "class B { public string ValueId { get; set; } public string ValueName { get; set; } }",
+            "class C { public Guid Id { get; set; } public string Name { get; set; } }");
+
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be(@"var target = new B();
+    if (source.Value != null)
+    {
+        target.ValueId = source.Value.Id.ToString();
+        target.ValueName = source.Value.Name;
+    }
+
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public void AutoFlattenedMultiplePropertiesPathDisabledNullable()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public C Value { get; set; } }",
+            "class B { public string ValueId { get; set; } public string ValueName { get; set; } }",
+            "class C { public Guid Id { get; set; } public string Name { get; set; } }");
+
+        TestHelper.GenerateSingleMapperMethodBody(source, TestHelperOptions.Default with { NullableOption = NullableContextOptions.Disable })
+            .Should()
+            .Be(@"if (source == null)
+        return default;
+    var target = new B();
+    if (source.Value != null)
+    {
+        target.ValueId = source.Value.Id.ToString();
+    }
+
+    target.ValueName = source.Value?.Name;
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public void AutoFlattenedPropertyPathDisabledNullable()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public C Value { get; set; } }",
+            "class B { public string ValueName { get; set; } }",
+            "class C { public string Name { get; set; } }");
+
+        TestHelper.GenerateSingleMapperMethodBody(source, TestHelperOptions.Default with { NullableOption = NullableContextOptions.Disable })
+            .Should()
+            .Be(@"if (source == null)
+        return default;
+    var target = new B();
+    target.ValueName = source.Value?.Name;
     return target;".ReplaceLineEndings());
     }
 

@@ -84,6 +84,23 @@ public class ObjectPropertyNullableTest
     }
 
     [Fact]
+    public void NullableClassToSameNullableClass()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public C? Value { get; set; } }",
+            "class B { public C? Value { get; set; } }",
+            "class C { }");
+
+        TestHelper.GenerateMapperMethodBody(source)
+            .Should()
+            .Be(@"var target = new B();
+    target.Value = source.Value;
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
     public void NonNullableClassToNullableClassProperty()
     {
         var source = TestSourceBuilder.Mapping(
