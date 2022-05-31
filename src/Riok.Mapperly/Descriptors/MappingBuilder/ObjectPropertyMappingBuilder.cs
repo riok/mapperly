@@ -186,7 +186,7 @@ public static class ObjectPropertyMappingBuilder
             var propertyMapping = new PropertyMapping(
                 delegateMapping,
                 sourcePropertyPath,
-                false,
+                true,
                 false);
             ctx.AddPropertyAssignmentMapping(new PropertyAssignmentMapping(targetPropertyPath, propertyMapping));
             return;
