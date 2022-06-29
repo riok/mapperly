@@ -9,11 +9,11 @@
     <PackageDescription>
       A .NET source generator for generating object mappings.
       Trimming save.
-      Inspired by MapStruct. 
+      Inspired by MapStruct.
     </PackageDescription>
     <PackageTags>Mapper SourceGenerator</PackageTags>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
@@ -22,7 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Riok.Mapperly.Abstractions\Riok.Mapperly.Abstractions.csproj" PrivateAssets="All" />
   </ItemGroup>
-  
+
   <!-- This ensures the library will be packaged as a source generator when we use `dotnet pack` -->
   <ItemGroup>
     <None Include="../../README.md" Pack="true" PackagePath="\" />
