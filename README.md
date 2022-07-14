@@ -8,7 +8,7 @@ Mapperly is a .NET source generator for generating object mappings. Inspired by 
 Because Mapperly creates the mapping code at build time, there is minimal overhead at runtime.
 Even better, the generated code is perfectly readable, allowing you to verify the generated mapping code easily.
 
-Mapperly is the fastet .NET object mapper out there, surpassing even the naive manual mapping approach! The benchmark was generated with https://github.com/mjebrahimi/Benchmark.netCoreMappers.
+Mapperly is the fastest .NET object mapper out there, surpassing even the naive manual mapping approach! The benchmark was generated with https://github.com/mjebrahimi/Benchmark.netCoreMappers.
 
 |        Method |       Mean |   Error |  StdDev |  Gen 0 | Allocated |
 |-------------- |-----------:|--------:|--------:|-------:|----------:|
