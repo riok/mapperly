@@ -26,5 +26,10 @@ public abstract class TypeMapping
     /// </summary>
     public virtual bool CallableByOtherMappings => true;
 
+    /// <summary>
+    /// Gets a value indicating whether this mapping produces any code or can be omitted completely (eg. direct assignments or delegate mappings).
+    /// </summary>
+    public virtual bool IsSynthetic => false;
+
     public abstract ExpressionSyntax Build(ExpressionSyntax source);
 }

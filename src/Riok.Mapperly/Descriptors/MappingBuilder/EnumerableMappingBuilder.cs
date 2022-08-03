@@ -25,23 +25,19 @@ public static class EnumerableMappingBuilder
         if (elementMapping == null)
             return null;
 
-        // true if there is no need to convert elements (eg. the source instances can directly be reused)
-        // this is the case if the types are equal and the mapping is a direct assignment.
-        var isDirectElementMapping = elementMapping is DirectAssignmentMapping;
-
-        // if element mapping is a direct assignment
+        // if element mapping is synthetic
         // and target is an IEnumerable, there is no mapping needed at all.
-        if (isDirectElementMapping && ctx.IsType(ctx.Target.OriginalDefinition, typeof(IEnumerable<>)))
+        if (elementMapping.IsSynthetic && ctx.IsType(ctx.Target.OriginalDefinition, typeof(IEnumerable<>)))
             return new CastMapping(ctx.Source, ctx.Target);
 
         // if source is an array and target is an array or IReadOnlyCollection faster mappings can be applied
         if (ctx.Source.IsArrayType()
             && (ctx.Target.IsArrayType() || ctx.IsType(ctx.Target.OriginalDefinition, typeof(IReadOnlyCollection<>))))
         {
-            // if element mapping is a direct assignment
+            // if element mapping is synthetic
             // a single Array.Clone / cast mapping call should be sufficient and fast,
             // use a for loop mapping otherwise.
-            if (!isDirectElementMapping)
+            if (!elementMapping.IsSynthetic)
                 return new ArrayForMapping(ctx.Source, ctx.Target, elementMapping, enumeratedTargetType);
 
             return ctx.MapperConfiguration.UseDeepCloning
@@ -55,12 +51,11 @@ public static class EnumerableMappingBuilder
         if (!canMapWithLinq)
             return BuildCustomTypeMapping(ctx, elementMapping);
 
-        return BuildLinqMapping(ctx, isDirectElementMapping, elementMapping, collectMethodName);
+        return BuildLinqMapping(ctx, elementMapping, collectMethodName);
     }
 
     private static LinqEnumerableMapping BuildLinqMapping(
         MappingBuilderContext ctx,
-        bool isDirectMapping,
         TypeMapping elementMapping,
         string? collectMethodName)
     {
@@ -68,7 +63,7 @@ public static class EnumerableMappingBuilder
             ? null
             : ResolveLinqMethod(ctx, collectMethodName);
 
-        var selectMethod = isDirectMapping
+        var selectMethod = elementMapping.IsSynthetic
             ? null
             : ResolveLinqMethod(ctx, SelectMethodName);
 

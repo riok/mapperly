@@ -15,4 +15,6 @@ public class DirectAssignmentMapping : TypeMapping
 
     public override ExpressionSyntax Build(ExpressionSyntax source)
         => source;
+
+    public override bool IsSynthetic => true;
 }

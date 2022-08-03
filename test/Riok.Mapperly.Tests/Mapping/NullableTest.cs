@@ -144,4 +144,21 @@ public class NullableTest
 
         return TestHelper.VerifyGenerator(source, TestHelperOptions.Default with { NullableOption = NullableContextOptions.Disable });
     }
+
+    [Fact]
+    public void NullableDirectiveEnabledTargetWithSameNullableRefTypeAsPropertyAndInEnumerable()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string Value { get; set; } public string[] Descriptions { get; set; } }",
+            "#nullable disable\n class B { public string Value { get; set; } public string[] Descriptions { get; set; } }\n#nullable enable");
+
+        TestHelper.GenerateMapperMethodBody(source)
+            .Should()
+            .Be(@"var target = new B();
+    target.Value = source.Value;
+    target.Descriptions = (string[])source.Descriptions;
+    return target;");
+    }
 }

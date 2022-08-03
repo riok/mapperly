@@ -181,7 +181,7 @@ public static class ObjectPropertyMappingBuilder
 
         // the source is nullable, or the mapping is a direct assignment and the target allows nulls
         // access the source in a null save matter (via ?.) but no other special handling required.
-        if (delegateMapping.SourceType.IsNullable() || delegateMapping is DirectAssignmentMapping && targetPropertyPath.Member.IsNullable())
+        if (delegateMapping.SourceType.IsNullable() || delegateMapping.IsSynthetic && targetPropertyPath.Member.IsNullable())
         {
             var propertyMapping = new PropertyMapping(
                 delegateMapping,

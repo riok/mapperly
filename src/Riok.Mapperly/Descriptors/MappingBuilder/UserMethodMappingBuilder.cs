@@ -39,14 +39,17 @@ public static class UserMethodMappingBuilder
 
     public static void BuildMappingBody(MappingBuilderContext ctx, UserDefinedNewInstanceMethodMapping mapping)
     {
-        mapping.DelegateMapping = ctx.BuildDelegateMapping(mapping.SourceType, mapping.TargetType);
-        if (mapping.DelegateMapping == null)
+        var delegateMapping = ctx.BuildDelegateMapping(mapping.SourceType, mapping.TargetType);
+        if (delegateMapping != null)
         {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.CouldNotCreateMapping,
-                mapping.SourceType,
-                mapping.TargetType);
+            mapping.SetDelegateMapping(delegateMapping);
+            return;
         }
+
+        ctx.ReportDiagnostic(
+            DiagnosticDescriptors.CouldNotCreateMapping,
+            mapping.SourceType,
+            mapping.TargetType);
     }
 
     private static IEnumerable<IMethodSymbol> ExtractMethods(ITypeSymbol mapperSymbol)
