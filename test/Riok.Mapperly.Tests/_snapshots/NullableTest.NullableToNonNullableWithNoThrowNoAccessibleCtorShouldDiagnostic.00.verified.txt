@@ -10,8 +10,7 @@
       HelpLink: ,
       MessageFormat: {0} has no accessible parameterless constructor,
       Message: B has no accessible parameterless constructor,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     }
   ]
 }

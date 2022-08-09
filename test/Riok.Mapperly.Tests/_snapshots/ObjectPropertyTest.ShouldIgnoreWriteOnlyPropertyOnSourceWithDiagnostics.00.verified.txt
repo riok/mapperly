@@ -10,8 +10,7 @@
       HelpLink: ,
       MessageFormat: Cannot map from write only property {0}.{1} of type {2} to property {3}.{4} of type {5},
       Message: Cannot map from write only property A.StringValue2 of type string to property B.StringValue2 of type string,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     },
     {
       Id: RMG020,
@@ -23,8 +22,7 @@
       HelpLink: ,
       MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},
       Message: The property StringValue2 on the mapping source type A is not mapped to any property on the mapping target type B,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     }
   ]
 }

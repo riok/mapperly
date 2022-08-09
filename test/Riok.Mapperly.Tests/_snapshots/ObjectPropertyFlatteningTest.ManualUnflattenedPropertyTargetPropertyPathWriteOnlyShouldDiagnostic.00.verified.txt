@@ -10,8 +10,7 @@
       HelpLink: ,
       MessageFormat: Cannot map from property {0}.{1} of type {2} to write only property path {3}.{4} of type {5},
       Message: Cannot map from property A.MyValueId of type string to write only property path B.Value.Id of type string,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     },
     {
       Id: RMG020,
@@ -23,8 +22,7 @@
       HelpLink: ,
       MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},
       Message: The property MyValueId on the mapping source type A is not mapped to any property on the mapping target type B,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     }
   ]
 }

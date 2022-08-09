@@ -10,8 +10,7 @@
       HelpLink: ,
       MessageFormat: The init only property {0}.{1} can have one configuration at max,
       Message: The init only property string.StringValue can have one configuration at max,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     },
     {
       Id: RMG020,
@@ -23,8 +22,7 @@
       HelpLink: ,
       MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},
       Message: The property StringValue3 on the mapping source type A is not mapped to any property on the mapping target type B,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     }
   ]
 }
