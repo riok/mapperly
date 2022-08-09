@@ -37,7 +37,7 @@ public class NullPropertyMapping : IPropertyMapping
         // source.A?.B == null ? <null-substitute> : Map(source.A.B.Value)
         // use simplified coalesce expression for direct assignments:
         // source.A?.B ?? <null-substitute>
-        if (_delegateMapping is DirectAssignmentMapping)
+        if (_delegateMapping.IsSynthetic)
         {
             var nullConditionalSourceAccess = SourcePath.BuildAccess(source, nullConditional: true);
             return Coalesce(

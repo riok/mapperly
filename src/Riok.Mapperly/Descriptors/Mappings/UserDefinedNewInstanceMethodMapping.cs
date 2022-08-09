@@ -12,6 +12,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
 {
     private const string NoMappingComment = "// Could not generate mapping";
+    private TypeMapping? _delegateMapping;
 
     public UserDefinedNewInstanceMethodMapping(IMethodSymbol method)
         : base(method.Parameters.Single().Type.UpgradeNullable(), method.ReturnType.UpgradeNullable())
@@ -26,11 +27,12 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
 
     public IMethodSymbol Method { get; }
 
-    public TypeMapping? DelegateMapping { get; set; }
+    public void SetDelegateMapping(TypeMapping delegateMapping)
+        => _delegateMapping = delegateMapping;
 
     public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
     {
-        if (DelegateMapping == null)
+        if (_delegateMapping == null)
         {
             return new StatementSyntax[]
             {
@@ -39,11 +41,11 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
             };
         }
 
-        if (DelegateMapping is MethodMapping delegateMethodMapping)
+        if (_delegateMapping is MethodMapping delegateMethodMapping)
         {
             return delegateMethodMapping.BuildBody(source);
         }
 
-        return new[] { ReturnStatement(DelegateMapping.Build(source)) };
+        return new[] { ReturnStatement(_delegateMapping.Build(source)) };
     }
 }

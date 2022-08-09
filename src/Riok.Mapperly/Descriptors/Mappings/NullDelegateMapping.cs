@@ -25,7 +25,17 @@ public class NullDelegateMapping : TypeMapping
     {
         _delegateMapping = delegateMapping;
         _nullFallbackValue = nullFallbackValue;
+
+        // the mapping is synthetic (produces no code)
+        // if and only if the delegate mapping is synthetic (produces also no code)
+        // and no null handling is required
+        // (this is the case if the delegate mapping source type accepts nulls
+        // or the source type is not nullable and the target type is not a nullable value type (otherwise a conversion is needed)).
+        IsSynthetic = _delegateMapping.IsSynthetic
+            && (_delegateMapping.SourceType.IsNullable() || !SourceType.IsNullable() && !TargetType.IsNullableValueType());
     }
+
+    public override bool IsSynthetic { get; }
 
     public override ExpressionSyntax Build(ExpressionSyntax source)
     {
