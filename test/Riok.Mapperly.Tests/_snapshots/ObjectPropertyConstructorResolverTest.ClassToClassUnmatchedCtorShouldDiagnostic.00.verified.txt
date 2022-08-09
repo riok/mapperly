@@ -10,8 +10,7 @@
       HelpLink: ,
       MessageFormat: {0} has no accessible constructor with mappable arguments,
       Message: B has no accessible constructor with mappable arguments,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     },
     {
       Id: RMG020,
@@ -23,8 +22,7 @@
       HelpLink: ,
       MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},
       Message: The property StringValue on the mapping source type A is not mapped to any property on the mapping target type B,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     }
   ]
 }

@@ -10,8 +10,7 @@
       HelpLink: ,
       MessageFormat: {0} is a partial instance mapping method in a static mapper. Instance mapping methods are only supported in instance (non-static) mappers.,
       Message: InstanceToObject is a partial instance mapping method in a static mapper. Instance mapping methods are only supported in instance (non-static) mappers.,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     }
   ]
 }

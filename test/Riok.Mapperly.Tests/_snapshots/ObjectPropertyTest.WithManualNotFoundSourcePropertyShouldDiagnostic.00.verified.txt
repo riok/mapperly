@@ -10,8 +10,7 @@
       HelpLink: ,
       MessageFormat: Specified property {0} on source type {1} was not found,
       Message: Specified property not_found on source type A was not found,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     },
     {
       Id: RMG020,
@@ -23,8 +22,7 @@
       HelpLink: ,
       MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},
       Message: The property StringValue on the mapping source type A is not mapped to any property on the mapping target type B,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     }
   ]
 }

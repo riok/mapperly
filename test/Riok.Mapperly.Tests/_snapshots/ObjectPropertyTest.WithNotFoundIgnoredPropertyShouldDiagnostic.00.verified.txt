@@ -10,8 +10,7 @@
       HelpLink: ,
       MessageFormat: Ignored property {0} on {1} was not found,
       Message: Ignored property not_found on B was not found,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     }
   ]
 }

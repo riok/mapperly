@@ -10,8 +10,7 @@
       HelpLink: ,
       MessageFormat: {0} has an unsupported mapping method signature,
       Message: ToString has an unsupported mapping method signature,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     }
   ]
 }

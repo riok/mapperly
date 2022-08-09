@@ -10,8 +10,7 @@
       HelpLink: ,
       MessageFormat: {0} has no accessible parameterless constructor,
       Message: A has no accessible parameterless constructor,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     },
     {
       Id: RMG002,
@@ -23,8 +22,7 @@
       HelpLink: ,
       MessageFormat: {0} has no accessible parameterless constructor,
       Message: A has no accessible parameterless constructor,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     },
     {
       Id: RMG008,
@@ -36,8 +34,7 @@
       HelpLink: ,
       MessageFormat: Could not create mapping from {0} to {1}. Consider implementing the mapping manually.,
       Message: Could not create mapping from System.Collections.Generic.IDictionary<string, int> to A. Consider implementing the mapping manually.,
-      Category: Mapper,
-      CustomTags: []
+      Category: Mapper
     }
   ]
 }
