@@ -9,7 +9,7 @@ public static class MemberPathCandidateBuilder
         var chunks = StringChunker.ChunkPascalCase(name).ToList();
         for (var i = 1 << chunks.Count - 1; i > 0; i--)
         {
-            yield return BuildName(chunks, i);
+            yield return BuildName(chunks, i - 1);
         }
     }
 

@@ -32,7 +32,7 @@ public class EnumerableExtensionsTest
             .DistinctBy(x => x.Item2)
             .Select(x => x.Item1)
             .Should()
-            .BeEquivalentTo(new[] { "item10", "item20", "item30" });
+            .BeEquivalentTo(new[] { "item10", "item20", "item30" }, o => o.WithStrictOrdering());
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class EnumerableExtensionsTest
                 new[] { 0, 1 },
                 new[] { 2, 3 },
                 new[] { 4 }
-            });
+            }, o => o.WithStrictOrdering());
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class EnumerableExtensionsTest
         items
             .SkipLast()
             .Should()
-            .BeEquivalentTo(items.Take(items.Length - 1));
+            .BeEquivalentTo(items.Take(items.Length - 1), o => o.WithoutStrictOrdering());
     }
 
     [Fact]

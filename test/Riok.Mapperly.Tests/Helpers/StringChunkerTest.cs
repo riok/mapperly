@@ -13,6 +13,6 @@ public class StringChunkerTest
     {
         StringChunker.ChunkPascalCase(str)
             .Should()
-            .BeEquivalentTo(expected);
+            .BeEquivalentTo(expected, o => o.WithStrictOrdering());
     }
 }

@@ -15,16 +15,16 @@ public class MethodNameBuilderTest
         builder.Reserve("MapToA");
         builder.Build(NewMethodMappingMock("A"))
             .Should()
-            .BeEquivalentTo("MapToA1");
+            .Be("MapToA1");
         builder.Build(NewMethodMappingMock("A"))
             .Should()
-            .BeEquivalentTo("MapToA2");
+            .Be("MapToA2");
         builder.Build(NewMethodMappingMock("B"))
             .Should()
-            .BeEquivalentTo("MapToB");
+            .Be("MapToB");
         builder.Build(NewMethodMappingMock("B"))
             .Should()
-            .BeEquivalentTo("MapToB1");
+            .Be("MapToB1");
     }
 
     private MethodMapping NewMethodMappingMock(string targetTypeName)
