@@ -13,6 +13,6 @@ public class MemberPathCandidateBuilderTest
         MemberPathCandidateBuilder.BuildMemberPathCandidates(name)
             .Select(x => string.Join(".", x))
             .Should()
-            .BeEquivalentTo(chunks);
+            .BeEquivalentTo(chunks, o => o.WithStrictOrdering());
     }
 }

@@ -39,6 +39,32 @@ public class ObjectPropertyFlatteningTest
     }
 
     [Fact]
+    public void AutoFlattenedPropertyAvailableShouldPreferNonFlattened()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public C Value { get; set; } public string ValueId { get; set; } }",
+            "class B { public string ValueId { get; set; } }",
+            "class C { public string Id { get; set; }");
+
+        var options = TestHelperOptions.Default with
+        {
+            AllowedDiagnostics = new HashSet<DiagnosticSeverity>
+            {
+                DiagnosticSeverity.Hidden,
+                DiagnosticSeverity.Info,
+            }
+        };
+
+        TestHelper.GenerateSingleMapperMethodBody(source, options)
+            .Should()
+            .Be(@"var target = new B();
+    target.ValueId = source.ValueId;
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
     public void AutoFlattenedPropertyNullablePath()
     {
         var source = TestSourceBuilder.Mapping(

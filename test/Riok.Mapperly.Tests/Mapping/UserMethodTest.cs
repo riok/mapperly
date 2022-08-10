@@ -122,7 +122,7 @@ public partial class MyMapper
         TestHelper.GenerateMapperMethodBodies(source)
             .Select(x => x.Name)
             .Should()
-            .BeEquivalentTo("MapToB", "MapToB1");
+            .BeEquivalentTo(new[] { "MapToB", "MapToB1" }, o => o.WithStrictOrdering());
     }
 
     [Fact]
