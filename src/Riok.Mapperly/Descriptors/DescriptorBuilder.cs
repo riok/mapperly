@@ -60,7 +60,7 @@ public class DescriptorBuilder
         _mapperSymbol = mapperSymbol;
         _context = sourceContext;
         Compilation = compilation;
-        _mapperDescriptor = new MapperDescriptor(mapperSymbol.Name, mapperSyntax, mapperSymbol.IsStatic);
+        _mapperDescriptor = new MapperDescriptor(mapperSyntax, mapperSymbol.IsStatic);
         MapperConfiguration = Configure();
     }
 

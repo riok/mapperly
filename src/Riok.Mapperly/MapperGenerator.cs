@@ -13,6 +13,7 @@ namespace Riok.Mapperly;
 [Generator]
 public class MapperGenerator : IIncrementalGenerator
 {
+    private const string GeneratedFileSuffix = ".g.cs";
     private static readonly string _mapperAttributeName = typeof(MapperAttribute).FullName;
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -61,6 +62,7 @@ public class MapperGenerator : IIncrementalGenerator
         if (mapperAttributeSymbol == null)
             return;
 
+        var uniqueNameBuilder = new UniqueNameBuilder();
         foreach (var mapperSyntax in mappers.Distinct())
         {
             var mapperModel = compilation.GetSemanticModel(mapperSyntax.SyntaxTree);
@@ -74,7 +76,7 @@ public class MapperGenerator : IIncrementalGenerator
             var descriptor = builder.Build();
 
             ctx.AddSource(
-                descriptor.FileName,
+                uniqueNameBuilder.Build(mapperSymbol.Name) + GeneratedFileSuffix,
                 SourceText.From(SourceEmitter.Build(descriptor).ToFullString(), Encoding.UTF8));
         }
     }
