@@ -5,20 +5,16 @@ namespace Riok.Mapperly.Descriptors;
 
 public class MapperDescriptor
 {
-    private const string FileNameSuffix = ".g.cs";
 
     private readonly List<TypeMapping> _mappings = new();
 
-    public MapperDescriptor(string name, ClassDeclarationSyntax syntax, bool isStatic)
+    public MapperDescriptor(ClassDeclarationSyntax syntax, bool isStatic)
     {
-        FileName = name + FileNameSuffix;
         Syntax = syntax;
         IsStatic = isStatic;
     }
 
     public string? Namespace { get; set; }
-
-    public string FileName { get; }
 
     public ClassDeclarationSyntax Syntax { get; }
 
