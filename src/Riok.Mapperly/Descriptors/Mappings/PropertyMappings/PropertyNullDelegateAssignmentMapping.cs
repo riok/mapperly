@@ -37,7 +37,7 @@ public class PropertyNullDelegateAssignmentMapping : IPropertyAssignmentMapping,
         var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(sourceAccess, true, true, true);
         var condition = IsNotNull(sourceNullConditionalAccess);
         var elseClause = _throwInsteadOfConditionalNullMapping
-            ? ElseClause(Block(ExpressionStatement(ThrowNewArgumentNullException(sourceNullConditionalAccess))))
+            ? ElseClause(Block(ExpressionStatement(ThrowArgumentNullException(sourceNullConditionalAccess))))
             : null;
 
         var mappings = _delegateMappings.Select(m => m.Build(sourceAccess, targetAccess)).ToList();

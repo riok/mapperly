@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.ObjectFactories;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 
@@ -27,13 +28,6 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     public ITypeSymbol Source { get; }
 
     public ITypeSymbol Target { get; }
-
-    public INamedTypeSymbol GetTypeSymbol(Type type)
-        => Compilation.GetTypeByMetadataName(type.FullName ?? throw new InvalidOperationException("Could not get name of type " + type))
-            ?? throw new InvalidOperationException("Could not get type " + type.FullName);
-
-    public bool IsType(ITypeSymbol symbol, Type type)
-        => SymbolEqualityComparer.Default.Equals(symbol, GetTypeSymbol(type));
 
     public TypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
         => _builder.FindMapping(sourceType.UpgradeNullable(), targetType.UpgradeNullable());
@@ -80,6 +74,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, params object[] messageArgs)
         => base.ReportDiagnostic(descriptor, _userSymbol, messageArgs);
+
+    public ObjectFactoryCollection ObjectFactories => _builder.ObjectFactories;
 
     public NullFallbackValue GetNullFallbackValue(ITypeSymbol? targetType = null)
     {

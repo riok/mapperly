@@ -6,6 +6,9 @@ using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
+/// <summary>
+/// An object mapping creating the target instance via a new() call.
+/// </summary>
 public class NewInstanceObjectPropertyMapping : ObjectPropertyMapping
 {
     private const string TargetVariableName = "target";

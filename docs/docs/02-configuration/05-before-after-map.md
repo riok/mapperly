@@ -4,7 +4,7 @@ To run custom code before or after a mapping, the generated map method can be wr
 
 ```csharp
 [Mapper]
-public partial class DtoMapper
+public partial class CarMapper
 {
     public CarDto MapCarToCarDto(Car car)
     {

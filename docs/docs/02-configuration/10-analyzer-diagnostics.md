@@ -25,6 +25,7 @@ RMG018  | Mapper   | Error    | Partial static mapping method in an instance map
 RMG019  | Mapper   | Error    | Partial instance mapping method in a static mapper
 RMG020  | Mapper   | Info     | Source property is not mapped to any target property
 RMG021  | Mapper   | Warning  | Ignored source property not found
+RMG022  | Mapper   | Error    | Invalid object factory signature
 
 ## Editorconfig
 

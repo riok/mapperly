@@ -15,6 +15,9 @@ public static class NewInstanceObjectPropertyMappingBuilder
         if (ctx.Target.SpecialType != SpecialType.None || ctx.Source.SpecialType != SpecialType.None)
             return null;
 
+        if (ctx.ObjectFactories.TryFindObjectFactory(ctx.Target, out var objectFactory))
+            return new NewInstanceObjectFactoryPropertyMapping(ctx.Source, ctx.Target.NonNullable(), objectFactory);
+
         if (ctx.Target is not INamedTypeSymbol namedTarget || namedTarget.Constructors.All(x => !x.IsAccessible()))
             return null;
 

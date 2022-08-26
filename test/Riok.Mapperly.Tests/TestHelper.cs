@@ -15,11 +15,36 @@ public static class TestHelper
         return Verify(driver).ToTask();
     }
 
+    public static MapperGenerationResult GenerateMapper(string source, TestHelperOptions? options = null)
+    {
+        options ??= TestHelperOptions.Default;
+
+        var result = Generate(source, options).GetRunResult();
+
+        var mapperClassImpl = result.GeneratedTrees.Single()
+            .GetRoot() // compilation
+            .ChildNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .Single();
+        var methodBodies = mapperClassImpl
+            .ChildNodes()
+            .OfType<MethodDeclarationSyntax>()
+            .ToDictionary(m => m.Identifier.ToString(), ExtractBody);
+
+        var mapperResult = new MapperGenerationResult(result.Diagnostics, methodBodies);
+        if (options.AllowedDiagnostics != null)
+        {
+            mapperResult.Should().NotHaveDiagnostics(options.AllowedDiagnostics);
+        }
+
+        return mapperResult;
+    }
+
     public static string GenerateSingleMapperMethodBody(string source, TestHelperOptions? options = null)
     {
         return GenerateMapperMethodBodies(source, options)
             .Single()
-            .Body;
+            .Value;
     }
 
     public static string GenerateMapperMethodBody(
@@ -27,33 +52,14 @@ public static class TestHelper
         string methodName = TestSourceBuilder.DefaultMapMethodName,
         TestHelperOptions? options = null)
     {
-        return GenerateMapperMethodBodies(source, options)
-            .Single(x => x.Name == methodName)
-            .Body;
+        return GenerateMapperMethodBodies(source, options)[methodName];
     }
 
-    public static IEnumerable<(string Name, string Body)> GenerateMapperMethodBodies(
+    public static IReadOnlyDictionary<string, string> GenerateMapperMethodBodies(
         string source,
         TestHelperOptions? options = null)
     {
-        options ??= TestHelperOptions.Default;
-
-        var result = Generate(source, options).GetRunResult();
-
-        result.Diagnostics
-            .FirstOrDefault(d => options.AllowedDiagnostics?.Contains(d.Severity) != true)
-            .Should()
-            .BeNull();
-
-        var mapperClassImpl = result.GeneratedTrees.Single()
-            .GetRoot() // compilation
-            .ChildNodes()
-            .OfType<ClassDeclarationSyntax>()
-            .Single();
-        return mapperClassImpl
-            .ChildNodes()
-            .OfType<MethodDeclarationSyntax>()
-            .Select(methodImpl => (methodImpl.Identifier.ToString(), ExtractBody(methodImpl)));
+        return GenerateMapper(source, options ?? TestHelperOptions.NoDiagnostics).MethodBodies;
     }
 
     private static string ExtractBody(MethodDeclarationSyntax methodImpl)

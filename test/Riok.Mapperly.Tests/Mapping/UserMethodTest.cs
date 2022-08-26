@@ -84,7 +84,7 @@ public partial class MyMapper
             "int ToInt2(string i);");
 
         TestHelper.GenerateMapperMethodBodies(source)
-            .Select(x => x.Body)
+            .Values
             .Should()
             .AllBe("return int.Parse(source);");
     }
@@ -98,8 +98,7 @@ public partial class MyMapper
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }");
 
-        var mappingMethods = TestHelper.GenerateMapperMethodBodies(source, TestHelperOptions.IgnoreInfoDiagnostics)
-            .ToDictionary(x => x.Name, x => x.Body);
+        var mappingMethods = TestHelper.GenerateMapperMethodBodies(source, TestHelperOptions.IgnoreInfoDiagnostics);
         mappingMethods.Should().HaveCount(2);
         mappingMethods["Map"].Should().Be(@"var target = new B();
     target.StringValue = source.StringValue;
@@ -120,7 +119,7 @@ public partial class MyMapper
             "class B { public B? Value { get; set; } }");
 
         TestHelper.GenerateMapperMethodBodies(source)
-            .Select(x => x.Name)
+            .Keys
             .Should()
             .BeEquivalentTo(new[] { "MapToB", "MapToB1" }, o => o.WithStrictOrdering());
     }
