@@ -154,13 +154,16 @@ public static class NewInstanceObjectPropertyMappingBuilder
         }
 
         var mapperConstructorAttribute = ctx.BuilderContext.GetTypeSymbol(typeof(MapperConstructorAttribute));
+        var obsoleteAttribute = ctx.BuilderContext.GetTypeSymbol(typeof(ObsoleteAttribute));
 
         // attributed ctor is prio 1
         // parameterless ctor is prio 2
         // then by descending parameter count
+        // ctors annotated with [Obsolete] are considered last unless they have a MapperConstructor attribute set
         var ctorCandidates = namedTargetType.Constructors
             .Where(ctor => ctor.IsAccessible())
             .OrderByDescending(x => x.HasAttribute(mapperConstructorAttribute))
+            .ThenBy(x => x.HasAttribute(obsoleteAttribute))
             .ThenByDescending(x => x.Parameters.Length == 0)
             .ThenByDescending(x => x.Parameters.Length);
         foreach (var ctorCandidate in ctorCandidates)
