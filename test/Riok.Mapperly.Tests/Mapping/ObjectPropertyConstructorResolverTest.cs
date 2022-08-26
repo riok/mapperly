@@ -79,7 +79,7 @@ public class ObjectPropertyConstructorResolverTest
     }
 
     [Fact]
-    public void ClassToClassMultipleCtorsShouldChooseCorrect()
+    public void ClassToClassMultipleCtorsShouldChooseSingleMatching()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -158,6 +158,37 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .Be(@"var target = new B();
     target.StringValue = source.StringValue;
+    target.IntValue = source.IntValue;
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public void ClassToClassMultipleCtorsShouldPreferNonObsolete()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
+            "class B { [Obsolete] public B(string StringValue) { } public B(string stringValue, int intvalue) { } { public string StringValue { get; set; } public int IntValue { get; set; } ");
+
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be(@"var target = new B(source.StringValue, source.IntValue);
+    return target;".ReplaceLineEndings());
+    }
+
+    [Fact]
+    public void ClassToClassMultipleCtorsShouldPreferObsoleteWithMapperCtorAttribute()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
+            "class B { [Obsolete, MapperConstructor] public B(string StringValue) { } public B(string stringValue, int intvalue) { } { public string StringValue { get; set; } public int IntValue { get; set; } ");
+
+        TestHelper.GenerateSingleMapperMethodBody(source)
+            .Should()
+            .Be(@"var target = new B(source.StringValue);
     target.IntValue = source.IntValue;
     return target;".ReplaceLineEndings());
     }
