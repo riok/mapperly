@@ -36,16 +36,18 @@ internal static class SymbolExtensions
         => symbol.GetAllMembers(name, StringComparer.Ordinal);
 
     internal static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol, string name, IEqualityComparer<string> comparer)
-    {
-        var members = symbol.GetMembers().Where(x => comparer.Equals(name, x.Name));
-        return symbol.BaseType == null
-            ? members
-            : members.Concat(symbol.BaseType.GetAllMembers(name, comparer));
-    }
+        => symbol.GetAllMembers().Where(x => comparer.Equals(name, x.Name));
 
     internal static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol)
     {
         var members = symbol.GetMembers();
+
+        if (symbol.TypeKind == TypeKind.Interface)
+        {
+            var interfaceProperties = symbol.AllInterfaces.SelectMany(i => i.GetAllMembers());
+            return members.Concat(interfaceProperties);
+        }
+
         return symbol.BaseType == null
             ? members
             : members.Concat(symbol.BaseType.GetAllMembers());
