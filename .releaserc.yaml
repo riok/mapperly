@@ -11,7 +11,7 @@ plugins:
   - '@semantic-release/github'
 prepare:
   - - "@semantic-release/exec"
-    - prepareCmd: "dotnet pack -c Release -o ./artifacts /p:Version='${nextRelease.version}' /p:PackageReleaseNotes='${nextRelease.notes}'"
+    - prepareCmd: "dotnet pack -c Release -o ./artifacts /p:Version='${nextRelease.version}' /p:PackageReleaseNotes='\\\"${nextRelease.notes}\\\"'"
 publish:
   - - "@semantic-release/exec"
     - publishCmd: "dotnet nuget push './artifacts/*.nupkg' --source $NUGET_SOURCE --api-key $NUGET_API_KEY"
