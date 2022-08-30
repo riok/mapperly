@@ -14,6 +14,5 @@ jobs:
     uses: ./.github/workflows/release.yml
     with:
       environment: stable
-      nuget_source: 'https://api.nuget.org/v3/index.json'
     secrets:
       nuget_api_key: ${{ secrets.NUGET_API_TOKEN }}
