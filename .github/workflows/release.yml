@@ -4,8 +4,9 @@ on:
   workflow_call:
     inputs:
       nuget_source:
-        required: true
+        required: false
         type: string
+        default: 'https://api.nuget.org/v3/index.json'
       environment:
         required: true
         type: string

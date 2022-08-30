@@ -14,9 +14,8 @@ jobs:
     uses: ./.github/workflows/release.yml
     with:
       environment: next
-      nuget_source: 'https://nuget.pkg.github.com/riok/index.json'
     secrets:
-      nuget_api_key: ${{ secrets.GITHUB_TOKEN }}
+      nuget_api_key: ${{ secrets.NUGET_API_TOKEN }}
 
   release-stable-update-branch:
     runs-on: ubuntu-latest
