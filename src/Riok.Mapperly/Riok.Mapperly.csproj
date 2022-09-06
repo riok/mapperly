@@ -4,11 +4,12 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageProjectUrl>https://riok.github.io/mapperly</PackageProjectUrl>
     <PackageId>Riok.Mapperly</PackageId>
     <PackageLicense>Apache-2.0</PackageLicense>
     <PackageDescription>
       A .NET source generator for generating object mappings.
-      Trimming save.
+      No runtime reflection.
       Inspired by MapStruct.
     </PackageDescription>
     <PackageTags>Mapper SourceGenerator</PackageTags>

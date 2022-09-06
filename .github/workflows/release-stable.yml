@@ -16,3 +16,10 @@ jobs:
       environment: stable
     secrets:
       nuget_api_key: ${{ secrets.NUGET_API_TOKEN }}
+
+  docs:
+    uses: ./.github/workflows/docs.yml
+    needs: release
+    with:
+      deploy: true
+      version: ${{ steps.release.outputs.version }}

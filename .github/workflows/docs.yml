@@ -1,0 +1,72 @@
+name: docs
+
+on:
+  workflow_call:
+    inputs:
+      deploy:
+        required: false
+        type: boolean
+        default: false
+      version:
+        required: false
+        type: string
+        default: '0.0.1-dev'
+  workflow_dispatch:
+    inputs:
+      deploy:
+        required: false
+        type: boolean
+        default: true
+        description: A boolean indicating whether the built pages should be deployed
+      version:
+        required: false
+        type: string
+        default: '0.0.1-dev'
+        description: The version of Mapperly to be referenced from the documentation
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/configure-pages@v2
+      - uses: actions/setup-dotnet@v2
+      - run: dotnet tool restore
+      - run: dotnet build
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: npm ci
+        working-directory: ./docs
+      - run: npm run prebuild
+        working-directory: ./docs
+      - run: npm run lint
+        working-directory: ./docs
+      - run: npm run build
+        working-directory: ./docs
+        env:
+          DOCUSAURUS_BASE_URL: '/mapperly/'
+          MAPPERLY_VERSION: ${{ inputs.version }}
+      - uses: actions/upload-pages-artifact@v1
+        if: ${{ inputs.deploy }}
+        with:
+          path: 'docs/build'
+  deploy:
+    if: ${{ inputs.deploy }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/deploy-pages@v1

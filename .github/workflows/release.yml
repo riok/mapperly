@@ -18,6 +18,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    outputs:
+      version: ${{ steps.release.outputs.version }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -34,7 +36,8 @@ jobs:
           @semantic-release/commit-analyzer@9.0.2 \
           @semantic-release/release-notes-generator@10.0.3 \
           @semantic-release/github@8.0.2
-      - run: npx semantic-release
+      - id: release
+        run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUGET_SOURCE: ${{ inputs.nuget_source }}

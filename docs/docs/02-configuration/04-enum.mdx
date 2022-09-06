@@ -1,0 +1,52 @@
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Enum mappings
+
+An enum mapping can be customized by setting the strategy to use.
+Apply the `MapEnumAttribute` and pass the strategy to be used for this enum.
+It is also possible to set the strategy for the entire mapper via the `MapperAttribute`.
+Available strategies:
+
+| Name    | Description                                    |
+|---------|------------------------------------------------|
+| ByValue | Matches enum entries by their values (default) |
+| ByName  | Matches enum entries by their exact names      |
+
+The `IgnoreCase` property allows to opt in for case insensitive mappings (defaults to `false`).
+
+<!-- do not indent this, it won't work, https://stackoverflow.com/a/67579641/3302887 -->
+<Tabs>
+<TabItem value="global" label="Global (Mapper Level)" default>
+
+Applied to all enums mapped inside this mapper.
+
+```csharp
+// highlight-start
+[Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName, EnumMappingIgnoreCase = true)]
+// highlight-end
+public partial class CarMapper
+{
+    ...
+}
+```
+
+</TabItem>
+<TabItem value="enum" label="Enum (Mapping Method Level)">
+
+Applied to the specific enum mapped by this method.
+Attribute is only valid on mapping method with enums as parameters.
+
+```csharp
+[Mapper]
+public partial class CarMapper
+{
+    // highlight-start
+    [MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)]
+    // highlight-end
+    public partial CarMakeDto MapMake(CarMake make);
+}
+```
+
+</TabItem>
+</Tabs>
