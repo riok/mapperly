@@ -9,4 +9,13 @@ public record TestHelperOptions(
     IReadOnlySet<DiagnosticSeverity>? AllowedDiagnostics = null)
 {
     public static readonly TestHelperOptions Default = new();
+
+    public static readonly TestHelperOptions IgnoreInfoDiagnostics = Default with
+    {
+        AllowedDiagnostics = new HashSet<DiagnosticSeverity>
+        {
+            DiagnosticSeverity.Hidden,
+            DiagnosticSeverity.Info
+        }
+    };
 }

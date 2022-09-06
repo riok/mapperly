@@ -1,0 +1,16 @@
+{
+  Diagnostics: [
+    {
+      Id: RMG021,
+      Title: Ignored source property not found,
+      Severity: Warning,
+      WarningLevel: 1,
+      Location: : (10,4)-(10,62),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Ignored source property {0} on {1} was not found,
+      Message: Ignored source property not_found on A was not found,
+      Category: Mapper
+    }
+  ]
+}

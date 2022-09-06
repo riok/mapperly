@@ -53,4 +53,6 @@ public class TestObject
     public InheritanceSubObject? SubObject { get; set; }
 
     public string? IgnoredStringValue { get; set; }
+
+    public int IgnoredIntValue { get; set; }
 }

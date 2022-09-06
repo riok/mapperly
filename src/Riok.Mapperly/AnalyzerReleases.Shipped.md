@@ -7,7 +7,7 @@ Rule ID | Category | Severity | Notes
 RMG001  | Mapper   | Error    | A mapping method has an unsupported signature.
 RMG002  | Mapper   | Error    | No accessible parameterless constructor found.
 RMG003  | Mapper   | Warning  | No overlapping enum members found.
-RMG004  | Mapper   | Warning  | Ignored property not found.
+RMG004  | Mapper   | Warning  | Ignored target property not found.
 RMG005  | Mapper   | Error    | Mapping target property not found.
 RMG006  | Mapper   | Error    | Mapping source property not found.
 RMG007  | Mapper   | Error    | Could not map property.
@@ -31,3 +31,11 @@ Rule ID | Category | Severity | Notes
 RMG018  | Mapper   | Error    | Partial static mapping method in an instance mapper
 RMG019  | Mapper   | Error    | Partial instance mapping method in a static mapper
 RMG020  | Mapper   | Info     | Source property is not mapped to any target property
+
+## Release 2.4
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|--------------------
+RMG021  | Mapper   | Warning  | Ignored source property not found

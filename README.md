@@ -70,7 +70,7 @@ To create deep copies, set the `UseDeepCloning` property on the `MapperAttribute
 
 On each mapping method declaration, property mappings can be customized.
 If a property on the target has a different name than on the source, the `MapPropertyAttribute` can be applied.
-If a property should be ignored, the `MapperIgnoreAttribute` can be used.
+If a property should be ignored, the `MapperIgnoreTargetAttribute` or `MapperIgnoreSourceAttribute` can be used.
 
 #### Flattening and unflattening
 

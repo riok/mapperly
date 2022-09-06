@@ -34,6 +34,7 @@ public static class ObjectPropertyMappingBuilder
             if (!PropertyPath.TryFind(
                 ctx.Mapping.SourceType,
                 MemberPathCandidateBuilder.BuildMemberPathCandidates(targetProperty.Name),
+                ctx.IgnoredSourcePropertyNames,
                 out var sourcePropertyPath))
             {
                 ctx.BuilderContext.ReportDiagnostic(
@@ -46,9 +47,7 @@ public static class ObjectPropertyMappingBuilder
             BuildPropertyAssignmentMapping(ctx, sourcePropertyPath, new PropertyPath(new[] { targetProperty }));
         }
 
-        ctx.AddUnmatchedIgnoredPropertiesDiagnostics();
-        ctx.AddUnmatchedTargetPropertiesDiagnostics();
-        ctx.AddUnmatchedSourcePropertiesDiagnostics();
+        ctx.AddDiagnostics();
     }
 
     private static void BuildPropertyAssignmentMapping(ObjectPropertyMappingBuilderContext ctx, MapPropertyAttribute config)

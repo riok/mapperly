@@ -28,10 +28,10 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         true);
 
-    public static readonly DiagnosticDescriptor IgnoredPropertyNotFound = new(
+    public static readonly DiagnosticDescriptor IgnoredTargetPropertyNotFound = new(
         "RMG004",
-        "Ignored property not found",
-        "Ignored property {0} on {1} was not found",
+        "Ignored target property not found",
+        "Ignored target property {0} on {1} was not found",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true);
@@ -162,5 +162,13 @@ internal static class DiagnosticDescriptors
         "The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
+        true);
+
+    public static readonly DiagnosticDescriptor IgnoredSourcePropertyNotFound = new(
+        "RMG021",
+        "Ignored source property not found",
+        "Ignored source property {0} on {1} was not found",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
         true);
 }

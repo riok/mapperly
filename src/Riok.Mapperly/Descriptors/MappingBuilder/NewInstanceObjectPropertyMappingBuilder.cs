@@ -55,6 +55,7 @@ public static class NewInstanceObjectPropertyMappingBuilder
             if (!PropertyPath.TryFind(
                 ctx.Mapping.SourceType,
                 MemberPathCandidateBuilder.BuildMemberPathCandidates(targetProperty.Name),
+                ctx.IgnoredSourcePropertyNames,
                 out var sourcePropertyPath))
             {
                 ctx.BuilderContext.ReportDiagnostic(
@@ -211,6 +212,7 @@ public static class NewInstanceObjectPropertyMappingBuilder
             if (!PropertyPath.TryFind(
                 ctx.Mapping.SourceType,
                 MemberPathCandidateBuilder.BuildMemberPathCandidates(parameter.Name),
+                ctx.IgnoredSourcePropertyNames,
                 StringComparer.OrdinalIgnoreCase,
                 out var sourcePath))
             {

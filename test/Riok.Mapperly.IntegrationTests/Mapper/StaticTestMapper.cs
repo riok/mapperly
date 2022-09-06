@@ -23,6 +23,7 @@ public static partial class StaticTestMapper
 
     public static partial IEnumerable<TestObjectDto> MapAllDtos(IEnumerable<TestObject> objects);
 
+    [MapperIgnoreSource(nameof(TestObject.IgnoredIntValue))]
     public static partial TestObjectDto MapToDtoExt(this TestObject src);
 
     public static TestObjectDto MapToDto(TestObject src)
@@ -32,7 +33,10 @@ public static partial class StaticTestMapper
         return target;
     }
 
+    // disable obsolete warning, as the obsolete attribute should still be tested.
+#pragma warning disable CS0618
     [MapperIgnore(nameof(TestObjectDto.IgnoredStringValue))]
+#pragma warning restore CS0618
     [MapProperty(nameof(TestObject.RenamedStringValue), nameof(TestObjectDto.RenamedStringValue2))]
     [MapProperty(
         new[] { nameof(TestObject.UnflatteningIdValue) },
@@ -40,14 +44,22 @@ public static partial class StaticTestMapper
     [MapProperty(
         nameof(TestObject.NullableUnflatteningIdValue),
         $"{nameof(TestObjectDto.NullableUnflattening)}.{nameof(TestObjectDto.NullableUnflattening.IdValue)}")]
+    [MapperIgnoreTarget(nameof(TestObject.IgnoredIntValue))]
+    [MapperIgnoreSource(nameof(TestObjectDto.IgnoredIntValue))]
     private static partial TestObjectDto MapToDtoInternal(TestObject testObject);
 
+    // disable obsolete warning, as the obsolete attribute should still be tested.
+#pragma warning disable CS0618
     [MapperIgnore(nameof(TestObject.IgnoredStringValue))]
+#pragma warning restore CS0618
+    [MapperIgnoreTarget(nameof(TestObject.IgnoredIntValue))]
+    [MapperIgnoreSource(nameof(TestObjectDto.IgnoredIntValue))]
     public static partial TestObject MapFromDto(TestObjectDto dto);
 
     [MapEnum(EnumMappingStrategy.ByName)]
     public static partial TestEnumDtoByName MapToEnumDtoByName(TestEnum v);
 
+    [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredIntValue))]
     public static partial void UpdateDto(TestObject source, TestObjectDto target);
 
     private static partial int PrivateDirectInt(int value);

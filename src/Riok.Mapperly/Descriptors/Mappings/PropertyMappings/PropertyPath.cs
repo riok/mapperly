@@ -154,19 +154,24 @@ public class PropertyPath
     public static bool TryFind(
         ITypeSymbol type,
         IEnumerable<IEnumerable<string>> pathCandidates,
+        IReadOnlyCollection<string> ignoredNames,
         [NotNullWhen(true)] out PropertyPath? propertyPath)
-        => TryFind(type, pathCandidates, StringComparer.Ordinal, out propertyPath);
+        => TryFind(type, pathCandidates, ignoredNames, StringComparer.Ordinal, out propertyPath);
 
     public static bool TryFind(
         ITypeSymbol type,
         IEnumerable<IEnumerable<string>> pathCandidates,
+        IReadOnlyCollection<string> ignoredNames,
         IEqualityComparer<string> comparer,
         [NotNullWhen(true)] out PropertyPath? propertyPath)
     {
-        foreach (var pathCandidate in pathCandidates)
+        foreach (var pathCandidate in FindCandidates(type, pathCandidates, comparer))
         {
-            if (TryFind(type, pathCandidate.ToList(), comparer, out propertyPath))
-                return true;
+            if (ignoredNames.Contains(pathCandidate.Path.First().Name))
+                continue;
+
+            propertyPath = pathCandidate;
+            return true;
         }
 
         propertyPath = null;
@@ -179,7 +184,19 @@ public class PropertyPath
         [NotNullWhen(true)] out PropertyPath? propertyPath)
         => TryFind(type, path, StringComparer.Ordinal, out propertyPath);
 
-    public static bool TryFind(
+    private static IEnumerable<PropertyPath> FindCandidates(
+        ITypeSymbol type,
+        IEnumerable<IEnumerable<string>> pathCandidates,
+        IEqualityComparer<string> comparer)
+    {
+        foreach (var pathCandidate in pathCandidates)
+        {
+            if (TryFind(type, pathCandidate.ToList(), comparer, out var propertyPath))
+                yield return propertyPath;
+        }
+    }
+
+    private static bool TryFind(
         ITypeSymbol type,
         IReadOnlyCollection<string> path,
         IEqualityComparer<string> comparer,
