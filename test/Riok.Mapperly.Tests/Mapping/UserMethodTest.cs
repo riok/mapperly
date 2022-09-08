@@ -98,7 +98,7 @@ public partial class MyMapper
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }");
 
-        var mappingMethods = TestHelper.GenerateMapperMethodBodies(source)
+        var mappingMethods = TestHelper.GenerateMapperMethodBodies(source, TestHelperOptions.IgnoreInfoDiagnostics)
             .ToDictionary(x => x.Name, x => x.Body);
         mappingMethods.Should().HaveCount(2);
         mappingMethods["Map"].Should().Be(@"var target = new B();

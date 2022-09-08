@@ -24,15 +24,26 @@ public class ObjectPropertyMappingBuilderContext
 {
     private readonly Dictionary<PropertyPath, PropertyNullDelegateAssignmentMapping> _nullDelegateMappings = new();
     private readonly HashSet<string> _unmappedSourcePropertyNames;
+    private readonly IReadOnlyCollection<string> _ignoredUnmatchedTargetPropertyNames;
+    private readonly IReadOnlyCollection<string> _ignoredUnmatchedSourcePropertyNames;
 
     public ObjectPropertyMappingBuilderContext(MappingBuilderContext builderContext, ObjectPropertyMapping mapping)
     {
         BuilderContext = builderContext;
         Mapping = mapping;
 
-        IgnoredTargetPropertyNames = GetIgnoredTargetProperties();
-        _unmappedSourcePropertyNames = GetSourcePropertyNames(IgnoredTargetPropertyNames);
+        _unmappedSourcePropertyNames = GetSourcePropertyNames();
         TargetProperties = GetTargetProperties();
+
+        var ignoredTargetPropertyNames = GetIgnoredTargetProperties();
+        IgnoredSourcePropertyNames = GetIgnoredSourceProperties();
+
+        _ignoredUnmatchedSourcePropertyNames = InitIgnoredUnmatchedProperties(IgnoredSourcePropertyNames, _unmappedSourcePropertyNames);
+        _ignoredUnmatchedTargetPropertyNames = InitIgnoredUnmatchedProperties(ignoredTargetPropertyNames, TargetProperties.Keys);
+
+        _unmappedSourcePropertyNames.ExceptWith(IgnoredSourcePropertyNames);
+        TargetProperties.RemoveRange(ignoredTargetPropertyNames);
+
         PropertyConfigsByRootTargetName = GetPropertyConfigurations();
     }
 
@@ -40,44 +51,18 @@ public class ObjectPropertyMappingBuilderContext
 
     public ObjectPropertyMapping Mapping { get; }
 
-    public HashSet<string> IgnoredTargetPropertyNames { get; }
+    public IReadOnlyCollection<string> IgnoredSourcePropertyNames { get; }
 
     public Dictionary<string, IPropertySymbol> TargetProperties { get; }
 
     public Dictionary<string, List<MapPropertyAttribute>> PropertyConfigsByRootTargetName { get; }
 
-    public void AddUnmatchedIgnoredPropertiesDiagnostics()
+    public void AddDiagnostics()
     {
-        foreach (var notFoundIgnoredProperty in IgnoredTargetPropertyNames)
-        {
-            BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.IgnoredPropertyNotFound,
-                notFoundIgnoredProperty,
-                Mapping.TargetType);
-        }
-    }
-
-    public void AddUnmatchedTargetPropertiesDiagnostics()
-    {
-        foreach (var propertyConfig in PropertyConfigsByRootTargetName.Values.SelectMany(x => x))
-        {
-            BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.ConfiguredMappingTargetPropertyNotFound,
-                propertyConfig.TargetFullName,
-                Mapping.TargetType);
-        }
-    }
-
-    public void AddUnmatchedSourcePropertiesDiagnostics()
-    {
-        foreach (var sourcePropertyName in _unmappedSourcePropertyNames)
-        {
-            BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.SourcePropertyNotMapped,
-                sourcePropertyName,
-                Mapping.SourceType,
-                Mapping.TargetType);
-        }
+        AddUnmatchedIgnoredTargetPropertiesDiagnostics();
+        AddUnmatchedIgnoredSourcePropertiesDiagnostics();
+        AddUnmatchedTargetPropertiesDiagnostics();
+        AddUnmatchedSourcePropertiesDiagnostics();
     }
 
     public void AddPropertyAssignmentMapping(PropertyAssignmentMapping propertyMapping)
@@ -144,28 +129,45 @@ public class ObjectPropertyMappingBuilderContext
         return mapping;
     }
 
+    private HashSet<string> InitIgnoredUnmatchedProperties(IEnumerable<string> allProperties, IEnumerable<string> mappedProperties)
+    {
+        var unmatched = new HashSet<string>(allProperties);
+        unmatched.ExceptWith(mappedProperties);
+        return unmatched;
+    }
+
     private HashSet<string> GetIgnoredTargetProperties()
     {
         return BuilderContext
-            .ListConfiguration<MapperIgnoreAttribute>()
+            .ListConfiguration<MapperIgnoreTargetAttribute>()
             .Select(x => x.Target)
+            // deprecated MapperIgnoreAttribute, but it is still supported by Mapperly.
+#pragma warning disable CS0618
+            .Concat(BuilderContext.ListConfiguration<MapperIgnoreAttribute>().Select(x => x.Target))
+#pragma warning restore CS0618
             .ToHashSet();
     }
 
-    private HashSet<string> GetSourcePropertyNames(IReadOnlyCollection<string> ignoredPropertyNames)
+    private HashSet<string> GetIgnoredSourceProperties()
+    {
+        return BuilderContext
+            .ListConfiguration<MapperIgnoreSourceAttribute>()
+            .Select(x => x.Source)
+            .ToHashSet();
+    }
+
+    private HashSet<string> GetSourcePropertyNames()
     {
         return Mapping.SourceType
             .GetAllAccessibleProperties()
-            .Where(x => !ignoredPropertyNames.Contains(x.Name))
             .Select(x => x.Name)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            .ToHashSet();
     }
 
     private Dictionary<string, IPropertySymbol> GetTargetProperties()
     {
         return Mapping.TargetType
             .GetAllAccessibleProperties()
-            .Where(x => !IgnoredTargetPropertyNames.Remove(x.Name))
             .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
     }
 
@@ -175,5 +177,50 @@ public class ObjectPropertyMappingBuilderContext
             .ListConfiguration<MapPropertyAttribute>()
             .GroupBy(x => x.Target.First())
             .ToDictionary(x => x.Key, x => x.ToList());
+    }
+
+    private void AddUnmatchedIgnoredTargetPropertiesDiagnostics()
+    {
+        foreach (var notFoundIgnoredProperty in _ignoredUnmatchedTargetPropertyNames)
+        {
+            BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.IgnoredTargetPropertyNotFound,
+                notFoundIgnoredProperty,
+                Mapping.TargetType);
+        }
+    }
+
+    private void AddUnmatchedIgnoredSourcePropertiesDiagnostics()
+    {
+        foreach (var notFoundIgnoredProperty in _ignoredUnmatchedSourcePropertyNames)
+        {
+            BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.IgnoredSourcePropertyNotFound,
+                notFoundIgnoredProperty,
+                Mapping.SourceType);
+        }
+    }
+
+    private void AddUnmatchedTargetPropertiesDiagnostics()
+    {
+        foreach (var propertyConfig in PropertyConfigsByRootTargetName.Values.SelectMany(x => x))
+        {
+            BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.ConfiguredMappingTargetPropertyNotFound,
+                propertyConfig.TargetFullName,
+                Mapping.TargetType);
+        }
+    }
+
+    private void AddUnmatchedSourcePropertiesDiagnostics()
+    {
+        foreach (var sourcePropertyName in _unmappedSourcePropertyNames)
+        {
+            BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.SourcePropertyNotMapped,
+                sourcePropertyName,
+                Mapping.SourceType,
+                Mapping.TargetType);
+        }
     }
 }

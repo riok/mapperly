@@ -127,10 +127,40 @@ public class ObjectPropertyTest
     }
 
     [Fact]
-    public void WithIgnoredProperty()
+    public Task WithObsoleteIgnoredTargetPropertyAttributeShouldIgnoreAndGenerateDiagnostics()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapperIgnore(nameof(B.IntValue))] partial B Map(A source);",
+            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
+            "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }");
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithIgnoredTargetPropertyShouldIgnoreAndGenerateDiagnostics()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapperIgnoreTarget(nameof(B.IntValue))] partial B Map(A source);",
+            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
+            "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }");
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithIgnoredSourcePropertyShouldIgnoreAndGenerateDiagnostics()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapperIgnoreSource(nameof(A.IntValue))] partial B Map(A source);",
+            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
+            "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }");
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void WithIgnoredSourceAndTargetPropertyShouldIgnore()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapperIgnoreSource(nameof(A.IntValue))] [MapperIgnoreTarget(nameof(B.IntValue))] partial B Map(A source);",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }");
 
@@ -242,10 +272,32 @@ private partial D MapToD(C source);
     }
 
     [Fact]
-    public Task WithNotFoundIgnoredPropertyShouldDiagnostic()
+    public Task WithNotFoundIgnoredObsoleteTargetAttributePropertyShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapperIgnore(\"not_found\")] partial B Map(A source);",
+            "class A { }",
+            "class B { }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithNotFoundIgnoredTargetPropertyShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapperIgnoreTarget(\"not_found\")] partial B Map(A source);",
+            "class A { }",
+            "class B { }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithNotFoundIgnoredSourcePropertyShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapperIgnoreSource(\"not_found\")] partial B Map(A source);",
             "class A { }",
             "class B { }");
 

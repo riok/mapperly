@@ -1,15 +1,15 @@
-﻿{
+{
   Diagnostics: [
     {
       Id: RMG004,
-      Title: Ignored property not found,
+      Title: Ignored target property not found,
       Severity: Warning,
       WarningLevel: 1,
       Location: : (10,4)-(10,56),
       Description: ,
       HelpLink: ,
-      MessageFormat: Ignored property {0} on {1} was not found,
-      Message: Ignored property not_found on B was not found,
+      MessageFormat: Ignored target property {0} on {1} was not found,
+      Message: Ignored target property not_found on B was not found,
       Category: Mapper
     }
   ]
