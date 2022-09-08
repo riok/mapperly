@@ -187,3 +187,15 @@ end_of_line = crlf
 # json
 [*.json]
 indent_size = 2
+
+# javascript
+[*.js]
+indent_size = 2
+
+# typescript
+[*.{ts,tsx}]
+indent_size = 2
+
+# css
+[*.css]
+indent_size = 2

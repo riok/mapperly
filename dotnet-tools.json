@@ -4,7 +4,15 @@
   "tools": {
     "dotnet-format": {
       "version": "5.1.250801",
-      "commands": ["dotnet-format"]
+      "commands": [
+        "dotnet-format"
+      ]
+    },
+    "xmldoc2markdown": {
+      "version": "3.0.0",
+      "commands": [
+        "xmldoc2md"
+      ]
     }
   }
 }

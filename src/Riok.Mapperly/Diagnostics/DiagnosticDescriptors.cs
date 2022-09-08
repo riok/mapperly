@@ -2,6 +2,8 @@ using Microsoft.CodeAnalysis;
 
 namespace Riok.Mapperly.Diagnostics;
 
+// if adjusted, these files may need adjustments as well:
+// analyzer-diagnostics.md, AnalyzerReleases.Shipped.md and AnalyzerReleases.Unshipped.md
 internal static class DiagnosticDescriptors
 {
     public static readonly DiagnosticDescriptor UnsupportedMappingMethodSignature = new(

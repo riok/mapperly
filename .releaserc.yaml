@@ -9,6 +9,8 @@ plugins:
     - preset: conventionalcommits
   - '@semantic-release/release-notes-generator'
   - '@semantic-release/github'
+  - - "@semantic-release/exec"
+    - verifyConditionsCmd: "echo ::set-output version=${nextRelease.version}"
 prepare:
   - - "@semantic-release/exec"
     - prepareCmd: "dotnet pack -c Release -o ./artifacts /p:Version='${nextRelease.version}' /p:PackageReleaseNotes=\"\\\"${nextRelease.notes}\\\"\""
