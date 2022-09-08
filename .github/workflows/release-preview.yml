@@ -2,12 +2,19 @@ name: release-preview
 
 on:
   workflow_dispatch:
+    inputs:
+      create_preview_release:
+        description: 'If this is set to true, a preview release is published, otherwise only the stable branch is updated.'
+        default: false
+        type: boolean
+        required: true
 
 jobs:
   test:
     uses: ./.github/workflows/test.yml
 
   release-preview:
+    if: ${{ inputs.create_preview_release }}
     needs: test
     uses: ./.github/workflows/release.yml
     with:
