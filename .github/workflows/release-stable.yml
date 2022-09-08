@@ -1,9 +1,7 @@
 name: release-stable
 
 on:
-  push:
-    branches:
-      - stable
+  workflow_dispatch:
 
 jobs:
   test:
@@ -22,4 +20,4 @@ jobs:
     needs: release
     with:
       deploy: true
-      version: ${{ steps.release.outputs.version }}
+      version: ${{ needs.release.outputs.version }}
