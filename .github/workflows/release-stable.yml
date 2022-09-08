@@ -1,7 +1,9 @@
 name: release-stable
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - stable
 
 jobs:
   test:

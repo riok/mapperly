@@ -2,12 +2,19 @@ name: release-preview
 
 on:
   workflow_dispatch:
+    inputs:
+      create_preview_release:
+        description: 'If this is set to true, a preview release is published, otherwise only the stable branch is updated.'
+        default: false
+        type: boolean
+        required: true
 
 jobs:
   test:
     uses: ./.github/workflows/test.yml
 
   release-preview:
+    if: ${{ inputs.create_preview_release }}
     needs: test
     uses: ./.github/workflows/release.yml
     with:
@@ -18,6 +25,7 @@ jobs:
   release-stable-update-branch:
     runs-on: ubuntu-latest
     needs: release-preview
+    if: ${{ always() }}
     steps:
       - uses: actions/checkout@v3
         # can't use the secrets.GITHUB_TOKEN since this doesn't trigger further workflows
