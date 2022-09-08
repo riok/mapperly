@@ -1,9 +1,7 @@
 name: release-preview
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   test:

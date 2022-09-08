@@ -8,15 +8,10 @@ plugins:
   - - '@semantic-release/commit-analyzer'
     - preset: conventionalcommits
   - '@semantic-release/release-notes-generator'
-  - '@semantic-release/github'
-  - - "@semantic-release/exec"
-    - verifyConditionsCmd: "echo ::set-output version=${nextRelease.version}"
-prepare:
-  - - "@semantic-release/exec"
-    - prepareCmd: "dotnet pack -c Release -o ./artifacts /p:Version='${nextRelease.version}' /p:PackageReleaseNotes=\"\\\"${nextRelease.notes}\\\"\""
-publish:
-  - - "@semantic-release/exec"
-    - publishCmd: "dotnet nuget push './artifacts/*.nupkg' --source $NUGET_SOURCE --api-key $NUGET_API_KEY"
   - - '@semantic-release/github'
     - assets:
-        - path: 'artifacts/*.nupkg'
+      - path: 'artifacts/*.nupkg'
+  - - "@semantic-release/exec"
+    - verifyReleaseCmd: "echo RELEASE_VERSION=${nextRelease.version} >> $GITHUB_ENV"
+      prepareCmd: "dotnet pack -c Release -o ./artifacts /p:Version='${nextRelease.version}' /p:PackageReleaseNotes=\"\\\"${nextRelease.notes}\\\"\""
+      publishCmd: "dotnet nuget push './artifacts/*.nupkg' --source $NUGET_SOURCE --api-key $NUGET_API_KEY"

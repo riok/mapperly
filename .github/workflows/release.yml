@@ -13,13 +13,17 @@ on:
     secrets:
       nuget_api_key:
         required: true
+    outputs:
+      version:
+        description: 'The created version'
+        value: ${{ jobs.release.outputs.version }}
 
 jobs:
   release:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     outputs:
-      version: ${{ steps.release.outputs.version }}
+      version: ${{ steps.release-version.outputs.version }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -36,9 +40,10 @@ jobs:
           @semantic-release/commit-analyzer@9.0.2 \
           @semantic-release/release-notes-generator@10.0.3 \
           @semantic-release/github@8.0.2
-      - id: release
-        run: npx semantic-release
+      - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUGET_SOURCE: ${{ inputs.nuget_source }}
           NUGET_API_KEY: ${{ secrets.nuget_api_key }}
+      - id: release-version
+        run: echo "::set-output name=version::${{ env.RELEASE_VERSION }}"
