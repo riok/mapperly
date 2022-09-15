@@ -79,8 +79,8 @@ public static class ObjectPropertyMappingBuilder
         PropertyPath targetPropertyPath,
         bool allowInitOnlyMember = false)
     {
-        // the target property path is readonly
-        if (targetPropertyPath.Member.IsReadOnly)
+        // the target property path is readonly or not accessible
+        if (targetPropertyPath.Member.IsReadOnly || targetPropertyPath.Member.SetMethod?.IsAccessible() != true)
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToReadOnlyProperty,
@@ -93,8 +93,8 @@ public static class ObjectPropertyMappingBuilder
             return false;
         }
 
-        // a target property path part is write only
-        if (targetPropertyPath.ObjectPath.Any(p => p.IsWriteOnly))
+        // a target property path part is write only or not accessible
+        if (targetPropertyPath.ObjectPath.Any(p => p.IsWriteOnly || p.GetMethod?.IsAccessible() != true))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToWriteOnlyPropertyPath,
@@ -122,8 +122,8 @@ public static class ObjectPropertyMappingBuilder
             return false;
         }
 
-        // a source property path is write only
-        if (sourcePropertyPath.Path.Any(p => p.IsWriteOnly))
+        // a source property path is write only or not accessible
+        if (sourcePropertyPath.Path.Any(p => p.IsWriteOnly || p.GetMethod?.IsAccessible() != true))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapFromWriteOnlyProperty,

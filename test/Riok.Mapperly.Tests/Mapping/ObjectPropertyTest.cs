@@ -303,4 +303,56 @@ private partial D MapToD(C source);
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task WithPrivateTargetSetterShouldIgnoreAndDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string StringValue { get; set; } public int IntValue { get; private set; } }",
+            "class B { public string StringValue { get; private set; } public int IntValue { private get; set; } }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithPrivateTargetPathGetterShouldIgnoreAndDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public C NestedValue { private get; set; } public int IntValue { get; private set; } }",
+            "class B { public D NestedValue { get; private set; } public int IntValue { private get; set; } }",
+            "class C { public string StringValue { get; set; } }",
+            "class D { public string StringValue { get; set; } }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithPrivateSourceGetterShouldIgnoreAndDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string StringValue { private get; set; } public int IntValue { get; private set; } }",
+            "class B { public string StringValue { get; set; } public int IntValue { private get; set; } }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithPrivateSourcePathGetterShouldIgnoreAndDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public C NestedValue { private get; set; } public int IntValue { get; private set; } }",
+            "class B { public D NestedValue { get; set; } public int IntValue { private get; set; } }",
+            "class C { public string StringValue { get; set; } }",
+            "class D { public string StringValue { get; set; } }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

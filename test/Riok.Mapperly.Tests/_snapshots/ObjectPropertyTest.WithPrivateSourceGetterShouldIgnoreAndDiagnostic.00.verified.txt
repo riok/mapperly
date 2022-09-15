@@ -1,0 +1,28 @@
+{
+  Diagnostics: [
+    {
+      Id: RMG010,
+      Title: Cannot map from write only property,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (10,4)-(10,28),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Cannot map from write only property {0}.{1} of type {2} to property {3}.{4} of type {5},
+      Message: Cannot map from write only property A.StringValue of type string to property B.StringValue of type string,
+      Category: Mapper
+    },
+    {
+      Id: RMG020,
+      Title: Source property is not mapped to any target property,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (10,4)-(10,28),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},
+      Message: The property StringValue on the mapping source type A is not mapped to any property on the mapping target type B,
+      Category: Mapper
+    }
+  ]
+}
