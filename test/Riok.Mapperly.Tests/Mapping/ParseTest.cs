@@ -6,27 +6,27 @@ public class ParseTest
     public void ParseableBuiltInStruct()
     {
         var source = TestSourceBuilder.Mapping("string", "DateTime");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return System.DateTime.Parse(source);");
+            .HaveSingleMethodBody("return System.DateTime.Parse(source);");
     }
 
     [Fact]
     public void ParseableBuiltInClass()
     {
         var source = TestSourceBuilder.Mapping("string", "Version");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return System.Version.Parse(source);");
+            .HaveSingleMethodBody("return System.Version.Parse(source);");
     }
 
     [Fact]
     public void ParseableBuiltNullableInClass()
     {
         var source = TestSourceBuilder.Mapping("string?", "int?");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source == null ? default : int.Parse(source);");
+            .HaveSingleMethodBody("return source == null ? default : int.Parse(source);");
     }
 
     [Fact]
@@ -36,9 +36,9 @@ public class ParseTest
             "string",
             "A",
             "struct A { public static A Parse(string v) => new(); }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return A.Parse(source);");
+            .HaveSingleMethodBody("return A.Parse(source);");
     }
 
     [Fact]
@@ -48,8 +48,8 @@ public class ParseTest
             "string",
             "A",
             "class A { public static A Parse(string v) => new(); }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return A.Parse(source);");
+            .HaveSingleMethodBody("return A.Parse(source);");
     }
 }

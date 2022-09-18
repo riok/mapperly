@@ -11,9 +11,9 @@ public class EnumTest
             "E1",
             "enum E1 {A, B, C}",
             "enum E2 {A, B, C}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (E1)source;");
+            .HaveSingleMethodBody("return (E1)source;");
     }
 
     [Fact]
@@ -24,9 +24,9 @@ public class EnumTest
             "E1",
             "enum E1 {A, B, C}");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source;");
+            .HaveSingleMethodBody("return source;");
     }
 
     [Fact]
@@ -37,9 +37,9 @@ public class EnumTest
             "E2",
             "enum E1 : short {A, B, C}",
             "enum E2 : byte {A, B, C}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (E2)source;");
+            .HaveSingleMethodBody("return (E2)source;");
     }
 
     [Fact]
@@ -50,9 +50,9 @@ public class EnumTest
             "E",
             "class C { public static explicit operator byte(C c) => 0; } }",
             "enum E : byte {A, B, C}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (E)(byte)source;");
+            .HaveSingleMethodBody("return (E)(byte)source;");
     }
 
     [Fact]
@@ -63,9 +63,9 @@ public class EnumTest
             "enum E1 {A, B, C}",
             "enum E2 {A = 100, B, C}");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (E2)source;");
+            .HaveSingleMethodBody("return (E2)source;");
     }
 
     [Fact]
@@ -76,9 +76,9 @@ public class EnumTest
             "enum E1 {A, B, C, D, E}",
             "enum E2 {A = 100, B, C, d, e, E}");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"return source switch
+            .HaveSingleMethodBody(@"return source switch
     {
         E1.A => E2.A,
         E1.B => E2.B,
@@ -96,9 +96,9 @@ public class EnumTest
             "enum E1 {A, B, C, D, E, f, F}",
             "enum E2 {A = 100, B, C, d, e, E, f}");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"return source switch
+            .HaveSingleMethodBody(@"return source switch
     {
         E1.A => E2.A,
         E1.B => E2.B,
@@ -141,9 +141,9 @@ enum E1 {A, B, C}
 enum E2 {A = 100, B, C}
 ";
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"return source switch
+            .HaveSingleMethodBody(@"return source switch
     {
         E1.A => E2.A,
         E1.B => E2.B,
@@ -161,9 +161,9 @@ enum E2 {A = 100, B, C}
             "enum E1 {A, B, C}",
             "enum E2 {A, B, C}");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source == null ? throw new System.ArgumentNullException(nameof(source)) : (E2)source.Value;");
+            .HaveSingleMethodBody("return source == null ? throw new System.ArgumentNullException(nameof(source)) : (E2)source.Value;");
     }
 
     [Fact]
@@ -175,9 +175,9 @@ enum E2 {A = 100, B, C}
             "enum E1 {A, B, C}",
             "enum E2 {A, B, C}");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source == null ? default : (E2)source.Value;");
+            .HaveSingleMethodBody("return source == null ? default : (E2)source.Value;");
     }
 
     [Fact]
@@ -188,9 +188,9 @@ enum E2 {A = 100, B, C}
             "E2?",
             "enum E1 {A, B, C}",
             "enum E2 {A, B, C}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (E2? )(E2)source;");
+            .HaveSingleMethodBody("return (E2? )(E2)source;");
     }
 
     [Fact]
@@ -200,9 +200,9 @@ enum E2 {A = 100, B, C}
             "E1",
             "string",
             "enum E1 {A, B, C}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"return source switch
+            .HaveSingleMethodBody(@"return source switch
     {
         E1.A => nameof(E1.A),
         E1.B => nameof(E1.B),
@@ -217,9 +217,9 @@ enum E2 {A = 100, B, C}
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)] partial E1 ToE1(string source);",
             "enum E1 {A, B, C}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"return source switch
+            .HaveSingleMethodBody(@"return source switch
     {
         { } s when s.Equals(nameof(E1.A), System.StringComparison.OrdinalIgnoreCase) => E1.A,
         { } s when s.Equals(nameof(E1.B), System.StringComparison.OrdinalIgnoreCase) => E1.B,
@@ -234,9 +234,9 @@ enum E2 {A = 100, B, C}
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapEnum(EnumMappingStrategy.ByName)] partial E1 ToE1(string source);",
             "enum E1 {A, B, C}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"return source switch
+            .HaveSingleMethodBody(@"return source switch
     {
         nameof(E1.A) => E1.A,
         nameof(E1.B) => E1.B,

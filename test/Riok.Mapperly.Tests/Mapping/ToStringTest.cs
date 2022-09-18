@@ -9,9 +9,9 @@ public class ToStringTest
             "A",
             "string",
             "class A {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source.ToString();");
+            .HaveSingleMethodBody("return source.ToString();");
     }
 
     [Fact]
@@ -21,9 +21,9 @@ public class ToStringTest
             "A",
             "string",
             "struct A {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source.ToString();");
+            .HaveSingleMethodBody("return source.ToString();");
     }
 
     [Fact]
@@ -32,9 +32,9 @@ public class ToStringTest
         var source = TestSourceBuilder.Mapping(
             "DateTime",
             "string");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source.ToString();");
+            .HaveSingleMethodBody("return source.ToString();");
     }
 
     [Fact]
@@ -43,8 +43,8 @@ public class ToStringTest
         var source = TestSourceBuilder.Mapping(
             "object",
             "string");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source.ToString();");
+            .HaveSingleMethodBody("return source.ToString();");
     }
 }

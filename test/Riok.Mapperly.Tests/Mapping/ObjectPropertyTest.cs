@@ -12,9 +12,9 @@ public class ObjectPropertyTest
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     target.StringValue = source.StringValue;
     return target;".ReplaceLineEndings());
     }
@@ -27,9 +27,9 @@ public class ObjectPropertyTest
             "A",
             "class A { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source;");
+            .HaveSingleMethodBody("return source;");
     }
 
     [Fact]
@@ -41,9 +41,9 @@ public class ObjectPropertyTest
             TestSourceBuilderOptions.WithDeepCloning,
             "class A { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new A();
+            .HaveSingleMethodBody(@"var target = new A();
     target.StringValue = source.StringValue;
     return target;".ReplaceLineEndings());
     }
@@ -55,9 +55,9 @@ public class ObjectPropertyTest
             "A",
             "A",
             "ref struct A {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source;");
+            .HaveSingleMethodBody("return source;");
     }
 
     [Fact]
@@ -68,9 +68,9 @@ public class ObjectPropertyTest
             "A",
             TestSourceBuilderOptions.WithDeepCloning,
             "ref struct A {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new A();
+            .HaveSingleMethodBody(@"var target = new A();
     return target;".ReplaceLineEndings());
     }
 
@@ -83,9 +83,9 @@ public class ObjectPropertyTest
             "class A { public string Value { get; set; } }",
             "class B { public int Value { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     target.Value = int.Parse(source.Value);
     return target;".ReplaceLineEndings());
     }
@@ -164,9 +164,9 @@ public class ObjectPropertyTest
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     target.StringValue = source.StringValue;
     return target;".ReplaceLineEndings());
     }
@@ -179,9 +179,9 @@ public class ObjectPropertyTest
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue2 { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     target.StringValue2 = source.StringValue;
     return target;".ReplaceLineEndings());
     }
@@ -229,12 +229,12 @@ private partial D MapToD(C source);
             "class C { public string StringValue { get; set; } }",
             "class D { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveMapMethodBody(@"var target = new B();
     target.StringValue = source.StringValue;
     target.NestedValue = UserImplementedMap(source.NestedValue);
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]

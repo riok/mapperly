@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis;
-
 namespace Riok.Mapperly.Tests.Mapping;
 
 [UsesVerify]
@@ -14,9 +12,9 @@ public class ObjectPropertyNullableTest
             "class A { public int? Value { get; set; } }",
             "class B { public int Value { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     if (source.Value != null)
     {
         target.Value = source.Value.Value;
@@ -34,9 +32,9 @@ public class ObjectPropertyNullableTest
             "class A { public string? Value { get; set; } }",
             "class B { public string Value { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     if (source.Value != null)
     {
         target.Value = source.Value;
@@ -56,15 +54,15 @@ public class ObjectPropertyNullableTest
             "class C { public string V {get; set; } }",
             "class D { public string V {get; set; } }");
 
-        TestHelper.GenerateMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveMapMethodBody(@"var target = new B();
     if (source.Value != null)
     {
         target.Value = MapToD(source.Value);
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -76,11 +74,11 @@ public class ObjectPropertyNullableTest
             "class A { public string? Value { get; set; } }",
             "class B { public string? Value { get; set; } }");
 
-        TestHelper.GenerateMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveMapMethodBody(@"var target = new B();
     target.Value = source.Value;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -93,11 +91,11 @@ public class ObjectPropertyNullableTest
             "class B { public C? Value { get; set; } }",
             "class C { }");
 
-        TestHelper.GenerateMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveMapMethodBody(@"var target = new B();
     target.Value = source.Value;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -111,11 +109,11 @@ public class ObjectPropertyNullableTest
             "class C { public string V {get; set; } }",
             "class D { public string V {get; set; } }");
 
-        TestHelper.GenerateMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveMapMethodBody(@"var target = new B();
     target.Value = MapToD(source.Value);
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -129,15 +127,15 @@ public class ObjectPropertyNullableTest
             "class C { public string V {get; set; } }",
             "class D { public string V {get; set; } }");
 
-        TestHelper.GenerateMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveMapMethodBody(@"var target = new B();
     if (source.Value != null)
     {
         target.Value = MapToD(source.Value);
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -151,15 +149,15 @@ public class ObjectPropertyNullableTest
             "class C { public string V {get; set; } }",
             "class D { public string V {get; set; } }");
 
-        TestHelper.GenerateMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveMapMethodBody(@"var target = new B();
     if (source.Value != null)
     {
         target.Value = MapToD(source.Value);
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -174,9 +172,9 @@ public class ObjectPropertyNullableTest
             "class C { public string V {get; set; } }",
             "class D { public string V {get; set; } }");
 
-        TestHelper.GenerateMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveMapMethodBody(@"var target = new B();
     if (source.Value != null)
     {
         target.Value = MapToD(source.Value);
@@ -186,7 +184,7 @@ public class ObjectPropertyNullableTest
         throw new System.ArgumentNullException(nameof(source.Value));
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -203,16 +201,14 @@ D UserImplementedMap(C source) => new D();";
             "class C {}",
             "class D {}");
 
-        TestHelper.GenerateSingleMapperMethodBody(
-                source,
-                TestHelperOptions.Default with { NullableOption = NullableContextOptions.Disable })
+        TestHelper.GenerateMapper(source, TestHelperOptions.DisabledNullable)
             .Should()
-            .Be(@"if (source == null)
+            .HaveSingleMethodBody(@"if (source == null)
         return default;
     var target = new B();
     target.StringValue = source.StringValue;
     target.NestedValue = UserImplementedMap(source.NestedValue);
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -228,9 +224,9 @@ public Wrapper Map(double? source) => source.HasValue ? new() { Test = source.Va
             "public class TypeWithNullableProperty { public double? Test { get; set; } }",
             "public class NotNullableType { public Wrapper Test { get; set; } = new(); }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"if (y == null)
+            .HaveSingleMethodBody(@"if (y == null)
         return default;
     var target = new NotNullableType();
     target.Test = Map(y.Test);
@@ -250,9 +246,9 @@ public Wrapper Map(double source) => new() { Test = source.Value };";
             "public class TypeWithNullableProperty { public double? Test { get; set; } }",
             "public class NotNullableType { public Wrapper Test { get; set; } = new(); }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"if (y == null)
+            .HaveSingleMethodBody(@"if (y == null)
         return default;
     var target = new NotNullableType();
     if (y.Test != null)
@@ -277,9 +273,9 @@ public Wrapper MapNullable(double? source) => source.HasValue ? new() { Test = s
             "public class TypeWithNullableProperty { public double? Test { get; set; } public double Test2 { get; set; } }",
             "public class NotNullableType { public Wrapper Test { get; set; } = new(); public Wrapper Test2 { get; set; } = new(); }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"if (y == null)
+            .HaveSingleMethodBody(@"if (y == null)
         return default;
     var target = new NotNullableType();
     target.Test = MapNullable(y.Test);
@@ -298,6 +294,6 @@ public Wrapper MapNullable(double? source) => source.HasValue ? new() { Test = s
             "class C { public string Value { get; set; } }",
             "class D { public string Value { get; set; } }");
 
-        return TestHelper.VerifyGenerator(source, TestHelperOptions.Default with { NullableOption = NullableContextOptions.Disable });
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
     }
 }

@@ -12,9 +12,9 @@ public class InheritanceTest
             "class B : A { public string StringValue2 { get; set; } }",
             "class C { public string StringValue1 { get; set; } public string StringValue2 { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new C();
+            .HaveSingleMethodBody(@"var target = new C();
     target.StringValue1 = source.StringValue1;
     target.StringValue2 = source.StringValue2;
     return target;".ReplaceLineEndings());
@@ -32,9 +32,9 @@ public class InheritanceTest
             "class D : C { public string StringValue4 { get; set; } }",
             "class E { public string StringValue1 { get; set; } public string StringValue2 { get; set; } public string StringValue3 { get; set; } public string StringValue4 { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new E();
+            .HaveSingleMethodBody(@"var target = new E();
     target.StringValue1 = source.StringValue1;
     target.StringValue2 = source.StringValue2;
     target.StringValue3 = source.StringValue3;
@@ -52,9 +52,9 @@ public class InheritanceTest
             "class B { public string StringValue1 { get; set; } }",
             "class C : B { public string StringValue2 { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new C();
+            .HaveSingleMethodBody(@"var target = new C();
     target.StringValue2 = source.StringValue2;
     target.StringValue1 = source.StringValue1;
     return target;".ReplaceLineEndings());
@@ -72,9 +72,9 @@ public class InheritanceTest
             "class D : C { public string StringValue3 { get; set; } }",
             "class E : D { public string StringValue4 { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new E();
+            .HaveSingleMethodBody(@"var target = new E();
     target.StringValue4 = source.StringValue4;
     target.StringValue3 = source.StringValue3;
     target.StringValue2 = source.StringValue2;
@@ -93,9 +93,9 @@ public class InheritanceTest
             "class C { public string StringValue1 { get; set; } }",
             "class D : C { public string StringValue2 { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new D();
+            .HaveSingleMethodBody(@"var target = new D();
     target.StringValue2 = source.StringValue2;
     target.StringValue1 = source.StringValue1;
     return target;".ReplaceLineEndings());
@@ -111,9 +111,9 @@ public class InheritanceTest
             "interface B : A { string StringValue2 { get; set; } }",
             "class C { public string StringValue1 { get; set; } public string StringValue2 { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new C();
+            .HaveSingleMethodBody(@"var target = new C();
     target.StringValue1 = source.StringValue1;
     target.StringValue2 = source.StringValue2;
     return target;".ReplaceLineEndings());
@@ -131,9 +131,9 @@ public class InheritanceTest
             "interface D : C { string StringValue4 { get; set; } }",
             "class E { public string StringValue1 { get; set; } public string StringValue2 { get; set; } public string StringValue3 { get; set; } public string StringValue4 { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new E();
+            .HaveSingleMethodBody(@"var target = new E();
     target.StringValue1 = source.StringValue1;
     target.StringValue2 = source.StringValue2;
     target.StringValue3 = source.StringValue3;
@@ -151,9 +151,9 @@ public class InheritanceTest
             "interface C : B { string StringValue1 { get; set; } }",
             "interface D : C { string StringValue2 { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"target.StringValue2 = source.StringValue2;
+            .HaveSingleMethodBody(@"target.StringValue2 = source.StringValue2;
     target.StringValue1 = source.StringValue1;");
     }
 }

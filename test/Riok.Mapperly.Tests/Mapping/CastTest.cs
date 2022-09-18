@@ -9,9 +9,9 @@ public class CastTest
     public void NumericExplicitCast(string from, string to)
     {
         var source = TestSourceBuilder.Mapping(from, to, TestSourceBuilderOptions.WithDeepCloning);
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be($"return ({to})source;");
+            .HaveSingleMethodBody($"return ({to})source;");
     }
 
     [Theory]
@@ -28,9 +28,9 @@ public class CastTest
     public void NumericImplicitCast(string from, string to)
     {
         var source = TestSourceBuilder.Mapping(from, to, TestSourceBuilderOptions.WithDeepCloning);
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be($"return ({to})source;");
+            .HaveSingleMethodBody($"return ({to})source;");
     }
 
     [Fact]
@@ -40,9 +40,9 @@ public class CastTest
             "A",
             "string",
             "class A { public static explicit operator string(A a) => \"A\"; }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (string)source;");
+            .HaveSingleMethodBody("return (string)source;");
     }
 
     [Fact]
@@ -53,9 +53,9 @@ public class CastTest
             "string",
             TestSourceBuilderOptions.WithDeepCloning,
             "class A { public static explicit operator string(A a) => \"A\"; }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (string)source;");
+            .HaveSingleMethodBody("return (string)source;");
     }
 
     [Fact]
@@ -65,9 +65,9 @@ public class CastTest
             "A",
             "string",
             "struct A { public static explicit operator string(A a) => \"A\"; }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (string)source;");
+            .HaveSingleMethodBody("return (string)source;");
     }
 
     [Fact]
@@ -78,9 +78,9 @@ public class CastTest
             "string",
             TestSourceBuilderOptions.WithDeepCloning,
             "struct A { public static explicit operator string(A a) => \"A\"; }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (string)source;");
+            .HaveSingleMethodBody("return (string)source;");
     }
 
     [Fact]
@@ -90,9 +90,9 @@ public class CastTest
             "string",
             "A",
             "class A { public static explicit operator A(string s) => new(); }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (A)source;");
+            .HaveSingleMethodBody("return (A)source;");
     }
 
     [Fact]
@@ -103,9 +103,9 @@ public class CastTest
             "A",
             TestSourceBuilderOptions.WithDeepCloning,
             "class A { public static explicit operator A(string s) => new(); }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (A)source;");
+            .HaveSingleMethodBody("return (A)source;");
     }
 
     [Fact]
@@ -115,9 +115,9 @@ public class CastTest
             "string",
             "A",
             "struct A { public static explicit operator A(string s) => new(); }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (A)source;");
+            .HaveSingleMethodBody("return (A)source;");
     }
 
     [Fact]
@@ -128,9 +128,9 @@ public class CastTest
             "A",
             TestSourceBuilderOptions.WithDeepCloning,
             "struct A { public static explicit operator A(string s) => new(); }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (A)source;");
+            .HaveSingleMethodBody("return (A)source;");
     }
 
     [Fact]
@@ -141,9 +141,9 @@ public class CastTest
             "B",
             "class A { public static explicit operator B(A a) => new(); }",
             "class B {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (B)source;");
+            .HaveSingleMethodBody("return (B)source;");
     }
 
     [Fact]
@@ -155,9 +155,9 @@ public class CastTest
             TestSourceBuilderOptions.WithDeepCloning,
             "class A { public static explicit operator B(A a) => new(); }",
             "class B {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     return target;".ReplaceLineEndings());
     }
 
@@ -169,9 +169,9 @@ public class CastTest
             "B",
             "struct A { public static explicit operator B(A a) => new(); }",
             "struct B {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (B)source;");
+            .HaveSingleMethodBody("return (B)source;");
     }
 
     [Fact]
@@ -183,9 +183,9 @@ public class CastTest
             TestSourceBuilderOptions.WithDeepCloning,
             "struct A { public static explicit operator B(A a) => new(); }",
             "struct B {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     return target;".ReplaceLineEndings());
     }
 
@@ -196,9 +196,9 @@ public class CastTest
             "A",
             "string",
             "class A { public static implicit operator string(A a) => \"A\"; }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (string)source;");
+            .HaveSingleMethodBody("return (string)source;");
     }
 
     [Fact]
@@ -209,9 +209,9 @@ public class CastTest
             "string",
             TestSourceBuilderOptions.WithDeepCloning,
             "class A { public static implicit operator string(A a) => \"A\"; }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (string)source;");
+            .HaveSingleMethodBody("return (string)source;");
     }
 
     [Fact]
@@ -221,9 +221,9 @@ public class CastTest
             "A",
             "string",
             "struct A { public static implicit operator string(A a) => \"A\"; }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (string)source;");
+            .HaveSingleMethodBody("return (string)source;");
     }
 
     [Fact]
@@ -234,9 +234,9 @@ public class CastTest
             "string",
             TestSourceBuilderOptions.WithDeepCloning,
             "struct A { public static implicit operator string(A a) => \"A\"; }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (string)source;");
+            .HaveSingleMethodBody("return (string)source;");
     }
 
     [Fact]
@@ -246,9 +246,9 @@ public class CastTest
             "string",
             "A",
             "class A { public static implicit operator A(string s) => new(); }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (A)source;");
+            .HaveSingleMethodBody("return (A)source;");
     }
 
     [Fact]
@@ -259,9 +259,9 @@ public class CastTest
             "A",
             TestSourceBuilderOptions.WithDeepCloning,
             "class A { public static implicit operator A(string s) => new(); }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (A)source;");
+            .HaveSingleMethodBody("return (A)source;");
     }
 
     [Fact]
@@ -271,9 +271,9 @@ public class CastTest
             "string",
             "A",
             "struct A { public static implicit operator A(string s) => new(); }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (A)source;");
+            .HaveSingleMethodBody("return (A)source;");
     }
 
     [Fact]
@@ -284,9 +284,9 @@ public class CastTest
             "A",
             TestSourceBuilderOptions.WithDeepCloning,
             "struct A { public static implicit operator A(string s) => new(); }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (A)source;");
+            .HaveSingleMethodBody("return (A)source;");
     }
 
     [Fact]
@@ -297,9 +297,9 @@ public class CastTest
             "B",
             "class A { public static implicit operator B(A a) => new(); }",
             "class B {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (B)source;");
+            .HaveSingleMethodBody("return (B)source;");
     }
 
     [Fact]
@@ -311,9 +311,9 @@ public class CastTest
             TestSourceBuilderOptions.WithDeepCloning,
             "class A { public static implicit operator B(A a) => new(); }",
             "class B {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     return target;".ReplaceLineEndings());
     }
 
@@ -325,9 +325,9 @@ public class CastTest
             "B",
             "struct A { public static implicit operator B(A a) => new(); }",
             "struct B {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (B)source;");
+            .HaveSingleMethodBody("return (B)source;");
     }
 
     [Fact]
@@ -339,9 +339,9 @@ public class CastTest
             TestSourceBuilderOptions.WithDeepCloning,
             "struct A { public static implicit operator B(A a) => new(); }",
             "struct B {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     return target;".ReplaceLineEndings());
     }
 }

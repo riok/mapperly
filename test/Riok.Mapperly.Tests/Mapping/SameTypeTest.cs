@@ -9,9 +9,9 @@ public class SameTypeTest
             "A",
             "A",
             "readonly struct A {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source;");
+            .HaveSingleMethodBody("return source;");
     }
 
     [Fact]
@@ -22,9 +22,9 @@ public class SameTypeTest
             "A",
             TestSourceBuilderOptions.WithDeepCloning,
             "readonly struct A {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source;");
+            .HaveSingleMethodBody("return source;");
     }
 
     [Fact]
@@ -33,9 +33,9 @@ public class SameTypeTest
         var source = TestSourceBuilder.Mapping(
             "string",
             "string");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source;");
+            .HaveSingleMethodBody("return source;");
     }
 
     [Fact]
@@ -45,9 +45,9 @@ public class SameTypeTest
             "string",
             "string",
             TestSourceBuilderOptions.WithDeepCloning);
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source;");
+            .HaveSingleMethodBody("return source;");
     }
 
     [Fact]
@@ -57,9 +57,9 @@ public class SameTypeTest
             "A",
             "A",
             "struct A {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source;");
+            .HaveSingleMethodBody("return source;");
     }
 
     [Fact]
@@ -70,9 +70,9 @@ public class SameTypeTest
             "A",
             TestSourceBuilderOptions.WithDeepCloning,
             "struct A {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new A();
+            .HaveSingleMethodBody(@"var target = new A();
     return target;".ReplaceLineEndings());
     }
 
@@ -83,9 +83,9 @@ public class SameTypeTest
             "A",
             "A",
             "class A { public string StringValue { get; set; } }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source;");
+            .HaveSingleMethodBody("return source;");
     }
 
     [Fact]
@@ -96,9 +96,9 @@ public class SameTypeTest
             "A",
             TestSourceBuilderOptions.WithDeepCloning,
             "class A {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new A();
+            .HaveSingleMethodBody(@"var target = new A();
     return target;".ReplaceLineEndings());
     }
 }

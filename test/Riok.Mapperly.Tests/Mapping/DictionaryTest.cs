@@ -9,9 +9,9 @@ public class DictionaryTest
         var source = TestSourceBuilder.Mapping(
             "Dictionary<string, long>",
             "Dictionary<string, long>");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return source;");
+            .HaveSingleMethodBody("return source;");
     }
 
     [Fact]
@@ -21,9 +21,9 @@ public class DictionaryTest
             "Dictionary<string, long>",
             "Dictionary<string, long>",
             TestSourceBuilderOptions.WithDeepCloning);
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new System.Collections.Generic.Dictionary<string, long>(source.Count);
+            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, long>(source.Count);
     foreach (var item in source)
     {
         target.Add(item.Key, item.Value);
@@ -38,9 +38,9 @@ public class DictionaryTest
         var source = TestSourceBuilder.Mapping(
             "Dictionary<string, long>",
             "Dictionary<string, int>");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
     foreach (var item in source)
     {
         target.Add(item.Key, (int)item.Value);
@@ -55,9 +55,9 @@ public class DictionaryTest
         var source = TestSourceBuilder.Mapping(
             "Dictionary<string, int?>",
             "Dictionary<string, int>");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
     foreach (var item in source)
     {
         target.Add(item.Key, item.Value == null ? throw new System.ArgumentNullException(nameof(item.Value)) : item.Value.Value);
@@ -73,9 +73,9 @@ public class DictionaryTest
             "Dictionary<string, int?>",
             "Dictionary<string, int>",
             TestSourceBuilderOptions.Default with { ThrowOnMappingNullMismatch = false });
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
     foreach (var item in source)
     {
         target.Add(item.Key, item.Value == null ? default : item.Value.Value);
@@ -90,9 +90,9 @@ public class DictionaryTest
         var source = TestSourceBuilder.Mapping(
             "Dictionary<string, long>",
             "IDictionary<string, int>");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
     foreach (var item in source)
     {
         target.Add(item.Key, (int)item.Value);
@@ -107,9 +107,9 @@ public class DictionaryTest
         var source = TestSourceBuilder.Mapping(
             "IEnumerable<KeyValuePair<string, int>>",
             "IDictionary<string, int>");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new System.Collections.Generic.Dictionary<string, int>();
+            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>();
     foreach (var item in source)
     {
         target.Add(item.Key, item.Value);
@@ -125,9 +125,9 @@ public class DictionaryTest
             "A",
             "IDictionary<string, int>",
             "class A : Dictionary<string, int> {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
     foreach (var item in source)
     {
         target.Add(item.Key, item.Value);
@@ -143,9 +143,9 @@ public class DictionaryTest
             "A",
             "IDictionary<string, int>",
             "class A : List<KeyValuePair<string, int>> {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
     foreach (var item in source)
     {
         target.Add(item.Key, item.Value);
@@ -161,9 +161,9 @@ public class DictionaryTest
             "IDictionary<string, int>",
             "A",
             "class A : Dictionary<string, int> {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new A();
+            .HaveSingleMethodBody(@"var target = new A();
     foreach (var item in source)
     {
         target.Add(item.Key, item.Value);

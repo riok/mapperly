@@ -14,9 +14,9 @@ public class ObjectFactoryTest
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = CreateB();
+            .HaveSingleMethodBody(@"var target = CreateB();
     target.StringValue = a.StringValue;
     return target;".ReplaceLineEndings());
     }
@@ -30,9 +30,9 @@ public class ObjectFactoryTest
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = Create<B>();
+            .HaveSingleMethodBody(@"var target = Create<B>();
     target.StringValue = a.StringValue;
     return target;".ReplaceLineEndings());
     }
@@ -48,9 +48,9 @@ public class ObjectFactoryTest
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = CreateB();
+            .HaveSingleMethodBody(@"var target = CreateB();
     target.StringValue = a.StringValue;
     return target;".ReplaceLineEndings());
     }
@@ -66,9 +66,9 @@ public class ObjectFactoryTest
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = CreateB<B>();
+            .HaveSingleMethodBody(@"var target = CreateB<B>();
     target.StringValue = a.StringValue;
     return target;".ReplaceLineEndings());
     }
@@ -82,9 +82,9 @@ public class ObjectFactoryTest
             "class A { public string StringValue { get; set; } }",
             "#nullable disable\nclass B { public string StringValue { get; set; } }\n#nullable restore");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = CreateB();
+            .HaveSingleMethodBody(@"var target = CreateB();
     target.StringValue = a.StringValue;
     return target;".ReplaceLineEndings());
     }
@@ -98,9 +98,9 @@ public class ObjectFactoryTest
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = CreateB() ?? new B();
+            .HaveSingleMethodBody(@"var target = CreateB() ?? new B();
     target.StringValue = a.StringValue;
     return target;".ReplaceLineEndings());
     }
@@ -114,9 +114,9 @@ public class ObjectFactoryTest
             "class A { public string StringValue { get; set; } }",
             "class B { private B() {} public string StringValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = CreateB() ?? throw new System.NullReferenceException(""The object factory CreateB returned null"");
+            .HaveSingleMethodBody(@"var target = CreateB() ?? throw new System.NullReferenceException(""The object factory CreateB returned null"");
     target.StringValue = a.StringValue;
     return target;".ReplaceLineEndings());
     }
@@ -130,9 +130,9 @@ public class ObjectFactoryTest
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = Create<B>() ?? new B();
+            .HaveSingleMethodBody(@"var target = Create<B>() ?? new B();
     target.StringValue = a.StringValue;
     return target;".ReplaceLineEndings());
     }
@@ -146,9 +146,9 @@ public class ObjectFactoryTest
             "class A { public string StringValue { get; set; } }",
             "class B { private B() {} public string StringValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = Create<B>() ?? throw new System.NullReferenceException(""The object factory Create returned null"");
+            .HaveSingleMethodBody(@"var target = Create<B>() ?? throw new System.NullReferenceException(""The object factory Create returned null"");
     target.StringValue = a.StringValue;
     return target;".ReplaceLineEndings());
     }
@@ -162,7 +162,7 @@ public class ObjectFactoryTest
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateMapper(source)
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.InvalidObjectFactorySignature));
     }
@@ -176,7 +176,7 @@ public class ObjectFactoryTest
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateMapper(source)
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.InvalidObjectFactorySignature));
     }
@@ -190,7 +190,7 @@ public class ObjectFactoryTest
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateMapper(source)
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.InvalidObjectFactorySignature));
     }
@@ -204,7 +204,7 @@ public class ObjectFactoryTest
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateMapper(source)
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.InvalidObjectFactorySignature));
     }
@@ -218,7 +218,7 @@ public class ObjectFactoryTest
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateMapper(source)
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.InvalidObjectFactorySignature));
     }
