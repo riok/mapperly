@@ -10,6 +10,11 @@ public record TestHelperOptions(
 {
     public static readonly TestHelperOptions Default = new();
 
+    public static readonly TestHelperOptions NoDiagnostics = Default with
+    {
+        AllowedDiagnostics = new HashSet<DiagnosticSeverity>(),
+    };
+
     public static readonly TestHelperOptions IgnoreInfoDiagnostics = Default with
     {
         AllowedDiagnostics = new HashSet<DiagnosticSeverity>

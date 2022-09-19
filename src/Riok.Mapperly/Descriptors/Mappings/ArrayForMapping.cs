@@ -10,7 +10,7 @@ public class ArrayForMapping : MethodMapping
 {
     private const string TargetVariableName = "target";
     private const string LoopCounterName = "i";
-    private static readonly string ArrayLengthProperty = nameof(Array.Length);
+    private const string ArrayLengthProperty = nameof(Array.Length);
 
     private readonly TypeMapping _elementMapping;
     private readonly ITypeSymbol _targetArrayElementType;

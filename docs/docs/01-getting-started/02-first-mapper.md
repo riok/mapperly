@@ -6,14 +6,14 @@ Mapperly generates mapping method implementations for the defined mapping method
 
 ```csharp title="Mapper declaration"
 [Mapper]
-public partial class DtoMapper
+public partial class CarMapper
 {
     public partial CarDto CarToCarDto(Car car);
 }
 ```
 
 ```csharp title="Mapper usage"
-var mapper = new DtoMapper();
+var mapper = new CarMapper();
 var car = new Car { NumberOfSeats = 10, ... };
 var dto = mapper.CarToCarDto(car);
 dto.NumberOfSeats.Should().Be(10);

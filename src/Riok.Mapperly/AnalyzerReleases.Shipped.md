@@ -39,3 +39,11 @@ RMG020  | Mapper   | Info     | Source property is not mapped to any target prop
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
 RMG021  | Mapper   | Warning  | Ignored source property not found
+
+## Release 2.5
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|--------------------
+RMG022  | Mapper   | Error    | Invalid object factory signature

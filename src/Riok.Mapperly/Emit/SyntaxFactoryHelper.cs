@@ -12,8 +12,8 @@ public static class SyntaxFactoryHelper
 {
     private const string ArgumentOutOfRangeExceptionClassName = "System.ArgumentOutOfRangeException";
     private const string ArgumentNullExceptionClassName = "System.ArgumentNullException";
-
     private const string NotImplementedExceptionClassName = "System.NotImplementedException";
+    private const string NullReferenceExceptionClassName = "System.NullReferenceException";
 
     public static readonly IdentifierNameSyntax VarIdentifier = IdentifierName("var");
 
@@ -54,7 +54,7 @@ public static class SyntaxFactoryHelper
             NullFallbackValue.Default => DefaultLiteral(),
             NullFallbackValue.EmptyString => StringLiteral(string.Empty),
             NullFallbackValue.CreateInstance => CreateInstance(t),
-            _ => ThrowNewArgumentNullException(argument),
+            _ => ThrowArgumentNullException(argument),
         };
     }
 
@@ -107,13 +107,19 @@ public static class SyntaxFactoryHelper
     public static InvocationExpressionSyntax NameOf(ExpressionSyntax expression)
         => Invocation(_nameofIdentifier, expression);
 
+    public static ThrowExpressionSyntax ThrowNullReferenceException(string message)
+    {
+        return ThrowExpression(ObjectCreationExpression(IdentifierName(NullReferenceExceptionClassName))
+            .WithArgumentList(ArgumentList(StringLiteral(message))));
+    }
+
     public static ThrowExpressionSyntax ThrowArgumentOutOfRangeException(ExpressionSyntax arg)
     {
         return ThrowExpression(ObjectCreationExpression(IdentifierName(ArgumentOutOfRangeExceptionClassName))
             .WithArgumentList(ArgumentList(NameOf(arg))));
     }
 
-    public static ThrowExpressionSyntax ThrowNewArgumentNullException(ExpressionSyntax arg)
+    public static ThrowExpressionSyntax ThrowArgumentNullException(ExpressionSyntax arg)
     {
         return ThrowExpression(ObjectCreationExpression(IdentifierName(ArgumentNullExceptionClassName))
             .WithArgumentList(ArgumentList(NameOf(arg))));
@@ -123,6 +129,14 @@ public static class SyntaxFactoryHelper
     {
         return ThrowExpression(ObjectCreationExpression(IdentifierName(NotImplementedExceptionClassName))
             .WithArgumentList(SyntaxFactory.ArgumentList()));
+    }
+
+    public static InvocationExpressionSyntax GenericInvocation(string methodName, IEnumerable<TypeSyntax> typeParams, params ExpressionSyntax[] arguments)
+    {
+        var method = GenericName(methodName)
+            .WithTypeArgumentList(TypeArgumentList(CommaSeparatedList(typeParams)));
+        return InvocationExpression(method)
+            .WithArgumentList(ArgumentList(arguments));
     }
 
     public static InvocationExpressionSyntax Invocation(string methodName, params ExpressionSyntax[] arguments)
@@ -227,7 +241,7 @@ public static class SyntaxFactoryHelper
         where T : SyntaxNode
         => SeparatedList<T>(JoinByComma(nodes, insertTrailingComma));
 
-    private static IdentifierNameSyntax NonNullableIdentifier(ITypeSymbol t)
+    public static IdentifierNameSyntax NonNullableIdentifier(ITypeSymbol t)
         => IdentifierName(t.NonNullable().ToDisplayString());
 
     private static IEnumerable<SyntaxNodeOrToken> JoinByComma(IEnumerable<SyntaxNode> nodes, bool insertTrailingComma = false)

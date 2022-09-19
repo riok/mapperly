@@ -2,6 +2,14 @@ namespace Riok.Mapperly.Helpers;
 
 public static class EnumerableExtensions
 {
+    public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> enumerable)
+        where T : notnull
+    {
+#nullable disable
+        return enumerable.Where(x => x != null);
+#nullable restore
+    }
+
     public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable, IEqualityComparer<T>? comparer = null)
     {
         var set = new HashSet<T>(comparer);

@@ -173,4 +173,12 @@ internal static class DiagnosticDescriptors
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true);
+
+    public static readonly DiagnosticDescriptor InvalidObjectFactorySignature = new(
+        "RMG022",
+        "Invalid object factory signature",
+        "The object factory {0} has an invalid signature",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true);
 }

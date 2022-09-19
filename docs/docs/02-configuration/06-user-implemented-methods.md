@@ -4,7 +4,7 @@ If Mapperly cannot generate a mapping, one can implement it manually simply by p
 
 ```csharp
 [Mapper]
-public partial class DtoMapper
+public partial class CarMapper
 {
     public partial CarDto CarToCarDto(Car car);
 
@@ -12,4 +12,4 @@ public partial class DtoMapper
 }
 ```
 
-Whenever Mapperly needs a mapping from `DateTime` to `DateOnly` inside the `DtoMapper` implementation, it will use the provided implementation.
+Whenever Mapperly needs a mapping from `DateTime` to `DateOnly` inside the `CarMapper` implementation, it will use the provided implementation.

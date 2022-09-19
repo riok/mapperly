@@ -4,6 +4,7 @@ using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBuilder;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.ObjectFactories;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
@@ -68,6 +69,8 @@ public class DescriptorBuilder
 
     internal Compilation Compilation { get; }
 
+    internal ObjectFactoryCollection ObjectFactories { get; private set; } = ObjectFactoryCollection.Empty;
+
     public MapperAttribute MapperConfiguration { get; }
 
     private MapperAttribute Configure()
@@ -87,11 +90,18 @@ public class DescriptorBuilder
     public MapperDescriptor Build()
     {
         ReserveMethodNames();
+        ExtractObjectFactories();
         ExtractUserMappings();
         BuildMappingBodies();
         BuildMappingMethodNames();
         AddMappingsToDescriptor();
         return _mapperDescriptor;
+    }
+
+    private void ExtractObjectFactories()
+    {
+        var ctx = new SimpleMappingBuilderContext(this);
+        ObjectFactories = ObjectFactoryBuilder.ExtractObjectFactories(ctx, _mapperSymbol);
     }
 
     public TypeMapping? FindOrBuildMapping(
