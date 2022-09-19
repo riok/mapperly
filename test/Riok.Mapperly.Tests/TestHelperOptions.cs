@@ -10,12 +10,19 @@ public record TestHelperOptions(
 {
     public static readonly TestHelperOptions Default = new();
 
+    public static readonly TestHelperOptions DisabledNullable = Default with { NullableOption = NullableContextOptions.Disable };
+
     public static readonly TestHelperOptions NoDiagnostics = Default with
     {
         AllowedDiagnostics = new HashSet<DiagnosticSeverity>(),
     };
 
-    public static readonly TestHelperOptions IgnoreInfoDiagnostics = Default with
+    public static readonly TestHelperOptions AllowAllDiagnostics = Default with
+    {
+        AllowedDiagnostics = Enum.GetValues<DiagnosticSeverity>().ToHashSet(),
+    };
+
+    public static readonly TestHelperOptions AllowInfoDiagnostics = Default with
     {
         AllowedDiagnostics = new HashSet<DiagnosticSeverity>
         {

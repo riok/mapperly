@@ -12,9 +12,9 @@ public class ObjectPropertyConstructorResolverTest
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { public B(string stringValue) {} { public int IntValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.StringValue);
+            .HaveSingleMethodBody(@"var target = new B(source.StringValue);
     target.IntValue = source.IntValue;
     return target;".ReplaceLineEndings());
     }
@@ -40,9 +40,9 @@ public class ObjectPropertyConstructorResolverTest
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { public B(string stringValue, int intValue = 10) {} }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.StringValue, source.IntValue);
+            .HaveSingleMethodBody(@"var target = new B(source.StringValue, source.IntValue);
     return target;".ReplaceLineEndings());
     }
 
@@ -55,9 +55,9 @@ public class ObjectPropertyConstructorResolverTest
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { public B(string stringValue, int intValue2 = 10) {} public int IntValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.StringValue);
+            .HaveSingleMethodBody(@"var target = new B(source.StringValue);
     target.IntValue = source.IntValue;
     return target;".ReplaceLineEndings());
     }
@@ -71,9 +71,9 @@ public class ObjectPropertyConstructorResolverTest
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } public int IntValue3 { get; set; } }",
             "class B { public B(string stringValue, int intValue2 = 10, int intValue = 20) {} public int IntValue3 { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.StringValue, intValue: source.IntValue);
+            .HaveSingleMethodBody(@"var target = new B(source.StringValue, intValue: source.IntValue);
     target.IntValue3 = source.IntValue3;
     return target;".ReplaceLineEndings());
     }
@@ -87,9 +87,9 @@ public class ObjectPropertyConstructorResolverTest
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { public B(string x) { } public B(string stringValue, int intvalue) { } public B(string stringValue) { } { public int IntValue { get; set; } ");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.StringValue, source.IntValue);
+            .HaveSingleMethodBody(@"var target = new B(source.StringValue, source.IntValue);
     return target;".ReplaceLineEndings());
     }
 
@@ -138,9 +138,9 @@ public class ObjectPropertyConstructorResolverTest
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { public B(string x) { } [MapperConstructor] public B(string stringValue) { } public B() { } { public string StringValue { get; set; } public int IntValue { get; set; } ");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.StringValue);
+            .HaveSingleMethodBody(@"var target = new B(source.StringValue);
     target.IntValue = source.IntValue;
     return target;".ReplaceLineEndings());
     }
@@ -154,9 +154,9 @@ public class ObjectPropertyConstructorResolverTest
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { public B(string x) { } public B(string stringValue, int intvalue) { } public B() { } { public string StringValue { get; set; } public int IntValue { get; set; } ");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     target.StringValue = source.StringValue;
     target.IntValue = source.IntValue;
     return target;".ReplaceLineEndings());
@@ -171,9 +171,9 @@ public class ObjectPropertyConstructorResolverTest
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { [Obsolete] public B(string StringValue) { } public B(string stringValue, int intvalue) { } { public string StringValue { get; set; } public int IntValue { get; set; } ");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.StringValue, source.IntValue);
+            .HaveSingleMethodBody(@"var target = new B(source.StringValue, source.IntValue);
     return target;".ReplaceLineEndings());
     }
 
@@ -186,9 +186,9 @@ public class ObjectPropertyConstructorResolverTest
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { [Obsolete, MapperConstructor] public B(string StringValue) { } public B(string stringValue, int intvalue) { } { public string StringValue { get; set; } public int IntValue { get; set; } ");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.StringValue);
+            .HaveSingleMethodBody(@"var target = new B(source.StringValue);
     target.IntValue = source.IntValue;
     return target;".ReplaceLineEndings());
     }
@@ -202,9 +202,9 @@ public class ObjectPropertyConstructorResolverTest
             "record A(string StringValue) { public int IntValue { get; set; } }",
             "record B(string StringValue) { public int IntValue { get; set; } ");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.StringValue);
+            .HaveSingleMethodBody(@"var target = new B(source.StringValue);
     target.IntValue = source.IntValue;
     return target;".ReplaceLineEndings());
     }
@@ -218,9 +218,9 @@ public class ObjectPropertyConstructorResolverTest
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "record B(string StringValue) { public int IntValue { get; set; } ");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.StringValue);
+            .HaveSingleMethodBody(@"var target = new B(source.StringValue);
     target.IntValue = source.IntValue;
     return target;".ReplaceLineEndings());
     }
@@ -235,9 +235,9 @@ public class ObjectPropertyConstructorResolverTest
             "record B(string NestedValue);",
             "record C(string Value);");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.Nested.Value);
+            .HaveSingleMethodBody(@"var target = new B(source.Nested.Value);
     return target;".ReplaceLineEndings());
     }
 
@@ -251,9 +251,9 @@ public class ObjectPropertyConstructorResolverTest
             "record B(string NestedValue);",
             "record C(string Value);");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested?.Value)));
+            .HaveSingleMethodBody(@"var target = new B(source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested?.Value)));
     return target;".ReplaceLineEndings());
     }
 
@@ -267,9 +267,9 @@ public class ObjectPropertyConstructorResolverTest
             "record B(string NestedValue);",
             "record C(string Value);");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(StrConversion(source.Nested?.Value));
+            .HaveSingleMethodBody(@"var target = new B(StrConversion(source.Nested?.Value));
     return target;".ReplaceLineEndings());
     }
 
@@ -284,9 +284,9 @@ public class ObjectPropertyConstructorResolverTest
             "record B(string NestedValue);",
             "record C(string Value);");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.Nested?.Value ?? """");
+            .HaveSingleMethodBody(@"var target = new B(source.Nested?.Value ?? """");
     return target;".ReplaceLineEndings());
     }
 
@@ -299,9 +299,9 @@ public class ObjectPropertyConstructorResolverTest
             "record A(int Value);",
             "record B(int? Value);");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B((int? )source.Value);
+            .HaveSingleMethodBody(@"var target = new B((int? )source.Value);
     return target;".ReplaceLineEndings());
     }
 
@@ -314,9 +314,9 @@ public class ObjectPropertyConstructorResolverTest
             "record A(int? Value);",
             "record B(int Value);");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.Value ?? throw new System.ArgumentNullException(nameof(source.Value)));
+            .HaveSingleMethodBody(@"var target = new B(source.Value ?? throw new System.ArgumentNullException(nameof(source.Value)));
     return target;".ReplaceLineEndings());
     }
 
@@ -329,9 +329,9 @@ public class ObjectPropertyConstructorResolverTest
             "record A(int? Value);",
             "record B(double Value);");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.Value == null ? throw new System.ArgumentNullException(nameof(source.Value.Value)) : (double)source.Value.Value);
+            .HaveSingleMethodBody(@"var target = new B(source.Value == null ? throw new System.ArgumentNullException(nameof(source.Value.Value)) : (double)source.Value.Value);
     return target;".ReplaceLineEndings());
     }
 
@@ -345,9 +345,9 @@ public class ObjectPropertyConstructorResolverTest
             "record B(double NestedValue);",
             "record C(int Value);");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B(source.Nested == null ? throw new System.ArgumentNullException(nameof(source.Nested.Value)) : (double)source.Nested.Value);
+            .HaveSingleMethodBody(@"var target = new B(source.Nested == null ? throw new System.ArgumentNullException(nameof(source.Nested.Value)) : (double)source.Nested.Value);
     return target;".ReplaceLineEndings());
     }
 }

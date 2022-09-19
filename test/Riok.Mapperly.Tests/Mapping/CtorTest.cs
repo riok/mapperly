@@ -9,9 +9,9 @@ public class CtorTest
             "string",
             "A",
             "class A { public A(string x) {} }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return new A(source);");
+            .HaveSingleMethodBody("return new A(source);");
     }
 
     [Fact]
@@ -21,8 +21,8 @@ public class CtorTest
             "string",
             "A",
             "struct A { public A(string x) {} }");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return new A(source);");
+            .HaveSingleMethodBody("return new A(source);");
     }
 }

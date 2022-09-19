@@ -17,7 +17,7 @@ public static class TestHelper
 
     public static MapperGenerationResult GenerateMapper(string source, TestHelperOptions? options = null)
     {
-        options ??= TestHelperOptions.Default;
+        options ??= TestHelperOptions.NoDiagnostics;
 
         var result = Generate(source, options).GetRunResult();
 
@@ -40,28 +40,6 @@ public static class TestHelper
         return mapperResult;
     }
 
-    public static string GenerateSingleMapperMethodBody(string source, TestHelperOptions? options = null)
-    {
-        return GenerateMapperMethodBodies(source, options)
-            .Single()
-            .Value;
-    }
-
-    public static string GenerateMapperMethodBody(
-        string source,
-        string methodName = TestSourceBuilder.DefaultMapMethodName,
-        TestHelperOptions? options = null)
-    {
-        return GenerateMapperMethodBodies(source, options)[methodName];
-    }
-
-    public static IReadOnlyDictionary<string, string> GenerateMapperMethodBodies(
-        string source,
-        TestHelperOptions? options = null)
-    {
-        return GenerateMapper(source, options ?? TestHelperOptions.NoDiagnostics).MethodBodies;
-    }
-
     private static string ExtractBody(MethodDeclarationSyntax methodImpl)
     {
         return methodImpl
@@ -76,7 +54,7 @@ public static class TestHelper
         string source,
         TestHelperOptions? options)
     {
-        options ??= TestHelperOptions.Default;
+        options ??= TestHelperOptions.NoDiagnostics;
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default.WithLanguageVersion(options.LanguageVersion));
         var compilation = BuildCompilation(options.NullableOption, syntaxTree);

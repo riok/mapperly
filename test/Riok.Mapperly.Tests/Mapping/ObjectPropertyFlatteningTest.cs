@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis;
-
 namespace Riok.Mapperly.Tests.Mapping;
 
 [UsesVerify]
@@ -14,9 +12,9 @@ public class ObjectPropertyFlatteningTest
             "class B { public string MyValueId { get; set; } }",
             "class C { public string Id { get; set; }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     target.MyValueId = source.Value.Id;
     return target;".ReplaceLineEndings());
     }
@@ -31,9 +29,9 @@ public class ObjectPropertyFlatteningTest
             "class B { public string ValueId { get; set; } }",
             "class C { public string Id { get; set; }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     target.ValueId = source.Value.Id;
     return target;".ReplaceLineEndings());
     }
@@ -48,20 +46,11 @@ public class ObjectPropertyFlatteningTest
             "class B { public string ValueId { get; set; } }",
             "class C { public string Id { get; set; }");
 
-        var options = TestHelperOptions.Default with
-        {
-            AllowedDiagnostics = new HashSet<DiagnosticSeverity>
-            {
-                DiagnosticSeverity.Hidden,
-                DiagnosticSeverity.Info,
-            }
-        };
-
-        TestHelper.GenerateSingleMapperMethodBody(source, options)
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     target.ValueId = source.ValueId;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -74,9 +63,9 @@ public class ObjectPropertyFlatteningTest
             "class B { public string ValueId { get; set; } }",
             "class C { public string Id { get; set; }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     if (source.Value != null)
     {
         target.ValueId = source.Value.Id;
@@ -95,9 +84,9 @@ public class ObjectPropertyFlatteningTest
             "class B { public string ValueId { get; set; } public string ValueName { get; set; } }",
             "class C { public Guid Id { get; set; } public string Name { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     if (source.Value != null)
     {
         target.ValueId = source.Value.Id.ToString();
@@ -117,9 +106,9 @@ public class ObjectPropertyFlatteningTest
             "class B { public string ValueId { get; set; } public string ValueName { get; set; } }",
             "class C { public Guid Id { get; set; } public string Name { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source, TestHelperOptions.Default with { NullableOption = NullableContextOptions.Disable })
+        TestHelper.GenerateMapper(source, TestHelperOptions.DisabledNullable)
             .Should()
-            .Be(@"if (source == null)
+            .HaveSingleMethodBody(@"if (source == null)
         return default;
     var target = new B();
     if (source.Value != null)
@@ -128,7 +117,7 @@ public class ObjectPropertyFlatteningTest
     }
 
     target.ValueName = source.Value?.Name;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -141,13 +130,13 @@ public class ObjectPropertyFlatteningTest
             "class B { public string ValueName { get; set; } }",
             "class C { public string Name { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source, TestHelperOptions.Default with { NullableOption = NullableContextOptions.Disable })
+        TestHelper.GenerateMapper(source, TestHelperOptions.DisabledNullable)
             .Should()
-            .Be(@"if (source == null)
+            .HaveSingleMethodBody(@"if (source == null)
         return default;
     var target = new B();
     target.ValueName = source.Value?.Name;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -159,9 +148,9 @@ public class ObjectPropertyFlatteningTest
             "class B { public C Value { get; set; } }",
             "class C { public string Id { get; set; }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     target.Value.Id = source.MyValueId;
     return target;".ReplaceLineEndings());
     }
@@ -175,9 +164,9 @@ public class ObjectPropertyFlatteningTest
             "class B { public C? Value { get; set; } }",
             "class C { public string Id { get; set; } public string Id2 { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     target.Value ??= new();
     target.Value.Id = source.MyValueId;
     target.Value.Id2 = source.MyValueId2;
@@ -247,9 +236,9 @@ public class ObjectPropertyFlatteningTest
             "class E { public F? Value2 { get; set; } public string Id200 { get; set; } }",
             "class F { public string Id2 { get; set; } public string Id20 { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B();
+            .HaveSingleMethodBody(@"var target = new B();
     if (source.Value1 != null)
     {
         target.Value2 ??= new();

@@ -9,9 +9,9 @@ public class SpecialTypeTest
             "A",
             "object",
             "class A {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (object)source;");
+            .HaveSingleMethodBody("return (object)source;");
     }
 
     [Fact]
@@ -22,9 +22,9 @@ public class SpecialTypeTest
             "object",
             TestSourceBuilderOptions.WithDeepCloning,
             "class A {}");
-        TestHelper.GenerateMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (object)MapToA(source);");
+            .HaveMapMethodBody("return (object)MapToA(source);");
     }
 
     [Fact]
@@ -33,9 +33,9 @@ public class SpecialTypeTest
         var source = TestSourceBuilder.Mapping(
             "string",
             "object");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (object)source;");
+            .HaveSingleMethodBody("return (object)source;");
     }
 
     [Fact]
@@ -45,9 +45,9 @@ public class SpecialTypeTest
             "string",
             "object",
             TestSourceBuilderOptions.WithDeepCloning);
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (object)source;");
+            .HaveSingleMethodBody("return (object)source;");
     }
 
     [Fact]
@@ -56,9 +56,9 @@ public class SpecialTypeTest
         var source = TestSourceBuilder.Mapping(
             "DateTime",
             "object");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (object)source;");
+            .HaveSingleMethodBody("return (object)source;");
     }
 
     [Fact]
@@ -68,9 +68,9 @@ public class SpecialTypeTest
             "DateTime",
             "object",
             TestSourceBuilderOptions.WithDeepCloning);
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (object)source;");
+            .HaveSingleMethodBody("return (object)source;");
     }
 
     [Fact]
@@ -80,9 +80,9 @@ public class SpecialTypeTest
             "A",
             "object",
             "readonly struct A {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (object)source;");
+            .HaveSingleMethodBody("return (object)source;");
     }
 
     [Fact]
@@ -93,9 +93,9 @@ public class SpecialTypeTest
             "object",
             TestSourceBuilderOptions.WithDeepCloning,
             "readonly struct A {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (object)source;");
+            .HaveSingleMethodBody("return (object)source;");
     }
 
     [Fact]
@@ -105,9 +105,9 @@ public class SpecialTypeTest
             "A",
             "object",
             "struct A {}");
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (object)source;");
+            .HaveSingleMethodBody("return (object)source;");
     }
 
     [Fact]
@@ -118,8 +118,8 @@ public class SpecialTypeTest
             "object",
             TestSourceBuilderOptions.WithDeepCloning,
             "struct A {}");
-        TestHelper.GenerateMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return (object)MapToA(source);");
+            .HaveMapMethodBody("return (object)MapToA(source);");
     }
 }

@@ -12,9 +12,9 @@ public class ObjectPropertyInitPropertyTest
             "class A { public string StringValue { get; init; } public int IntValue { get; set; } }",
             "class B { public string StringValue { get; init; } public int IntValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B()
+            .HaveSingleMethodBody(@"var target = new B()
     {StringValue = source.StringValue};
     target.IntValue = source.IntValue;
     return target;".ReplaceLineEndings());
@@ -29,9 +29,9 @@ public class ObjectPropertyInitPropertyTest
             "class A { public string StringValue { get; init; } public int IntValue { get; set; } }",
             "class B { public string StringValue { get; init; } public int IntValue { get; init; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B()
+            .HaveSingleMethodBody(@"var target = new B()
     {StringValue = source.StringValue, IntValue = source.IntValue};
     return target;".ReplaceLineEndings());
     }
@@ -45,9 +45,9 @@ public class ObjectPropertyInitPropertyTest
             "class A { public string? Value { get; init; } }",
             "class B { public string Value { get; init; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B()
+            .HaveSingleMethodBody(@"var target = new B()
     {Value = source.Value ?? throw new System.ArgumentNullException(nameof(source.Value))};
     return target;".ReplaceLineEndings());
     }
@@ -62,9 +62,9 @@ public class ObjectPropertyInitPropertyTest
             "class A { public string? Value { get; init; } }",
             "class B { public string Value { get; init; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B()
+            .HaveSingleMethodBody(@"var target = new B()
     {Value = source.Value ?? """"};
     return target;".ReplaceLineEndings());
     }
@@ -77,9 +77,9 @@ public class ObjectPropertyInitPropertyTest
             "class A { public string StringValue2 { get; init; } }",
             "class B { public string StringValue { get; init; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B()
+            .HaveSingleMethodBody(@"var target = new B()
     {StringValue = source.StringValue2};
     return target;".ReplaceLineEndings());
     }
@@ -94,9 +94,9 @@ public class ObjectPropertyInitPropertyTest
             "class B { public string NestedValue { get; init; } }",
             "class C { public string Value { get; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B()
+            .HaveSingleMethodBody(@"var target = new B()
     {NestedValue = source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested?.Value))};
     return target;".ReplaceLineEndings());
     }
@@ -111,9 +111,9 @@ public class ObjectPropertyInitPropertyTest
             "class B { public string NestedValue { get; init; } }",
             "class C { public string Value { get; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be(@"var target = new B()
+            .HaveSingleMethodBody(@"var target = new B()
     {NestedValue = source.Nested.Value};
     return target;".ReplaceLineEndings());
     }

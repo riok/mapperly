@@ -58,9 +58,9 @@ public partial class MyMapper
             "partial int ToInt(string i);" +
             "int ToInt2(string i) => int.Parse(i);");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("return int.Parse(i);");
+            .HaveSingleMethodBody("return int.Parse(i);");
     }
 
     [Fact]
@@ -71,9 +71,9 @@ public partial class MyMapper
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateSingleMapperMethodBody(source)
+        TestHelper.GenerateMapper(source)
             .Should()
-            .Be("target.StringValue = source.StringValue;");
+            .HaveSingleMethodBody("target.StringValue = source.StringValue;");
     }
 
     [Fact]
@@ -83,10 +83,9 @@ public partial class MyMapper
             "int ToInt(string i);" +
             "int ToInt2(string i);");
 
-        TestHelper.GenerateMapperMethodBodies(source)
-            .Values
+        TestHelper.GenerateMapper(source)
             .Should()
-            .AllBe("return int.Parse(source);");
+            .AllMethodsHaveBody("return int.Parse(source);");
     }
 
     [Fact]
@@ -98,15 +97,15 @@ public partial class MyMapper
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }");
 
-        var mappingMethods = TestHelper.GenerateMapperMethodBodies(source, TestHelperOptions.IgnoreInfoDiagnostics);
-        mappingMethods.Should().HaveCount(2);
-        mappingMethods["Map"].Should().Be(@"var target = new B();
+        var mapper = TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics);
+        mapper.Should()
+            .HaveMethodCount(2)
+            .HaveMethodBody("Map", @"var target = new B();
     target.StringValue = source.StringValue;
-    return target;".ReplaceLineEndings());
-
-        mappingMethods["Map2"].Should().Be(@"var target = new B();
+    return target;")
+            .HaveMethodBody("Map2", @"var target = new B();
     target.IntValue = source.IntValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -118,10 +117,9 @@ public partial class MyMapper
             "class A { public B? Value { get; set; } }",
             "class B { public B? Value { get; set; } }");
 
-        TestHelper.GenerateMapperMethodBodies(source)
-            .Keys
+        TestHelper.GenerateMapper(source)
             .Should()
-            .BeEquivalentTo(new[] { "MapToB", "MapToB1" }, o => o.WithStrictOrdering());
+            .HaveMethods("MapToB", "MapToB1");
     }
 
     [Fact]
