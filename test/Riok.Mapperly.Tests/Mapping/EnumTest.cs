@@ -85,7 +85,7 @@ public class EnumTest
         E1.C => E2.C,
         E1.E => E2.E,
         _ => throw new System.ArgumentOutOfRangeException(nameof(source)),
-    };".ReplaceLineEndings());
+    };");
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public class EnumTest
         E1.f => E2.f,
         E1.F => E2.f,
         _ => throw new System.ArgumentOutOfRangeException(nameof(source)),
-    };".ReplaceLineEndings());
+    };");
     }
 
     [Fact]
@@ -149,7 +149,7 @@ enum E2 {A = 100, B, C}
         E1.B => E2.B,
         E1.C => E2.C,
         _ => throw new System.ArgumentOutOfRangeException(nameof(source)),
-    };".ReplaceLineEndings());
+    };");
     }
 
     [Fact]
@@ -208,7 +208,7 @@ enum E2 {A = 100, B, C}
         E1.B => nameof(E1.B),
         E1.C => nameof(E1.C),
         _ => source.ToString(),
-    };".ReplaceLineEndings());
+    };");
     }
 
     [Fact]
@@ -225,7 +225,7 @@ enum E2 {A = 100, B, C}
         { } s when s.Equals(nameof(E1.B), System.StringComparison.OrdinalIgnoreCase) => E1.B,
         { } s when s.Equals(nameof(E1.C), System.StringComparison.OrdinalIgnoreCase) => E1.C,
         _ => (E1)System.Enum.Parse(typeof(E1), source, true),
-    };".ReplaceLineEndings());
+    };");
     }
 
     [Fact]
@@ -242,6 +242,6 @@ enum E2 {A = 100, B, C}
         nameof(E1.B) => E1.B,
         nameof(E1.C) => E1.C,
         _ => (E1)System.Enum.Parse(typeof(E1), source, false),
-    };".ReplaceLineEndings());
+    };");
     }
 }

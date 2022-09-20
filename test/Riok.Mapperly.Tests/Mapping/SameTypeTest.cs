@@ -73,7 +73,7 @@ public class SameTypeTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new A();
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -99,6 +99,6 @@ public class SameTypeTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new A();
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 }

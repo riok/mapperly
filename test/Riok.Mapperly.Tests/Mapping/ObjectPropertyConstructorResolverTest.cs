@@ -16,7 +16,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.StringValue);
     target.IntValue = source.IntValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public class ObjectPropertyConstructorResolverTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.StringValue, source.IntValue);
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.StringValue);
     target.IntValue = source.IntValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.StringValue, intValue: source.IntValue);
     target.IntValue3 = source.IntValue3;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class ObjectPropertyConstructorResolverTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.StringValue, source.IntValue);
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -142,7 +142,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.StringValue);
     target.IntValue = source.IntValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -159,7 +159,7 @@ public class ObjectPropertyConstructorResolverTest
             .HaveSingleMethodBody(@"var target = new B();
     target.StringValue = source.StringValue;
     target.IntValue = source.IntValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -174,7 +174,7 @@ public class ObjectPropertyConstructorResolverTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.StringValue, source.IntValue);
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -190,7 +190,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.StringValue);
     target.IntValue = source.IntValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -206,7 +206,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.StringValue);
     target.IntValue = source.IntValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -222,7 +222,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.StringValue);
     target.IntValue = source.IntValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -238,7 +238,7 @@ public class ObjectPropertyConstructorResolverTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.Nested.Value);
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -254,7 +254,7 @@ public class ObjectPropertyConstructorResolverTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested?.Value)));
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -270,7 +270,7 @@ public class ObjectPropertyConstructorResolverTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B(StrConversion(source.Nested?.Value));
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -287,7 +287,7 @@ public class ObjectPropertyConstructorResolverTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.Nested?.Value ?? """");
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -302,7 +302,7 @@ public class ObjectPropertyConstructorResolverTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B((int? )source.Value);
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -317,7 +317,7 @@ public class ObjectPropertyConstructorResolverTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.Value ?? throw new System.ArgumentNullException(nameof(source.Value)));
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -332,7 +332,7 @@ public class ObjectPropertyConstructorResolverTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.Value == null ? throw new System.ArgumentNullException(nameof(source.Value.Value)) : (double)source.Value.Value);
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -348,6 +348,6 @@ public class ObjectPropertyConstructorResolverTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B(source.Nested == null ? throw new System.ArgumentNullException(nameof(source.Nested.Value)) : (double)source.Nested.Value);
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 }

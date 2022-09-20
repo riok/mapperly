@@ -17,7 +17,7 @@ public class NullableTest
             .HaveSingleMethodBody(@"if (source == null)
         throw new System.ArgumentNullException(nameof(source));
     var target = new B();
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public class NullableTest
             .HaveSingleMethodBody(@"if (source == null)
         return default;
     var target = new B();
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class NullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"return source == null ? default : (int)source.Value;".ReplaceLineEndings());
+            .HaveSingleMethodBody(@"return source == null ? default : (int)source.Value;");
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class NullableTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B();
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class NullableTest
             .HaveSingleMethodBody(@"if (source == null)
         return new B();
     var target = new B();
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class NullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return source == null ? \"\" : source.ToString();".ReplaceLineEndings());
+            .HaveSingleMethodBody("return source == null ? \"\" : source.ToString();");
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class NullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return source == null ? default : source.Value;".ReplaceLineEndings());
+            .HaveSingleMethodBody("return source == null ? default : source.Value;");
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public class NullableTest
             .Should()
             .HaveSingleMethodBody(@"if (source == null)
         return;
-    target.StringValue = source.StringValue;".ReplaceLineEndings());
+    target.StringValue = source.StringValue;");
     }
 
     [Fact]

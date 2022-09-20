@@ -158,7 +158,7 @@ public class CastTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B();
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public class CastTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B();
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -314,7 +314,7 @@ public class CastTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B();
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -342,6 +342,6 @@ public class CastTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new B();
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 }

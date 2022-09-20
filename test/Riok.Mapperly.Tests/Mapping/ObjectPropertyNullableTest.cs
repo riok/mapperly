@@ -20,7 +20,7 @@ public class ObjectPropertyNullableTest
         target.Value = source.Value.Value;
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public class ObjectPropertyNullableTest
         target.Value = source.Value;
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -230,7 +230,7 @@ public Wrapper Map(double? source) => source.HasValue ? new() { Test = source.Va
         return default;
     var target = new NotNullableType();
     target.Test = Map(y.Test);
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -256,7 +256,7 @@ public Wrapper Map(double source) => new() { Test = source.Value };";
         target.Test = Map(y.Test.Value);
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -280,7 +280,7 @@ public Wrapper MapNullable(double? source) => source.HasValue ? new() { Test = s
     var target = new NotNullableType();
     target.Test = MapNullable(y.Test);
     target.Test2 = MapNonNullable(y.Test2);
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
