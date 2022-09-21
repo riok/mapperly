@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Riok.Mapperly.Helpers;
 
@@ -75,5 +76,28 @@ internal static class SymbolExtensions
 
         genericIntf = t.AllInterfaces.FirstOrDefault(x => x.IsGenericType && SymbolEqualityComparer.Default.Equals(x.OriginalDefinition, genericInterfaceSymbol));
         return genericIntf != null;
+    }
+
+    internal static bool CanConsumeType(this ITypeParameterSymbol typeParameter, Compilation compilation, ITypeSymbol type)
+    {
+        if (typeParameter.HasConstructorConstraint && !type.HasAccessibleParameterlessConstructor())
+            return false;
+
+        if (typeParameter.HasNotNullConstraint && type.IsNullable())
+            return false;
+
+        if (typeParameter.HasValueTypeConstraint && !type.IsValueType)
+            return false;
+
+        if (typeParameter.HasReferenceTypeConstraint && !type.IsReferenceType)
+            return false;
+
+        foreach (var constraintType in typeParameter.ConstraintTypes)
+        {
+            if (!compilation.ClassifyConversion(type, constraintType.UpgradeNullable()).IsImplicit)
+                return false;
+        }
+
+        return true;
     }
 }

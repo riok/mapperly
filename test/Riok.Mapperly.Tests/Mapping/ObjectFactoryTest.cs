@@ -22,7 +22,41 @@ public class ObjectFactoryTest
     }
 
     [Fact]
-    public void ShouldUseGenericObjectFactory()
+    public void ShouldUseSimpleObjectFactoryForMultipleMaps()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[ObjectFactory] B CreateB() => new B();"
+            + "partial B Map(A a);"
+            + "partial B Map2(A a);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }");
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMethodCount(2)
+            .AllMethodsHaveBody(@"var target = CreateB();
+    target.StringValue = a.StringValue;
+    return target;");
+    }
+
+    [Fact]
+    public void ShouldUseSimpleObjectFactoryWithSource()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[ObjectFactory] B CreateB(A source) => new B(source.IntValue);"
+            + "[MapperIgnoreSource(nameof(A.IntValue))] partial B Map(A a);",
+            "class A { public int IntValue { get; set; } public string StringValue { get; set; } }",
+            "class B { private readonly int _intValue; public B(int v) => _intValue = v; public string StringValue { get; set; } }");
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(@"var target = CreateB(a);
+    target.StringValue = a.StringValue;
+    return target;");
+    }
+
+    [Fact]
+    public void ShouldUseGenericTargetObjectFactory()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[ObjectFactory] T Create<T>() where T : new() => new T();"
@@ -33,6 +67,70 @@ public class ObjectFactoryTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = Create<B>();
+    target.StringValue = a.StringValue;
+    return target;");
+    }
+
+    [Fact]
+    public void ShouldUseGenericTargetObjectFactoryWithSource()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[ObjectFactory] T Create<T>(A source) where T : new() => new T();"
+            + "partial B Map(A a);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }");
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(@"var target = Create<B>(a);
+    target.StringValue = a.StringValue;
+    return target;");
+    }
+
+    [Fact]
+    public void ShouldUseGenericSourceTargetObjectFactoryTargetFirst()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[ObjectFactory] T Create<T, S>(S source) where T : new() => new T();"
+            + "partial B Map(A a);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }");
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(@"var target = Create<B, A>(a);
+    target.StringValue = a.StringValue;
+    return target;");
+    }
+
+    [Fact]
+    public void ShouldUseGenericSourceTargetObjectFactorySourceFirst()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[ObjectFactory] T Create<S, T>(S source) where T : new() => new T();"
+            + "partial B Map(A a);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }");
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(@"var target = Create<A, B>(a);
+    target.StringValue = a.StringValue;
+    return target;");
+    }
+
+    [Fact]
+    public void ShouldUseGenericSourceObjectFactory()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[ObjectFactory] B Create<S>(S source) => new B();"
+            + "partial B Map(A a);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }");
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(@"var target = Create<A>(a);
     target.StringValue = a.StringValue;
     return target;");
     }
@@ -214,6 +312,62 @@ public class ObjectFactoryTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[ObjectFactory] B CreateB<T>() => new B();"
+            + "partial B Map(A a);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }");
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.InvalidObjectFactorySignature));
+    }
+
+    [Fact]
+    public void InvalidSignatureTooManyTypeParameters()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[ObjectFactory] T CreateB<S, T, T2>(S source) where T : new() => new T();"
+            + "partial B Map(A a);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }");
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.InvalidObjectFactorySignature));
+    }
+
+    [Fact]
+    public void InvalidSignatureTooManyTypeParametersSourceNotTypeParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[ObjectFactory] T CreateB<S, T>(A source) where T : new() => new T();"
+            + "partial B Map(A a);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }");
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.InvalidObjectFactorySignature));
+    }
+
+    [Fact]
+    public void InvalidSignatureTooManyTypeParametersTargetNotTypeParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[ObjectFactory] B CreateB<S, T>(S source) => new B();"
+            + "partial B Map(A a);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }");
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.InvalidObjectFactorySignature));
+    }
+
+    [Fact]
+    public void InvalidSignatureGenericSourceTargetSameTypeParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[ObjectFactory] T CreateB<T>(T source) where T : new() => new T();"
             + "partial B Map(A a);",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");

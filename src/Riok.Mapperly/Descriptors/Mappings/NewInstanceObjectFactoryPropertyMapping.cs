@@ -26,7 +26,7 @@ public class NewInstanceObjectFactoryPropertyMapping : ObjectPropertyMapping
     public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
     {
         // var target = CreateMyObject<T>();
-        yield return DeclareLocalVariable(TargetVariableName, _objectFactory.CreateType(TargetType));
+        yield return DeclareLocalVariable(TargetVariableName, _objectFactory.CreateType(SourceType, TargetType, source));
 
         // map properties
         foreach (var expression in BuildBody(source, IdentifierName(TargetVariableName)))

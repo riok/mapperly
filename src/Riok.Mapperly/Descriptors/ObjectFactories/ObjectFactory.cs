@@ -8,22 +8,32 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 /// <summary>
 /// An object factory represents a method to instantiate objects of a certain type.
 /// </summary>
-public class ObjectFactory
+public abstract class ObjectFactory
 {
-    public ObjectFactory(IMethodSymbol method)
+    protected ObjectFactory(IMethodSymbol method)
     {
         Method = method;
     }
 
     protected IMethodSymbol Method { get; }
 
-    public virtual ExpressionSyntax CreateType(ITypeSymbol typeToCreate)
-        => HandleNull(Invocation(Method.Name), typeToCreate);
+    public ExpressionSyntax CreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source)
+        => HandleNull(BuildCreateType(sourceType, targetTypeToCreate, source), targetTypeToCreate);
 
-    public virtual bool CanCreateType(ITypeSymbol typeToCreate)
-        => SymbolEqualityComparer.Default.Equals(Method.ReturnType, typeToCreate);
+    public abstract bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate);
 
-    protected ExpressionSyntax HandleNull(ExpressionSyntax expression, ITypeSymbol typeToCreate)
+    protected abstract ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source);
+
+    /// <summary>
+    /// Wraps the <see cref="expression"/> in null handling.
+    /// If the <see cref="expression"/> returns a nullable type, but the <see cref="typeToCreate"/> is not nullable,
+    /// a new instance is created (if a parameterless ctor is accessible). Otherwise a <see cref="NullReferenceException"/> is thrown.
+    /// If the <see cref="typeToCreate"/> is nullable, the <see cref="expression"/> is returned without additional handling.
+    /// </summary>
+    /// <param name="expression">The expression.</param>
+    /// <param name="typeToCreate">The type to create.</param>
+    /// <returns></returns>
+    private ExpressionSyntax HandleNull(ExpressionSyntax expression, ITypeSymbol typeToCreate)
     {
         if (!Method.ReturnType.UpgradeNullable().IsNullable())
             return expression;

@@ -24,7 +24,7 @@ public static class ObjectFactoryBuilder
     private static ObjectFactory? BuildObjectFactory(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol)
     {
         if (methodSymbol.IsAsync
-            || methodSymbol.Parameters.Length != 0
+            || methodSymbol.Parameters.Length > 1
             || methodSymbol.IsPartialDefinition
             || methodSymbol.MethodKind != MethodKind.Ordinary
             || methodSymbol.ReturnsVoid)
@@ -34,20 +34,75 @@ public static class ObjectFactoryBuilder
         }
 
         if (!methodSymbol.IsGenericMethod)
-            return new ObjectFactory(methodSymbol);
+        {
+            return methodSymbol.Parameters.Length == 1
+                ? new SimpleObjectFactoryWithSource(methodSymbol)
+                : new SimpleObjectFactory(methodSymbol);
+        }
 
-        if (methodSymbol.TypeParameters.Length != 1)
+        switch (methodSymbol.TypeParameters.Length)
+        {
+            case 2:
+                return BuildGenericSourceTargetObjectFactory(ctx, methodSymbol);
+
+            case 1:
+                return BuildGenericSingleTypeParameterObjectFactory(ctx, methodSymbol);
+
+            default:
+                ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature, methodSymbol, methodSymbol.Name);
+                return null;
+        }
+    }
+    private static ObjectFactory? BuildGenericSingleTypeParameterObjectFactory(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol)
+    {
+        var sourceParameter = methodSymbol.Parameters.FirstOrDefault();
+        var typeParameter = methodSymbol.TypeParameters[0];
+        var returnTypeIsGeneric = methodSymbol.ReturnType.TypeKind == TypeKind.TypeParameter && string.Equals(methodSymbol.ReturnType.Name, typeParameter.Name, StringComparison.Ordinal);
+        var hasSourceParameter = sourceParameter != null;
+        var sourceParameterIsGeneric = sourceParameter?.Type.TypeKind == TypeKind.TypeParameter && string.Equals(sourceParameter.Type.Name, typeParameter.Name, StringComparison.Ordinal);
+
+        if (returnTypeIsGeneric && hasSourceParameter && sourceParameterIsGeneric)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature, methodSymbol, methodSymbol.Name);
             return null;
         }
 
-        if (methodSymbol.ReturnType.TypeKind != TypeKind.TypeParameter)
+        if (returnTypeIsGeneric)
+        {
+            return hasSourceParameter
+                ? new GenericTargetObjectFactoryWithSource(methodSymbol, ctx.Compilation)
+                : new GenericTargetObjectFactory(methodSymbol, ctx.Compilation);
+        }
+
+        if (hasSourceParameter)
+            return new GenericSourceObjectFactory(methodSymbol, ctx.Compilation);
+
+        ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature, methodSymbol, methodSymbol.Name);
+        return null;
+    }
+
+    private static ObjectFactory? BuildGenericSourceTargetObjectFactory(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol)
+    {
+        if (methodSymbol.Parameters.Length != 1)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature, methodSymbol, methodSymbol.Name);
             return null;
         }
 
-        return new GenericObjectFactory(methodSymbol, ctx.Compilation);
+        var typeParameterNames = methodSymbol.TypeParameters.Select(tp => tp.Name).ToList();
+        var sourceParameterIndex = typeParameterNames.IndexOf(methodSymbol.Parameters[0].Type.Name);
+        if (sourceParameterIndex == -1)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature, methodSymbol, methodSymbol.Name);
+            return null;
+        }
+
+        if (!typeParameterNames.Contains(methodSymbol.ReturnType.Name))
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature, methodSymbol, methodSymbol.Name);
+            return null;
+        }
+
+        return new GenericSourceTargetObjectFactory(methodSymbol, ctx.Compilation, sourceParameterIndex);
     }
 }
