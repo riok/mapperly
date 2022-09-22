@@ -15,16 +15,16 @@ public class ObjectFactoryCollection
         _objectFactories = objectFactories;
     }
 
-    public bool TryFindObjectFactory(ITypeSymbol typeToCreate, [NotNullWhen(true)] out ObjectFactory? objectFactory)
+    public bool TryFindObjectFactory(ITypeSymbol sourceType, ITypeSymbol targetType, [NotNullWhen(true)] out ObjectFactory? objectFactory)
     {
-        if (_concreteObjectFactories.TryGetValue(typeToCreate, out objectFactory))
+        if (_concreteObjectFactories.TryGetValue(targetType, out objectFactory))
             return true;
 
-        objectFactory = _objectFactories.FirstOrDefault(f => f.CanCreateType(typeToCreate));
+        objectFactory = _objectFactories.FirstOrDefault(f => f.CanCreateType(sourceType, targetType));
         if (objectFactory == null)
             return false;
 
-        _concreteObjectFactories[typeToCreate] = objectFactory;
+        _concreteObjectFactories[targetType] = objectFactory;
         return true;
     }
 }

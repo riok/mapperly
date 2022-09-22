@@ -6,15 +6,15 @@ If no parameterless constructor is available, Mapperly will try to map to the co
 Alternatively custom object factories can be used to construct or resolve target objects.
 To make use of object factories create an object factory method inside the mapper class
 and set the `Riok.Mapperly.Abstractions.ObjectFactoryAttribute` attribute.
-An object factory method needs to be parameterless and needs to return a non-void type.
-The first object factory with a matching return type is used to construct the desired type by Mapperly.
+An object factory method needs to return a non-void type. It may have a single parameter which is the source object.
+The first object factory with a matching signature is used to construct the desired type by Mapperly.
 
 :::info
 If an object factory is used for a certain type,
 Mapperly cannot map to init only properties or constructor parameters.
 :::
 
-```csharp
+```csharp title="Example"
 [Mapper]
 public partial class CarMapper
 {
@@ -28,8 +28,7 @@ public partial class CarMapper
 }
 ```
 
-The generated code will look like this:
-```csharp
+```csharp title="Generated code"
 public partial class CarMapper
 {
     public partial CarDto CarToCarDto(Car car)
@@ -68,4 +67,17 @@ public partial class CarMapper
 
     public partial CarDto CarToCarDto(Car car);
 }
+```
+
+## Supported object factory method signatures
+
+Mapperly supports several object factory method signatures.
+```csharp title="Supported object factory method signatures"
+TargetType CreateTargetType();
+TargetType CreateTargetType(SourceType source);
+TargetType CreateTargetType<S>(S source);
+T CreateTargetType<T>();
+T CreateTargetType<T>(SourceType source);
+TTarget CreateTargetType<TSource, TTarget>(TSource source);
+TTarget CreateTargetType<TTarget, TSource>(TSource source);
 ```
