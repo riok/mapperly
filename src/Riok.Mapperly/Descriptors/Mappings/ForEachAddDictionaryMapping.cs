@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.ObjectFactories;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -21,6 +22,7 @@ public class ForEachAddDictionaryMapping : MethodMapping
     private readonly TypeMapping _keyMapping;
     private readonly TypeMapping _valueMapping;
     private readonly bool _sourceHasCount;
+    private readonly ObjectFactory? _objectFactory;
     private readonly ITypeSymbol _typeToInstantiate;
 
     public ForEachAddDictionaryMapping(
@@ -29,12 +31,14 @@ public class ForEachAddDictionaryMapping : MethodMapping
         TypeMapping keyMapping,
         TypeMapping valueMapping,
         bool sourceHasCount,
-        ITypeSymbol? typeToInstantiate = null)
+        ITypeSymbol? typeToInstantiate = null,
+        ObjectFactory? objectFactory = null)
         : base(sourceType, targetType)
     {
         _keyMapping = keyMapping;
         _valueMapping = valueMapping;
         _sourceHasCount = sourceHasCount;
+        _objectFactory = objectFactory;
         _typeToInstantiate = typeToInstantiate ?? targetType;
     }
 
@@ -43,7 +47,11 @@ public class ForEachAddDictionaryMapping : MethodMapping
         var convertedKeyExpression = _keyMapping.Build(MemberAccess(LoopItemVariableName, KeyValueKeyPropertyName));
         var convertedValueExpression = _valueMapping.Build(MemberAccess(LoopItemVariableName, KeyValueValuePropertyName));
 
-        if (_sourceHasCount)
+        if (_objectFactory != null)
+        {
+            yield return DeclareLocalVariable(TargetVariableName, _objectFactory.CreateType(SourceType, _typeToInstantiate, source));
+        }
+        else if (_sourceHasCount)
         {
             yield return CreateInstance(TargetVariableName, _typeToInstantiate, MemberAccess(source, CountPropertyName));
         }

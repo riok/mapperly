@@ -173,6 +173,24 @@ public class DictionaryTest
     }
 
     [Fact]
+    public void DictionaryToCustomDictionaryWithObjectFactory()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[ObjectFactory] A CreateA() => new();"
+            + "partial A Map(IDictionary<string, int> source);",
+            "class A : Dictionary<string, int> {}");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(@"var target = CreateA();
+    foreach (var item in source)
+    {
+        target.Add(item.Key, item.Value);
+    }
+
+    return target;");
+    }
+
+    [Fact]
     public Task DictionaryToCustomDictionaryWithPrivateCtorShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(

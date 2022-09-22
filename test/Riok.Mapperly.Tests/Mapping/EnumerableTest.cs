@@ -372,6 +372,24 @@ public class EnumerableTest
     }
 
     [Fact]
+    public void EnumerableToCustomCollectionWithObjectFactory()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[ObjectFactory] B CreateB() => new();"
+            + "partial B Map(IEnumerable<long> source);",
+            "class B : ICollection<int> {}");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(@"var target = CreateB();
+    foreach (var item in source)
+    {
+        target.Add((int)item);
+    }
+
+    return target;");
+    }
+
+    [Fact]
     public Task ShouldUpgradeNullabilityInDisabledNullableContextInSelectClause()
     {
         var source = TestSourceBuilder.Mapping(
