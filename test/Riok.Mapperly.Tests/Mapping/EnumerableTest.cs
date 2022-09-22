@@ -39,7 +39,7 @@ public class EnumerableTest
         target[i] = source[i] == null ? throw new System.ArgumentNullException(nameof(source[i])) : source[i].Value;
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public class EnumerableTest
         target[i] = (int? )source[i];
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public class EnumerableTest
         target[i] = source[i] == null ? throw new System.ArgumentNullException(nameof(source[i])) : source[i].Value;
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class EnumerableTest
         target[i] = (int? )source[i];
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class EnumerableTest
         target[i] = source[i] == null ? throw new System.ArgumentNullException(nameof(source[i])) : source[i];
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -284,7 +284,7 @@ public class EnumerableTest
         target[i] = (int)source[i];
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -368,7 +368,7 @@ public class EnumerableTest
         target.Add((int)item);
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]

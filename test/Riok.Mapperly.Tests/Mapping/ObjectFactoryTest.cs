@@ -18,7 +18,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(@"var target = CreateB();
     target.StringValue = a.StringValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(@"var target = Create<B>();
     target.StringValue = a.StringValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(@"var target = CreateB();
     target.StringValue = a.StringValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(@"var target = CreateB<B>();
     target.StringValue = a.StringValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(@"var target = CreateB();
     target.StringValue = a.StringValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(@"var target = CreateB() ?? new B();
     target.StringValue = a.StringValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -118,7 +118,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(@"var target = CreateB() ?? throw new System.NullReferenceException(""The object factory CreateB returned null"");
     target.StringValue = a.StringValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(@"var target = Create<B>() ?? new B();
     target.StringValue = a.StringValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -150,7 +150,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(@"var target = Create<B>() ?? throw new System.NullReferenceException(""The object factory Create returned null"");
     target.StringValue = a.StringValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -171,7 +171,7 @@ public class ObjectFactoryTest
     public void InvalidSignatureParameters()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[ObjectFactory] B CreateB(int i) => new B();"
+            "[ObjectFactory] B CreateB(int i, int j) => new B();"
             + "partial B Map(A a);",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }");

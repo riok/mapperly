@@ -16,7 +16,7 @@ public class ObjectPropertyFlatteningTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B();
     target.MyValueId = source.Value.Id;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public class ObjectPropertyFlatteningTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B();
     target.ValueId = source.Value.Id;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class ObjectPropertyFlatteningTest
         target.ValueId = source.Value.Id;
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class ObjectPropertyFlatteningTest
         target.ValueName = source.Value.Name;
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class ObjectPropertyFlatteningTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B();
     target.Value.Id = source.MyValueId;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -170,7 +170,7 @@ public class ObjectPropertyFlatteningTest
     target.Value ??= new();
     target.Value.Id = source.MyValueId;
     target.Value.Id2 = source.MyValueId2;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -251,6 +251,6 @@ public class ObjectPropertyFlatteningTest
         }
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 }

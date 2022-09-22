@@ -16,7 +16,7 @@ public class ObjectPropertyTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B();
     target.StringValue = source.StringValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public class ObjectPropertyTest
             .Should()
             .HaveSingleMethodBody(@"var target = new A();
     target.StringValue = source.StringValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class ObjectPropertyTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(@"var target = new A();
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class ObjectPropertyTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B();
     target.Value = int.Parse(source.Value);
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -168,7 +168,7 @@ public class ObjectPropertyTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B();
     target.StringValue = source.StringValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public class ObjectPropertyTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B();
     target.StringValue2 = source.StringValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]

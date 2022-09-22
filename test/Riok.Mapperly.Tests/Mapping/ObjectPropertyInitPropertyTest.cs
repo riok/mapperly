@@ -17,7 +17,7 @@ public class ObjectPropertyInitPropertyTest
             .HaveSingleMethodBody(@"var target = new B()
     {StringValue = source.StringValue};
     target.IntValue = source.IntValue;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B()
     {StringValue = source.StringValue, IntValue = source.IntValue};
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -49,7 +49,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B()
     {Value = source.Value ?? throw new System.ArgumentNullException(nameof(source.Value))};
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B()
     {Value = source.Value ?? """"};
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B()
     {StringValue = source.StringValue2};
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B()
     {NestedValue = source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested?.Value))};
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B()
     {NestedValue = source.Nested.Value};
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]

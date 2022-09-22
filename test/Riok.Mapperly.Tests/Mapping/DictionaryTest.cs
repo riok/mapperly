@@ -29,7 +29,7 @@ public class DictionaryTest
         target.Add(item.Key, item.Value);
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class DictionaryTest
         target.Add(item.Key, (int)item.Value);
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class DictionaryTest
         target.Add(item.Key, item.Value == null ? throw new System.ArgumentNullException(nameof(item.Value)) : item.Value.Value);
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public class DictionaryTest
         target.Add(item.Key, item.Value == null ? default : item.Value.Value);
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public class DictionaryTest
         target.Add(item.Key, (int)item.Value);
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class DictionaryTest
         target.Add(item.Key, item.Value);
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class DictionaryTest
         target.Add(item.Key, item.Value);
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class DictionaryTest
         target.Add(item.Key, item.Value);
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public class DictionaryTest
         target.Add(item.Key, item.Value);
     }
 
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]

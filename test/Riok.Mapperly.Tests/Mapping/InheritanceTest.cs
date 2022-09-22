@@ -17,7 +17,7 @@ public class InheritanceTest
             .HaveSingleMethodBody(@"var target = new C();
     target.StringValue1 = source.StringValue1;
     target.StringValue2 = source.StringValue2;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class InheritanceTest
     target.StringValue2 = source.StringValue2;
     target.StringValue3 = source.StringValue3;
     target.StringValue4 = source.StringValue4;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class InheritanceTest
             .HaveSingleMethodBody(@"var target = new C();
     target.StringValue2 = source.StringValue2;
     target.StringValue1 = source.StringValue1;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class InheritanceTest
     target.StringValue3 = source.StringValue3;
     target.StringValue2 = source.StringValue2;
     target.StringValue1 = source.StringValue1;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public class InheritanceTest
             .HaveSingleMethodBody(@"var target = new D();
     target.StringValue2 = source.StringValue2;
     target.StringValue1 = source.StringValue1;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class InheritanceTest
             .HaveSingleMethodBody(@"var target = new C();
     target.StringValue1 = source.StringValue1;
     target.StringValue2 = source.StringValue2;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
@@ -138,7 +138,7 @@ public class InheritanceTest
     target.StringValue2 = source.StringValue2;
     target.StringValue3 = source.StringValue3;
     target.StringValue4 = source.StringValue4;
-    return target;".ReplaceLineEndings());
+    return target;");
     }
 
     [Fact]
