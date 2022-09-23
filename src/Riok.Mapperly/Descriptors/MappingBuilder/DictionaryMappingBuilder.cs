@@ -34,18 +34,19 @@ public static class DictionaryMappingBuilder
                 .Any(x => !x.IsStatic && !x.IsIndexer && !x.IsWriteOnly && x.Type.SpecialType == SpecialType.System_Int32);
 
             var targetDictionarySymbol = ctx.GetTypeSymbol(typeof(Dictionary<,>)).Construct(targetKeyType, targetValueType);
-            return new ForEachAddDictionaryMapping(ctx.Source, ctx.Target, keyMapping, valueMapping, sourceHasCount, targetDictionarySymbol);
+            ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var dictionaryObjectFactory);
+            return new ForEachAddDictionaryMapping(ctx.Source, ctx.Target, keyMapping, valueMapping, sourceHasCount, targetDictionarySymbol, dictionaryObjectFactory);
         }
 
         // the target is not a well known dictionary type
-        // it should have a parameterless public ctor
-        if (!ctx.Target.HasAccessibleParameterlessConstructor())
+        // it should have a an object factory or a parameterless public ctor
+        if (!ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory) && !ctx.Target.HasAccessibleParameterlessConstructor())
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, ctx.Target);
             return null;
         }
 
-        return new ForEachAddDictionaryMapping(ctx.Source, ctx.Target, keyMapping, valueMapping, false);
+        return new ForEachAddDictionaryMapping(ctx.Source, ctx.Target, keyMapping, valueMapping, false, objectFactory: objectFactory);
     }
 
     private static bool IsDictionaryType(MappingBuilderContext ctx, ITypeSymbol symbol)

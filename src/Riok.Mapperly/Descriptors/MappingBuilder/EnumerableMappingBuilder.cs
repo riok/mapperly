@@ -74,14 +74,14 @@ public static class EnumerableMappingBuilder
         MappingBuilderContext ctx,
         TypeMapping elementMapping)
     {
-        if (!ctx.Target.HasAccessibleParameterlessConstructor())
+        if (!ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory) && !ctx.Target.HasAccessibleParameterlessConstructor())
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, ctx.Target);
             return null;
         }
 
         return ctx.Target.ImplementsGeneric(ctx.GetTypeSymbol(typeof(ICollection<>)), out _)
-            ? new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping)
+            ? new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping, objectFactory)
             : null;
     }
 
