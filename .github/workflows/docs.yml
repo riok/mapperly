@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/configure-pages@v2
-      - uses: actions/setup-dotnet@v2
+      - uses: actions/setup-dotnet@v3.0.0
       - run: dotnet tool restore
       - run: dotnet build
       - uses: actions/setup-node@v3
