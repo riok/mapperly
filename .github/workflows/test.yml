@@ -17,3 +17,12 @@ jobs:
       - run: dotnet format --no-restore --verify-no-changes
       - run: dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
       - uses: codecov/codecov-action@v3
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3.0.1
+      - run: dotnet tool restore
+      - run: dotnet pack -c Release
+      - run: dotnet meziantou.validate-nuget-package ./src/Riok.Mapperly/bin/Release/*.nupkg
+      - run: dotnet validate package local ./src/Riok.Mapperly/bin/Release/*.nupkg

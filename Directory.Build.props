@@ -4,6 +4,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Version>0.0.1-dev</Version>
+    <Authors>Mapperly Contributors, Lars Tönz, Manuel Allenspach</Authors>
   </PropertyGroup>
 
 </Project>
