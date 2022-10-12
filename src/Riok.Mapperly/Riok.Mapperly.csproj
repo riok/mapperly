@@ -1,12 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <EnablePackageValidation>true</EnablePackageValidation>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageProjectUrl>https://riok.github.io/mapperly</PackageProjectUrl>
     <PackageId>Riok.Mapperly</PackageId>
-    <PackageLicense>Apache-2.0</PackageLicense>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageDescription>
       A .NET source generator for generating object mappings.
       No runtime reflection.
@@ -28,10 +29,11 @@
   <!-- This ensures the library will be packaged as a source generator when we use `dotnet pack` -->
   <ItemGroup>
     <None Include="../../README.md" Pack="true" PackagePath="\" />
-    <None Include="../../docs/static/img/logo.png" Pack="true" PackagePath="" />
+    <None Include="../../docs/static/img/logo.png" Pack="true" PackagePath="\" />
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(OutputPath)\$(AssemblyName).Abstractions.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(OutputPath)\$(AssemblyName).Abstractions.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
+    <None Include="$(OutputPath)\$(AssemblyName).Abstractions.xml" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
   </ItemGroup>
 
 </Project>
