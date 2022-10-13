@@ -11,7 +11,7 @@ Even better, the generated code is perfectly readable, allowing you to verify th
 
 ## Documentation
 
-The documentation is available [here](https://riok.github.io/mapperly/docs/getting-started/installation).
+The documentation is available [here](https://mapperly.riok.app/docs/getting-started/installation).
 
 ## Quickstart
 
@@ -43,7 +43,7 @@ var dto = mapper.CarToCarDto(car);
 dto.NumberOfSeats.Should().Be(10);
 ```
 
-[Read the docs](https://riok.github.io/mapperly/docs/getting-started/installation) for any further information.
+[Read the docs](https://mapperly.riok.app/docs/getting-started/installation) for any further information.
 
 ## License
 

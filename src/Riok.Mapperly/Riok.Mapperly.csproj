@@ -5,7 +5,7 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <PackageProjectUrl>https://riok.github.io/mapperly</PackageProjectUrl>
+    <PackageProjectUrl>https://mapperly.riok.app</PackageProjectUrl>
     <PackageId>Riok.Mapperly</PackageId>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageDescription>
