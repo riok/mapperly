@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
   title: 'Mapperly',
   tagline: 'A .NET source generator for generating object mappings. No runtime reflection. Inspired by MapStruct.',
-  url: process.env.DOCUSAURUS_URL || 'https://riok.github.io',
+  url: process.env.DOCUSAURUS_URL || 'https://mapperly.riok.app',
   baseUrl: process.env.DOCUSAURUS_BASE_URL || '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'throw',
