@@ -48,7 +48,6 @@ jobs:
       - run: npm run build
         working-directory: ./docs
         env:
-          DOCUSAURUS_BASE_URL: '/mapperly/'
           MAPPERLY_VERSION: ${{ inputs.version }}
       - uses: actions/upload-pages-artifact@v1
         if: ${{ inputs.deploy }}
