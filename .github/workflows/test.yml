@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-dotnet@v3.0.2
+      - uses: actions/setup-dotnet@v3.0.3
       - run: dotnet tool restore
       - run: dotnet build /p:TreatWarningsAsErrors=true
       - run: dotnet format --no-restore --verify-no-changes
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-dotnet@v3.0.2
+      - uses: actions/setup-dotnet@v3.0.3
       - run: dotnet tool restore
       - run: dotnet pack -c Release
       - run: dotnet meziantou.validate-nuget-package ./src/Riok.Mapperly/bin/Release/*.nupkg
