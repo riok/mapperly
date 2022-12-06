@@ -1,4 +1,4 @@
-{
+﻿{
   Diagnostics: [
     {
       Id: RMG021,
