@@ -7,22 +7,56 @@ on:
       - '**'
 
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-dotnet@v3.0.3
       - run: dotnet tool restore
+      - run: dotnet format --verify-no-changes
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3.0.3
       - run: dotnet build /p:TreatWarningsAsErrors=true
-      - run: dotnet format --no-restore --verify-no-changes
       - run: dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
       - uses: codecov/codecov-action@v3
   package:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-dotnet@v3.0.3
       - run: dotnet tool restore
-      - run: dotnet pack -c Release
-      - run: dotnet meziantou.validate-nuget-package ./src/Riok.Mapperly/bin/Release/*.nupkg
-      - run: dotnet validate package local ./src/Riok.Mapperly/bin/Release/*.nupkg
+      - run: dotnet pack -c Release -o ./artifacts /p:Version="0.0.1-dev.$GITHUB_RUN_ID"
+      - run: dotnet meziantou.validate-nuget-package ./artifacts/*.nupkg
+      - run: dotnet validate package local ./artifacts/*.nupkg
+      - uses: actions/upload-artifact@v2
+        with:
+          name: mapperly-nupkg
+          path: artifacts/*.nupkg
+  integration-test:
+    needs: package
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet:
+          - net7.0
+          - net6.0
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v2
+        with:
+          name: mapperly-nupkg
+          path: localnuget
+
+      # use nupkg artifact for integration tests instead of project references
+      - run: dotnet nuget add source "$(pwd)/localnuget"
+      - run: dotnet remove ./test/Riok.Mapperly.IntegrationTests reference ./src/Riok.Mapperly/Riok.Mapperly.csproj ./src/Riok.Mapperly.Abstractions/Riok.Mapperly.Abstractions.csproj
+      - run: dotnet add ./test/Riok.Mapperly.IntegrationTests package Riok.Mapperly --version "0.0.1-dev.$GITHUB_RUN_ID"
+      - run: dotnet build --framework ${{ matrix.dotnet }}
+        working-directory: ./test/Riok.Mapperly.IntegrationTests
+      - run: dotnet test --no-build --framework ${{ matrix.dotnet }}
+        working-directory: ./test/Riok.Mapperly.IntegrationTests
