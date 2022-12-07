@@ -1,15 +1,15 @@
-{
+﻿{
   Diagnostics: [
     {
-      Id: RMG010,
-      Title: Cannot map from write only property,
+      Id: RMG009,
+      Title: Cannot map to read only property,
       Severity: Info,
       WarningLevel: 1,
       Location: : (10,4)-(10,28),
       Description: ,
       HelpLink: ,
-      MessageFormat: Cannot map from write only property {0}.{1} of type {2} to property {3}.{4} of type {5},
-      Message: Cannot map from write only property A.StringValue of type string to property B.StringValue of type string,
+      MessageFormat: Cannot map property {0}.{1} of type {2} to read only property {3}.{4} of type {5},
+      Message: Cannot map property A.StringValue of type string to read only property B.StringValue of type string,
       Category: Mapper
     },
     {

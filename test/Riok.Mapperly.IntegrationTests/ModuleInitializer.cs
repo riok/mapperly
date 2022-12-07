@@ -10,6 +10,6 @@ public static class ModuleInitializer
 #pragma warning restore CA2255
     public static void Init()
     {
-        VerifierSettings.DerivePathInfo((file, _, type, method) => new(Path.Join(Path.GetDirectoryName(file), "_snapshots"), type.Name, method.Name));
+        DerivePathInfo((file, _, type, method) => new(Path.Join(Path.GetDirectoryName(file), "_snapshots"), type.Name, method.Name));
     }
 }

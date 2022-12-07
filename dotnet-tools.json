@@ -25,6 +25,12 @@
       "commands": [
         "meziantou.validate-nuget-package"
       ]
+    },
+    "verify.tool": {
+      "version": "0.3.0",
+      "commands": [
+        "dotnet-verify"
+      ]
     }
   }
 }
