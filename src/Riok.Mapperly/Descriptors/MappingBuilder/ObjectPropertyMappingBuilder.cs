@@ -16,6 +16,11 @@ public static class ObjectPropertyMappingBuilder
 
     public static void BuildMappingBody(ObjectPropertyMappingBuilderContext ctx)
     {
+        var propertyNameComparer = ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy ==
+                       PropertyNameMappingStrategy.CaseSensitive
+            ? StringComparer.Ordinal
+            : StringComparer.OrdinalIgnoreCase;
+
         foreach (var targetProperty in ctx.TargetProperties.Values)
         {
             if (ctx.PropertyConfigsByRootTargetName.Remove(targetProperty.Name, out var propertyConfigs))
@@ -35,6 +40,7 @@ public static class ObjectPropertyMappingBuilder
                 ctx.Mapping.SourceType,
                 MemberPathCandidateBuilder.BuildMemberPathCandidates(targetProperty.Name),
                 ctx.IgnoredSourcePropertyNames,
+                propertyNameComparer,
                 out var sourcePropertyPath))
             {
                 ctx.BuilderContext.ReportDiagnostic(

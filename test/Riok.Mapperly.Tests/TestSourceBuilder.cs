@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Riok.Mapperly.Abstractions;
 
 namespace Riok.Mapperly.Tests;
 
@@ -38,12 +39,17 @@ public partial class Mapper
 
     private static string BuildAttribute(TestSourceBuilderOptions options)
     {
-        var attrs = new[]
+        var attrs = new List<string>
         {
             Attribute(options.UseDeepCloning),
             Attribute(options.ThrowOnMappingNullMismatch),
-            Attribute(options.ThrowOnPropertyMappingNullMismatch),
+            Attribute(options.ThrowOnPropertyMappingNullMismatch)
         };
+
+        if (options.PropertyNameMappingStrategy != PropertyNameMappingStrategy.CaseSensitive)
+        {
+            attrs.Add($"{nameof(MapperAttribute.PropertyNameMappingStrategy)} = {nameof(PropertyNameMappingStrategy)}.{options.PropertyNameMappingStrategy}");
+        }
 
         return $"[Mapper({string.Join(", ", attrs)})]";
     }

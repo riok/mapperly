@@ -37,3 +37,27 @@ public partial class CarMapper
     public partial CarDto ToDto(Car car);
 }
 ```
+
+## Property name mapping strategy
+
+By default, property names are matched using a case sensitive strategy. If all properties differ only in casing, for example ModelName on the source and modelName on the target, the `[MapperAttribute]` can be used with the `PropertyNameMappingStrategy` option.
+
+```csharp
+// highlight-start
+[Mapper(PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseInsensitive)]
+// highlight-end
+public partial class CarMapper
+{
+    public partial CarDto ToDto(Car car);
+}
+
+public class Car
+{
+    public string ModelName { get; set; }
+}
+
+public class CarDto
+{
+    public string modelName { get; set; }
+}
+```
