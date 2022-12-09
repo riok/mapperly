@@ -1,3 +1,5 @@
+using Riok.Mapperly.Abstractions;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 [UsesVerify]
@@ -184,6 +186,40 @@ public class ObjectPropertyTest
             .HaveSingleMethodBody(@"var target = new B();
     target.StringValue2 = source.StringValue;
     return target;");
+    }
+
+    [Fact]
+    public void WithPropertyNameMappingStrategyCaseInsensitive()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions
+            {
+                PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseInsensitive
+            },
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string stringvalue { get; set; } }");
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(@"var target = new B();
+    target.stringvalue = source.StringValue;
+    return target;");
+    }
+
+    [Fact]
+    public Task WithPropertyNameMappingStrategyCaseSensitive()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions
+            {
+                PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseSensitive
+            },
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string stringvalue { get; set; } }");
+
+        return TestHelper.VerifyGenerator(source);
     }
 
     [Fact]

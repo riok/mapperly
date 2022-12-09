@@ -7,6 +7,11 @@ namespace Riok.Mapperly.Abstractions;
 public sealed class MapperAttribute : Attribute
 {
     /// <summary>
+    /// Strategy on how to match mapping property names.
+    /// </summary>
+    public PropertyNameMappingStrategy PropertyNameMappingStrategy { get; set; } = PropertyNameMappingStrategy.CaseSensitive;
+
+    /// <summary>
     /// The default enum mapping strategy.
     /// Can be overwritten on specific enums via mapping method configurations.
     /// </summary>
