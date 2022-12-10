@@ -174,4 +174,34 @@ public class ObjectPropertyInitPropertyTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+
+    [Fact]
+    public void RequiredProperty()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string StringValue { get; init; } public int IntValue { get; set; } }",
+            "class B { public required string StringValue { get; set; } public int IntValue { get; set; } }");
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(@"var target = new B()
+    {StringValue = source.StringValue};
+    target.IntValue = source.IntValue;
+    return target;");
+    }
+
+    [Fact]
+    public Task RequiredPropertySourceNotFoundShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string StringValue2 { get; init; } public int IntValue { get; set; } }",
+            "class B { public required string StringValue { get; init; } public int IntValue { get; set; } }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

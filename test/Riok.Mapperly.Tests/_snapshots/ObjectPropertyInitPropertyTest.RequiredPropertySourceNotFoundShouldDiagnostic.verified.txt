@@ -1,0 +1,28 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG023,
+      Title: Source property was not found for required target property,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (10,4)-(10,28),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Required property {0} on mapping target type was not found on the mapping source type {1},
+      Message: Required property StringValue on mapping target type was not found on the mapping source type A,
+      Category: Mapper
+    },
+    {
+      Id: RMG020,
+      Title: Source property is not mapped to any target property,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (10,4)-(10,28),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},
+      Message: The property StringValue2 on the mapping source type A is not mapped to any property on the mapping target type B,
+      Category: Mapper
+    }
+  ]
+}
