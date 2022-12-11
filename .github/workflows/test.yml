@@ -33,7 +33,7 @@ jobs:
       - run: dotnet pack -c Release -o ./artifacts /p:Version="0.0.1-dev.$GITHUB_RUN_ID"
       - run: dotnet meziantou.validate-nuget-package ./artifacts/*.nupkg
       - run: dotnet validate package local ./artifacts/*.nupkg
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: mapperly-nupkg
           path: artifacts/*.nupkg
