@@ -47,3 +47,11 @@ RMG021  | Mapper   | Warning  | Ignored source property not found
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
 RMG022  | Mapper   | Error    | Invalid object factory signature
+
+## Release 2.6
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|--------------------
+RMG023  | Mapper   | Error    | Mapping source property for a required target property not found
