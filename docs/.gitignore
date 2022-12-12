@@ -23,3 +23,6 @@ yarn-error.log*
 /docs/99-api/
 # keep the category file which produces the generated overview
 !/docs/99-api/_category_.yml
+
+# generated data files
+/src/data/generated/

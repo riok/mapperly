@@ -1,0 +1,26 @@
+import AnalyzerRules from '@site/src/components/AnalyzerRules';
+
+# Analyzer diagnostics
+
+Mapperly emits several diagnostics:
+<AnalyzerRules></AnalyzerRules>
+
+## Editorconfig
+
+The severity of these diagnostics can be customized via an `.editorconfig` file:
+
+```editorconfig title=".editorconfig"
+dotnet_diagnostic.{RuleID}.severity = error
+dotnet_diagnostic.RMG020.severity = error
+```
+
+## Strict mappings
+
+To enforce strict mappings
+(all source properties have to be mapped to a target property and all target properties have to be mapped from a source property)
+set the following two editorconfig settings:
+
+```editorconfig title=".editorconfig"
+dotnet_diagnostic.RMG012.severity = error # Unmapped target property
+dotnet_diagnostic.RMG020.severity = error # Unmapped source property
+```
