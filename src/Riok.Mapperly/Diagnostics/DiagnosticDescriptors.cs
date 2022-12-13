@@ -2,8 +2,6 @@ using Microsoft.CodeAnalysis;
 
 namespace Riok.Mapperly.Diagnostics;
 
-// if adjusted, these files may need adjustments as well:
-// analyzer-diagnostics.md, AnalyzerReleases.Shipped.md and AnalyzerReleases.Unshipped.md
 // cannot use target-typed new: https://github.com/dotnet/roslyn-analyzers/issues/5828
 internal static class DiagnosticDescriptors
 {
