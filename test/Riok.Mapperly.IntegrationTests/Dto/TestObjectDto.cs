@@ -18,6 +18,12 @@ public class TestObjectDto
 
     public int IntInitOnlyValue { get; init; }
 
+#if NET7_0_OR_GREATER
+    public required int RequiredValue { get; init; }
+#else
+    public int RequiredValue { get; init; }
+#endif
+
     public string StringValue { get; set; } = string.Empty;
 
     public string RenamedStringValue2 { get; set; } = string.Empty;
