@@ -32,6 +32,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
+      - run: sudo apt update && sudo apt -y install zipmerge # zipmerge is used to merge the multi target nupkg
       - run: |
           npm i \
           semantic-release@19.0.2 \
