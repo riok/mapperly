@@ -24,6 +24,8 @@ public abstract class BaseMapperTest
             IntValue = 10,
             EnumName = TestEnum.Value10,
             EnumValue = TestEnum.Value10,
+            IntInitOnlyValue = 3,
+            RequiredValue = 4,
             NestedNullable = new TestObjectNested { IntValue = 100, },
             StringValue = "fooBar",
             SubObject = new InheritanceSubObject { BaseIntValue = 1, SubIntValue = 2, },
@@ -43,11 +45,12 @@ public abstract class BaseMapperTest
                 {
                     EnumValue = TestEnum.Value10,
                     EnumName = TestEnum.Value30,
-                    EnumReverseStringValue = nameof(TestEnumDtoByValue.DtoValue3)
+                    EnumReverseStringValue = nameof(TestEnumDtoByValue.DtoValue3),
+                    RequiredValue = 4,
                 },
             NullableReadOnlyObjectCollection =
                 new[] { new TestObjectNested { IntValue = 10 }, new TestObjectNested { IntValue = 20 }, },
-            SourceTargetSameObjectType = new TestObject(8) { IntValue = 99, }
+            SourceTargetSameObjectType = new TestObject(8) { IntValue = 99, RequiredValue = 98, }
         };
     }
 }
