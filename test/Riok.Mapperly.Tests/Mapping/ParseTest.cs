@@ -1,3 +1,6 @@
+using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 public class ParseTest
@@ -51,5 +54,18 @@ public class ParseTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody("return A.Parse(source);");
+    }
+
+    [Fact]
+    public void ParseMappingDisabledShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "string",
+            "DateTime",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.ParseMethod),
+            "class A { public A(string x) {} }");
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
     }
 }

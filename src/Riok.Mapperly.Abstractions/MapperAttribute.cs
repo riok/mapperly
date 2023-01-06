@@ -46,4 +46,18 @@ public sealed class MapperAttribute : Attribute
     /// With <c><see cref="UseDeepCloning"/>=false</c>, the array and each person is cloned.
     /// </summary>
     public bool UseDeepCloning { get; set; }
+
+    /// <summary>
+    /// Enabled conversions which Mapperly automatically implements.
+    /// By default all supported type conversions are enabled.
+    /// <example>
+    /// Eg. to disable all automatically implemented conversions:<br />
+    /// <c>EnabledConversions = MappingConversionType.None</c>
+    /// </example>
+    /// <example>
+    /// Eg. to disable <c>ToString()</c> method calls:<br />
+    /// <c>EnabledConversions = MappingConversionType.All &amp; ~MappingConversionType.ToStringMethod</c>
+    /// </example>
+    /// </summary>
+    public MappingConversionType EnabledConversions { get; set; } = MappingConversionType.All;
 }

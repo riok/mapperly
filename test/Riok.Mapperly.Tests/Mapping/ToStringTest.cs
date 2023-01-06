@@ -1,3 +1,6 @@
+using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 public class ToStringTest
@@ -46,5 +49,18 @@ public class ToStringTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody("return source.ToString();");
+    }
+
+    [Fact]
+    public void ToStringMappingDisabledShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "string",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.ToStringMethod),
+            "class A {}");
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
     }
 }

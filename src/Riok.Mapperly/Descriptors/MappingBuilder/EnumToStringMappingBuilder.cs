@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
 
@@ -8,6 +9,9 @@ public static class EnumToStringMappingBuilder
 {
     public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
+        if (!ctx.IsConversionEnabled(MappingConversionType.EnumToString))
+            return null;
+
         if (ctx.Target.SpecialType != SpecialType.System_String || !ctx.Source.IsEnum())
             return null;
 

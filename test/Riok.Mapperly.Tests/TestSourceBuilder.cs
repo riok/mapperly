@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using Riok.Mapperly.Abstractions;
 
 namespace Riok.Mapperly.Tests;
 
@@ -39,27 +38,31 @@ public partial class Mapper
 
     private static string BuildAttribute(TestSourceBuilderOptions options)
     {
-        var attrs = new List<string>
+        var attrs = new[]
         {
             Attribute(options.UseDeepCloning),
             Attribute(options.ThrowOnMappingNullMismatch),
-            Attribute(options.ThrowOnPropertyMappingNullMismatch)
+            Attribute(options.ThrowOnPropertyMappingNullMismatch),
+            Attribute(options.EnabledConversions),
+            Attribute(options.PropertyNameMappingStrategy),
         };
-
-        if (options.PropertyNameMappingStrategy != PropertyNameMappingStrategy.CaseSensitive)
-        {
-            attrs.Add($"{nameof(MapperAttribute.PropertyNameMappingStrategy)} = {nameof(PropertyNameMappingStrategy)}.{options.PropertyNameMappingStrategy}");
-        }
 
         return $"[Mapper({string.Join(", ", attrs)})]";
     }
 
+    private static string Attribute<T>(T value, [CallerArgumentExpression("value")] string? expression = null)
+        where T : Enum
+        => Attribute(Convert.ChangeType(value, Enum.GetUnderlyingType(typeof(T))).ToString() ?? throw new ArgumentNullException(), expression);
+
     private static string Attribute(bool value, [CallerArgumentExpression("value")] string? expression = null)
+        => Attribute(value ? "true" : "false", expression);
+
+    private static string Attribute(string value, [CallerArgumentExpression("value")] string? expression = null)
     {
         if (expression == null)
             throw new ArgumentNullException(nameof(expression));
 
-        return $"{expression.Split(".").Last()} = {(value ? "true" : "false")}";
+        return $"{expression.Split(".").Last()} = {value}";
     }
 
     public static string MapperWithBodyAndTypes(string body, params string[] types)

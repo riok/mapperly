@@ -1,3 +1,6 @@
+using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 public class CastTest
@@ -343,5 +346,29 @@ public class CastTest
             .Should()
             .HaveSingleMethodBody(@"var target = new B();
     return target;");
+    }
+
+    [Fact]
+    public void ImplicitCastMappingDisabledShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "byte",
+            "int",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.ImplicitCast));
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
+    }
+
+    [Fact]
+    public void ExplicitCastMappingDisabledShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "int",
+            "byte",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.ExplicitCast));
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
     }
 }
