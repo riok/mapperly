@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
 
@@ -10,6 +11,9 @@ public static class ParseMappingBuilder
 
     public static StaticMethodMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
+        if (!ctx.IsConversionEnabled(MappingConversionType.ParseMethod))
+            return null;
+
         if (ctx.Source.SpecialType != SpecialType.System_String)
             return null;
 

@@ -19,6 +19,9 @@ public class SimpleMappingBuilderContext
 
     public MapperAttribute MapperConfiguration => _builder.MapperConfiguration;
 
+    public bool IsConversionEnabled(MappingConversionType conversionType)
+        => MapperConfiguration.EnabledConversions.HasFlag(conversionType);
+
     public INamedTypeSymbol GetTypeSymbol(Type type)
         => Compilation.GetTypeByMetadataName(type.FullName ?? throw new InvalidOperationException("Could not get name of type " + type))
             ?? throw new InvalidOperationException("Could not get type " + type.FullName);

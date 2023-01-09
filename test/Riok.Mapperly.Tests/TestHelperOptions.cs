@@ -8,21 +8,21 @@ public record TestHelperOptions(
     LanguageVersion LanguageVersion = LanguageVersion.Default,
     IReadOnlySet<DiagnosticSeverity>? AllowedDiagnostics = null)
 {
-    public static readonly TestHelperOptions Default = new();
+    public static readonly TestHelperOptions AllowDiagnostics = new();
 
-    public static readonly TestHelperOptions DisabledNullable = Default with { NullableOption = NullableContextOptions.Disable };
+    public static readonly TestHelperOptions DisabledNullable = AllowDiagnostics with { NullableOption = NullableContextOptions.Disable };
 
-    public static readonly TestHelperOptions NoDiagnostics = Default with
+    public static readonly TestHelperOptions NoDiagnostics = AllowDiagnostics with
     {
         AllowedDiagnostics = new HashSet<DiagnosticSeverity>(),
     };
 
-    public static readonly TestHelperOptions AllowAllDiagnostics = Default with
+    public static readonly TestHelperOptions AllowAllDiagnostics = AllowDiagnostics with
     {
         AllowedDiagnostics = Enum.GetValues<DiagnosticSeverity>().ToHashSet(),
     };
 
-    public static readonly TestHelperOptions AllowInfoDiagnostics = Default with
+    public static readonly TestHelperOptions AllowInfoDiagnostics = AllowDiagnostics with
     {
         AllowedDiagnostics = new HashSet<DiagnosticSeverity>
         {

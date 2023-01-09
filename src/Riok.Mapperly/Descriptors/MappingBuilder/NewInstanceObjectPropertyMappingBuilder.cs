@@ -21,6 +21,9 @@ public static class NewInstanceObjectPropertyMappingBuilder
         if (ctx.Target is not INamedTypeSymbol namedTarget || namedTarget.Constructors.All(x => !x.IsAccessible()))
             return null;
 
+        if (ctx.Source.IsEnum() || ctx.Target.IsEnum())
+            return null;
+
         return new NewInstanceObjectPropertyMapping(ctx.Source, ctx.Target.NonNullable());
     }
 

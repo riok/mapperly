@@ -20,7 +20,8 @@ public static class EnumMappingBuilder
         // one is an enum, other may be an underlying type (eg. int)
         if (!sourceIsEnum || !targetIsEnum)
         {
-            return ctx.FindOrBuildMapping(sourceEnumType ?? ctx.Source, targetEnumType ?? ctx.Target) is { } delegateMapping
+            return ctx.IsConversionEnabled(MappingConversionType.ExplicitCast)
+                    && ctx.FindOrBuildMapping(sourceEnumType ?? ctx.Source, targetEnumType ?? ctx.Target) is { } delegateMapping
                 ? new CastMapping(ctx.Source, ctx.Target, delegateMapping)
                 : null;
         }
@@ -28,6 +29,9 @@ public static class EnumMappingBuilder
         // since enums are immutable they can be directly assigned if they are of the same type
         if (SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, ctx.Target))
             return new DirectAssignmentMapping(ctx.Source);
+
+        if (!ctx.IsConversionEnabled(MappingConversionType.EnumToEnum))
+            return null;
 
         // map enums by strategy
         var config = ctx.GetConfigurationOrDefault<MapEnumAttribute>();

@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
 
@@ -8,6 +9,9 @@ public static class CtorMappingBuilder
 {
     public static CtorMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
+        if (!ctx.IsConversionEnabled(MappingConversionType.Constructor))
+            return null;
+
         if (ctx.Target is not INamedTypeSymbol namedTarget)
             return null;
 

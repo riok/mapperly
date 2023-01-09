@@ -9,6 +9,8 @@ Riok.Mapperly.Abstractions.MapEnumAttribute.IgnoreCase.set -> void
 Riok.Mapperly.Abstractions.MapEnumAttribute.MapEnumAttribute(Riok.Mapperly.Abstractions.EnumMappingStrategy strategy) -> void
 Riok.Mapperly.Abstractions.MapEnumAttribute.Strategy.get -> Riok.Mapperly.Abstractions.EnumMappingStrategy
 Riok.Mapperly.Abstractions.MapperAttribute
+Riok.Mapperly.Abstractions.MapperAttribute.EnabledConversions.get -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MapperAttribute.EnabledConversions.set -> void
 Riok.Mapperly.Abstractions.MapperAttribute.EnumMappingIgnoreCase.get -> bool
 Riok.Mapperly.Abstractions.MapperAttribute.EnumMappingIgnoreCase.set -> void
 Riok.Mapperly.Abstractions.MapperAttribute.EnumMappingStrategy.get -> Riok.Mapperly.Abstractions.EnumMappingStrategy
@@ -45,3 +47,14 @@ Riok.Mapperly.Abstractions.ObjectFactoryAttribute.ObjectFactoryAttribute() -> vo
 Riok.Mapperly.Abstractions.PropertyNameMappingStrategy
 Riok.Mapperly.Abstractions.PropertyNameMappingStrategy.CaseInsensitive = 1 -> Riok.Mapperly.Abstractions.PropertyNameMappingStrategy
 Riok.Mapperly.Abstractions.PropertyNameMappingStrategy.CaseSensitive = 0 -> Riok.Mapperly.Abstractions.PropertyNameMappingStrategy
+Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.All = -1 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.Constructor = 1 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.EnumToEnum = 128 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.EnumToString = 64 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.ExplicitCast = 4 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.ImplicitCast = 2 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.None = 0 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.ParseMethod = 8 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.StringToEnum = 32 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.ToStringMethod = 16 -> Riok.Mapperly.Abstractions.MappingConversionType

@@ -1,3 +1,6 @@
+using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 [UsesVerify]
@@ -243,5 +246,83 @@ enum E2 {A = 100, B, C}
         nameof(E1.C) => E1.C,
         _ => (E1)System.Enum.Parse(typeof(E1), source, false),
     };");
+    }
+
+    [Fact]
+    public void EnumToEnumMappingAndExplicitCastMappingDisabledShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "E2",
+            "E1",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.EnumToEnum, MappingConversionType.ExplicitCast),
+            "enum E1 {A, B, C}",
+            "enum E2 {A, B, C}");
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
+    }
+
+    [Fact]
+    public void EnumToEnumMappingDisabledShouldUseExplicitCastMapping()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "E2",
+            "E1",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.EnumToEnum),
+            "enum E1 {A, B, C}",
+            "enum E2 {A, B, C}");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody("return (E1)source;");
+    }
+
+    [Fact]
+    public void StringToEnumMappingAndParseMappingDisabledShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByName)] partial E1 ToE1(string source);",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.StringToEnum, MappingConversionType.ParseMethod),
+            "enum E1 {A, B, C}");
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
+    }
+
+    [Fact]
+    public void StringToEnumMappingDisabledShouldUseParseMethodMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByName)] partial E1 ToE1(string source);",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.StringToEnum),
+            "enum E1 {A, B, C}");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody("return (E1)int.Parse(source);");
+    }
+
+    [Fact]
+    public void EnumToStringMappingAndToStringMethodMappingDisabledShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "E1",
+            "string",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.EnumToString, MappingConversionType.ToStringMethod),
+            "enum E1 {A, B, C}");
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
+    }
+
+    [Fact]
+    public void EnumToStringMappingDisabledShouldUseToStringMapping()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "E1",
+            "string",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.EnumToString),
+            "enum E1 {A, B, C}");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody("return (string)source.ToString();");
     }
 }

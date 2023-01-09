@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilder;
@@ -7,6 +8,9 @@ public static class SpecialTypeMappingBuilder
 {
     public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
+        if (!ctx.IsConversionEnabled(MappingConversionType.ExplicitCast))
+            return null;
+
         return ctx.Target.SpecialType switch
         {
             SpecialType.System_Object when ctx.MapperConfiguration.UseDeepCloning
