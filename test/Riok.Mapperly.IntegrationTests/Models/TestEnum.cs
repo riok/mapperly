@@ -1,8 +1,9 @@
-namespace Riok.Mapperly.IntegrationTests.Models;
-
-public enum TestEnum : byte
+namespace Riok.Mapperly.IntegrationTests.Models
 {
-    Value10 = 10,
-    Value20 = 20,
-    Value30 = 30,
+    public enum TestEnum : byte
+    {
+        Value10 = 10,
+        Value20 = 20,
+        Value30 = 30,
+    }
 }
