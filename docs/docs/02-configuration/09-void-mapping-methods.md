@@ -6,7 +6,9 @@ If an existing object instance should be used as target, you can define the mapp
 [Mapper]
 public partial class CarMapper
 {
+    // highlight-start
     public partial void CarToCarDto(Car car, CarDto dto);
+    // highlight-end
 }
 ```
 

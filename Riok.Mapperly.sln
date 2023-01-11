@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riok.Mapperly.Abstractions"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riok.Mapperly.Tests", "test\Riok.Mapperly.Tests\Riok.Mapperly.Tests.csproj", "{284E2122-CE48-4A5A-A045-3A3F941DA5C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riok.Mapperly.Abstractions.Test", "test\Riok.Mapperly.Abstractions.Test\Riok.Mapperly.Abstractions.Test.csproj", "{C3C40A0A-168F-4A66-B9F9-FC80D2F26306}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riok.Mapperly.Abstractions.Tests", "test\Riok.Mapperly.Abstractions.Tests\Riok.Mapperly.Abstractions.Tests.csproj", "{C3C40A0A-168F-4A66-B9F9-FC80D2F26306}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

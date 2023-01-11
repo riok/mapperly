@@ -7,15 +7,14 @@ public record DiagnosticMatcher(
     string? Message = null)
 {
     public bool Matches(Diagnostic diagnostic)
+        => Descriptor.Equals(diagnostic.Descriptor);
+
+    public void EnsureMatches(Diagnostic diagnostic)
     {
-        if (!diagnostic.Descriptor.Equals(Descriptor))
-            return false;
+        diagnostic.Descriptor.Id
+            .Should()
+            .Be(Descriptor.Id);
 
-        if (Message != null)
-        {
-            diagnostic.GetMessage().Should().Be(Message);
-        }
-
-        return true;
+        Message?.Should().Be(diagnostic.GetMessage(), $"Message for descriptor id {Descriptor.Id} does not match");
     }
 }

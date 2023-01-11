@@ -5,7 +5,7 @@
       Title: Source property is not mapped to any target property,
       Severity: Info,
       WarningLevel: 1,
-      Location: : (10,4)-(10,63),
+      Location: : (11,4)-(11,63),
       Description: ,
       HelpLink: ,
       MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},

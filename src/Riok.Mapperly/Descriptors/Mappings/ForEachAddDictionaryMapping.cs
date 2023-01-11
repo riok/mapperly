@@ -19,8 +19,8 @@ public class ForEachAddDictionaryMapping : MethodMapping
     private const string KeyValueValuePropertyName = "Value";
     private const string CountPropertyName = "Count";
 
-    private readonly TypeMapping _keyMapping;
-    private readonly TypeMapping _valueMapping;
+    private readonly ITypeMapping _keyMapping;
+    private readonly ITypeMapping _valueMapping;
     private readonly bool _sourceHasCount;
     private readonly ObjectFactory? _objectFactory;
     private readonly ITypeSymbol _typeToInstantiate;
@@ -28,8 +28,8 @@ public class ForEachAddDictionaryMapping : MethodMapping
     public ForEachAddDictionaryMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        TypeMapping keyMapping,
-        TypeMapping valueMapping,
+        ITypeMapping keyMapping,
+        ITypeMapping valueMapping,
         bool sourceHasCount,
         ITypeSymbol? typeToInstantiate = null,
         ObjectFactory? objectFactory = null)
@@ -42,18 +42,18 @@ public class ForEachAddDictionaryMapping : MethodMapping
         _typeToInstantiate = typeToInstantiate ?? targetType;
     }
 
-    public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
+    public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
-        var convertedKeyExpression = _keyMapping.Build(MemberAccess(LoopItemVariableName, KeyValueKeyPropertyName));
-        var convertedValueExpression = _valueMapping.Build(MemberAccess(LoopItemVariableName, KeyValueValuePropertyName));
+        var convertedKeyExpression = _keyMapping.Build(ctx.WithSource(MemberAccess(LoopItemVariableName, KeyValueKeyPropertyName)));
+        var convertedValueExpression = _valueMapping.Build(ctx.WithSource(MemberAccess(LoopItemVariableName, KeyValueValuePropertyName)));
 
         if (_objectFactory != null)
         {
-            yield return DeclareLocalVariable(TargetVariableName, _objectFactory.CreateType(SourceType, _typeToInstantiate, source));
+            yield return DeclareLocalVariable(TargetVariableName, _objectFactory.CreateType(SourceType, _typeToInstantiate, ctx.Source));
         }
         else if (_sourceHasCount)
         {
-            yield return CreateInstance(TargetVariableName, _typeToInstantiate, MemberAccess(source, CountPropertyName));
+            yield return CreateInstance(TargetVariableName, _typeToInstantiate, MemberAccess(ctx.Source, CountPropertyName));
         }
         else
         {
@@ -64,7 +64,7 @@ public class ForEachAddDictionaryMapping : MethodMapping
         yield return ForEachStatement(
             VarIdentifier,
             Identifier(LoopItemVariableName),
-            source,
+            ctx.Source,
             Block(ExpressionStatement(Invocation(addMethod, convertedKeyExpression, convertedValueExpression))));
         yield return ReturnVariable(TargetVariableName);
     }

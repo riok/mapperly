@@ -13,8 +13,8 @@ public class DirectAssignmentMapping : TypeMapping
     {
     }
 
-    public override ExpressionSyntax Build(ExpressionSyntax source)
-        => source;
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
+        => ctx.Source;
 
     public override bool IsSynthetic => true;
 }

@@ -16,7 +16,7 @@ public static class NewInstanceObjectPropertyMappingBuilder
             return null;
 
         if (ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory))
-            return new NewInstanceObjectFactoryPropertyMapping(ctx.Source, ctx.Target.NonNullable(), objectFactory);
+            return new NewInstanceObjectFactoryPropertyMapping(ctx.Source, ctx.Target.NonNullable(), objectFactory, ctx.MapperConfiguration.UseReferenceHandling);
 
         if (ctx.Target is not INamedTypeSymbol namedTarget || namedTarget.Constructors.All(x => !x.IsAccessible()))
             return null;
@@ -24,7 +24,7 @@ public static class NewInstanceObjectPropertyMappingBuilder
         if (ctx.Source.IsEnum() || ctx.Target.IsEnum())
             return null;
 
-        return new NewInstanceObjectPropertyMapping(ctx.Source, ctx.Target.NonNullable());
+        return new NewInstanceObjectPropertyMapping(ctx.Source, ctx.Target.NonNullable(), ctx.MapperConfiguration.UseReferenceHandling);
     }
 
     public static void BuildMappingBody(MappingBuilderContext ctx, NewInstanceObjectPropertyMapping mapping)
@@ -162,17 +162,14 @@ public static class NewInstanceObjectPropertyMappingBuilder
             return false;
         }
 
-        var mapperConstructorAttribute = ctx.BuilderContext.GetTypeSymbol(typeof(MapperConstructorAttribute));
-        var obsoleteAttribute = ctx.BuilderContext.GetTypeSymbol(typeof(ObsoleteAttribute));
-
         // attributed ctor is prio 1
         // parameterless ctor is prio 2
         // then by descending parameter count
         // ctors annotated with [Obsolete] are considered last unless they have a MapperConstructor attribute set
         var ctorCandidates = namedTargetType.Constructors
             .Where(ctor => ctor.IsAccessible())
-            .OrderByDescending(x => x.HasAttribute(mapperConstructorAttribute))
-            .ThenBy(x => x.HasAttribute(obsoleteAttribute))
+            .OrderByDescending(x => x.HasAttribute(ctx.BuilderContext.Types.MapperConstructorAttribute))
+            .ThenBy(x => x.HasAttribute(ctx.BuilderContext.Types.ObsoleteAttribute))
             .ThenByDescending(x => x.Parameters.Length == 0)
             .ThenByDescending(x => x.Parameters.Length);
         foreach (var ctorCandidate in ctorCandidates)
@@ -183,7 +180,7 @@ public static class NewInstanceObjectPropertyMappingBuilder
                 out mappedTargetPropertyNames,
                 out var constructorParameterMappings))
             {
-                if (ctorCandidate.HasAttribute(mapperConstructorAttribute))
+                if (ctorCandidate.HasAttribute(ctx.BuilderContext.Types.MapperConstructorAttribute))
                 {
                     ctx.BuilderContext.ReportDiagnostic(
                         DiagnosticDescriptors.CannotMapToConfiguredConstructor,

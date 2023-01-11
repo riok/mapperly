@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 
 namespace Riok.Mapperly.Tests;
@@ -22,16 +23,17 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions HaveDiagnostic(DiagnosticMatcher diagnosticMatcher)
     {
-        _mapper.Diagnostics.FirstOrDefault(diagnosticMatcher.Matches)
-            .Should()
-            .NotBeNull();
+        var diag = _mapper.Diagnostics.FirstOrDefault(diagnosticMatcher.Matches);
+        diag.Should().NotBeNull($"No diagnostic with id {diagnosticMatcher.Descriptor.Id} found");
+        diagnosticMatcher.EnsureMatches(diag!);
         return this;
     }
 
-    public MapperGenerationResultAssertions HaveSingleMethodBody(string mapperMethodBody)
+    public MapperGenerationResultAssertions HaveSingleMethodBody([StringSyntax(StringSyntax.CSharp)] string mapperMethodBody)
     {
-        _mapper.MethodBodies.Single()
+        _mapper.Methods.Single()
             .Value
+            .Body
             .Should()
             .Be(mapperMethodBody.ReplaceLineEndings());
         return this;
@@ -39,16 +41,16 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions HaveMethodCount(int count)
     {
-        _mapper.MethodBodies.Should().HaveCount(count);
+        _mapper.Methods.Should().HaveCount(count);
         return this;
     }
 
     public MapperGenerationResultAssertions AllMethodsHaveBody(string mapperMethodBody)
     {
         mapperMethodBody = mapperMethodBody.ReplaceLineEndings();
-        foreach (var methodBody in _mapper.MethodBodies.Values)
+        foreach (var method in _mapper.Methods.Values)
         {
-            methodBody.Should().Be(mapperMethodBody);
+            method.Body.Should().Be(mapperMethodBody);
         }
 
         return this;
@@ -58,18 +60,25 @@ public class MapperGenerationResultAssertions
     {
         foreach (var methodName in methodNames)
         {
-            _mapper.MethodBodies.Keys.Should().Contain(methodName);
+            _mapper.Methods.Keys.Should().Contain(methodName);
         }
 
         return this;
     }
 
-    public MapperGenerationResultAssertions HaveMethodBody(string methodName, string mapperMethodBody)
+    public MapperGenerationResultAssertions HaveOnlyMethods(params string[] methodNames)
     {
-        _mapper.MethodBodies[methodName].Should().Be(mapperMethodBody.ReplaceLineEndings());
+        HaveMethods(methodNames);
+        HaveMethodCount(methodNames.Length);
         return this;
     }
 
-    public MapperGenerationResultAssertions HaveMapMethodBody(string mapperMethodBody)
+    public MapperGenerationResultAssertions HaveMethodBody(string methodName, [StringSyntax(StringSyntax.CSharp)] string mapperMethodBody)
+    {
+        _mapper.Methods[methodName].Body.Should().Be(mapperMethodBody.ReplaceLineEndings(), $"Method: {methodName}");
+        return this;
+    }
+
+    public MapperGenerationResultAssertions HaveMapMethodBody([StringSyntax(StringSyntax.CSharp)] string mapperMethodBody)
         => HaveMethodBody(TestSourceBuilder.DefaultMapMethodName, mapperMethodBody);
 }

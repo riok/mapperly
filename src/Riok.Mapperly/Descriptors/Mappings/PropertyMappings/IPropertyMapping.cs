@@ -10,5 +10,5 @@ public interface IPropertyMapping
 {
     PropertyPath SourcePath { get; }
 
-    ExpressionSyntax Build(ExpressionSyntax source);
+    ExpressionSyntax Build(TypeMappingBuildContext ctx);
 }

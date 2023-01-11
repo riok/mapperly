@@ -27,18 +27,18 @@ public class PropertyAssignmentMapping : IPropertyAssignmentMapping
     public PropertyPath TargetPath { get; }
 
     public StatementSyntax Build(
-        ExpressionSyntax sourceAccess,
+        TypeMappingBuildContext ctx,
         ExpressionSyntax targetAccess)
     {
-        return ExpressionStatement(BuildExpression(sourceAccess, targetAccess));
+        return ExpressionStatement(BuildExpression(ctx, targetAccess));
     }
 
     public ExpressionSyntax BuildExpression(
-        ExpressionSyntax sourceAccess,
+        TypeMappingBuildContext ctx,
         ExpressionSyntax? targetAccess)
     {
         var targetPropertyAccess = TargetPath.BuildAccess(targetAccess);
-        var mappedValue = _mapping.Build(sourceAccess);
+        var mappedValue = _mapping.Build(ctx);
 
         // target.Property = mappedValue;
         return AssignmentExpression(

@@ -1,3 +1,5 @@
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 [UsesVerify]
@@ -99,7 +101,7 @@ public partial class MyMapper
 
         var mapper = TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics);
         mapper.Should()
-            .HaveMethodCount(2)
+            .HaveOnlyMethods("Map", "Map2")
             .HaveMethodBody("Map", @"var target = new B();
     target.StringValue = source.StringValue;
     return target;")
@@ -119,25 +121,29 @@ public partial class MyMapper
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMethods("MapToB", "MapToB1");
+            .HaveOnlyMethods("MapToB", "MapToB1");
     }
 
     [Fact]
-    public Task WithInvalidSignatureShouldDiagnostic()
+    public void WithInvalidSignatureShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial string ToString(T source, string format);");
 
-        return TestHelper.VerifyGenerator(source);
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new DiagnosticMatcher(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "ToString has an unsupported mapping method signature"));
     }
 
     [Fact]
-    public Task WithInvalidGenericSignatureShouldDiagnostic()
+    public void WithInvalidGenericSignatureShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial string ToString<T>(T source);");
 
-        return TestHelper.VerifyGenerator(source);
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new DiagnosticMatcher(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "ToString has an unsupported mapping method signature"));
     }
 
     [Fact]

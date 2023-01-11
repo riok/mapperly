@@ -12,14 +12,14 @@ public class LinqEnumerableMapping : TypeMapping
 {
     private const string LambdaParamName = "x";
 
-    private readonly TypeMapping _elementMapping;
+    private readonly ITypeMapping _elementMapping;
     private readonly IMethodSymbol? _selectMethod;
     private readonly IMethodSymbol? _collectMethod;
 
     public LinqEnumerableMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        TypeMapping elementMapping,
+        ITypeMapping elementMapping,
         IMethodSymbol? selectMethod,
         IMethodSymbol? collectMethod)
         : base(sourceType, targetType)
@@ -29,21 +29,21 @@ public class LinqEnumerableMapping : TypeMapping
         _collectMethod = collectMethod;
     }
 
-    public override ExpressionSyntax Build(ExpressionSyntax source)
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         ExpressionSyntax mappedSource;
 
         // Select / Map if needed
         if (_selectMethod != null)
         {
-            var sourceMapExpression = _elementMapping.Build(IdentifierName(LambdaParamName));
+            var sourceMapExpression = _elementMapping.Build(ctx.WithSource(LambdaParamName));
             var convertLambda = SimpleLambdaExpression(Parameter(Identifier(LambdaParamName)))
                 .WithExpressionBody(sourceMapExpression);
-            mappedSource = StaticInvocation(_selectMethod, source, convertLambda);
+            mappedSource = StaticInvocation(_selectMethod, ctx.Source, convertLambda);
         }
         else
         {
-            mappedSource = _elementMapping.Build(source);
+            mappedSource = _elementMapping.Build(ctx);
         }
 
         return _collectMethod == null

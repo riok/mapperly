@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 
@@ -9,11 +8,9 @@ public static class ObjectFactoryBuilder
 {
     public static ObjectFactoryCollection ExtractObjectFactories(SimpleMappingBuilderContext ctx, ITypeSymbol mapperSymbol)
     {
-        var objectFactoryAttribute = ctx.GetTypeSymbol(typeof(ObjectFactoryAttribute));
-
         var objectFactories = mapperSymbol.GetMembers()
             .OfType<IMethodSymbol>()
-            .Where(m => m.HasAttribute(objectFactoryAttribute))
+            .Where(m => m.HasAttribute(ctx.Types.ObjectFactoryAttribute))
             .Select(x => BuildObjectFactory(ctx, x))
             .WhereNotNull()
             .ToList();

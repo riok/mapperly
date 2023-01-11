@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
+using Riok.Mapperly.Emit.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -12,7 +13,13 @@ public abstract class ObjectPropertyMapping : MethodMapping, IPropertyAssignment
 {
     private readonly HashSet<IPropertyAssignmentMapping> _mappings = new();
 
-    protected ObjectPropertyMapping(ITypeSymbol sourceType, ITypeSymbol targetType) : base(sourceType, targetType)
+    protected ObjectPropertyMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+        : base(sourceType, targetType)
+    {
+    }
+
+    protected ObjectPropertyMapping(MethodParameter sourceParameter, ITypeSymbol targetType)
+        : base(sourceParameter, targetType)
     {
     }
 
@@ -30,6 +37,6 @@ public abstract class ObjectPropertyMapping : MethodMapping, IPropertyAssignment
     public bool HasPropertyMapping(IPropertyAssignmentMapping mapping)
         => _mappings.Contains(mapping);
 
-    protected IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source, ExpressionSyntax target)
-        => _mappings.Select(x => x.Build(source, target));
+    protected IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx, ExpressionSyntax target)
+        => _mappings.Select(x => x.Build(ctx, target));
 }

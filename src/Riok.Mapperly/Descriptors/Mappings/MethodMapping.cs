@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Emit;
+using Riok.Mapperly.Emit.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -12,11 +13,23 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public abstract class MethodMapping : TypeMapping
 {
-    private const string DefaultSourceParamName = "source";
+    protected const string DefaultReferenceHandlerParameterName = "refHandler";
+    private const string DefaultSourceParameterName = "source";
+
+    private const int SourceParameterIndex = 0;
+    private const int ReferenceHandlerParameterIndex = 1;
+
     private string? _methodName;
 
-    protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType) : base(sourceType, targetType)
+    protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+        : this(new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType), targetType)
     {
+    }
+
+    protected MethodMapping(MethodParameter sourceParameter, ITypeSymbol targetType)
+        : base(sourceParameter.Type, targetType)
+    {
+        SourceParameter = sourceParameter;
     }
 
     protected Accessibility Accessibility { get; set; } = Accessibility.Private;
@@ -31,51 +44,43 @@ public abstract class MethodMapping : TypeMapping
         set => _methodName = value;
     }
 
-    protected string MappingSourceParameterName
-    {
-        get;
-        set;
-    } = DefaultSourceParamName;
+    protected MethodParameter SourceParameter { get; }
 
-    public override ExpressionSyntax Build(ExpressionSyntax source)
-        => Invocation(MethodName, source);
+    protected MethodParameter? ReferenceHandlerParameter { get; set; }
 
-    public MethodDeclarationSyntax BuildMethod(SourceEmitterContext context)
+    protected virtual ITypeSymbol? ReturnType => TargetType;
+
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
+        => Invocation(MethodName, SourceParameter.WithArgument(ctx.Source), ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
+
+    public MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
     {
         TypeSyntax returnType = ReturnType == null
             ? PredefinedType(Token(SyntaxKind.VoidKeyword))
             : IdentifierName(TargetType.ToDisplayString());
 
+        var typeMappingBuildContext = new TypeMappingBuildContext(SourceParameter.Name, ReferenceHandlerParameter?.Name);
+
         return MethodDeclaration(returnType, Identifier(MethodName))
-            .WithModifiers(TokenList(BuildModifiers(context.IsStatic)))
+            .WithModifiers(TokenList(BuildModifiers(ctx.IsStatic)))
             .WithParameterList(BuildParameterList())
-            .WithBody(Block(BuildBody(IdentifierName(MappingSourceParameterName))));
+            .WithBody(Block(BuildBody(typeMappingBuildContext)));
     }
 
-    public abstract IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source);
+    public abstract IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx);
 
     internal void SetMethodNameIfNeeded(Func<MethodMapping, string> methodNameBuilder)
     {
         _methodName ??= methodNameBuilder(this);
     }
 
-    protected virtual ITypeSymbol? ReturnType => TargetType;
-
-    protected virtual IEnumerable<ParameterSyntax> BuildParameters()
+    internal virtual void EnableReferenceHandling(INamedTypeSymbol iReferenceHandlerType)
     {
-        return new[]
-        {
-            Parameter(Identifier(MappingSourceParameterName))
-                .WithType(IdentifierName(SourceType.ToDisplayString()))
-                .WithModifiers(TokenList(BuildParameterModifiers())),
-        };
+        ReferenceHandlerParameter ??= new MethodParameter(ReferenceHandlerParameterIndex, DefaultReferenceHandlerParameterName, iReferenceHandlerType);
     }
 
-    private IEnumerable<SyntaxToken> BuildParameterModifiers()
-    {
-        if (IsExtensionMethod)
-            yield return Token(SyntaxKind.ThisKeyword);
-    }
+    protected virtual ParameterListSyntax BuildParameterList()
+        => ParameterList(IsExtensionMethod, SourceParameter, ReferenceHandlerParameter);
 
     private IEnumerable<SyntaxToken> BuildModifiers(bool isStatic)
     {
@@ -86,10 +91,5 @@ public abstract class MethodMapping : TypeMapping
 
         if (IsPartial)
             yield return Token(SyntaxKind.PartialKeyword);
-    }
-
-    private ParameterListSyntax BuildParameterList()
-    {
-        return ParameterList(CommaSeparatedList(BuildParameters()));
     }
 }

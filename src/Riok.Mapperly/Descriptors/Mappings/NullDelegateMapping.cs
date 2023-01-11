@@ -13,13 +13,13 @@ public class NullDelegateMapping : TypeMapping
 {
     private const string NullableValueProperty = "Value";
 
-    private readonly TypeMapping _delegateMapping;
+    private readonly ITypeMapping _delegateMapping;
     private readonly NullFallbackValue _nullFallbackValue;
 
     public NullDelegateMapping(
         ITypeSymbol nullableSourceType,
         ITypeSymbol nullableTargetType,
-        TypeMapping delegateMapping,
+        ITypeMapping delegateMapping,
         NullFallbackValue nullFallbackValue)
         : base(nullableSourceType, nullableTargetType)
     {
@@ -37,18 +37,18 @@ public class NullDelegateMapping : TypeMapping
 
     public override bool IsSynthetic { get; }
 
-    public override ExpressionSyntax Build(ExpressionSyntax source)
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         if (_delegateMapping.SourceType.IsNullable())
-            return _delegateMapping.Build(source);
+            return _delegateMapping.Build(ctx);
 
         if (!SourceType.IsNullable())
         {
             // if the target type is a nullable value type, there needs to be an additional cast
             // eg. int => int? needs to be casted.
             return TargetType.IsNullableValueType()
-                ? CastExpression(IdentifierName(TargetType.ToDisplayString()), _delegateMapping.Build(source))
-                : _delegateMapping.Build(source);
+                ? CastExpression(IdentifierName(TargetType.ToDisplayString()), _delegateMapping.Build(ctx))
+                : _delegateMapping.Build(ctx);
         }
 
         // source is nullable and the mapping method cannot handle nulls,
@@ -57,12 +57,12 @@ public class NullDelegateMapping : TypeMapping
         // or for nullable value types:
         // source == null ? <null-substitute> : Map(source.Value)
         var sourceValue = SourceType.IsNullableValueType()
-            ? MemberAccess(source, NullableValueProperty)
-            : source;
+            ? MemberAccess(ctx.Source, NullableValueProperty)
+            : ctx.Source;
 
         return ConditionalExpression(
-            IsNull(source),
-            NullSubstitute(TargetType.NonNullable(), source, _nullFallbackValue),
-            _delegateMapping.Build(sourceValue));
+            IsNull(ctx.Source),
+            NullSubstitute(TargetType.NonNullable(), ctx.Source, _nullFallbackValue),
+            _delegateMapping.Build(ctx.WithSource(sourceValue)));
     }
 }

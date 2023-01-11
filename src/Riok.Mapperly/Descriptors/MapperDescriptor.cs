@@ -6,7 +6,7 @@ namespace Riok.Mapperly.Descriptors;
 public class MapperDescriptor
 {
 
-    private readonly List<TypeMapping> _mappings = new();
+    private readonly List<ITypeMapping> _mappings = new();
 
     public MapperDescriptor(ClassDeclarationSyntax syntax, bool isStatic)
     {
@@ -23,6 +23,6 @@ public class MapperDescriptor
     public IEnumerable<MethodMapping> MethodTypeMappings
         => _mappings.OfType<MethodMapping>();
 
-    public void AddTypeMapping(TypeMapping mapping)
+    public void AddTypeMapping(ITypeMapping mapping)
         => _mappings.Add(mapping);
 }

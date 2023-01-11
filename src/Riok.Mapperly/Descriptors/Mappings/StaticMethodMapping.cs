@@ -16,6 +16,6 @@ public class StaticMethodMapping : TypeMapping
         _method = method;
     }
 
-    public override ExpressionSyntax Build(ExpressionSyntax source)
-        => StaticInvocation(_method, source);
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
+        => StaticInvocation(_method, ctx.Source);
 }

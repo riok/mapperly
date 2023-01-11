@@ -22,12 +22,7 @@ public class SimpleMappingBuilderContext
     public bool IsConversionEnabled(MappingConversionType conversionType)
         => MapperConfiguration.EnabledConversions.HasFlag(conversionType);
 
-    public INamedTypeSymbol GetTypeSymbol(Type type)
-        => Compilation.GetTypeByMetadataName(type.FullName ?? throw new InvalidOperationException("Could not get name of type " + type))
-            ?? throw new InvalidOperationException("Could not get type " + type.FullName);
-
-    public bool IsType(ITypeSymbol symbol, Type type)
-        => SymbolEqualityComparer.Default.Equals(symbol, GetTypeSymbol(type));
+    public WellKnownTypes Types => _builder.WellKnownTypes;
 
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? location, params object[] messageArgs)
         => ReportDiagnostic(descriptor, location?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(), messageArgs);

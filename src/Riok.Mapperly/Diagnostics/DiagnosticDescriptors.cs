@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 
 namespace Riok.Mapperly.Diagnostics;
 
@@ -184,7 +185,23 @@ internal static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor RequiredPropertyNotMapped = new DiagnosticDescriptor(
         "RMG023",
         "Source property was not found for required target property",
-         "Required property {0} on mapping target type was not found on the mapping source type {1}",
+        "Required property {0} on mapping target type was not found on the mapping source type {1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true);
+
+    public static readonly DiagnosticDescriptor ReferenceHandlerParameterWrongType = new DiagnosticDescriptor(
+        "RMG024",
+        "The reference handler parameter is not of the correct type",
+        "The reference handler parameter of {0}.{1} needs to be of type {2} but is {3}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true);
+
+    public static readonly DiagnosticDescriptor ReferenceHandlingNotEnabled = new DiagnosticDescriptor(
+        "RMG025",
+        "To use reference handling it needs to be enabled on the mapper attribute",
+        $"{{0}}.{{1}} uses reference handling, but it is not enabled on the mapper attribute, to enable reference handling set {nameof(MapperAttribute.UseReferenceHandling)} to true",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true);

@@ -16,13 +16,13 @@ public class ForEachAddEnumerableMapping : MethodMapping
     private const string LoopItemVariableName = "item";
     private const string AddMethodName = "Add";
 
-    private readonly TypeMapping _elementMapping;
+    private readonly ITypeMapping _elementMapping;
     private readonly ObjectFactory? _objectFactory;
 
     public ForEachAddEnumerableMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        TypeMapping elementMapping,
+        ITypeMapping elementMapping,
         ObjectFactory? objectFactory)
         : base(sourceType, targetType)
     {
@@ -30,18 +30,18 @@ public class ForEachAddEnumerableMapping : MethodMapping
         _objectFactory = objectFactory;
     }
 
-    public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
+    public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         yield return _objectFactory == null
             ? CreateInstance(TargetVariableName, TargetType)
-            : DeclareLocalVariable(TargetVariableName, _objectFactory.CreateType(SourceType, TargetType, source));
+            : DeclareLocalVariable(TargetVariableName, _objectFactory.CreateType(SourceType, TargetType, ctx.Source));
 
-        var convertedSourceItemExpression = _elementMapping.Build(IdentifierName(LoopItemVariableName));
+        var convertedSourceItemExpression = _elementMapping.Build(ctx.WithSource(LoopItemVariableName));
         var addMethod = MemberAccess(TargetVariableName, AddMethodName);
         yield return ForEachStatement(
             VarIdentifier,
             Identifier(LoopItemVariableName),
-            source,
+            ctx.Source,
             Block(ExpressionStatement(Invocation(addMethod, convertedSourceItemExpression))));
         yield return ReturnVariable(TargetVariableName);
     }

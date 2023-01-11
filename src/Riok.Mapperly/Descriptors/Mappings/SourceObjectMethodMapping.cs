@@ -17,6 +17,6 @@ public class SourceObjectMethodMapping : TypeMapping
         _methodName = methodName;
     }
 
-    public override ExpressionSyntax Build(ExpressionSyntax source)
-        => InvocationExpression(MemberAccess(source, _methodName));
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
+        => InvocationExpression(MemberAccess(ctx.Source, _methodName));
 }

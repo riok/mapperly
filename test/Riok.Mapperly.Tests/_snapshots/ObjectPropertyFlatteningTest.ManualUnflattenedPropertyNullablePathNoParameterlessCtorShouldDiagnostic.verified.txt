@@ -5,7 +5,7 @@
       Title: No accessible parameterless constructor found,
       Severity: Error,
       WarningLevel: 0,
-      Location: : (10,4)-(10,68),
+      Location: : (11,4)-(11,68),
       Description: ,
       HelpLink: ,
       MessageFormat: {0} has no accessible parameterless constructor,
