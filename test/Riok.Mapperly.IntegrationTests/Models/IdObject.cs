@@ -1,6 +1,7 @@
-namespace Riok.Mapperly.IntegrationTests.Models;
-
-public class IdObject
+namespace Riok.Mapperly.IntegrationTests.Models
 {
-    public int IdValue { get; set; }
+    public class IdObject
+    {
+        public int IdValue { get; set; }
+    }
 }

@@ -66,10 +66,25 @@ jobs:
 
       # use nupkg artifact for integration tests instead of project references
       - run: dotnet nuget add source "$(pwd)/artifacts"
-      - run: dotnet remove ./test/Riok.Mapperly.IntegrationTests reference ./src/Riok.Mapperly/Riok.Mapperly.csproj ./src/Riok.Mapperly.Abstractions/Riok.Mapperly.Abstractions.csproj
-      - run: dotnet add package Riok.Mapperly --version "0.0.1-dev.$GITHUB_RUN_ID" --no-restore
-        working-directory: ./test/Riok.Mapperly.IntegrationTests
-      - run: dotnet build -f net${{ matrix.dotnet }} -p:MapperlyIntegrationTestsTargetFramework=net${{ matrix.dotnet }}
+      - run: dotnet build -f net${{ matrix.dotnet }} -p:MapperlyIntegrationTestsTargetFramework=net${{ matrix.dotnet }} -p:MapperlyNugetPackageVersion=0.0.1-dev.$GITHUB_RUN_ID
         working-directory: ./test/Riok.Mapperly.IntegrationTests
       - run: dotnet test --no-build -f net${{ matrix.dotnet }}
+        working-directory: ./test/Riok.Mapperly.IntegrationTests
+  integration-test-net-framework:
+    needs: package
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      # delete global.json since we want to use custom versions here
+      - run: rm global.json
+      - uses: actions/download-artifact@v3
+        with:
+          name: mapperly-nupkg
+          path: artifacts
+
+      # use nupkg artifact for integration tests instead of project references
+      - run: dotnet nuget add source "$(Get-Location)/artifacts"
+      - run: dotnet build -f net48 -p:MapperlyIntegrationTestsTargetFramework=net48 -p:MapperlyNugetPackageVersion=0.0.1-dev.$env:GITHUB_RUN_ID
+        working-directory: ./test/Riok.Mapperly.IntegrationTests
+      - run: dotnet test --no-build -f net48
         working-directory: ./test/Riok.Mapperly.IntegrationTests

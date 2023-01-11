@@ -1,6 +1,7 @@
-namespace Riok.Mapperly.IntegrationTests.Dto;
-
-public class IdObjectDto
+namespace Riok.Mapperly.IntegrationTests.Dto
 {
-    public int IdValue { get; set; }
+    public class IdObjectDto
+    {
+        public int IdValue { get; set; }
+    }
 }

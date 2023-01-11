@@ -1,6 +1,7 @@
-namespace Riok.Mapperly.IntegrationTests.Dto;
-
-public class TestObjectNestedDto
+namespace Riok.Mapperly.IntegrationTests.Dto
 {
-    public int IntValue { get; set; }
+    public class TestObjectNestedDto
+    {
+        public int IntValue { get; set; }
+    }
 }

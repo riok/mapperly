@@ -1,6 +1,7 @@
-namespace Riok.Mapperly.IntegrationTests.Models;
-
-public class InheritanceSubObject : InheritanceBaseObject
+namespace Riok.Mapperly.IntegrationTests.Models
 {
-    public int SubIntValue { get; set; }
+    public class InheritanceSubObject : InheritanceBaseObject
+    {
+        public int SubIntValue { get; set; }
+    }
 }
