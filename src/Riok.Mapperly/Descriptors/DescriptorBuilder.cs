@@ -11,7 +11,7 @@ namespace Riok.Mapperly.Descriptors;
 
 public class DescriptorBuilder
 {
-    private delegate TypeMapping? MappingBuilder(MappingBuilderContext context);
+    private delegate ITypeMapping? MappingBuilder(MappingBuilderContext context);
 
     private static readonly IReadOnlyCollection<MappingBuilder> _mappingBuilders = new MappingBuilder[]
     {
@@ -40,15 +40,10 @@ public class DescriptorBuilder
     // Usually these are derived from the mapper attribute or default values.
     private readonly Dictionary<Type, Attribute> _defaultConfigurations = new();
 
-    // this includes mappings to build and already built mappings
-    private readonly Dictionary<(ITypeSymbol SourceType, ITypeSymbol TargetType), TypeMapping> _mappings = new(new MappingTupleEqualityComparer());
-
-    // additional user defined mappings
-    // (with same signature as already defined mappings but with different names)
-    private readonly List<TypeMapping> _extraMappings = new();
-
     // queue of mappings which don't have the body built yet
-    private readonly Queue<(TypeMapping, MappingBuilderContext)> _mappingsToBuildBody = new();
+    private readonly Queue<(ITypeMapping, MappingBuilderContext)> _mappingsToBuildBody = new();
+
+    private readonly MappingCollection _mappings = new();
 
     private readonly MethodNameBuilder _methodNameBuilder = new();
 
@@ -61,6 +56,7 @@ public class DescriptorBuilder
         _mapperSymbol = mapperSymbol;
         _context = sourceContext;
         Compilation = compilation;
+        WellKnownTypes = new WellKnownTypes(Compilation);
         _mapperDescriptor = new MapperDescriptor(mapperSyntax, mapperSymbol.IsStatic);
         MapperConfiguration = Configure();
     }
@@ -68,6 +64,8 @@ public class DescriptorBuilder
     internal IReadOnlyDictionary<Type, Attribute> DefaultConfigurations => _defaultConfigurations;
 
     internal Compilation Compilation { get; }
+
+    internal WellKnownTypes WellKnownTypes { get; }
 
     internal ObjectFactoryCollection ObjectFactories { get; private set; } = ObjectFactoryCollection.Empty;
 
@@ -94,6 +92,7 @@ public class DescriptorBuilder
         ExtractUserMappings();
         BuildMappingBodies();
         BuildMappingMethodNames();
+        BuildReferenceHandlingParameters();
         AddMappingsToDescriptor();
         return _mapperDescriptor;
     }
@@ -103,28 +102,36 @@ public class DescriptorBuilder
         var ctx = new SimpleMappingBuilderContext(this);
         ObjectFactories = ObjectFactoryBuilder.ExtractObjectFactories(ctx, _mapperSymbol);
     }
+    public ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+        => _mappings.FindMapping(sourceType, targetType);
 
-    public TypeMapping? FindOrBuildMapping(
+    public ITypeMapping? FindOrBuildMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType)
     {
-        if (FindMapping(sourceType, targetType) is { } foundMapping)
+        if (_mappings.FindMapping(sourceType, targetType) is { } foundMapping)
             return foundMapping;
 
         if (BuildDelegateMapping(null, sourceType, targetType) is not { } mapping)
             return null;
 
-        AddMapping(mapping);
+        _mappings.AddMapping(mapping);
         return mapping;
     }
 
-    public TypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    public ITypeMapping? BuildMappingWithUserSymbol(
+        ISymbol userSymbol,
+        ITypeSymbol sourceType,
+        ITypeSymbol targetType)
     {
-        _mappings.TryGetValue((sourceType, targetType), out var mapping);
+        if (BuildDelegateMapping(userSymbol, sourceType, targetType) is not { } mapping)
+            return null;
+
+        _mappings.AddMapping(mapping);
         return mapping;
     }
 
-    public TypeMapping? BuildDelegateMapping(
+    public ITypeMapping? BuildDelegateMapping(
         ISymbol? userSymbol,
         ITypeSymbol sourceType,
         ITypeSymbol targetType)
@@ -150,13 +157,13 @@ public class DescriptorBuilder
         var defaultContext = new SimpleMappingBuilderContext(this);
         foreach (var userMapping in UserMethodMappingBuilder.ExtractUserMappings(defaultContext, _mapperSymbol))
         {
-            AddUserMapping(userMapping);
+            _mappings.AddMapping(userMapping);
 
             var ctx = new MappingBuilderContext(
                 this,
                 userMapping.SourceType,
                 userMapping.TargetType,
-                (userMapping as IUserMapping)?.Method);
+                userMapping.Method);
             _mappingsToBuildBody.Enqueue((userMapping, ctx));
         }
     }
@@ -188,60 +195,31 @@ public class DescriptorBuilder
         }
     }
 
-    private void AddMapping(TypeMapping mapping)
-        => _mappings.Add((mapping.SourceType, mapping.TargetType), mapping);
-
-    private void AddUserMapping(TypeMapping mapping)
-    {
-        if (mapping.CallableByOtherMappings && FindMapping(mapping.SourceType, mapping.TargetType) is null)
-        {
-            AddMapping(mapping);
-            return;
-        }
-
-        _extraMappings.Add(mapping);
-    }
-
     private void BuildMappingMethodNames()
     {
-        foreach (var methodMapping in _mappings.Values.Concat(_extraMappings).OfType<MethodMapping>())
+        foreach (var methodMapping in _mappings.MethodMappings)
         {
             methodMapping.SetMethodNameIfNeeded(_methodNameBuilder.Build);
+        }
+    }
+
+    private void BuildReferenceHandlingParameters()
+    {
+        if (!MapperConfiguration.UseReferenceHandling)
+            return;
+
+        foreach (var methodMapping in _mappings.MethodMappings)
+        {
+            methodMapping.EnableReferenceHandling(WellKnownTypes.IReferenceHandler);
         }
     }
 
     private void AddMappingsToDescriptor()
     {
         // add generated mappings to the mapper
-        foreach (var mapping in _mappings.Values)
+        foreach (var mapping in _mappings.All)
         {
             _mapperDescriptor.AddTypeMapping(mapping);
         }
-
-        // add extra mappings to the mapper
-        foreach (var extraMapping in _extraMappings)
-        {
-            _mapperDescriptor.AddTypeMapping(extraMapping);
-        }
-    }
-
-    private class MappingTupleEqualityComparer : IEqualityComparer<(ITypeSymbol Source, ITypeSymbol Target)>
-    {
-        public bool Equals((ITypeSymbol Source, ITypeSymbol Target) x, (ITypeSymbol Source, ITypeSymbol Target) y)
-        {
-            return Equals(x.Source, y.Source)
-                && Equals(x.Target, y.Target);
-        }
-
-        public int GetHashCode((ITypeSymbol Source, ITypeSymbol Target) obj)
-        {
-            unchecked
-            {
-                return (SymbolEqualityComparer.Default.GetHashCode(obj.Source) * 397) ^ SymbolEqualityComparer.Default.GetHashCode(obj.Target);
-            }
-        }
-
-        private bool Equals(ITypeSymbol x, ITypeSymbol y)
-            => SymbolEqualityComparer.IncludeNullability.Equals(x, y);
     }
 }

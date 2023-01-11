@@ -21,9 +21,9 @@ public class ConstructorParameterMapping
 
     public NullPropertyMapping DelegateMapping { get; }
 
-    public ArgumentSyntax BuildArgument(ExpressionSyntax source)
+    public ArgumentSyntax BuildArgument(TypeMappingBuildContext ctx)
     {
-        var argumentExpression = DelegateMapping.Build(source);
+        var argumentExpression = DelegateMapping.Build(ctx);
         var arg = Argument(argumentExpression);
         return _selfOrPreviousIsUnmappedOptional
             ? arg.WithNameColon(NameColon(_parameter.Name))

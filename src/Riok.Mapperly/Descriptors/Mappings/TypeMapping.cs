@@ -4,11 +4,9 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
-/// <summary>
-/// Represents a mapping to map from one type to another.
-/// </summary>
+/// <inheritdoc cref="ITypeMapping"/>
 [DebuggerDisplay("{GetType()}({SourceType.Name} => {TargetType.Name})")]
-public abstract class TypeMapping
+public abstract class TypeMapping : ITypeMapping
 {
     protected TypeMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
     {
@@ -20,16 +18,11 @@ public abstract class TypeMapping
 
     public ITypeSymbol TargetType { get; }
 
-    /// <summary>
-    /// Gets a value indicating if this mapping can be called / built by another mapping.
-    /// This should be <c>true</c> for most mappings.
-    /// </summary>
+    /// <inheritdoc cref="ITypeMapping.CallableByOtherMappings"/>
     public virtual bool CallableByOtherMappings => true;
 
-    /// <summary>
-    /// Gets a value indicating whether this mapping produces any code or can be omitted completely (eg. direct assignments or delegate mappings).
-    /// </summary>
+    /// <inheritdoc cref="ITypeMapping.IsSynthetic"/>
     public virtual bool IsSynthetic => false;
 
-    public abstract ExpressionSyntax Build(ExpressionSyntax source);
+    public abstract ExpressionSyntax Build(TypeMappingBuildContext ctx);
 }

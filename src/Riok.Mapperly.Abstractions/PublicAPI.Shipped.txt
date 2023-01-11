@@ -58,3 +58,14 @@ Riok.Mapperly.Abstractions.MappingConversionType.None = 0 -> Riok.Mapperly.Abstr
 Riok.Mapperly.Abstractions.MappingConversionType.ParseMethod = 8 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.StringToEnum = 32 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.ToStringMethod = 16 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MapperAttribute.UseReferenceHandling.get -> bool
+Riok.Mapperly.Abstractions.MapperAttribute.UseReferenceHandling.set -> void
+Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler
+Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler.PreserveReferenceHandler() -> void
+Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler.SetReference<TSource, TTarget>(TSource source, TTarget target) -> void
+Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler.TryGetReference<TSource, TTarget>(TSource source, out TTarget? target) -> bool
+Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler
+Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler.SetReference<TSource, TTarget>(TSource source, TTarget target) -> void
+Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler.TryGetReference<TSource, TTarget>(TSource source, out TTarget? target) -> bool
+Riok.Mapperly.Abstractions.ReferenceHandling.ReferenceHandlerAttribute
+Riok.Mapperly.Abstractions.ReferenceHandling.ReferenceHandlerAttribute.ReferenceHandlerAttribute() -> void

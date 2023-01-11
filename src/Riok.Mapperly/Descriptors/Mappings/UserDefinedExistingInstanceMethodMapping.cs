@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Emit.Symbols;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
@@ -12,44 +13,70 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public class UserDefinedExistingInstanceMethodMapping : ObjectPropertyMapping, IUserMapping
 {
+    private readonly bool _enableReferenceHandling;
+    private readonly INamedTypeSymbol _referenceHandlerType;
+
     public UserDefinedExistingInstanceMethodMapping(
-        IMethodSymbol method)
-        : base(method.Parameters[0].Type.UpgradeNullable(), method.Parameters[1].Type.UpgradeNullable())
+        IMethodSymbol method,
+        MethodParameter sourceParameter,
+        MethodParameter targetParameter,
+        MethodParameter? referenceHandlerParameter,
+        bool enableReferenceHandling,
+        INamedTypeSymbol referenceHandlerType)
+        : base(sourceParameter, targetParameter.Type)
     {
+        _enableReferenceHandling = enableReferenceHandling;
+        _referenceHandlerType = referenceHandlerType;
         IsPartial = true;
         IsExtensionMethod = method.IsExtensionMethod;
         Accessibility = method.DeclaredAccessibility;
-        MappingSourceParameterName = method.Parameters[0].Name;
         Method = method;
         MethodName = method.Name;
+        TargetParameter = targetParameter;
+        ReferenceHandlerParameter = referenceHandlerParameter;
     }
 
     public IMethodSymbol Method { get; }
 
-    private IParameterSymbol TargetParameter => Method.Parameters[1];
+    private MethodParameter TargetParameter { get; }
 
     public override bool CallableByOtherMappings => false;
 
-    public override ExpressionSyntax Build(ExpressionSyntax source)
-        => throw new InvalidOperationException($"{nameof(UserDefinedExistingInstanceMethodMapping)} does not support {nameof(Build)}");
-
-    public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
-    {
-        var body = base.BuildBody(source, IdentifierName(TargetParameter.Name));
-
-        // if the source type is nullable, add a null guard.
-        return SourceType.IsNullable()
-            ? body.Prepend(IfNullReturn(source))
-            : body;
-    }
-
     protected override ITypeSymbol? ReturnType => null; // return type is always void.
 
-    protected override IEnumerable<ParameterSyntax> BuildParameters()
-    {
-        var targetParam = Parameter(Identifier(TargetParameter.Name))
-            .WithType(IdentifierName(TargetType.ToDisplayString()));
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
+        => throw new InvalidOperationException($"{nameof(UserDefinedExistingInstanceMethodMapping)} does not support {nameof(Build)}");
 
-        return base.BuildParameters().Append(targetParam);
+    public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
+    {
+        // if the source type is nullable, add a null guard.
+        if (SourceType.IsNullable())
+        {
+            yield return IfNullReturn(ctx.Source);
+        }
+
+        // if reference handling is enabled and no reference handler parameter is declared
+        // a new reference handler is instantiated and used.
+        if (_enableReferenceHandling && ReferenceHandlerParameter == null)
+        {
+            // var refHandler = new RefHandler();
+            var createRefHandler = CreateInstance(_referenceHandlerType);
+            yield return DeclareLocalVariable(DefaultReferenceHandlerParameterName, createRefHandler);
+            ctx = ctx.WithRefHandler(DefaultReferenceHandlerParameterName);
+        }
+
+        foreach (var body in base.BuildBody(ctx, IdentifierName(TargetParameter.Name)))
+        {
+            yield return body;
+        }
+    }
+
+    protected override ParameterListSyntax BuildParameterList()
+        // needs to include the target parameter
+        => ParameterList(IsExtensionMethod, SourceParameter, TargetParameter, ReferenceHandlerParameter);
+
+    internal override void EnableReferenceHandling(INamedTypeSymbol iReferenceHandlerType)
+    {
+        // the parameters of user defined methods should not be manipulated
     }
 }

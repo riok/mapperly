@@ -5,6 +5,7 @@ namespace Riok.Mapperly.Tests;
 public record TestSourceBuilderOptions(
     string? Namespace = null,
     bool UseDeepCloning = false,
+    bool UseReferenceHandling = false,
     bool ThrowOnMappingNullMismatch = true,
     bool ThrowOnPropertyMappingNullMismatch = false,
     PropertyNameMappingStrategy PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseSensitive,
@@ -12,6 +13,8 @@ public record TestSourceBuilderOptions(
 {
     public static readonly TestSourceBuilderOptions Default = new();
     public static readonly TestSourceBuilderOptions WithDeepCloning = new(UseDeepCloning: true);
+    public static readonly TestSourceBuilderOptions WithReferenceHandling = new(UseReferenceHandling: true);
+
     public static TestSourceBuilderOptions WithDisabledMappingConversion(params MappingConversionType[] conversionTypes)
     {
         var enabled = MappingConversionType.All;
@@ -21,6 +24,6 @@ public record TestSourceBuilderOptions(
             enabled &= ~disabledConversionType;
         }
 
-        return Default with { EnabledConversions = enabled };
+        return new(EnabledConversions: enabled);
     }
 }

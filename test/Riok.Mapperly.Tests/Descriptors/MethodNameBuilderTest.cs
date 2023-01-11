@@ -42,7 +42,7 @@ public class MethodNameBuilderTest
         {
         }
 
-        public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
+        public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
             => Enumerable.Empty<StatementSyntax>();
     }
 }

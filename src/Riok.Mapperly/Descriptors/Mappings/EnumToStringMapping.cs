@@ -26,12 +26,12 @@ public class EnumToStringMapping : MethodMapping
         _enumMembers = enumMembers;
     }
 
-    public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
+    public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         // fallback switch arm: _ => source.ToString()
         var fallbackArm = SwitchExpressionArm(
             DiscardPattern(),
-            Invocation(MemberAccess(source, ToStringMethodName)));
+            Invocation(MemberAccess(ctx.Source, ToStringMethodName)));
 
         // switch for each name to the enum value
         // eg: Enum1.Value1 => "Value1"
@@ -39,7 +39,7 @@ public class EnumToStringMapping : MethodMapping
             .Select(BuildArm)
             .Append(fallbackArm);
 
-        var switchExpr = SwitchExpression(source)
+        var switchExpr = SwitchExpression(ctx.Source)
             .WithArms(CommaSeparatedList(arms, true));
 
         yield return ReturnStatement(switchExpr);

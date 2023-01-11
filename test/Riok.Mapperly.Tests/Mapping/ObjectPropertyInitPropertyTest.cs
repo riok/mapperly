@@ -1,3 +1,5 @@
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 [UsesVerify]
@@ -119,18 +121,20 @@ public class ObjectPropertyInitPropertyTest
     }
 
     [Fact]
-    public Task InitOnlyPropertyShouldDiagnosticOnVoidMethod()
+    public void InitOnlyPropertyShouldDiagnosticOnVoidMethod()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial void Map(A source, B target);",
             "class A { public string StringValue { get; } }",
             "class B { public string StringValue { get; init; } }");
-
-        return TestHelper.VerifyGenerator(source);
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToInitOnlyPropertyPath, "Cannot map from property A.StringValue of type string to init only property path B.StringValue of type string"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotMapped, "The property StringValue on the mapping source type A is not mapped to any property on the mapping target type B"));
     }
 
     [Fact]
-    public Task InitOnlyPropertySourceNotFoundShouldDiagnostic()
+    public void InitOnlyPropertySourceNotFoundShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -138,7 +142,10 @@ public class ObjectPropertyInitPropertyTest
             "class A { public string StringValue2 { get; init; } public int IntValue { get; set; } }",
             "class B { public string StringValue { get; init; } public int IntValue { get; set; } }");
 
-        return TestHelper.VerifyGenerator(source);
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.MappingSourcePropertyNotFound, "Property StringValue on source type A was not found"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotMapped, "The property StringValue2 on the mapping source type A is not mapped to any property on the mapping target type B"));
     }
 
     [Fact]

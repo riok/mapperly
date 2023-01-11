@@ -29,7 +29,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public ITypeSymbol Target { get; }
 
-    public TypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    public ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
         => _builder.FindMapping(sourceType.UpgradeNullable(), targetType.UpgradeNullable());
 
     /// <summary>
@@ -44,7 +44,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="sourceType">The source type.</param>
     /// <param name="targetType">The target type.</param>
     /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
-    public TypeMapping? FindOrBuildMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    public ITypeMapping? FindOrBuildMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
         => _builder.FindOrBuildMapping(sourceType.UpgradeNullable(), targetType.UpgradeNullable());
 
     /// <summary>
@@ -56,8 +56,26 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="source">The source type.</param>
     /// <param name="target">The target type.</param>
     /// <returns>The created mapping or <c>null</c> if none could be created.</returns>
-    public TypeMapping? BuildDelegateMapping(ITypeSymbol source, ITypeSymbol target)
+    public ITypeMapping? BuildDelegateMapping(ITypeSymbol source, ITypeSymbol target)
         => _builder.BuildDelegateMapping(_userSymbol, source.UpgradeNullable(), target.UpgradeNullable());
+
+    /// <summary>
+    /// Tries to build a new mapping for the given types while keeping the current user symbol reference.
+    /// This reuses configurations on the user symbol for the to be built mapping (eg. <see cref="Riok.Mapperly.Abstractions.MapPropertyAttribute"/>).
+    /// If no mapping is possible for the provided types,
+    /// <c>null</c> is returned.
+    /// If a new mapping is created, it is added to the mapping descriptor
+    /// and returned in further <see cref="FindOrBuildMapping"/> calls.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public ITypeMapping? BuildMappingWithUserSymbol(ITypeSymbol source, ITypeSymbol target)
+        => _builder.BuildMappingWithUserSymbol(
+            _userSymbol ?? throw new InvalidOperationException(nameof(BuildMappingWithUserSymbol) + " can only be called for contexts with a user symbol"),
+            source.UpgradeNullable(),
+            target.UpgradeNullable());
 
     public T GetConfigurationOrDefault<T>() where T : Attribute
     {

@@ -8,11 +8,11 @@ namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 /// </summary>
 public class PropertyMapping : IPropertyMapping
 {
-    private readonly TypeMapping _delegateMapping;
+    private readonly ITypeMapping _delegateMapping;
     private readonly bool _nullConditionalAccess;
     private readonly bool _addValuePropertyOnNullable;
 
-    public PropertyMapping(TypeMapping delegateMapping, PropertyPath sourcePath, bool nullConditionalAccess, bool addValuePropertyOnNullable)
+    public PropertyMapping(ITypeMapping delegateMapping, PropertyPath sourcePath, bool nullConditionalAccess, bool addValuePropertyOnNullable)
     {
         _delegateMapping = delegateMapping;
         SourcePath = sourcePath;
@@ -22,6 +22,9 @@ public class PropertyMapping : IPropertyMapping
 
     public PropertyPath SourcePath { get; }
 
-    public ExpressionSyntax Build(ExpressionSyntax source)
-        => _delegateMapping.Build(SourcePath.BuildAccess(source, _addValuePropertyOnNullable, _nullConditionalAccess));
+    public ExpressionSyntax Build(TypeMappingBuildContext ctx)
+    {
+        ctx = ctx.WithSource(SourcePath.BuildAccess(ctx.Source, _addValuePropertyOnNullable, _nullConditionalAccess));
+        return _delegateMapping.Build(ctx);
+    }
 }

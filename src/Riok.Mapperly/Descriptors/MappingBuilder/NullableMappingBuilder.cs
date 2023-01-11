@@ -18,7 +18,7 @@ public static class NullableMappingBuilder
             : BuildNullDelegateMapping(ctx, delegateMapping);
     }
 
-    private static TypeMapping BuildNullDelegateMapping(MappingBuilderContext ctx, TypeMapping mapping)
+    private static TypeMapping BuildNullDelegateMapping(MappingBuilderContext ctx, ITypeMapping mapping)
     {
         var nullFallback = ctx.GetNullFallbackValue();
         return mapping switch

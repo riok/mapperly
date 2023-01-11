@@ -27,20 +27,20 @@ public class PropertyNullDelegateAssignmentMapping : IPropertyAssignmentMapping,
     }
 
     public StatementSyntax Build(
-        ExpressionSyntax sourceAccess,
+        TypeMappingBuildContext ctx,
         ExpressionSyntax targetAccess)
     {
         // if (source.Value != null)
         //   target.Value = Map(Source.Name);
         // else
         //   throw ...
-        var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(sourceAccess, true, true, true);
+        var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, true, true, true);
         var condition = IsNotNull(sourceNullConditionalAccess);
         var elseClause = _throwInsteadOfConditionalNullMapping
             ? ElseClause(Block(ExpressionStatement(ThrowArgumentNullException(sourceNullConditionalAccess))))
             : null;
 
-        var mappings = _delegateMappings.Select(m => m.Build(sourceAccess, targetAccess)).ToList();
+        var mappings = _delegateMappings.Select(m => m.Build(ctx, targetAccess)).ToList();
         return IfStatement(condition, Block(mappings), elseClause);
     }
 

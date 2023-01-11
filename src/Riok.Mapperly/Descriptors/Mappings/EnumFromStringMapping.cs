@@ -32,12 +32,12 @@ public class EnumFromStringMapping : MethodMapping
         _ignoreCase = ignoreCase;
     }
 
-    public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
+    public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         // fallback switch arm: _ => (TargetType)System.Enum.Parse(typeof(TargetType), source, ignoreCase)
         var enumParseInvocation = Invocation(
             MemberAccess(EnumClassName, ParseMethodName),
-            TypeOfExpression(IdentifierName(TargetType.ToDisplayString())), source, BooleanLiteral(_ignoreCase));
+            TypeOfExpression(IdentifierName(TargetType.ToDisplayString())), ctx.Source, BooleanLiteral(_ignoreCase));
         var fallbackArm = SwitchExpressionArm(
             DiscardPattern(),
             CastExpression(IdentifierName(TargetType.ToDisplayString()), enumParseInvocation));
@@ -48,7 +48,7 @@ public class EnumFromStringMapping : MethodMapping
             : _enumMembers.Select(BuildArm);
         arms = arms.Append(fallbackArm);
 
-        var switchExpr = SwitchExpression(source)
+        var switchExpr = SwitchExpression(ctx.Source)
             .WithArms(CommaSeparatedList(arms, true));
 
         yield return ReturnStatement(switchExpr);

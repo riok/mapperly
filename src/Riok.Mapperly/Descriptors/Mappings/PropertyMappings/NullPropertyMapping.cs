@@ -13,10 +13,10 @@ namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 [DebuggerDisplay("NullPropertyMapping({SourcePath}: {_delegateMapping})")]
 public class NullPropertyMapping : IPropertyMapping
 {
-    private readonly TypeMapping _delegateMapping;
+    private readonly ITypeMapping _delegateMapping;
     private readonly NullFallbackValue _nullFallback;
 
-    public NullPropertyMapping(TypeMapping delegateMapping, PropertyPath sourcePath, NullFallbackValue nullFallback)
+    public NullPropertyMapping(ITypeMapping delegateMapping, PropertyPath sourcePath, NullFallbackValue nullFallback)
     {
         SourcePath = sourcePath;
         _delegateMapping = delegateMapping;
@@ -25,10 +25,13 @@ public class NullPropertyMapping : IPropertyMapping
 
     public PropertyPath SourcePath { get; }
 
-    public ExpressionSyntax Build(ExpressionSyntax source)
+    public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         if (_delegateMapping.SourceType.IsNullable() || !SourcePath.IsAnyNullable())
-            return _delegateMapping.Build(SourcePath.BuildAccess(source, nullConditional: true));
+        {
+            ctx = ctx.WithSource(SourcePath.BuildAccess(ctx.Source, nullConditional: true));
+            return _delegateMapping.Build(ctx);
+        }
 
         // source is nullable and the mapping method cannot handle nulls,
         // call mapping only if source is not null.
@@ -39,18 +42,18 @@ public class NullPropertyMapping : IPropertyMapping
         // source.A?.B ?? <null-substitute>
         if (_delegateMapping.IsSynthetic)
         {
-            var nullConditionalSourceAccess = SourcePath.BuildAccess(source, nullConditional: true);
+            var nullConditionalSourceAccess = SourcePath.BuildAccess(ctx.Source, nullConditional: true);
             return Coalesce(
-                _delegateMapping.Build(nullConditionalSourceAccess),
+                _delegateMapping.Build(ctx.WithSource(nullConditionalSourceAccess)),
                 NullSubstitute(_delegateMapping.TargetType, nullConditionalSourceAccess, _nullFallback));
         }
 
-        var nullCheckPath = SourcePath.BuildAccess(source, nullConditional: true, skipTrailingNonNullable: true);
-        var sourcePropertyAccess = SourcePath.BuildAccess(source, true);
+        var nullCheckPath = SourcePath.BuildAccess(ctx.Source, nullConditional: true, skipTrailingNonNullable: true);
+        var sourcePropertyAccess = SourcePath.BuildAccess(ctx.Source, true);
         return ConditionalExpression(
             IsNull(nullCheckPath),
             NullSubstitute(_delegateMapping.TargetType, sourcePropertyAccess, _nullFallback),
-            _delegateMapping.Build(sourcePropertyAccess));
+            _delegateMapping.Build(ctx.WithSource(sourcePropertyAccess)));
     }
 
     protected bool Equals(NullPropertyMapping other)

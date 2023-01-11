@@ -18,7 +18,7 @@ public class PropertyNullAssignmentInitializerMapping : IPropertyAssignmentMappi
         _pathToInitialize = pathToInitialize;
     }
 
-    public StatementSyntax Build(ExpressionSyntax sourceAccess, ExpressionSyntax targetAccess)
+    public StatementSyntax Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
         // source.Value ??= new();
         return ExpressionStatement(

@@ -1,4 +1,4 @@
-namespace Riok.Mapperly.Abstractions.Test;
+namespace Riok.Mapperly.Abstractions.Tests;
 
 public class MapPropertyAttributeTest
 {

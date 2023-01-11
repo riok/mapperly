@@ -5,6 +5,15 @@ namespace Riok.Mapperly.Tests.Helpers;
 public class EnumerableExtensionsTest
 {
     [Fact]
+    public void WhereValueTypeNotNullShouldFilterNulls()
+    {
+        new int?[] { 1, null, null, 2, 3, 4, null }
+            .WhereNotNull()
+            .Should()
+            .BeEquivalentTo(new[] { 1, 2, 3, 4 }, o => o.WithStrictOrdering());
+    }
+
+    [Fact]
     public void WhereNotNullShouldFilterNulls()
     {
         new[] { "a", "b", "c", null, "d", null, null, "e" }

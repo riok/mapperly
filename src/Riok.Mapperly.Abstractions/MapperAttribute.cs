@@ -1,3 +1,5 @@
+using Riok.Mapperly.Abstractions.ReferenceHandling;
+
 namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
@@ -60,4 +62,12 @@ public sealed class MapperAttribute : Attribute
     /// </example>
     /// </summary>
     public MappingConversionType EnabledConversions { get; set; } = MappingConversionType.All;
+
+    /// <summary>
+    /// Enables the reference handling feature.
+    /// Disabled by default for performance reasons.
+    /// When enabled, an <see cref="IReferenceHandler"/> instance is passed through the mapping methods
+    /// to keep track of and reuse existing target object instances.
+    /// </summary>
+    public bool UseReferenceHandling { get; set; }
 }

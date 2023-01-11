@@ -25,10 +25,10 @@ public class NullDelegateMethodMapping : MethodMapping
         _nullFallbackValue = nullFallbackValue;
     }
 
-    public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
+    public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
-        var body = _delegateMapping.BuildBody(source);
-        return AddPreNullHandling(source, body);
+        var body = _delegateMapping.BuildBody(ctx);
+        return AddPreNullHandling(ctx.Source, body);
     }
 
     private IEnumerable<StatementSyntax> AddPreNullHandling(ExpressionSyntax source, IEnumerable<StatementSyntax> body)

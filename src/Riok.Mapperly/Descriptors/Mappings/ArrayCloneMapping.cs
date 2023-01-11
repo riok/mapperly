@@ -19,10 +19,10 @@ public class ArrayCloneMapping : TypeMapping
     {
     }
 
-    public override ExpressionSyntax Build(ExpressionSyntax source)
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         return CastExpression(
             IdentifierName(TargetType.ToDisplayString()),
-            InvocationExpression(MemberAccess(source, CloneMethodName)));
+            InvocationExpression(MemberAccess(ctx.Source, CloneMethodName)));
     }
 }

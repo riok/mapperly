@@ -8,6 +8,6 @@ namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 public interface IPropertyAssignmentMapping
 {
     StatementSyntax Build(
-        ExpressionSyntax sourceAccess,
+        TypeMappingBuildContext ctx,
         ExpressionSyntax targetAccess);
 }

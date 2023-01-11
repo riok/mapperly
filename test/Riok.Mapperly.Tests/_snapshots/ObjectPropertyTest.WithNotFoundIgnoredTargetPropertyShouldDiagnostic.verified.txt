@@ -5,7 +5,7 @@
       Title: Ignored target property not found,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (10,4)-(10,62),
+      Location: : (11,4)-(11,62),
       Description: ,
       HelpLink: ,
       MessageFormat: Ignored target property {0} on {1} was not found,

@@ -23,12 +23,12 @@ public class EnumNameMapping : MethodMapping
         _enumMemberMappings = enumMemberMappings;
     }
 
-    public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
+    public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         // fallback switch arm: _ => throw new ArgumentOutOfRangeException("source");
         var fallbackArm = SwitchExpressionArm(
             DiscardPattern(),
-            ThrowArgumentOutOfRangeException(source));
+            ThrowArgumentOutOfRangeException(ctx.Source));
 
         // switch for each name to the enum value
         // eg: Enum1.Value1 => Enum2.Value1,
@@ -36,7 +36,7 @@ public class EnumNameMapping : MethodMapping
             .Select(BuildArm)
             .Append(fallbackArm);
 
-        var switchExpr = SwitchExpression(source)
+        var switchExpr = SwitchExpression(ctx.Source)
             .WithArms(CommaSeparatedList(arms, true));
 
         yield return ReturnStatement(switchExpr);

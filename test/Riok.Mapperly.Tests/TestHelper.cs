@@ -26,28 +26,19 @@ public static class TestHelper
             .ChildNodes()
             .OfType<ClassDeclarationSyntax>()
             .Single();
-        var methodBodies = mapperClassImpl
+        var methods = mapperClassImpl
             .ChildNodes()
             .OfType<MethodDeclarationSyntax>()
-            .ToDictionary(m => m.Identifier.ToString(), ExtractBody);
+            .Select(x => new GeneratedMethod(x))
+            .ToDictionary(x => x.Name);
 
-        var mapperResult = new MapperGenerationResult(result.Diagnostics, methodBodies);
+        var mapperResult = new MapperGenerationResult(result.Diagnostics, methods);
         if (options.AllowedDiagnostics != null)
         {
             mapperResult.Should().NotHaveDiagnostics(options.AllowedDiagnostics);
         }
 
         return mapperResult;
-    }
-
-    private static string ExtractBody(MethodDeclarationSyntax methodImpl)
-    {
-        return methodImpl
-            .Body
-            ?.NormalizeWhitespace()
-            .ToFullString()
-            .Trim('{', '}', ' ', '\r', '\n') // simplify string to make assertions simpler
-            .ReplaceLineEndings() ?? string.Empty;
     }
 
     private static GeneratorDriver Generate(

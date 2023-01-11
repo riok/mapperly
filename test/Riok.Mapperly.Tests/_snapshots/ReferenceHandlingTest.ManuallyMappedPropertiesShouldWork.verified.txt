@@ -1,0 +1,28 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG012,
+      Title: Mapping source property not found,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (11,4)-(11,65),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Property {0} on source type {1} was not found,
+      Message: Property MyValue2 on source type A was not found,
+      Category: Mapper
+    },
+    {
+      Id: RMG012,
+      Title: Mapping source property not found,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (11,65)-(11,128),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Property {0} on source type {1} was not found,
+      Message: Property MyValue on source type A was not found,
+      Category: Mapper
+    }
+  ]
+}

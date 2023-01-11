@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Emit.Symbols;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -134,10 +135,16 @@ public static class SyntaxFactoryHelper
     public static InvocationExpressionSyntax GenericInvocation(string methodName, IEnumerable<TypeSyntax> typeParams, params ExpressionSyntax[] arguments)
     {
         var method = GenericName(methodName)
-            .WithTypeArgumentList(TypeArgumentList(CommaSeparatedList(typeParams)));
+            .WithTypeArgumentList(TypeArgumentList(typeParams.ToArray()));
         return InvocationExpression(method)
             .WithArgumentList(ArgumentList(arguments));
     }
+
+    public static InvocationExpressionSyntax Invocation(string methodName, params MethodArgument?[] arguments)
+        => Invocation(IdentifierName(methodName), arguments);
+
+    public static InvocationExpressionSyntax Invocation(ExpressionSyntax method, params MethodArgument?[] arguments)
+        => Invocation(method, arguments.WhereNotNull().OrderBy(x => x.Parameter.Ordinal).Select(x => x.Argument).ToArray());
 
     public static InvocationExpressionSyntax Invocation(string methodName, params ExpressionSyntax[] arguments)
         => Invocation(IdentifierName(methodName), arguments);
@@ -146,6 +153,37 @@ public static class SyntaxFactoryHelper
     {
         return InvocationExpression(method)
             .WithArgumentList(ArgumentList(arguments));
+    }
+
+    public static InvocationExpressionSyntax Invocation(ExpressionSyntax method)
+        => Invocation(method, Array.Empty<ArgumentSyntax>());
+
+    public static InvocationExpressionSyntax Invocation(ExpressionSyntax method, params ArgumentSyntax[] arguments)
+    {
+        return InvocationExpression(method)
+            .WithArgumentList(ArgumentList(arguments));
+    }
+
+    public static ParameterListSyntax ParameterList(bool extensionMethod, params MethodParameter?[] parameters)
+    {
+        var parameterSyntaxes = parameters
+            .WhereNotNull()
+            .OrderBy(x => x.Ordinal)
+            .Select(p => Parameter(extensionMethod, p));
+        return SyntaxFactory.ParameterList(CommaSeparatedList(parameterSyntaxes));
+    }
+
+    public static ParameterSyntax Parameter(bool addThisKeyword, MethodParameter parameter)
+    {
+        var param = SyntaxFactory.Parameter(Identifier(parameter.Name))
+            .WithType(IdentifierName(parameter.Type.ToDisplayString()));
+
+        if (addThisKeyword && parameter.Ordinal == 0)
+        {
+            param = param.WithModifiers(TokenList(Token(SyntaxKind.ThisKeyword)));
+        }
+
+        return param;
     }
 
     public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ExpressionSyntax[] arguments)
@@ -233,6 +271,9 @@ public static class SyntaxFactoryHelper
 
     public static ArgumentListSyntax ArgumentList(params ExpressionSyntax[] argSyntaxes)
         => SyntaxFactory.ArgumentList(CommaSeparatedList(argSyntaxes.Select(Argument)));
+
+    public static TypeArgumentListSyntax TypeArgumentList(params TypeSyntax[] argSyntaxes)
+        => SyntaxFactory.TypeArgumentList(CommaSeparatedList(argSyntaxes));
 
     public static ArgumentListSyntax ArgumentList(params ArgumentSyntax[] args)
         => SyntaxFactory.ArgumentList(CommaSeparatedList(args));

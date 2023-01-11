@@ -12,30 +12,31 @@ public class ArrayForMapping : MethodMapping
     private const string LoopCounterName = "i";
     private const string ArrayLengthProperty = nameof(Array.Length);
 
-    private readonly TypeMapping _elementMapping;
+    private readonly ITypeMapping _elementMapping;
     private readonly ITypeSymbol _targetArrayElementType;
 
     public ArrayForMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        TypeMapping elementMapping,
+        ITypeMapping elementMapping,
         ITypeSymbol targetArrayElementType) : base(sourceType, targetType)
     {
         _elementMapping = elementMapping;
         _targetArrayElementType = targetArrayElementType;
     }
 
-    public override IEnumerable<StatementSyntax> BuildBody(ExpressionSyntax source)
+    public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         // var target = new T[source.Length];
-        var sourceLengthArrayRank = ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(MemberAccess(source, ArrayLengthProperty)));
+        var sourceLengthArrayRank = ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(MemberAccess(ctx.Source, ArrayLengthProperty)));
         var targetInitializationValue = ArrayCreationExpression(
             ArrayType(IdentifierName(_targetArrayElementType.ToDisplayString()))
                 .WithRankSpecifiers(SingletonList(sourceLengthArrayRank)));
         yield return DeclareLocalVariable(TargetVariableName, targetInitializationValue);
 
         // target[i] = Map(source[i]);
-        var mappedIndexedSourceValue = _elementMapping.Build(ElementAccess(source, IdentifierName(LoopCounterName)));
+        var forLoopBuilderCtx = ctx.WithSource(ElementAccess(ctx.Source, IdentifierName(LoopCounterName)));
+        var mappedIndexedSourceValue = _elementMapping.Build(forLoopBuilderCtx);
         var assignment = AssignmentExpression(
             SyntaxKind.SimpleAssignmentExpression,
             ElementAccess(IdentifierName(TargetVariableName), IdentifierName(LoopCounterName)),
@@ -44,7 +45,7 @@ public class ArrayForMapping : MethodMapping
 
         // for(var i = 0; i < source.Length; i++)
         //   target[i] = Map(source[i]);
-        yield return IncrementalForLoop(LoopCounterName, assignmentBlock, MemberAccess(source, ArrayLengthProperty));
+        yield return IncrementalForLoop(LoopCounterName, assignmentBlock, MemberAccess(ctx.Source, ArrayLengthProperty));
 
         // return target;
         yield return ReturnVariable(TargetVariableName);
