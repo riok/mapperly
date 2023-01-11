@@ -8,7 +8,7 @@ To opt in for reference handling set `UseReferenceHandling` to `true`:
 // highlight-end
 public partial class CarMapper
 {
-    public partial void CarToCarDto(Car car, CarDto dto);
+    public partial CarDto CarToCarDto(Car car);
 }
 ```
 
@@ -29,7 +29,7 @@ can be added to the mapping method.
 public partial class CarMapper
 {
     // highlight-start
-    public partial void CarToCarDto(Car car, CarDto dto, [ReferenceHandler] IReferenceHandler myRefHandler);
+    public partial CarDto CarToCarDto(Car car, [ReferenceHandler] IReferenceHandler myRefHandler);
     // highlight-end
 }
 ```
