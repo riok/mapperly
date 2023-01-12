@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Emit.Symbols;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -60,9 +60,10 @@ public class UserDefinedExistingInstanceMethodMapping : ObjectPropertyMapping, I
         if (_enableReferenceHandling && ReferenceHandlerParameter == null)
         {
             // var refHandler = new RefHandler();
+            var referenceHandlerName = ctx.NameBuilder.New(DefaultReferenceHandlerParameterName);
             var createRefHandler = CreateInstance(_referenceHandlerType);
-            yield return DeclareLocalVariable(DefaultReferenceHandlerParameterName, createRefHandler);
-            ctx = ctx.WithRefHandler(DefaultReferenceHandlerParameterName);
+            yield return DeclareLocalVariable(referenceHandlerName, createRefHandler);
+            ctx = ctx.WithRefHandler(referenceHandlerName);
         }
 
         foreach (var body in base.BuildBody(ctx, IdentifierName(TargetParameter.Name)))

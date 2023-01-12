@@ -31,13 +31,15 @@ public class LinqEnumerableMapping : TypeMapping
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
+        var lambdaParamName = ctx.NameBuilder.New(LambdaParamName);
+
         ExpressionSyntax mappedSource;
 
         // Select / Map if needed
         if (_selectMethod != null)
         {
-            var sourceMapExpression = _elementMapping.Build(ctx.WithSource(LambdaParamName));
-            var convertLambda = SimpleLambdaExpression(Parameter(Identifier(LambdaParamName)))
+            var sourceMapExpression = _elementMapping.Build(ctx.WithSource(lambdaParamName));
+            var convertLambda = SimpleLambdaExpression(Parameter(Identifier(lambdaParamName)))
                 .WithExpressionBody(sourceMapExpression);
             mappedSource = StaticInvocation(_selectMethod, ctx.Source, convertLambda);
         }

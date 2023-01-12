@@ -271,6 +271,42 @@ public class EnumerableTest
     }
 
     [Fact]
+    public void ArrayToArrayOfMutableStructDeepCloningLoopNameTaken()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial A[] Map(A[] i);",
+            TestSourceBuilderOptions.WithDeepCloning,
+            "struct A{}");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(@"var target = new A[i.Length];
+    for (var i1 = 0; i1 < i.Length; i1++)
+    {
+        target[i1] = MapToA(i[i1]);
+    }
+
+    return target;");
+    }
+
+    [Fact]
+    public void ArrayToArrayOfMutableStructDeepCloningTargetNameTaken()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial A[] Map(A[] target);",
+            TestSourceBuilderOptions.WithDeepCloning,
+            "struct A{}");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(@"var target1 = new A[target.Length];
+    for (var i = 0; i < target.Length; i++)
+    {
+        target1[i] = MapToA(target[i]);
+    }
+
+    return target1;");
+    }
+
+    [Fact]
     public void ArrayToArrayOfCastedTypes()
     {
         var source = TestSourceBuilder.Mapping(

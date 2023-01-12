@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace Riok.Mapperly.Emit.Symbols;
+namespace Riok.Mapperly.Symbols;
 
 /// <summary>
 /// A method argument (a parameter and an argument value).

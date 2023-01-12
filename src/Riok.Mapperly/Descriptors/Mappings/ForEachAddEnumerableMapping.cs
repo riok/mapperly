@@ -32,17 +32,20 @@ public class ForEachAddEnumerableMapping : MethodMapping
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
-        yield return _objectFactory == null
-            ? CreateInstance(TargetVariableName, TargetType)
-            : DeclareLocalVariable(TargetVariableName, _objectFactory.CreateType(SourceType, TargetType, ctx.Source));
+        var targetVariableName = ctx.NameBuilder.New(TargetVariableName);
+        var loopItemVariableName = ctx.NameBuilder.New(LoopItemVariableName);
 
-        var convertedSourceItemExpression = _elementMapping.Build(ctx.WithSource(LoopItemVariableName));
-        var addMethod = MemberAccess(TargetVariableName, AddMethodName);
+        yield return _objectFactory == null
+            ? CreateInstance(targetVariableName, TargetType)
+            : DeclareLocalVariable(targetVariableName, _objectFactory.CreateType(SourceType, TargetType, ctx.Source));
+
+        var convertedSourceItemExpression = _elementMapping.Build(ctx.WithSource(loopItemVariableName));
+        var addMethod = MemberAccess(targetVariableName, AddMethodName);
         yield return ForEachStatement(
             VarIdentifier,
-            Identifier(LoopItemVariableName),
+            Identifier(loopItemVariableName),
             ctx.Source,
             Block(ExpressionStatement(Invocation(addMethod, convertedSourceItemExpression))));
-        yield return ReturnVariable(TargetVariableName);
+        yield return ReturnVariable(targetVariableName);
     }
 }

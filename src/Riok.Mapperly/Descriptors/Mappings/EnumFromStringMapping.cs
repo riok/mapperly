@@ -44,7 +44,7 @@ public class EnumFromStringMapping : MethodMapping
 
         // switch for each name to the enum value
         var arms = _ignoreCase
-            ? _enumMembers.Select(BuildArmIgnoreCase)
+            ? BuildArmsIgnoreCase(ctx)
             : _enumMembers.Select(BuildArm);
         arms = arms.Append(fallbackArm);
 
@@ -54,12 +54,18 @@ public class EnumFromStringMapping : MethodMapping
         yield return ReturnStatement(switchExpr);
     }
 
-    private SwitchExpressionArmSyntax BuildArmIgnoreCase(IFieldSymbol field)
+    private IEnumerable<SwitchExpressionArmSyntax> BuildArmsIgnoreCase(TypeMappingBuildContext ctx)
+    {
+        var ignoreCaseSwitchDesignatedVariableName = ctx.NameBuilder.New(IgnoreCaseSwitchDesignatedVariableName);
+        return _enumMembers.Select(f => BuildArmIgnoreCase(ignoreCaseSwitchDesignatedVariableName, f));
+    }
+
+    private SwitchExpressionArmSyntax BuildArmIgnoreCase(string ignoreCaseSwitchDesignatedVariableName, IFieldSymbol field)
     {
         // { } s
         var pattern = RecursivePattern()
             .WithPropertyPatternClause(PropertyPatternClause())
-            .WithDesignation(SingleVariableDesignation(Identifier(IgnoreCaseSwitchDesignatedVariableName)));
+            .WithDesignation(SingleVariableDesignation(Identifier(ignoreCaseSwitchDesignatedVariableName)));
 
         // source.Value1
         var typeMemberAccess = MemberAccess(
@@ -69,7 +75,7 @@ public class EnumFromStringMapping : MethodMapping
         // when s.Equals(nameof(source.Value1), StringComparison.OrdinalIgnoreCase)
         var whenClause = WhenClause(
             Invocation(
-                MemberAccess(IgnoreCaseSwitchDesignatedVariableName, StringEqualsMethodName),
+                MemberAccess(ignoreCaseSwitchDesignatedVariableName, StringEqualsMethodName),
                 NameOf(typeMemberAccess),
                 IdentifierName(StringComparisonFullName)));
 

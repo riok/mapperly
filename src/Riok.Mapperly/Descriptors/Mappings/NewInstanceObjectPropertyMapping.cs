@@ -34,6 +34,8 @@ public class NewInstanceObjectPropertyMapping : ObjectPropertyMapping
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
+        var targetVariableName = ctx.NameBuilder.New(TargetVariableName);
+
         if (_enableReferenceHandling)
         {
             // TryGetReference
@@ -54,7 +56,7 @@ public class NewInstanceObjectPropertyMapping : ObjectPropertyMapping
         }
 
         // var target = new T() { ... };
-        yield return DeclareLocalVariable(TargetVariableName, objectCreationExpression);
+        yield return DeclareLocalVariable(targetVariableName, objectCreationExpression);
 
         // set the reference as soon as it is created,
         // as property mappings could refer to the same instance.
@@ -64,16 +66,16 @@ public class NewInstanceObjectPropertyMapping : ObjectPropertyMapping
             yield return ExpressionStatement(ReferenceHandlingSyntaxFactoryHelper.SetReference(
                 this,
                 ctx,
-                IdentifierName(TargetVariableName)));
+                IdentifierName(targetVariableName)));
         }
 
         // map properties
-        foreach (var expression in BuildBody(ctx, IdentifierName(TargetVariableName)))
+        foreach (var expression in BuildBody(ctx, IdentifierName(targetVariableName)))
         {
             yield return expression;
         }
 
         // return target;
-        yield return ReturnVariable(TargetVariableName);
+        yield return ReturnVariable(targetVariableName);
     }
 }

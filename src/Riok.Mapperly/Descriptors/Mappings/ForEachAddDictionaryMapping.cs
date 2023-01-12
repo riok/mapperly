@@ -44,8 +44,10 @@ public class ForEachAddDictionaryMapping : MethodMapping
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
-        var convertedKeyExpression = _keyMapping.Build(ctx.WithSource(MemberAccess(LoopItemVariableName, KeyValueKeyPropertyName)));
-        var convertedValueExpression = _valueMapping.Build(ctx.WithSource(MemberAccess(LoopItemVariableName, KeyValueValuePropertyName)));
+        var loopItemVariableName = ctx.NameBuilder.New(LoopItemVariableName);
+
+        var convertedKeyExpression = _keyMapping.Build(ctx.WithSource(MemberAccess(loopItemVariableName, KeyValueKeyPropertyName)));
+        var convertedValueExpression = _valueMapping.Build(ctx.WithSource(MemberAccess(loopItemVariableName, KeyValueValuePropertyName)));
 
         if (_objectFactory != null)
         {
@@ -63,7 +65,7 @@ public class ForEachAddDictionaryMapping : MethodMapping
         var addMethod = MemberAccess(TargetVariableName, AddMethodName);
         yield return ForEachStatement(
             VarIdentifier,
-            Identifier(LoopItemVariableName),
+            Identifier(loopItemVariableName),
             ctx.Source,
             Block(ExpressionStatement(Invocation(addMethod, convertedKeyExpression, convertedValueExpression))));
         yield return ReturnVariable(TargetVariableName);

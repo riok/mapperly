@@ -27,27 +27,30 @@ public class ArrayForMapping : MethodMapping
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
+        var targetVariableName = ctx.NameBuilder.New(TargetVariableName);
+        var loopCounterVariableName = ctx.NameBuilder.New(LoopCounterName);
+
         // var target = new T[source.Length];
         var sourceLengthArrayRank = ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(MemberAccess(ctx.Source, ArrayLengthProperty)));
         var targetInitializationValue = ArrayCreationExpression(
             ArrayType(IdentifierName(_targetArrayElementType.ToDisplayString()))
                 .WithRankSpecifiers(SingletonList(sourceLengthArrayRank)));
-        yield return DeclareLocalVariable(TargetVariableName, targetInitializationValue);
+        yield return DeclareLocalVariable(targetVariableName, targetInitializationValue);
 
         // target[i] = Map(source[i]);
-        var forLoopBuilderCtx = ctx.WithSource(ElementAccess(ctx.Source, IdentifierName(LoopCounterName)));
+        var forLoopBuilderCtx = ctx.WithSource(ElementAccess(ctx.Source, IdentifierName(loopCounterVariableName)));
         var mappedIndexedSourceValue = _elementMapping.Build(forLoopBuilderCtx);
         var assignment = AssignmentExpression(
             SyntaxKind.SimpleAssignmentExpression,
-            ElementAccess(IdentifierName(TargetVariableName), IdentifierName(LoopCounterName)),
+            ElementAccess(IdentifierName(targetVariableName), IdentifierName(loopCounterVariableName)),
             mappedIndexedSourceValue);
         var assignmentBlock = Block(SingletonList<StatementSyntax>(ExpressionStatement(assignment)));
 
         // for(var i = 0; i < source.Length; i++)
         //   target[i] = Map(source[i]);
-        yield return IncrementalForLoop(LoopCounterName, assignmentBlock, MemberAccess(ctx.Source, ArrayLengthProperty));
+        yield return IncrementalForLoop(loopCounterVariableName, assignmentBlock, MemberAccess(ctx.Source, ArrayLengthProperty));
 
         // return target;
-        yield return ReturnVariable(TargetVariableName);
+        yield return ReturnVariable(targetVariableName);
     }
 }

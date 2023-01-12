@@ -10,7 +10,7 @@ public static class SourceEmitter
 {
     public static CompilationUnitSyntax Build(MapperDescriptor descriptor)
     {
-        var sourceEmitterContext = new SourceEmitterContext(descriptor.IsStatic);
+        var sourceEmitterContext = new SourceEmitterContext(descriptor.Symbol.IsStatic, descriptor.NameBuilder);
         var classDeclaration = ClassDeclaration(descriptor.Syntax.Identifier)
             .WithModifiers(descriptor.Syntax.Modifiers)
             .WithMembers(List(BuildMembers(descriptor, sourceEmitterContext)));
