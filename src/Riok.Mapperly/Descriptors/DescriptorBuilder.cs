@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Descriptors.MappingBodyBuilder;
 using Riok.Mapperly.Descriptors.MappingBuilder;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.ObjectFactories;
@@ -183,13 +184,13 @@ public class DescriptorBuilder
             switch (typeMapping)
             {
                 case NewInstanceObjectPropertyMapping mapping:
-                    NewInstanceObjectPropertyMappingBuilder.BuildMappingBody(ctx, mapping);
+                    NewInstanceObjectPropertyMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;
                 case ObjectPropertyMapping mapping:
-                    ObjectPropertyMappingBuilder.BuildMappingBody(ctx, mapping);
+                    ObjectPropertyMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;
                 case UserDefinedNewInstanceMethodMapping mapping:
-                    UserMethodMappingBuilder.BuildMappingBody(ctx, mapping);
+                    UserMethodMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;
             }
         }

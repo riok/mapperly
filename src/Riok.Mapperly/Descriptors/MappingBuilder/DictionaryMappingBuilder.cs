@@ -7,7 +7,7 @@ namespace Riok.Mapperly.Descriptors.MappingBuilder;
 
 public static class DictionaryMappingBuilder
 {
-    private static readonly string _countPropertyName = "Count";
+    private const string CountPropertyName = nameof(IDictionary<object, object>.Count);
 
     public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
@@ -29,7 +29,7 @@ public static class DictionaryMappingBuilder
         // The constructed type should be Dictionary<,>
         if (IsDictionaryType(ctx, ctx.Target))
         {
-            var sourceHasCount = ctx.Source.GetAllMembers(_countPropertyName)
+            var sourceHasCount = ctx.Source.GetAllMembers(CountPropertyName)
                 .OfType<IPropertySymbol>()
                 .Any(x => !x.IsStatic && !x.IsIndexer && !x.IsWriteOnly && x.Type.SpecialType == SpecialType.System_Int32);
 
