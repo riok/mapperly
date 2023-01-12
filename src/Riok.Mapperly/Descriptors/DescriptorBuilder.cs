@@ -51,13 +51,13 @@ public class DescriptorBuilder
         SourceProductionContext sourceContext,
         Compilation compilation,
         ClassDeclarationSyntax mapperSyntax,
-        ITypeSymbol mapperSymbol)
+        INamedTypeSymbol mapperSymbol)
     {
         _mapperSymbol = mapperSymbol;
         _context = sourceContext;
         Compilation = compilation;
         WellKnownTypes = new WellKnownTypes(Compilation);
-        _mapperDescriptor = new MapperDescriptor(mapperSyntax, mapperSymbol.IsStatic);
+        _mapperDescriptor = new MapperDescriptor(mapperSyntax, mapperSymbol, _methodNameBuilder);
         MapperConfiguration = Configure();
     }
 
@@ -170,7 +170,7 @@ public class DescriptorBuilder
 
     private void ReserveMethodNames()
     {
-        foreach (var methodSymbol in _mapperSymbol.GetAllMembers().OfType<IMethodSymbol>())
+        foreach (var methodSymbol in _mapperSymbol.GetAllMembers())
         {
             _methodNameBuilder.Reserve(methodSymbol.Name);
         }

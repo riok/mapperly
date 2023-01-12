@@ -1,4 +1,4 @@
-namespace Riok.Mapperly.Emit.Symbols;
+namespace Riok.Mapperly.Symbols;
 
 /// <summary>
 /// Well known mapping method parameters.

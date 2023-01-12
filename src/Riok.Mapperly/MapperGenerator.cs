@@ -66,7 +66,7 @@ public class MapperGenerator : IIncrementalGenerator
         foreach (var mapperSyntax in mappers.Distinct())
         {
             var mapperModel = compilation.GetSemanticModel(mapperSyntax.SyntaxTree);
-            if (mapperModel.GetDeclaredSymbol(mapperSyntax) is not ITypeSymbol mapperSymbol)
+            if (mapperModel.GetDeclaredSymbol(mapperSyntax) is not INamedTypeSymbol mapperSymbol)
                 continue;
 
             if (!mapperSymbol.HasAttribute(mapperAttributeSymbol))
@@ -76,7 +76,7 @@ public class MapperGenerator : IIncrementalGenerator
             var descriptor = builder.Build();
 
             ctx.AddSource(
-                uniqueNameBuilder.Build(mapperSymbol.Name) + GeneratedFileSuffix,
+                uniqueNameBuilder.New(mapperSymbol.Name) + GeneratedFileSuffix,
                 SourceText.From(SourceEmitter.Build(descriptor).ToFullString(), Encoding.UTF8));
         }
     }

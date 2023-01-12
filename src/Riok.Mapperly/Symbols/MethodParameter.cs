@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
 
-namespace Riok.Mapperly.Emit.Symbols;
+namespace Riok.Mapperly.Symbols;
 
 public readonly struct MethodParameter
 {

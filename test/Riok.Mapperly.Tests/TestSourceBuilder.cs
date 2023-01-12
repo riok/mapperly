@@ -7,10 +7,17 @@ public static class TestSourceBuilder
 {
     internal const string DefaultMapMethodName = "Map";
 
-    public static string Mapping(string fromTypeName, string toTypeName, [StringSyntax(StringSyntax.CSharp)] params string[] types)
+    public static string Mapping(
+        [StringSyntax(StringSyntax.CSharp)] string fromTypeName,
+        [StringSyntax(StringSyntax.CSharp)] string toTypeName,
+        [StringSyntax(StringSyntax.CSharp)] params string[] types)
         => Mapping(fromTypeName, toTypeName, null, types);
 
-    public static string Mapping(string fromTypeName, string toTypeName, TestSourceBuilderOptions? options, [StringSyntax(StringSyntax.CSharp)] params string[] types)
+    public static string Mapping(
+        [StringSyntax(StringSyntax.CSharp)] string fromTypeName,
+        [StringSyntax(StringSyntax.CSharp)] string toTypeName,
+        TestSourceBuilderOptions? options,
+        [StringSyntax(StringSyntax.CSharp)] params string[] types)
     {
         return MapperWithBodyAndTypes(
             $"partial {toTypeName} {DefaultMapMethodName}({fromTypeName} source);",
@@ -38,10 +45,15 @@ public partial class Mapper
 ";
     }
 
-    public static string MapperWithBodyAndTypes([StringSyntax(StringSyntax.CSharp)] string body, [StringSyntax(StringSyntax.CSharp)] params string[] types)
+    public static string MapperWithBodyAndTypes(
+        [StringSyntax(StringSyntax.CSharp)] string body,
+        [StringSyntax(StringSyntax.CSharp)] params string[] types)
         => MapperWithBodyAndTypes(body, null, types);
 
-    public static string MapperWithBodyAndTypes([StringSyntax(StringSyntax.CSharp)] string body, TestSourceBuilderOptions? options, [StringSyntax(StringSyntax.CSharp)] params string[] types)
+    public static string MapperWithBodyAndTypes(
+        [StringSyntax(StringSyntax.CSharp)] string body,
+        TestSourceBuilderOptions? options,
+        [StringSyntax(StringSyntax.CSharp)] params string[] types)
     {
         var sep = Environment.NewLine + Environment.NewLine;
         return MapperWithBody(body, options)

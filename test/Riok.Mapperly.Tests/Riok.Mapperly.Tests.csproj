@@ -6,7 +6,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="FluentAssertions"/>
+    <Using Include="FluentAssertions" />
   </ItemGroup>
 
   <ItemGroup>

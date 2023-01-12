@@ -2,7 +2,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Emit;
-using Riok.Mapperly.Emit.Symbols;
+using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -59,11 +60,17 @@ public abstract class MethodMapping : TypeMapping
             ? PredefinedType(Token(SyntaxKind.VoidKeyword))
             : IdentifierName(TargetType.ToDisplayString());
 
-        var typeMappingBuildContext = new TypeMappingBuildContext(SourceParameter.Name, ReferenceHandlerParameter?.Name);
+        var typeMappingBuildContext = new TypeMappingBuildContext(
+            SourceParameter.Name,
+            ReferenceHandlerParameter?.Name,
+            ctx.NameBuilder.NewScope());
+
+        var parameters = BuildParameterList();
+        ReserveParameterNames(typeMappingBuildContext.NameBuilder, parameters);
 
         return MethodDeclaration(returnType, Identifier(MethodName))
             .WithModifiers(TokenList(BuildModifiers(ctx.IsStatic)))
-            .WithParameterList(BuildParameterList())
+            .WithParameterList(parameters)
             .WithBody(Block(BuildBody(typeMappingBuildContext)));
     }
 
@@ -91,5 +98,13 @@ public abstract class MethodMapping : TypeMapping
 
         if (IsPartial)
             yield return Token(SyntaxKind.PartialKeyword);
+    }
+
+    private void ReserveParameterNames(UniqueNameBuilder nameBuilder, ParameterListSyntax parameters)
+    {
+        foreach (var param in parameters.Parameters)
+        {
+            nameBuilder.Reserve(param.Identifier.Text);
+        }
     }
 }

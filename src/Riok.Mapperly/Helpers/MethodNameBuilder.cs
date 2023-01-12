@@ -1,16 +1,15 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
-using Riok.Mapperly.Helpers;
 
-namespace Riok.Mapperly.Descriptors;
+namespace Riok.Mapperly.Helpers;
 
 internal class MethodNameBuilder : UniqueNameBuilder
 {
     private const string MethodNamePrefix = "MapTo";
     private const string ArrayTypeNameSuffix = "Array";
 
-    internal string Build(MethodMapping mapping)
-        => Build(MethodNamePrefix + BuildTypeMethodName(mapping.TargetType.NonNullable()));
+    public string Build(MethodMapping mapping)
+        => New(MethodNamePrefix + BuildTypeMethodName(mapping.TargetType.NonNullable()));
 
     private string BuildTypeMethodName(ITypeSymbol t)
     {
