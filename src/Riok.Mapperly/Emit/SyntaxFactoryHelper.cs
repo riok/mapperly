@@ -114,10 +114,10 @@ public static class SyntaxFactoryHelper
             .WithArgumentList(ArgumentList(StringLiteral(message))));
     }
 
-    public static ThrowExpressionSyntax ThrowArgumentOutOfRangeException(ExpressionSyntax arg)
+    public static ThrowExpressionSyntax ThrowArgumentOutOfRangeException(ExpressionSyntax arg, string message)
     {
         return ThrowExpression(ObjectCreationExpression(IdentifierName(ArgumentOutOfRangeExceptionClassName))
-            .WithArgumentList(ArgumentList(NameOf(arg))));
+            .WithArgumentList(ArgumentList(NameOf(arg), arg, StringLiteral(message))));
     }
 
     public static ThrowExpressionSyntax ThrowArgumentNullException(ExpressionSyntax arg)
