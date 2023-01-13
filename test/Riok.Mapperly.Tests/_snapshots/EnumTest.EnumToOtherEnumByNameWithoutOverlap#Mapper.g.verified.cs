@@ -6,7 +6,7 @@ public partial class Mapper
     {
         return source switch
         {
-            _ => throw new System.ArgumentOutOfRangeException(nameof(source)),
+            _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
         };
     }
 }

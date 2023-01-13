@@ -87,7 +87,7 @@ public class EnumTest
         E1.B => E2.B,
         E1.C => E2.C,
         E1.E => E2.E,
-        _ => throw new System.ArgumentOutOfRangeException(nameof(source)),
+        _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, ""The value of enum E1 is not supported""),
     };");
     }
 
@@ -110,7 +110,7 @@ public class EnumTest
         E1.E => E2.E,
         E1.f => E2.f,
         E1.F => E2.f,
-        _ => throw new System.ArgumentOutOfRangeException(nameof(source)),
+        _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, ""The value of enum E1 is not supported""),
     };");
     }
 
@@ -151,7 +151,7 @@ enum E2 {A = 100, B, C}
         E1.A => E2.A,
         E1.B => E2.B,
         E1.C => E2.C,
-        _ => throw new System.ArgumentOutOfRangeException(nameof(source)),
+        _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, ""The value of enum E1 is not supported""),
     };");
     }
 

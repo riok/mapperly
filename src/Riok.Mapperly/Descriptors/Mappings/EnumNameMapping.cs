@@ -25,10 +25,10 @@ public class EnumNameMapping : MethodMapping
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
-        // fallback switch arm: _ => throw new ArgumentOutOfRangeException("source");
+        // fallback switch arm: _ => throw new ArgumentOutOfRangeException(nameof(source), source, message);
         var fallbackArm = SwitchExpressionArm(
             DiscardPattern(),
-            ThrowArgumentOutOfRangeException(ctx.Source));
+            ThrowArgumentOutOfRangeException(ctx.Source, $"The value of enum {SourceType.Name} is not supported"));
 
         // switch for each name to the enum value
         // eg: Enum1.Value1 => Enum2.Value1,
