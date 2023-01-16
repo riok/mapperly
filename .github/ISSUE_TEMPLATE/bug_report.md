@@ -23,10 +23,10 @@ A clear and concise description of what you expected to happen.
 If applicable, add code snippets to help explain your problem.
 
 **Environment (please complete the following information):**
- - Mapperly Version: [e.g. 1.0.1]
- - .NET Version: [e.g. .NET 6.0.102]
- - Target Framework: [e.g. .net6.0]
- - OS: [e.g. iOS8.1]
+- Mapperly Version: [e.g. 1.0.1]
+- .NET Version: [e.g. .NET 6.0.102]
+- Target Framework: [e.g. .net6.0]
+- OS: [e.g. iOS8.1]
 
 **Additional context**
 Add any other context about the problem here.

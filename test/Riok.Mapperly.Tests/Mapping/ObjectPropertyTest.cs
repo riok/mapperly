@@ -262,16 +262,16 @@ public class ObjectPropertyTest
     [Fact]
     public void ShouldUseUserImplementedMapping()
     {
-        var mapperBody = @"
-public partial B Map(A source);
-private D UserImplementedMap(C source)
-{
-  var target = Map(source);
-  target.StringValue += ""ok"";
-  return target;
-}
-private partial D MapToD(C source);
-";
+        var mapperBody = """
+            public partial B Map(A source);
+            private D UserImplementedMap(C source)
+            {
+                var target = Map(source);
+                target.StringValue += "ok";
+                return target;
+            }
+            private partial D MapToD(C source);
+            """;
 
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             mapperBody,

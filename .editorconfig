@@ -199,3 +199,7 @@ indent_size = 2
 # css
 [*.css]
 indent_size = 2
+
+# markdown
+[*.md]
+indent_size = unset

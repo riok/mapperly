@@ -3,7 +3,7 @@
 The Mapperly documentation is built using [Docusaurus 2](https://docusaurus.io/)
 and is located in the `docs` directory.
 
-### Dependencies
+## Dependencies
 
 Docusaurus is based on the node ecosystem.
 A `.node-version` file provides the node version number to be used.
@@ -11,6 +11,7 @@ This file can be interpreted by several node version managers (eg. [fnm](https:/
 Make sure you use a node version matching the version in `.node-version` for all following commands.
 
 To install documentation dependencies run:
+
 ```bash
 npm i
 ```
@@ -28,7 +29,7 @@ npm run prebuild
 
 To reflect changes, this command needs to be re-run each time the source of the generated output changes.
 
-### Local Development
+## Local Development
 
 ```bash
 npm run start
@@ -39,7 +40,21 @@ Most changes are reflected live without having to restart the server.
 The documentation search does not work when using the local development server,
 as it depends on the statically built content (see [build](#build)).
 
-### Build
+## Linting
+
+To run the linters locally run:
+
+```bash
+npm run lint
+```
+
+To fix detected issues automatically run:
+
+```bash
+npm run fix
+```
+
+## Build
 
 ```bash
 npm run build

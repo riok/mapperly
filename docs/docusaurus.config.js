@@ -6,7 +6,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Mapperly',
-  tagline: 'A .NET source generator for generating object mappings. No runtime reflection. Inspired by MapStruct.',
+  tagline:
+    'A .NET source generator for generating object mappings. No runtime reflection. Inspired by MapStruct.',
   url: process.env.DOCUSAURUS_URL || 'https://mapperly.riok.app',
   baseUrl: process.env.DOCUSAURUS_BASE_URL || '/',
   onBrokenLinks: 'throw',
@@ -55,7 +56,7 @@ const config = {
           },
           {
             href: 'https://github.com/riok/mapperly',
-            className: 'header-github-link',
+            className: 'headerGithubLink',
             'aria-label': 'GitHub repository',
             position: 'right',
           },
@@ -86,7 +87,7 @@ const config = {
             items: [
               {
                 label: 'Open an issue',
-                href: 'https://github.com/riok/mapperly/issues/new/choose'
+                href: 'https://github.com/riok/mapperly/issues/new/choose',
               },
               {
                 label: 'GitHub Repository',
@@ -96,7 +97,7 @@ const config = {
                 label: 'Contributing',
                 to: '/docs/contributing',
               },
-            ]
+            ],
           },
           {
             title: 'More',
@@ -137,8 +138,8 @@ const config = {
     '@easyops-cn/docusaurus-search-local',
   ],
   customFields: {
-      mapperlyVersion: process.env.MAPPERLY_VERSION || '0.0.1-dev',
-  }
+    mapperlyVersion: process.env.MAPPERLY_VERSION || '0.0.1-dev',
+  },
 };
 
 module.exports = config;

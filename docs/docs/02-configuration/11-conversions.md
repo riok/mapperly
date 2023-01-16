@@ -3,7 +3,7 @@
 Mapperly implements several types of automatic conversions (in order of priority):
 
 | Name              | Description                                                               | Conditions                                                                                                      |
-|-------------------|---------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| ----------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | Direct assignment | Directly assigns the source object to the target                          | Source type is assignable to the target type and `UseDeepCloning` is `false`                                    |
 | Dictionary        | Maps a source dictionary to an enumerable target                          | Source type is an `IDictionary<,>` or an `IReadOnlyDictionary<,>`                                               |
 | Enumerable        | Maps an enumerable source to an enumerable target                         | Source type is an `IEnumerable<>`                                                                               |
@@ -20,6 +20,7 @@ Mapperly implements several types of automatic conversions (in order of priority
 ## Disable all automatic conversions
 
 To disable all conversions supported by Mapperly set `EnabledConversions` to `None`:
+
 ```csharp
 // highlight-start
 [Mapper(EnabledConversions = MappingConversionType.None)]
@@ -33,6 +34,7 @@ public partial class CarMapper
 ## Disable specific automatic conversions
 
 To disable a specific conversion type, set `EnabledConversions` to `All` excluding the conversion type to disable:
+
 ```csharp
 // this disables conversions using the ToString() method:
 // highlight-start

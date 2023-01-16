@@ -1,0 +1,12 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@docusaurus/recommended"
+  ],
+  "plugins": ["@typescript-eslint", "@docusaurus"],
+  "root": true,
+  "rules": {
+    "@typescript-eslint/no-var-requires": "off"
+  }
+}

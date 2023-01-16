@@ -18,6 +18,7 @@ This describes the process implemented by Mapperly on a higher level.
 For each discovered `MapperAttribute` a new `DescriptorBuilder` is created.
 The `DescriptorBuilder` is responsible to build a `MapperDescriptor` which holds all the mappings.
 The `DescriptorBuilder` does this by following this process:
+
 1. Extracting the configuration from the attribute
 2. Extracting user implemented object factories
 3. Extracting user implemented and user defined mapping methods.

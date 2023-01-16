@@ -4,9 +4,11 @@ Mapperly is continuously tested by GitHub Actions.
 Tests are separated into integration and unit tests located in the `test` directory
 and use [xUnit](https://xunit.net/) and [VerifyTests](https://github.com/VerifyTests/Verify).
 You can run the tests by running
+
 ```bash
 dotnet test
 ```
+
 or by running the discovered tests in your IDE.
 
 ## Unit tests
@@ -47,11 +49,13 @@ To work with the tests of Mapperly you may find it helpful to read the documenta
 The source of Mapperly is linted with multiple dotnet analyzers.
 The format is checked with `dotnet format`.
 To fix issues locally run
+
 ```bash
 dotnet format
 ```
 
 and to verify there are no issues run
+
 ```bash
 dotnet format --verify-no-changes
 ```

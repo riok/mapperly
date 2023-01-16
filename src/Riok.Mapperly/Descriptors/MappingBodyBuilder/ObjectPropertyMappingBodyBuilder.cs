@@ -17,8 +17,8 @@ public static class ObjectPropertyMappingBodyBuilder
 
     public static void BuildMappingBody(ObjectPropertyMappingBuilderContext ctx)
     {
-        var propertyNameComparer = ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy ==
-                       PropertyNameMappingStrategy.CaseSensitive
+        var propertyNameComparer =
+            ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseSensitive
             ? StringComparer.Ordinal
             : StringComparer.OrdinalIgnoreCase;
 

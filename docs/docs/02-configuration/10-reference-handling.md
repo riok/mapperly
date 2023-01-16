@@ -2,6 +2,7 @@
 
 Mapperly can support mapping object structures with circular references.
 To opt in for reference handling set `UseReferenceHandling` to `true`:
+
 ```csharp
 // highlight-start
 [Mapper(UseReferenceHandling = true)]
