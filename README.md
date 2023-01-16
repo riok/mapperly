@@ -47,6 +47,11 @@ dto.NumberOfSeats.Should().Be(10);
 
 [Read the docs](https://mapperly.riok.app/docs/getting-started/installation) for any further information.
 
+## How To Contribute
+
+We would love for you to contribute to Mapperly and help make it even better than it is today!
+Find information on how to contribute [in the docs](https://mapperly.riok.app/docs/contributing/).
+
 ## License
 
 Mapperly is [Apache 2.0](https://github.com/riok/mapperly/blob/main/LICENSE) licensed.

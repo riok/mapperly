@@ -12,22 +12,33 @@ internal static class DebuggerUtil
         if (Debugger.IsAttached)
             return;
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            Debugger.Launch();
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            // on macos we currently only support rider (make sure "Generate Shell Scripts" is enabled in the jetbrains toolbox app
-            // and the generated scripts are in the path)
-            Process.Start("rider", $"attach-to-process {Process.GetCurrentProcess().Id} \"{FindSolutionFile()}\"");
-        }
+        TryAttachDebugger();
 
         // wait for debugger to be attached (up to 30s)
         // this leaves time to manually attach it on linux or if the automatic attach didn't work
         for (var i = 0; i < 30 && !Debugger.IsAttached; i++)
         {
             Thread.Sleep(1000);
+        }
+    }
+
+    private static void TryAttachDebugger()
+    {
+        try
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Debugger.Launch();
+                return;
+            }
+
+            // on other operating systems we currently only support rider (make sure "Generate Shell Scripts" is enabled in the jetbrains toolbox app
+            // and the generated scripts are in the path)
+            Process.Start("rider", $"attach-to-process {Process.GetCurrentProcess().Id} \"{FindSolutionFile()}\"");
+        }
+        catch (Exception)
+        {
+            // ignore exceptions if the debugger couldn't be attached
         }
     }
 

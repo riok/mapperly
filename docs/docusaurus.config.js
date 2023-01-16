@@ -92,6 +92,10 @@ const config = {
                 label: 'GitHub Repository',
                 href: 'https://github.com/riok/mapperly',
               },
+              {
+                label: 'Contributing',
+                to: '/docs/contributing',
+              },
             ]
           },
           {
