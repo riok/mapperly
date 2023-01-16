@@ -143,6 +143,18 @@ public static class ObjectPropertyMappingBodyBuilder
             return false;
         }
 
+        // cannot map from an indexed property
+        if (sourcePropertyPath.Member.IsIndexer)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CannotMapFromIndexedProperty,
+                ctx.Mapping.SourceType,
+                sourcePropertyPath.FullName,
+                ctx.Mapping.TargetType,
+                targetPropertyPath.FullName);
+            return false;
+        }
+
         return true;
     }
 

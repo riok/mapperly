@@ -205,4 +205,12 @@ internal static class DiagnosticDescriptors
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true);
+
+    public static readonly DiagnosticDescriptor CannotMapFromIndexedProperty = new DiagnosticDescriptor(
+        "RMG026",
+        "Cannot map from indexed property",
+        "Cannot map from indexed property {0}.{1} to property {2}.{3}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Info,
+        true);
 }

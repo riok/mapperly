@@ -57,3 +57,11 @@ Rule ID | Category | Severity | Notes
 RMG023  | Mapper   | Error    | Mapping source property for a required target property not found
 RMG024  | Mapper   | Error    | The reference handler parameter is not of the correct type
 RMG025  | Mapper   | Error    | To use reference handling it needs to be enabled on the mapper attribute
+
+## Release 2.7
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+RMG026  | Mapper   | Info     | Cannot map from indexed property
