@@ -1,4 +1,5 @@
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
 
@@ -114,6 +115,20 @@ public class ObjectPropertyTest
             "class B { public string StringValue { get; set; } public string StringValue2 { get; } }");
 
         return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void ShouldIgnoreIndexedPropertyOnSourceWithDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public int this[int index] { get => -1; set { } } }",
+            "class B { public int this[int index] { get => -1; set { } } }");
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new DiagnosticMatcher(DiagnosticDescriptors.CannotMapFromIndexedProperty, "Cannot map from indexed property A.this[] to property B.this[]"));
     }
 
     [Fact]
