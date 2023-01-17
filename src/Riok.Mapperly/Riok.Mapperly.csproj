@@ -15,23 +15,15 @@
     </PackageDescription>
     <PackageTags>Mapper SourceGenerator</PackageTags>
     <PackageIcon>logo.png</PackageIcon>
+    
+    <!-- default roslyn version -->
+    <ROSLYN_VERSION Condition="'$(ROSLYN_VERSION)' == ''">4.4</ROSLYN_VERSION>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <ROSLYN_VERSION Condition="'$(ROSLYN_VERSION)' == ''">4.4</ROSLYN_VERSION>
-    <DefineConstants Condition="'$(ROSLYN_VERSION)' == '4.4'">$(DefineConstants);ROSLYN4_4_OR_GREATER</DefineConstants>
-  </PropertyGroup>
+  <Import Project="Riok.Mapperly.Roslyn$(ROSLYN_VERSION).props" />
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(ROSLYN_VERSION)' == '4.0'">
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(ROSLYN_VERSION)' == '4.4'">
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
