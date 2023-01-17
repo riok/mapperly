@@ -16,12 +16,14 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         DescriptorBuilder builder,
         ITypeSymbol source,
         ITypeSymbol target,
+        RefKind targetRefKind,
         ISymbol? userSymbol)
         : base(builder)
     {
         _builder = builder;
         Source = source;
         Target = target;
+        TargetRefKind = targetRefKind;
         _userSymbol = userSymbol;
     }
 
@@ -29,8 +31,10 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public ITypeSymbol Target { get; }
 
-    public ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        => _builder.FindMapping(sourceType.UpgradeNullable(), targetType.UpgradeNullable());
+    public RefKind TargetRefKind { get; }
+
+    public ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType, RefKind targetRefKind = RefKind.None)
+        => _builder.FindMapping(sourceType.UpgradeNullable(), targetType.UpgradeNullable(), targetRefKind);
 
     /// <summary>
     /// Tries to find an existing mapping for the provided types.
@@ -44,8 +48,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="sourceType">The source type.</param>
     /// <param name="targetType">The target type.</param>
     /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
-    public ITypeMapping? FindOrBuildMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        => _builder.FindOrBuildMapping(sourceType.UpgradeNullable(), targetType.UpgradeNullable());
+    public ITypeMapping? FindOrBuildMapping(ITypeSymbol sourceType, ITypeSymbol targetType, RefKind targetRefKind = RefKind.None)
+        => _builder.FindOrBuildMapping(sourceType.UpgradeNullable(), targetType.UpgradeNullable(), targetRefKind);
 
     /// <summary>
     /// Tries to build a new mapping for the given types.
@@ -56,8 +60,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="source">The source type.</param>
     /// <param name="target">The target type.</param>
     /// <returns>The created mapping or <c>null</c> if none could be created.</returns>
-    public ITypeMapping? BuildDelegateMapping(ITypeSymbol source, ITypeSymbol target)
-        => _builder.BuildDelegateMapping(_userSymbol, source.UpgradeNullable(), target.UpgradeNullable());
+    public ITypeMapping? BuildDelegateMapping(ITypeSymbol source, ITypeSymbol target, RefKind targetRefKind = RefKind.None)
+        => _builder.BuildDelegateMapping(_userSymbol, source.UpgradeNullable(), target.UpgradeNullable(), targetRefKind);
 
     /// <summary>
     /// Tries to build a new mapping for the given types while keeping the current user symbol reference.

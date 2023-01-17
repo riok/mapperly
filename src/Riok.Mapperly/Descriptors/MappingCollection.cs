@@ -22,9 +22,9 @@ public class MappingCollection
 
     public IReadOnlyCollection<ITypeMapping> All => _allMappings;
 
-    public ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    public ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType, RefKind targetRefKind = RefKind.None)
     {
-        _mappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var mapping);
+        _mappings.TryGetValue(new TypeMappingKey(sourceType, targetType, targetRefKind), out var mapping);
         return mapping;
     }
 
@@ -51,17 +51,20 @@ public class MappingCollection
 
         private readonly ITypeSymbol _source;
         private readonly ITypeSymbol _target;
+        private readonly RefKind _targetRefKind;
 
         public TypeMappingKey(ITypeMapping mapping)
         {
             _source = mapping.SourceType;
             _target = mapping.TargetType;
+            _targetRefKind = RefKind.None;
         }
 
-        public TypeMappingKey(ITypeSymbol source, ITypeSymbol target)
+        public TypeMappingKey(ITypeSymbol source, ITypeSymbol target, RefKind targetRefKind = RefKind.None)
         {
             _source = source;
             _target = target;
+            _targetRefKind = targetRefKind;
         }
 
         private bool Equals(TypeMappingKey other)

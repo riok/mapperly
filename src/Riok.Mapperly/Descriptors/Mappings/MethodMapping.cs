@@ -33,6 +33,19 @@ public abstract class MethodMapping : TypeMapping
         SourceParameter = sourceParameter;
     }
 
+    protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, RefKind targetRefKind)
+        : this(new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType),
+              new MethodParameter(ReferenceHandlerParameterIndex, DefaultReferenceHandlerParameterName, targetType, targetRefKind))
+    {
+    }
+    protected MethodMapping(MethodParameter sourceParameter, MethodParameter targetParameter)
+        : base(sourceParameter.Type, targetParameter.Type, targetParameter.RefKind)
+    {
+        SourceParameter = sourceParameter;
+        if (targetParameter.RefKind != RefKind.None)
+            ReferenceHandlerParameter = targetParameter;
+    }
+
     protected Accessibility Accessibility { get; set; } = Accessibility.Private;
 
     protected bool IsPartial { get; set; }

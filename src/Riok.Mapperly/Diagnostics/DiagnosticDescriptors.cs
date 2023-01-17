@@ -70,10 +70,10 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true);
 
-    public static readonly DiagnosticDescriptor CannotMapToReadOnlyProperty = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor CannotMapToReadOnlyValueProperty = new DiagnosticDescriptor(
         "RMG009",
-        "Cannot map to read only property",
-        "Cannot map property {0}.{1} of type {2} to read only property {3}.{4} of type {5}",
+        "Cannot map to read only value property",
+        "Cannot map property {0}.{1} of type {2} to read only property {3}.{4} of value type {5}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
         true);

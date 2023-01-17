@@ -6,11 +6,12 @@ namespace Riok.Mapperly.Symbols;
 
 public readonly struct MethodParameter
 {
-    public MethodParameter(int ordinal, string name, ITypeSymbol type)
+    public MethodParameter(int ordinal, string name, ITypeSymbol type, RefKind refKind = RefKind.None)
     {
         Ordinal = ordinal;
         Name = name;
         Type = type;
+        RefKind = refKind;
     }
 
     public MethodParameter(IParameterSymbol symbol)
@@ -23,6 +24,8 @@ public readonly struct MethodParameter
     public string Name { get; }
 
     public ITypeSymbol Type { get; }
+
+    public RefKind RefKind { get; }
 
     public MethodArgument WithArgument(ExpressionSyntax? argument)
         => new(this, argument ?? throw new ArgumentNullException(nameof(argument)));

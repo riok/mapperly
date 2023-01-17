@@ -9,6 +9,8 @@ public class WellKnownTypes
 {
     private readonly Compilation _compilation;
 
+    private INamedTypeSymbol? _string;
+
     private INamedTypeSymbol? _referenceHandlerAttribute;
     private INamedTypeSymbol? _objectFactoryAttribute;
     private INamedTypeSymbol? _mapperConstructorAttribute;
@@ -18,6 +20,7 @@ public class WellKnownTypes
     private INamedTypeSymbol? _iReferenceHandler;
     private INamedTypeSymbol? _preserveReferenceHandler;
 
+    private INamedTypeSymbol? _iList;
     private INamedTypeSymbol? _iDictionary;
     private INamedTypeSymbol? _iReadOnlyDictionary;
     private INamedTypeSymbol? _iEnumerable;
@@ -32,12 +35,14 @@ public class WellKnownTypes
         _compilation = compilation;
     }
 
+    public INamedTypeSymbol String => _string ??= GetTypeSymbol(typeof(string));
     public INamedTypeSymbol ReferenceHandlerAttribute => _referenceHandlerAttribute ??= GetTypeSymbol(typeof(ReferenceHandlerAttribute));
     public INamedTypeSymbol ObjectFactoryAttribute => _objectFactoryAttribute ??= GetTypeSymbol(typeof(ObjectFactoryAttribute));
     public INamedTypeSymbol MapperConstructorAttribute => _mapperConstructorAttribute ??= GetTypeSymbol(typeof(MapperConstructorAttribute));
     public INamedTypeSymbol ObsoleteAttribute => _obsoleteAttribute ??= GetTypeSymbol(typeof(ObsoleteAttribute));
     public INamedTypeSymbol IReferenceHandler => _iReferenceHandler ??= GetTypeSymbol(typeof(IReferenceHandler));
     public INamedTypeSymbol PreserveReferenceHandler => _preserveReferenceHandler ??= GetTypeSymbol(typeof(PreserveReferenceHandler));
+    public INamedTypeSymbol IList => _iList ??= GetTypeSymbol(typeof(IList<>));
     public INamedTypeSymbol IDictionary => _iDictionary ??= GetTypeSymbol(typeof(IDictionary<,>));
     public INamedTypeSymbol IReadOnlyDictionary => _iReadOnlyDictionary ??= GetTypeSymbol(typeof(IReadOnlyDictionary<,>));
     public INamedTypeSymbol IEnumerable => _iEnumerable ??= GetTypeSymbol(typeof(IEnumerable<>));

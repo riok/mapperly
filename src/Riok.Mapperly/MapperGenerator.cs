@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,6 +19,14 @@ public class MapperGenerator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+#if DEBUG
+        if (!Debugger.IsAttached)
+        {
+            // Uncomment out when debugging launcher, don't leave this uncommented because it
+            // will screw up vs when launching
+            // Debugger.Launch();
+        }
+#endif
         var mapperClassDeclarations = context.SyntaxProvider
             .CreateSyntaxProvider(
                 static (s, _) => IsSyntaxTargetForGeneration(s),

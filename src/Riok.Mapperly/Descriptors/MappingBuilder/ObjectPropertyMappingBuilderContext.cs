@@ -68,6 +68,9 @@ public class ObjectPropertyMappingBuilderContext
     public void AddPropertyAssignmentMapping(PropertyAssignmentMapping propertyMapping)
         => AddPropertyAssignmentMapping(Mapping, propertyMapping);
 
+    public void AddPropertyReferenceMapping(PropertyReferenceMapping propertyMapping)
+        => AddPropertyReferenceMapping(Mapping, propertyMapping);
+
     public void AddNullDelegatePropertyAssignmentMapping(PropertyAssignmentMapping propertyMapping)
     {
         var nullConditionSourcePath = new PropertyPath(propertyMapping.SourcePath.PathWithoutTrailingNonNullable().ToList());
@@ -81,6 +84,14 @@ public class ObjectPropertyMappingBuilderContext
         container.AddPropertyMappings(BuildNullPropertyInitializers(mapping.TargetPath));
         container.AddPropertyMapping(mapping);
     }
+
+    private void AddPropertyReferenceMapping(IPropertyAssignmentMappingContainer container, PropertyReferenceMapping mapping)
+    {
+        SetSourcePropertyMapped(mapping.SourcePath);
+        container.AddPropertyMappings(BuildNullPropertyInitializers(mapping.TargetPath));
+        container.AddPropertyMapping(mapping);
+    }
+
 
     protected void SetSourcePropertyMapped(PropertyPath sourcePath)
         => _unmappedSourcePropertyNames.Remove(sourcePath.Path.First().Name);

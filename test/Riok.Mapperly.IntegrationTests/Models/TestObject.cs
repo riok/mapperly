@@ -63,5 +63,9 @@ namespace Riok.Mapperly.IntegrationTests.Models
         public string? IgnoredStringValue { get; set; }
 
         public int IgnoredIntValue { get; set; }
+
+        public readonly IList<int> _readOnlyList = new List<int>();
+
+        public IList<int> ReadOnlyList { get => _readOnlyList; }
     }
 }

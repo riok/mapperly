@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.MappingBuilder;
 using Riok.Mapperly.Descriptors.Mappings;
@@ -51,7 +52,14 @@ public static class ObjectPropertyMappingBodyBuilder
                 continue;
             }
 
-            BuildPropertyAssignmentMapping(ctx, sourcePropertyPath, new PropertyPath(new[] { targetProperty }));
+            if (targetProperty.IsReadOnly)
+            {
+                BuildPropertyReferenceMapping(ctx, sourcePropertyPath, new PropertyPath(new[] { targetProperty }));
+            }
+            else
+            {
+                BuildPropertyAssignmentMapping(ctx, sourcePropertyPath, new PropertyPath(new[] { targetProperty }));
+            }
         }
 
         ctx.AddDiagnostics();
@@ -80,17 +88,85 @@ public static class ObjectPropertyMappingBodyBuilder
         BuildPropertyAssignmentMapping(ctx, sourcePropertyPath, targetPropertyPath);
     }
 
-    public static bool ValidateMappingSpecification(
+    public static bool ValidatePropertyReferenceMappingSpecification(
         ObjectPropertyMappingBuilderContext ctx,
         PropertyPath sourcePropertyPath,
         PropertyPath targetPropertyPath,
         bool allowInitOnlyMember = false)
     {
-        // the target property path is readonly or not accessible
-        if (targetPropertyPath.Member.IsReadOnly || targetPropertyPath.Member.SetMethod?.IsAccessible() != true)
+        if (targetPropertyPath.MemberType.IsValueType ||
+            SymbolEqualityComparer.Default.Equals(targetPropertyPath.MemberType, ctx.BuilderContext.Types.String) ||
+           (targetPropertyPath.MemberType.IsReferenceType && targetPropertyPath.Member.IsReadOnly && targetPropertyPath.Member.GetMethod?.IsAccessible() == false))
         {
             ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.CannotMapToReadOnlyProperty,
+                DiagnosticDescriptors.CannotMapToReadOnlyValueProperty,
+                ctx.Mapping.SourceType,
+                sourcePropertyPath.FullName,
+                sourcePropertyPath.Member.Type,
+                ctx.Mapping.TargetType,
+                targetPropertyPath.FullName,
+                targetPropertyPath.Member.Type);
+            return false;
+        }
+
+        // a target property path part is write only or not accessible
+        if (targetPropertyPath.ObjectPath.Any(p => p.IsWriteOnly || p.GetMethod?.IsAccessible() != true))
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CannotMapToWriteOnlyPropertyPath,
+                ctx.Mapping.SourceType,
+                sourcePropertyPath.FullName,
+                sourcePropertyPath.Member.Type,
+                ctx.Mapping.TargetType,
+                targetPropertyPath.FullName,
+                targetPropertyPath.Member.Type);
+            return false;
+        }
+
+        // a target property path part is init only
+        var noInitOnlyPath = allowInitOnlyMember ? targetPropertyPath.ObjectPath : targetPropertyPath.Path;
+        if (noInitOnlyPath.Any(p => p.IsInitOnly()))
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CannotMapToInitOnlyPropertyPath,
+                ctx.Mapping.SourceType,
+                sourcePropertyPath.FullName,
+                sourcePropertyPath.Member.Type,
+                ctx.Mapping.TargetType,
+                targetPropertyPath.FullName,
+                targetPropertyPath.Member.Type);
+            return false;
+        }
+
+        // a source property path is write only or not accessible
+        if (sourcePropertyPath.Path.Any(p => p.IsWriteOnly || p.GetMethod?.IsAccessible() != true))
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CannotMapFromWriteOnlyProperty,
+                ctx.Mapping.SourceType,
+                sourcePropertyPath.FullName,
+                sourcePropertyPath.Member.Type,
+                ctx.Mapping.TargetType,
+                targetPropertyPath.FullName,
+                targetPropertyPath.Member.Type);
+            return false;
+        }
+
+        return true;
+    }
+
+    public static bool ValidateAssignmentMappingSpecification(
+        ObjectPropertyMappingBuilderContext ctx,
+        PropertyPath sourcePropertyPath,
+        PropertyPath targetPropertyPath,
+        bool allowInitOnlyMember = false)
+    {
+        // Target property cannot be the following
+        // must be assignable
+        if (targetPropertyPath.Member.IsReadOnly || targetPropertyPath.Member.SetMethod?.IsAccessible() == false)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CannotMapToReadOnlyValueProperty,
                 ctx.Mapping.SourceType,
                 sourcePropertyPath.FullName,
                 sourcePropertyPath.Member.Type,
@@ -151,7 +227,7 @@ public static class ObjectPropertyMappingBodyBuilder
         PropertyPath sourcePropertyPath,
         PropertyPath targetPropertyPath)
     {
-        if (!ValidateMappingSpecification(ctx, sourcePropertyPath, targetPropertyPath))
+        if (!ValidateAssignmentMappingSpecification(ctx, sourcePropertyPath, targetPropertyPath))
             return;
 
         // nullability is handled inside the property mapping
@@ -181,6 +257,7 @@ public static class ObjectPropertyMappingBodyBuilder
                 sourcePropertyPath,
                 false,
                 true);
+
             ctx.AddPropertyAssignmentMapping(new PropertyAssignmentMapping(targetPropertyPath, propertyMapping));
             return;
         }
@@ -203,5 +280,51 @@ public static class ObjectPropertyMappingBodyBuilder
         ctx.AddNullDelegatePropertyAssignmentMapping(new PropertyAssignmentMapping(
             targetPropertyPath,
             new PropertyMapping(delegateMapping, sourcePropertyPath, false, true)));
+    }
+
+    private static void BuildPropertyReferenceMapping(
+        ObjectPropertyMappingBuilderContext ctx,
+        PropertyPath sourcePropertyPath,
+        PropertyPath targetPropertyPath)
+    {
+        if (!ValidatePropertyReferenceMappingSpecification(ctx, sourcePropertyPath, targetPropertyPath))
+            return;
+
+        // nullability is handled inside the property mapping
+        // since we check mapping on a type basis, readonly properties do not count as readonly types
+        // but we still need someway of differentiating readonly mappings from normal mappings, so we add
+        // the refkind as an extra key
+        var delegateMapping = ctx.BuilderContext.FindMapping(sourcePropertyPath.Member.Type, targetPropertyPath.Member.Type, RefKind.Ref) ??
+            ctx.BuilderContext.FindOrBuildMapping(
+                sourcePropertyPath.Member.Type.NonNullable(),
+                targetPropertyPath.Member.Type.NonNullable(),
+                RefKind.Ref);
+
+        // couldn't build the mapping
+        if (delegateMapping == null)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.CouldNotMapProperty,
+                ctx.Mapping.SourceType,
+                sourcePropertyPath.FullName,
+                sourcePropertyPath.Member.Type,
+                ctx.Mapping.TargetType,
+                targetPropertyPath.FullName,
+                targetPropertyPath.Member.Type);
+            return;
+        }
+
+        // no member of the source path is nullable, no null handling needed
+        if (!sourcePropertyPath.IsAnyNullable())
+        {
+            var propertyMapping = new PropertyMapping(
+                delegateMapping,
+                sourcePropertyPath,
+                false,
+                true);
+
+            ctx.AddPropertyReferenceMapping(new PropertyReferenceMapping(targetPropertyPath, propertyMapping));
+            return;
+        }
     }
 }

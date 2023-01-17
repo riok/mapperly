@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Riok.Mapperly.IntegrationTests.Models;
 
 namespace Riok.Mapperly.IntegrationTests.Dto
@@ -63,6 +64,11 @@ namespace Riok.Mapperly.IntegrationTests.Dto
         public InheritanceSubObjectDto? SubObject { get; set; }
 
         public string? IgnoredStringValue { get; set; }
+
         public int IgnoredIntValue { get; set; }
+
+        private readonly IList<int> _readOnlyList = new List<int>();
+
+        public IList<int> ReadOnlyList { get => _readOnlyList; }
     }
 }

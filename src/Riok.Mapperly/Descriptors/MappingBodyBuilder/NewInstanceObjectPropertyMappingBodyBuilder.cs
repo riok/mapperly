@@ -107,7 +107,7 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
         PropertyPath sourcePath)
     {
         var targetPath = new PropertyPath(new[] { targetProperty });
-        if (!ObjectPropertyMappingBodyBuilder.ValidateMappingSpecification(ctx, sourcePath, targetPath, true))
+        if (!ObjectPropertyMappingBodyBuilder.ValidateAssignmentMappingSpecification(ctx, sourcePath, targetPath, true))
             return;
 
         var delegateMapping = ctx.BuilderContext.FindMapping(sourcePath.MemberType, targetProperty.Type)

@@ -103,17 +103,18 @@ public class DescriptorBuilder
         var ctx = new SimpleMappingBuilderContext(this);
         ObjectFactories = ObjectFactoryBuilder.ExtractObjectFactories(ctx, _mapperSymbol);
     }
-    public ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        => _mappings.FindMapping(sourceType, targetType);
+    public ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType, RefKind targetRefkind = RefKind.None)
+        => _mappings.FindMapping(sourceType, targetType, targetRefkind);
 
     public ITypeMapping? FindOrBuildMapping(
         ITypeSymbol sourceType,
-        ITypeSymbol targetType)
+        ITypeSymbol targetType,
+        RefKind targetRefKind = RefKind.None)
     {
-        if (_mappings.FindMapping(sourceType, targetType) is { } foundMapping)
+        if (_mappings.FindMapping(sourceType, targetType, targetRefKind) is { } foundMapping)
             return foundMapping;
 
-        if (BuildDelegateMapping(null, sourceType, targetType) is not { } mapping)
+        if (BuildDelegateMapping(null, sourceType, targetType, targetRefKind) is not { } mapping)
             return null;
 
         _mappings.AddMapping(mapping);
@@ -135,9 +136,10 @@ public class DescriptorBuilder
     public ITypeMapping? BuildDelegateMapping(
         ISymbol? userSymbol,
         ITypeSymbol sourceType,
-        ITypeSymbol targetType)
+        ITypeSymbol targetType,
+        RefKind targetRefKind = RefKind.None)
     {
-        var ctx = new MappingBuilderContext(this, sourceType, targetType, userSymbol);
+        var ctx = new MappingBuilderContext(this, sourceType, targetType, targetRefKind, userSymbol);
         foreach (var mappingBuilder in _mappingBuilders)
         {
             if (mappingBuilder(ctx) is { } mapping)
@@ -164,6 +166,8 @@ public class DescriptorBuilder
                 this,
                 userMapping.SourceType,
                 userMapping.TargetType,
+                // TODO: extract from user method
+                RefKind.None,
                 userMapping.Method);
             _mappingsToBuildBody.Enqueue((userMapping, ctx));
         }

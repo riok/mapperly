@@ -31,8 +31,8 @@ public static class EnumerableMappingBuilder
             return new CastMapping(ctx.Source, ctx.Target);
 
         // if source is an array and target is an array or IReadOnlyCollection faster mappings can be applied
-        if (ctx.Source.IsArrayType()
-            && (ctx.Target.IsArrayType() || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IReadOnlyCollection)))
+        if (ctx.Source.IsArrayType() &&
+           (ctx.Target.IsArrayType() || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IReadOnlyCollection)))
         {
             // if element mapping is synthetic
             // a single Array.Clone / cast mapping call should be sufficient and fast,
@@ -44,6 +44,11 @@ public static class EnumerableMappingBuilder
                 ? new ArrayCloneMapping(ctx.Source, ctx.Target)
                 : new CastMapping(ctx.Source, ctx.Target);
         }
+
+        // need to use special existing type list add mapping
+        if (ctx.TargetRefKind == RefKind.Ref &&
+            SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IList))
+            return new IListReadonlyMapping(ctx.Source, ctx.Target, elementMapping, enumeratedTargetType);
 
         // try linq mapping: x.Select(Map).ToArray/ToList
         // if that doesn't work do a foreach with add calls

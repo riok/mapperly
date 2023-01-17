@@ -431,7 +431,7 @@ public class EnumerableTest
         var source = TestSourceBuilder.Mapping(
             "A",
             "B",
-            "class A { public C[] Value { get; set;} }",
+            "class A { public C[] Value { get; set; } }",
             "class B { public D[] Value { get; set; } }",
             "class C { public string Value { get; set; } }",
             "class D { public string Value { get; set; } }");

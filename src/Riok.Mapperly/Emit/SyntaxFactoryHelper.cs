@@ -175,8 +175,7 @@ public static class SyntaxFactoryHelper
 
     public static ParameterSyntax Parameter(bool addThisKeyword, MethodParameter parameter)
     {
-        var param = SyntaxFactory.Parameter(Identifier(parameter.Name))
-            .WithType(IdentifierName(parameter.Type.ToDisplayString()));
+        ParameterSyntax param = SyntaxFactory.Parameter(Identifier(parameter.Name)).WithType(IdentifierName(parameter.Type.ToDisplayString()));
 
         if (addThisKeyword && parameter.Ordinal == 0)
         {

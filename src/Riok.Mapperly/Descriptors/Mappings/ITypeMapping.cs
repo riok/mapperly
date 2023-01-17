@@ -12,6 +12,8 @@ public interface ITypeMapping
 
     ITypeSymbol TargetType { get; }
 
+    RefKind TargetRefKind { get; }
+
     /// <summary>
     /// Gets a value indicating if this mapping can be called / built by another mapping.
     /// This should be <c>true</c> for most mappings.
