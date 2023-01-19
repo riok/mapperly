@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <EnablePackageValidation>true</EnablePackageValidation>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -15,7 +16,7 @@
     </PackageDescription>
     <PackageTags>Mapper SourceGenerator</PackageTags>
     <PackageIcon>logo.png</PackageIcon>
-    
+
     <!-- default roslyn version -->
     <ROSLYN_VERSION Condition="'$(ROSLYN_VERSION)' == ''">4.4</ROSLYN_VERSION>
   </PropertyGroup>
@@ -23,11 +24,15 @@
   <Import Project="Riok.Mapperly.Roslyn$(ROSLYN_VERSION).props" />
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.3" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Riok.Mapperly.Abstractions\Riok.Mapperly.Abstractions.csproj" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup Condition="!$(DefineConstants.Contains('DEBUG_SOURCE_GENERATOR'))">
+    <Compile Remove="Helpers/DebuggerUtil.cs" />
   </ItemGroup>
 
   <!-- This ensures the library will be packaged as a source generator when we use `dotnet pack` -->

@@ -14,8 +14,7 @@ If it is set, it tries to attach a debugger
 and waits for the connection of the debugger (for up to 30 seconds).
 If the automatic debugger attachment fails you can use these 30 seconds to attach the debugger manually
 (for vs 2022 see [attach to running processes](https://docs.microsoft.com/en-us/visualstudio/debugger/attach-to-running-processes-with-the-visual-studio-debugger?view=vs-2022)).
-You can use the `DefineConstants` dontet build or csproj parameter to define the `DEBUG_SOURCE_GENERATOR` constant
-or temporary comment the conditional attribute on `DebuggerUtil.AttachDebugger()`.
+You can use the `DefineConstants` dotnet build or csproj parameter to define the `DEBUG_SOURCE_GENERATOR` constant.
 
 For the debugger attachment with JetBrains Rider to work correctly,
 `Generate Shell Scripts` needs to be enabled in the JetBrains ToolBox

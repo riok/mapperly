@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -6,7 +7,6 @@ namespace Riok.Mapperly.Helpers;
 
 internal static class DebuggerUtil
 {
-    [Conditional("DEBUG_SOURCE_GENERATOR")]
     internal static void AttachDebugger()
     {
         if (Debugger.IsAttached)
@@ -42,6 +42,10 @@ internal static class DebuggerUtil
         }
     }
 
+    [SuppressMessage(
+        "MicrosoftCodeAnalysisCorrectness",
+        "RS1035:Do not use APIs banned for analyzers",
+        Justification = "Only used here to launch the debugger correctly and not in included the release build")]
     private static string FindSolutionFile([CallerFilePath] string? callerFile = null)
     {
         var dir = Path.GetDirectoryName(callerFile)
