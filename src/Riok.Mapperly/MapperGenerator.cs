@@ -56,7 +56,9 @@ public class MapperGenerator : IIncrementalGenerator
         if (mappers.IsDefaultOrEmpty)
             return;
 
+#if DEBUG_SOURCE_GENERATOR
         DebuggerUtil.AttachDebugger();
+#endif
 
         var mapperAttributeSymbol = compilation.GetTypeByMetadataName(_mapperAttributeName);
         if (mapperAttributeSymbol == null)
