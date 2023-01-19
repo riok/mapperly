@@ -17,10 +17,14 @@ and verifying the reported diagnostics and the emitted code.
 Unit tests are easy to debug (you can debug them like any other code),
 but be reminded that these kind of tests only run on the latest supported target framework.
 
+The `TestSourceBuilder` class can be used to generate the source code of a Mapper class.
+The `TestHelper` class can be used to run the source generator and assert or snapshot the result.
+
 ## Integration tests
 
 The integration tests are located in `tests/Riok.Mapperly.IntegrationTests`.
-Integration tests are "a bit of everything" mappers.
+Integration tests are implementations of "a bit of everything" mappers.
+The generated code as well as the mapped objects are verified.
 These tests run locally by referencing the source generator as an analyzer.
 In the CI pipeline, the integration tests reference the built NuGet package and
 are run on several supported target frameworks (including .NET 7.0 but also .NET Framework).
