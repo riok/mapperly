@@ -11,11 +11,10 @@ RELEASE_VERSION=${RELEASE_VERSION:-'0.0.1-dev'}
 RELEASE_NOTES=${RELEASE_NOTES:-''}
 
 # https://stackoverflow.com/a/246128/3302887
-script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 artifacts_dir="${script_dir}/../artifacts"
 
-for roslyn_version in "${roslyn_versions[@]}"
-do
+for roslyn_version in "${roslyn_versions[@]}"; do
     dotnet pack \
         "${script_dir}/../src/Riok.Mapperly" \
         -c Release \

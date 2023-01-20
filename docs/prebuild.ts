@@ -1,13 +1,14 @@
-const {exec} = require('child_process');
-const {readFile, writeFile, copyFile, mkdir, rmdir, readdir, rm} = require('fs').promises;
-const {join} = require('path');
+const { exec } = require('child_process');
+const { readFile, writeFile, copyFile, mkdir, rmdir, readdir, rm } =
+  require('fs').promises;
+const { join } = require('path');
 const util = require('util');
-const {marked} = require('marked');
+const { marked } = require('marked');
 const execPromise = util.promisify(exec);
 
 const generatedDataDir = './src/data/generated';
 
-async function clearGeneratedFiles() {
+async function clearGeneratedFiles(): Promise<void> {
   try {
     await rm(generatedDataDir, { recursive: true });
   } catch {}
@@ -15,7 +16,7 @@ async function clearGeneratedFiles() {
   await mkdir(generatedDataDir, { recursive: true });
 }
 
-async function deleteFilesWithExtension(dir, extension) {
+async function deleteFilesWithExtension(dir, extension): Promise<void> {
   const fileNames = await readdir(dir);
   for (const fileName of fileNames) {
     if (fileName.endsWith(extension)) {
@@ -24,9 +25,10 @@ async function deleteFilesWithExtension(dir, extension) {
   }
 }
 
-async function buildApiDocs() {
+async function buildApiDocs(): Promise<void> {
   const targetDir = './docs/99-api';
-  const dll = '../src/Riok.Mapperly.Abstractions/bin/Debug/netstandard2.0/Riok.Mapperly.Abstractions.dll';
+  const dll =
+    '../src/Riok.Mapperly.Abstractions/bin/Debug/netstandard2.0/Riok.Mapperly.Abstractions.dll';
 
   // clean target directory
   await deleteFilesWithExtension(targetDir, '.md');
@@ -50,13 +52,13 @@ async function buildApiDocs() {
   }
 }
 
-async function buildAnalyzerRulesData() {
+async function buildAnalyzerRulesData(): Promise<void> {
   // extract analyzer rules from AnalyzerReleases.Shipped.md and write to a json file
   const targetFile = join(generatedDataDir, 'analyzer-rules.json');
   const sourceFile = '../src/Riok.Mapperly/AnalyzerReleases.Shipped.md';
 
   let rules = [];
-  const walkTokens = token => {
+  const walkTokens = (token) => {
     if (token.type !== 'table') {
       return token;
     }
@@ -72,27 +74,30 @@ async function buildAnalyzerRulesData() {
 
     return token;
   };
-  marked.use({walkTokens});
+  marked.use({ walkTokens });
 
   const analyzersMd = await readFile(sourceFile);
   marked.parse(analyzersMd.toString());
-  await writeFile(targetFile, JSON.stringify(rules, undefined,  '  '));
+  await writeFile(targetFile, JSON.stringify(rules, undefined, '  '));
 }
 
-async function buildSamples() {
+async function buildSamples(): Promise<void> {
   const targetDir = join(generatedDataDir, 'samples');
   await mkdir(targetDir);
 
   const sampleProject = '../samples/Riok.Mapperly.Sample';
   const projectFilesToCopy = ['CarMapper.cs', 'Car.cs', 'CarDto.cs'];
-  const generatedMapperFile = join(sampleProject, 'obj/Debug/net7.0/generated/Riok.Mapperly/Riok.Mapperly.MapperGenerator/CarMapper.g.cs');
+  const generatedMapperFile = join(
+    sampleProject,
+    'obj/Debug/net7.0/generated/Riok.Mapperly/Riok.Mapperly.MapperGenerator/CarMapper.g.cs',
+  );
 
   // clean target directory
   await deleteFilesWithExtension(targetDir, '.cs');
 
   // Copy generated mapper to target dir
   await copyFile(generatedMapperFile, join(targetDir, 'CarMapper.g.cs'));
-  
+
   // Copy sample project files to target dir
   for (const file of projectFilesToCopy) {
     await copyFile(join(sampleProject, file), join(targetDir, file));

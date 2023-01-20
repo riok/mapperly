@@ -1,9 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-
-    <!-- setting the TargetFramework directly from the cli via -p:TargetFramework=netA.B does not work
-         using a custom msbuild property seems to work -->
+    <!-- setting the TargetFramework directly from the cli via -p:TargetFramework=netA.B does not work using a custom msbuild property seems to work -->
     <MapperlyIntegrationTestsTargetFramework Condition="'$(MapperlyIntegrationTestsTargetFramework)' == ''">net7.0</MapperlyIntegrationTestsTargetFramework>
     <TargetFramework>$(MapperlyIntegrationTestsTargetFramework)</TargetFramework>
 
@@ -15,8 +13,8 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(MapperlyIntegrationTestsTargetFramework)' == 'net48'">
-    <!-- .NET Framework 4.8 defaults to lang version 7.3, but we want to test nullable features. These are available in 8.0. 
-         To also use init-only properties, we upgrade to lang version 9.0, which is works, but is not officially supported. -->
+    <!-- .NET Framework 4.8 defaults to lang version 7.3, but we want to test nullable features. These are available in 8.0.
+          To also use init-only properties, we upgrade to lang version 9.0, which is works, but is not officially supported. -->
     <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 

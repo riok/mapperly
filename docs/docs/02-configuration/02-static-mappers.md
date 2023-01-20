@@ -1,6 +1,7 @@
 # Static mappers and extension methods
 
 Mapperly supports static mappers and extension methods:
+
 ```csharp
 [Mapper]
 public static partial class CarMapper

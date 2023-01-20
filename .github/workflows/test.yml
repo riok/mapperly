@@ -66,7 +66,7 @@ jobs:
 
       # use nupkg artifact for integration tests instead of project references
       - run: dotnet nuget add source "$(pwd)/artifacts"
-      - run: dotnet build -f net${{ matrix.dotnet }} -p:MapperlyIntegrationTestsTargetFramework=net${{ matrix.dotnet }} -p:MapperlyNugetPackageVersion=0.0.1-dev.$GITHUB_RUN_ID
+      - run: dotnet build -f net${{ matrix.dotnet }} -p:MapperlyIntegrationTestsTargetFramework=net${{ matrix.dotnet }} -p:MapperlyNugetPackageVersion="0.0.1-dev.$GITHUB_RUN_ID"
         working-directory: ./test/Riok.Mapperly.IntegrationTests
       - run: dotnet test --no-build -f net${{ matrix.dotnet }}
         working-directory: ./test/Riok.Mapperly.IntegrationTests

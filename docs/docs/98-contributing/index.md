@@ -18,16 +18,16 @@ Even better, you can [submit a Pull Request](#submit-pr) with a fix.
 
 ## Missing a Feature?
 
-You can *request* a new feature by [submitting an issue](#submit-issue) to our GitHub repository.
-If you would like to *implement* a new feature, please consider the size of the change in order to determine the right steps to proceed:
+You can _request_ a new feature by [submitting an issue](#submit-issue) to our GitHub repository.
+If you would like to _implement_ a new feature, please consider the size of the change in order to determine the right steps to proceed:
 
-* For a **major feature**, first [open an issue](https://github.com/riok/mapperly/issues/new) and outline your proposal so that it can be discussed.
+- For a **major feature**, first [open an issue](https://github.com/riok/mapperly/issues/new) and outline your proposal so that it can be discussed.
   Getting early feedback will help ensure your implementation work is accepted by the maintainers.
   This will also allow us to better coordinate our efforts and minimize duplicated effort.
 
   Note: Adding a new topic to the documentation, or significantly re-writing a topic, counts as a major feature.
 
-* **Small Features** can be crafted and directly [submitted as a Pull Request](#submit-pr).
+- **Small Features** can be crafted and directly [submitted as a Pull Request](#submit-pr).
 
 ## Submission Guidelines
 
@@ -50,23 +50,24 @@ Before you submit your Pull Request (PR) consider the following guidelines:
 
 3. Get an overview on how Mapperly works by reading this contributing documentation, the [architectural overview](./architecture) and related documentation.
 
-4. [Fork](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo) the riok/mapperly repo.
+4. [Fork](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo) the riok/mapperly repository.
 
 5. In your forked repository, make your changes in a new git branch:
 
-     ```shell
-     git checkout -b my-fix-branch main
-     ```
+   ```shell
+   git checkout -b my-fix-branch main
+   ```
 
 6. Create your patch, including appropriate [test](./tests) cases and [documentation](./docs) updates.
 
 7. Commit your changes using a descriptive commit message that follows our [commit message conventions](#commit).
    Adherence to these conventions is necessary because release notes are automatically generated from these messages.
 
-     ```shell
-     git commit --all
-     ```
-   Note: the optional commit `-a` command line option will automatically "add" and "rm" edited files.
+   ```shell
+   git commit --all
+   ```
+
+   Note: the optional commit `-a` command-line option will automatically "add" and "rm" edited files.
 
 8. If any commits have been made to the upstream main branch,
    you should rebase your development branch so that merging it will be a simple fast-forward that won't require any conflict resolution work.
@@ -76,15 +77,15 @@ Before you submit your Pull Request (PR) consider the following guidelines:
    git pull upstream main
    git checkout my-fix-branch
    git rebase main
-    ```
+   ```
 
 10. Now, it may be desirable to squash some of your smaller commits down into a small number of larger more cohesive commits. You can do this with an interactive rebase:
 
-     ```bash
-     # Rebase all commits on your development branch
-     git checkout
-     git rebase -i main
-     ```
+    ```bash
+    # Rebase all commits on your development branch
+    git checkout
+    git rebase -i main
+    ```
 
 11. Push your branch to GitHub:
 
@@ -96,7 +97,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
 
 #### Checks failure
 
-Once you've submitted a pull request, all continuous-integration checks are triggered again.
+Once you've submitted a pull request, all continuous-integration checks are triggered.
 If some of these checks fail, it could be either problems with the pull request or a failure of some test cases.
 For more information on the failure, check the output logs of the jobs.
 
@@ -116,6 +117,6 @@ Make sure you use [conventional commit message format](https://www.conventionalc
 Must be one of the following:
 
 - **feat**: New Feature
-- **fix**: Bug Fix
+- **fix**: Bugfix
 - **docs**: Documentation
 - **chore**: Chores which should not lead to a changelog / release notes entry

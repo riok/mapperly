@@ -1,4 +1,4 @@
-name: Conventional Commits
+name: conventional-commits
 
 on:
   pull_request:
@@ -6,8 +6,8 @@ on:
       - '**'
 
 jobs:
-  build:
-    name: Conventional Commits
+  validate:
+    name:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

@@ -18,7 +18,7 @@ Mapperly is one of the fastest .NET object mapper out there, surpassing even the
 The benchmark was generated with [Benchmark.netCoreMappers](https://github.com/mjebrahimi/Benchmark.netCoreMappers).
 
 | Method        |       Mean |   Error |  StdDev |  Gen 0 | Allocated |
-|---------------|-----------:|--------:|--------:|-------:|----------:|
+| ------------- | ---------: | ------: | ------: | -----: | --------: |
 | AgileMapper   | 1,523.8 ns | 3.90 ns | 3.25 ns | 1.5106 |   3,160 B |
 | TinyMapper    | 4,094.3 ns | 3.90 ns | 3.05 ns | 1.0300 |   2,160 B |
 | ExpressMapper | 2,595.8 ns | 5.49 ns | 5.14 ns | 2.3422 |   4,904 B |

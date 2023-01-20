@@ -72,6 +72,7 @@ public partial class CarMapper
 ## Supported object factory method signatures
 
 Mapperly supports several object factory method signatures.
+
 ```csharp title="Supported object factory method signatures"
 TargetType CreateTargetType();
 TargetType CreateTargetType(SourceType source);
