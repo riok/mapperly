@@ -62,6 +62,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
 
 7. Commit your changes using a descriptive commit message that follows our [commit message conventions](#commit).
    Adherence to these conventions is necessary because release notes are automatically generated from these messages.
+   [Husky](https://alirezanet.github.io/Husky.Net/) and [csharpier](https://csharpier.com/) automatically format changed files when commited.
 
    ```shell
    git commit --all

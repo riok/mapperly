@@ -13,7 +13,10 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-dotnet@v3.0.3
       - run: dotnet tool restore
-      - run: dotnet format --verify-no-changes
+      - run: dotnet csharpier --check .
+      # don't run dotnet format for whitespace formatting as this is done by csharpier
+      - run: dotnet format style --verify-no-changes
+      - run: dotnet format analyzers --verify-no-changes
   test:
     needs: lint
     runs-on: ubuntu-latest

@@ -1,0 +1,12 @@
+printWidth: 140
+useTabs: false
+tabWidth: 4
+preprocessorSymbolSets:
+  - ""
+  - "DEBUG"
+  - "DEBUG_SOURCE_GENERATOR"
+  - "NETSTANDARD2_0"
+  - "SYSTEM_PRIVATE_CORELIB"
+  - "NET6_0_OR_GREATER"
+  - "NET7_0_OR_GREATER"
+  - "ROSLYN4_4_OR_GREATER"
