@@ -17,6 +17,8 @@ public class NewInstanceMappingBuilderContext : ObjectPropertyMappingBuilderCont
 
     public void AddConstructorParameterMapping(ConstructorParameterMapping mapping)
     {
+        PropertyConfigsByRootTargetName.Remove(mapping.Parameter.Name);
+
         SetSourcePropertyMapped(mapping.DelegateMapping.SourcePath);
         Mapping.AddConstructorParameterMapping(mapping);
     }

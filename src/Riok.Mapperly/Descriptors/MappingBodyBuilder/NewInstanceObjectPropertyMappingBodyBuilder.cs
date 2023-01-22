@@ -198,12 +198,7 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
         var skippedOptionalParam = false;
         foreach (var parameter in ctor.Parameters)
         {
-            if (!PropertyPath.TryFind(
-                ctx.Mapping.SourceType,
-                MemberPathCandidateBuilder.BuildMemberPathCandidates(parameter.Name),
-                ctx.IgnoredSourcePropertyNames,
-                StringComparer.OrdinalIgnoreCase,
-                out var sourcePath))
+            if (!TryFindConstructorParameterSourcePath(ctx, parameter, out var sourcePath))
             {
                 if (!parameter.IsOptional)
                     return false;
@@ -229,6 +224,57 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
             var ctorMapping = new ConstructorParameterMapping(parameter, propertyMapping, skippedOptionalParam);
             constructorParameterMappings.Add(ctorMapping);
             mappedTargetPropertyNames.Add(parameter.Name);
+        }
+
+        return true;
+    }
+
+    private static bool TryFindConstructorParameterSourcePath(
+        NewInstanceMappingBuilderContext ctx,
+        IParameterSymbol parameter,
+        [NotNullWhen(true)] out PropertyPath? sourcePath)
+    {
+        sourcePath = null;
+
+        if (!ctx.PropertyConfigsByRootTargetName.TryGetValue(parameter.Name, out var propertyConfigs))
+        {
+            return PropertyPath.TryFind(
+                ctx.Mapping.SourceType,
+                MemberPathCandidateBuilder.BuildMemberPathCandidates(parameter.Name),
+                ctx.IgnoredSourcePropertyNames,
+                StringComparer.OrdinalIgnoreCase,
+                out sourcePath
+            );
+        }
+
+        if (propertyConfigs.Count > 1)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.MultipleConfigurationsForConstructorParameter,
+                parameter.Type,
+                parameter.Name);
+        }
+
+        var propertyConfig = propertyConfigs.First();
+        if (propertyConfig.Target.Count > 1)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.ConstructorParameterDoesNotSupportPaths,
+                parameter.Type,
+                string.Join(".", propertyConfig.Target));
+            return false;
+        }
+
+        if (!PropertyPath.TryFind(
+            ctx.Mapping.SourceType,
+            propertyConfig.Source,
+            out sourcePath))
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.MappingSourcePropertyNotFound,
+                propertyConfig.Source,
+                ctx.Mapping.SourceType);
+            return false;
         }
 
         return true;

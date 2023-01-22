@@ -350,4 +350,36 @@ public class ObjectPropertyConstructorResolverTest
             .HaveSingleMethodBody(@"var target = new B(source.Nested == null ? throw new System.ArgumentNullException(nameof(source.Nested.Value)) : (double)source.Nested.Value);
     return target;");
     }
+
+    [Fact]
+    public void CanResolveToRecordConstructorWithMapPropertyAttribute()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(nameof(A.Id), nameof(B.Id2))] partial B ToRecord(A a);",
+            "class A { public string? Id { get; set; } public bool F { get; set; } }",
+            "record B(string? Id2, bool F);"
+        );
+
+        var result = TestHelper.GenerateMapper(source);
+        result
+            .Should()
+            .HaveSingleMethodBody(@"var target = new B(a.Id ?? default, a.F);
+    return target;");
+    }
+
+    [Fact]
+    public void CanResolveToClassConstructorWithMapPropertyAttribute()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(nameof(A.Id), \"id2\")] partial B ToRecord(A a);",
+            "class A { public string? Id { get; set; } public bool F { get; set; } }",
+            "class B { public B(string? id2, bool f) { Id2 = id2; F = f; } public string? Id2 { get; set; } public bool F { get; set; } }"
+        );
+
+        var result = TestHelper.GenerateMapper(source);
+        result
+            .Should()
+            .HaveSingleMethodBody(@"var target = new B(a.Id ?? default, a.F);
+    return target;");
+    }
 }
