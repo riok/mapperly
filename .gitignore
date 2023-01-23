@@ -3,6 +3,8 @@
 bin/
 obj/
 
+.vs/
+
 # verify received files
 *.received.*
 

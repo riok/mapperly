@@ -213,4 +213,20 @@ internal static class DiagnosticDescriptors
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
         true);
+
+    public static readonly DiagnosticDescriptor MultipleConfigurationsForConstructorParameter = new DiagnosticDescriptor(
+        "RMG027",
+        "A constructor parameter can have one configuration at max",
+        "The constructor parameter at {0}.{1} can have one configuration at max",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        true);
+
+    public static readonly DiagnosticDescriptor ConstructorParameterDoesNotSupportPaths = new DiagnosticDescriptor(
+        "RMG028",
+        "Constructor parameter cannot handle target paths",
+        "Cannot map to constructor parameter target path {0}.{1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true);
 }

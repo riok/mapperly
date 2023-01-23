@@ -65,3 +65,5 @@ RMG025  | Mapper   | Error    | To use reference handling it needs to be enabled
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 RMG026  | Mapper   | Info     | Cannot map from indexed property
+RMG027  | Mapper   | Warning  | A constructor parameter can have one configuration at max
+RMG028  | Mapper   | Error    | Constructor parameter cannot handle target paths

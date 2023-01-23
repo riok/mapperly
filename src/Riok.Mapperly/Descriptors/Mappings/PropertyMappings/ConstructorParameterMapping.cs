@@ -6,7 +6,6 @@ namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 
 public class ConstructorParameterMapping
 {
-    private readonly IParameterSymbol _parameter;
     private readonly bool _selfOrPreviousIsUnmappedOptional;
 
     public ConstructorParameterMapping(
@@ -15,9 +14,11 @@ public class ConstructorParameterMapping
         bool selfOrPreviousIsUnmappedOptional)
     {
         DelegateMapping = delegateMapping;
-        _parameter = parameter;
+        Parameter = parameter;
         _selfOrPreviousIsUnmappedOptional = selfOrPreviousIsUnmappedOptional;
     }
+
+    public IParameterSymbol Parameter { get; }
 
     public NullPropertyMapping DelegateMapping { get; }
 
@@ -26,12 +27,12 @@ public class ConstructorParameterMapping
         var argumentExpression = DelegateMapping.Build(ctx);
         var arg = Argument(argumentExpression);
         return _selfOrPreviousIsUnmappedOptional
-            ? arg.WithNameColon(NameColon(_parameter.Name))
+            ? arg.WithNameColon(NameColon(Parameter.Name))
             : arg;
     }
 
     protected bool Equals(ConstructorParameterMapping other)
-        => _parameter.Equals(other._parameter, SymbolEqualityComparer.Default)
+        => Parameter.Equals(other.Parameter, SymbolEqualityComparer.Default)
             && DelegateMapping.Equals(other.DelegateMapping)
             && _selfOrPreviousIsUnmappedOptional == other._selfOrPreviousIsUnmappedOptional;
 
@@ -59,7 +60,7 @@ public class ConstructorParameterMapping
     {
         unchecked
         {
-            var hashCode = SymbolEqualityComparer.Default.GetHashCode(_parameter);
+            var hashCode = SymbolEqualityComparer.Default.GetHashCode(Parameter);
             hashCode = (hashCode * 397) ^ DelegateMapping.GetHashCode();
             hashCode = (hashCode * 397) ^ _selfOrPreviousIsUnmappedOptional.GetHashCode();
             return hashCode;
