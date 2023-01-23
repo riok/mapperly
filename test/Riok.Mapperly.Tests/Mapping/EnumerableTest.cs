@@ -390,6 +390,39 @@ public class EnumerableTest
     }
 
     [Fact]
+    public void EnumerableToIListOfCastedTypes()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "IEnumerable<long>",
+            "IList<int>");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody("return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(source, x => (int)x));");
+    }
+
+    [Fact]
+    public void EnumerableToListOfCastedTypes()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "IEnumerable<long>",
+            "List<int>");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody("return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(source, x => (int)x));");
+    }
+
+    [Fact]
+    public void EnumerableToIReadOnlyListOfCastedTypes()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "IEnumerable<long>",
+            "IReadOnlyList<int>");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody("return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(source, x => (int)x));");
+    }
+
+    [Fact]
     public void EnumerableToCustomCollection()
     {
         var source = TestSourceBuilder.Mapping(

@@ -25,7 +25,7 @@ public static class DictionaryMappingBuilder
         if (valueMapping == null)
             return null;
 
-        // target is of type IDictionary<,> or IReadOnlyDictionary<,>.
+        // target is of type IDictionary<,>, IReadOnlyDictionary<,> or Dictionary<,>.
         // The constructed type should be Dictionary<,>
         if (IsDictionaryType(ctx, ctx.Target))
         {
