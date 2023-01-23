@@ -24,6 +24,9 @@ public class WellKnownTypes
     private INamedTypeSymbol? _enumerable;
     private INamedTypeSymbol? _iCollection;
     private INamedTypeSymbol? _iReadOnlyCollection;
+    private INamedTypeSymbol? _iList;
+    private INamedTypeSymbol? _list;
+    private INamedTypeSymbol? _iReadOnlyList;
     private INamedTypeSymbol? _keyValuePair;
     private INamedTypeSymbol? _dictionary;
 
@@ -44,6 +47,9 @@ public class WellKnownTypes
     public INamedTypeSymbol Enumerable => _enumerable ??= GetTypeSymbol(typeof(Enumerable));
     public INamedTypeSymbol ICollection => _iCollection ??= GetTypeSymbol(typeof(ICollection<>));
     public INamedTypeSymbol IReadOnlyCollection => _iReadOnlyCollection ??= GetTypeSymbol(typeof(IReadOnlyCollection<>));
+    public INamedTypeSymbol IList => _iList ??= GetTypeSymbol(typeof(IList<>));
+    public INamedTypeSymbol List => _list ??= GetTypeSymbol(typeof(List<>));
+    public INamedTypeSymbol IReadOnlyList => _iReadOnlyList ??= GetTypeSymbol(typeof(IReadOnlyList<>));
     public INamedTypeSymbol KeyValuePair => _keyValuePair ??= GetTypeSymbol(typeof(KeyValuePair<,>));
     public INamedTypeSymbol Dictionary => _dictionary ??= GetTypeSymbol(typeof(Dictionary<,>));
 

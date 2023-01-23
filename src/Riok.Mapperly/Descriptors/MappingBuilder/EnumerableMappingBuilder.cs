@@ -106,10 +106,12 @@ public static class EnumerableMappingBuilder
         if (targetIsReadOnlyCollection && sourceCountIsKnown)
             return (true, ToArrayMethodName);
 
-        // if target is a list, ICollection<T> or IReadOnlyCollection<T> collect with ToList()
+        // if target is a IReadOnlyCollection<T>, IList<T>, List<T> or ICollection<T> with ToList()
         return targetIsReadOnlyCollection
+            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IReadOnlyList)
+            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IList)
+            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.List)
             || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ICollection)
-            || targetIsReadOnlyCollection
             ? (true, ToListMethodName)
             : (false, null);
     }
