@@ -55,3 +55,12 @@ dotnet build /p:EmitCompilerGeneratedFiles=true /p:CompilerGeneratedFilesOutputP
 
 </TabItem>
 </Tabs>
+
+:::info
+Mapperly only emits updated source code on build.
+You won't see the updated mapper code or mapper diagnostics until you perform a build.
+
+This is done for performance reasons,
+otherwise the IDE could become laggy.
+Improvements are tracked in [#72](https://github.com/riok/mapperly/issues/72).
+:::

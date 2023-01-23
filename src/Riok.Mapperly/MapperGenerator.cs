@@ -25,7 +25,7 @@ public class MapperGenerator : IIncrementalGenerator
             .WhereNotNull();
 
         var compilationAndMappers = context.CompilationProvider.Combine(mapperClassDeclarations.Collect());
-        context.RegisterSourceOutput(compilationAndMappers, static (spc, source) => Execute(source.Left, source.Right, spc));
+        context.RegisterImplementationSourceOutput(compilationAndMappers, static (spc, source) => Execute(source.Left, source.Right, spc));
     }
 
     private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
