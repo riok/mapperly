@@ -25,7 +25,11 @@ public class GeneratedMethod
             .Body
             ?.NormalizeWhitespace()
             .ToFullString()
-            .Trim('{', '}', ' ', '\r', '\n') // simplify string to make assertions simpler
+            // simplify string to make assertions simpler, trim only first braces
+            // but all whitespace/nl afterwards
+            .Trim(' ', '\r', '\n')
+            .Trim('{', '}')
+            .Trim(' ', '\r', '\n')
             .ReplaceLineEndings() ?? string.Empty;
     }
 }

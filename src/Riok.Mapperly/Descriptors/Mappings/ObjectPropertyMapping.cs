@@ -1,42 +1,41 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
-using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
 /// <summary>
-/// Represents a complex object mapping implemented in its own method.
-/// Maps each property from the source to the target.
+/// A mapping from type to another by mapping each property.
+/// A <see cref="MethodMapping"/> implementation of <see cref="IPropertyAssignmentTypeMapping"/>.
 /// </summary>
-public abstract class ObjectPropertyMapping : MethodMapping, IPropertyAssignmentMappingContainer
+public abstract class ObjectPropertyMapping :
+    MethodMapping,
+    IPropertyAssignmentTypeMapping
 {
-    private readonly HashSet<IPropertyAssignmentMapping> _mappings = new();
+    private readonly ObjectPropertyExistingTargetMapping _mapping;
 
     protected ObjectPropertyMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
         : base(sourceType, targetType)
     {
-    }
-
-    protected ObjectPropertyMapping(MethodParameter sourceParameter, ITypeSymbol targetType)
-        : base(sourceParameter, targetType)
-    {
-    }
-
-    public void AddPropertyMapping(IPropertyAssignmentMapping mapping)
-        => _mappings.Add(mapping);
-
-    public void AddPropertyMappings(IEnumerable<IPropertyAssignmentMapping> mappings)
-    {
-        foreach (var mapping in mappings)
-        {
-            _mappings.Add(mapping);
-        }
+        _mapping = new ObjectPropertyExistingTargetMapping(sourceType, targetType);
     }
 
     public bool HasPropertyMapping(IPropertyAssignmentMapping mapping)
-        => _mappings.Contains(mapping);
+        => _mapping.HasPropertyMapping(mapping);
+
+    public void AddPropertyMapping(IPropertyAssignmentMapping mapping)
+        => _mapping.AddPropertyMapping(mapping);
+
+    public bool HasPropertyMappingContainer(IPropertyAssignmentMappingContainer container)
+        => _mapping.HasPropertyMappingContainer(container);
+
+    public void AddPropertyMappingContainer(IPropertyAssignmentMappingContainer container)
+        => _mapping.AddPropertyMappingContainer(container);
+
+    public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
+        => BuildBody(ctx, targetAccess);
 
     protected IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx, ExpressionSyntax target)
-        => _mappings.Select(x => x.Build(ctx, target));
+        => _mapping.Build(ctx, target);
 }

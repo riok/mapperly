@@ -26,7 +26,7 @@ public partial class Mapper
 
     private D[] MapToDArray(C[] source)
     {
-        var target = new D[source.Length];
+        var target = new D?[source.Length];
         for (var i = 0; i < source.Length; i++)
         {
             target[i] = MapToD(source[i]);

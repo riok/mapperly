@@ -57,24 +57,20 @@ public class NullPropertyMapping : IPropertyMapping
     }
 
     protected bool Equals(NullPropertyMapping other)
-        => _delegateMapping.Equals(other._delegateMapping) && _nullFallback == other._nullFallback && SourcePath.Equals(other.SourcePath);
+        => _delegateMapping.Equals(other._delegateMapping)
+            && _nullFallback == other._nullFallback
+            && SourcePath.Equals(other.SourcePath);
 
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj))
-        {
             return false;
-        }
 
         if (ReferenceEquals(this, obj))
-        {
             return true;
-        }
 
         if (obj.GetType() != GetType())
-        {
             return false;
-        }
 
         return Equals((NullPropertyMapping)obj);
     }

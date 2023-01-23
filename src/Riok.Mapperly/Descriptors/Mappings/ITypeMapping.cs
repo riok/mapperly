@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
@@ -6,12 +5,8 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Represents a mapping from one type to another.
 /// </summary>
-public interface ITypeMapping
+public interface ITypeMapping : IMapping
 {
-    ITypeSymbol SourceType { get; }
-
-    ITypeSymbol TargetType { get; }
-
     /// <summary>
     /// Gets a value indicating if this mapping can be called / built by another mapping.
     /// This should be <c>true</c> for most mappings.

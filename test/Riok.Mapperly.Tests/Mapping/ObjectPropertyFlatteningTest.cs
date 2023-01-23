@@ -242,13 +242,14 @@ public class ObjectPropertyFlatteningTest
     if (source.Value1 != null)
     {
         target.Value2 ??= new();
-        target.Value2.Id200 = source.Value1.Id100;
         if (source.Value1?.Value1 != null)
         {
             target.Value2.Value2 ??= new();
             target.Value2.Value2.Id2 = source.Value1.Value1.Id1;
             target.Value2.Value2.Id20 = source.Value1.Value1.Id10;
         }
+
+        target.Value2.Id200 = source.Value1.Id100;
     }
 
     return target;");

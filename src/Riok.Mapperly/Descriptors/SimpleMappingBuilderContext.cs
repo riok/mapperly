@@ -8,21 +8,21 @@ namespace Riok.Mapperly.Descriptors;
 /// </summary>
 public class SimpleMappingBuilderContext
 {
-    private readonly DescriptorBuilder _builder;
-
     public SimpleMappingBuilderContext(DescriptorBuilder builder)
     {
-        _builder = builder;
+        Builder = builder;
     }
 
-    public Compilation Compilation => _builder.Compilation;
+    protected DescriptorBuilder Builder { get; }
 
-    public MapperAttribute MapperConfiguration => _builder.MapperConfiguration;
+    public Compilation Compilation => Builder.Compilation;
+
+    public MapperAttribute MapperConfiguration => Builder.MapperConfiguration;
 
     public bool IsConversionEnabled(MappingConversionType conversionType)
         => MapperConfiguration.EnabledConversions.HasFlag(conversionType);
 
-    public WellKnownTypes Types => _builder.WellKnownTypes;
+    public WellKnownTypes Types => Builder.WellKnownTypes;
 
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? location, params object[] messageArgs)
         => ReportDiagnostic(descriptor, location?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(), messageArgs);
@@ -31,5 +31,5 @@ public class SimpleMappingBuilderContext
         => ReportDiagnostic(descriptor, location?.GetLocation(), messageArgs);
 
     private void ReportDiagnostic(DiagnosticDescriptor descriptor, Location? location, params object[] messageArgs)
-        => _builder.ReportDiagnostic(descriptor, location, messageArgs);
+        => Builder.ReportDiagnostic(descriptor, location, messageArgs);
 }

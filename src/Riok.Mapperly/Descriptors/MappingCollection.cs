@@ -1,5 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -8,15 +10,17 @@ public class MappingCollection
     // this includes mappings to build and already built mappings
     private readonly Dictionary<TypeMappingKey, ITypeMapping> _mappings = new();
 
-    // additional user defined mappings
-    // (with same signature as already defined mappings but with different names)
-    private readonly List<ITypeMapping> _extraMappings = new();
-
     // a list of all method mappings (extra mappings and mappings)
     private readonly List<MethodMapping> _methodMappings = new();
 
     // a list of all mappings (extra mappings and mappings)
     private readonly List<ITypeMapping> _allMappings = new();
+
+    // queue of mappings which don't have the body built yet
+    private readonly Queue<(IMapping, MappingBuilderContext)> _mappingsToBuildBody = new();
+
+    // a list of existing target mappings
+    private readonly Dictionary<TypeMappingKey, IExistingTargetMapping> _existingTargetMappings = new();
 
     public IReadOnlyCollection<MethodMapping> MethodMappings => _methodMappings;
 
@@ -27,6 +31,15 @@ public class MappingCollection
         _mappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var mapping);
         return mapping;
     }
+
+    public IExistingTargetMapping? FindExistingInstanceMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    {
+        _existingTargetMappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var mapping);
+        return mapping;
+    }
+
+    public void EnqueueMappingToBuildBody(IMapping mapping, MappingBuilderContext ctx)
+        => _mappingsToBuildBody.Enqueue((mapping, ctx));
 
     public void AddMapping(ITypeMapping mapping)
     {
@@ -39,11 +52,14 @@ public class MappingCollection
         if (mapping.CallableByOtherMappings && FindMapping(mapping.SourceType, mapping.TargetType) is null)
         {
             _mappings.Add(new TypeMappingKey(mapping), mapping);
-            return;
         }
-
-        _extraMappings.Add(mapping);
     }
+
+    public void AddExistingTargetMapping(IExistingTargetMapping mapping)
+        => _existingTargetMappings.Add(new TypeMappingKey(mapping), mapping);
+
+    public IEnumerable<(IMapping, MappingBuilderContext)> DequeueMappingsToBuildBody()
+        => _mappingsToBuildBody.DequeueAll();
 
     private readonly struct TypeMappingKey
     {
@@ -53,9 +69,13 @@ public class MappingCollection
         private readonly ITypeSymbol _target;
 
         public TypeMappingKey(ITypeMapping mapping)
+            : this(mapping.SourceType, mapping.TargetType)
         {
-            _source = mapping.SourceType;
-            _target = mapping.TargetType;
+        }
+
+        public TypeMappingKey(IExistingTargetMapping mapping)
+            : this(mapping.SourceType, mapping.TargetType)
+        {
         }
 
         public TypeMappingKey(ITypeSymbol source, ITypeSymbol target)

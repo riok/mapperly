@@ -26,7 +26,7 @@ public class DictionaryTest
             .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, long>(source.Count);
     foreach (var item in source)
     {
-        target.Add(item.Key, item.Value);
+        target[item.Key] = item.Value;
     }
 
     return target;");
@@ -43,7 +43,7 @@ public class DictionaryTest
             .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
     foreach (var item in source)
     {
-        target.Add(item.Key, (int)item.Value);
+        target[item.Key] = (int)item.Value;
     }
 
     return target;");
@@ -60,7 +60,7 @@ public class DictionaryTest
             .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
     foreach (var item in source)
     {
-        target.Add(item.Key, item.Value == null ? throw new System.ArgumentNullException(nameof(item.Value)) : item.Value.Value);
+        target[item.Key] = item.Value == null ? throw new System.ArgumentNullException(nameof(item.Value)) : item.Value.Value;
     }
 
     return target;");
@@ -78,7 +78,7 @@ public class DictionaryTest
             .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
     foreach (var item in source)
     {
-        target.Add(item.Key, item.Value == null ? default : item.Value.Value);
+        target[item.Key] = item.Value == null ? default : item.Value.Value;
     }
 
     return target;");
@@ -95,7 +95,7 @@ public class DictionaryTest
             .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
     foreach (var item in source)
     {
-        target.Add(item.Key, (int)item.Value);
+        target[item.Key] = (int)item.Value;
     }
 
     return target;");
@@ -112,7 +112,7 @@ public class DictionaryTest
             .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>();
     foreach (var item in source)
     {
-        target.Add(item.Key, item.Value);
+        target[item.Key] = item.Value;
     }
 
     return target;");
@@ -130,7 +130,7 @@ public class DictionaryTest
             .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
     foreach (var item in source)
     {
-        target.Add(item.Key, item.Value);
+        target[item.Key] = item.Value;
     }
 
     return target;");
@@ -148,7 +148,7 @@ public class DictionaryTest
             .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
     foreach (var item in source)
     {
-        target.Add(item.Key, item.Value);
+        target[item.Key] = item.Value;
     }
 
     return target;");
@@ -166,7 +166,7 @@ public class DictionaryTest
             .HaveSingleMethodBody(@"var target = new A();
     foreach (var item in source)
     {
-        target.Add(item.Key, item.Value);
+        target[item.Key] = item.Value;
     }
 
     return target;");
@@ -184,7 +184,7 @@ public class DictionaryTest
             .HaveSingleMethodBody(@"var target = CreateA();
     foreach (var item in source)
     {
-        target.Add(item.Key, item.Value);
+        target[item.Key] = item.Value;
     }
 
     return target;");

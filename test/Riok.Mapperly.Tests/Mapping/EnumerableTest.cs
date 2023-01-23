@@ -471,4 +471,64 @@ public class EnumerableTest
 
         return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
     }
+
+    [Fact]
+    public Task MapToExistingCollectionShouldWork()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(List<A>? source, RepeatedField<B> target);",
+            "class RepeatedField<T> : IList<T> {  }",
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapToReadOnlyNullableCollectionProperty()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public ICollection<int> Value { get; } }",
+            "class B { public ICollection<long>? Value { get; } }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapToReadOnlyNullableCollectionPropertyFromNullable()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public ICollection<int>? Value { get; } }",
+            "class B { public ICollection<long>? Value { get; } }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapToReadOnlyCollectionPropertyFromNullable()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public ICollection<int>? Value { get; } }",
+            "class B { public ICollection<long> Value { get; } }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapToReadOnlyCollectionProperty()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public ICollection<int> Value { get; } }",
+            "class B { public ICollection<long> Value { get; } }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }
