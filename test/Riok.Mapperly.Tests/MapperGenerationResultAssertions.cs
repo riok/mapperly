@@ -35,7 +35,7 @@ public class MapperGenerationResultAssertions
             .Value
             .Body
             .Should()
-            .Be(mapperMethodBody.ReplaceLineEndings());
+            .Be(mapperMethodBody.ReplaceLineEndings().Trim());
         return this;
     }
 
@@ -47,7 +47,7 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions AllMethodsHaveBody(string mapperMethodBody)
     {
-        mapperMethodBody = mapperMethodBody.ReplaceLineEndings();
+        mapperMethodBody = mapperMethodBody.ReplaceLineEndings().Trim();
         foreach (var method in _mapper.Methods.Values)
         {
             method.Body.Should().Be(mapperMethodBody);
@@ -75,7 +75,10 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions HaveMethodBody(string methodName, [StringSyntax(StringSyntax.CSharp)] string mapperMethodBody)
     {
-        _mapper.Methods[methodName].Body.Should().Be(mapperMethodBody.ReplaceLineEndings(), $"Method: {methodName}");
+        _mapper.Methods[methodName]
+            .Body
+            .Should()
+            .Be(mapperMethodBody.ReplaceLineEndings().Trim(), $"Method: {methodName}");
         return this;
     }
 

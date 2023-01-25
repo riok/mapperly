@@ -42,6 +42,28 @@ public static class SyntaxFactoryHelper
             coalesceExpr);
     }
 
+    public static ExpressionSyntax Or(IEnumerable<ExpressionSyntax> values)
+        => values.Aggregate((a, b) => BinaryExpression(SyntaxKind.LogicalOrExpression, a, b));
+
+    public static ExpressionSyntax And(IEnumerable<ExpressionSyntax> values)
+        => values.Aggregate((a, b) => BinaryExpression(SyntaxKind.LogicalAndExpression, a, b));
+
+    public static ExpressionSyntax IfNoneNull(params (ITypeSymbol Type, ExpressionSyntax Access)[] values)
+    {
+        var conditions = values
+            .Where(x => x.Type.IsNullable())
+            .Select(x => IsNotNull(x.Access));
+        return And(conditions);
+    }
+
+    public static ExpressionSyntax IfAnyNull(params (ITypeSymbol Type, ExpressionSyntax Access)[] values)
+    {
+        var conditions = values
+            .Where(x => x.Type.IsNullable())
+            .Select(x => IsNull(x.Access));
+        return Or(conditions);
+    }
+
     public static BinaryExpressionSyntax IsNull(ExpressionSyntax expression)
         => BinaryExpression(SyntaxKind.EqualsExpression, expression, NullLiteral());
 
@@ -58,9 +80,6 @@ public static class SyntaxFactoryHelper
             _ => ThrowArgumentNullException(argument),
         };
     }
-
-    public static StatementSyntax IfNullReturn(ExpressionSyntax expression)
-        => IfStatement(IsNull(expression), ReturnStatement());
 
     public static StatementSyntax IfNullReturnOrThrow(ExpressionSyntax expression, ExpressionSyntax? returnOrThrowExpression = null)
     {
@@ -98,6 +117,12 @@ public static class SyntaxFactoryHelper
 
     public static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax idExpression, string propertyIdentifierName)
         => MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, idExpression, IdentifierName(propertyIdentifierName));
+
+    public static AssignmentExpressionSyntax Assignment(
+        ExpressionSyntax target,
+        ExpressionSyntax source,
+        SyntaxKind kind = SyntaxKind.SimpleAssignmentExpression)
+        => AssignmentExpression(kind, target, source);
 
     public static ElementAccessExpressionSyntax ElementAccess(ExpressionSyntax idExpression, ExpressionSyntax index)
         => ElementAccessExpression(idExpression).WithArgumentList(BracketedArgumentList(SingletonSeparatedList(Argument(index))));
@@ -226,9 +251,6 @@ public static class SyntaxFactoryHelper
 
     public static StatementSyntax CreateInstance(string variableName, ITypeSymbol typeSymbol)
         => DeclareLocalVariable(variableName, CreateInstance(typeSymbol));
-
-    public static StatementSyntax CreateInstance(string variableName, ITypeSymbol typeSymbol, params ExpressionSyntax[] args)
-        => DeclareLocalVariable(variableName, CreateInstance(typeSymbol, args));
 
     public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol)
     {

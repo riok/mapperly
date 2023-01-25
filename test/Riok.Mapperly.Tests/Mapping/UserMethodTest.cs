@@ -79,6 +79,71 @@ public partial class MyMapper
     }
 
     [Fact]
+    public void WithExistingInstanceNullable()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(A? source, B? target)",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }");
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                    if (source == null || target == null)
+                        return;
+                    target.StringValue = source.StringValue;
+                """);
+    }
+
+    [Fact]
+    public Task WithExistingInstanceDisabledNullable()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(A source, B target)",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }");
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
+
+    [Fact]
+    public void WithExistingCollectionInstance()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(IEnumerable<A> source, ICollection<B> target)",
+            "record A(string Value);",
+            "record B(string Value);");
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody("""
+                    foreach (var item in source)
+                    {
+                        target.Add(MapToB(item));
+                    }
+                """);
+    }
+
+    [Fact]
+    public void WithExistingDictionaryInstance()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(IReadOnlyDictionary<string, A> source, IDictionary<string, B> target)",
+            "record A(string Value);",
+            "record B(string Value);");
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody("""
+                    foreach (var item in source)
+                    {
+                        target[item.Key] = MapToB(item.Value);
+                    }
+                """);
+    }
+
+    [Fact]
     public void WithMultipleUserDefinedMethodShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBody(

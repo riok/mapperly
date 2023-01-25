@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
@@ -40,8 +39,7 @@ public class ArrayForMapping : MethodMapping
         // target[i] = Map(source[i]);
         var forLoopBuilderCtx = ctx.WithSource(ElementAccess(ctx.Source, IdentifierName(loopCounterVariableName)));
         var mappedIndexedSourceValue = _elementMapping.Build(forLoopBuilderCtx);
-        var assignment = AssignmentExpression(
-            SyntaxKind.SimpleAssignmentExpression,
+        var assignment = Assignment(
             ElementAccess(IdentifierName(targetVariableName), IdentifierName(loopCounterVariableName)),
             mappedIndexedSourceValue);
         var assignmentBlock = Block(SingletonList<StatementSyntax>(ExpressionStatement(assignment)));

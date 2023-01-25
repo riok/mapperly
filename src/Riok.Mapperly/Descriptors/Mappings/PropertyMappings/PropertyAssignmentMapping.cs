@@ -1,7 +1,7 @@
 using System.Diagnostics;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 
@@ -26,11 +26,14 @@ public class PropertyAssignmentMapping : IPropertyAssignmentMapping
 
     public PropertyPath TargetPath { get; }
 
-    public StatementSyntax Build(
+    public IEnumerable<StatementSyntax> Build(
         TypeMappingBuildContext ctx,
         ExpressionSyntax targetAccess)
     {
-        return ExpressionStatement(BuildExpression(ctx, targetAccess));
+        return new[]
+        {
+            ExpressionStatement(BuildExpression(ctx, targetAccess)),
+        };
     }
 
     public ExpressionSyntax BuildExpression(
@@ -41,8 +44,7 @@ public class PropertyAssignmentMapping : IPropertyAssignmentMapping
         var mappedValue = _mapping.Build(ctx);
 
         // target.Property = mappedValue;
-        return AssignmentExpression(
-            SyntaxKind.SimpleAssignmentExpression,
+        return Assignment(
             targetPropertyAccess,
             mappedValue);
     }

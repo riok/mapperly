@@ -7,7 +7,11 @@ namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 /// </summary>
 public interface IPropertyAssignmentMapping
 {
-    StatementSyntax Build(
+    PropertyPath SourcePath { get; }
+
+    PropertyPath TargetPath { get; }
+
+    IEnumerable<StatementSyntax> Build(
         TypeMappingBuildContext ctx,
         ExpressionSyntax targetAccess);
 }

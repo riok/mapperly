@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 
@@ -9,7 +10,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 /// A property initializer which initializes null properties to new objects.
 /// </summary>
 [DebuggerDisplay("PropertyNullInitializerMapping({_pathToInitialize} ??= new())")]
-public class PropertyNullAssignmentInitializerMapping : IPropertyAssignmentMapping
+public class PropertyNullAssignmentInitializerMapping : PropertyAssignmentMappingContainer
 {
     private readonly PropertyPath _pathToInitialize;
 
@@ -18,14 +19,16 @@ public class PropertyNullAssignmentInitializerMapping : IPropertyAssignmentMappi
         _pathToInitialize = pathToInitialize;
     }
 
-    public StatementSyntax Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
+    public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
         // source.Value ??= new();
-        return ExpressionStatement(
-            AssignmentExpression(
-                SyntaxKind.CoalesceAssignmentExpression,
+        var initializer = ExpressionStatement(
+            Assignment(
                 _pathToInitialize.BuildAccess(targetAccess),
-                ImplicitObjectCreationExpression()));
+                ImplicitObjectCreationExpression(),
+                SyntaxKind.CoalesceAssignmentExpression));
+        return base.Build(ctx, targetAccess)
+            .Prepend(initializer);
     }
 
     public override bool Equals(object? obj)

@@ -78,9 +78,6 @@ internal static class SymbolExtensions
         return genericIntf != null;
     }
 
-    internal static bool Implements(this ITypeSymbol t, INamedTypeSymbol interfaceSymbol)
-        => t.AllInterfaces.Any(x => SymbolEqualityComparer.Default.Equals(interfaceSymbol, x));
-
     internal static bool CanConsumeType(this ITypeParameterSymbol typeParameter, Compilation compilation, ITypeSymbol type)
     {
         if (typeParameter.HasConstructorConstraint && !type.HasAccessibleParameterlessConstructor())

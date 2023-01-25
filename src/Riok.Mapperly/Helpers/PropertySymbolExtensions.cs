@@ -4,6 +4,12 @@ namespace Riok.Mapperly.Helpers;
 
 public static class PropertySymbolExtensions
 {
+    public static bool CanSet(this IPropertySymbol prop)
+        => !prop.IsReadOnly && prop.SetMethod?.IsAccessible() != false;
+
+    public static bool CanGet(this IPropertySymbol prop)
+        => !prop.IsWriteOnly && prop.GetMethod?.IsAccessible() != false;
+
     public static bool IsInitOnly(this IPropertySymbol prop)
         => prop.SetMethod?.IsInitOnly == true;
 

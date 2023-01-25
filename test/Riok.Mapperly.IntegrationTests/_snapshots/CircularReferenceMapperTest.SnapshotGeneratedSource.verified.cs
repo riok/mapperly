@@ -14,12 +14,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 return existingTargetReference;
             var target = new Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto();
             refHandler.SetReference<Riok.Mapperly.IntegrationTests.Models.CircularReferenceObject, Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto>(source, target);
-            target.Value = source.Value;
             if (source.Parent != null)
             {
                 target.Parent = MapToCircularReferenceDto(source.Parent, refHandler);
             }
 
+            target.Value = source.Value;
             return target;
         }
     }

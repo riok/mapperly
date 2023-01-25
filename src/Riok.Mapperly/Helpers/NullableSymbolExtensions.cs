@@ -15,6 +15,7 @@ public static class NullableSymbolExtensions
 
     /// <summary>
     /// Upgrade the nullability of a symbol from <see cref="NullableAnnotation.None"/> to <see cref="NullableAnnotation.Annotated"/>.
+    /// Does not upgrade the nullability of type parameters or array element types.
     /// </summary>
     /// <param name="symbol">The symbol to upgrade.</param>
     /// <returns>The upgraded symbol</returns>
@@ -26,6 +27,7 @@ public static class NullableSymbolExtensions
 
     /// <summary>
     /// Tries to upgrade the nullability of a symbol from <see cref="NullableAnnotation.None"/> to <see cref="NullableAnnotation.Annotated"/>.
+    /// Does not upgrade the nullability of type parameters or array element types.
     /// </summary>
     /// <param name="symbol">The symbol.</param>
     /// <param name="upgradedSymbol">The upgraded symbol, if an upgrade has taken place, <c>null</c> otherwise.</param>

@@ -9,24 +9,22 @@ namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 /// a property mapping container, which performs a null check before the mappings.
 /// </summary>
 [DebuggerDisplay("PropertyNullDelegateMapping({_nullConditionalSourcePath} != null)")]
-public class PropertyNullDelegateAssignmentMapping : IPropertyAssignmentMapping, IPropertyAssignmentMappingContainer
+public class PropertyNullDelegateAssignmentMapping : PropertyAssignmentMappingContainer
 {
     private readonly PropertyPath _nullConditionalSourcePath;
     private readonly bool _throwInsteadOfConditionalNullMapping;
-    private readonly HashSet<IPropertyAssignmentMapping> _delegateMappings = new();
-    private readonly IPropertyAssignmentMappingContainer _parent;
 
     public PropertyNullDelegateAssignmentMapping(
         PropertyPath nullConditionalSourcePath,
         IPropertyAssignmentMappingContainer parent,
         bool throwInsteadOfConditionalNullMapping)
+        : base(parent)
     {
         _nullConditionalSourcePath = nullConditionalSourcePath;
         _throwInsteadOfConditionalNullMapping = throwInsteadOfConditionalNullMapping;
-        _parent = parent;
     }
 
-    public StatementSyntax Build(
+    public override IEnumerable<StatementSyntax> Build(
         TypeMappingBuildContext ctx,
         ExpressionSyntax targetAccess)
     {
@@ -40,28 +38,11 @@ public class PropertyNullDelegateAssignmentMapping : IPropertyAssignmentMapping,
             ? ElseClause(Block(ExpressionStatement(ThrowArgumentNullException(sourceNullConditionalAccess))))
             : null;
 
-        var mappings = _delegateMappings.Select(m => m.Build(ctx, targetAccess)).ToList();
-        return IfStatement(condition, Block(mappings), elseClause);
-    }
-
-    public void AddPropertyMappings(IEnumerable<IPropertyAssignmentMapping> mappings)
-    {
-        foreach (var mapping in mappings)
+        return new[]
         {
-            AddPropertyMapping(mapping);
-        }
+            IfStatement(condition, Block(base.Build(ctx, targetAccess)), elseClause),
+        };
     }
-
-    public void AddPropertyMapping(IPropertyAssignmentMapping mapping)
-    {
-        if (!HasPropertyMapping(mapping))
-        {
-            _delegateMappings.Add(mapping);
-        }
-    }
-
-    public bool HasPropertyMapping(IPropertyAssignmentMapping mapping)
-        => _delegateMappings.Contains(mapping) || _parent.HasPropertyMapping(mapping);
 
     public override bool Equals(object? obj)
     {
