@@ -100,6 +100,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.EnumRawValue = (byte)testObject.EnumRawValue;
             target.EnumStringValue = MapToString(testObject.EnumStringValue);
             target.EnumReverseStringValue = MapToTestEnumDtoByValue(testObject.EnumReverseStringValue);
+            target.DateTimeValueTargetDateOnly = System.DateOnly.FromDateTime(testObject.DateTimeValueTargetDateOnly);
+            target.DateTimeValueTargetTimeOnly = System.TimeOnly.FromDateTime(testObject.DateTimeValueTargetTimeOnly);
             return target;
         }
 
@@ -207,6 +209,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.EnumStringValue = MapToString(source.EnumStringValue);
             target.EnumReverseStringValue = MapToTestEnumDtoByValue(source.EnumReverseStringValue);
             target.IgnoredStringValue = source.IgnoredStringValue;
+            target.DateTimeValueTargetDateOnly = System.DateOnly.FromDateTime(source.DateTimeValueTargetDateOnly);
+            target.DateTimeValueTargetTimeOnly = System.TimeOnly.FromDateTime(source.DateTimeValueTargetTimeOnly);
         }
 
         private partial int PrivateDirectInt(int value)

@@ -50,6 +50,8 @@ Riok.Mapperly.Abstractions.PropertyNameMappingStrategy.CaseSensitive = 0 -> Riok
 Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.All = -1 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.Constructor = 1 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.DateTimeToDateOnly = 256 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.DateTimeToTimeOnly = 512 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.EnumToEnum = 128 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.EnumToString = 64 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.ExplicitCast = 4 -> Riok.Mapperly.Abstractions.MappingConversionType

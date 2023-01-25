@@ -50,6 +50,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         // disable obsolete warning, as the obsolete attribute should still be tested.
 #pragma warning disable CS0618
         [MapperIgnore(nameof(TestObject.IgnoredStringValue))]
+        [MapperIgnore(nameof(TestObjectDto.DateTimeValueTargetDateOnly))]
+        [MapperIgnore(nameof(TestObjectDto.DateTimeValueTargetTimeOnly))]
 #pragma warning restore CS0618
         [MapperIgnoreTarget(nameof(TestObject.IgnoredIntValue))]
         [MapperIgnoreSource(nameof(TestObjectDto.IgnoredIntValue))]

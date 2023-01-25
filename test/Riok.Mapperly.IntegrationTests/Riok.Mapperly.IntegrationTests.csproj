@@ -29,4 +29,8 @@
     <PackageReference Include="Riok.Mapperly" Version="$(MapperlyNugetPackageVersion)" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(MapperlyIntegrationTestsTargetFramework)' == 'net48'">
+    <PackageReference Include="Portable.System.DateTimeOnly" Version="7.0.0" />
+  </ItemGroup>
+
 </Project>

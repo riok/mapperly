@@ -1,6 +1,10 @@
+using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Riok.Mapperly.IntegrationTests.Dto;
+#if !NET6_0_OR_GREATER
+using Riok.Mapperly.IntegrationTests.Helpers;
+#endif
 using Riok.Mapperly.IntegrationTests.Models;
 using VerifyTests;
 using VerifyXunit;
@@ -11,6 +15,16 @@ namespace Riok.Mapperly.IntegrationTests
     {
         static BaseMapperTest()
         {
+#if !NET6_0_OR_GREATER
+            VerifierSettings.AddExtraSettings(settings =>
+            {
+                settings.Converters.Add(new PortableDateOnlyConverter());
+                settings.Converters.Add(new PortableTimeOnlyConverter());
+            });
+#endif
+
+            VerifierSettings.DontScrubDateTimes();
+
             Verifier.DerivePathInfo((file, _, type, method)
                 => new PathInfo(Path.Combine(Path.GetDirectoryName(file)!, "_snapshots"), type.Name, method.Name));
         }
@@ -40,6 +54,8 @@ namespace Riok.Mapperly.IntegrationTests
                 SubObject = new InheritanceSubObject { BaseIntValue = 1, SubIntValue = 2, },
                 EnumRawValue = TestEnum.Value20,
                 EnumStringValue = TestEnum.Value30,
+                DateTimeValueTargetDateOnly = new DateTime(2020, 1, 3, 15, 10, 5, DateTimeKind.Utc),
+                DateTimeValueTargetTimeOnly = new DateTime(2020, 1, 3, 15, 10, 5, DateTimeKind.Utc),
                 IgnoredStringValue = "ignored",
                 RenamedStringValue = "fooBar2",
                 StringNullableTargetNotNullable = "fooBar3",
