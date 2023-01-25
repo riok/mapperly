@@ -30,6 +30,9 @@ public class WellKnownTypes
     private INamedTypeSymbol? _keyValuePair;
     private INamedTypeSymbol? _dictionary;
 
+    private INamedTypeSymbol? _dateOnly;
+    private INamedTypeSymbol? _timeOnly;
+
     internal WellKnownTypes(Compilation compilation)
     {
         _compilation = compilation;
@@ -52,8 +55,13 @@ public class WellKnownTypes
     public INamedTypeSymbol IReadOnlyList => _iReadOnlyList ??= GetTypeSymbol(typeof(IReadOnlyList<>));
     public INamedTypeSymbol KeyValuePair => _keyValuePair ??= GetTypeSymbol(typeof(KeyValuePair<,>));
     public INamedTypeSymbol Dictionary => _dictionary ??= GetTypeSymbol(typeof(Dictionary<,>));
+    public INamedTypeSymbol? DateOnly => _dateOnly ??= GetTypeSymbol("System.DateOnly");
+    public INamedTypeSymbol? TimeOnly => _timeOnly ??= GetTypeSymbol("System.TimeOnly");
 
     private INamedTypeSymbol GetTypeSymbol(Type type)
         => _compilation.GetTypeByMetadataName(type.FullName ?? throw new InvalidOperationException("Could not get name of type " + type))
             ?? throw new InvalidOperationException("Could not get type " + type.FullName);
+
+    private INamedTypeSymbol? GetTypeSymbol(string typeFullName)
+        => _compilation.GetTypeByMetadataName(typeFullName);
 }

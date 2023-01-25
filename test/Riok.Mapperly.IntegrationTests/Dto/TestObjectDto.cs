@@ -1,3 +1,4 @@
+using System;
 using Riok.Mapperly.IntegrationTests.Models;
 
 namespace Riok.Mapperly.IntegrationTests.Dto
@@ -64,5 +65,9 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         public string? IgnoredStringValue { get; set; }
         public int IgnoredIntValue { get; set; }
+
+        public DateOnly DateTimeValueTargetDateOnly { get; set; }
+
+        public TimeOnly DateTimeValueTargetTimeOnly { get; set; }
     }
 }

@@ -20,6 +20,8 @@ public class MappingBuilder
         StringToEnumMappingBuilder.TryBuildMapping,
         EnumToStringMappingBuilder.TryBuildMapping,
         EnumMappingBuilder.TryBuildMapping,
+        DateTimeToDateOnlyMappingBuilder.TryBuildMapping,
+        DateTimeToTimeOnlyMappingBuilder.TryBuildMapping,
         ExplicitCastMappingBuilder.TryBuildMapping,
         ToStringMappingBuilder.TryBuildMapping,
         NewInstanceObjectPropertyMappingBuilder.TryBuildMapping,

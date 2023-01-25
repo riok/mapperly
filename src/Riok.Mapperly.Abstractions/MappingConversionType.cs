@@ -63,6 +63,20 @@ public enum MappingConversionType
     EnumToEnum = 1 << 7,
 
     /// <summary>
+    /// If the source is a <see cref="DateTime"/>
+    /// and the target is a DateOnly
+    /// uses the `FromDateTime` method on the target type with the source as single parameter.
+    /// </summary>
+    DateTimeToDateOnly = 1 << 8,
+
+    /// <summary>
+    /// If the source is a <see cref="DateTime"/>
+    /// and the target is a TimeOnly
+    /// uses the `FromDateTime` method on the target type with the source as single parameter.
+    /// </summary>
+    DateTimeToTimeOnly = 1 << 9,
+
+    /// <summary>
     /// Enables all supported conversions.
     /// </summary>
     All = ~None,

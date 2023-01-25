@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Riok.Mapperly.IntegrationTests.Models
@@ -63,5 +64,9 @@ namespace Riok.Mapperly.IntegrationTests.Models
         public string? IgnoredStringValue { get; set; }
 
         public int IgnoredIntValue { get; set; }
+
+        public DateTime DateTimeValueTargetDateOnly { get; set; }
+
+        public DateTime DateTimeValueTargetTimeOnly { get; set; }
     }
 }

@@ -8,8 +8,8 @@ public partial class CarMapper
 {
     public partial CarDto CarToCarDto(Car car);
 
-    private DateOnly DateTimeToDateOnly(DateTime dt) => DateOnly.FromDateTime(dt);
+    private int TimeSpanToHours(TimeSpan t) => t.Hours;
 }
 ```
 
-Whenever Mapperly needs a mapping from `DateTime` to `DateOnly` inside the `CarMapper` implementation, it will use the provided implementation.
+Whenever Mapperly needs a mapping from `TimeSpan` to `int` inside the `CarMapper` implementation, it will use the provided implementation.
