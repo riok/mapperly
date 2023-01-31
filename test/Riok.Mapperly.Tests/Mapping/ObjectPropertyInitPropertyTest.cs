@@ -87,6 +87,22 @@ public class ObjectPropertyInitPropertyTest
     }
 
     [Fact]
+    public void InitOnlyReferenceLoop()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public A? Parent { get; init; } }",
+            "class B { public B? Parent { get; init; } }");
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(@"var target = new B()
+    {Parent = source.Parent == null ? default : Map(source.Parent)};
+    return target;");
+    }
+
+    [Fact]
     public void InitOnlyPropertyWithAutoFlattenedNullablePath()
     {
         var source = TestSourceBuilder.Mapping(

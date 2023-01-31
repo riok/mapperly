@@ -301,7 +301,7 @@ public class ObjectPropertyConstructorResolverTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B((int? )source.Value);
+            .HaveSingleMethodBody(@"var target = new B(source.Value);
     return target;");
     }
 
