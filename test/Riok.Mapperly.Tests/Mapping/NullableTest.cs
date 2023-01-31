@@ -121,6 +121,18 @@ public class NullableTest
     }
 
     [Fact]
+    public void NonNullableToNullableValueType()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "DateTime",
+            "DateTime?");
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody("return (System.DateTime? )source;");
+    }
+
+    [Fact]
     public void WithExistingInstanceNullableSource()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

@@ -111,7 +111,7 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
             return;
 
         var delegateMapping = ctx.BuilderContext.FindMapping(sourcePath.MemberType, targetProperty.Type)
-            ?? ctx.BuilderContext.FindOrBuildMapping(sourcePath.MemberType.NonNullable(), targetProperty.Type);
+            ?? ctx.BuilderContext.FindOrBuildMapping(sourcePath.MemberType.NonNullable(), targetProperty.Type.NonNullable());
 
         if (delegateMapping == null)
         {
@@ -210,7 +210,8 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
             // nullability is handled inside the property mapping
             var paramType = parameter.Type.WithNullableAnnotation(parameter.NullableAnnotation);
             var delegateMapping = ctx.BuilderContext.FindMapping(sourcePath.MemberType, paramType)
-                ?? ctx.BuilderContext.FindOrBuildMapping(sourcePath.Member.Type.NonNullable(), paramType);
+                ?? ctx.BuilderContext.FindOrBuildMapping(sourcePath.Member.Type.NonNullable(), paramType.NonNullable());
+
             if (delegateMapping == null)
             {
                 if (!parameter.IsOptional)
