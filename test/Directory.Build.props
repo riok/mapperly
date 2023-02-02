@@ -24,7 +24,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Meziantou.Xunit.ParallelTestFramework" Version="2.1.0"/>
-    <PackageReference Include="Verify.XUnit" Version="19.7.1" />
+    <PackageReference Include="Verify.XUnit" Version="19.8.2" />
     <PackageReference Include="Moq" Version="4.18.4" />
   </ItemGroup>
 </Project>
