@@ -31,6 +31,9 @@ These tests run locally by referencing the source generator as an analyzer.
 In the CI pipeline, the integration tests reference the built NuGet package and
 are run on several supported target frameworks (including .NET 7.0 but also .NET Framework).
 
+Snapshots of the generated code are stored per Roslyn version.
+You may need to manually update older versions.
+
 Debugging integration tests is a lot harder than debugging unit tests.
 Therefore if an integration test needs to be debugged,
 it is often easier to implement an unit test for the to be tested behaviour

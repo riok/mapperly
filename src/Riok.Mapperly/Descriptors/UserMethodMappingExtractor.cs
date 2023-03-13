@@ -177,7 +177,7 @@ public static class UserMethodMappingExtractor
                 method.ContainingType.ToDisplayString(),
                 method.Name,
                 ctx.Types.IReferenceHandler.ToDisplayString(),
-                refHandlerParameterSymbol.ToDisplayString());
+                refHandlerParameterSymbol.Type.ToDisplayString());
         }
 
         if (!ctx.MapperConfiguration.UseReferenceHandling)
