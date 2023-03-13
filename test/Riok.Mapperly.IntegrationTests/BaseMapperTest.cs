@@ -2,12 +2,12 @@ using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Riok.Mapperly.IntegrationTests.Dto;
-#if !NET6_0_OR_GREATER
-using Riok.Mapperly.IntegrationTests.Helpers;
-#endif
 using Riok.Mapperly.IntegrationTests.Models;
 using VerifyTests;
 using VerifyXunit;
+#if !NET6_0_OR_GREATER
+using Riok.Mapperly.IntegrationTests.Helpers;
+#endif
 
 namespace Riok.Mapperly.IntegrationTests
 {
@@ -26,7 +26,7 @@ namespace Riok.Mapperly.IntegrationTests
             VerifierSettings.DontScrubDateTimes();
 
             Verifier.DerivePathInfo((file, _, type, method)
-                => new PathInfo(Path.Combine(Path.GetDirectoryName(file)!, "_snapshots"), type.Name, method.Name));
+                => new PathInfo(Path.Combine(Path.GetDirectoryName(file)!, "_snapshots", "Roslyn_" + GetRoslynVersion()), type.Name, method.Name));
         }
 
         protected string GetGeneratedMapperFilePath(string name, [CallerFilePath] string filePath = "")
@@ -77,6 +77,15 @@ namespace Riok.Mapperly.IntegrationTests
                     new[] { new TestObjectNested { IntValue = 10 }, new TestObjectNested { IntValue = 20 }, },
                 SourceTargetSameObjectType = new TestObject(8) { IntValue = 99, RequiredValue = 98, }
             };
+        }
+
+        private static string GetRoslynVersion()
+        {
+#if NET7_0_OR_GREATER || NET48_OR_GREATER
+            return "4_5";
+#else
+            return "4_4_OR_LOWER";
+#endif
         }
     }
 }

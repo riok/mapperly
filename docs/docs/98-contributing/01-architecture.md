@@ -49,6 +49,9 @@ See `build/package.sh` for details.
 2. Create a new file `Riok.Mapperly.Roslyn$(Version).props` in `src/Riok.Mapperly` similar to the existing ones
    and define constants as needed.
 3. Update the default `ROSLYN_VERSION` in `src/Riok.Mapperly/Riok.Mapperly.csproj`.
-4. Adjust the .NET version matrix of the `integration-test` GitHub Actions job (defined in `.github/workflows/test.yml`)
+4. Update the `Microsoft.CodeAnalysis.CSharp` dependency version in `test/Riok.Mapperly.Tests/Riok.Mapperly.Tests.csproj`.
+5. Adjust the .NET version matrix of the `integration-test` GitHub Actions job (defined in `.github/workflows/test.yml`)
    to include a dotnet version which is based on the added Roslyn version.
-5. Adjust the .NET version in the `global.json` file as needed.
+6. Adjust the .NET version in the `global.json` file as needed.
+7. If generated code changes based on the new Roslyn version,
+   introduce a new `roslynVersionName` in `Riok.Mapperly.IntegrationTests.BaseMapperTest.GetRoslynVersion()` and generate the new snapshots.

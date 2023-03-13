@@ -18,7 +18,7 @@
     <PackageIcon>logo.png</PackageIcon>
 
     <!-- default roslyn version -->
-    <ROSLYN_VERSION Condition="'$(ROSLYN_VERSION)' == ''">4.4</ROSLYN_VERSION>
+    <ROSLYN_VERSION Condition="'$(ROSLYN_VERSION)' == ''">4.5</ROSLYN_VERSION>
   </PropertyGroup>
 
   <Import Project="Riok.Mapperly.Roslyn$(ROSLYN_VERSION).props" />
@@ -44,5 +44,4 @@
     <None Include="$(OutputPath)\$(AssemblyName).Abstractions.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
     <None Include="$(OutputPath)\$(AssemblyName).Abstractions.xml" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
   </ItemGroup>
-
 </Project>
