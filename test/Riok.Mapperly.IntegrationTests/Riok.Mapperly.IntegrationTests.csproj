@@ -30,6 +30,6 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(MapperlyIntegrationTestsTargetFramework)' == 'net48'">
-    <PackageReference Include="Portable.System.DateTimeOnly" Version="7.0.0" />
+    <PackageReference Include="Portable.System.DateTimeOnly" Version="7.0.1" />
   </ItemGroup>
 </Project>
