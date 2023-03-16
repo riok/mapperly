@@ -14,10 +14,13 @@ public class NullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"if (source == null)
-        throw new System.ArgumentNullException(nameof(source));
-    var target = new B();
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    throw new System.ArgumentNullException(nameof(source));
+                var target = new B();
+                return target;
+                """);
     }
 
     [Fact]
@@ -31,10 +34,13 @@ public class NullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"if (source == null)
-        return default;
-    var target = new B();
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return default;
+                var target = new B();
+                return target;
+                """);
     }
 
     [Fact]
@@ -60,8 +66,11 @@ public class NullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                return target;
+                """);
     }
 
     [Fact]
@@ -76,10 +85,13 @@ public class NullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"if (source == null)
-        return new B();
-    var target = new B();
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return new B();
+                var target = new B();
+                return target;
+                """);
     }
 
     [Fact]
@@ -142,9 +154,12 @@ public class NullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"if (source == null)
-        return;
-    target.StringValue = source.StringValue;");
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return;
+                target.StringValue = source.StringValue;
+                """);
     }
 
     [Fact]
@@ -166,9 +181,12 @@ public class NullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMapMethodBody(@"var target = new B();
-    target.Value = source.Value;
-    target.Descriptions = (string[])source.Descriptions;
-    return target;");
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                target.Value = source.Value;
+                target.Descriptions = (string[])source.Descriptions;
+                return target;
+                """);
     }
 }

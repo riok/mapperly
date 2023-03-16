@@ -17,9 +17,12 @@ public class ObjectPropertyTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    target.StringValue = source.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                target.StringValue = source.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -46,9 +49,12 @@ public class ObjectPropertyTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new A();
-    target.StringValue = source.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new A();
+                target.StringValue = source.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -73,8 +79,11 @@ public class ObjectPropertyTest
             "ref struct A {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new A();
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new A();
+                return target;
+                """);
     }
 
     [Fact]
@@ -88,9 +97,12 @@ public class ObjectPropertyTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    target.Value = int.Parse(source.Value);
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                target.Value = int.Parse(source.Value);
+                return target;
+                """);
     }
 
     [Fact]
@@ -144,51 +156,6 @@ public class ObjectPropertyTest
     }
 
     [Fact]
-    public Task WithObsoleteIgnoredTargetPropertyAttributeShouldIgnoreAndGenerateDiagnostics()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapperIgnore(nameof(B.IntValue))] partial B Map(A source);",
-            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }");
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task WithIgnoredTargetPropertyShouldIgnoreAndGenerateDiagnostics()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapperIgnoreTarget(nameof(B.IntValue))] partial B Map(A source);",
-            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }");
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task WithIgnoredSourcePropertyShouldIgnoreAndGenerateDiagnostics()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapperIgnoreSource(nameof(A.IntValue))] partial B Map(A source);",
-            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }");
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public void WithIgnoredSourceAndTargetPropertyShouldIgnore()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapperIgnoreSource(nameof(A.IntValue))] [MapperIgnoreTarget(nameof(B.IntValue))] partial B Map(A source);",
-            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }");
-
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    target.StringValue = source.StringValue;
-    return target;");
-    }
-
-    [Fact]
     public void WithManualMappedProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -198,9 +165,12 @@ public class ObjectPropertyTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    target.StringValue2 = source.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                target.StringValue2 = source.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -217,9 +187,12 @@ public class ObjectPropertyTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    target.stringvalue = source.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                target.stringvalue = source.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -252,7 +225,7 @@ public class ObjectPropertyTest
     public Task WithManualMappedNotFoundSourcePropertyShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty(nameof(A.StringValue9), nameof(B.StringValue2)] partial B Map(A source);",
+            "[MapProperty(\"A.StringValue9\", nameof(B.StringValue2)] partial B Map(A source);",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue2 { get; set; } }");
 
@@ -282,10 +255,13 @@ public class ObjectPropertyTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMapMethodBody(@"var target = new B();
-    target.StringValue = source.StringValue;
-    target.NestedValue = UserImplementedMap(source.NestedValue);
-    return target;");
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                target.StringValue = source.StringValue;
+                target.NestedValue = UserImplementedMap(source.NestedValue);
+                return target;
+                """);
     }
 
     [Fact]
@@ -318,39 +294,6 @@ public class ObjectPropertyTest
             "[MapProperty(\"not_found\", nameof(B.StringValue2))] partial B Map(A source);",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue2 { get; set; } }");
-
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task WithNotFoundIgnoredObsoleteTargetAttributePropertyShouldDiagnostic()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapperIgnore(\"not_found\")] partial B Map(A source);",
-            "class A { }",
-            "class B { }");
-
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task WithNotFoundIgnoredTargetPropertyShouldDiagnostic()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapperIgnoreTarget(\"not_found\")] partial B Map(A source);",
-            "class A { }",
-            "class B { }");
-
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task WithNotFoundIgnoredSourcePropertyShouldDiagnostic()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapperIgnoreSource(\"not_found\")] partial B Map(A source);",
-            "class A { }",
-            "class B { }");
 
         return TestHelper.VerifyGenerator(source);
     }

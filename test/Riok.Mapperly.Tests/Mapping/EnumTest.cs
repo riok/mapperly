@@ -81,14 +81,17 @@ public class EnumTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"return source switch
-    {
-        E1.A => E2.A,
-        E1.B => E2.B,
-        E1.C => E2.C,
-        E1.E => E2.E,
-        _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, ""The value of enum E1 is not supported""),
-    };");
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    E1.A => E2.A,
+                    E1.B => E2.B,
+                    E1.C => E2.C,
+                    E1.E => E2.E,
+                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
+                };
+                """);
     }
 
     [Fact]
@@ -101,17 +104,20 @@ public class EnumTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"return source switch
-    {
-        E1.A => E2.A,
-        E1.B => E2.B,
-        E1.C => E2.C,
-        E1.D => E2.d,
-        E1.E => E2.E,
-        E1.f => E2.f,
-        E1.F => E2.f,
-        _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, ""The value of enum E1 is not supported""),
-    };");
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    E1.A => E2.A,
+                    E1.B => E2.B,
+                    E1.C => E2.C,
+                    E1.D => E2.d,
+                    E1.E => E2.E,
+                    E1.f => E2.f,
+                    E1.F => E2.f,
+                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
+                };
+                """);
     }
 
     [Fact]
@@ -146,13 +152,16 @@ enum E2 {A = 100, B, C}
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"return source switch
-    {
-        E1.A => E2.A,
-        E1.B => E2.B,
-        E1.C => E2.C,
-        _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, ""The value of enum E1 is not supported""),
-    };");
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    E1.A => E2.A,
+                    E1.B => E2.B,
+                    E1.C => E2.C,
+                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
+                };
+                """);
     }
 
     [Fact]
@@ -205,13 +214,16 @@ enum E2 {A = 100, B, C}
             "enum E1 {A, B, C}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"return source switch
-    {
-        E1.A => nameof(E1.A),
-        E1.B => nameof(E1.B),
-        E1.C => nameof(E1.C),
-        _ => source.ToString(),
-    };");
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    E1.A => nameof(E1.A),
+                    E1.B => nameof(E1.B),
+                    E1.C => nameof(E1.C),
+                    _ => source.ToString(),
+                };
+                """);
     }
 
     [Fact]
@@ -222,13 +234,16 @@ enum E2 {A = 100, B, C}
             "enum E1 {A, B, C}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"return source switch
-    {
-        { } s when s.Equals(nameof(E1.A), System.StringComparison.OrdinalIgnoreCase) => E1.A,
-        { } s when s.Equals(nameof(E1.B), System.StringComparison.OrdinalIgnoreCase) => E1.B,
-        { } s when s.Equals(nameof(E1.C), System.StringComparison.OrdinalIgnoreCase) => E1.C,
-        _ => (E1)System.Enum.Parse(typeof(E1), source, true),
-    };");
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    { } s when s.Equals(nameof(E1.A), System.StringComparison.OrdinalIgnoreCase) => E1.A,
+                    { } s when s.Equals(nameof(E1.B), System.StringComparison.OrdinalIgnoreCase) => E1.B,
+                    { } s when s.Equals(nameof(E1.C), System.StringComparison.OrdinalIgnoreCase) => E1.C,
+                    _ => (E1)System.Enum.Parse(typeof(E1), source, true),
+                };
+                """);
     }
 
     [Fact]
@@ -239,13 +254,16 @@ enum E2 {A = 100, B, C}
             "enum E1 {A, B, C}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"return source switch
-    {
-        nameof(E1.A) => E1.A,
-        nameof(E1.B) => E1.B,
-        nameof(E1.C) => E1.C,
-        _ => (E1)System.Enum.Parse(typeof(E1), source, false),
-    };");
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    nameof(E1.A) => E1.A,
+                    nameof(E1.B) => E1.B,
+                    nameof(E1.C) => E1.C,
+                    _ => (E1)System.Enum.Parse(typeof(E1), source, false),
+                };
+                """);
     }
 
     [Fact]

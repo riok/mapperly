@@ -16,9 +16,12 @@ public class ObjectFactoryTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = CreateB();
-    target.StringValue = a.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = CreateB();
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -34,9 +37,12 @@ public class ObjectFactoryTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveMethodCount(2)
-            .AllMethodsHaveBody(@"var target = CreateB();
-    target.StringValue = a.StringValue;
-    return target;");
+            .AllMethodsHaveBody(
+                """
+                var target = CreateB();
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -50,9 +56,12 @@ public class ObjectFactoryTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = CreateB(a);
-    target.StringValue = a.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = CreateB(a);
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -66,9 +75,12 @@ public class ObjectFactoryTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = Create<B>();
-    target.StringValue = a.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = Create<B>();
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -82,9 +94,12 @@ public class ObjectFactoryTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = Create<B>(a);
-    target.StringValue = a.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = Create<B>(a);
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -98,9 +113,12 @@ public class ObjectFactoryTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = Create<B, A>(a);
-    target.StringValue = a.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = Create<B, A>(a);
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -114,9 +132,12 @@ public class ObjectFactoryTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = Create<A, B>(a);
-    target.StringValue = a.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = Create<A, B>(a);
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -130,9 +151,12 @@ public class ObjectFactoryTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = Create<A>(a);
-    target.StringValue = a.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = Create<A>(a);
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -148,9 +172,12 @@ public class ObjectFactoryTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = CreateB();
-    target.StringValue = a.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = CreateB();
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -166,9 +193,12 @@ public class ObjectFactoryTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = CreateB<B>();
-    target.StringValue = a.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = CreateB<B>();
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -182,9 +212,12 @@ public class ObjectFactoryTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = CreateB();
-    target.StringValue = a.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = CreateB();
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -198,9 +231,12 @@ public class ObjectFactoryTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = CreateB() ?? new B();
-    target.StringValue = a.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = CreateB() ?? new B();
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -214,9 +250,12 @@ public class ObjectFactoryTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = CreateB() ?? throw new System.NullReferenceException(""The object factory CreateB returned null"");
-    target.StringValue = a.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = CreateB() ?? throw new System.NullReferenceException("The object factory CreateB returned null");
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -230,9 +269,12 @@ public class ObjectFactoryTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = Create<B>() ?? new B();
-    target.StringValue = a.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = Create<B>() ?? new B();
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]
@@ -246,9 +288,12 @@ public class ObjectFactoryTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = Create<B>() ?? throw new System.NullReferenceException(""The object factory Create returned null"");
-    target.StringValue = a.StringValue;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = Create<B>() ?? throw new System.NullReferenceException("The object factory Create returned null");
+                target.StringValue = a.StringValue;
+                return target;
+                """);
     }
 
     [Fact]

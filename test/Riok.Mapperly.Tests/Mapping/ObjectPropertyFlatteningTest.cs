@@ -14,9 +14,12 @@ public class ObjectPropertyFlatteningTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    target.MyValueId = source.Value.Id;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                target.MyValueId = source.Value.Id;
+                return target;
+                """);
     }
 
     [Fact]
@@ -31,9 +34,12 @@ public class ObjectPropertyFlatteningTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    target.ValueId = source.Value.Id;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                target.ValueId = source.Value.Id;
+                return target;
+                """);
     }
 
     [Fact]
@@ -48,9 +54,12 @@ public class ObjectPropertyFlatteningTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    target.ValueId = source.ValueId;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                target.ValueId = source.ValueId;
+                return target;
+                """);
     }
 
     [Fact]
@@ -65,13 +74,16 @@ public class ObjectPropertyFlatteningTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    if (source.Value != null)
-    {
-        target.ValueId = source.Value.Id;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                if (source.Value != null)
+                {
+                    target.ValueId = source.Value.Id;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -86,14 +98,17 @@ public class ObjectPropertyFlatteningTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    if (source.Value != null)
-    {
-        target.ValueId = source.Value.Id.ToString();
-        target.ValueName = source.Value.Name;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                if (source.Value != null)
+                {
+                    target.ValueId = source.Value.Id.ToString();
+                    target.ValueName = source.Value.Name;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -108,16 +123,19 @@ public class ObjectPropertyFlatteningTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.DisabledNullable)
             .Should()
-            .HaveSingleMethodBody(@"if (source == null)
-        return default;
-    var target = new B();
-    if (source.Value != null)
-    {
-        target.ValueId = source.Value.Id.ToString();
-    }
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return default;
+                var target = new B();
+                if (source.Value != null)
+                {
+                    target.ValueId = source.Value.Id.ToString();
+                }
 
-    target.ValueName = source.Value?.Name;
-    return target;");
+                target.ValueName = source.Value?.Name;
+                return target;
+                """);
     }
 
     [Fact]
@@ -132,11 +150,14 @@ public class ObjectPropertyFlatteningTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.DisabledNullable)
             .Should()
-            .HaveSingleMethodBody(@"if (source == null)
-        return default;
-    var target = new B();
-    target.ValueName = source.Value?.Name;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return default;
+                var target = new B();
+                target.ValueName = source.Value?.Name;
+                return target;
+                """);
     }
 
     [Fact]
@@ -150,9 +171,12 @@ public class ObjectPropertyFlatteningTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    target.Value.Id = source.MyValueId;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                target.Value.Id = source.MyValueId;
+                return target;
+                """);
     }
 
     [Fact]
@@ -166,11 +190,14 @@ public class ObjectPropertyFlatteningTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    target.Value ??= new();
-    target.Value.Id = source.MyValueId;
-    target.Value.Id2 = source.MyValueId2;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                target.Value ??= new();
+                target.Value.Id = source.MyValueId;
+                target.Value.Id2 = source.MyValueId2;
+                return target;
+                """);
     }
 
     [Fact]
@@ -238,20 +265,23 @@ public class ObjectPropertyFlatteningTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    if (source.Value1 != null)
-    {
-        target.Value2 ??= new();
-        if (source.Value1?.Value1 != null)
-        {
-            target.Value2.Value2 ??= new();
-            target.Value2.Value2.Id2 = source.Value1.Value1.Id1;
-            target.Value2.Value2.Id20 = source.Value1.Value1.Id10;
-        }
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                if (source.Value1 != null)
+                {
+                    target.Value2 ??= new();
+                    if (source.Value1?.Value1 != null)
+                    {
+                        target.Value2.Value2 ??= new();
+                        target.Value2.Value2.Id2 = source.Value1.Value1.Id1;
+                        target.Value2.Value2.Id20 = source.Value1.Value1.Id10;
+                    }
 
-        target.Value2.Id200 = source.Value1.Id100;
-    }
+                    target.Value2.Id200 = source.Value1.Id100;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 }

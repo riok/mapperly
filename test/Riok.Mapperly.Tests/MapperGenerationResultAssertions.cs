@@ -12,6 +12,12 @@ public class MapperGenerationResultAssertions
         _mapper = mapper;
     }
 
+    public MapperGenerationResultAssertions HaveDiagnostics()
+    {
+        _mapper.Diagnostics.Should().NotBeEmpty();
+        return this;
+    }
+
     public MapperGenerationResultAssertions NotHaveDiagnostics(IReadOnlySet<DiagnosticSeverity> allowedDiagnosticSeverities)
     {
         _mapper.Diagnostics
@@ -24,7 +30,8 @@ public class MapperGenerationResultAssertions
     public MapperGenerationResultAssertions HaveDiagnostic(DiagnosticMatcher diagnosticMatcher)
     {
         var diag = _mapper.Diagnostics.FirstOrDefault(diagnosticMatcher.Matches);
-        diag.Should().NotBeNull($"No diagnostic with id {diagnosticMatcher.Descriptor.Id} found");
+        var foundIds = string.Join(", ", _mapper.Diagnostics.Select(x => x.Descriptor.Id));
+        diag.Should().NotBeNull($"No diagnostic with id {diagnosticMatcher.Descriptor.Id} found, found diagnostic ids: {foundIds}");
         diagnosticMatcher.EnsureMatches(diag!);
         return this;
     }
@@ -35,7 +42,7 @@ public class MapperGenerationResultAssertions
             .Value
             .Body
             .Should()
-            .Be(mapperMethodBody.ReplaceLineEndings().Trim());
+            .Be(mapperMethodBody.ReplaceLineEndings());
         return this;
     }
 
