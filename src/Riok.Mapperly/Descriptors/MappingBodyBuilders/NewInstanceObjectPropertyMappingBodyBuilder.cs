@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Descriptors.MappingBuilders;
+using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 using Riok.Mapperly.Diagnostics;
@@ -9,29 +9,32 @@ using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
+/// <summary>
+/// Body builder for new instance object property mappings (mappings for which the target object gets created via <code>new()</code>).
+/// </summary>
 public static class NewInstanceObjectPropertyMappingBodyBuilder
 {
     public static void BuildMappingBody(MappingBuilderContext ctx, NewInstanceObjectPropertyMapping mapping)
     {
-        var mappingCtx = new NewInstanceMappingBuilderContext(ctx, mapping);
+        var mappingCtx = new NewInstanceBuilderContext<NewInstanceObjectPropertyMapping>(ctx, mapping);
+        BuildConstructorMapping(mappingCtx);
+        BuildInitOnlyPropertyMappings(mappingCtx, true);
+        mappingCtx.AddDiagnostics();
+    }
 
-        // map constructor
-        if (TryBuildConstructorMapping(mappingCtx, out var mappedTargetPropertyNames))
-        {
-            mappingCtx.TargetProperties.RemoveRange(mappedTargetPropertyNames);
-        }
-        else
-        {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.NoConstructorFound, ctx.Target);
-        }
-
+    public static void BuildMappingBody(MappingBuilderContext ctx, NewInstanceObjectPropertyMethodMapping mapping)
+    {
+        var mappingCtx = new NewInstanceContainerBuilderContext<NewInstanceObjectPropertyMethodMapping>(ctx, mapping);
+        BuildConstructorMapping(mappingCtx);
         BuildInitOnlyPropertyMappings(mappingCtx);
         ObjectPropertyMappingBodyBuilder.BuildMappingBody(mappingCtx);
     }
 
-    private static void BuildInitOnlyPropertyMappings(NewInstanceMappingBuilderContext ctx)
+    private static void BuildInitOnlyPropertyMappings(INewInstanceBuilderContext<IMapping> ctx, bool includeAllProperties = false)
     {
-        var initOnlyTargetProperties = ctx.TargetProperties.Values.Where(x => x.IsInitOnly() || x.IsRequired()).ToArray();
+        var initOnlyTargetProperties = includeAllProperties
+            ? ctx.TargetProperties.Values.ToArray()
+            : ctx.TargetProperties.Values.Where(x => x.CanOnlySetViaInitializer()).ToArray();
         foreach (var targetProperty in initOnlyTargetProperties)
         {
             ctx.TargetProperties.Remove(targetProperty.Name);
@@ -51,7 +54,7 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
                 ctx.BuilderContext.ReportDiagnostic(
                     targetProperty.IsRequired()
                         ? DiagnosticDescriptors.RequiredPropertyNotMapped
-                        : DiagnosticDescriptors.MappingSourcePropertyNotFound,
+                        : DiagnosticDescriptors.SourcePropertyNotFound,
                     targetProperty.Name,
                     ctx.Mapping.SourceType);
                 continue;
@@ -62,7 +65,7 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
     }
 
     private static void BuildInitPropertyMapping(
-        NewInstanceMappingBuilderContext ctx,
+        INewInstanceBuilderContext<IMapping> ctx,
         IPropertySymbol targetProperty,
         IReadOnlyCollection<MapPropertyAttribute> propertyConfigs)
     {
@@ -92,7 +95,7 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
             out var sourcePropertyPath))
         {
             ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.MappingSourcePropertyNotFound,
+                DiagnosticDescriptors.SourcePropertyNotFound,
                 targetProperty.Name,
                 ctx.Mapping.SourceType);
             return;
@@ -102,11 +105,14 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
     }
 
     private static void BuildInitPropertyMapping(
-        NewInstanceMappingBuilderContext ctx,
+        INewInstanceBuilderContext<IMapping> ctx,
         IPropertySymbol targetProperty,
         PropertyPath sourcePath)
     {
-        var targetPath = new PropertyPath(new[] { targetProperty });
+        var targetPath = new PropertyPath(new[]
+        {
+            targetProperty
+        });
         if (!ObjectPropertyMappingBodyBuilder.ValidateMappingSpecification(ctx, sourcePath, targetPath, true))
             return;
 
@@ -126,24 +132,41 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
             return;
         }
 
+        if (delegateMapping.Equals(ctx.Mapping))
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.ReferenceLoopInInitOnlyMapping,
+                ctx.Mapping.SourceType,
+                sourcePath.FullName,
+                ctx.Mapping.TargetType,
+                targetPath.FullName);
+            return;
+        }
+
+        var nullFallback = NullFallbackValue.Default;
+        if (!delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyNullable())
+        {
+            nullFallback = ctx.BuilderContext.GetNullFallbackValue(targetProperty.Type);
+        }
+
         var propertyMapping = new NullPropertyMapping(
             delegateMapping,
             sourcePath,
-            ctx.BuilderContext.GetNullFallbackValue(targetProperty.Type));
+            targetProperty.Type,
+            nullFallback,
+            !ctx.BuilderContext.IsExpression);
         var propertyAssignmentMapping = new PropertyAssignmentMapping(
             targetPath,
             propertyMapping);
         ctx.AddInitPropertyMapping(propertyAssignmentMapping);
     }
 
-    private static bool TryBuildConstructorMapping(
-        NewInstanceMappingBuilderContext ctx,
-        [NotNullWhen(true)] out ISet<string>? mappedTargetPropertyNames)
+    private static void BuildConstructorMapping(INewInstanceBuilderContext<IMapping> ctx)
     {
         if (ctx.Mapping.TargetType is not INamedTypeSymbol namedTargetType)
         {
-            mappedTargetPropertyNames = null;
-            return false;
+            ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoConstructorFound, ctx.BuilderContext.Target);
+            return;
         }
 
         // attributed ctor is prio 1
@@ -161,7 +184,7 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
             if (!TryBuildConstructorMapping(
                 ctx,
                 ctorCandidate,
-                out mappedTargetPropertyNames,
+                out var mappedTargetPropertyNames,
                 out var constructorParameterMappings))
             {
                 if (ctorCandidate.HasAttribute(ctx.BuilderContext.Types.MapperConstructorAttribute))
@@ -175,20 +198,20 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
                 continue;
             }
 
+            ctx.TargetProperties.RemoveRange(mappedTargetPropertyNames);
             foreach (var constructorParameterMapping in constructorParameterMappings)
             {
                 ctx.AddConstructorParameterMapping(constructorParameterMapping);
             }
 
-            return true;
+            return;
         }
 
-        mappedTargetPropertyNames = null;
-        return false;
+        ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoConstructorFound, ctx.BuilderContext.Target);
     }
 
     private static bool TryBuildConstructorMapping(
-        NewInstanceMappingBuilderContext ctx,
+        INewInstanceBuilderContext<IMapping> ctx,
         IMethodSymbol ctor,
         [NotNullWhen(true)] out ISet<string>? mappedTargetPropertyNames,
         [NotNullWhen(true)] out ISet<ConstructorParameterMapping>? constructorParameterMappings)
@@ -200,7 +223,8 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
         {
             if (!TryFindConstructorParameterSourcePath(ctx, parameter, out var sourcePath))
             {
-                if (!parameter.IsOptional)
+                // expressions do not allow skipping of optional parameters
+                if (!parameter.IsOptional || ctx.BuilderContext.IsExpression)
                     return false;
 
                 skippedOptionalParam = true;
@@ -221,7 +245,23 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
                 continue;
             }
 
-            var propertyMapping = new NullPropertyMapping(delegateMapping, sourcePath, ctx.BuilderContext.GetNullFallbackValue(paramType));
+            if (delegateMapping.Equals(ctx.Mapping))
+            {
+                ctx.BuilderContext.ReportDiagnostic(
+                    DiagnosticDescriptors.ReferenceLoopInCtorMapping,
+                    ctx.Mapping.SourceType,
+                    sourcePath.FullName,
+                    ctx.Mapping.TargetType,
+                    parameter.Name);
+                return false;
+            }
+
+            var propertyMapping = new NullPropertyMapping(
+                delegateMapping,
+                sourcePath,
+                paramType,
+                ctx.BuilderContext.GetNullFallbackValue(paramType),
+                !ctx.BuilderContext.IsExpression);
             var ctorMapping = new ConstructorParameterMapping(parameter, propertyMapping, skippedOptionalParam);
             constructorParameterMappings.Add(ctorMapping);
             mappedTargetPropertyNames.Add(parameter.Name);
@@ -231,7 +271,7 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
     }
 
     private static bool TryFindConstructorParameterSourcePath(
-        NewInstanceMappingBuilderContext ctx,
+        INewInstanceBuilderContext<IMapping> ctx,
         IParameterSymbol parameter,
         [NotNullWhen(true)] out PropertyPath? sourcePath)
     {
@@ -272,7 +312,7 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
             out sourcePath))
         {
             ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.MappingSourcePropertyNotFound,
+                DiagnosticDescriptors.SourcePropertyNotFound,
                 propertyConfig.Source,
                 ctx.Mapping.SourceType);
             return false;

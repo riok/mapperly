@@ -12,6 +12,7 @@ public class MappingBuilder
         NullableMappingBuilder.TryBuildMapping,
         SpecialTypeMappingBuilder.TryBuildMapping,
         DirectAssignmentMappingBuilder.TryBuildMapping,
+        QueryableMappingBuilder.TryBuildMapping,
         DictionaryMappingBuilder.TryBuildMapping,
         EnumerableMappingBuilder.TryBuildMapping,
         ImplicitCastMappingBuilder.TryBuildMapping,
@@ -27,61 +28,31 @@ public class MappingBuilder
         NewInstanceObjectPropertyMappingBuilder.TryBuildMapping,
     };
 
-    private readonly DescriptorBuilder _descriptorBuilder;
     private readonly MappingCollection _mappings;
 
-    public MappingBuilder(DescriptorBuilder descriptorBuilder, MappingCollection mappings)
+    public MappingBuilder(MappingCollection mappings)
     {
-        _descriptorBuilder = descriptorBuilder;
         _mappings = mappings;
     }
 
     /// <inheritdoc cref="MappingBuilderContext.FindMapping"/>
-    public ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        => _mappings.FindMapping(sourceType, targetType);
+    public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType)
+        => _mappings.Find(sourceType, targetType);
 
-    /// <inheritdoc cref="MappingBuilderContext.FindOrBuildMapping"/>
-    public ITypeMapping? FindOrBuild(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType)
+    public ITypeMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {
-        if (_mappings.FindMapping(sourceType, targetType) is { } foundMapping)
-            return foundMapping;
-
-        if (BuildDelegate(null, sourceType, targetType) is not { } mapping)
-            return null;
-
-        _mappings.AddMapping(mapping);
-        return mapping;
-    }
-
-    /// <inheritdoc cref="MappingBuilderContext.BuildMappingWithUserSymbol"/>
-    public ITypeMapping? BuildWithUserSymbol(
-        ISymbol userSymbol,
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType)
-    {
-        if (BuildDelegate(userSymbol, sourceType, targetType) is not { } mapping)
-            return null;
-
-        _mappings.AddMapping(mapping);
-        return mapping;
-    }
-
-    /// <inheritdoc cref="MappingBuilderContext.BuildDelegateMapping"/>
-    public ITypeMapping? BuildDelegate(
-        ISymbol? userSymbol,
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType)
-    {
-        var ctx = new MappingBuilderContext(_descriptorBuilder, sourceType, targetType, userSymbol);
         foreach (var mappingBuilder in _builders)
         {
-            if (mappingBuilder(ctx) is { } mapping)
+            if (mappingBuilder(ctx) is not { } mapping)
+                continue;
+
+            if (resultIsReusable)
             {
-                _mappings.EnqueueMappingToBuildBody(mapping, ctx);
-                return mapping;
+                _mappings.Add(mapping);
             }
+
+            _mappings.EnqueueToBuildBody(mapping, ctx);
+            return mapping;
         }
 
         return null;

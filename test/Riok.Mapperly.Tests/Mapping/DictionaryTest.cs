@@ -1,3 +1,4 @@
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
@@ -265,5 +266,17 @@ public class DictionaryTest
                 var target = new B();
                 return target;
                 """);
+    }
+
+    [Fact]
+    public void DictionaryMappingDisabledShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "Dictionary<long, long>",
+            "Dictionary<int, int>",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.Dictionary));
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostics();
     }
 }

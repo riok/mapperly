@@ -37,9 +37,19 @@ public static class EnumMappingBuilder
         var config = ctx.GetConfigurationOrDefault<MapEnumAttribute>();
         return config.Strategy switch
         {
+            EnumMappingStrategy.ByName when ctx.IsExpression => BuildCastMappingAndDiagnostic(ctx),
             EnumMappingStrategy.ByName => BuildNameMapping(ctx, config.IgnoreCase),
             _ => new CastMapping(ctx.Source, ctx.Target),
         };
+    }
+
+    private static TypeMapping BuildCastMappingAndDiagnostic(MappingBuilderContext ctx)
+    {
+        ctx.ReportDiagnostic(
+            DiagnosticDescriptors.EnumMappingStrategyByNameNotSupportedInProjectionMappings,
+            ctx.Source.ToDisplayString(),
+            ctx.Target.ToDisplayString());
+        return new CastMapping(ctx.Source, ctx.Target);
     }
 
     private static TypeMapping BuildNameMapping(MappingBuilderContext ctx, bool ignoreCase)
@@ -58,7 +68,9 @@ public static class EnumMappingBuilder
             getTargetField = source => targetFieldsByName.GetValueOrDefault(source.Name);
         }
 
-        var enumMemberMappings = ctx.Source.GetMembers().OfType<IFieldSymbol>()
+        var enumMemberMappings = ctx.Source
+            .GetMembers()
+            .OfType<IFieldSymbol>()
             .Select(x => (Source: x, Target: getTargetField(x)))
             .Where(x => x.Target != null)
             .ToDictionary(x => x.Source.Name, x => x.Target!.Name);
@@ -71,6 +83,9 @@ public static class EnumMappingBuilder
                 ctx.Target);
         }
 
-        return new EnumNameMapping(ctx.Source, ctx.Target, enumMemberMappings);
+        return new EnumNameMapping(
+            ctx.Source,
+            ctx.Target,
+            enumMemberMappings);
     }
 }

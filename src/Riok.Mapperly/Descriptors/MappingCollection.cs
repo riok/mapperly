@@ -13,9 +13,6 @@ public class MappingCollection
     // a list of all method mappings (extra mappings and mappings)
     private readonly List<MethodMapping> _methodMappings = new();
 
-    // a list of all mappings (extra mappings and mappings)
-    private readonly List<ITypeMapping> _allMappings = new();
-
     // queue of mappings which don't have the body built yet
     private readonly Queue<(IMapping, MappingBuilderContext)> _mappingsToBuildBody = new();
 
@@ -24,9 +21,7 @@ public class MappingCollection
 
     public IReadOnlyCollection<MethodMapping> MethodMappings => _methodMappings;
 
-    public IReadOnlyCollection<ITypeMapping> All => _allMappings;
-
-    public ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType)
     {
         _mappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var mapping);
         return mapping;
@@ -38,18 +33,17 @@ public class MappingCollection
         return mapping;
     }
 
-    public void EnqueueMappingToBuildBody(IMapping mapping, MappingBuilderContext ctx)
+    public void EnqueueToBuildBody(IMapping mapping, MappingBuilderContext ctx)
         => _mappingsToBuildBody.Enqueue((mapping, ctx));
 
-    public void AddMapping(ITypeMapping mapping)
+    public void Add(ITypeMapping mapping)
     {
-        _allMappings.Add(mapping);
         if (mapping is MethodMapping methodMapping)
         {
             _methodMappings.Add(methodMapping);
         }
 
-        if (mapping.CallableByOtherMappings && FindMapping(mapping.SourceType, mapping.TargetType) is null)
+        if (mapping.CallableByOtherMappings && Find(mapping.SourceType, mapping.TargetType) is null)
         {
             _mappings.Add(new TypeMappingKey(mapping), mapping);
         }

@@ -67,3 +67,14 @@ Rule ID | Category | Severity | Notes
 RMG026  | Mapper   | Info     | Cannot map from indexed property
 RMG027  | Mapper   | Warning  | A constructor parameter can have one configuration at max
 RMG028  | Mapper   | Error    | Constructor parameter cannot handle target paths
+
+## Release 2.8
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+RMG029  | Mapper   | Error    | Queryable projection mappings do not support reference handling
+RMG030  | Mapper   | Error    | Reference loop detected while mapping to an init only property
+RMG031  | Mapper   | Warning  | Reference loop detected while mapping to a constructor property
+RMG032 | Mapper | Warning | The enum mapping strategy ByName cannot be used in projection mappings

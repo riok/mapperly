@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Diagnostics;
@@ -14,6 +15,9 @@ public static class EnumerableMappingBuilder
 
     public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
+        if (!ctx.IsConversionEnabled(MappingConversionType.Enumerable))
+            return null;
+
         if (BuildElementMapping(ctx) is not { } elementMapping)
             return null;
 
@@ -23,7 +27,8 @@ public static class EnumerableMappingBuilder
             return new CastMapping(ctx.Source, ctx.Target);
 
         // if source is an array and target is an array or IReadOnlyCollection faster mappings can be applied
-        if (ctx.Source.IsArrayType()
+        if (!ctx.IsExpression
+            && ctx.Source.IsArrayType()
             && (ctx.Target.IsArrayType() || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IReadOnlyCollection)))
         {
             // if element mapping is synthetic
@@ -40,10 +45,12 @@ public static class EnumerableMappingBuilder
         // try linq mapping: x.Select(Map).ToArray/ToList
         // if that doesn't work do a foreach with add calls
         var (canMapWithLinq, collectMethodName) = ResolveCollectMethodName(ctx);
-        if (!canMapWithLinq)
-            return BuildCustomTypeMapping(ctx, elementMapping);
+        if (canMapWithLinq)
+            return BuildLinqMapping(ctx, elementMapping, collectMethodName);
 
-        return BuildLinqMapping(ctx, elementMapping, collectMethodName);
+        return ctx.IsExpression
+            ? null
+            : BuildCustomTypeMapping(ctx, elementMapping);
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)

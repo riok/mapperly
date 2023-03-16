@@ -21,7 +21,11 @@ public static class NewInstanceObjectPropertyMappingBuilder
         if (ctx.Source.IsEnum() || ctx.Target.IsEnum())
             return null;
 
-        return new NewInstanceObjectPropertyMapping(ctx.Source, ctx.Target.NonNullable(), ctx.MapperConfiguration.UseReferenceHandling);
+        // inline expressions don't support method property mappings
+        // and can only map to properties via object initializers.
+        return ctx.IsExpression
+            ? new NewInstanceObjectPropertyMapping(ctx.Source, ctx.Target.NonNullable())
+            : new NewInstanceObjectPropertyMethodMapping(ctx.Source, ctx.Target.NonNullable(), ctx.MapperConfiguration.UseReferenceHandling);
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)

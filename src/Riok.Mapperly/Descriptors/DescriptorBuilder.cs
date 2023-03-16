@@ -1,7 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders;
 using Riok.Mapperly.Descriptors.MappingBuilders;
 using Riok.Mapperly.Descriptors.ObjectFactories;
@@ -11,18 +9,14 @@ namespace Riok.Mapperly.Descriptors;
 
 public class DescriptorBuilder
 {
-    private readonly SourceProductionContext _context;
-    private readonly ITypeSymbol _mapperSymbol;
     private readonly MapperDescriptor _mapperDescriptor;
-
-    // default configurations, used a configuration is needed but no configuration is provided by the user
-    // these are the default configurations registered for each configuration attribute.
-    // Usually these are derived from the mapper attribute or default values.
-    private readonly Dictionary<Type, Attribute> _defaultConfigurations = new();
 
     private readonly MappingCollection _mappings = new();
     private readonly MethodNameBuilder _methodNameBuilder = new();
     private readonly MappingBodyBuilder _mappingBodyBuilder;
+    private readonly SimpleMappingBuilderContext _builderContext;
+
+    private ObjectFactoryCollection _objectFactories = ObjectFactoryCollection.Empty;
 
     public DescriptorBuilder(
         SourceProductionContext sourceContext,
@@ -30,43 +24,16 @@ public class DescriptorBuilder
         ClassDeclarationSyntax mapperSyntax,
         INamedTypeSymbol mapperSymbol)
     {
-        _mapperSymbol = mapperSymbol;
-        _context = sourceContext;
         _mapperDescriptor = new MapperDescriptor(mapperSyntax, mapperSymbol, _methodNameBuilder);
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
-        Compilation = compilation;
-        WellKnownTypes = new WellKnownTypes(Compilation);
-        MappingBuilder = new MappingBuilder(this, _mappings);
-        ExistingTargetMappingBuilder = new ExistingTargetMappingBuilder(this, _mappings);
-        MapperConfiguration = Configure();
-    }
-
-    internal IReadOnlyDictionary<Type, Attribute> DefaultConfigurations => _defaultConfigurations;
-
-    internal Compilation Compilation { get; }
-
-    internal WellKnownTypes WellKnownTypes { get; }
-
-    internal ObjectFactoryCollection ObjectFactories { get; private set; } = ObjectFactoryCollection.Empty;
-
-    public MapperAttribute MapperConfiguration { get; }
-
-    public MappingBuilder MappingBuilder { get; }
-
-    public ExistingTargetMappingBuilder ExistingTargetMappingBuilder { get; }
-
-    private MapperAttribute Configure()
-    {
-        var mapperAttribute = AttributeDataAccessor.AccessFirstOrDefault<MapperAttribute>(Compilation, _mapperSymbol) ?? new();
-        if (!_mapperSymbol.ContainingNamespace.IsGlobalNamespace)
-        {
-            _mapperDescriptor.Namespace = _mapperSymbol.ContainingNamespace.ToDisplayString();
-        }
-
-        _defaultConfigurations.Add(
-            typeof(MapEnumAttribute),
-            new MapEnumAttribute(mapperAttribute.EnumMappingStrategy) { IgnoreCase = mapperAttribute.EnumMappingIgnoreCase });
-        return mapperAttribute;
+        _builderContext = new SimpleMappingBuilderContext(
+            compilation,
+            new Configuration(compilation, mapperSymbol),
+            new WellKnownTypes(compilation),
+            _mapperDescriptor,
+            sourceContext,
+            new MappingBuilder(_mappings),
+            new ExistingTargetMappingBuilder(_mappings));
     }
 
     public MapperDescriptor Build()
@@ -83,31 +50,28 @@ public class DescriptorBuilder
 
     private void ExtractObjectFactories()
     {
-        var ctx = new SimpleMappingBuilderContext(this);
-        ObjectFactories = ObjectFactoryBuilder.ExtractObjectFactories(ctx, _mapperSymbol);
+        _objectFactories = ObjectFactoryBuilder.ExtractObjectFactories(_builderContext, _mapperDescriptor.Symbol);
     }
-
-    internal void ReportDiagnostic(DiagnosticDescriptor descriptor, Location? location, params object[] messageArgs)
-        => _context.ReportDiagnostic(Diagnostic.Create(descriptor, location ?? _mapperDescriptor.Syntax.GetLocation(), messageArgs));
 
     private void ExtractUserMappings()
     {
-        var defaultContext = new SimpleMappingBuilderContext(this);
-        foreach (var userMapping in UserMethodMappingExtractor.ExtractUserMappings(defaultContext, _mapperSymbol))
+        foreach (var userMapping in UserMethodMappingExtractor.ExtractUserMappings(_builderContext, _mapperDescriptor.Symbol))
         {
             var ctx = new MappingBuilderContext(
-                this,
+                _builderContext,
+                _objectFactories,
+                userMapping.Method,
                 userMapping.SourceType,
-                userMapping.TargetType,
-                userMapping.Method);
-            _mappings.AddMapping(userMapping);
-            _mappings.EnqueueMappingToBuildBody(userMapping, ctx);
+                userMapping.TargetType);
+
+            _mappings.Add(userMapping);
+            _mappings.EnqueueToBuildBody(userMapping, ctx);
         }
     }
 
     private void ReserveMethodNames()
     {
-        foreach (var methodSymbol in _mapperSymbol.GetAllMembers())
+        foreach (var methodSymbol in _mapperDescriptor.Symbol.GetAllMembers())
         {
             _methodNameBuilder.Reserve(methodSymbol.Name);
         }
@@ -123,19 +87,19 @@ public class DescriptorBuilder
 
     private void BuildReferenceHandlingParameters()
     {
-        if (!MapperConfiguration.UseReferenceHandling)
+        if (!_builderContext.MapperConfiguration.UseReferenceHandling)
             return;
 
         foreach (var methodMapping in _mappings.MethodMappings)
         {
-            methodMapping.EnableReferenceHandling(WellKnownTypes.IReferenceHandler);
+            methodMapping.EnableReferenceHandling(_builderContext.Types.IReferenceHandler);
         }
     }
 
     private void AddMappingsToDescriptor()
     {
         // add generated mappings to the mapper
-        foreach (var mapping in _mappings.All)
+        foreach (var mapping in _mappings.MethodMappings)
         {
             _mapperDescriptor.AddTypeMapping(mapping);
         }

@@ -10,6 +10,9 @@ public static class PropertySymbolExtensions
     public static bool CanGet(this IPropertySymbol prop)
         => !prop.IsWriteOnly && prop.GetMethod?.IsAccessible() != false;
 
+    public static bool CanOnlySetViaInitializer(this IPropertySymbol prop)
+        => prop.IsInitOnly() || prop.IsRequired();
+
     public static bool IsInitOnly(this IPropertySymbol prop)
         => prop.SetMethod?.IsInitOnly == true;
 

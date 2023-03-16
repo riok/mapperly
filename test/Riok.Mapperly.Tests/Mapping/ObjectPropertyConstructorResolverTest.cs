@@ -384,7 +384,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.Value == null ? throw new System.ArgumentNullException(nameof(source.Value.Value)) : (double)source.Value.Value);
+                var target = new B(source.Value != null ? (double)source.Value.Value : throw new System.ArgumentNullException(nameof(source.Value.Value)));
                 return target;
                 """);
     }
@@ -403,7 +403,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.Nested == null ? throw new System.ArgumentNullException(nameof(source.Nested.Value)) : (double)source.Nested.Value);
+                var target = new B(source.Nested != null ? (double)source.Nested.Value : throw new System.ArgumentNullException(nameof(source.Nested.Value)));
                 return target;
                 """);
     }
@@ -422,7 +422,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(a.Id ?? default, a.F);
+                var target = new B(a.Id, a.F);
                 return target;
                 """);
     }
@@ -441,7 +441,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(a.Id ?? default, a.F);
+                var target = new B(a.Id, a.F);
                 return target;
                 """);
     }

@@ -42,11 +42,14 @@ public static class SyntaxFactoryHelper
             coalesceExpr);
     }
 
-    public static ExpressionSyntax Or(IEnumerable<ExpressionSyntax> values)
-        => values.Aggregate((a, b) => BinaryExpression(SyntaxKind.LogicalOrExpression, a, b));
+    public static ExpressionSyntax Or(IEnumerable<ExpressionSyntax?> values)
+        => values.WhereNotNull().Aggregate((a, b) => BinaryExpression(SyntaxKind.LogicalOrExpression, a, b));
 
-    public static ExpressionSyntax And(IEnumerable<ExpressionSyntax> values)
-        => values.Aggregate((a, b) => BinaryExpression(SyntaxKind.LogicalAndExpression, a, b));
+    public static ExpressionSyntax And(params ExpressionSyntax?[] values)
+        => And((IEnumerable<ExpressionSyntax?>)values);
+
+    public static ExpressionSyntax And(IEnumerable<ExpressionSyntax?> values)
+        => values.WhereNotNull().Aggregate((a, b) => BinaryExpression(SyntaxKind.LogicalAndExpression, a, b));
 
     public static ExpressionSyntax IfNoneNull(params (ITypeSymbol Type, ExpressionSyntax Access)[] values)
     {
@@ -116,7 +119,10 @@ public static class SyntaxFactoryHelper
         => MemberAccess(IdentifierName(identifierName), propertyIdentifierName);
 
     public static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax idExpression, string propertyIdentifierName)
-        => MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, idExpression, IdentifierName(propertyIdentifierName));
+        => MemberAccess(idExpression, IdentifierName(propertyIdentifierName));
+
+    public static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax idExpression, SimpleNameSyntax property)
+        => MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, idExpression, property);
 
     public static AssignmentExpressionSyntax Assignment(
         ExpressionSyntax target,
@@ -155,6 +161,14 @@ public static class SyntaxFactoryHelper
     {
         return ThrowExpression(ObjectCreationExpression(IdentifierName(NotImplementedExceptionClassName))
             .WithArgumentList(SyntaxFactory.ArgumentList()));
+    }
+
+    public static InvocationExpressionSyntax GenericInvocation(string receiver, string methodName, IEnumerable<TypeSyntax> typeParams, params ExpressionSyntax[] arguments)
+    {
+        var method = GenericName(methodName)
+            .WithTypeArgumentList(TypeArgumentList(typeParams.ToArray()));
+        return InvocationExpression(MemberAccess(IdentifierName(receiver), method))
+            .WithArgumentList(ArgumentList(arguments));
     }
 
     public static InvocationExpressionSyntax GenericInvocation(string methodName, IEnumerable<TypeSyntax> typeParams, params ExpressionSyntax[] arguments)
@@ -211,14 +225,18 @@ public static class SyntaxFactoryHelper
         return param;
     }
 
-    public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ExpressionSyntax[] arguments)
+    public static InvocationExpressionSyntax StaticInvocation(string receiverType, string methodName, params ExpressionSyntax[] arguments)
     {
-        var receiverType = method.ReceiverType ?? throw new ArgumentNullException(nameof(method.ReceiverType));
-        var receiverTypeIdentifier = NonNullableIdentifier(receiverType);
-        var methodAccess = MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, receiverTypeIdentifier, IdentifierName(method.Name));
-        return InvocationExpression(methodAccess)
-            .WithArgumentList(ArgumentList(arguments));
+        var receiverTypeIdentifier = IdentifierName(receiverType);
+        var methodAccess = MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, receiverTypeIdentifier, IdentifierName(methodName));
+        return InvocationExpression(methodAccess).WithArgumentList(ArgumentList(arguments));
     }
+
+    public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ExpressionSyntax[] arguments)
+        => StaticInvocation(
+            method.ReceiverType?.NonNullable().ToDisplayString() ?? throw new ArgumentNullException(nameof(method.ReceiverType)),
+            method.Name,
+            arguments);
 
     public static ForStatementSyntax IncrementalForLoop(string counterName, StatementSyntax body, ExpressionSyntax maxValueExclusive)
     {

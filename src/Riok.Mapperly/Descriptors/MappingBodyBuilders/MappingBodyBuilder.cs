@@ -4,6 +4,9 @@ using Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
+/// <summary>
+/// Builds bodies mappings (the body of the mapping methods).
+/// </summary>
 public class MappingBodyBuilder
 {
     private readonly MappingCollection _mappings;
@@ -19,6 +22,9 @@ public class MappingBodyBuilder
         {
             switch (typeMapping)
             {
+                case NewInstanceObjectPropertyMethodMapping mapping:
+                    NewInstanceObjectPropertyMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                    break;
                 case NewInstanceObjectPropertyMapping mapping:
                     NewInstanceObjectPropertyMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;

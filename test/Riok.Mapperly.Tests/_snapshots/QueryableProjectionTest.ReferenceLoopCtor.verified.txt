@@ -1,0 +1,40 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG031,
+      Title: Reference loop detected while mapping to a constructor parameter,
+      Severity: Warning,
+      WarningLevel: 1,
+      Location: : (8,0)-(12,1),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Reference loop detected while mapping from {0}.{1} to the constructor parameter {3} of {2}, consider ignoring this property or mark another constructor as mapping constructor,
+      Message: Reference loop detected while mapping from A.Parent to the constructor parameter parent of B, consider ignoring this property or mark another constructor as mapping constructor,
+      Category: Mapper
+    },
+    {
+      Id: RMG013,
+      Title: No accessible constructor with mappable arguments found,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (8,0)-(12,1),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: {0} has no accessible constructor with mappable arguments,
+      Message: B has no accessible constructor with mappable arguments,
+      Category: Mapper
+    },
+    {
+      Id: RMG020,
+      Title: Source property is not mapped to any target property,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (8,0)-(12,1),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},
+      Message: The property Parent on the mapping source type A is not mapped to any property on the mapping target type B,
+      Category: Mapper
+    }
+  ]
+}

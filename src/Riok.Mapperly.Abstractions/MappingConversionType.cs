@@ -77,6 +77,25 @@ public enum MappingConversionType
     DateTimeToTimeOnly = 1 << 9,
 
     /// <summary>
+    /// If the source and the target is a <see cref="IQueryable{T}"/>.
+    /// Only uses object initializers and inlines the mapping code.
+    /// </summary>
+    Queryable = 1 << 10,
+
+    /// <summary>
+    /// If the source and the target is an <see cref="IEnumerable{T}"/>
+    /// Maps each element individually.
+    /// </summary>
+    Enumerable = 1 << 11,
+
+    /// <summary>
+    /// If the source and targets are <see cref="IDictionary{TKey,TValue}"/>
+    /// or <see cref="IReadOnlyDictionary{TKey,TValue}"/>.
+    /// Maps each <see cref="KeyValuePair{TKey,TValue}"/> individually.
+    /// </summary>
+    Dictionary = 1 << 12,
+
+    /// <summary>
     /// Enables all supported conversions.
     /// </summary>
     All = ~None,

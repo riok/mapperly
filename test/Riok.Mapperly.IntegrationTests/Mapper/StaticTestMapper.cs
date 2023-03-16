@@ -26,6 +26,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial IEnumerable<TestObjectDto> MapAllDtos(IEnumerable<TestObject> objects);
 
         [MapperIgnoreSource(nameof(TestObject.IgnoredIntValue))]
+        [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredStringValue))]
         public static partial TestObjectDto MapToDtoExt(this TestObject src);
 
         public static TestObjectDto MapToDto(TestObject src)
@@ -46,8 +47,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapProperty(
             nameof(TestObject.NullableUnflatteningIdValue),
             nameof(TestObjectDto.NullableUnflattening) + "." + nameof(TestObjectDto.NullableUnflattening.IdValue))]
-        [MapperIgnoreTarget(nameof(TestObject.IgnoredIntValue))]
-        [MapperIgnoreSource(nameof(TestObjectDto.IgnoredIntValue))]
+        [MapperIgnoreSource(nameof(TestObject.IgnoredIntValue))]
+        [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredIntValue))]
         private static partial TestObjectDto MapToDtoInternal(TestObject testObject);
 
         // disable obsolete warning, as the obsolete attribute should still be tested.
@@ -64,6 +65,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial TestEnumDtoByName MapToEnumDtoByName(TestEnum v);
 
         [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredIntValue))]
+        [MapperIgnoreSource(nameof(TestObject.IgnoredStringValue))]
         public static partial void UpdateDto(TestObject source, TestObjectDto target);
 
         private static partial int PrivateDirectInt(int value);

@@ -12,7 +12,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(MapperlyIntegrationTestsTargetFramework)' == 'net48'">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
     <!-- .NET Framework 4.8 defaults to lang version 7.3, but we want to test nullable features. These are available in 8.0.
           To also use init-only properties, we upgrade to lang version 9.0, which is works, but is not officially supported. -->
     <LangVersion>9.0</LangVersion>
@@ -29,7 +29,12 @@
     <PackageReference Include="Riok.Mapperly" Version="$(MapperlyNugetPackageVersion)" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(MapperlyIntegrationTestsTargetFramework)' == 'net48'">
+  <!-- ef core tests should only run on net7 -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.4" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
     <PackageReference Include="Portable.System.DateTimeOnly" Version="7.0.1" />
   </ItemGroup>
 </Project>

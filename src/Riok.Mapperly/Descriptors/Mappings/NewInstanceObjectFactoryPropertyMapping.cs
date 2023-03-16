@@ -10,7 +10,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// An object mapping creating the target instance via an object factory.
 /// </summary>
-public class NewInstanceObjectFactoryPropertyMapping : ObjectPropertyMapping
+public class NewInstanceObjectFactoryPropertyMapping : ObjectPropertyMethodMapping
 {
     private const string TargetVariableName = "target";
     private readonly ObjectFactory _objectFactory;

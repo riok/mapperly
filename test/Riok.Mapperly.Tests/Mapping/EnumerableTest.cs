@@ -1,3 +1,6 @@
+using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 [UsesVerify]
@@ -566,5 +569,17 @@ public class EnumerableTest
             "class B { public ICollection<long> Value { get; } }");
 
         return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void EnumerableMappingDisabledShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "IEnumerable<long>",
+            "IEnumerable<int>",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.Enumerable));
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
     }
 }

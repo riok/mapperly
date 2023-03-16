@@ -26,7 +26,7 @@ namespace Riok.Mapperly.IntegrationTests
             VerifierSettings.DontScrubDateTimes();
 
             Verifier.DerivePathInfo((file, _, type, method)
-                => new PathInfo(Path.Combine(Path.GetDirectoryName(file)!, "_snapshots", "Roslyn_" + GetRoslynVersion()), type.Name, method.Name));
+                => new PathInfo(Path.Combine(Path.GetDirectoryName(file)!, "_snapshots", GetPlatformVersion()), type.Name, method.Name));
         }
 
         protected string GetGeneratedMapperFilePath(string name, [CallerFilePath] string filePath = "")
@@ -79,12 +79,14 @@ namespace Riok.Mapperly.IntegrationTests
             };
         }
 
-        private static string GetRoslynVersion()
+        private static string GetPlatformVersion()
         {
-#if NET7_0_OR_GREATER || NET48_OR_GREATER
-            return "4_5";
+#if NET48_OR_GREATER
+            return "NET_48";
+#elif NET7_0_OR_GREATER
+            return "Roslyn_4_5";
 #else
-            return "4_4_OR_LOWER";
+            return "Roslyn_4_4_OR_LOWER";
 #endif
         }
     }

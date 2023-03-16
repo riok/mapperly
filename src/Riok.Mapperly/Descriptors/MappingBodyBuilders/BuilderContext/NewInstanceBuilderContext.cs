@@ -1,11 +1,19 @@
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 
-namespace Riok.Mapperly.Descriptors.MappingBuilders;
+namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
-public class NewInstanceMappingBuilderContext : ObjectPropertyMappingBuilderContext<NewInstanceObjectPropertyMapping>
+/// <summary>
+/// An implementation of <see cref="INewInstanceBuilderContext{T}"/>.
+/// </summary>
+/// <typeparam name="T">The type of the mapping.</typeparam>
+public class NewInstanceBuilderContext<T> :
+    PropertiesMappingBuilderContext<T>,
+    INewInstanceBuilderContext<T>
+    where T : INewInstanceObjectPropertyMapping
 {
-    public NewInstanceMappingBuilderContext(MappingBuilderContext builderContext, NewInstanceObjectPropertyMapping mapping) : base(builderContext, mapping)
+    public NewInstanceBuilderContext(MappingBuilderContext builderContext, T mapping)
+        : base(builderContext, mapping)
     {
     }
 
@@ -18,7 +26,6 @@ public class NewInstanceMappingBuilderContext : ObjectPropertyMappingBuilderCont
     public void AddConstructorParameterMapping(ConstructorParameterMapping mapping)
     {
         PropertyConfigsByRootTargetName.Remove(mapping.Parameter.Name);
-
         SetSourcePropertyMapped(mapping.DelegateMapping.SourcePath);
         Mapping.AddConstructorParameterMapping(mapping);
     }

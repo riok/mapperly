@@ -9,13 +9,13 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// A mapping from type to another by mapping each property.
 /// A <see cref="MethodMapping"/> implementation of <see cref="IPropertyAssignmentTypeMapping"/>.
 /// </summary>
-public abstract class ObjectPropertyMapping :
+public abstract class ObjectPropertyMethodMapping :
     MethodMapping,
     IPropertyAssignmentTypeMapping
 {
     private readonly ObjectPropertyExistingTargetMapping _mapping;
 
-    protected ObjectPropertyMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    protected ObjectPropertyMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
         : base(sourceType, targetType)
     {
         _mapping = new ObjectPropertyExistingTargetMapping(sourceType, targetType);
