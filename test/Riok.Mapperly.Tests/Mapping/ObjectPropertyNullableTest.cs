@@ -14,13 +14,16 @@ public class ObjectPropertyNullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    if (source.Value != null)
-    {
-        target.Value = source.Value.Value;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                if (source.Value != null)
+                {
+                    target.Value = source.Value.Value;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -34,13 +37,16 @@ public class ObjectPropertyNullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    if (source.Value != null)
-    {
-        target.Value = source.Value;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                if (source.Value != null)
+                {
+                    target.Value = source.Value;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -56,13 +62,16 @@ public class ObjectPropertyNullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMapMethodBody(@"var target = new B();
-    if (source.Value != null)
-    {
-        target.Value = MapToD(source.Value);
-    }
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                if (source.Value != null)
+                {
+                    target.Value = MapToD(source.Value);
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -76,9 +85,12 @@ public class ObjectPropertyNullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMapMethodBody(@"var target = new B();
-    target.Value = source.Value;
-    return target;");
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                target.Value = source.Value;
+                return target;
+                """);
     }
 
     [Fact]
@@ -93,9 +105,12 @@ public class ObjectPropertyNullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMapMethodBody(@"var target = new B();
-    target.Value = source.Value;
-    return target;");
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                target.Value = source.Value;
+                return target;
+                """);
     }
 
     [Fact]
@@ -111,9 +126,12 @@ public class ObjectPropertyNullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMapMethodBody(@"var target = new B();
-    target.Value = MapToD(source.Value);
-    return target;");
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                target.Value = MapToD(source.Value);
+                return target;
+                """);
     }
 
     [Fact]
@@ -129,13 +147,16 @@ public class ObjectPropertyNullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMapMethodBody(@"var target = new B();
-    if (source.Value != null)
-    {
-        target.Value = MapToD(source.Value);
-    }
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                if (source.Value != null)
+                {
+                    target.Value = MapToD(source.Value);
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -151,13 +172,16 @@ public class ObjectPropertyNullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMapMethodBody(@"var target = new B();
-    if (source.Value != null)
-    {
-        target.Value = MapToD(source.Value);
-    }
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                if (source.Value != null)
+                {
+                    target.Value = MapToD(source.Value);
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -174,17 +198,20 @@ public class ObjectPropertyNullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMapMethodBody(@"var target = new B();
-    if (source.Value != null)
-    {
-        target.Value = MapToD(source.Value);
-    }
-    else
-    {
-        throw new System.ArgumentNullException(nameof(source.Value));
-    }
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                if (source.Value != null)
+                {
+                    target.Value = MapToD(source.Value);
+                }
+                else
+                {
+                    throw new System.ArgumentNullException(nameof(source.Value));
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -203,12 +230,15 @@ D UserImplementedMap(C source) => new D();";
 
         TestHelper.GenerateMapper(source, TestHelperOptions.DisabledNullable)
             .Should()
-            .HaveSingleMethodBody(@"if (source == null)
-        return default;
-    var target = new B();
-    target.StringValue = source.StringValue;
-    target.NestedValue = UserImplementedMap(source.NestedValue);
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return default;
+                var target = new B();
+                target.StringValue = source.StringValue;
+                target.NestedValue = UserImplementedMap(source.NestedValue);
+                return target;
+                """);
     }
 
     [Fact]
@@ -226,11 +256,14 @@ public Wrapper Map(double? source) => source.HasValue ? new() { Test = source.Va
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"if (y == null)
-        return default;
-    var target = new NotNullableType();
-    target.Test = Map(y.Test);
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                if (y == null)
+                    return default;
+                var target = new NotNullableType();
+                target.Test = Map(y.Test);
+                return target;
+                """);
     }
 
     [Fact]
@@ -248,15 +281,18 @@ public Wrapper Map(double source) => new() { Test = source.Value };";
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"if (y == null)
-        return default;
-    var target = new NotNullableType();
-    if (y.Test != null)
-    {
-        target.Test = Map(y.Test.Value);
-    }
+            .HaveSingleMethodBody(
+                """
+                if (y == null)
+                    return default;
+                var target = new NotNullableType();
+                if (y.Test != null)
+                {
+                    target.Test = Map(y.Test.Value);
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -275,12 +311,15 @@ public Wrapper MapNullable(double? source) => source.HasValue ? new() { Test = s
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"if (y == null)
-        return default;
-    var target = new NotNullableType();
-    target.Test = MapNullable(y.Test);
-    target.Test2 = MapNonNullable(y.Test2);
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                if (y == null)
+                    return default;
+                var target = new NotNullableType();
+                target.Test = MapNullable(y.Test);
+                target.Test2 = MapNonNullable(y.Test2);
+                return target;
+                """);
     }
 
     [Fact]

@@ -14,10 +14,13 @@ public class InheritanceTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new C();
-    target.StringValue1 = source.StringValue1;
-    target.StringValue2 = source.StringValue2;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new C();
+                target.StringValue1 = source.StringValue1;
+                target.StringValue2 = source.StringValue2;
+                return target;
+                """);
     }
 
     [Fact]
@@ -34,12 +37,15 @@ public class InheritanceTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new E();
-    target.StringValue1 = source.StringValue1;
-    target.StringValue2 = source.StringValue2;
-    target.StringValue3 = source.StringValue3;
-    target.StringValue4 = source.StringValue4;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new E();
+                target.StringValue1 = source.StringValue1;
+                target.StringValue2 = source.StringValue2;
+                target.StringValue3 = source.StringValue3;
+                target.StringValue4 = source.StringValue4;
+                return target;
+                """);
     }
 
     [Fact]
@@ -54,10 +60,13 @@ public class InheritanceTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new C();
-    target.StringValue2 = source.StringValue2;
-    target.StringValue1 = source.StringValue1;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new C();
+                target.StringValue2 = source.StringValue2;
+                target.StringValue1 = source.StringValue1;
+                return target;
+                """);
     }
 
     [Fact]
@@ -74,12 +83,15 @@ public class InheritanceTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new E();
-    target.StringValue4 = source.StringValue4;
-    target.StringValue3 = source.StringValue3;
-    target.StringValue2 = source.StringValue2;
-    target.StringValue1 = source.StringValue1;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new E();
+                target.StringValue4 = source.StringValue4;
+                target.StringValue3 = source.StringValue3;
+                target.StringValue2 = source.StringValue2;
+                target.StringValue1 = source.StringValue1;
+                return target;
+                """);
     }
 
     [Fact]
@@ -95,10 +107,13 @@ public class InheritanceTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new D();
-    target.StringValue2 = source.StringValue2;
-    target.StringValue1 = source.StringValue1;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new D();
+                target.StringValue2 = source.StringValue2;
+                target.StringValue1 = source.StringValue1;
+                return target;
+                """);
     }
 
     [Fact]
@@ -113,10 +128,13 @@ public class InheritanceTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new C();
-    target.StringValue1 = source.StringValue1;
-    target.StringValue2 = source.StringValue2;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new C();
+                target.StringValue1 = source.StringValue1;
+                target.StringValue2 = source.StringValue2;
+                return target;
+                """);
     }
 
     [Fact]
@@ -133,12 +151,15 @@ public class InheritanceTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new E();
-    target.StringValue1 = source.StringValue1;
-    target.StringValue2 = source.StringValue2;
-    target.StringValue3 = source.StringValue3;
-    target.StringValue4 = source.StringValue4;
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new E();
+                target.StringValue1 = source.StringValue1;
+                target.StringValue2 = source.StringValue2;
+                target.StringValue3 = source.StringValue3;
+                target.StringValue4 = source.StringValue4;
+                return target;
+                """);
     }
 
     [Fact]
@@ -153,7 +174,10 @@ public class InheritanceTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"target.StringValue2 = source.StringValue2;
-    target.StringValue1 = source.StringValue1;");
+            .HaveSingleMethodBody(
+                """
+                target.StringValue2 = source.StringValue2;
+                target.StringValue1 = source.StringValue1;
+                """);
     }
 }

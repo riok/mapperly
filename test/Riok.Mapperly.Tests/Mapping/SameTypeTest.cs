@@ -72,8 +72,11 @@ public class SameTypeTest
             "struct A {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new A();
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new A();
+                return target;
+                """);
     }
 
     [Fact]
@@ -98,7 +101,10 @@ public class SameTypeTest
             "class A {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new A();
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new A();
+                return target;
+                """);
     }
 }

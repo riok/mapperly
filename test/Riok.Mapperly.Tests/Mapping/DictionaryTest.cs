@@ -23,13 +23,16 @@ public class DictionaryTest
             TestSourceBuilderOptions.WithDeepCloning);
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, long>(source.Count);
-    foreach (var item in source)
-    {
-        target[item.Key] = item.Value;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new System.Collections.Generic.Dictionary<string, long>(source.Count);
+                foreach (var item in source)
+                {
+                    target[item.Key] = item.Value;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -40,13 +43,16 @@ public class DictionaryTest
             "Dictionary<string, int>");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
-    foreach (var item in source)
-    {
-        target[item.Key] = (int)item.Value;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+                foreach (var item in source)
+                {
+                    target[item.Key] = (int)item.Value;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -57,13 +63,16 @@ public class DictionaryTest
             "Dictionary<string, int>");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
-    foreach (var item in source)
-    {
-        target[item.Key] = item.Value == null ? throw new System.ArgumentNullException(nameof(item.Value)) : item.Value.Value;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+                foreach (var item in source)
+                {
+                    target[item.Key] = item.Value == null ? throw new System.ArgumentNullException(nameof(item.Value)) : item.Value.Value;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -75,13 +84,16 @@ public class DictionaryTest
             TestSourceBuilderOptions.Default with { ThrowOnMappingNullMismatch = false });
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
-    foreach (var item in source)
-    {
-        target[item.Key] = item.Value == null ? default : item.Value.Value;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+                foreach (var item in source)
+                {
+                    target[item.Key] = item.Value == null ? default : item.Value.Value;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -92,13 +104,16 @@ public class DictionaryTest
             "IDictionary<string, int>");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
-    foreach (var item in source)
-    {
-        target[item.Key] = (int)item.Value;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+                foreach (var item in source)
+                {
+                    target[item.Key] = (int)item.Value;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -109,13 +124,16 @@ public class DictionaryTest
             "IDictionary<string, int>");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>();
-    foreach (var item in source)
-    {
-        target[item.Key] = item.Value;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new System.Collections.Generic.Dictionary<string, int>();
+                foreach (var item in source)
+                {
+                    target[item.Key] = item.Value;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -127,13 +145,16 @@ public class DictionaryTest
             "class A : Dictionary<string, int> {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
-    foreach (var item in source)
-    {
-        target[item.Key] = item.Value;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+                foreach (var item in source)
+                {
+                    target[item.Key] = item.Value;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -145,13 +166,16 @@ public class DictionaryTest
             "class A : List<KeyValuePair<string, int>> {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
-    foreach (var item in source)
-    {
-        target[item.Key] = item.Value;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+                foreach (var item in source)
+                {
+                    target[item.Key] = item.Value;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -163,13 +187,16 @@ public class DictionaryTest
             "class A : Dictionary<string, int> {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new A();
-    foreach (var item in source)
-    {
-        target[item.Key] = item.Value;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new A();
+                foreach (var item in source)
+                {
+                    target[item.Key] = item.Value;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -181,13 +208,16 @@ public class DictionaryTest
             "class A : Dictionary<string, int> {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = CreateA();
-    foreach (var item in source)
-    {
-        target[item.Key] = item.Value;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = CreateA();
+                foreach (var item in source)
+                {
+                    target[item.Key] = item.Value;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]

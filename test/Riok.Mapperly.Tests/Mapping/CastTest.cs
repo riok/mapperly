@@ -160,8 +160,11 @@ public class CastTest
             "class B {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                return target;
+                """);
     }
 
     [Fact]
@@ -188,8 +191,11 @@ public class CastTest
             "struct B {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                return target;
+                """);
     }
 
     [Fact]
@@ -316,8 +322,11 @@ public class CastTest
             "class B {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                return target;
+                """);
     }
 
     [Fact]
@@ -344,8 +353,11 @@ public class CastTest
             "struct B {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    return target;");
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                return target;
+                """);
     }
 
     [Fact]

@@ -33,13 +33,16 @@ public class EnumerableTest
             "int[]");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new int[source.Length];
-    for (var i = 0; i < source.Length; i++)
-    {
-        target[i] = source[i] == null ? throw new System.ArgumentNullException(nameof(source[i])) : source[i].Value;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new int[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = source[i] == null ? throw new System.ArgumentNullException(nameof(source[i])) : source[i].Value;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -50,13 +53,16 @@ public class EnumerableTest
             "int?[]");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new int? [source.Length];
-    for (var i = 0; i < source.Length; i++)
-    {
-        target[i] = (int? )source[i];
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new int? [source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (int? )source[i];
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -80,13 +86,16 @@ public class EnumerableTest
             TestSourceBuilderOptions.WithDeepCloning);
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new int[source.Length];
-    for (var i = 0; i < source.Length; i++)
-    {
-        target[i] = source[i] == null ? throw new System.ArgumentNullException(nameof(source[i])) : source[i].Value;
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new int[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = source[i] == null ? throw new System.ArgumentNullException(nameof(source[i])) : source[i].Value;
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -98,13 +107,16 @@ public class EnumerableTest
             TestSourceBuilderOptions.WithDeepCloning);
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new int? [source.Length];
-    for (var i = 0; i < source.Length; i++)
-    {
-        target[i] = (int? )source[i];
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new int? [source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (int? )source[i];
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -128,13 +140,16 @@ public class EnumerableTest
             "class B { public int Value {get; set; }}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B[source.Length];
-    for (var i = 0; i < source.Length; i++)
-    {
-        target[i] = source[i] == null ? throw new System.ArgumentNullException(nameof(source[i])) : source[i];
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new B[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = source[i] == null ? throw new System.ArgumentNullException(nameof(source[i])) : source[i];
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -159,13 +174,16 @@ public class EnumerableTest
             "class B { public int Value { get; set; }}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMapMethodBody(@"var target = new B[source.Length];
-    for (var i = 0; i < source.Length; i++)
-    {
-        target[i] = MapToB(source[i]);
-    }
+            .HaveMapMethodBody(
+                """
+                var target = new B[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = MapToB(source[i]);
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -261,13 +279,16 @@ public class EnumerableTest
             "struct A{}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMapMethodBody(@"var target = new A[source.Length];
-    for (var i = 0; i < source.Length; i++)
-    {
-        target[i] = MapToA(source[i]);
-    }
+            .HaveMapMethodBody(
+                """
+                var target = new A[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = MapToA(source[i]);
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -279,13 +300,16 @@ public class EnumerableTest
             "struct A{}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMapMethodBody(@"var target = new A[i.Length];
-    for (var i1 = 0; i1 < i.Length; i1++)
-    {
-        target[i1] = MapToA(i[i1]);
-    }
+            .HaveMapMethodBody(
+                """
+                var target = new A[i.Length];
+                for (var i1 = 0; i1 < i.Length; i1++)
+                {
+                    target[i1] = MapToA(i[i1]);
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -297,13 +321,16 @@ public class EnumerableTest
             "struct A{}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMapMethodBody(@"var target1 = new A[target.Length];
-    for (var i = 0; i < target.Length; i++)
-    {
-        target1[i] = MapToA(target[i]);
-    }
+            .HaveMapMethodBody(
+                """
+                var target1 = new A[target.Length];
+                for (var i = 0; i < target.Length; i++)
+                {
+                    target1[i] = MapToA(target[i]);
+                }
 
-    return target1;");
+                return target1;
+                """);
     }
 
     [Fact]
@@ -314,13 +341,16 @@ public class EnumerableTest
             "int[]");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new int[source.Length];
-    for (var i = 0; i < source.Length; i++)
-    {
-        target[i] = (int)source[i];
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new int[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (int)source[i];
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -431,13 +461,16 @@ public class EnumerableTest
             "class B : ICollection<int> {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = new B();
-    foreach (var item in source)
-    {
-        target.Add((int)item);
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                foreach (var item in source)
+                {
+                    target.Add((int)item);
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]
@@ -449,13 +482,16 @@ public class EnumerableTest
             "class B : ICollection<int> {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(@"var target = CreateB();
-    foreach (var item in source)
-    {
-        target.Add((int)item);
-    }
+            .HaveSingleMethodBody(
+                """
+                var target = CreateB();
+                foreach (var item in source)
+                {
+                    target.Add((int)item);
+                }
 
-    return target;");
+                return target;
+                """);
     }
 
     [Fact]

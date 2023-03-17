@@ -7,6 +7,15 @@ public static class TestSourceBuilder
 {
     internal const string DefaultMapMethodName = "Map";
 
+    /// <summary>
+    /// Helper method to apply <see cref="System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/>
+    /// to a given string.
+    /// </summary>
+    /// <param name="code">The c# code.</param>
+    /// <returns>The c# code.</returns>
+    public static string CSharp([StringSyntax(StringSyntax.CSharp)] string code)
+        => code;
+
     public static string Mapping(
         [StringSyntax(StringSyntax.CSharp)] string fromTypeName,
         [StringSyntax(StringSyntax.CSharp)] string toTypeName,
@@ -71,6 +80,7 @@ public partial class Mapper
             Attribute(options.ThrowOnPropertyMappingNullMismatch),
             Attribute(options.EnabledConversions),
             Attribute(options.PropertyNameMappingStrategy),
+            Attribute(options.EnumMappingStrategy),
         };
 
         return $"[Mapper({string.Join(", ", attrs)})]";
