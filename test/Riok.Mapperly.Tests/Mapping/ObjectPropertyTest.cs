@@ -225,7 +225,7 @@ public class ObjectPropertyTest
     public Task WithManualMappedNotFoundSourcePropertyShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty(\"A.StringValue9\", nameof(B.StringValue2)] partial B Map(A source);",
+            "[MapProperty(\"StringValue9\", nameof(B.StringValue2)] partial B Map(A source);",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue2 { get; set; } }");
 

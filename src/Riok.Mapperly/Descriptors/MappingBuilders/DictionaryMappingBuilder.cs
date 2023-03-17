@@ -43,6 +43,9 @@ public static class DictionaryMappingBuilder
             return null;
         }
 
+        if (!ctx.Target.ImplementsGeneric(ctx.Types.IDictionary, out _))
+            return null;
+
         return new ForEachSetDictionaryMapping(
             ctx.Source,
             ctx.Target,
@@ -54,6 +57,9 @@ public static class DictionaryMappingBuilder
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
     {
+        if (!ctx.Target.ImplementsGeneric(ctx.Types.IDictionary, out _))
+            return null;
+
         if (BuildKeyValueMapping(ctx) is not var (keyMapping, valueMapping))
             return null;
 

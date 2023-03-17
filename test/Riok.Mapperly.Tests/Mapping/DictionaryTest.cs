@@ -1,3 +1,5 @@
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 [UsesVerify]
@@ -228,5 +230,40 @@ public class DictionaryTest
             "A",
             "class A : Dictionary<string, int> { private A(){} }");
         return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void ReadOnlyDictionaryToCustomTypeReadOnlyReadOnlyDictionaryShouldIgnore()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "IReadOnlyDictionary<string, string>",
+            "A",
+            "class A : IReadOnlyDictionary<int, int> {}");
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyProperty))
+            .HaveMapMethodBody(
+                """
+                var target = new A();
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void ReadOnlyDictionaryToReadOnlyDictionaryExistingInstanceShouldIgnore()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IReadOnlyDictionary<string, string> Values { get; } }",
+            "class B { public IReadOnlyDictionary<string, string> Values { get; } }");
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyProperty))
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                return target;
+                """);
     }
 }
