@@ -35,11 +35,6 @@ export default function Home(): JSX.Element {
       <main>
         <HomepageFeatures />
       </main>
-      <script
-        defer
-        data-domain={new URL(siteConfig.url).hostname}
-        src="https://plausible.io/js/script.js"
-      ></script>
     </Layout>
   );
 }

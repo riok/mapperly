@@ -20,4 +20,5 @@ jobs:
     needs: release
     with:
       deploy: true
+      environment: stable
       version: ${{ needs.release.outputs.version }}
