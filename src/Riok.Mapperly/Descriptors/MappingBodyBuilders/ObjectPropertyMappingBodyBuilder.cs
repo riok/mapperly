@@ -1,20 +1,24 @@
 using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Descriptors.MappingBuilders;
+using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
+using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
+/// <summary>
+/// Mapping body builder for object property mappings.
+/// </summary>
 public static class ObjectPropertyMappingBodyBuilder
 {
     public static void BuildMappingBody(MappingBuilderContext ctx, IPropertyAssignmentTypeMapping mapping)
     {
-        var mappingCtx = new ObjectPropertyMappingBuilderContext<IPropertyAssignmentTypeMapping>(ctx, mapping);
+        var mappingCtx = new PropertiesContainerBuilderContext<IPropertyAssignmentTypeMapping>(ctx, mapping);
         BuildMappingBody(mappingCtx);
     }
 
-    public static void BuildMappingBody(ObjectPropertyMappingBuilderContext ctx)
+    public static void BuildMappingBody(IPropertiesContainerBuilderContext<IPropertyAssignmentTypeMapping> ctx)
     {
         var propertyNameComparer =
             ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseSensitive
@@ -44,7 +48,7 @@ public static class ObjectPropertyMappingBodyBuilder
                 out var sourcePropertyPath))
             {
                 ctx.BuilderContext.ReportDiagnostic(
-                    DiagnosticDescriptors.MappingSourcePropertyNotFound,
+                    DiagnosticDescriptors.SourcePropertyNotFound,
                     targetProperty.Name,
                     ctx.Mapping.SourceType);
                 continue;
@@ -56,7 +60,9 @@ public static class ObjectPropertyMappingBodyBuilder
         ctx.AddDiagnostics();
     }
 
-    private static void BuildPropertyAssignmentMapping(ObjectPropertyMappingBuilderContext ctx, MapPropertyAttribute config)
+    private static void BuildPropertyAssignmentMapping(
+        IPropertiesContainerBuilderContext<IPropertyAssignmentTypeMapping> ctx,
+        MapPropertyAttribute config)
     {
         if (!PropertyPath.TryFind(ctx.Mapping.TargetType, config.Target, out var targetPropertyPath))
         {
@@ -80,7 +86,7 @@ public static class ObjectPropertyMappingBodyBuilder
     }
 
     public static bool ValidateMappingSpecification(
-        ObjectPropertyMappingBuilderContext ctx,
+        IPropertiesBuilderContext<IMapping> ctx,
         PropertyPath sourcePropertyPath,
         PropertyPath targetPropertyPath,
         bool allowInitOnlyMember = false)
@@ -158,7 +164,7 @@ public static class ObjectPropertyMappingBodyBuilder
     }
 
     private static void BuildPropertyAssignmentMapping(
-        ObjectPropertyMappingBuilderContext ctx,
+        IPropertiesContainerBuilderContext<IPropertyAssignmentTypeMapping> ctx,
         PropertyPath sourcePropertyPath,
         PropertyPath targetPropertyPath)
     {
@@ -221,7 +227,7 @@ public static class ObjectPropertyMappingBodyBuilder
     }
 
     private static bool TryAddExistingTargetMapping(
-        ObjectPropertyMappingBuilderContext ctx,
+        IPropertiesContainerBuilderContext<IPropertyAssignmentTypeMapping> ctx,
         PropertyPath sourcePropertyPath,
         PropertyPath targetPropertyPath)
     {

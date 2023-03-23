@@ -7,17 +7,21 @@ namespace Riok.Mapperly.Descriptors;
 
 public class MapperDescriptor
 {
-
-    private readonly List<ITypeMapping> _mappings = new();
+    private readonly List<MethodMapping> _methodMappings = new();
 
     public MapperDescriptor(ClassDeclarationSyntax syntax, INamedTypeSymbol symbol, UniqueNameBuilder nameBuilder)
     {
         Syntax = syntax;
         Symbol = symbol;
         NameBuilder = nameBuilder;
+
+        if (!Symbol.ContainingNamespace.IsGlobalNamespace)
+        {
+            Namespace = Symbol.ContainingNamespace.ToDisplayString();
+        }
     }
 
-    public string? Namespace { get; set; }
+    public string? Namespace { get; }
 
     public ClassDeclarationSyntax Syntax { get; }
 
@@ -25,9 +29,8 @@ public class MapperDescriptor
 
     public UniqueNameBuilder NameBuilder { get; }
 
-    public IEnumerable<MethodMapping> MethodTypeMappings
-        => _mappings.OfType<MethodMapping>();
+    public IReadOnlyCollection<MethodMapping> MethodTypeMappings => _methodMappings;
 
-    public void AddTypeMapping(ITypeMapping mapping)
-        => _mappings.Add(mapping);
+    public void AddTypeMapping(MethodMapping mapping)
+        => _methodMappings.Add(mapping);
 }

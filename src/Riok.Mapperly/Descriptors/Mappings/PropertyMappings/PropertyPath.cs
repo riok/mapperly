@@ -82,6 +82,9 @@ public class PropertyPath
     public bool IsAnyNullable()
         => Path.Any(p => p.IsNullable());
 
+    public bool IsAnyObjectPathNullable()
+        => ObjectPath.Any(p => p.IsNullable());
+
     public ExpressionSyntax BuildAccess(
         ExpressionSyntax? baseAccess,
         bool addValuePropertyOnNullable = false,
@@ -98,23 +101,53 @@ public class PropertyPath
             path = path.Skip(1);
         }
 
-        if (!nullConditional)
+        if (nullConditional)
         {
-            if (addValuePropertyOnNullable)
-            {
-                return path.Aggregate(baseAccess, (a, b) => b.Type.IsNullableValueType()
-                    ? MemberAccess(MemberAccess(a, b.Name), NullableValueProperty)
-                    : MemberAccess(a, b.Name));
-            }
-
-            return path.Aggregate(baseAccess, (a, b) => MemberAccess(a, b.Name));
+            return path.AggregateWithPrevious(
+                baseAccess,
+                (expr, prevProp, prop) => prevProp?.IsNullable() == true
+                    ? ConditionalAccess(expr, prop.Name)
+                    : MemberAccess(expr, prop.Name));
         }
 
-        return path.AggregateWithPrevious(
-            baseAccess,
-            (expr, prevProp, prop) => prevProp?.IsNullable() == true
-                ? ConditionalAccess(expr, prop.Name)
-                : MemberAccess(expr, prop.Name));
+        if (addValuePropertyOnNullable)
+        {
+            return path.Aggregate(baseAccess, (a, b) => b.Type.IsNullableValueType()
+                ? MemberAccess(MemberAccess(a, b.Name), NullableValueProperty)
+                : MemberAccess(a, b.Name));
+        }
+
+        return path.Aggregate(baseAccess, (a, b) => MemberAccess(a, b.Name));
+    }
+
+    /// <summary>
+    /// Builds a condition (the resulting expression evaluates to a boolean)
+    /// whether the path is non-null.
+    /// </summary>
+    /// <param name="baseAccess">The base access to access the property or <c>null</c>.</param>
+    /// <returns><c>null</c> if no part of the path is nullable or the condition which needs to be true, that the path cannot be <c>null</c>.</returns>
+    public ExpressionSyntax? BuildNonNullConditionWithoutConditionalAccess(ExpressionSyntax? baseAccess)
+    {
+        var path = PathWithoutTrailingNonNullable();
+        ExpressionSyntax? condition = null;
+        var access = baseAccess;
+        if (access == null)
+        {
+            access = IdentifierName(path.First().Name);
+            path = path.Skip(1);
+        }
+
+        foreach (var pathPart in path)
+        {
+            access = MemberAccess(access, pathPart.Name);
+
+            if (!pathPart.IsNullable())
+                continue;
+
+            condition = And(condition, IsNotNull(access));
+        }
+
+        return condition;
     }
 
     public override bool Equals(object? obj)

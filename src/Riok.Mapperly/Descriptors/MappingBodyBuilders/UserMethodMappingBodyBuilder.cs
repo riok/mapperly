@@ -5,12 +5,15 @@ using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
+/// <summary>
+/// Mapping body builder for user defined methods.
+/// </summary>
 public static class UserMethodMappingBodyBuilder
 {
     public static void BuildMappingBody(MappingBuilderContext ctx, UserDefinedExistingTargetMethodMapping mapping)
     {
         // UserDefinedExistingTargetMethodMapping handles null already
-        var delegateMapping = ctx.FindOrBuildExistingTargetMapping(
+        var delegateMapping = ctx.BuildExistingTargetMappingWithUserSymbol(
             mapping.SourceType.NonNullable(),
             mapping.TargetType.NonNullable());
 

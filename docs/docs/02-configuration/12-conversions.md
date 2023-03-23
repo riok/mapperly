@@ -5,6 +5,7 @@ Mapperly implements several types of automatic conversions (in order of priority
 | Name                 | Description                                                               | Conditions                                                                                                      |
 | -------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | Direct assignment    | Directly assigns the source object to the target                          | Source type is assignable to the target type and `UseDeepCloning` is `false`                                    |
+| Queryable            | Projects the source queryable to the target queryable                     | Source and target types are `IQueryable<>`                                                                      |
 | Dictionary           | Maps a source dictionary to an enumerable target                          | Source type is an `IDictionary<,>` or an `IReadOnlyDictionary<,>`                                               |
 | Enumerable           | Maps an enumerable source to an enumerable target                         | Source type is an `IEnumerable<>`                                                                               |
 | Implicit cast        | Implicit cast operator                                                    | An implicit cast operator is defined to cast from the source type to the target type                            |
@@ -41,6 +42,21 @@ To disable a specific conversion type, set `EnabledConversions` to `All` excludi
 // this disables conversions using the ToString() method:
 // highlight-start
 [Mapper(EnabledConversions = MappingConversionType.All & ~MappingConversionType.ToStringMethod)]
+// highlight-end
+public partial class CarMapper
+{
+  ...
+}
+```
+
+## Enable only specific automatic conversions
+
+To enable only specific conversion types, set `EnabledConversions` the conversion type to enable:
+
+```csharp
+// This disables conversions using the ToString() method, which is enabled by default:
+// highlight-start
+[Mapper(EnabledConversions = MappingConversionType.Constructor | MappingConversionType.ExplicitCast)]
 // highlight-end
 public partial class CarMapper
 {

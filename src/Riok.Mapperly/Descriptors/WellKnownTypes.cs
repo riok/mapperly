@@ -29,6 +29,9 @@ public class WellKnownTypes
     private INamedTypeSymbol? _iReadOnlyList;
     private INamedTypeSymbol? _keyValuePair;
     private INamedTypeSymbol? _dictionary;
+    private INamedTypeSymbol? _enum;
+
+    private INamedTypeSymbol? _iQueryable;
 
     private INamedTypeSymbol? _dateOnly;
     private INamedTypeSymbol? _timeOnly;
@@ -55,6 +58,10 @@ public class WellKnownTypes
     public INamedTypeSymbol IReadOnlyList => _iReadOnlyList ??= GetTypeSymbol(typeof(IReadOnlyList<>));
     public INamedTypeSymbol KeyValuePair => _keyValuePair ??= GetTypeSymbol(typeof(KeyValuePair<,>));
     public INamedTypeSymbol Dictionary => _dictionary ??= GetTypeSymbol(typeof(Dictionary<,>));
+    public INamedTypeSymbol Enum => _enum ??= GetTypeSymbol(typeof(Enum));
+    public INamedTypeSymbol IQueryable => _iQueryable ??= GetTypeSymbol(typeof(IQueryable<>));
+
+    // use string type name as they are not available in netstandard2.0
     public INamedTypeSymbol? DateOnly => _dateOnly ??= GetTypeSymbol("System.DateOnly");
     public INamedTypeSymbol? TimeOnly => _timeOnly ??= GetTypeSymbol("System.TimeOnly");
 

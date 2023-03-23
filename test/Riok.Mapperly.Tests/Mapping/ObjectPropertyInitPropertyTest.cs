@@ -127,7 +127,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new B()
                 {
-                    Parent = source.Parent == null ? default : Map(source.Parent)
+                    Parent = source.Parent != null ? Map(source.Parent) : default
                 };
                 return target;
                 """);
@@ -201,7 +201,7 @@ public class ObjectPropertyInitPropertyTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.MappingSourcePropertyNotFound, "Property StringValue on source type A was not found"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound, "Property StringValue on source type A was not found"))
             .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotMapped, "The property StringValue2 on the mapping source type A is not mapped to any property on the mapping target type B"));
     }
 

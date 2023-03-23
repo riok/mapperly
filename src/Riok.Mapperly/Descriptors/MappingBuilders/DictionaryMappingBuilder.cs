@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Diagnostics;
@@ -12,6 +13,9 @@ public static class DictionaryMappingBuilder
 
     public static ITypeMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
+        if (!ctx.IsConversionEnabled(MappingConversionType.Dictionary))
+            return null;
+
         if (BuildKeyValueMapping(ctx) is not var (keyMapping, valueMapping))
             return null;
 

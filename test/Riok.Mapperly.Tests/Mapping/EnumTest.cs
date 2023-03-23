@@ -241,7 +241,7 @@ enum E2 {A = 100, B, C}
                     { } s when s.Equals(nameof(E1.A), System.StringComparison.OrdinalIgnoreCase) => E1.A,
                     { } s when s.Equals(nameof(E1.B), System.StringComparison.OrdinalIgnoreCase) => E1.B,
                     { } s when s.Equals(nameof(E1.C), System.StringComparison.OrdinalIgnoreCase) => E1.C,
-                    _ => (E1)System.Enum.Parse(typeof(E1), source, true),
+                    _ => System.Enum.Parse<E1>(source, true),
                 };
                 """);
     }
@@ -261,7 +261,7 @@ enum E2 {A = 100, B, C}
                     nameof(E1.A) => E1.A,
                     nameof(E1.B) => E1.B,
                     nameof(E1.C) => E1.C,
-                    _ => (E1)System.Enum.Parse(typeof(E1), source, false),
+                    _ => System.Enum.Parse<E1>(source, false),
                 };
                 """);
     }

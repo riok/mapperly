@@ -9,38 +9,37 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Represents a mapping from a string to an enum.
 /// Uses a switch expression for performance reasons (in comparison to <see cref="Enum.Parse(System.Type,string)"/>).
+/// Optimized version of <see cref="EnumFromStringParseMapping"/>.
 /// </summary>
-public class EnumFromStringMapping : MethodMapping
+public class EnumFromStringSwitchMapping : MethodMapping
 {
-    private const string EnumClassName = "System.Enum";
-    private const string ParseMethodName = "Parse";
     private const string IgnoreCaseSwitchDesignatedVariableName = "s";
     private const string StringEqualsMethodName = nameof(string.Equals);
     private const string StringComparisonFullName = "System.StringComparison.OrdinalIgnoreCase";
 
     private readonly IEnumerable<IFieldSymbol> _enumMembers;
     private readonly bool _ignoreCase;
+    private readonly EnumFromStringParseMapping _fallbackMapping;
 
-    public EnumFromStringMapping(
+    public EnumFromStringSwitchMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         IEnumerable<IFieldSymbol> enumMembers,
+        bool genericParseMethodSupported,
         bool ignoreCase)
         : base(sourceType, targetType)
     {
         _enumMembers = enumMembers;
         _ignoreCase = ignoreCase;
+        _fallbackMapping = new EnumFromStringParseMapping(sourceType, targetType, genericParseMethodSupported, ignoreCase);
     }
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
-        // fallback switch arm: _ => (TargetType)System.Enum.Parse(typeof(TargetType), source, ignoreCase)
-        var enumParseInvocation = Invocation(
-            MemberAccess(EnumClassName, ParseMethodName),
-            TypeOfExpression(IdentifierName(TargetType.ToDisplayString())), ctx.Source, BooleanLiteral(_ignoreCase));
+        // fallback switch arm: _ => System.Enum.Parse<TargetType>(source, ignoreCase)
         var fallbackArm = SwitchExpressionArm(
             DiscardPattern(),
-            CastExpression(IdentifierName(TargetType.ToDisplayString()), enumParseInvocation));
+            _fallbackMapping.Build(ctx));
 
         // switch for each name to the enum value
         var arms = _ignoreCase

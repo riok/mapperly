@@ -208,7 +208,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.EnumRawValue = (byte)source.EnumRawValue;
             target.EnumStringValue = MapToString(source.EnumStringValue);
             target.EnumReverseStringValue = MapToTestEnumDtoByValue(source.EnumReverseStringValue);
-            target.IgnoredStringValue = source.IgnoredStringValue;
             target.DateTimeValueTargetDateOnly = System.DateOnly.FromDateTime(source.DateTimeValueTargetDateOnly);
             target.DateTimeValueTargetTimeOnly = System.TimeOnly.FromDateTime(source.DateTimeValueTargetTimeOnly);
         }
@@ -243,7 +242,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 nameof(Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue1) => Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue1,
                 nameof(Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue2) => Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue2,
                 nameof(Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue3) => Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue3,
-                _ => (Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)System.Enum.Parse(typeof(Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue), source, false),
+                _ => System.Enum.Parse<Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue>(source, false),
             };
         }
 
@@ -280,7 +279,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 nameof(Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10) => Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10,
                 nameof(Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20) => Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20,
                 nameof(Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30) => Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
-                _ => (Riok.Mapperly.IntegrationTests.Models.TestEnum)System.Enum.Parse(typeof(Riok.Mapperly.IntegrationTests.Models.TestEnum), source, false),
+                _ => System.Enum.Parse<Riok.Mapperly.IntegrationTests.Models.TestEnum>(source, false),
             };
         }
 

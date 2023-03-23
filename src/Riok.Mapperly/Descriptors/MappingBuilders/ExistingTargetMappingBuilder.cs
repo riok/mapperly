@@ -16,38 +16,29 @@ public class ExistingTargetMappingBuilder
     };
 
     private readonly MappingCollection _mappings;
-    private readonly DescriptorBuilder _descriptorBuilder;
 
-    public ExistingTargetMappingBuilder(DescriptorBuilder descriptorBuilder, MappingCollection mappings)
+    public ExistingTargetMappingBuilder(MappingCollection mappings)
     {
-        _descriptorBuilder = descriptorBuilder;
         _mappings = mappings;
     }
 
-    /// <inheritdoc cref="MappingBuilderContext.FindOrBuildExistingTargetMapping"/>
-    public IExistingTargetMapping? FindOrBuild(
-        ISymbol? userSymbol,
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType)
-    {
-        return _mappings.FindExistingInstanceMapping(sourceType, targetType)
-            ?? Build(userSymbol, sourceType, targetType);
-    }
+    public IExistingTargetMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType)
+        => _mappings.FindExistingInstanceMapping(sourceType, targetType);
 
-    private IExistingTargetMapping? Build(
-        ISymbol? userSymbol,
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType)
+    public IExistingTargetMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {
-        var ctx = new MappingBuilderContext(_descriptorBuilder, sourceType, targetType, userSymbol);
         foreach (var mappingBuilder in _builders)
         {
-            if (mappingBuilder(ctx) is { } mapping)
+            if (mappingBuilder(ctx) is not { } mapping)
+                continue;
+
+            if (resultIsReusable)
             {
                 _mappings.AddExistingTargetMapping(mapping);
-                _mappings.EnqueueMappingToBuildBody(mapping, ctx);
-                return mapping;
             }
+
+            _mappings.EnqueueToBuildBody(mapping, ctx);
+            return mapping;
         }
 
         return null;

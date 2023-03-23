@@ -94,7 +94,7 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Info,
         true);
 
-    public static readonly DiagnosticDescriptor MappingSourcePropertyNotFound = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor SourcePropertyNotFound = new DiagnosticDescriptor(
         "RMG012",
         "Mapping source property not found",
         "Property {0} on source type {1} was not found",
@@ -228,5 +228,37 @@ internal static class DiagnosticDescriptors
         "Cannot map to constructor parameter target path {0}.{1}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
+        true);
+
+    public static readonly DiagnosticDescriptor QueryableProjectionMappingsDoNotSupportReferenceHandling = new DiagnosticDescriptor(
+        "RMG029",
+        "Queryable projection mappings do not support reference handling",
+        "Queryable projection mappings do not support reference handling",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true);
+
+    public static readonly DiagnosticDescriptor ReferenceLoopInInitOnlyMapping = new DiagnosticDescriptor(
+        "RMG030",
+        "Reference loop detected while mapping to an init only property",
+        "Reference loop detected while mapping from {0}.{1} to the init only property {2}.{3}, consider ignoring this property",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true);
+
+    public static readonly DiagnosticDescriptor ReferenceLoopInCtorMapping = new DiagnosticDescriptor(
+        "RMG031",
+        "Reference loop detected while mapping to a constructor parameter",
+        "Reference loop detected while mapping from {0}.{1} to the constructor parameter {3} of {2}, consider ignoring this property or mark another constructor as mapping constructor",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        true);
+
+    public static readonly DiagnosticDescriptor EnumMappingStrategyByNameNotSupportedInProjectionMappings = new DiagnosticDescriptor(
+        "RMG032",
+        "The enum mapping strategy ByName cannot be used in projection mappings",
+        "The enum mapping strategy ByName cannot be used in projection mappings to map from {0} to {1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
         true);
 }

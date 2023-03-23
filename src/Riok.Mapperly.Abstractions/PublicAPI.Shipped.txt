@@ -52,6 +52,8 @@ Riok.Mapperly.Abstractions.MappingConversionType.All = -1 -> Riok.Mapperly.Abstr
 Riok.Mapperly.Abstractions.MappingConversionType.Constructor = 1 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.DateTimeToDateOnly = 256 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.DateTimeToTimeOnly = 512 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.Dictionary = 4096 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.Enumerable = 2048 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.EnumToEnum = 128 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.EnumToString = 64 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.ExplicitCast = 4 -> Riok.Mapperly.Abstractions.MappingConversionType
@@ -60,6 +62,7 @@ Riok.Mapperly.Abstractions.MappingConversionType.None = 0 -> Riok.Mapperly.Abstr
 Riok.Mapperly.Abstractions.MappingConversionType.ParseMethod = 8 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.StringToEnum = 32 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.ToStringMethod = 16 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.Queryable = 1024 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MapperAttribute.UseReferenceHandling.get -> bool
 Riok.Mapperly.Abstractions.MapperAttribute.UseReferenceHandling.set -> void
 Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler
