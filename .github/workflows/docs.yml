@@ -68,5 +68,5 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - uses: actions/deploy-pages@v1
+      - uses: actions/deploy-pages@v2
         id: deployment
