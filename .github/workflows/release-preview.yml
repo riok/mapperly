@@ -22,6 +22,14 @@ jobs:
     secrets:
       nuget_api_key: ${{ secrets.NUGET_API_TOKEN }}
 
+  docs:
+    uses: ./.github/workflows/docs.yml
+    needs: release-preview
+    with:
+      deploy: true
+      environment: next
+      version: ${{ needs.release-preview.outputs.version }}
+
   release-stable-update-branch:
     runs-on: ubuntu-latest
     needs: release-preview
