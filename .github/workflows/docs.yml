@@ -84,7 +84,7 @@ jobs:
           path: 'docs/build'
       # replace stable environment name with main
       # cf pages only recognizes main as production branch
-      - uses: bluwy/substitute-string-action@v1
+      - uses: bluwy/substitute-string-action@v2
         id: cf-pages-branch-name
         with:
           _input-text: ${{ inputs.environment }}
