@@ -477,6 +477,94 @@ public class EnumerableTest
     }
 
     [Fact]
+    public void EnumerableToStack()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public Stack<long> Value { get; } }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                foreach (var item in source.Value)
+                {
+                    target.Value.Push((long)item);
+                }
+
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void EnumerableToQueue()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public Queue<long> Value { get; } }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                foreach (var item in source.Value)
+                {
+                    target.Value.Enqueue((long)item);
+                }
+
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void EnumerableToCreatedStack()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public Stack<long> Value { get; set; } }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMethodBody("MapToStack",
+                """
+                var target = new System.Collections.Generic.Stack<long>();
+                foreach (var item in source)
+                {
+                    target.Push((long)item);
+                }
+
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void EnumerableToCreatedQueue()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public Queue<long> Value { get; set; } }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMethodBody("MapToQueue",
+                """
+                var target = new System.Collections.Generic.Queue<long>();
+                foreach (var item in source)
+                {
+                    target.Enqueue((long)item);
+                }
+
+                return target;
+                """);
+    }
+
+    [Fact]
     public void EnumerableToCustomCollectionWithObjectFactory()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -517,6 +605,28 @@ public class EnumerableTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial void Map(List<A>? source, RepeatedField<B> target);",
             "class RepeatedField<T> : IList<T> {  }",
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapToExistingStackShouldWork()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(List<A>? source, Stack<B> target);",
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapToExistingQueueShouldWork()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(List<A>? source, Queue<B> target);",
             "class A { public string Value { get; set; } }",
             "class B { public string Value { get; set; } }");
 
