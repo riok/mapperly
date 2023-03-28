@@ -12,24 +12,26 @@ namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 public class ForEachAddEnumerableExistingTargetMapping : ExistingTargetMapping
 {
     private const string LoopItemVariableName = "item";
-    private const string AddMethodName = nameof(ICollection<object>.Add);
 
     private readonly ITypeMapping _elementMapping;
+    private readonly string _insertMethodName;
 
     public ForEachAddEnumerableExistingTargetMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        ITypeMapping elementMapping)
+        ITypeMapping elementMapping,
+        string insertMethodName)
         : base(sourceType, targetType)
     {
         _elementMapping = elementMapping;
+        _insertMethodName = insertMethodName;
     }
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
         var loopItemVariableName = ctx.NameBuilder.New(LoopItemVariableName);
         var convertedSourceItemExpression = _elementMapping.Build(ctx.WithSource(loopItemVariableName));
-        var addMethod = MemberAccess(target, AddMethodName);
+        var addMethod = MemberAccess(target, _insertMethodName);
 
         return new StatementSyntax[]
         {

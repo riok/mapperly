@@ -26,6 +26,8 @@ public class WellKnownTypes
     private INamedTypeSymbol? _iReadOnlyCollection;
     private INamedTypeSymbol? _iList;
     private INamedTypeSymbol? _list;
+    private INamedTypeSymbol? _stack;
+    private INamedTypeSymbol? _queue;
     private INamedTypeSymbol? _iReadOnlyList;
     private INamedTypeSymbol? _keyValuePair;
     private INamedTypeSymbol? _dictionary;
@@ -55,6 +57,8 @@ public class WellKnownTypes
     public INamedTypeSymbol IReadOnlyCollection => _iReadOnlyCollection ??= GetTypeSymbol(typeof(IReadOnlyCollection<>));
     public INamedTypeSymbol IList => _iList ??= GetTypeSymbol(typeof(IList<>));
     public INamedTypeSymbol List => _list ??= GetTypeSymbol(typeof(List<>));
+    public INamedTypeSymbol Stack => _stack ??= GetTypeSymbol(typeof(Stack<>));
+    public INamedTypeSymbol Queue => _queue ??= GetTypeSymbol(typeof(Queue<>));
     public INamedTypeSymbol IReadOnlyList => _iReadOnlyList ??= GetTypeSymbol(typeof(IReadOnlyList<>));
     public INamedTypeSymbol KeyValuePair => _keyValuePair ??= GetTypeSymbol(typeof(KeyValuePair<,>));
     public INamedTypeSymbol Dictionary => _dictionary ??= GetTypeSymbol(typeof(Dictionary<,>));

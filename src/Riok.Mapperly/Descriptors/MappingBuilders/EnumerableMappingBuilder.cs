@@ -58,13 +58,16 @@ public static class EnumerableMappingBuilder
         if (BuildElementMapping(ctx) is not { } elementMapping)
             return null;
 
-        if (!ctx.Target.ImplementsGeneric(ctx.Types.ICollection, out _))
-            return null;
+        if (ctx.Target.ImplementsGeneric(ctx.Types.Stack, out _))
+            return new ForEachAddEnumerableExistingTargetMapping(ctx.Source, ctx.Target, elementMapping, nameof(Stack<object>.Push));
 
-        return new ForEachAddEnumerableExistingTargetMapping(
-            ctx.Source,
-            ctx.Target,
-            elementMapping);
+        if (ctx.Target.ImplementsGeneric(ctx.Types.Queue, out _))
+            return new ForEachAddEnumerableExistingTargetMapping(ctx.Source, ctx.Target, elementMapping, nameof(Queue<object>.Enqueue));
+
+        if (ctx.Target.ImplementsGeneric(ctx.Types.ICollection, out _))
+            return new ForEachAddEnumerableExistingTargetMapping(ctx.Source, ctx.Target, elementMapping, nameof(ICollection<object>.Add));
+
+        return null;
     }
 
     private static ITypeMapping? BuildElementMapping(MappingBuilderContext ctx)
@@ -96,7 +99,7 @@ public static class EnumerableMappingBuilder
         return new LinqEnumerableMapping(ctx.Source, ctx.Target, elementMapping, selectMethod, collectMethod);
     }
 
-    private static ForEachAddEnumerableMapping? BuildCustomTypeMapping(
+    private static ExistingTargetMappingMethodWrapper? BuildCustomTypeMapping(
         MappingBuilderContext ctx,
         ITypeMapping elementMapping)
     {
@@ -106,9 +109,16 @@ public static class EnumerableMappingBuilder
             return null;
         }
 
-        return ctx.Target.ImplementsGeneric(ctx.Types.ICollection, out _)
-            ? new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping, objectFactory)
-            : null;
+        if (ctx.Target.ImplementsGeneric(ctx.Types.Stack, out _))
+            return new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping, objectFactory, nameof(Stack<object>.Push));
+
+        if (ctx.Target.ImplementsGeneric(ctx.Types.Queue, out _))
+            return new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping, objectFactory, nameof(Queue<object>.Enqueue));
+
+        if (ctx.Target.ImplementsGeneric(ctx.Types.ICollection, out _))
+            return new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping, objectFactory, nameof(ICollection<object>.Add));
+
+        return null;
     }
 
     private static (bool CanMapWithLinq, string? CollectMethod) ResolveCollectMethodName(MappingBuilderContext ctx)
