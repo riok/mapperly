@@ -49,6 +49,10 @@ namespace Riok.Mapperly.IntegrationTests.Models
 
         public IReadOnlyCollection<TestObjectNested>? NullableReadOnlyObjectCollection { get; set; }
 
+        public Stack<string> StackValue { get; set; } = new();
+
+        public Queue<string> QueueValue { get; set; } = new();
+
         public TestEnum EnumValue { get; set; }
 
         public TestEnum EnumName { get; set; }

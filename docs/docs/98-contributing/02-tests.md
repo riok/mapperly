@@ -33,6 +33,8 @@ are run on several supported target frameworks (including .NET 7.0 but also .NET
 
 Snapshots of the generated code are stored per Roslyn version.
 You may need to manually update older versions.
+The received snapshots of the tests are saved in the GitHub Actions as artifacts
+and can be downloaded.
 
 Debugging integration tests is a lot harder than debugging unit tests.
 Therefore if an integration test needs to be debugged,

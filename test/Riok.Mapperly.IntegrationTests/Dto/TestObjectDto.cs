@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Riok.Mapperly.IntegrationTests.Models;
 
 namespace Riok.Mapperly.IntegrationTests.Dto
@@ -50,6 +51,10 @@ namespace Riok.Mapperly.IntegrationTests.Dto
         public TestObject? SourceTargetSameObjectType { get; set; }
 
         public TestObjectNestedDto[]? NullableReadOnlyObjectCollection { get; set; }
+
+        public Stack<int> StackValue { get; set; } = new();
+
+        public Queue<int> QueueValue { get; set; } = new();
 
         public TestEnumDtoByValue EnumValue { get; set; }
 
