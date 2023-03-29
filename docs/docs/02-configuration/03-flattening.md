@@ -6,9 +6,9 @@ If Mapperly can't resolve the target or source property correctly, it is possibl
 by either using the source and target property path names as arrays or using a dot separated property access path string
 
 ```csharp
-[MapProperty(Source = new[] { nameof(Car), nameof(Car.Make), nameof(Car.Make.Id) }, Target = new[] { nameof(CarDto), nameof(CarDto.MakeId) })]
+[MapProperty(new[] { nameof(Car), nameof(Car.Make), nameof(Car.Make.Id) }, new[] { nameof(CarDto), nameof(CarDto.MakeId) })]
 // Or alternatively
-[MapProperty(Source = "Car.Make.Id", Target = "CarDto.MakeId")]
+[MapProperty("Car.Make.Id", "CarDto.MakeId")]
 ```
 
 :::info
