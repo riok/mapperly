@@ -39,7 +39,7 @@ jobs:
           name: mapperly-nupkg
           path: artifacts/*.nupkg
       - if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: verify-test-results
           path: '**/*.received.*'
@@ -81,7 +81,7 @@ jobs:
       - run: dotnet test --no-build -f net${{ matrix.dotnet }}
         working-directory: ./test/Riok.Mapperly.IntegrationTests
       - if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: verify-test-results
           path: '**/*.received.*'
@@ -108,7 +108,7 @@ jobs:
       - run: dotnet test --no-build -f net48
         working-directory: ./test/Riok.Mapperly.IntegrationTests
       - if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: verify-test-results
           path: '**/*.received.*'
