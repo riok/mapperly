@@ -87,6 +87,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.StringValue = src.StringValue;
             target.FlatteningIdValue = DirectInt(src.Flattening.IdValue);
             target.SourceTargetSameObjectType = src.SourceTargetSameObjectType;
+            target.StackValue = MapToStack(src.StackValue);
+            target.QueueValue = MapToQueue(src.QueueValue);
             target.EnumValue = (Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)src.EnumValue;
             target.EnumName = MapToEnumDtoByName(src.EnumName);
             target.EnumRawValue = (byte)src.EnumRawValue;
@@ -149,6 +151,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.FlatteningIdValue = DirectInt(testObject.Flattening.IdValue);
             target.Unflattening.IdValue = DirectInt(testObject.UnflatteningIdValue);
             target.SourceTargetSameObjectType = testObject.SourceTargetSameObjectType;
+            target.StackValue = MapToStack(testObject.StackValue);
+            target.QueueValue = MapToQueue(testObject.QueueValue);
             target.EnumValue = (Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)testObject.EnumValue;
             target.EnumName = MapToEnumDtoByName(testObject.EnumName);
             target.EnumRawValue = (byte)testObject.EnumRawValue;
@@ -194,6 +198,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.NestedNullableTargetNotNullable = MapToTestObjectNested(dto.NestedNullableTargetNotNullable);
             target.StringNullableTargetNotNullable = dto.StringNullableTargetNotNullable;
             target.SourceTargetSameObjectType = dto.SourceTargetSameObjectType;
+            target.StackValue = MapToStack1(dto.StackValue);
+            target.QueueValue = MapToQueue1(dto.QueueValue);
             target.EnumValue = (Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumValue;
             target.EnumName = (Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumName;
             target.EnumRawValue = (Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumRawValue;
@@ -257,6 +263,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.StringValue = source.StringValue;
             target.FlatteningIdValue = DirectInt(source.Flattening.IdValue);
             target.SourceTargetSameObjectType = source.SourceTargetSameObjectType;
+            target.StackValue = MapToStack(source.StackValue);
+            target.QueueValue = MapToQueue(source.QueueValue);
             target.EnumValue = (Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)source.EnumValue;
             target.EnumName = MapToEnumDtoByName(source.EnumName);
             target.EnumRawValue = (byte)source.EnumRawValue;
@@ -275,6 +283,28 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         {
             var target = new Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto();
             target.IntValue = DirectInt(source.IntValue);
+            return target;
+        }
+
+        private static System.Collections.Generic.Stack<int> MapToStack(System.Collections.Generic.Stack<string> source)
+        {
+            var target = new System.Collections.Generic.Stack<int>();
+            foreach (var item in source)
+            {
+                target.Push(ParseableInt(item));
+            }
+
+            return target;
+        }
+
+        private static System.Collections.Generic.Queue<int> MapToQueue(System.Collections.Generic.Queue<string> source)
+        {
+            var target = new System.Collections.Generic.Queue<int>();
+            foreach (var item in source)
+            {
+                target.Enqueue(ParseableInt(item));
+            }
+
             return target;
         }
 
@@ -321,6 +351,28 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             for (var i = 0; i < source.Length; i++)
             {
                 target[i] = MapToTestObjectNested(source[i]);
+            }
+
+            return target;
+        }
+
+        private static System.Collections.Generic.Stack<string> MapToStack1(System.Collections.Generic.Stack<int> source)
+        {
+            var target = new System.Collections.Generic.Stack<string>();
+            foreach (var item in source)
+            {
+                target.Push(item.ToString());
+            }
+
+            return target;
+        }
+
+        private static System.Collections.Generic.Queue<string> MapToQueue1(System.Collections.Generic.Queue<int> source)
+        {
+            var target = new System.Collections.Generic.Queue<string>();
+            foreach (var item in source)
+            {
+                target.Enqueue(item.ToString());
             }
 
             return target;

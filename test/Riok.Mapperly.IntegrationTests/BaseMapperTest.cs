@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Riok.Mapperly.IntegrationTests.Dto;
@@ -75,7 +76,9 @@ namespace Riok.Mapperly.IntegrationTests
                     },
                 NullableReadOnlyObjectCollection =
                     new[] { new TestObjectNested { IntValue = 10 }, new TestObjectNested { IntValue = 20 }, },
-                SourceTargetSameObjectType = new TestObject(8) { IntValue = 99, RequiredValue = 98, }
+                SourceTargetSameObjectType = new TestObject(8) { IntValue = 99, RequiredValue = 98, },
+                StackValue = new Stack<string>(new[] { "1", "2", "3" }),
+                QueueValue = new Queue<string>(new[] { "1", "2", "3" }),
             };
         }
 

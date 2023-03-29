@@ -38,6 +38,11 @@ jobs:
         with:
           name: mapperly-nupkg
           path: artifacts/*.nupkg
+      - if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: verify-test-results
+          path: '**/*.received.*'
   integration-test:
     needs: package
     runs-on: ubuntu-latest
@@ -52,7 +57,8 @@ jobs:
           - '6.0'
     steps:
       - uses: actions/checkout@v3
-      # install required dotnet dependencies https://learn.microsoft.com/en-us/dotnet/core/install/linux-alpine#dependencies
+      # install required dotnet dependencies
+      # https://learn.microsoft.com/en-us/dotnet/core/install/linux-alpine#dependencies
       - run: apk add --no-cache bash icu-libs krb5-libs libgcc libintl libssl1.1 libstdc++ zlib
       # delete global.json since we want to use custom versions here
       - run: rm global.json
@@ -66,10 +72,19 @@ jobs:
 
       # use nupkg artifact for integration tests instead of project references
       - run: dotnet nuget add source "$(pwd)/artifacts"
-      - run: dotnet build -f net${{ matrix.dotnet }} -p:MapperlyIntegrationTestsTargetFramework=net${{ matrix.dotnet }} -p:MapperlyNugetPackageVersion="0.0.1-dev.$GITHUB_RUN_ID"
+      - run: >-
+          dotnet build
+          -f net${{ matrix.dotnet }}
+          -p:MapperlyIntegrationTestsTargetFramework=net${{ matrix.dotnet }}
+          -p:MapperlyNugetPackageVersion="0.0.1-dev.$GITHUB_RUN_ID"
         working-directory: ./test/Riok.Mapperly.IntegrationTests
       - run: dotnet test --no-build -f net${{ matrix.dotnet }}
         working-directory: ./test/Riok.Mapperly.IntegrationTests
+      - if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: verify-test-results
+          path: '**/*.received.*'
   integration-test-net-framework:
     needs: package
     runs-on: windows-latest
@@ -84,7 +99,16 @@ jobs:
 
       # use nupkg artifact for integration tests instead of project references
       - run: dotnet nuget add source "$(Get-Location)/artifacts"
-      - run: dotnet build -f net48 -p:MapperlyIntegrationTestsTargetFramework=net48 -p:MapperlyNugetPackageVersion=0.0.1-dev.$env:GITHUB_RUN_ID
+      - run: >-
+          dotnet build
+          -f net48
+          -p:MapperlyIntegrationTestsTargetFramework=net48
+          -p:MapperlyNugetPackageVersion=0.0.1-dev.$env:GITHUB_RUN_ID
         working-directory: ./test/Riok.Mapperly.IntegrationTests
       - run: dotnet test --no-build -f net48
         working-directory: ./test/Riok.Mapperly.IntegrationTests
+      - if: failure()
+        uses: actions/upload-artifact@v2
+        with:
+          name: verify-test-results
+          path: '**/*.received.*'

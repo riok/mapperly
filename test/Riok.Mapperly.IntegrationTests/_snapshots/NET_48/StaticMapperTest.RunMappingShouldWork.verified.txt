@@ -52,6 +52,16 @@
       IntValue: 20
     }
   ],
+  StackValue: [
+    1,
+    2,
+    3
+  ],
+  QueueValue: [
+    1,
+    2,
+    3
+  ],
   EnumValue: DtoValue1,
   EnumName: Value10,
   EnumRawValue: 20,
