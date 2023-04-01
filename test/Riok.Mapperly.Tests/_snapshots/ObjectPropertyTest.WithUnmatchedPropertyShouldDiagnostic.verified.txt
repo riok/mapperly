@@ -2,14 +2,14 @@
   Diagnostics: [
     {
       Id: RMG012,
-      Title: Mapping source property not found,
+      Title: Source property was not found for target property,
       Severity: Info,
       WarningLevel: 1,
       Location: : (11,4)-(11,28),
       Description: ,
       HelpLink: ,
-      MessageFormat: Property {0} on source type {1} was not found,
-      Message: Property StringValueB on source type A was not found,
+      MessageFormat: The property {0} on the mapping target type {1} was not found on the mapping source type {2},
+      Message: The property StringValueB on the mapping target type B was not found on the mapping source type A,
       Category: Mapper
     },
     {

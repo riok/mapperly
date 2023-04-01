@@ -56,6 +56,7 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
                         ? DiagnosticDescriptors.RequiredPropertyNotMapped
                         : DiagnosticDescriptors.SourcePropertyNotFound,
                     targetProperty.Name,
+                    ctx.Mapping.TargetType,
                     ctx.Mapping.SourceType);
                 continue;
             }
@@ -97,6 +98,7 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.SourcePropertyNotFound,
                 targetProperty.Name,
+                ctx.Mapping.TargetType,
                 ctx.Mapping.SourceType);
             return;
         }
@@ -314,6 +316,7 @@ public static class NewInstanceObjectPropertyMappingBodyBuilder
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.SourcePropertyNotFound,
                 propertyConfig.Source,
+                ctx.Mapping.TargetType,
                 ctx.Mapping.SourceType);
             return false;
         }
