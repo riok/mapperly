@@ -605,7 +605,7 @@ public class EnumerableTest
     [Fact]
     public void EnumerableToExplicitAddCustomCollection()
     {
-        // should not create a mapping using a looped add inside a foreach loop when th add method is explicit
+        // should not create a mapping using a looping add method inside a foreach loop when the add method is explicit
         var source = TestSourceBuilder.Mapping(
             "IEnumerable<int>",
             "B",
@@ -632,6 +632,51 @@ public class EnumerableTest
     }
 
     [Fact]
+    public void EnumerableToExistingCustomCollection()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(IEnumerable<int> source, A target);",
+            "class A : List<int> { }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                if (global::System.Linq.Enumerable.TryGetNonEnumeratedCount(source, out var sourceCount))
+                {
+                    target.EnsureCapacity(sourceCount + target.Count);
+                }
+
+                foreach (var item in source)
+                {
+                    target.Add(item);
+                }
+                """);
+    }
+
+    [Fact]
+    public void ReadOnlyCollectionToList()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IReadOnlyCollection<int> Value { get; } }",
+            "class B { public List<int> Value { get; } }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Value.EnsureCapacity(source.Value.Count + target.Value.Count);
+                foreach (var item in source.Value)
+                {
+                    target.Value.Add(item);
+                }
+
+                return target;
+                """);
+    }
+
+    [Fact]
     public void EnumerableToStack()
     {
         var source = TestSourceBuilder.Mapping(
@@ -644,6 +689,11 @@ public class EnumerableTest
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
+                if (global::System.Linq.Enumerable.TryGetNonEnumeratedCount(source.Value, out var sourceCount))
+                {
+                    target.Value.EnsureCapacity(sourceCount + target.Value.Count);
+                }
+
                 foreach (var item in source.Value)
                 {
                     target.Value.Push((long)item);
@@ -666,6 +716,11 @@ public class EnumerableTest
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
+                if (global::System.Linq.Enumerable.TryGetNonEnumeratedCount(source.Value, out var sourceCount))
+                {
+                    target.Value.EnsureCapacity(sourceCount + target.Value.Count);
+                }
+
                 foreach (var item in source.Value)
                 {
                     target.Value.Enqueue((long)item);

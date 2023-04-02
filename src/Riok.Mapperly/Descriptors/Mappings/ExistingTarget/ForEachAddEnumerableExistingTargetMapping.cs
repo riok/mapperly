@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -15,16 +16,19 @@ public class ForEachAddEnumerableExistingTargetMapping : ExistingTargetMapping
 
     private readonly ITypeMapping _elementMapping;
     private readonly string _insertMethodName;
+    private readonly EnsureCapacity? _ensureCapacityBuilder;
 
     public ForEachAddEnumerableExistingTargetMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         ITypeMapping elementMapping,
-        string insertMethodName)
+        string insertMethodName,
+        EnsureCapacity? ensureCapacityBuilder)
         : base(sourceType, targetType)
     {
         _elementMapping = elementMapping;
         _insertMethodName = insertMethodName;
+        _ensureCapacityBuilder = ensureCapacityBuilder;
     }
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
@@ -33,13 +37,16 @@ public class ForEachAddEnumerableExistingTargetMapping : ExistingTargetMapping
         var convertedSourceItemExpression = _elementMapping.Build(ctx.WithSource(loopItemVariableName));
         var addMethod = MemberAccess(target, _insertMethodName);
 
-        return new StatementSyntax[]
+        var ensureCapacityStatement = _ensureCapacityBuilder?.Build(ctx, target);
+        if (ensureCapacityStatement != null)
         {
-            ForEachStatement(
+            yield return ensureCapacityStatement;
+        }
+
+        yield return ForEachStatement(
                 VarIdentifier,
                 Identifier(loopItemVariableName),
                 ctx.Source,
-                Block(ExpressionStatement(Invocation(addMethod, convertedSourceItemExpression))))
-        };
+                Block(ExpressionStatement(Invocation(addMethod, convertedSourceItemExpression))));
     }
 }
