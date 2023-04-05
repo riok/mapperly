@@ -100,28 +100,52 @@ internal static class SymbolExtensions
         return genericIntf != null;
     }
 
-    internal static bool HasImplicitInterfaceMethod(this ITypeSymbol symbol, INamedTypeSymbol inter, string methodName)
+    internal static bool ImplementsGeneric(
+        this ITypeSymbol t,
+        INamedTypeSymbol genericInterfaceSymbol,
+        string symbolName,
+        [NotNullWhen(true)] out INamedTypeSymbol? genericIntf,
+        out bool isExplicit)
     {
-        // return true if symbol is the same interface - does not check that the method is implemented so class A : IList<T> { } will be accepted
-        if (SymbolEqualityComparer.Default.Equals(symbol.OriginalDefinition, inter))
+        if (SymbolEqualityComparer.Default.Equals(t.OriginalDefinition, genericInterfaceSymbol))
+        {
+            genericIntf = (INamedTypeSymbol)t;
+            isExplicit = false;
             return true;
+        }
 
-        // return false if it does not implement the interface
-        if (!symbol.ImplementsGeneric(inter, out var typedInter))
+        genericIntf = t.AllInterfaces.FirstOrDefault(x => x.IsGenericType && SymbolEqualityComparer.Default.Equals(x.OriginalDefinition, genericInterfaceSymbol));
+
+        if (genericIntf == null)
+        {
+            isExplicit = false;
             return false;
+        }
 
-        var interfaceMethodSymbol = typedInter.GetMembers(methodName).OfType<IMethodSymbol>().Single();
+        var interfaceSymbol = genericIntf.GetMembers(symbolName).First();
 
-        var methodInterImplementaton = symbol.FindImplementationForInterfaceMember(interfaceMethodSymbol) as IMethodSymbol;
+        var symbolImplementaton = t.FindImplementationForInterfaceMember(interfaceSymbol);
 
         // if null then the method is unimplemented
         // symbol implements genericInterface but has not implemented the corresponding methods
         // this can only occur in unit tests
-        if (methodInterImplementaton is null)
-            return false;
+        if (symbolImplementaton == null)
+            throw new NotSupportedException("Symbol implementation cannot be null for objects implementing interface.");
 
-        // check if methodImplementation is explicit
-        return !methodInterImplementaton.ExplicitInterfaceImplementations.Any();
+        // check if symbol is explicit
+        isExplicit = symbolImplementaton switch
+        {
+            IMethodSymbol methodSymbol => methodSymbol.ExplicitInterfaceImplementations.Any(),
+            IPropertySymbol propertySymbol => propertySymbol.ExplicitInterfaceImplementations.Any(),
+            _ => throw new NotImplementedException(),
+        };
+
+        return true;
+    }
+
+    internal static bool HasImplicitInterfaceMethod(this ITypeSymbol symbol, INamedTypeSymbol inter, string methodName)
+    {
+        return symbol.ImplementsGeneric(inter, methodName, out _, out var isExplicit) && !isExplicit;
     }
 
     internal static bool CanConsumeType(this ITypeParameterSymbol typeParameter, Compilation compilation, ITypeSymbol type)
