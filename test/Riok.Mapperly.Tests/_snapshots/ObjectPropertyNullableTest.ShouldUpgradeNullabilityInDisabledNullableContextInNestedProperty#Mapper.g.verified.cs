@@ -2,7 +2,7 @@
 #nullable enable
 public partial class Mapper
 {
-    private partial B? Map(A? source)
+    private partial B? Map(global::A? source)
     {
         if (source == null)
             return default;
@@ -15,7 +15,7 @@ public partial class Mapper
         return target;
     }
 
-    private D MapToD(C source)
+    private D MapToD(global::C source)
     {
         var target = new D();
         target.Value = source.Value;

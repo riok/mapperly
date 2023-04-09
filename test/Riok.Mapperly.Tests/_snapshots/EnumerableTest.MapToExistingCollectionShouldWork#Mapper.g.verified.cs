@@ -2,7 +2,7 @@
 #nullable enable
 public partial class Mapper
 {
-    private partial void Map(System.Collections.Generic.List<A>? source, RepeatedField<B> target)
+    private partial void Map(global::System.Collections.Generic.List<global::A>? source, global::RepeatedField<global::B> target)
     {
         if (source == null)
             return;
@@ -12,7 +12,7 @@ public partial class Mapper
         }
     }
 
-    private B MapToB(A source)
+    private B MapToB(global::A source)
     {
         var target = new B();
         target.Value = source.Value;

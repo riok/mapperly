@@ -2,7 +2,7 @@
 #nullable enable
 internal sealed abstract partial class BaseMapper
 {
-    public partial B AToB(A source)
+    public partial B AToB(global::A source)
     {
         var target = new B();
         target.Value = IntToString(source.Value);

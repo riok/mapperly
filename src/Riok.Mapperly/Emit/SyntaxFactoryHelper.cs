@@ -1,9 +1,11 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
+
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Emit;
@@ -214,8 +216,13 @@ public static class SyntaxFactoryHelper
 
     public static ParameterSyntax Parameter(bool addThisKeyword, MethodParameter parameter)
     {
+        var parameterTypeSyntax = IdentifierName(parameter.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
         var param = SyntaxFactory.Parameter(Identifier(parameter.Name))
-            .WithType(IdentifierName(parameter.Type.ToDisplayString()));
+            .WithType(
+            parameter.Type.NullableAnnotation == NullableAnnotation.Annotated ?
+            SyntaxFactory.NullableType(parameterTypeSyntax) :
+            parameterTypeSyntax
+            );
 
         if (addThisKeyword && parameter.Ordinal == 0)
         {

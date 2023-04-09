@@ -2,7 +2,7 @@
 #nullable enable
 public partial class Mapper
 {
-    private partial void Map(A? source, B? target)
+    private partial void Map(global::A? source, global::B? target)
     {
         if (source == null || target == null)
             return;
