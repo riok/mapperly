@@ -16,7 +16,7 @@ public class ObjectPropertyFlatteningTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.MyValueId = source.Value.Id;
                 return target;
                 """);
@@ -36,7 +36,7 @@ public class ObjectPropertyFlatteningTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.ValueId = source.Value.Id;
                 return target;
                 """);
@@ -56,7 +56,7 @@ public class ObjectPropertyFlatteningTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.ValueId = source.ValueId;
                 return target;
                 """);
@@ -76,7 +76,7 @@ public class ObjectPropertyFlatteningTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 if (source.Value != null)
                 {
                     target.ValueId = source.Value.Id;
@@ -100,7 +100,7 @@ public class ObjectPropertyFlatteningTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 if (source.Value != null)
                 {
                     target.ValueId = source.Value.Id.ToString();
@@ -127,7 +127,7 @@ public class ObjectPropertyFlatteningTest
                 """
                 if (source == null)
                     return default;
-                var target = new B();
+                var target = new global::B();
                 if (source.Value != null)
                 {
                     target.ValueId = source.Value.Id.ToString();
@@ -154,7 +154,7 @@ public class ObjectPropertyFlatteningTest
                 """
                 if (source == null)
                     return default;
-                var target = new B();
+                var target = new global::B();
                 target.ValueName = source.Value?.Name;
                 return target;
                 """);
@@ -173,7 +173,7 @@ public class ObjectPropertyFlatteningTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.Value.Id = source.MyValueId;
                 return target;
                 """);
@@ -192,7 +192,7 @@ public class ObjectPropertyFlatteningTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.Value ??= new();
                 target.Value.Id = source.MyValueId;
                 target.Value.Id2 = source.MyValueId2;
@@ -267,7 +267,7 @@ public class ObjectPropertyFlatteningTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 if (source.Value1 != null)
                 {
                     target.Value2 ??= new();

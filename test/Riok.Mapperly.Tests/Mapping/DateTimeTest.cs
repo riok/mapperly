@@ -11,7 +11,7 @@ public class DateTimeTest
             "DateOnly");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return System.DateOnly.FromDateTime(source);");
+            .HaveSingleMethodBody("return global::System.DateOnly.FromDateTime(source);");
     }
 
     [Fact]
@@ -22,6 +22,6 @@ public class DateTimeTest
             "TimeOnly");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return System.TimeOnly.FromDateTime(source);");
+            .HaveSingleMethodBody("return global::System.TimeOnly.FromDateTime(source);");
     }
 }

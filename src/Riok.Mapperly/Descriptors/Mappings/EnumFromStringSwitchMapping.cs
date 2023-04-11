@@ -68,7 +68,7 @@ public class EnumFromStringSwitchMapping : MethodMapping
 
         // source.Value1
         var typeMemberAccess = MemberAccess(
-            IdentifierName(field.ContainingType.WithNullableAnnotation(NullableAnnotation.None).ToDisplayString()),
+            IdentifierName(field.ContainingType.WithNullableAnnotation(NullableAnnotation.None).GetFullyQualifiedIdentifierName()),
             field.Name);
 
         // when s.Equals(nameof(source.Value1), StringComparison.OrdinalIgnoreCase)
@@ -87,7 +87,7 @@ public class EnumFromStringSwitchMapping : MethodMapping
     {
         // nameof(source.Value1) => source.Value1;
         var typeMemberAccess = MemberAccess(
-            IdentifierName(field.ContainingType.NonNullable().ToDisplayString()),
+            IdentifierName(field.ContainingType.NonNullable().GetFullyQualifiedIdentifierName()),
             field.Name);
         var pattern = ConstantPattern(NameOf(typeMemberAccess));
         return SwitchExpressionArm(pattern, typeMemberAccess);

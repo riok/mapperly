@@ -2,7 +2,7 @@
 #nullable enable
 public partial class Mapper
 {
-    private partial E2 ToE1(global::E1 source)
+    private partial global::E2 ToE1(global::E1 source)
     {
         return source switch
         {

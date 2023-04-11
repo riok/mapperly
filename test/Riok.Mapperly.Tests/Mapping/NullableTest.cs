@@ -18,7 +18,7 @@ public class NullableTest
                 """
                 if (source == null)
                     throw new System.ArgumentNullException(nameof(source));
-                var target = new B();
+                var target = new global::B();
                 return target;
                 """);
     }
@@ -38,7 +38,7 @@ public class NullableTest
                 """
                 if (source == null)
                     return default;
-                var target = new B();
+                var target = new global::B();
                 return target;
                 """);
     }
@@ -68,7 +68,7 @@ public class NullableTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 return target;
                 """);
     }
@@ -88,8 +88,8 @@ public class NullableTest
             .HaveSingleMethodBody(
                 """
                 if (source == null)
-                    return new B();
-                var target = new B();
+                    return new global::B();
+                var target = new global::B();
                 return target;
                 """);
     }
@@ -141,7 +141,7 @@ public class NullableTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (System.DateTime? )source;");
+            .HaveSingleMethodBody("return (global::System.DateTime? )source;");
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public class NullableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.Value = source.Value;
                 target.Descriptions = (string[])source.Descriptions;
                 return target;

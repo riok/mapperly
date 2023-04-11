@@ -2,12 +2,12 @@
 #nullable enable
 public partial class MyMapper
 {
-    public partial B Map(global::A source)
+    public partial global::B Map(global::A source)
     {
-        var target = new B();
+        var target = new global::B();
         target.Value = MyMapping(source.Value);
-        target.Value2 = ((BaseMapper2)this).MyMapping2(source.Value2);
-        target.Value3 = ((BaseMapper3)this).MyMapping3(source.Value3);
+        target.Value2 = ((global::BaseMapper2)this).MyMapping2(source.Value2);
+        target.Value3 = ((global::BaseMapper3)this).MyMapping3(source.Value3);
         target.Value4 = MyIntToShortMapping(source.Value4);
         return target;
     }

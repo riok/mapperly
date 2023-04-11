@@ -48,7 +48,7 @@ public class EnumToStringMapping : MethodMapping
     private SwitchExpressionArmSyntax BuildArm(IFieldSymbol field)
     {
         var typeMemberAccess = MemberAccess(
-            IdentifierName(field.ContainingType.NonNullable().ToDisplayString()),
+            IdentifierName(field.ContainingType.NonNullable().GetFullyQualifiedIdentifierName()),
             field.Name);
         var pattern = ConstantPattern(typeMemberAccess);
         var nameOf = NameOf(typeMemberAccess);

@@ -16,7 +16,7 @@ public class ObjectPropertyNullableTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 if (source.Value != null)
                 {
                     target.Value = source.Value.Value;
@@ -39,7 +39,7 @@ public class ObjectPropertyNullableTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 if (source.Value != null)
                 {
                     target.Value = source.Value;
@@ -64,7 +64,7 @@ public class ObjectPropertyNullableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 if (source.Value != null)
                 {
                     target.Value = MapToD(source.Value);
@@ -87,7 +87,7 @@ public class ObjectPropertyNullableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.Value = source.Value;
                 return target;
                 """);
@@ -107,7 +107,7 @@ public class ObjectPropertyNullableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.Value = source.Value;
                 return target;
                 """);
@@ -128,7 +128,7 @@ public class ObjectPropertyNullableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.Value = MapToD(source.Value);
                 return target;
                 """);
@@ -149,7 +149,7 @@ public class ObjectPropertyNullableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 if (source.Value != null)
                 {
                     target.Value = MapToD(source.Value);
@@ -174,7 +174,7 @@ public class ObjectPropertyNullableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 if (source.Value != null)
                 {
                     target.Value = MapToD(source.Value);
@@ -200,7 +200,7 @@ public class ObjectPropertyNullableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 if (source.Value != null)
                 {
                     target.Value = MapToD(source.Value);
@@ -234,7 +234,7 @@ D UserImplementedMap(C source) => new D();";
                 """
                 if (source == null)
                     return default;
-                var target = new B();
+                var target = new global::B();
                 target.StringValue = source.StringValue;
                 target.NestedValue = UserImplementedMap(source.NestedValue);
                 return target;
@@ -260,7 +260,7 @@ public Wrapper Map(double? source) => source.HasValue ? new() { Test = source.Va
                 """
                 if (y == null)
                     return default;
-                var target = new NotNullableType();
+                var target = new global::NotNullableType();
                 target.Test = Map(y.Test);
                 return target;
                 """);
@@ -285,7 +285,7 @@ public Wrapper Map(double source) => new() { Test = source.Value };";
                 """
                 if (y == null)
                     return default;
-                var target = new NotNullableType();
+                var target = new global::NotNullableType();
                 if (y.Test != null)
                 {
                     target.Test = Map(y.Test.Value);
@@ -315,7 +315,7 @@ public Wrapper MapNullable(double? source) => source.HasValue ? new() { Test = s
                 """
                 if (y == null)
                     return default;
-                var target = new NotNullableType();
+                var target = new global::NotNullableType();
                 target.Test = MapNullable(y.Test);
                 target.Test2 = MapNonNullable(y.Test2);
                 return target;

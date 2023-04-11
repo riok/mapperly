@@ -18,7 +18,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B()
+                var target = new global::B()
                 {
                     StringValue = source.StringValue
                 };
@@ -40,7 +40,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B()
+                var target = new global::B()
                 {
                     StringValue = source.StringValue,
                     IntValue = source.IntValue
@@ -62,7 +62,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B()
+                var target = new global::B()
                 {
                     Value = source.Value ?? throw new System.ArgumentNullException(nameof(source.Value))
                 };
@@ -84,7 +84,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B()
+                var target = new global::B()
                 {
                     Value = source.Value ?? ""
                 };
@@ -104,7 +104,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B()
+                var target = new global::B()
                 {
                     StringValue = source.StringValue2
                 };
@@ -125,7 +125,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B()
+                var target = new global::B()
                 {
                     Parent = source.Parent != null ? Map(source.Parent) : default
                 };
@@ -147,7 +147,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B()
+                var target = new global::B()
                 {
                     NestedValue = source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested?.Value))
                 };
@@ -169,7 +169,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B()
+                var target = new global::B()
                 {
                     NestedValue = source.Nested.Value
                 };
@@ -253,7 +253,7 @@ public class ObjectPropertyInitPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B()
+                var target = new global::B()
                 {
                     StringValue = source.StringValue
                 };

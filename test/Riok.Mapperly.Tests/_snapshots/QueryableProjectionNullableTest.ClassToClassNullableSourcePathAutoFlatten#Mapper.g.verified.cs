@@ -2,10 +2,10 @@
 #nullable enable
 public partial class Mapper
 {
-    private partial System.Linq.IQueryable<B> Map(global::System.Linq.IQueryable<global::A> source)
+    private partial global::System.Linq.IQueryable<global::B> Map(global::System.Linq.IQueryable<global::A> source)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(source, x => new B() { NestedValue = x.Nested != null ? x.Nested.Value : default });
+        return System.Linq.Queryable.Select(source, x => new global::B() { NestedValue = x.Nested != null ? x.Nested.Value : default });
 #nullable enable
     }
 }

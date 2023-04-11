@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Riok.Mapperly.Helpers;
 
@@ -99,5 +101,63 @@ internal static class SymbolExtensions
         }
 
         return true;
+    }
+
+    internal static TypeSyntax GetFullyQualifiedTypeSyntax(this ITypeSymbol typeSymbol)
+    {
+        if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol)
+        {
+            var arrayFullName = arrayTypeSymbol.ToDisplayString();
+
+            string arrayQualifiedName = default!;
+            var rr = arrayTypeSymbol.ElementType.ToString();
+            if (IsPrimitiveType(arrayTypeSymbol.ElementType))
+                arrayQualifiedName = arrayFullName;
+            else
+                arrayQualifiedName = $"global::{arrayFullName}";
+            var identifierSyntax = SyntaxFactory.IdentifierName(arrayQualifiedName);
+            return arrayTypeSymbol.NullableAnnotation == NullableAnnotation.Annotated ?
+                SyntaxFactory.NullableType(identifierSyntax) :
+                identifierSyntax;
+        }
+        var returnTypeIdentifierSyntax = SyntaxFactory.IdentifierName(typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+        var isNullableType = typeSymbol.NullableAnnotation == NullableAnnotation.Annotated;
+        if (isNullableType)
+        {
+            if (typeSymbol is INamedTypeSymbol namedTypeSymbol && namedTypeSymbol.ConstructedFrom.ToDisplayString() == "System.Nullable<T>")
+            {
+                return returnTypeIdentifierSyntax;
+            }
+            else
+                return SyntaxFactory.NullableType(returnTypeIdentifierSyntax);
+        }
+        return returnTypeIdentifierSyntax;
+    }
+
+    internal static string GetFullyQualifiedIdentifierName(this ITypeSymbol typeSymbol)
+    {
+        return typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+    }
+
+    // Method to check if a type is a primitive type
+    private static bool IsPrimitiveType(ITypeSymbol typeSymbol)
+    {
+        return typeSymbol.SpecialType is
+             SpecialType.System_Char
+             or SpecialType.System_SByte
+             or SpecialType.System_Single
+             or SpecialType.System_String
+             or SpecialType.System_Boolean
+             or SpecialType.System_UInt16
+             or SpecialType.System_UInt32
+             or SpecialType.System_UInt64
+             or SpecialType.System_UInt32
+             or SpecialType.System_UIntPtr
+             or SpecialType.System_Int32
+             or SpecialType.System_Int64
+             or SpecialType.System_IntPtr
+             or SpecialType.System_Decimal
+             or SpecialType.System_Double;
     }
 }

@@ -95,7 +95,7 @@ public class CastTest
             "class A { public static explicit operator A(string s) => new(); }");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (A)source;");
+            .HaveSingleMethodBody("return (global::A)source;");
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public class CastTest
             "class A { public static explicit operator A(string s) => new(); }");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (A)source;");
+            .HaveSingleMethodBody("return (global::A)source;");
     }
 
     [Fact]
@@ -120,7 +120,7 @@ public class CastTest
             "struct A { public static explicit operator A(string s) => new(); }");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (A)source;");
+            .HaveSingleMethodBody("return (global::A)source;");
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class CastTest
             "struct A { public static explicit operator A(string s) => new(); }");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (A)source;");
+            .HaveSingleMethodBody("return (global::A)source;");
     }
 
     [Fact]
@@ -146,7 +146,7 @@ public class CastTest
             "class B {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (B)source;");
+            .HaveSingleMethodBody("return (global::B)source;");
     }
 
     [Fact]
@@ -162,7 +162,7 @@ public class CastTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 return target;
                 """);
     }
@@ -177,7 +177,7 @@ public class CastTest
             "struct B {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (B)source;");
+            .HaveSingleMethodBody("return (global::B)source;");
     }
 
     [Fact]
@@ -193,7 +193,7 @@ public class CastTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 return target;
                 """);
     }
@@ -257,7 +257,7 @@ public class CastTest
             "class A { public static implicit operator A(string s) => new(); }");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (A)source;");
+            .HaveSingleMethodBody("return (global::A)source;");
     }
 
     [Fact]
@@ -270,7 +270,7 @@ public class CastTest
             "class A { public static implicit operator A(string s) => new(); }");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (A)source;");
+            .HaveSingleMethodBody("return (global::A)source;");
     }
 
     [Fact]
@@ -282,7 +282,7 @@ public class CastTest
             "struct A { public static implicit operator A(string s) => new(); }");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (A)source;");
+            .HaveSingleMethodBody("return (global::A)source;");
     }
 
     [Fact]
@@ -295,7 +295,7 @@ public class CastTest
             "struct A { public static implicit operator A(string s) => new(); }");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (A)source;");
+            .HaveSingleMethodBody("return (global::A)source;");
     }
 
     [Fact]
@@ -308,7 +308,7 @@ public class CastTest
             "class B {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (B)source;");
+            .HaveSingleMethodBody("return (global::B)source;");
     }
 
     [Fact]
@@ -324,7 +324,7 @@ public class CastTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 return target;
                 """);
     }
@@ -339,7 +339,7 @@ public class CastTest
             "struct B {}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (B)source;");
+            .HaveSingleMethodBody("return (global::B)source;");
     }
 
     [Fact]
@@ -355,7 +355,7 @@ public class CastTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 return target;
                 """);
     }

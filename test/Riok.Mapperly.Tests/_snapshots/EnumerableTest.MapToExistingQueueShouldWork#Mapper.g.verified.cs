@@ -12,9 +12,9 @@ public partial class Mapper
         }
     }
 
-    private B MapToB(global::A source)
+    private global::B MapToB(global::A source)
     {
-        var target = new B();
+        var target = new global::B();
         target.Value = source.Value;
         return target;
     }

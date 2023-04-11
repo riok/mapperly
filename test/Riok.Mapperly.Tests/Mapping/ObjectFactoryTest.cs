@@ -77,7 +77,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = Create<B>();
+                var target = Create<global::B>();
                 target.StringValue = a.StringValue;
                 return target;
                 """);
@@ -96,7 +96,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = Create<B>(a);
+                var target = Create<global::B>(a);
                 target.StringValue = a.StringValue;
                 return target;
                 """);
@@ -115,7 +115,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = Create<B, A>(a);
+                var target = Create<global::B, global::A>(a);
                 target.StringValue = a.StringValue;
                 return target;
                 """);
@@ -134,7 +134,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = Create<A, B>(a);
+                var target = Create<global::A, global::B>(a);
                 target.StringValue = a.StringValue;
                 return target;
                 """);
@@ -153,7 +153,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = Create<A>(a);
+                var target = Create<global::A>(a);
                 target.StringValue = a.StringValue;
                 return target;
                 """);
@@ -195,7 +195,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = CreateB<B>();
+                var target = CreateB<global::B>();
                 target.StringValue = a.StringValue;
                 return target;
                 """);
@@ -233,7 +233,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = CreateB() ?? new B();
+                var target = CreateB() ?? new global::B();
                 target.StringValue = a.StringValue;
                 return target;
                 """);
@@ -271,7 +271,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = Create<B>() ?? new B();
+                var target = Create<global::B>() ?? new global::B();
                 target.StringValue = a.StringValue;
                 return target;
                 """);
@@ -290,7 +290,7 @@ public class ObjectFactoryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = Create<B>() ?? throw new System.NullReferenceException("The object factory Create returned null");
+                var target = Create<global::B>() ?? throw new System.NullReferenceException("The object factory Create returned null");
                 target.StringValue = a.StringValue;
                 return target;
                 """);

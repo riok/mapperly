@@ -216,13 +216,8 @@ public static class SyntaxFactoryHelper
 
     public static ParameterSyntax Parameter(bool addThisKeyword, MethodParameter parameter)
     {
-        var parameterTypeSyntax = IdentifierName(parameter.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
         var param = SyntaxFactory.Parameter(Identifier(parameter.Name))
-            .WithType(
-            parameter.Type.NullableAnnotation == NullableAnnotation.Annotated ?
-            SyntaxFactory.NullableType(parameterTypeSyntax) :
-            parameterTypeSyntax
-            );
+            .WithType(parameter.Type.GetFullyQualifiedTypeSyntax());
 
         if (addThisKeyword && parameter.Ordinal == 0)
         {
@@ -241,7 +236,7 @@ public static class SyntaxFactoryHelper
 
     public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ExpressionSyntax[] arguments)
         => StaticInvocation(
-            method.ReceiverType?.NonNullable().ToDisplayString() ?? throw new ArgumentNullException(nameof(method.ReceiverType)),
+            method.ReceiverType?.NonNullable().GetFullyQualifiedIdentifierName() ?? throw new ArgumentNullException(nameof(method.ReceiverType)),
             method.Name,
             arguments);
 
@@ -330,7 +325,7 @@ public static class SyntaxFactoryHelper
         => SeparatedList<T>(JoinByComma(nodes, insertTrailingComma));
 
     public static IdentifierNameSyntax NonNullableIdentifier(ITypeSymbol t)
-        => IdentifierName(t.NonNullable().ToDisplayString());
+        => IdentifierName(t.NonNullable().GetFullyQualifiedIdentifierName());
 
     private static IEnumerable<SyntaxNodeOrToken> JoinByComma(IEnumerable<SyntaxNode> nodes, bool insertTrailingComma = false)
         => Join(Token(SyntaxKind.CommaToken), insertTrailingComma, nodes);

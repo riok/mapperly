@@ -16,7 +16,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.StringValue);
+                var target = new global::B(source.StringValue);
                 target.IntValue = source.IntValue;
                 return target;
                 """);
@@ -47,7 +47,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.StringValue, source.IntValue);
+                var target = new global::B(source.StringValue, source.IntValue);
                 return target;
                 """);
     }
@@ -65,7 +65,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.StringValue);
+                var target = new global::B(source.StringValue);
                 target.IntValue = source.IntValue;
                 return target;
                 """);
@@ -84,7 +84,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.StringValue, intValue: source.IntValue);
+                var target = new global::B(source.StringValue, intValue: source.IntValue);
                 target.IntValue3 = source.IntValue3;
                 return target;
                 """);
@@ -103,7 +103,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.StringValue, source.IntValue);
+                var target = new global::B(source.StringValue, source.IntValue);
                 return target;
                 """);
     }
@@ -157,7 +157,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.StringValue);
+                var target = new global::B(source.StringValue);
                 target.IntValue = source.IntValue;
                 return target;
                 """);
@@ -176,7 +176,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.StringValue = source.StringValue;
                 target.IntValue = source.IntValue;
                 return target;
@@ -196,7 +196,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.StringValue, source.IntValue);
+                var target = new global::B(source.StringValue, source.IntValue);
                 return target;
                 """);
     }
@@ -214,7 +214,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.StringValue);
+                var target = new global::B(source.StringValue);
                 target.IntValue = source.IntValue;
                 return target;
                 """);
@@ -233,7 +233,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.StringValue);
+                var target = new global::B(source.StringValue);
                 target.IntValue = source.IntValue;
                 return target;
                 """);
@@ -252,7 +252,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.StringValue);
+                var target = new global::B(source.StringValue);
                 target.IntValue = source.IntValue;
                 return target;
                 """);
@@ -272,7 +272,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.Nested.Value);
+                var target = new global::B(source.Nested.Value);
                 return target;
                 """);
     }
@@ -291,7 +291,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested?.Value)));
+                var target = new global::B(source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested?.Value)));
                 return target;
                 """);
     }
@@ -310,7 +310,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(StrConversion(source.Nested?.Value));
+                var target = new global::B(StrConversion(source.Nested?.Value));
                 return target;
                 """);
     }
@@ -330,7 +330,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.Nested?.Value ?? "");
+                var target = new global::B(source.Nested?.Value ?? "");
                 return target;
                 """);
     }
@@ -348,7 +348,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.Value);
+                var target = new global::B(source.Value);
                 return target;
                 """);
     }
@@ -366,7 +366,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.Value ?? throw new System.ArgumentNullException(nameof(source.Value)));
+                var target = new global::B(source.Value ?? throw new System.ArgumentNullException(nameof(source.Value)));
                 return target;
                 """);
     }
@@ -384,7 +384,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.Value != null ? (double)source.Value.Value : throw new System.ArgumentNullException(nameof(source.Value.Value)));
+                var target = new global::B(source.Value != null ? (double)source.Value.Value : throw new System.ArgumentNullException(nameof(source.Value.Value)));
                 return target;
                 """);
     }
@@ -403,7 +403,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(source.Nested != null ? (double)source.Nested.Value : throw new System.ArgumentNullException(nameof(source.Nested.Value)));
+                var target = new global::B(source.Nested != null ? (double)source.Nested.Value : throw new System.ArgumentNullException(nameof(source.Nested.Value)));
                 return target;
                 """);
     }
@@ -422,7 +422,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(a.Id, a.F);
+                var target = new global::B(a.Id, a.F);
                 return target;
                 """);
     }
@@ -441,7 +441,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B(a.Id, a.F);
+                var target = new global::B(a.Id, a.F);
                 return target;
                 """);
     }

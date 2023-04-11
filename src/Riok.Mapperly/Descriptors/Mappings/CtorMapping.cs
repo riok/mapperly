@@ -18,7 +18,7 @@ public class CtorMapping : TypeMapping
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        var type = IdentifierName(TargetType.NonNullable().ToDisplayString());
-        return ObjectCreationExpression(type).WithArgumentList(ArgumentList(ctx.Source));
+        return ObjectCreationExpression(TargetType.GetFullyQualifiedTypeSyntax()).WithArgumentList(ArgumentList(ctx.Source));
+
     }
 }

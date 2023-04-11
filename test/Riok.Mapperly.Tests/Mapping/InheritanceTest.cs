@@ -16,7 +16,7 @@ public class InheritanceTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new C();
+                var target = new global::C();
                 target.StringValue1 = source.StringValue1;
                 target.StringValue2 = source.StringValue2;
                 return target;
@@ -39,7 +39,7 @@ public class InheritanceTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new E();
+                var target = new global::E();
                 target.StringValue1 = source.StringValue1;
                 target.StringValue2 = source.StringValue2;
                 target.StringValue3 = source.StringValue3;
@@ -62,7 +62,7 @@ public class InheritanceTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new C();
+                var target = new global::C();
                 target.StringValue2 = source.StringValue2;
                 target.StringValue1 = source.StringValue1;
                 return target;
@@ -85,7 +85,7 @@ public class InheritanceTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new E();
+                var target = new global::E();
                 target.StringValue4 = source.StringValue4;
                 target.StringValue3 = source.StringValue3;
                 target.StringValue2 = source.StringValue2;
@@ -109,7 +109,7 @@ public class InheritanceTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new D();
+                var target = new global::D();
                 target.StringValue2 = source.StringValue2;
                 target.StringValue1 = source.StringValue1;
                 return target;
@@ -130,7 +130,7 @@ public class InheritanceTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new C();
+                var target = new global::C();
                 target.StringValue1 = source.StringValue1;
                 target.StringValue2 = source.StringValue2;
                 return target;
@@ -153,7 +153,7 @@ public class InheritanceTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new E();
+                var target = new global::E();
                 target.StringValue1 = source.StringValue1;
                 target.StringValue2 = source.StringValue2;
                 target.StringValue3 = source.StringValue3;

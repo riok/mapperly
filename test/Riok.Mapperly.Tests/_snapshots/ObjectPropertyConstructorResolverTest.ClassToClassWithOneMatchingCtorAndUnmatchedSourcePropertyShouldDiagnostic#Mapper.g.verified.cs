@@ -2,9 +2,9 @@
 #nullable enable
 public partial class Mapper
 {
-    private partial B Map(global::A source)
+    private partial global::B Map(global::A source)
     {
-        var target = new B(source.StringValue);
+        var target = new global::B(source.StringValue);
         return target;
     }
 }

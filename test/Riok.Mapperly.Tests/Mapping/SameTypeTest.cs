@@ -74,7 +74,7 @@ public class SameTypeTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new A();
+                var target = new global::A();
                 return target;
                 """);
     }
@@ -103,7 +103,7 @@ public class SameTypeTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new A();
+                var target = new global::A();
                 return target;
                 """);
     }

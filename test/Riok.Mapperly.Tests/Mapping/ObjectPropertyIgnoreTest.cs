@@ -17,7 +17,7 @@ public class ObjectPropertyIgnoreTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.StringValue = source.StringValue;
                 return target;
                 """);
@@ -51,7 +51,7 @@ public class ObjectPropertyIgnoreTest
             .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound, "Property IntValue on source type A was not found"))
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.StringValue = source.StringValue;
                 return target;
                 """);
@@ -70,7 +70,7 @@ public class ObjectPropertyIgnoreTest
             .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotMapped, "The property IntValue on the mapping source type A is not mapped to any property on the mapping target type B"))
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.StringValue = source.StringValue;
                 return target;
                 """);
@@ -89,7 +89,7 @@ public class ObjectPropertyIgnoreTest
             .HaveDiagnostic(new(DiagnosticDescriptors.IgnoredTargetPropertyNotFound, "Ignored target property not_found on B was not found"))
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 return target;
                 """);
     }
@@ -107,7 +107,7 @@ public class ObjectPropertyIgnoreTest
             .HaveDiagnostic(new(DiagnosticDescriptors.IgnoredSourcePropertyNotFound, "Ignored source property not_found on A was not found"))
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 return target;
                 """);
     }
@@ -125,7 +125,7 @@ public class ObjectPropertyIgnoreTest
             .HaveDiagnostic(new(DiagnosticDescriptors.IgnoredTargetPropertyNotFound, "Ignored target property not_found on B was not found"))
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 return target;
                 """);
     }
@@ -143,7 +143,7 @@ public class ObjectPropertyIgnoreTest
             .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotMapped, "The property IntValue on the mapping source type A is not mapped to any property on the mapping target type B"))
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.StringValue = source.StringValue;
                 return target;
                 """);

@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -38,7 +39,7 @@ public class EnumFromStringParseMapping : TypeMapping
             return GenericInvocation(
                 EnumClassName,
                 ParseMethodName,
-                new[] { IdentifierName(TargetType.ToDisplayString()) },
+                new[] { TargetType.GetFullyQualifiedTypeSyntax() },
                 ctx.Source,
                 BooleanLiteral(_ignoreCase));
         }
@@ -46,7 +47,7 @@ public class EnumFromStringParseMapping : TypeMapping
         // (TargetType)System.Enum.Parse(typeof(TargetType), source, ignoreCase)
         var enumParseInvocation = Invocation(
             MemberAccess(EnumClassName, ParseMethodName),
-            TypeOfExpression(IdentifierName(TargetType.ToDisplayString())), ctx.Source, BooleanLiteral(_ignoreCase));
-        return CastExpression(IdentifierName(TargetType.ToDisplayString()), enumParseInvocation);
+            TypeOfExpression(TargetType.GetFullyQualifiedTypeSyntax()), ctx.Source, BooleanLiteral(_ignoreCase));
+        return CastExpression(TargetType.GetFullyQualifiedTypeSyntax(), enumParseInvocation);
     }
 }

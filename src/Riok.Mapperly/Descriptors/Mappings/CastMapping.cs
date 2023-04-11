@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
@@ -22,6 +23,6 @@ public class CastMapping : TypeMapping
         var objToCast = _delegateMapping != null
             ? _delegateMapping.Build(ctx)
             : ctx.Source;
-        return CastExpression(IdentifierName(TargetType.ToDisplayString()), objToCast);
+        return CastExpression(TargetType.GetFullyQualifiedTypeSyntax(), objToCast);
     }
 }

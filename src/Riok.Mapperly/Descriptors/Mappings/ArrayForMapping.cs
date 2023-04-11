@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -32,7 +33,7 @@ public class ArrayForMapping : MethodMapping
         // var target = new T[source.Length];
         var sourceLengthArrayRank = ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(MemberAccess(ctx.Source, ArrayLengthProperty)));
         var targetInitializationValue = ArrayCreationExpression(
-            ArrayType(IdentifierName(_targetArrayElementType.ToDisplayString()))
+            ArrayType(_targetArrayElementType.GetFullyQualifiedTypeSyntax())
                 .WithRankSpecifiers(SingletonList(sourceLengthArrayRank)));
         yield return DeclareLocalVariable(targetVariableName, targetInitializationValue);
 
