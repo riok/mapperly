@@ -26,7 +26,8 @@ If applicable, add code snippets to help explain your problem.
 - Mapperly Version: [e.g. 1.0.1]
 - .NET Version: [e.g. .NET 6.0.102]
 - Target Framework: [e.g. .net6.0]
-- OS: [e.g. iOS8.1]
+- IDE: [e.g. Visual Studio v17.5.2 or Rider 2023.1]
+- OS: [e.g. macOS 13.3]
 
 **Additional context**
 Add any other context about the problem here.
