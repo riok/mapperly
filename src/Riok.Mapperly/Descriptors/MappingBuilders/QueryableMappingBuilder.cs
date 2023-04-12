@@ -12,10 +12,10 @@ public static class QueryableMappingBuilder
         if (!ctx.IsConversionEnabled(MappingConversionType.Queryable))
             return null;
 
-        if (!ctx.Source.ImplementsGeneric(ctx.Types.IQueryable, out var sourceQueryable))
+        if (!ctx.Source.ImplementsGeneric(ctx.Types.IQueryableT, out var sourceQueryable))
             return null;
 
-        if (!ctx.Target.ImplementsGeneric(ctx.Types.IQueryable, out var targetQueryable))
+        if (!ctx.Target.ImplementsGeneric(ctx.Types.IQueryableT, out var targetQueryable))
             return null;
 
         var sourceType = sourceQueryable.TypeArguments[0];

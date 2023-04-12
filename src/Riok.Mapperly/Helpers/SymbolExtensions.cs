@@ -78,6 +78,30 @@ internal static class SymbolExtensions
         return genericIntf != null;
     }
 
+    internal static bool HasImplicitInterfaceMethod(this ITypeSymbol symbol, INamedTypeSymbol inter, string methodName)
+    {
+        // return true if symbol is the same interface - does not check that the method is implemented so class A : IList<T> { } will be accepted
+        if (SymbolEqualityComparer.Default.Equals(symbol.OriginalDefinition, inter))
+            return true;
+
+        // return false if it does not implement the interface
+        if (!symbol.ImplementsGeneric(inter, out var typedInter))
+            return false;
+
+        var interfaceMethodSymbol = typedInter.GetMembers(methodName).OfType<IMethodSymbol>().Single();
+
+        var methodInterImplementaton = symbol.FindImplementationForInterfaceMember(interfaceMethodSymbol) as IMethodSymbol;
+
+        // if null then the method is unimplemented
+        // symbol implements genericInterface but has not implemented the corresponding methods
+        // this can only occur in unit tests
+        if (methodInterImplementaton is null)
+            return false;
+
+        // check if methodImplementation is explicit
+        return !methodInterImplementaton.ExplicitInterfaceImplementations.Any();
+    }
+
     internal static bool CanConsumeType(this ITypeParameterSymbol typeParameter, Compilation compilation, ITypeSymbol type)
     {
         if (typeParameter.HasConstructorConstraint && !type.HasAccessibleParameterlessConstructor())

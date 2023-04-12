@@ -27,7 +27,7 @@ public static class DictionaryMappingBuilder
                 .OfType<IPropertySymbol>()
                 .Any(x => !x.IsStatic && !x.IsIndexer && !x.IsWriteOnly && x.Type.SpecialType == SpecialType.System_Int32);
 
-            var targetDictionarySymbol = ctx.Types.Dictionary.Construct(keyMapping.TargetType, valueMapping.TargetType);
+            var targetDictionarySymbol = ctx.Types.DictionaryT.Construct(keyMapping.TargetType, valueMapping.TargetType);
             ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var dictionaryObjectFactory);
             return new ForEachSetDictionaryMapping(
                 ctx.Source,
@@ -47,7 +47,7 @@ public static class DictionaryMappingBuilder
             return null;
         }
 
-        if (!ctx.Target.ImplementsGeneric(ctx.Types.IDictionary, out _))
+        if (!ctx.Target.ImplementsGeneric(ctx.Types.IDictionaryT, out _))
             return null;
 
         return new ForEachSetDictionaryMapping(
@@ -61,7 +61,7 @@ public static class DictionaryMappingBuilder
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
     {
-        if (!ctx.Target.ImplementsGeneric(ctx.Types.IDictionary, out _))
+        if (!ctx.Target.ImplementsGeneric(ctx.Types.IDictionaryT, out _))
             return null;
 
         if (BuildKeyValueMapping(ctx) is not var (keyMapping, valueMapping))
@@ -98,19 +98,19 @@ public static class DictionaryMappingBuilder
         if (symbol is not INamedTypeSymbol namedSymbol)
             return false;
 
-        return SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.Dictionary)
-            || SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.IDictionary)
-            || SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.IReadOnlyDictionary);
+        return SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.DictionaryT)
+            || SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.IDictionaryT)
+            || SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.IReadOnlyDictionaryT);
     }
 
     private static (ITypeSymbol, ITypeSymbol)? GetDictionaryKeyValueTypes(MappingBuilderContext ctx, ITypeSymbol t)
     {
-        if (t.ImplementsGeneric(ctx.Types.IDictionary, out var dictionaryImpl))
+        if (t.ImplementsGeneric(ctx.Types.IDictionaryT, out var dictionaryImpl))
         {
             return (dictionaryImpl.TypeArguments[0], dictionaryImpl.TypeArguments[1]);
         }
 
-        if (t.ImplementsGeneric(ctx.Types.IReadOnlyDictionary, out var readOnlyDictionaryImpl))
+        if (t.ImplementsGeneric(ctx.Types.IReadOnlyDictionaryT, out var readOnlyDictionaryImpl))
         {
             return (readOnlyDictionaryImpl.TypeArguments[0], readOnlyDictionaryImpl.TypeArguments[1]);
         }
@@ -120,13 +120,13 @@ public static class DictionaryMappingBuilder
 
     private static (ITypeSymbol, ITypeSymbol)? GetEnumerableKeyValueTypes(MappingBuilderContext ctx, ITypeSymbol t)
     {
-        if (!t.ImplementsGeneric(ctx.Types.IEnumerable, out var enumerableImpl))
+        if (!t.ImplementsGeneric(ctx.Types.IEnumerableT, out var enumerableImpl))
             return null;
 
         if (enumerableImpl.TypeArguments[0] is not INamedTypeSymbol enumeratedType)
             return null;
 
-        if (!SymbolEqualityComparer.Default.Equals(enumeratedType.ConstructedFrom, ctx.Types.KeyValuePair))
+        if (!SymbolEqualityComparer.Default.Equals(enumeratedType.ConstructedFrom, ctx.Types.KeyValuePairT))
             return null;
 
         return (enumeratedType.TypeArguments[0], enumeratedType.TypeArguments[1]);
