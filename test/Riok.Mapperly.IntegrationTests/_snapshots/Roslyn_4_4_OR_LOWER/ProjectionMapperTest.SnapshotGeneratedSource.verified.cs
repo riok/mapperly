@@ -11,11 +11,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {IntValue = x.NestedNullable.IntValue} : default, NestedNullableTargetNotNullable = x.NestedNullableTargetNotNullable != null ? new Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto()
             {IntValue = x.NestedNullableTargetNotNullable.IntValue} : new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto(), StringNullableTargetNotNullable = x.StringNullableTargetNotNullable ?? "", SourceTargetSameObjectType = x.SourceTargetSameObjectType, NullableReadOnlyObjectCollection = x.NullableReadOnlyObjectCollection != null ? global::System.Linq.Enumerable.ToArray(System.Linq.Enumerable.Select(x.NullableReadOnlyObjectCollection, x1 => new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto()
             {IntValue = x1.IntValue})) : default, EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)x.EnumValue, EnumName = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)x.EnumName, EnumRawValue = (byte)x.EnumRawValue, EnumStringValue = (string)x.EnumStringValue.ToString(), EnumReverseStringValue = global::System.Enum.Parse<global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue>(x.EnumReverseStringValue, false), SubObject = x.SubObject != null ? new global::Riok.Mapperly.IntegrationTests.Dto.InheritanceSubObjectDto()
-            {SubIntValue = x.SubObject.SubIntValue, BaseIntValue = x.SubObject.BaseIntValue} : default, DateTimeValueTargetDateOnly = System.DateOnly.FromDateTime(x.DateTimeValueTargetDateOnly), DateTimeValueTargetTimeOnly = System.TimeOnly.FromDateTime(x.DateTimeValueTargetTimeOnly)});
+            {SubIntValue = x.SubObject.SubIntValue, BaseIntValue = x.SubObject.BaseIntValue} : default, DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(x.DateTimeValueTargetDateOnly), DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(x.DateTimeValueTargetTimeOnly)});
 #nullable enable
         }
 
-        private static partial global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection ProjectToDto(this Riok.Mapperly.IntegrationTests.Models.TestObjectProjection testObject)
+        private static partial global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection ProjectToDto(this global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjection testObject)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection(testObject.CtorValue)
             {IntInitOnlyValue = testObject.IntInitOnlyValue, RequiredValue = testObject.RequiredValue};
