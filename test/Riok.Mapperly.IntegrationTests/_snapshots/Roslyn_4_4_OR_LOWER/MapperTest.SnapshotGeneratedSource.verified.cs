@@ -46,10 +46,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         private partial global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto MapToDtoInternal(global::Riok.Mapperly.IntegrationTests.Models.TestObject testObject)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto(DirectInt(testObject.CtorValue), ctorValue2: DirectInt(testObject.CtorValue2))
-            {
-                IntInitOnlyValue = DirectInt(testObject.IntInitOnlyValue),
-                RequiredValue = DirectInt(testObject.RequiredValue)
-            };
+            { IntInitOnlyValue = DirectInt(testObject.IntInitOnlyValue), RequiredValue = DirectInt(testObject.RequiredValue) };
             if (testObject.NullableFlattening != null)
             {
                 target.NullableFlatteningIdValue = CastIntNullable(testObject.NullableFlattening.IdValue);
@@ -119,10 +116,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public partial global::Riok.Mapperly.IntegrationTests.Models.TestObject MapFromDto(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto dto)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObject(DirectInt(dto.CtorValue), ctorValue2: DirectInt(dto.CtorValue2))
-            {
-                IntInitOnlyValue = DirectInt(dto.IntInitOnlyValue),
-                RequiredValue = DirectInt(dto.RequiredValue)
-            };
+            { IntInitOnlyValue = DirectInt(dto.IntInitOnlyValue), RequiredValue = DirectInt(dto.RequiredValue) };
             if (dto.NullableUnflattening != null)
             {
                 target.NullableUnflatteningIdValue = CastIntNullable(dto.NullableUnflattening.IdValue);
