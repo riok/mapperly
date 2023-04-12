@@ -467,8 +467,8 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
-                target.Value = System.Collections.Immutable.ImmutableList.ToImmutableList(source.Value);
+                var target = new global::B();
+                target.Value = global::System.Collections.Immutable.ImmutableList.ToImmutableList(source.Value);
                 return target;
                 """);
     }
@@ -485,8 +485,8 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
-                target.Value = System.Collections.Immutable.ImmutableList.ToImmutableList(System.Linq.Enumerable.Select(source.Value, x => (long)x));
+                var target = new global::B();
+                target.Value = global::System.Collections.Immutable.ImmutableList.ToImmutableList(global::System.Linq.Enumerable.Select(source.Value, x => (long)x));
                 return target;
                 """);
     }
@@ -503,8 +503,8 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
-                target.Value = System.Collections.Immutable.ImmutableArray.ToImmutableArray(source.Value);
+                var target = new global::B();
+                target.Value = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(source.Value);
                 return target;
                 """);
     }
@@ -521,8 +521,8 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
-                target.Value = System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(source.Value);
+                var target = new global::B();
+                target.Value = global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(source.Value);
                 return target;
                 """);
     }
@@ -539,8 +539,8 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
-                target.Value = System.Collections.Immutable.ImmutableQueue.CreateRange(source.Value);
+                var target = new global::B();
+                target.Value = global::System.Collections.Immutable.ImmutableQueue.CreateRange(source.Value);
                 return target;
                 """);
     }
@@ -557,8 +557,8 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
-                target.Value = System.Collections.Immutable.ImmutableStack.CreateRange(source.Value);
+                var target = new global::B();
+                target.Value = global::System.Collections.Immutable.ImmutableStack.CreateRange(source.Value);
                 return target;
                 """);
     }
@@ -575,8 +575,8 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
-                target.Value = System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(source.Value);
+                var target = new global::B();
+                target.Value = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(source.Value);
                 return target;
                 """);
     }
@@ -614,7 +614,7 @@ public class EnumerableTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 return target;
                 """);
     }
@@ -970,7 +970,7 @@ public class EnumerableTest
             .Should()
             .HaveSingleMethodBody(
             """
-            var target = new B();
+            var target = new global::B();
             return target;
             """)
             .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyProperty));
