@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using Riok.Mapperly.IntegrationTests.Models;
 
 namespace Riok.Mapperly.IntegrationTests.Dto
@@ -56,6 +57,18 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         public Queue<int> QueueValue { get; set; } = new();
 
+        public ImmutableArray<int> ImmutableArrayValue { get; set; } = ImmutableArray<int>.Empty;
+
+        public ImmutableList<int> ImmutableListValue { get; set; } = ImmutableList<int>.Empty;
+
+        public ImmutableHashSet<int> ImmutableHashSetValue { get; set; } = ImmutableHashSet<int>.Empty;
+
+        public ImmutableQueue<int> ImmutableQueueValue { get; set; } = ImmutableQueue<int>.Empty;
+
+        public ImmutableStack<int> ImmutableStackValue { get; set; } = ImmutableStack<int>.Empty;
+
+        public ImmutableSortedSet<int> ImmutableSortedSetValue { get; set; } = ImmutableSortedSet<int>.Empty;
+
         public TestEnumDtoByValue EnumValue { get; set; }
 
         public TestEnumDtoByName EnumName { get; set; }
@@ -69,6 +82,7 @@ namespace Riok.Mapperly.IntegrationTests.Dto
         public InheritanceSubObjectDto? SubObject { get; set; }
 
         public string? IgnoredStringValue { get; set; }
+
         public int IgnoredIntValue { get; set; }
 
         public DateOnly DateTimeValueTargetDateOnly { get; set; }
