@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -18,7 +17,7 @@ public class CtorMapping : TypeMapping
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        return ObjectCreationExpression(TargetType.GetFullyQualifiedTypeSyntax()).WithArgumentList(ArgumentList(ctx.Source));
+        return ObjectCreationExpression(FullyQualifiedIdentifier(TargetType)).WithArgumentList(ArgumentList(ctx.Source));
 
     }
 }

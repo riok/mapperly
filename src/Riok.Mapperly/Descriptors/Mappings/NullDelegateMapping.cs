@@ -47,7 +47,7 @@ public class NullDelegateMapping : TypeMapping
             // if the target type is a nullable value type, there needs to be an additional cast in some cases
             // (eg. in a linq expression, int => int?)
             return TargetType.IsNullableValueType()
-                ? CastExpression(TargetType.GetFullyQualifiedTypeSyntax(), _delegateMapping.Build(ctx))
+                ? CastExpression(FullyQualifiedIdentifier(TargetType), _delegateMapping.Build(ctx))
                 : _delegateMapping.Build(ctx);
         }
 

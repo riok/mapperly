@@ -19,7 +19,8 @@ public static class SyntaxFactoryHelper
     private const string NullReferenceExceptionClassName = "System.NullReferenceException";
 
     public static readonly IdentifierNameSyntax VarIdentifier = IdentifierName("var");
-
+    private static readonly SymbolDisplayFormat _fullyQualifiedNullableFormat = SymbolDisplayFormat.FullyQualifiedFormat.AddMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
+    private static readonly SymbolDisplayFormat _fullyQualifiedNonNullableFormat = SymbolDisplayFormat.FullyQualifiedFormat.AddMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
     private static readonly IdentifierNameSyntax _nameofIdentifier = IdentifierName("nameof");
 
     public static SyntaxToken Accessibility(Accessibility accessibility)
@@ -217,7 +218,7 @@ public static class SyntaxFactoryHelper
     public static ParameterSyntax Parameter(bool addThisKeyword, MethodParameter parameter)
     {
         var param = SyntaxFactory.Parameter(Identifier(parameter.Name))
-            .WithType(parameter.Type.GetFullyQualifiedTypeSyntax());
+            .WithType(FullyQualifiedIdentifier(parameter.Type));
 
         if (addThisKeyword && parameter.Ordinal == 0)
         {
@@ -236,7 +237,7 @@ public static class SyntaxFactoryHelper
 
     public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ExpressionSyntax[] arguments)
         => StaticInvocation(
-            method.ReceiverType?.NonNullable().GetFullyQualifiedIdentifierName() ?? throw new ArgumentNullException(nameof(method.ReceiverType)),
+           FullyQualifiedIdentifierName(method.ReceiverType?.NonNullable()!) ?? throw new ArgumentNullException(nameof(method.ReceiverType)),
             method.Name,
             arguments);
 
@@ -325,7 +326,7 @@ public static class SyntaxFactoryHelper
         => SeparatedList<T>(JoinByComma(nodes, insertTrailingComma));
 
     public static IdentifierNameSyntax NonNullableIdentifier(ITypeSymbol t)
-        => IdentifierName(t.NonNullable().GetFullyQualifiedIdentifierName());
+        => FullyQualifiedNonNullableIdentifier(t);
 
     private static IEnumerable<SyntaxNodeOrToken> JoinByComma(IEnumerable<SyntaxNode> nodes, bool insertTrailingComma = false)
         => Join(Token(SyntaxKind.CommaToken), insertTrailingComma, nodes);
@@ -351,5 +352,33 @@ public static class SyntaxFactoryHelper
         {
             yield return sep;
         }
+    }
+
+    public static IdentifierNameSyntax FullyQualifiedIdentifier(ITypeSymbol typeSymbol)
+    {
+        if (typeSymbol is null)
+            throw new ArgumentNullException(nameof(typeSymbol));
+        return IdentifierName(FullyQualifiedIdentifierName(typeSymbol));
+    }
+
+    public static string FullyQualifiedIdentifierName(ITypeSymbol typeSymbol)
+    {
+        if (typeSymbol is null)
+            throw new ArgumentNullException(nameof(typeSymbol));
+        return typeSymbol.ToDisplayString(_fullyQualifiedNullableFormat);
+    }
+
+    public static IdentifierNameSyntax FullyQualifiedNonNullableIdentifier(ITypeSymbol typeSymbol)
+    {
+        if (typeSymbol is null)
+            throw new ArgumentNullException(nameof(typeSymbol));
+        return IdentifierName(FullyQualifiedNonNullableIdentifierName(typeSymbol));
+    }
+
+    public static string FullyQualifiedNonNullableIdentifierName(ITypeSymbol typeSymbol)
+    {
+        if (typeSymbol is null)
+            throw new ArgumentNullException(nameof(typeSymbol));
+        return typeSymbol.ToDisplayString(_fullyQualifiedNonNullableFormat);
     }
 }

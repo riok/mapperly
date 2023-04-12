@@ -33,7 +33,7 @@ public class UserImplementedMethodMapping : TypeMapping, IUserMapping
         if (Method.ReceiverType?.TypeKind != TypeKind.Interface)
             return Invocation(Method.Name, _sourceParameter.WithArgument(ctx.Source), _referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
 
-        var castedThis = CastExpression(Method.ReceiverType!.GetFullyQualifiedTypeSyntax(), ThisExpression());
+        var castedThis = CastExpression(FullyQualifiedIdentifier(Method.ReceiverType!), ThisExpression());
         var method = MemberAccess(ParenthesizedExpression(castedThis), Method.Name);
         return Invocation(method, _sourceParameter.WithArgument(ctx.Source), _referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
     }

@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -45,8 +44,8 @@ public class EnumNameMapping : MethodMapping
 
     private SwitchExpressionArmSyntax BuildArm(KeyValuePair<string, string> sourceTargetField)
     {
-        var sourceMember = MemberAccess(SourceType.GetFullyQualifiedIdentifierName(), sourceTargetField.Key);
-        var targetMember = MemberAccess(TargetType.GetFullyQualifiedIdentifierName(), sourceTargetField.Value);
+        var sourceMember = MemberAccess(FullyQualifiedIdentifier(SourceType), sourceTargetField.Key);
+        var targetMember = MemberAccess(FullyQualifiedIdentifier(TargetType), sourceTargetField.Value);
         var pattern = ConstantPattern(sourceMember);
         return SwitchExpressionArm(pattern, targetMember);
     }

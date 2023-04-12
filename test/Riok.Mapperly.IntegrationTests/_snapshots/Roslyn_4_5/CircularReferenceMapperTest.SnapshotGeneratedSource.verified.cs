@@ -3,17 +3,17 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 {
     public static partial class CircularReferenceMapper
     {
-        public static partial Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto ToDto(Riok.Mapperly.IntegrationTests.Models.CircularReferenceObject obj)
+        public static partial global::Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto ToDto(global::Riok.Mapperly.IntegrationTests.Models.CircularReferenceObject obj)
         {
-            return MapToCircularReferenceDto(obj, new Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler());
+            return MapToCircularReferenceDto(obj, new global::Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler());
         }
 
-        private static Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto MapToCircularReferenceDto(Riok.Mapperly.IntegrationTests.Models.CircularReferenceObject source, Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
+        private static global::Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto MapToCircularReferenceDto(global::Riok.Mapperly.IntegrationTests.Models.CircularReferenceObject source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
         {
-            if (refHandler.TryGetReference<Riok.Mapperly.IntegrationTests.Models.CircularReferenceObject, Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto>(source, out var existingTargetReference))
+            if (refHandler.TryGetReference<global::Riok.Mapperly.IntegrationTests.Models.CircularReferenceObject, global::Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto>(source, out var existingTargetReference))
                 return existingTargetReference;
-            var target = new Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto();
-            refHandler.SetReference<Riok.Mapperly.IntegrationTests.Models.CircularReferenceObject, Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto>(source, target);
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto();
+            refHandler.SetReference<global::Riok.Mapperly.IntegrationTests.Models.CircularReferenceObject, global::Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto>(source, target);
             if (source.Parent != null)
             {
                 target.Parent = MapToCircularReferenceDto(source.Parent, refHandler);

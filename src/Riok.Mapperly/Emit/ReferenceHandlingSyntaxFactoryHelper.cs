@@ -2,7 +2,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
 using Riok.Mapperly.Descriptors.Mappings;
-using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -19,7 +18,7 @@ public static class ReferenceHandlingSyntaxFactoryHelper
         // GetReference<TSource, TTarget>
         var refHandler = ctx.ReferenceHandler ?? throw new ArgumentNullException(nameof(ctx.ReferenceHandler));
         var methodName = GenericName(Identifier(nameof(IReferenceHandler.TryGetReference)))
-            .WithTypeArgumentList(TypeArgumentList(mapping.SourceType.GetFullyQualifiedTypeSyntax(), mapping.TargetType.GetFullyQualifiedTypeSyntax()));
+            .WithTypeArgumentList(TypeArgumentList(FullyQualifiedIdentifier(mapping.SourceType), FullyQualifiedIdentifier(mapping.TargetType)));
         var method = MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, refHandler, methodName);
 
         // out var target
@@ -47,7 +46,7 @@ public static class ReferenceHandlingSyntaxFactoryHelper
         // SetReference<TSource, TTarget>
         var refHandler = ctx.ReferenceHandler ?? throw new ArgumentNullException(nameof(ctx.ReferenceHandler));
         var methodName = GenericName(Identifier(nameof(IReferenceHandler.SetReference)))
-            .WithTypeArgumentList(TypeArgumentList(mapping.SourceType.GetFullyQualifiedTypeSyntax(), (mapping.TargetType.GetFullyQualifiedTypeSyntax())));
+            .WithTypeArgumentList(TypeArgumentList(FullyQualifiedIdentifier(mapping.SourceType), (FullyQualifiedIdentifier(mapping.TargetType))));
         var method = MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, refHandler, methodName);
 
         return Invocation(method, ctx.Source, target);
