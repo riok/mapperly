@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Riok.Mapperly.IntegrationTests.Dto;
 using Riok.Mapperly.IntegrationTests.Models;
 using VerifyTests;
 using VerifyXunit;
+
 #if !NET6_0_OR_GREATER
 using Riok.Mapperly.IntegrationTests.Helpers;
 #endif
@@ -79,6 +81,12 @@ namespace Riok.Mapperly.IntegrationTests
                 SourceTargetSameObjectType = new TestObject(8) { IntValue = 99, RequiredValue = 98, },
                 StackValue = new Stack<string>(new[] { "1", "2", "3" }),
                 QueueValue = new Queue<string>(new[] { "1", "2", "3" }),
+                ImmutableArrayValue = ImmutableArray.Create("1", "2", "3"),
+                ImmutableListValue = ImmutableList.Create("1", "2", "3"),
+                ImmutableHashSetValue = ImmutableHashSet.Create("1", "2", "3"),
+                ImmutableQueueValue = ImmutableQueue.Create("1", "2", "3"),
+                ImmutableStackValue = ImmutableStack.Create("1", "2", "3"),
+                ImmutableSortedSetValue = ImmutableSortedSet.Create("1", "2", "3")
             };
         }
 

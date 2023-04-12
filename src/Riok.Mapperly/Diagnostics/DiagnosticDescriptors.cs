@@ -96,8 +96,8 @@ internal static class DiagnosticDescriptors
 
     public static readonly DiagnosticDescriptor SourcePropertyNotFound = new DiagnosticDescriptor(
         "RMG012",
-        "Mapping source property not found",
-        "Property {0} on source type {1} was not found",
+        "Source property was not found for target property",
+        "The property {0} on the mapping target type {1} was not found on the mapping source type {2}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
         true);
@@ -185,7 +185,7 @@ internal static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor RequiredPropertyNotMapped = new DiagnosticDescriptor(
         "RMG023",
         "Source property was not found for required target property",
-        "Required property {0} on mapping target type was not found on the mapping source type {1}",
+        "Required property {0} on mapping target type {1} was not found on the mapping source type {2}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true);

@@ -201,7 +201,7 @@ public class ObjectPropertyInitPropertyTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound, "Property StringValue on source type A was not found"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound, "The property StringValue on the mapping target type B was not found on the mapping source type A"))
             .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotMapped, "The property StringValue2 on the mapping source type A is not mapped to any property on the mapping target type B"));
     }
 

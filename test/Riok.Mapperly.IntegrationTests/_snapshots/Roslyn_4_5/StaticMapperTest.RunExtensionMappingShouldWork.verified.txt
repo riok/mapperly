@@ -24,6 +24,9 @@
     Unflattening: {},
     NestedNullableTargetNotNullable: {},
     StringNullableTargetNotNullable: ,
+    ImmutableArrayValue: null,
+    ImmutableQueueValue: [],
+    ImmutableStackValue: [],
     EnumValue: DtoValue1,
     EnumName: Value30,
     EnumStringValue: 0,
@@ -37,6 +40,9 @@
     StringValue: ,
     RenamedStringValue: ,
     Flattening: {},
+    ImmutableArrayValue: null,
+    ImmutableQueueValue: [],
+    ImmutableStackValue: [],
     EnumReverseStringValue: 
   },
   NullableReadOnlyObjectCollection: [
@@ -53,6 +59,36 @@
     3
   ],
   QueueValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableArrayValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableListValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableHashSetValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableQueueValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableStackValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableSortedSetValue: [
     1,
     2,
     3

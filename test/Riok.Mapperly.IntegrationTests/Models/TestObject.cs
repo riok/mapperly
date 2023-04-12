@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Riok.Mapperly.IntegrationTests.Models
 {
@@ -52,6 +53,18 @@ namespace Riok.Mapperly.IntegrationTests.Models
         public Stack<string> StackValue { get; set; } = new();
 
         public Queue<string> QueueValue { get; set; } = new();
+
+        public ImmutableArray<string> ImmutableArrayValue { get; set; } = ImmutableArray<string>.Empty;
+
+        public ImmutableList<string> ImmutableListValue { get; set; } = ImmutableList<string>.Empty;
+
+        public ImmutableHashSet<string> ImmutableHashSetValue { get; set; } = ImmutableHashSet<string>.Empty;
+
+        public ImmutableQueue<string> ImmutableQueueValue { get; set; } = ImmutableQueue<string>.Empty;
+
+        public ImmutableStack<string> ImmutableStackValue { get; set; } = ImmutableStack<string>.Empty;
+
+        public ImmutableSortedSet<string> ImmutableSortedSetValue { get; set; } = ImmutableSortedSet<string>.Empty;
 
         public TestEnum EnumValue { get; set; }
 

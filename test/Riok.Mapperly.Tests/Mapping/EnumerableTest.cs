@@ -456,12 +456,138 @@ public class EnumerableTest
     }
 
     [Fact]
+    public void EnumerableToImmutableList()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public System.Collections.Immutable.ImmutableList<int> Value { get; set; } }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                target.Value = System.Collections.Immutable.ImmutableList.ToImmutableList(source.Value);
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void EnumerableToImmutableListOfCastedTypes()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public System.Collections.Immutable.ImmutableList<long> Value { get; set; } }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                target.Value = System.Collections.Immutable.ImmutableList.ToImmutableList(System.Linq.Enumerable.Select(source.Value, x => (long)x));
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void EnumerableToImmutableArray()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public System.Collections.Immutable.ImmutableArray<int> Value { get; set; } }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                target.Value = System.Collections.Immutable.ImmutableArray.ToImmutableArray(source.Value);
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void EnumerableToImmutableHashSet()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public System.Collections.Immutable.ImmutableHashSet<int> Value { get; set; } }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                target.Value = System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(source.Value);
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void EnumerableToImmutableQueue()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public System.Collections.Immutable.ImmutableQueue<int> Value { get; set; } }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                target.Value = System.Collections.Immutable.ImmutableQueue.CreateRange(source.Value);
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void EnumerableToImmutableStack()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public System.Collections.Immutable.ImmutableStack<int> Value { get; set; } }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                target.Value = System.Collections.Immutable.ImmutableStack.CreateRange(source.Value);
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void EnumerableToImmutableSortedSet()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public System.Collections.Immutable.ImmutableSortedSet<int> Value { get; set; } }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new B();
+                target.Value = System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(source.Value);
+                return target;
+                """);
+    }
+
+    [Fact]
     public void EnumerableToCustomCollection()
     {
         var source = TestSourceBuilder.Mapping(
             "IEnumerable<long>",
             "B",
-            "class B : ICollection<int> {}");
+            "class B : ICollection<int> { public void Add(int item) {} }");
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
@@ -474,6 +600,35 @@ public class EnumerableTest
 
                 return target;
                 """);
+    }
+
+    [Fact]
+    public void EnumerableToExplicitAddCustomCollection()
+    {
+        // should not create a mapping using a looped add inside a foreach loop when th add method is explicit
+        var source = TestSourceBuilder.Mapping(
+            "IEnumerable<int>",
+            "B",
+            "class B : ICollection<int> { void ICollection<int>.Add(int item) {} }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new B();
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void MapToExistingExplicitAddCustomCollection()
+    {
+        // should not create a mapping using a looped add inside a foreach loop when th add method is explicit
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(IEnumerable<int> source, B target);",
+            "class B : ICollection<int> { void ICollection<int>.Add(int item) {} }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody("");
     }
 
     [Fact]
@@ -570,7 +725,7 @@ public class EnumerableTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[ObjectFactory] B CreateB() => new();"
             + "partial B Map(IEnumerable<long> source);",
-            "class B : ICollection<int> {}");
+            "class B : ICollection<int> { public void Add(int item) {} }");
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
@@ -604,7 +759,7 @@ public class EnumerableTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial void Map(List<A>? source, RepeatedField<B> target);",
-            "class RepeatedField<T> : IList<T> {  }",
+            "class RepeatedField<T> : IList<T> { public void Add(T item) {} }",
             "class A { public string Value { get; set; } }",
             "class B { public string Value { get; set; } }");
 
@@ -635,6 +790,18 @@ public class EnumerableTest
 
     [Fact]
     public Task MapToReadOnlyNullableCollectionProperty()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public ICollection<int> Value { get; } }",
+            "class B { public ICollection<long>? Value { get; } }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapToReadOnlyNullableICollectionProperty()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -682,6 +849,102 @@ public class EnumerableTest
     }
 
     [Fact]
+    public void EnumerableToReadonlyImmutableListShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public System.Collections.Immutable.ImmutableList<int> Value { get; } }");
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound));
+    }
+
+    [Fact]
+    public void EnumerableToReadonlyImmutableList()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public System.Collections.Immutable.ImmutableList<int> Value { get; } }");
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound));
+    }
+
+    [Fact]
+    public void EnumerableToReadonlyImmutableArray()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public System.Collections.Immutable.ImmutableArray<int> Value { get; } }");
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound));
+    }
+
+    [Fact]
+    public void EnumerableToReadonlyImmutableHashSet()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int? Value { get; } }",
+            "class B { public System.Collections.Immutable.ImmutableHashSet<int> Value { get; } }");
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics).Should().HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound));
+    }
+
+    [Fact]
+    public void EnumerableToReadonlyImmutableQueue()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public System.Collections.Immutable.ImmutableQueue<int> Value { get; } }");
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound));
+    }
+
+    [Fact]
+    public void EnumerableToReadonlyImmutableStack()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public System.Collections.Immutable.ImmutableStack<int> Value { get; } }");
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound));
+    }
+
+    [Fact]
+    public void EnumerableToReadonlyImmutableSortedSet()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public System.Collections.Immutable.ImmutableSortedSet<int> Value { get; } }");
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound));
+    }
+
+    [Fact]
     public void EnumerableMappingDisabledShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
@@ -691,5 +954,25 @@ public class EnumerableTest
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
+    }
+
+    [Fact]
+    public void EnumerableToReadOnlyArrayPropertyShouldDiagnostic()
+    {
+        // should not create a mapping that maps to an array by adding to it in a foreach loop
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public ICollection<int> Value { get; } }",
+            "class B { public int[] Value { get; } }");
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+            """
+            var target = new B();
+            return target;
+            """)
+            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyProperty));
     }
 }
