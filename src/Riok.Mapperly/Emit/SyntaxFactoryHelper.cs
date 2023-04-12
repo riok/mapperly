@@ -375,10 +375,5 @@ public static class SyntaxFactoryHelper
         return IdentifierName(FullyQualifiedNonNullableIdentifierName(typeSymbol));
     }
 
-    public static string FullyQualifiedNonNullableIdentifierName(ITypeSymbol typeSymbol)
-    {
-        if (typeSymbol is null)
-            throw new ArgumentNullException(nameof(typeSymbol));
-        return typeSymbol.ToDisplayString(_fullyQualifiedNonNullableFormat);
-    }
+    public static string FullyQualifiedNonNullableIdentifierName(ITypeSymbol typeSymbol) => typeSymbol.ToDisplayString(_fullyQualifiedNonNullableFormat);
 }
