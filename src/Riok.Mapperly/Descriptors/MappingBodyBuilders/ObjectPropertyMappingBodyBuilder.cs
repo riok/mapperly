@@ -50,6 +50,7 @@ public static class ObjectPropertyMappingBodyBuilder
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.SourcePropertyNotFound,
                     targetProperty.Name,
+                    ctx.Mapping.TargetType,
                     ctx.Mapping.SourceType);
                 continue;
             }

@@ -8,8 +8,8 @@
       Location: : (11,4)-(11,28),
       Description: ,
       HelpLink: ,
-      MessageFormat: Required property {0} on mapping target type was not found on the mapping source type {1},
-      Message: Required property StringValue on mapping target type was not found on the mapping source type A,
+      MessageFormat: Required property {0} on mapping target type {1} was not found on the mapping source type {2},
+      Message: Required property StringValue on mapping target type B was not found on the mapping source type A,
       Category: Mapper
     },
     {
