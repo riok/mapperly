@@ -20,7 +20,6 @@ public static class SyntaxFactoryHelper
 
     public static readonly IdentifierNameSyntax VarIdentifier = IdentifierName("var");
     private static readonly SymbolDisplayFormat _fullyQualifiedNullableFormat = SymbolDisplayFormat.FullyQualifiedFormat.AddMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
-    private static readonly SymbolDisplayFormat _fullyQualifiedNonNullableFormat = SymbolDisplayFormat.FullyQualifiedFormat.AddMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
     private static readonly IdentifierNameSyntax _nameofIdentifier = IdentifierName("nameof");
 
     public static SyntaxToken Accessibility(Accessibility accessibility)
@@ -326,7 +325,7 @@ public static class SyntaxFactoryHelper
         => SeparatedList<T>(JoinByComma(nodes, insertTrailingComma));
 
     public static IdentifierNameSyntax NonNullableIdentifier(ITypeSymbol t)
-        => FullyQualifiedNonNullableIdentifier(t);
+        => FullyQualifiedIdentifier(t.NonNullable());
 
     private static IEnumerable<SyntaxNodeOrToken> JoinByComma(IEnumerable<SyntaxNode> nodes, bool insertTrailingComma = false)
         => Join(Token(SyntaxKind.CommaToken), insertTrailingComma, nodes);
@@ -355,25 +354,8 @@ public static class SyntaxFactoryHelper
     }
 
     public static IdentifierNameSyntax FullyQualifiedIdentifier(ITypeSymbol typeSymbol)
-    {
-        if (typeSymbol is null)
-            throw new ArgumentNullException(nameof(typeSymbol));
-        return IdentifierName(FullyQualifiedIdentifierName(typeSymbol));
-    }
+    => IdentifierName(FullyQualifiedIdentifierName(typeSymbol));
 
     public static string FullyQualifiedIdentifierName(ITypeSymbol typeSymbol)
-    {
-        if (typeSymbol is null)
-            throw new ArgumentNullException(nameof(typeSymbol));
-        return typeSymbol.ToDisplayString(_fullyQualifiedNullableFormat);
-    }
-
-    public static IdentifierNameSyntax FullyQualifiedNonNullableIdentifier(ITypeSymbol typeSymbol)
-    {
-        if (typeSymbol is null)
-            throw new ArgumentNullException(nameof(typeSymbol));
-        return IdentifierName(FullyQualifiedNonNullableIdentifierName(typeSymbol));
-    }
-
-    public static string FullyQualifiedNonNullableIdentifierName(ITypeSymbol typeSymbol) => typeSymbol.ToDisplayString(_fullyQualifiedNonNullableFormat);
+    => typeSymbol.ToDisplayString(_fullyQualifiedNullableFormat);
 }

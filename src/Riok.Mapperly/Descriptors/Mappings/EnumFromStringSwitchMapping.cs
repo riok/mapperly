@@ -1,5 +1,8 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+using Riok.Mapperly.Helpers;
+
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -67,7 +70,7 @@ public class EnumFromStringSwitchMapping : MethodMapping
 
         // source.Value1
         var typeMemberAccess = MemberAccess(
-            FullyQualifiedNonNullableIdentifier(field.ContainingType),
+            FullyQualifiedIdentifierName(field.ContainingType.NonNullable()),
             field.Name);
 
         // when s.Equals(nameof(source.Value1), StringComparison.OrdinalIgnoreCase)
