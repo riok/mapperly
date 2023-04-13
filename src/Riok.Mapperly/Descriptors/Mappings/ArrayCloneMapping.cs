@@ -23,7 +23,7 @@ public class ArrayCloneMapping : TypeMapping
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         return CastExpression(
-       FullyQualifiedIdentifier(TargetType),
-  InvocationExpression(MemberAccess(ctx.Source, CloneMethodName)));
+            FullyQualifiedIdentifier(TargetType),
+            InvocationExpression(MemberAccess(ctx.Source, CloneMethodName)));
     }
 }
