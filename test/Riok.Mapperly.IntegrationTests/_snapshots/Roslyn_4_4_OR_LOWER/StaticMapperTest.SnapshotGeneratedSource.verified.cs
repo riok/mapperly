@@ -46,7 +46,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto MapToDtoExt(this global::Riok.Mapperly.IntegrationTests.Models.TestObject src)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto(DirectInt(src.CtorValue), ctorValue2: DirectInt(src.CtorValue2))
-            { IntInitOnlyValue = DirectInt(src.IntInitOnlyValue), RequiredValue = DirectInt(src.RequiredValue) };
+            {IntInitOnlyValue = DirectInt(src.IntInitOnlyValue), RequiredValue = DirectInt(src.RequiredValue)};
             if (src.NullableFlattening != null)
             {
                 target.NullableFlatteningIdValue = CastIntNullable(src.NullableFlattening.IdValue);
@@ -108,7 +108,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         private static partial global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto MapToDtoInternal(global::Riok.Mapperly.IntegrationTests.Models.TestObject testObject)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto(DirectInt(testObject.CtorValue), ctorValue2: DirectInt(testObject.CtorValue2))
-            { IntInitOnlyValue = DirectInt(testObject.IntInitOnlyValue), RequiredValue = DirectInt(testObject.RequiredValue) };
+            {IntInitOnlyValue = DirectInt(testObject.IntInitOnlyValue), RequiredValue = DirectInt(testObject.RequiredValue)};
             if (testObject.NullableFlattening != null)
             {
                 target.NullableFlatteningIdValue = CastIntNullable(testObject.NullableFlattening.IdValue);
@@ -178,7 +178,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial global::Riok.Mapperly.IntegrationTests.Models.TestObject MapFromDto(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto dto)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObject(DirectInt(dto.CtorValue), ctorValue2: DirectInt(dto.CtorValue2))
-            { IntInitOnlyValue = DirectInt(dto.IntInitOnlyValue), RequiredValue = DirectInt(dto.RequiredValue) };
+            {IntInitOnlyValue = DirectInt(dto.IntInitOnlyValue), RequiredValue = DirectInt(dto.RequiredValue)};
             if (dto.NullableUnflattening != null)
             {
                 target.NullableUnflatteningIdValue = CastIntNullable(dto.NullableUnflattening.IdValue);
