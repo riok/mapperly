@@ -236,7 +236,7 @@ public static class SyntaxFactoryHelper
 
     public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ExpressionSyntax[] arguments)
         => StaticInvocation(
-           FullyQualifiedIdentifierName(method.ReceiverType?.NonNullable()!) ?? throw new ArgumentNullException(nameof(method.ReceiverType)),
+            FullyQualifiedIdentifierName(method.ReceiverType?.NonNullable()!) ?? throw new ArgumentNullException(nameof(method.ReceiverType)),
             method.Name,
             arguments);
 
