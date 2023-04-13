@@ -145,7 +145,7 @@ public class EnumerableTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B[source.Length];
+                var target = new global::B[source.Length];
                 for (var i = 0; i < source.Length; i++)
                 {
                     target[i] = source[i] == null ? throw new System.ArgumentNullException(nameof(source[i])) : source[i];
@@ -164,7 +164,7 @@ public class EnumerableTest
             "class B { public int Value {get; set; }}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (B? [])source;");
+            .HaveSingleMethodBody("return (global::B? [])source;");
     }
 
     [Fact]
@@ -179,7 +179,7 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B[source.Length];
+                var target = new global::B[source.Length];
                 for (var i = 0; i < source.Length; i++)
                 {
                     target[i] = MapToB(source[i]);
@@ -257,7 +257,7 @@ public class EnumerableTest
             "readonly struct A{}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (A[])source.Clone();");
+            .HaveSingleMethodBody("return (global::A[])source.Clone();");
     }
 
     [Fact]
@@ -284,7 +284,7 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new A[source.Length];
+                var target = new global::A[source.Length];
                 for (var i = 0; i < source.Length; i++)
                 {
                     target[i] = MapToA(source[i]);
@@ -305,7 +305,7 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new A[i.Length];
+                var target = new global::A[i.Length];
                 for (var i1 = 0; i1 < i.Length; i1++)
                 {
                     target[i1] = MapToA(i[i1]);
@@ -326,7 +326,7 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target1 = new A[target.Length];
+                var target1 = new global::A[target.Length];
                 for (var i = 0; i < target.Length; i++)
                 {
                     target1[i] = MapToA(target[i]);
@@ -364,7 +364,7 @@ public class EnumerableTest
             "int[]");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return System.Linq.Enumerable.ToArray(source);");
+            .HaveSingleMethodBody("return global::System.Linq.Enumerable.ToArray(source);");
     }
 
     [Fact]
@@ -386,7 +386,7 @@ public class EnumerableTest
             "ICollection<int>");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return System.Linq.Enumerable.ToList(source);");
+            .HaveSingleMethodBody("return global::System.Linq.Enumerable.ToList(source);");
     }
 
     [Fact]
@@ -397,7 +397,7 @@ public class EnumerableTest
             "IReadOnlyCollection<int>");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return System.Linq.Enumerable.ToList(source);");
+            .HaveSingleMethodBody("return global::System.Linq.Enumerable.ToList(source);");
     }
 
     [Fact]
@@ -408,7 +408,7 @@ public class EnumerableTest
             "IReadOnlyCollection<long>");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(source, x => (long)x));");
+            .HaveSingleMethodBody("return global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(source, x => (long)x));");
     }
 
     [Fact]
@@ -419,7 +419,7 @@ public class EnumerableTest
             "IReadOnlyCollection<int>");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(source, x => (int)x));");
+            .HaveSingleMethodBody("return global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(source, x => (int)x));");
     }
 
     [Fact]
@@ -430,7 +430,7 @@ public class EnumerableTest
             "IList<int>");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(source, x => (int)x));");
+            .HaveSingleMethodBody("return global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(source, x => (int)x));");
     }
 
     [Fact]
@@ -441,7 +441,7 @@ public class EnumerableTest
             "List<int>");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(source, x => (int)x));");
+            .HaveSingleMethodBody("return global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(source, x => (int)x));");
     }
 
     [Fact]
@@ -452,7 +452,7 @@ public class EnumerableTest
             "IReadOnlyList<int>");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return System.Linq.Enumerable.ToList(System.Linq.Enumerable.Select(source, x => (int)x));");
+            .HaveSingleMethodBody("return global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(source, x => (int)x));");
     }
 
     [Fact]
@@ -467,8 +467,8 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
-                target.Value = System.Collections.Immutable.ImmutableList.ToImmutableList(source.Value);
+                var target = new global::B();
+                target.Value = global::System.Collections.Immutable.ImmutableList.ToImmutableList(source.Value);
                 return target;
                 """);
     }
@@ -485,8 +485,8 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
-                target.Value = System.Collections.Immutable.ImmutableList.ToImmutableList(System.Linq.Enumerable.Select(source.Value, x => (long)x));
+                var target = new global::B();
+                target.Value = global::System.Collections.Immutable.ImmutableList.ToImmutableList(global::System.Linq.Enumerable.Select(source.Value, x => (long)x));
                 return target;
                 """);
     }
@@ -503,8 +503,8 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
-                target.Value = System.Collections.Immutable.ImmutableArray.ToImmutableArray(source.Value);
+                var target = new global::B();
+                target.Value = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(source.Value);
                 return target;
                 """);
     }
@@ -521,8 +521,8 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
-                target.Value = System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(source.Value);
+                var target = new global::B();
+                target.Value = global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(source.Value);
                 return target;
                 """);
     }
@@ -539,8 +539,8 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
-                target.Value = System.Collections.Immutable.ImmutableQueue.CreateRange(source.Value);
+                var target = new global::B();
+                target.Value = global::System.Collections.Immutable.ImmutableQueue.CreateRange(source.Value);
                 return target;
                 """);
     }
@@ -557,8 +557,8 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
-                target.Value = System.Collections.Immutable.ImmutableStack.CreateRange(source.Value);
+                var target = new global::B();
+                target.Value = global::System.Collections.Immutable.ImmutableStack.CreateRange(source.Value);
                 return target;
                 """);
     }
@@ -575,8 +575,8 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
-                target.Value = System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(source.Value);
+                var target = new global::B();
+                target.Value = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(source.Value);
                 return target;
                 """);
     }
@@ -592,7 +592,7 @@ public class EnumerableTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 foreach (var item in source)
                 {
                     target.Add((int)item);
@@ -614,7 +614,7 @@ public class EnumerableTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 return target;
                 """);
     }
@@ -643,7 +643,7 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 foreach (var item in source.Value)
                 {
                     target.Value.Push((long)item);
@@ -665,7 +665,7 @@ public class EnumerableTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 foreach (var item in source.Value)
                 {
                     target.Value.Enqueue((long)item);
@@ -687,7 +687,7 @@ public class EnumerableTest
             .Should()
             .HaveMethodBody("MapToStack",
                 """
-                var target = new System.Collections.Generic.Stack<long>();
+                var target = new global::System.Collections.Generic.Stack<long>();
                 foreach (var item in source)
                 {
                     target.Push((long)item);
@@ -709,7 +709,7 @@ public class EnumerableTest
             .Should()
             .HaveMethodBody("MapToQueue",
                 """
-                var target = new System.Collections.Generic.Queue<long>();
+                var target = new global::System.Collections.Generic.Queue<long>();
                 foreach (var item in source)
                 {
                     target.Enqueue((long)item);
@@ -970,7 +970,7 @@ public class EnumerableTest
             .Should()
             .HaveSingleMethodBody(
             """
-            var target = new B();
+            var target = new global::B();
             return target;
             """)
             .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyProperty));

@@ -2,7 +2,7 @@
 #nullable enable
 public partial class Mapper
 {
-    private partial void Map(System.Collections.Generic.List<A>? source, System.Collections.Generic.Queue<B> target)
+    private partial void Map(global::System.Collections.Generic.List<global::A>? source, global::System.Collections.Generic.Queue<global::B> target)
     {
         if (source == null)
             return;
@@ -12,9 +12,9 @@ public partial class Mapper
         }
     }
 
-    private B MapToB(A source)
+    private global::B MapToB(global::A source)
     {
-        var target = new B();
+        var target = new global::B();
         target.Value = source.Value;
         return target;
     }

@@ -38,7 +38,7 @@ public class EnumFromStringParseMapping : TypeMapping
             return GenericInvocation(
                 EnumClassName,
                 ParseMethodName,
-                new[] { IdentifierName(TargetType.ToDisplayString()) },
+                new[] { FullyQualifiedIdentifier(TargetType) },
                 ctx.Source,
                 BooleanLiteral(_ignoreCase));
         }
@@ -46,7 +46,7 @@ public class EnumFromStringParseMapping : TypeMapping
         // (TargetType)System.Enum.Parse(typeof(TargetType), source, ignoreCase)
         var enumParseInvocation = Invocation(
             MemberAccess(EnumClassName, ParseMethodName),
-            TypeOfExpression(IdentifierName(TargetType.ToDisplayString())), ctx.Source, BooleanLiteral(_ignoreCase));
-        return CastExpression(IdentifierName(TargetType.ToDisplayString()), enumParseInvocation);
+            TypeOfExpression(FullyQualifiedIdentifier(TargetType)), ctx.Source, BooleanLiteral(_ignoreCase));
+        return CastExpression(FullyQualifiedIdentifier(TargetType), enumParseInvocation);
     }
 }

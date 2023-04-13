@@ -1,9 +1,11 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
+
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Emit;
@@ -17,7 +19,7 @@ public static class SyntaxFactoryHelper
     private const string NullReferenceExceptionClassName = "System.NullReferenceException";
 
     public static readonly IdentifierNameSyntax VarIdentifier = IdentifierName("var");
-
+    private static readonly SymbolDisplayFormat _fullyQualifiedNullableFormat = SymbolDisplayFormat.FullyQualifiedFormat.AddMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
     private static readonly IdentifierNameSyntax _nameofIdentifier = IdentifierName("nameof");
 
     public static SyntaxToken Accessibility(Accessibility accessibility)
@@ -103,8 +105,8 @@ public static class SyntaxFactoryHelper
     public static LiteralExpressionSyntax NullLiteral()
         => LiteralExpression(SyntaxKind.NullLiteralExpression);
 
-    public static LiteralExpressionSyntax StringLiteral(string content) =>
-        LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(content));
+    public static LiteralExpressionSyntax StringLiteral(string content)
+        => LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(content));
 
     public static LiteralExpressionSyntax BooleanLiteral(bool b)
         => LiteralExpression(b ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression);
@@ -215,7 +217,7 @@ public static class SyntaxFactoryHelper
     public static ParameterSyntax Parameter(bool addThisKeyword, MethodParameter parameter)
     {
         var param = SyntaxFactory.Parameter(Identifier(parameter.Name))
-            .WithType(IdentifierName(parameter.Type.ToDisplayString()));
+            .WithType(FullyQualifiedIdentifier(parameter.Type));
 
         if (addThisKeyword && parameter.Ordinal == 0)
         {
@@ -234,7 +236,7 @@ public static class SyntaxFactoryHelper
 
     public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ExpressionSyntax[] arguments)
         => StaticInvocation(
-            method.ReceiverType?.NonNullable().ToDisplayString() ?? throw new ArgumentNullException(nameof(method.ReceiverType)),
+            FullyQualifiedIdentifierName(method.ReceiverType?.NonNullable()!) ?? throw new ArgumentNullException(nameof(method.ReceiverType)),
             method.Name,
             arguments);
 
@@ -323,7 +325,13 @@ public static class SyntaxFactoryHelper
         => SeparatedList<T>(JoinByComma(nodes, insertTrailingComma));
 
     public static IdentifierNameSyntax NonNullableIdentifier(ITypeSymbol t)
-        => IdentifierName(t.NonNullable().ToDisplayString());
+        => FullyQualifiedIdentifier(t.NonNullable());
+
+    public static IdentifierNameSyntax FullyQualifiedIdentifier(ITypeSymbol typeSymbol)
+        => IdentifierName(FullyQualifiedIdentifierName(typeSymbol));
+
+    public static string FullyQualifiedIdentifierName(ITypeSymbol typeSymbol)
+        => typeSymbol.ToDisplayString(_fullyQualifiedNullableFormat);
 
     private static IEnumerable<SyntaxNodeOrToken> JoinByComma(IEnumerable<SyntaxNode> nodes, bool insertTrailingComma = false)
         => Join(Token(SyntaxKind.CommaToken), insertTrailingComma, nodes);

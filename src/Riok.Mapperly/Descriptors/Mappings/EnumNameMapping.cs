@@ -44,8 +44,8 @@ public class EnumNameMapping : MethodMapping
 
     private SwitchExpressionArmSyntax BuildArm(KeyValuePair<string, string> sourceTargetField)
     {
-        var sourceMember = MemberAccess(SourceType.ToDisplayString(), sourceTargetField.Key);
-        var targetMember = MemberAccess(TargetType.ToDisplayString(), sourceTargetField.Value);
+        var sourceMember = MemberAccess(FullyQualifiedIdentifier(SourceType), sourceTargetField.Key);
+        var targetMember = MemberAccess(FullyQualifiedIdentifier(TargetType), sourceTargetField.Value);
         var pattern = ConstantPattern(sourceMember);
         return SwitchExpressionArm(pattern, targetMember);
     }

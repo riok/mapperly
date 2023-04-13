@@ -14,7 +14,7 @@ public class CtorTest
             "class A { public A(string x) {} }");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return new A(source);");
+            .HaveSingleMethodBody("return new global::A(source);");
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class CtorTest
             "struct A { public A(string x) {} }");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return new A(source);");
+            .HaveSingleMethodBody("return new global::A(source);");
     }
 
     [Fact]

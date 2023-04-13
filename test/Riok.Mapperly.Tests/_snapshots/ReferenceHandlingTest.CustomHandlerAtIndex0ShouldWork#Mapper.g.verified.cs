@@ -2,23 +2,23 @@
 #nullable enable
 public partial class Mapper
 {
-    private partial B Map(Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler, A a)
+    private partial global::B Map(global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler, global::A a)
     {
-        if (refHandler.TryGetReference<A, B>(a, out var existingTargetReference))
+        if (refHandler.TryGetReference<global::A, global::B>(a, out var existingTargetReference))
             return existingTargetReference;
-        var target = new B();
-        refHandler.SetReference<A, B>(a, target);
+        var target = new global::B();
+        refHandler.SetReference<global::A, global::B>(a, target);
         target.Parent = Map(refHandler, a.Parent);
         target.Value = MapToD(a.Value, refHandler);
         return target;
     }
 
-    private D MapToD(C source, Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
+    private global::D MapToD(global::C source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
     {
-        if (refHandler.TryGetReference<C, D>(source, out var existingTargetReference))
+        if (refHandler.TryGetReference<global::C, global::D>(source, out var existingTargetReference))
             return existingTargetReference;
-        var target = new D();
-        refHandler.SetReference<C, D>(source, target);
+        var target = new global::D();
+        refHandler.SetReference<global::C, global::D>(source, target);
         target.StringValue = source.StringValue;
         return target;
     }

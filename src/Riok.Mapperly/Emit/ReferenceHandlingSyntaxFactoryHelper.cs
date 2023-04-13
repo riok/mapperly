@@ -18,7 +18,7 @@ public static class ReferenceHandlingSyntaxFactoryHelper
         // GetReference<TSource, TTarget>
         var refHandler = ctx.ReferenceHandler ?? throw new ArgumentNullException(nameof(ctx.ReferenceHandler));
         var methodName = GenericName(Identifier(nameof(IReferenceHandler.TryGetReference)))
-            .WithTypeArgumentList(TypeArgumentList(IdentifierName(mapping.SourceType.ToDisplayString()), IdentifierName(mapping.TargetType.ToDisplayString())));
+            .WithTypeArgumentList(TypeArgumentList(FullyQualifiedIdentifier(mapping.SourceType), FullyQualifiedIdentifier(mapping.TargetType)));
         var method = MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, refHandler, methodName);
 
         // out var target
@@ -46,7 +46,7 @@ public static class ReferenceHandlingSyntaxFactoryHelper
         // SetReference<TSource, TTarget>
         var refHandler = ctx.ReferenceHandler ?? throw new ArgumentNullException(nameof(ctx.ReferenceHandler));
         var methodName = GenericName(Identifier(nameof(IReferenceHandler.SetReference)))
-            .WithTypeArgumentList(TypeArgumentList(IdentifierName(mapping.SourceType.ToDisplayString()), IdentifierName(mapping.TargetType.ToDisplayString())));
+            .WithTypeArgumentList(TypeArgumentList(FullyQualifiedIdentifier(mapping.SourceType), (FullyQualifiedIdentifier(mapping.TargetType))));
         var method = MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, refHandler, methodName);
 
         return Invocation(method, ctx.Source, target);

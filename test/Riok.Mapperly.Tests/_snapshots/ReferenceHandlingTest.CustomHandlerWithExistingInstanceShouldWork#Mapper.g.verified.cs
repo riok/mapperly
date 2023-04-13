@@ -2,29 +2,29 @@
 #nullable enable
 public partial class Mapper
 {
-    private partial void Map(A a, B b, Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
+    private partial void Map(global::A a, global::B b, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
     {
         b.Parent = MapToB(a.Parent, refHandler);
         b.Value = MapToD(a.Value, refHandler);
     }
 
-    private B MapToB(A source, Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
+    private global::B MapToB(global::A source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
     {
-        if (refHandler.TryGetReference<A, B>(source, out var existingTargetReference))
+        if (refHandler.TryGetReference<global::A, global::B>(source, out var existingTargetReference))
             return existingTargetReference;
-        var target = new B();
-        refHandler.SetReference<A, B>(source, target);
+        var target = new global::B();
+        refHandler.SetReference<global::A, global::B>(source, target);
         target.Parent = MapToB(source.Parent, refHandler);
         target.Value = MapToD(source.Value, refHandler);
         return target;
     }
 
-    private D MapToD(C source, Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
+    private global::D MapToD(global::C source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
     {
-        if (refHandler.TryGetReference<C, D>(source, out var existingTargetReference))
+        if (refHandler.TryGetReference<global::C, global::D>(source, out var existingTargetReference))
             return existingTargetReference;
-        var target = new D();
-        refHandler.SetReference<C, D>(source, target);
+        var target = new global::D();
+        refHandler.SetReference<global::C, global::D>(source, target);
         target.StringValue = source.StringValue;
         return target;
     }

@@ -28,7 +28,7 @@ public class DictionaryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new System.Collections.Generic.Dictionary<string, long>(source.Count);
+                var target = new global::System.Collections.Generic.Dictionary<string, long>(source.Count);
                 foreach (var item in source)
                 {
                     target[item.Key] = item.Value;
@@ -48,7 +48,7 @@ public class DictionaryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+                var target = new global::System.Collections.Generic.Dictionary<string, int>(source.Count);
                 foreach (var item in source)
                 {
                     target[item.Key] = (int)item.Value;
@@ -68,7 +68,7 @@ public class DictionaryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+                var target = new global::System.Collections.Generic.Dictionary<string, int>(source.Count);
                 foreach (var item in source)
                 {
                     target[item.Key] = item.Value == null ? throw new System.ArgumentNullException(nameof(item.Value)) : item.Value.Value;
@@ -89,7 +89,7 @@ public class DictionaryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+                var target = new global::System.Collections.Generic.Dictionary<string, int>(source.Count);
                 foreach (var item in source)
                 {
                     target[item.Key] = item.Value == null ? default : item.Value.Value;
@@ -109,7 +109,7 @@ public class DictionaryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+                var target = new global::System.Collections.Generic.Dictionary<string, int>(source.Count);
                 foreach (var item in source)
                 {
                     target[item.Key] = (int)item.Value;
@@ -129,7 +129,7 @@ public class DictionaryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new System.Collections.Generic.Dictionary<string, int>();
+                var target = new global::System.Collections.Generic.Dictionary<string, int>();
                 foreach (var item in source)
                 {
                     target[item.Key] = item.Value;
@@ -150,7 +150,7 @@ public class DictionaryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+                var target = new global::System.Collections.Generic.Dictionary<string, int>(source.Count);
                 foreach (var item in source)
                 {
                     target[item.Key] = item.Value;
@@ -171,7 +171,7 @@ public class DictionaryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new System.Collections.Generic.Dictionary<string, int>(source.Count);
+                var target = new global::System.Collections.Generic.Dictionary<string, int>(source.Count);
                 foreach (var item in source)
                 {
                     target[item.Key] = item.Value;
@@ -192,7 +192,7 @@ public class DictionaryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new A();
+                var target = new global::A();
                 foreach (var item in source)
                 {
                     target[item.Key] = item.Value;
@@ -245,7 +245,7 @@ public class DictionaryTest
             .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyProperty))
             .HaveMapMethodBody(
                 """
-                var target = new A();
+                var target = new global::A();
                 return target;
                 """);
     }
@@ -263,7 +263,7 @@ public class DictionaryTest
             .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyProperty))
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 return target;
                 """);
     }

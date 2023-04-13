@@ -19,7 +19,7 @@ public class ObjectPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.StringValue = source.StringValue;
                 return target;
                 """);
@@ -51,7 +51,7 @@ public class ObjectPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new A();
+                var target = new global::A();
                 target.StringValue = source.StringValue;
                 return target;
                 """);
@@ -81,7 +81,7 @@ public class ObjectPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new A();
+                var target = new global::A();
                 return target;
                 """);
     }
@@ -99,7 +99,7 @@ public class ObjectPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.Value = int.Parse(source.Value);
                 return target;
                 """);
@@ -167,7 +167,7 @@ public class ObjectPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.StringValue2 = source.StringValue;
                 return target;
                 """);
@@ -189,7 +189,7 @@ public class ObjectPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.stringvalue = source.StringValue;
                 return target;
                 """);
@@ -257,7 +257,7 @@ public class ObjectPropertyTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new B();
+                var target = new global::B();
                 target.StringValue = source.StringValue;
                 target.NestedValue = UserImplementedMap(source.NestedValue);
                 return target;

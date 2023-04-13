@@ -58,7 +58,7 @@ public abstract class MethodMapping : TypeMapping
     {
         TypeSyntax returnType = ReturnType == null
             ? PredefinedType(Token(SyntaxKind.VoidKeyword))
-            : IdentifierName(TargetType.ToDisplayString());
+            : FullyQualifiedIdentifier(TargetType);
 
         var typeMappingBuildContext = new TypeMappingBuildContext(
             SourceParameter.Name,

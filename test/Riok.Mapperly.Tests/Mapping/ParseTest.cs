@@ -11,7 +11,7 @@ public class ParseTest
         var source = TestSourceBuilder.Mapping("string", "DateTime");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return System.DateTime.Parse(source);");
+            .HaveSingleMethodBody("return global::System.DateTime.Parse(source);");
     }
 
     [Fact]
@@ -20,7 +20,7 @@ public class ParseTest
         var source = TestSourceBuilder.Mapping("string", "Version");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return System.Version.Parse(source);");
+            .HaveSingleMethodBody("return global::System.Version.Parse(source);");
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class ParseTest
             "struct A { public static A Parse(string v) => new(); }");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return A.Parse(source);");
+            .HaveSingleMethodBody("return global::A.Parse(source);");
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class ParseTest
             "class A { public static A Parse(string v) => new(); }");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return A.Parse(source);");
+            .HaveSingleMethodBody("return global::A.Parse(source);");
     }
 
     [Fact]

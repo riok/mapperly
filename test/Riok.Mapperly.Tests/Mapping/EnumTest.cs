@@ -16,7 +16,7 @@ public class EnumTest
             "enum E2 {A, B, C}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (E1)source;");
+            .HaveSingleMethodBody("return (global::E1)source;");
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class EnumTest
             "enum E2 : byte {A, B, C}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (E2)source;");
+            .HaveSingleMethodBody("return (global::E2)source;");
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class EnumTest
             "enum E : byte {A, B, C}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (E)(byte)source;");
+            .HaveSingleMethodBody("return (global::E)(byte)source;");
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public class EnumTest
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (E2)source;");
+            .HaveSingleMethodBody("return (global::E2)source;");
     }
 
     [Fact]
@@ -85,10 +85,10 @@ public class EnumTest
                 """
                 return source switch
                 {
-                    E1.A => E2.A,
-                    E1.B => E2.B,
-                    E1.C => E2.C,
-                    E1.E => E2.E,
+                    global::E1.A => global::E2.A,
+                    global::E1.B => global::E2.B,
+                    global::E1.C => global::E2.C,
+                    global::E1.E => global::E2.E,
                     _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
                 };
                 """);
@@ -108,13 +108,13 @@ public class EnumTest
                 """
                 return source switch
                 {
-                    E1.A => E2.A,
-                    E1.B => E2.B,
-                    E1.C => E2.C,
-                    E1.D => E2.d,
-                    E1.E => E2.E,
-                    E1.f => E2.f,
-                    E1.F => E2.f,
+                    global::E1.A => global::E2.A,
+                    global::E1.B => global::E2.B,
+                    global::E1.C => global::E2.C,
+                    global::E1.D => global::E2.d,
+                    global::E1.E => global::E2.E,
+                    global::E1.f => global::E2.f,
+                    global::E1.F => global::E2.f,
                     _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
                 };
                 """);
@@ -142,7 +142,7 @@ using Riok.Mapperly.Abstractions;
 [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
 public partial class Mapper
 {
-    partial E2 ToE1(E1 source);
+    partial global::E2 ToE1(global::E1 source);
 }
 
 enum E1 {A, B, C}
@@ -156,9 +156,9 @@ enum E2 {A = 100, B, C}
                 """
                 return source switch
                 {
-                    E1.A => E2.A,
-                    E1.B => E2.B,
-                    E1.C => E2.C,
+                    global::E1.A => global::E2.A,
+                    global::E1.B => global::E2.B,
+                    global::E1.C => global::E2.C,
                     _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
                 };
                 """);
@@ -175,7 +175,7 @@ enum E2 {A = 100, B, C}
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return source == null ? throw new System.ArgumentNullException(nameof(source)) : (E2)source.Value;");
+            .HaveSingleMethodBody("return source == null ? throw new System.ArgumentNullException(nameof(source)) : (global::E2)source.Value;");
     }
 
     [Fact]
@@ -189,7 +189,7 @@ enum E2 {A = 100, B, C}
 
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return source == null ? default : (E2)source.Value;");
+            .HaveSingleMethodBody("return source == null ? default : (global::E2)source.Value;");
     }
 
     [Fact]
@@ -202,7 +202,7 @@ enum E2 {A = 100, B, C}
             "enum E2 {A, B, C}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (E2? )(E2)source;");
+            .HaveSingleMethodBody("return (global::E2? )(global::E2)source;");
     }
 
     [Fact]
@@ -218,9 +218,9 @@ enum E2 {A = 100, B, C}
                 """
                 return source switch
                 {
-                    E1.A => nameof(E1.A),
-                    E1.B => nameof(E1.B),
-                    E1.C => nameof(E1.C),
+                    global::E1.A => nameof(global::E1.A),
+                    global::E1.B => nameof(global::E1.B),
+                    global::E1.C => nameof(global::E1.C),
                     _ => source.ToString(),
                 };
                 """);
@@ -238,10 +238,10 @@ enum E2 {A = 100, B, C}
                 """
                 return source switch
                 {
-                    { } s when s.Equals(nameof(E1.A), System.StringComparison.OrdinalIgnoreCase) => E1.A,
-                    { } s when s.Equals(nameof(E1.B), System.StringComparison.OrdinalIgnoreCase) => E1.B,
-                    { } s when s.Equals(nameof(E1.C), System.StringComparison.OrdinalIgnoreCase) => E1.C,
-                    _ => System.Enum.Parse<E1>(source, true),
+                    { } s when s.Equals(nameof(global::E1.A), System.StringComparison.OrdinalIgnoreCase) => global::E1.A,
+                    { } s when s.Equals(nameof(global::E1.B), System.StringComparison.OrdinalIgnoreCase) => global::E1.B,
+                    { } s when s.Equals(nameof(global::E1.C), System.StringComparison.OrdinalIgnoreCase) => global::E1.C,
+                    _ => System.Enum.Parse<global::E1>(source, true),
                 };
                 """);
     }
@@ -258,10 +258,10 @@ enum E2 {A = 100, B, C}
                 """
                 return source switch
                 {
-                    nameof(E1.A) => E1.A,
-                    nameof(E1.B) => E1.B,
-                    nameof(E1.C) => E1.C,
-                    _ => System.Enum.Parse<E1>(source, false),
+                    nameof(global::E1.A) => global::E1.A,
+                    nameof(global::E1.B) => global::E1.B,
+                    nameof(global::E1.C) => global::E1.C,
+                    _ => System.Enum.Parse<global::E1>(source, false),
                 };
                 """);
     }
@@ -291,7 +291,7 @@ enum E2 {A = 100, B, C}
             "enum E2 {A, B, C}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (E1)source;");
+            .HaveSingleMethodBody("return (global::E1)source;");
     }
 
     [Fact]
@@ -315,7 +315,7 @@ enum E2 {A = 100, B, C}
             "enum E1 {A, B, C}");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return (E1)int.Parse(source);");
+            .HaveSingleMethodBody("return (global::E1)int.Parse(source);");
     }
 
     [Fact]

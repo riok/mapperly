@@ -172,14 +172,14 @@ public partial class MyMapper
             .HaveMethodBody(
                 "Map",
                 """
-                var target = new B();
+                var target = new global::B();
                 target.StringValue = source.StringValue;
                 return target;
                 """)
             .HaveMethodBody(
                 "Map2",
                 """
-                var target = new B();
+                var target = new global::B();
                 target.IntValue = source.IntValue;
                 return target;
                 """);

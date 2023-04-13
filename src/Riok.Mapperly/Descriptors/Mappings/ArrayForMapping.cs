@@ -32,7 +32,7 @@ public class ArrayForMapping : MethodMapping
         // var target = new T[source.Length];
         var sourceLengthArrayRank = ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(MemberAccess(ctx.Source, ArrayLengthProperty)));
         var targetInitializationValue = ArrayCreationExpression(
-            ArrayType(IdentifierName(_targetArrayElementType.ToDisplayString()))
+            ArrayType(FullyQualifiedIdentifier(_targetArrayElementType))
                 .WithRankSpecifiers(SingletonList(sourceLengthArrayRank)));
         yield return DeclareLocalVariable(targetVariableName, targetInitializationValue);
 
