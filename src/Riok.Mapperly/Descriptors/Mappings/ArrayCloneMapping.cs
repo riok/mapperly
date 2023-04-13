@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -22,7 +23,7 @@ public class ArrayCloneMapping : TypeMapping
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         return CastExpression(
-           FullyQualifiedIdentifier(TargetType),
-            InvocationExpression(MemberAccess(ctx.Source, CloneMethodName)));
+       FullyQualifiedIdentifier(TargetType),
+  InvocationExpression(MemberAccess(ctx.Source, CloneMethodName)));
     }
 }
