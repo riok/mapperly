@@ -105,8 +105,8 @@ public static class SyntaxFactoryHelper
     public static LiteralExpressionSyntax NullLiteral()
         => LiteralExpression(SyntaxKind.NullLiteralExpression);
 
-    public static LiteralExpressionSyntax StringLiteral(string content) =>
-        LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(content));
+    public static LiteralExpressionSyntax StringLiteral(string content)
+        => LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(content));
 
     public static LiteralExpressionSyntax BooleanLiteral(bool b)
         => LiteralExpression(b ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression);
@@ -327,6 +327,12 @@ public static class SyntaxFactoryHelper
     public static IdentifierNameSyntax NonNullableIdentifier(ITypeSymbol t)
         => FullyQualifiedIdentifier(t.NonNullable());
 
+    public static IdentifierNameSyntax FullyQualifiedIdentifier(ITypeSymbol typeSymbol)
+        => IdentifierName(FullyQualifiedIdentifierName(typeSymbol));
+
+    public static string FullyQualifiedIdentifierName(ITypeSymbol typeSymbol)
+        => typeSymbol.ToDisplayString(_fullyQualifiedNullableFormat);
+
     private static IEnumerable<SyntaxNodeOrToken> JoinByComma(IEnumerable<SyntaxNode> nodes, bool insertTrailingComma = false)
         => Join(Token(SyntaxKind.CommaToken), insertTrailingComma, nodes);
 
@@ -352,10 +358,4 @@ public static class SyntaxFactoryHelper
             yield return sep;
         }
     }
-
-    public static IdentifierNameSyntax FullyQualifiedIdentifier(ITypeSymbol typeSymbol)
-    => IdentifierName(FullyQualifiedIdentifierName(typeSymbol));
-
-    public static string FullyQualifiedIdentifierName(ITypeSymbol typeSymbol)
-    => typeSymbol.ToDisplayString(_fullyQualifiedNullableFormat);
 }
