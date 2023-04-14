@@ -1,6 +1,6 @@
-using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
@@ -19,7 +19,7 @@ public interface IMembersBuilderContext<out T>
 
     IReadOnlyCollection<string> IgnoredSourceMemberNames { get; }
 
-    Dictionary<string, IPropertySymbol> TargetMembers { get; }
+    Dictionary<string, IMappableMember> TargetMembers { get; }
 
     Dictionary<string, List<MapPropertyAttribute>> MemberConfigsByRootTargetName { get; }
 }

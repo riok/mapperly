@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 

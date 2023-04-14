@@ -23,8 +23,7 @@ public static class DictionaryMappingBuilder
         // The constructed type should be Dictionary<,>
         if (IsDictionaryType(ctx, ctx.Target))
         {
-            var sourceHasCount = ctx.Source.GetAllMembers(CountPropertyName)
-                .OfType<IPropertySymbol>()
+            var sourceHasCount = ctx.Source.GetAllProperties(CountPropertyName)
                 .Any(x => !x.IsStatic && !x.IsIndexer && !x.IsWriteOnly && x.Type.SpecialType == SpecialType.System_Int32);
 
             var targetDictionarySymbol = ctx.Types.DictionaryT.Construct(keyMapping.TargetType, valueMapping.TargetType);

@@ -4,6 +4,7 @@ using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
@@ -93,7 +94,7 @@ public static class ObjectMemberMappingBodyBuilder
         bool allowInitOnlyMember = false)
     {
         // the target member path is readonly or not accessible
-        if (!targetMemberPath.Member.CanSet())
+        if (!targetMemberPath.Member.CanSet)
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToReadOnlyMember,
@@ -107,7 +108,7 @@ public static class ObjectMemberMappingBodyBuilder
         }
 
         // a target member path part is write only or not accessible
-        if (targetMemberPath.ObjectPath.Any(p => !p.CanGet()))
+        if (targetMemberPath.ObjectPath.Any(p => !p.CanGet))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToWriteOnlyMemberPath,
@@ -122,7 +123,7 @@ public static class ObjectMemberMappingBodyBuilder
 
         // a target member path part is init only
         var noInitOnlyPath = allowInitOnlyMember ? targetMemberPath.ObjectPath : targetMemberPath.Path;
-        if (noInitOnlyPath.Any(p => p.IsInitOnly()))
+        if (noInitOnlyPath.Any(p => p.IsInitOnly))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToInitOnlyMemberPath,
@@ -136,7 +137,7 @@ public static class ObjectMemberMappingBodyBuilder
         }
 
         // a source member path is write only or not accessible
-        if (sourceMemberPath.Path.Any(p => !p.CanGet()))
+        if (sourceMemberPath.Path.Any(p => !p.CanGet))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapFromWriteOnlyMember,
@@ -209,7 +210,7 @@ public static class ObjectMemberMappingBodyBuilder
 
         // the source is nullable, or the mapping is a direct assignment and the target allows nulls
         // access the source in a null save matter (via ?.) but no other special handling required.
-        if (delegateMapping.SourceType.IsNullable() || delegateMapping.IsSynthetic && targetMemberPath.Member.IsNullable())
+        if (delegateMapping.SourceType.IsNullable() || delegateMapping.IsSynthetic && targetMemberPath.Member.IsNullable)
         {
             var memberMapping = new MemberMapping(
                 delegateMapping,
@@ -235,9 +236,9 @@ public static class ObjectMemberMappingBodyBuilder
         // if the member is readonly
         // and the target and source path is readable,
         // we try to create an existing target mapping
-        if (targetMemberPath.Member.CanSet()
-            || !targetMemberPath.Path.All(op => op.CanGet())
-            || !sourceMemberPath.Path.All(op => op.CanGet()))
+        if (targetMemberPath.Member.CanSet
+            || !targetMemberPath.Path.All(op => op.CanGet)
+            || !sourceMemberPath.Path.All(op => op.CanGet))
         {
             return false;
         }

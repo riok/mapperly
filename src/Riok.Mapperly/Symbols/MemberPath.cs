@@ -6,7 +6,7 @@ using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
-namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
+namespace Riok.Mapperly.Symbols;
 
 /// <summary>
 /// Represents a set of members to access a certain member.
@@ -18,25 +18,25 @@ public class MemberPath
     internal const string MemberAccessSeparator = ".";
     private const string NullableValueProperty = "Value";
 
-    private IPropertySymbol? _member;
+    private IMappableMember? _member;
 
-    public MemberPath(IReadOnlyCollection<IPropertySymbol> path)
+    public MemberPath(IReadOnlyCollection<IMappableMember> path)
     {
         Path = path;
         FullName = string.Join(MemberAccessSeparator, Path.Select(x => x.Name));
     }
 
-    public IReadOnlyCollection<IPropertySymbol> Path { get; }
+    public IReadOnlyCollection<IMappableMember> Path { get; }
 
     /// <summary>
     /// Gets the path without the very last element (the path of the object containing the <see cref="Member"/>).
     /// </summary>
-    public IEnumerable<IPropertySymbol> ObjectPath => Path.SkipLast();
+    public IEnumerable<IMappableMember> ObjectPath => Path.SkipLast();
 
     /// <summary>
     /// Gets the last part of the path or throws if there is none.
     /// </summary>
-    public IPropertySymbol Member
+    public IMappableMember Member
     {
         get => _member ??= Path.Last();
     }
@@ -58,21 +58,21 @@ public class MemberPath
     /// Builds a member path skipping trailing path items which are non nullable.
     /// </summary>
     /// <returns>The built path.</returns>
-    public IEnumerable<IPropertySymbol> PathWithoutTrailingNonNullable()
-        => Path.Reverse().SkipWhile(x => !x.IsNullable()).Reverse();
+    public IEnumerable<IMappableMember> PathWithoutTrailingNonNullable()
+        => Path.Reverse().SkipWhile(x => !x.IsNullable).Reverse();
 
     /// <summary>
     /// Returns an element for each nullable sub-path of the <see cref="ObjectPath"/>.
     /// If the <see cref="Member"/> is nullable, the entire <see cref="Path"/> is not returned.
     /// </summary>
     /// <returns>All nullable sub-paths of the <see cref="ObjectPath"/>.</returns>
-    public IEnumerable<IReadOnlyCollection<IPropertySymbol>> ObjectPathNullableSubPaths()
+    public IEnumerable<IReadOnlyCollection<IMappableMember>> ObjectPathNullableSubPaths()
     {
-        var pathParts = new List<IPropertySymbol>(Path.Count);
+        var pathParts = new List<IMappableMember>(Path.Count);
         foreach (var pathPart in ObjectPath)
         {
             pathParts.Add(pathPart);
-            if (!pathPart.IsNullable())
+            if (!pathPart.IsNullable)
                 continue;
 
             yield return pathParts;
@@ -80,10 +80,10 @@ public class MemberPath
     }
 
     public bool IsAnyNullable()
-        => Path.Any(p => p.IsNullable());
+        => Path.Any(p => p.IsNullable);
 
     public bool IsAnyObjectPathNullable()
-        => ObjectPath.Any(p => p.IsNullable());
+        => ObjectPath.Any(p => p.IsNullable);
 
     public ExpressionSyntax BuildAccess(
         ExpressionSyntax? baseAccess,
@@ -105,7 +105,7 @@ public class MemberPath
         {
             return path.AggregateWithPrevious(
                 baseAccess,
-                (expr, prevProp, prop) => prevProp?.IsNullable() == true
+                (expr, prevProp, prop) => prevProp?.IsNullable == true
                     ? ConditionalAccess(expr, prop.Name)
                     : MemberAccess(expr, prop.Name));
         }
@@ -141,7 +141,7 @@ public class MemberPath
         {
             access = MemberAccess(access, pathPart.Name);
 
-            if (!pathPart.IsNullable())
+            if (!pathPart.IsNullable)
                 continue;
 
             condition = And(condition, IsNotNull(access));
@@ -169,7 +169,7 @@ public class MemberPath
         var hc = 0;
         foreach (var item in Path)
         {
-            hc ^= SymbolEqualityComparer.Default.GetHashCode(item);
+            hc ^= item.GetHashCode();
         }
 
         return hc;
@@ -182,7 +182,7 @@ public class MemberPath
         => !Equals(left, right);
 
     private bool Equals(MemberPath other)
-        => Path.SequenceEqual(other.Path, SymbolEqualityComparer.IncludeNullability);
+        => Path.SequenceEqual(other.Path);
 
     public static bool TryFind(
         ITypeSymbol type,
@@ -246,7 +246,7 @@ public class MemberPath
         return true;
     }
 
-    private static IEnumerable<IPropertySymbol> Find(
+    private static IEnumerable<IMappableMember> Find(
         ITypeSymbol type,
         IEnumerable<string> path,
         IEqualityComparer<string> comparer)
@@ -261,13 +261,13 @@ public class MemberPath
         }
     }
 
-    private static IPropertySymbol? FindMember(
+    private static IMappableMember? FindMember(
         ITypeSymbol type,
         string name,
         IEqualityComparer<string> comparer)
     {
-        return type.GetAllMembers(name, comparer)
-            .OfType<IPropertySymbol>()
-            .FirstOrDefault(p => !p.IsStatic);
+        return type
+            .GetMappableMembers(name, comparer)
+            .FirstOrDefault();
     }
 }

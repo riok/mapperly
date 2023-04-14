@@ -1,9 +1,8 @@
-using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
-using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
@@ -44,7 +43,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
     public IReadOnlyCollection<string> IgnoredSourceMemberNames { get; }
 
-    public Dictionary<string, IPropertySymbol> TargetMembers { get; }
+    public Dictionary<string, IMappableMember> TargetMembers { get; }
 
     public Dictionary<string, List<MapPropertyAttribute>> MemberConfigsByRootTargetName { get; }
 
@@ -89,15 +88,15 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     private HashSet<string> GetSourceMemberNames()
     {
         return Mapping.SourceType
-            .GetAllAccessibleProperties()
+            .GetAccessibleMappableMembers()
             .Select(x => x.Name)
             .ToHashSet();
     }
 
-    private Dictionary<string, IPropertySymbol> GetTargetMembers()
+    private Dictionary<string, IMappableMember> GetTargetMembers()
     {
         return Mapping.TargetType
-            .GetAllAccessibleProperties()
+            .GetAccessibleMappableMembers()
             .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
     }
 
