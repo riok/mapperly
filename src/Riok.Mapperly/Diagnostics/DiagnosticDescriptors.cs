@@ -261,4 +261,12 @@ internal static class DiagnosticDescriptors
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true);
+
+    public static readonly DiagnosticDescriptor MappedObjectToObjectWithoutDeepClone = new DiagnosticDescriptor(
+        "RMG033",
+        "Object mapped to another object without deep clone",
+        "Object mapped to another object without deep clone, consider implementing the mapping manually",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Info,
+        true);
 }
