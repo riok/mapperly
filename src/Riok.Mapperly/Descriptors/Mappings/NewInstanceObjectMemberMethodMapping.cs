@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
+using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Emit;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
@@ -11,14 +11,14 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// An object mapping creating the target instance via a new() call,
 /// mapping properties via ctor, object initializer and by assigning.
 /// </summary>
-public class NewInstanceObjectPropertyMethodMapping : ObjectPropertyMethodMapping, INewInstanceObjectPropertyMapping
+public class NewInstanceObjectMemberMethodMapping : ObjectMemberMethodMapping, INewInstanceObjectMemberMapping
 {
     private const string TargetVariableName = "target";
     private readonly HashSet<ConstructorParameterMapping> _constructorPropertyMappings = new();
-    private readonly HashSet<PropertyAssignmentMapping> _initPropertyMappings = new();
+    private readonly HashSet<MemberAssignmentMapping> _initPropertyMappings = new();
     private readonly bool _enableReferenceHandling;
 
-    public NewInstanceObjectPropertyMethodMapping(
+    public NewInstanceObjectMemberMethodMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         bool enableReferenceHandling)
@@ -30,7 +30,7 @@ public class NewInstanceObjectPropertyMethodMapping : ObjectPropertyMethodMappin
     public void AddConstructorParameterMapping(ConstructorParameterMapping mapping)
         => _constructorPropertyMappings.Add(mapping);
 
-    public void AddInitPropertyMapping(PropertyAssignmentMapping mapping)
+    public void AddInitMemberMapping(MemberAssignmentMapping mapping)
         => _initPropertyMappings.Add(mapping);
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)

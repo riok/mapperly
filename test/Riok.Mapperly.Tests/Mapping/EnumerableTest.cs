@@ -887,7 +887,7 @@ public class EnumerableTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound));
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound));
     }
 
     [Fact]
@@ -901,7 +901,7 @@ public class EnumerableTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound));
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound));
     }
 
     [Fact]
@@ -915,7 +915,7 @@ public class EnumerableTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound));
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound));
     }
 
     [Fact]
@@ -927,7 +927,7 @@ public class EnumerableTest
             "class A { public IEnumerable<int? Value { get; } }",
             "class B { public System.Collections.Immutable.ImmutableHashSet<int> Value { get; } }");
 
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics).Should().HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound));
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics).Should().HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound));
     }
 
     [Fact]
@@ -941,7 +941,7 @@ public class EnumerableTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound));
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound));
     }
 
     [Fact]
@@ -955,7 +955,7 @@ public class EnumerableTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound));
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound));
     }
 
     [Fact]
@@ -969,7 +969,7 @@ public class EnumerableTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound));
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound));
     }
 
     [Fact]
@@ -1001,6 +1001,6 @@ public class EnumerableTest
             var target = new global::B();
             return target;
             """)
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyProperty));
+            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
     }
 }

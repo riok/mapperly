@@ -186,8 +186,8 @@ public class ObjectPropertyInitPropertyTest
             "class B { public string StringValue { get; init; } }");
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToInitOnlyPropertyPath, "Cannot map from property A.StringValue of type string to init only property path B.StringValue of type string"))
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotMapped, "The property StringValue on the mapping source type A is not mapped to any property on the mapping target type B"));
+            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToInitOnlyMemberPath, "Cannot map from member A.StringValue of type string to init only member path B.StringValue of type string"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotMapped, "The member StringValue on the mapping source type A is not mapped to any member on the mapping target type B"));
     }
 
     [Fact]
@@ -201,8 +201,8 @@ public class ObjectPropertyInitPropertyTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound, "The property StringValue on the mapping target type B was not found on the mapping source type A"))
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotMapped, "The property StringValue2 on the mapping source type A is not mapped to any property on the mapping target type B"));
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound, "The member StringValue on the mapping target type B was not found on the mapping source type A"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotMapped, "The member StringValue2 on the mapping source type A is not mapped to any member on the mapping target type B"));
     }
 
     [Fact]

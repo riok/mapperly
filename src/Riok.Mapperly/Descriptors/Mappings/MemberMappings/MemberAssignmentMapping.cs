@@ -3,28 +3,28 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
-namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
+namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 /// <summary>
-/// Represents a simple property mapping including an assignment to a target property.
+/// Represents a simple member mapping including an assignment to a target member.
 /// (eg. target.A = source.B)
 /// </summary>
-[DebuggerDisplay("PropertyMapping({SourcePath.FullName} => {TargetPath.FullName})")]
-public class PropertyAssignmentMapping : IPropertyAssignmentMapping
+[DebuggerDisplay("MemberAssignmentMapping({SourcePath.FullName} => {TargetPath.FullName})")]
+public class MemberAssignmentMapping : IMemberAssignmentMapping
 {
-    private readonly IPropertyMapping _mapping;
+    private readonly IMemberMapping _mapping;
 
-    public PropertyAssignmentMapping(
-        PropertyPath targetPath,
-        IPropertyMapping mapping)
+    public MemberAssignmentMapping(
+        MemberPath targetPath,
+        IMemberMapping mapping)
     {
         TargetPath = targetPath;
         _mapping = mapping;
     }
 
-    public PropertyPath SourcePath => _mapping.SourcePath;
+    public MemberPath SourcePath => _mapping.SourcePath;
 
-    public PropertyPath TargetPath { get; }
+    public MemberPath TargetPath { get; }
 
     public IEnumerable<StatementSyntax> Build(
         TypeMappingBuildContext ctx,
@@ -40,12 +40,12 @@ public class PropertyAssignmentMapping : IPropertyAssignmentMapping
         TypeMappingBuildContext ctx,
         ExpressionSyntax? targetAccess)
     {
-        var targetPropertyAccess = TargetPath.BuildAccess(targetAccess);
+        var targetMemberAccess = TargetPath.BuildAccess(targetAccess);
         var mappedValue = _mapping.Build(ctx);
 
-        // target.Property = mappedValue;
+        // target.Member = mappedValue;
         return Assignment(
-            targetPropertyAccess,
+            targetMemberAccess,
             mappedValue);
     }
 
@@ -60,7 +60,7 @@ public class PropertyAssignmentMapping : IPropertyAssignmentMapping
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((PropertyAssignmentMapping)obj);
+        return Equals((MemberAssignmentMapping)obj);
     }
 
     public override int GetHashCode()
@@ -74,13 +74,13 @@ public class PropertyAssignmentMapping : IPropertyAssignmentMapping
         }
     }
 
-    public static bool operator ==(PropertyAssignmentMapping? left, PropertyAssignmentMapping? right)
+    public static bool operator ==(MemberAssignmentMapping? left, MemberAssignmentMapping? right)
         => Equals(left, right);
 
-    public static bool operator !=(PropertyAssignmentMapping? left, PropertyAssignmentMapping? right)
+    public static bool operator !=(MemberAssignmentMapping? left, MemberAssignmentMapping? right)
         => !Equals(left, right);
 
-    protected bool Equals(PropertyAssignmentMapping other)
+    protected bool Equals(MemberAssignmentMapping other)
     {
         return _mapping.Equals(other._mapping)
             && SourcePath.Equals(other.SourcePath)

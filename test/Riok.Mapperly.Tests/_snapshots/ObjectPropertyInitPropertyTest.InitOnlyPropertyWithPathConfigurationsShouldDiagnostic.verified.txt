@@ -2,26 +2,26 @@
   Diagnostics: [
     {
       Id: RMG016,
-      Title: Init only property cannot handle target paths,
+      Title: Init only member cannot handle target paths,
       Severity: Error,
       WarningLevel: 0,
       Location: : (11,4)-(11,74),
       Description: ,
       HelpLink: ,
-      MessageFormat: Cannot map to init only property path {0}.{1},
-      Message: Cannot map to init only property path C.Nested.Value,
+      MessageFormat: Cannot map to init only member path {0}.{1},
+      Message: Cannot map to init only member path C.Nested.Value,
       Category: Mapper
     },
     {
       Id: RMG020,
-      Title: Source property is not mapped to any target property,
+      Title: Source member is not mapped to any target member,
       Severity: Info,
       WarningLevel: 1,
       Location: : (11,4)-(11,74),
       Description: ,
       HelpLink: ,
-      MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},
-      Message: The property NestedValue on the mapping source type A is not mapped to any property on the mapping target type B,
+      MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
+      Message: The member NestedValue on the mapping source type A is not mapped to any member on the mapping target type B,
       Category: Mapper
     }
   ]

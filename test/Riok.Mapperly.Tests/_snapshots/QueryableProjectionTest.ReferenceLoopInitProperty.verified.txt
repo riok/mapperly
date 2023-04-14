@@ -2,26 +2,26 @@
   Diagnostics: [
     {
       Id: RMG030,
-      Title: Reference loop detected while mapping to an init only property,
+      Title: Reference loop detected while mapping to an init only member,
       Severity: Error,
       WarningLevel: 0,
       Location: : (8,0)-(12,1),
       Description: ,
       HelpLink: ,
-      MessageFormat: Reference loop detected while mapping from {0}.{1} to the init only property {2}.{3}, consider ignoring this property,
-      Message: Reference loop detected while mapping from A.Parent to the init only property B.Parent, consider ignoring this property,
+      MessageFormat: Reference loop detected while mapping from {0}.{1} to the init only member {2}.{3}, consider ignoring this member,
+      Message: Reference loop detected while mapping from A.Parent to the init only member B.Parent, consider ignoring this member,
       Category: Mapper
     },
     {
       Id: RMG020,
-      Title: Source property is not mapped to any target property,
+      Title: Source member is not mapped to any target member,
       Severity: Info,
       WarningLevel: 1,
       Location: : (8,0)-(12,1),
       Description: ,
       HelpLink: ,
-      MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},
-      Message: The property Parent on the mapping source type A is not mapped to any property on the mapping target type B,
+      MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
+      Message: The member Parent on the mapping source type A is not mapped to any member on the mapping target type B,
       Category: Mapper
     }
   ]

@@ -1,5 +1,5 @@
 using Microsoft.CodeAnalysis;
-using Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
+using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 
@@ -7,9 +7,9 @@ namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 /// Represents a complex object mapping implemented in its own method.
 /// Maps each property from the source to the target.
 /// </summary>
-public class ObjectPropertyExistingTargetMapping : PropertyAssignmentMappingContainer, IExistingTargetMapping, IPropertyAssignmentTypeMapping
+public class ObjectMemberExistingTargetMapping : MemberAssignmentMappingContainer, IExistingTargetMapping, IMemberAssignmentTypeMapping
 {
-    public ObjectPropertyExistingTargetMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    public ObjectMemberExistingTargetMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
     {
         SourceType = sourceType;
         TargetType = targetType;
