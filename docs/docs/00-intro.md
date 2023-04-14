@@ -26,3 +26,8 @@ The benchmark was generated with [Benchmark.netCoreMappers](https://github.com/m
 | ManualMapping |   529.6 ns | 0.52 ns | 0.44 ns | 0.5541 |   1,160 B |
 | Mapster       |   562.1 ns | 1.14 ns | 0.89 ns | 0.9098 |   1,904 B |
 | Mapperly      |   338.5 ns | 0.95 ns | 0.84 ns | 0.4396 |     920 B |
+
+## Requirements
+
+Mapperly supports .NET 5+ and .NET Framework 4.x.
+Mapperly requires at least C# language version 8.
