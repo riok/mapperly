@@ -30,34 +30,34 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         true);
 
-    public static readonly DiagnosticDescriptor IgnoredTargetPropertyNotFound = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor IgnoredTargetMemberNotFound = new DiagnosticDescriptor(
         "RMG004",
-        "Ignored target property not found",
-        "Ignored target property {0} on {1} was not found",
+        "Ignored target member not found",
+        "Ignored target member {0} on {1} was not found",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true);
 
-    public static readonly DiagnosticDescriptor ConfiguredMappingTargetPropertyNotFound = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor ConfiguredMappingTargetMemberNotFound = new DiagnosticDescriptor(
         "RMG005",
-        "Mapping target property not found",
-        "Specified property {0} on mapping target type {1} was not found",
+        "Mapping target member not found",
+        "Specified member {0} on mapping target type {1} was not found",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true);
 
-    public static readonly DiagnosticDescriptor ConfiguredMappingSourcePropertyNotFound = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor ConfiguredMappingSourceMemberNotFound = new DiagnosticDescriptor(
         "RMG006",
-        "Mapping source property not found",
-        "Specified property {0} on source type {1} was not found",
+        "Mapping source member not found",
+        "Specified member {0} on source type {1} was not found",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true);
 
-    public static readonly DiagnosticDescriptor CouldNotMapProperty = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor CouldNotMapMember = new DiagnosticDescriptor(
         "RMG007",
-        "Could not map property",
-        "Could not map property {0}.{1} of type {2} to {3}.{4} of type {5}",
+        "Could not map member",
+        "Could not map member {0}.{1} of type {2} to {3}.{4} of type {5}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true);
@@ -70,34 +70,34 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true);
 
-    public static readonly DiagnosticDescriptor CannotMapToReadOnlyProperty = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor CannotMapToReadOnlyMember = new DiagnosticDescriptor(
         "RMG009",
-        "Cannot map to read only property",
-        "Cannot map property {0}.{1} of type {2} to read only property {3}.{4} of type {5}",
+        "Cannot map to read only member",
+        "Cannot map member {0}.{1} of type {2} to read only member {3}.{4} of type {5}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
         true);
 
-    public static readonly DiagnosticDescriptor CannotMapFromWriteOnlyProperty = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor CannotMapFromWriteOnlyMember = new DiagnosticDescriptor(
         "RMG010",
-        "Cannot map from write only property",
-        "Cannot map from write only property {0}.{1} of type {2} to property {3}.{4} of type {5}",
+        "Cannot map from write only member",
+        "Cannot map from write only member {0}.{1} of type {2} to member {3}.{4} of type {5}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
         true);
 
-    public static readonly DiagnosticDescriptor CannotMapToWriteOnlyPropertyPath = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor CannotMapToWriteOnlyMemberPath = new DiagnosticDescriptor(
         "RMG011",
-        "Cannot map to write only property path",
-        "Cannot map from property {0}.{1} of type {2} to write only property path {3}.{4} of type {5}",
+        "Cannot map to write only member path",
+        "Cannot map from member {0}.{1} of type {2} to write only member path {3}.{4} of type {5}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
         true);
 
-    public static readonly DiagnosticDescriptor SourcePropertyNotFound = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor SourceMemberNotFound = new DiagnosticDescriptor(
         "RMG012",
-        "Source property was not found for target property",
-        "The property {0} on the mapping target type {1} was not found on the mapping source type {2}",
+        "Source member was not found for target member",
+        "The member {0} on the mapping target type {1} was not found on the mapping source type {2}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
         true);
@@ -118,26 +118,26 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         true);
 
-    public static readonly DiagnosticDescriptor CannotMapToInitOnlyPropertyPath = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor CannotMapToInitOnlyMemberPath = new DiagnosticDescriptor(
         "RMG015",
-        "Cannot map to init only property path",
-        "Cannot map from property {0}.{1} of type {2} to init only property path {3}.{4} of type {5}",
+        "Cannot map to init only member path",
+        "Cannot map from member {0}.{1} of type {2} to init only member path {3}.{4} of type {5}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
         true);
 
-    public static readonly DiagnosticDescriptor InitOnlyPropertyDoesNotSupportPaths = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor InitOnlyMemberDoesNotSupportPaths = new DiagnosticDescriptor(
         "RMG016",
-        "Init only property cannot handle target paths",
-        "Cannot map to init only property path {0}.{1}",
+        "Init only member cannot handle target paths",
+        "Cannot map to init only member path {0}.{1}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true);
 
-    public static readonly DiagnosticDescriptor MultipleConfigurationsForInitOnlyProperty = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor MultipleConfigurationsForInitOnlyMember = new DiagnosticDescriptor(
         "RMG017",
-        "An init only property can have one configuration at max",
-        "The init only property {0}.{1} can have one configuration at max",
+        "An init only member can have one configuration at max",
+        "The init only member {0}.{1} can have one configuration at max",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true);
@@ -158,18 +158,18 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true);
 
-    public static readonly DiagnosticDescriptor SourcePropertyNotMapped = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor SourceMemberNotMapped = new DiagnosticDescriptor(
         "RMG020",
-        "Source property is not mapped to any target property",
-        "The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2}",
+        "Source member is not mapped to any target member",
+        "The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
         true);
 
-    public static readonly DiagnosticDescriptor IgnoredSourcePropertyNotFound = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor IgnoredSourceMemberNotFound = new DiagnosticDescriptor(
         "RMG021",
-        "Ignored source property not found",
-        "Ignored source property {0} on {1} was not found",
+        "Ignored source member not found",
+        "Ignored source member {0} on {1} was not found",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true);
@@ -182,10 +182,10 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true);
 
-    public static readonly DiagnosticDescriptor RequiredPropertyNotMapped = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor RequiredMemberNotMapped = new DiagnosticDescriptor(
         "RMG023",
-        "Source property was not found for required target property",
-        "Required property {0} on mapping target type {1} was not found on the mapping source type {2}",
+        "Source member was not found for required target member",
+        "Required member {0} on mapping target type {1} was not found on the mapping source type {2}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true);
@@ -206,10 +206,10 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true);
 
-    public static readonly DiagnosticDescriptor CannotMapFromIndexedProperty = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor CannotMapFromIndexedMember = new DiagnosticDescriptor(
         "RMG026",
-        "Cannot map from indexed property",
-        "Cannot map from indexed property {0}.{1} to property {2}.{3}",
+        "Cannot map from indexed member",
+        "Cannot map from indexed member {0}.{1} to member {2}.{3}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
         true);
@@ -240,8 +240,8 @@ internal static class DiagnosticDescriptors
 
     public static readonly DiagnosticDescriptor ReferenceLoopInInitOnlyMapping = new DiagnosticDescriptor(
         "RMG030",
-        "Reference loop detected while mapping to an init only property",
-        "Reference loop detected while mapping from {0}.{1} to the init only property {2}.{3}, consider ignoring this property",
+        "Reference loop detected while mapping to an init only member",
+        "Reference loop detected while mapping from {0}.{1} to the init only member {2}.{3}, consider ignoring this member",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true);
@@ -249,7 +249,7 @@ internal static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor ReferenceLoopInCtorMapping = new DiagnosticDescriptor(
         "RMG031",
         "Reference loop detected while mapping to a constructor parameter",
-        "Reference loop detected while mapping from {0}.{1} to the constructor parameter {3} of {2}, consider ignoring this property or mark another constructor as mapping constructor",
+        "Reference loop detected while mapping from {0}.{1} to the constructor parameter {3} of {2}, consider ignoring this member or mark another constructor as mapping constructor",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true);

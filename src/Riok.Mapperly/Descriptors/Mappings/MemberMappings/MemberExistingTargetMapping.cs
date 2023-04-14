@@ -1,25 +1,25 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 
-namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
+namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 /// <summary>
-/// A <see cref="IPropertyAssignmentMapping"/> which maps to an existing target instance.
+/// A <see cref="IMemberAssignmentMapping"/> which maps to an existing target instance.
 /// </summary>
-public class PropertyExistingTargetMapping : IPropertyAssignmentMapping
+public class MemberExistingTargetMapping : IMemberAssignmentMapping
 {
     private readonly IExistingTargetMapping _delegateMapping;
 
-    public PropertyExistingTargetMapping(IExistingTargetMapping delegateMapping, PropertyPath sourcePath, PropertyPath targetPath)
+    public MemberExistingTargetMapping(IExistingTargetMapping delegateMapping, MemberPath sourcePath, MemberPath targetPath)
     {
         _delegateMapping = delegateMapping;
         SourcePath = sourcePath;
         TargetPath = targetPath;
     }
 
-    public PropertyPath SourcePath { get; }
+    public MemberPath SourcePath { get; }
 
-    public PropertyPath TargetPath { get; }
+    public MemberPath TargetPath { get; }
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {

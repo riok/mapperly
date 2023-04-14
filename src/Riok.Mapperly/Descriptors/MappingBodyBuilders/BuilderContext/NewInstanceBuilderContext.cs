@@ -1,5 +1,5 @@
 using Riok.Mapperly.Descriptors.Mappings;
-using Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
+using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
@@ -8,25 +8,25 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// </summary>
 /// <typeparam name="T">The type of the mapping.</typeparam>
 public class NewInstanceBuilderContext<T> :
-    PropertiesMappingBuilderContext<T>,
+    MembersMappingBuilderContext<T>,
     INewInstanceBuilderContext<T>
-    where T : INewInstanceObjectPropertyMapping
+    where T : INewInstanceObjectMemberMapping
 {
     public NewInstanceBuilderContext(MappingBuilderContext builderContext, T mapping)
         : base(builderContext, mapping)
     {
     }
 
-    public void AddInitPropertyMapping(PropertyAssignmentMapping mapping)
+    public void AddInitMemberMapping(MemberAssignmentMapping mapping)
     {
-        SetSourcePropertyMapped(mapping.SourcePath);
-        Mapping.AddInitPropertyMapping(mapping);
+        SetSourceMemberMapped(mapping.SourcePath);
+        Mapping.AddInitMemberMapping(mapping);
     }
 
     public void AddConstructorParameterMapping(ConstructorParameterMapping mapping)
     {
-        PropertyConfigsByRootTargetName.Remove(mapping.Parameter.Name);
-        SetSourcePropertyMapped(mapping.DelegateMapping.SourcePath);
+        MemberConfigsByRootTargetName.Remove(mapping.Parameter.Name);
+        SetSourceMemberMapped(mapping.DelegateMapping.SourcePath);
         Mapping.AddConstructorParameterMapping(mapping);
     }
 }
