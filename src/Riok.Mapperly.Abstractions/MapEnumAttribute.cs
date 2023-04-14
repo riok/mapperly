@@ -15,7 +15,6 @@ public sealed class MapEnumAttribute : Attribute
         Strategy = strategy;
     }
 
-
     /// <summary>
     /// The strategy to be used to map enums.
     /// </summary>

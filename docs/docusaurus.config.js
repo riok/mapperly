@@ -64,6 +64,14 @@ const config = {
       },
       footer: {
         style: 'dark',
+        logo: {
+          alt: 'riok Logo',
+          src: '/img/riok-logo-grayscale.svg',
+          href: 'https://riok.ch',
+          width: '180px',
+        },
+        copyright:
+          'Mapperly is an open source project of <a href="https://riok.ch">riok</a>.',
         links: [
           {
             title: 'Docs',
@@ -86,12 +94,12 @@ const config = {
             title: 'Community',
             items: [
               {
-                label: 'Open an issue',
-                href: 'https://github.com/riok/mapperly/issues/new/choose',
+                label: 'Q&A',
+                href: 'https://github.com/riok/mapperly/discussions',
               },
               {
-                label: 'GitHub Repository',
-                href: 'https://github.com/riok/mapperly',
+                label: 'Open an issue',
+                href: 'https://github.com/riok/mapperly/issues/new/choose',
               },
               {
                 label: 'Contributing',
@@ -103,6 +111,10 @@ const config = {
             title: 'More',
             items: [
               {
+                label: 'GitHub Repository',
+                href: 'https://github.com/riok/mapperly',
+              },
+              {
                 label: 'NuGet',
                 href: 'https://www.nuget.org/packages/Riok.Mapperly',
               },
@@ -110,6 +122,11 @@ const config = {
                 label: 'Releases',
                 href: 'https://github.com/riok/mapperly/releases',
               },
+            ],
+          },
+          {
+            title: 'Legal',
+            items: [
               {
                 label: 'License',
                 href: 'https://github.com/riok/mapperly/blob/main/LICENSE',
