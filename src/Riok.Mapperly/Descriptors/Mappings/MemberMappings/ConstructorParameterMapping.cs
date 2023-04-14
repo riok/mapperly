@@ -1,8 +1,8 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
+namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 public class ConstructorParameterMapping
 {
@@ -10,7 +10,7 @@ public class ConstructorParameterMapping
 
     public ConstructorParameterMapping(
         IParameterSymbol parameter,
-        NullPropertyMapping delegateMapping,
+        NullMemberMapping delegateMapping,
         bool selfOrPreviousIsUnmappedOptional)
     {
         DelegateMapping = delegateMapping;
@@ -20,14 +20,14 @@ public class ConstructorParameterMapping
 
     public IParameterSymbol Parameter { get; }
 
-    public NullPropertyMapping DelegateMapping { get; }
+    public NullMemberMapping DelegateMapping { get; }
 
     public ArgumentSyntax BuildArgument(TypeMappingBuildContext ctx)
     {
         var argumentExpression = DelegateMapping.Build(ctx);
-        var arg = Argument(argumentExpression);
+        var arg = SyntaxFactory.Argument(argumentExpression);
         return _selfOrPreviousIsUnmappedOptional
-            ? arg.WithNameColon(NameColon(Parameter.Name))
+            ? arg.WithNameColon(SyntaxFactory.NameColon(Parameter.Name))
             : arg;
     }
 

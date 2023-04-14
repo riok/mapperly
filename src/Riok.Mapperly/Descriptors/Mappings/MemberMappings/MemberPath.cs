@@ -6,24 +6,24 @@ using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
-namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
+namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 /// <summary>
-/// Represents a set of properties to access a certain property.
+/// Represents a set of members to access a certain member.
 /// Eg. A.B.C
 /// </summary>
 [DebuggerDisplay("{FullName}")]
-public class PropertyPath
+public class MemberPath
 {
-    internal const string PropertyAccessSeparator = ".";
+    internal const string MemberAccessSeparator = ".";
     private const string NullableValueProperty = "Value";
 
     private IPropertySymbol? _member;
 
-    public PropertyPath(IReadOnlyCollection<IPropertySymbol> path)
+    public MemberPath(IReadOnlyCollection<IPropertySymbol> path)
     {
         Path = path;
-        FullName = string.Join(PropertyAccessSeparator, Path.Select(x => x.Name));
+        FullName = string.Join(MemberAccessSeparator, Path.Select(x => x.Name));
     }
 
     public IReadOnlyCollection<IPropertySymbol> Path { get; }
@@ -55,7 +55,7 @@ public class PropertyPath
     public string FullName { get; }
 
     /// <summary>
-    /// Builds a property path skipping trailing path items which are non nullable.
+    /// Builds a member path skipping trailing path items which are non nullable.
     /// </summary>
     /// <returns>The built path.</returns>
     public IEnumerable<IPropertySymbol> PathWithoutTrailingNonNullable()
@@ -124,7 +124,7 @@ public class PropertyPath
     /// Builds a condition (the resulting expression evaluates to a boolean)
     /// whether the path is non-null.
     /// </summary>
-    /// <param name="baseAccess">The base access to access the property or <c>null</c>.</param>
+    /// <param name="baseAccess">The base access to access the member or <c>null</c>.</param>
     /// <returns><c>null</c> if no part of the path is nullable or the condition which needs to be true, that the path cannot be <c>null</c>.</returns>
     public ExpressionSyntax? BuildNonNullConditionWithoutConditionalAccess(ExpressionSyntax? baseAccess)
     {
@@ -161,7 +161,7 @@ public class PropertyPath
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((PropertyPath)obj);
+        return Equals((MemberPath)obj);
     }
 
     public override int GetHashCode()
@@ -175,57 +175,57 @@ public class PropertyPath
         return hc;
     }
 
-    public static bool operator ==(PropertyPath? left, PropertyPath? right)
+    public static bool operator ==(MemberPath? left, MemberPath? right)
         => Equals(left, right);
 
-    public static bool operator !=(PropertyPath? left, PropertyPath? right)
+    public static bool operator !=(MemberPath? left, MemberPath? right)
         => !Equals(left, right);
 
-    private bool Equals(PropertyPath other)
+    private bool Equals(MemberPath other)
         => Path.SequenceEqual(other.Path, SymbolEqualityComparer.IncludeNullability);
 
     public static bool TryFind(
         ITypeSymbol type,
         IEnumerable<IEnumerable<string>> pathCandidates,
         IReadOnlyCollection<string> ignoredNames,
-        [NotNullWhen(true)] out PropertyPath? propertyPath)
-        => TryFind(type, pathCandidates, ignoredNames, StringComparer.Ordinal, out propertyPath);
+        [NotNullWhen(true)] out MemberPath? memberPath)
+        => TryFind(type, pathCandidates, ignoredNames, StringComparer.Ordinal, out memberPath);
 
     public static bool TryFind(
         ITypeSymbol type,
         IEnumerable<IEnumerable<string>> pathCandidates,
         IReadOnlyCollection<string> ignoredNames,
         IEqualityComparer<string> comparer,
-        [NotNullWhen(true)] out PropertyPath? propertyPath)
+        [NotNullWhen(true)] out MemberPath? memberPath)
     {
         foreach (var pathCandidate in FindCandidates(type, pathCandidates, comparer))
         {
             if (ignoredNames.Contains(pathCandidate.Path.First().Name))
                 continue;
 
-            propertyPath = pathCandidate;
+            memberPath = pathCandidate;
             return true;
         }
 
-        propertyPath = null;
+        memberPath = null;
         return false;
     }
 
     public static bool TryFind(
         ITypeSymbol type,
         IReadOnlyCollection<string> path,
-        [NotNullWhen(true)] out PropertyPath? propertyPath)
-        => TryFind(type, path, StringComparer.Ordinal, out propertyPath);
+        [NotNullWhen(true)] out MemberPath? memberPath)
+        => TryFind(type, path, StringComparer.Ordinal, out memberPath);
 
-    private static IEnumerable<PropertyPath> FindCandidates(
+    private static IEnumerable<MemberPath> FindCandidates(
         ITypeSymbol type,
         IEnumerable<IEnumerable<string>> pathCandidates,
         IEqualityComparer<string> comparer)
     {
         foreach (var pathCandidate in pathCandidates)
         {
-            if (TryFind(type, pathCandidate.ToList(), comparer, out var propertyPath))
-                yield return propertyPath;
+            if (TryFind(type, pathCandidate.ToList(), comparer, out var memberPath))
+                yield return memberPath;
         }
     }
 
@@ -233,16 +233,16 @@ public class PropertyPath
         ITypeSymbol type,
         IReadOnlyCollection<string> path,
         IEqualityComparer<string> comparer,
-        [NotNullWhen(true)] out PropertyPath? propertyPath)
+        [NotNullWhen(true)] out MemberPath? memberPath)
     {
         var foundPath = Find(type, path, comparer).ToList();
         if (foundPath.Count != path.Count)
         {
-            propertyPath = null;
+            memberPath = null;
             return false;
         }
 
-        propertyPath = new(foundPath);
+        memberPath = new(foundPath);
         return true;
     }
 
@@ -253,15 +253,15 @@ public class PropertyPath
     {
         foreach (var name in path)
         {
-            if (FindProperty(type, name, comparer) is not { } property)
+            if (FindMember(type, name, comparer) is not { } member)
                 break;
 
-            type = property.Type;
-            yield return property;
+            type = member.Type;
+            yield return member;
         }
     }
 
-    private static IPropertySymbol? FindProperty(
+    private static IPropertySymbol? FindMember(
         ITypeSymbol type,
         string name,
         IEqualityComparer<string> comparer)

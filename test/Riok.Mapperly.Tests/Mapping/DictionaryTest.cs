@@ -242,7 +242,7 @@ public class DictionaryTest
             "class A : IReadOnlyDictionary<int, int> {}");
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyProperty))
+            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember))
             .HaveMapMethodBody(
                 """
                 var target = new global::A();
@@ -260,7 +260,7 @@ public class DictionaryTest
             "class B { public IReadOnlyDictionary<string, string> Values { get; } }");
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyProperty))
+            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember))
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
