@@ -30,4 +30,4 @@ The benchmark was generated with [Benchmark.netCoreMappers](https://github.com/m
 ## Requirements
 
 Mapperly supports .NET 5+ and .NET Framework 4.x.
-Mapperly requires at least C# language version 8.
+Mapperly requires at least C# language version 9.
