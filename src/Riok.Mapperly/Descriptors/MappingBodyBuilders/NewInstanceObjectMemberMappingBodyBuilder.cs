@@ -6,6 +6,7 @@ using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
@@ -30,9 +31,9 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         ObjectMemberMappingBodyBuilder.BuildMappingBody(mappingCtx);
     }
 
-    private static void BuildInitOnlyMemberMappings(INewInstanceBuilderContext<IMapping> ctx, bool includeAllProperties = false)
+    private static void BuildInitOnlyMemberMappings(INewInstanceBuilderContext<IMapping> ctx, bool includeAllMembers = false)
     {
-        var initOnlyTargetMembers = includeAllProperties
+        var initOnlyTargetMembers = includeAllMembers
             ? ctx.TargetMembers.Values.ToArray()
             : ctx.TargetMembers.Values.Where(x => x.CanOnlySetViaInitializer()).ToArray();
         foreach (var targetMember in initOnlyTargetMembers)
@@ -52,7 +53,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 out var sourceMemberPath))
             {
                 ctx.BuilderContext.ReportDiagnostic(
-                    targetMember.IsRequired()
+                    targetMember.IsRequired
                         ? DiagnosticDescriptors.RequiredMemberNotMapped
                         : DiagnosticDescriptors.SourceMemberNotFound,
                     targetMember.Name,
@@ -67,7 +68,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
     private static void BuildInitMemberMapping(
         INewInstanceBuilderContext<IMapping> ctx,
-        IPropertySymbol targetMember,
+        IMappableMember targetMember,
         IReadOnlyCollection<MapPropertyAttribute> memberConfigs)
     {
         // add configured mapping
@@ -108,13 +109,10 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
     private static void BuildInitMemberMapping(
         INewInstanceBuilderContext<IMapping> ctx,
-        IPropertySymbol targetMember,
+        IMappableMember targetMember,
         MemberPath sourcePath)
     {
-        var targetPath = new MemberPath(new[]
-        {
-            targetMember
-        });
+        var targetPath = new MemberPath(new[] { targetMember });
         if (!ObjectMemberMappingBodyBuilder.ValidateMappingSpecification(ctx, sourcePath, targetPath, true))
             return;
 

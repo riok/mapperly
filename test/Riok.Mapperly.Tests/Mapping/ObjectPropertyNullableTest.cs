@@ -335,4 +335,18 @@ public Wrapper MapNullable(double? source) => source.HasValue ? new() { Test = s
 
         return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
     }
+
+    [Fact]
+    public Task NullableIntWithAdditionalFlattenedValueToNonNullableIntProperties()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public C? Nested { get; set; } }",
+            "class B { public D Nested { get; set; } public int NestedValue2 { set; } }",
+            "class C { public int? Value1 { get; } public int? Value2 { get; } }",
+            "class D { public int Value1 { set; } }");
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

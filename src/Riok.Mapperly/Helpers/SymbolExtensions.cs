@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Helpers;
 
@@ -34,11 +35,14 @@ internal static class SymbolExtensions
         return enumType != null;
     }
 
-    internal static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol, string name)
-        => symbol.GetAllMembers(name, StringComparer.Ordinal);
+    internal static IEnumerable<IMethodSymbol> GetAllMethods(this ITypeSymbol symbol)
+        => symbol.GetAllMembers().OfType<IMethodSymbol>();
 
-    internal static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol, string name, IEqualityComparer<string> comparer)
-        => symbol.GetAllMembers().Where(x => comparer.Equals(name, x.Name));
+    internal static IEnumerable<IMethodSymbol> GetAllMethods(this ITypeSymbol symbol, string name)
+        => symbol.GetAllMembers(name).OfType<IMethodSymbol>();
+
+    internal static IEnumerable<IPropertySymbol> GetAllProperties(this ITypeSymbol symbol, string name)
+        => symbol.GetAllMembers(name).OfType<IPropertySymbol>();
 
     internal static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol)
     {
@@ -55,13 +59,23 @@ internal static class SymbolExtensions
             : members.Concat(symbol.BaseType.GetAllMembers());
     }
 
-    internal static IEnumerable<IPropertySymbol> GetAllAccessibleProperties(this ITypeSymbol symbol)
+    internal static IEnumerable<IMappableMember> GetMappableMembers(this ITypeSymbol symbol, string name, IEqualityComparer<string> comparer)
     {
         return symbol
             .GetAllMembers()
-            .OfType<IPropertySymbol>()
+            .Where(x => comparer.Equals(name, x.Name) && !x.IsStatic)
+            .Select(MappableMember.Create)
+            .WhereNotNull();
+    }
+
+    internal static IEnumerable<IMappableMember> GetAccessibleMappableMembers(this ITypeSymbol symbol)
+    {
+        return symbol
+            .GetAllMembers()
             .Where(x => x.IsAccessible())
-            .DistinctBy(x => x.Name);
+            .DistinctBy(x => x.Name)
+            .Select(MappableMember.Create)
+            .WhereNotNull();
     }
 
     internal static bool ImplementsGeneric(
@@ -125,4 +139,7 @@ internal static class SymbolExtensions
 
         return true;
     }
+
+    private static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol, string name)
+        => symbol.GetAllMembers().Where(x => name.Equals(x.Name));
 }

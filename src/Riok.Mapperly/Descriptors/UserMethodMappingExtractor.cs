@@ -44,8 +44,8 @@ public static class UserMethodMappingExtractor
 
     private static IEnumerable<IMethodSymbol> ExtractBaseMethods(INamedTypeSymbol objectType, ITypeSymbol mapperSymbol)
     {
-        var baseMethods = mapperSymbol.BaseType?.GetAllMembers() ?? Enumerable.Empty<ISymbol>();
-        var intfMethods = mapperSymbol.AllInterfaces.SelectMany(x => x.GetAllMembers());
+        var baseMethods = mapperSymbol.BaseType?.GetAllMethods() ?? Enumerable.Empty<ISymbol>();
+        var intfMethods = mapperSymbol.AllInterfaces.SelectMany(x => x.GetAllMethods());
         return baseMethods
             .Concat(intfMethods)
             .OfType<IMethodSymbol>()

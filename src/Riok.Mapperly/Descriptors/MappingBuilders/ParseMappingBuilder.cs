@@ -19,8 +19,7 @@ public static class ParseMappingBuilder
 
         var targetIsNullable = ctx.Target.NonNullable(out var nonNullableTarget);
 
-        var parseMethodCandidates = nonNullableTarget.GetAllMembers(ParseMethodName)
-            .OfType<IMethodSymbol>()
+        var parseMethodCandidates = nonNullableTarget.GetAllMethods(ParseMethodName)
             .Where(m =>
                 m.IsStatic
                 && !m.ReturnsVoid

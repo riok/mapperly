@@ -87,6 +87,7 @@ except for ignored members)
 set the following two EditorConfig settings (see also [analyzer diagnostics](./13-analyzer-diagnostics.mdx)):
 
 ```editorconfig title=".editorconfig"
+[*.cs]
 dotnet_diagnostic.RMG012.severity = error # Unmapped target member
 dotnet_diagnostic.RMG020.severity = error # Unmapped source member
 ```
