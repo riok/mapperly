@@ -49,6 +49,7 @@ public class WellKnownTypes
     private INamedTypeSymbol? _immutableSortedSetT;
     private INamedTypeSymbol? _immutableDictionary;
     private INamedTypeSymbol? _immutableDictionaryT;
+    private INamedTypeSymbol? _iImmutableDictionaryT;
     private INamedTypeSymbol? _immutableSortedDictionary;
     private INamedTypeSymbol? _immutableSortedDictionaryT;
 
@@ -98,7 +99,9 @@ public class WellKnownTypes
     public INamedTypeSymbol ImmutableSortedSet => _immutableSortedSet ??= GetTypeSymbol(typeof(ImmutableSortedSet));
     public INamedTypeSymbol ImmutableSortedSetT => _immutableSortedSetT ??= GetTypeSymbol(typeof(ImmutableSortedSet<>));
     public INamedTypeSymbol ImmutableDictionary => _immutableDictionary ??= GetTypeSymbol(typeof(ImmutableDictionary));
+    public INamedTypeSymbol IImmutableDictionaryT => _iImmutableDictionaryT ??= GetTypeSymbol(typeof(IImmutableDictionary<,>));
     public INamedTypeSymbol ImmutableDictionaryT => _immutableDictionaryT ??= GetTypeSymbol(typeof(ImmutableDictionary<,>));
+
     public INamedTypeSymbol ImmutableSortedDictionary => _immutableSortedDictionary ??= GetTypeSymbol(typeof(ImmutableSortedDictionary));
     public INamedTypeSymbol ImmutableSortedDictionaryT => _immutableSortedDictionaryT ??= GetTypeSymbol(typeof(ImmutableSortedDictionary<,>));
 

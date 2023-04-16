@@ -78,6 +78,13 @@ internal static class SymbolExtensions
             .WhereNotNull();
     }
 
+    internal static IMethodSymbol? GetStaticGenericMethod(this INamedTypeSymbol namedType, string methodName)
+    {
+        return namedType.GetMembers(methodName)
+                        .OfType<IMethodSymbol>()
+                        .FirstOrDefault(m => m.IsStatic && m.IsGenericMethod);
+    }
+
     internal static bool ImplementsGeneric(
         this ITypeSymbol t,
         INamedTypeSymbol genericInterfaceSymbol,

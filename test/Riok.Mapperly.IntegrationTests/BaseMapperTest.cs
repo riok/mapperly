@@ -86,7 +86,9 @@ namespace Riok.Mapperly.IntegrationTests
                 ImmutableHashSetValue = ImmutableHashSet.Create("1", "2", "3"),
                 ImmutableQueueValue = ImmutableQueue.Create("1", "2", "3"),
                 ImmutableStackValue = ImmutableStack.Create("1", "2", "3"),
-                ImmutableSortedSetValue = ImmutableSortedSet.Create("1", "2", "3")
+                ImmutableSortedSetValue = ImmutableSortedSet.Create("1", "2", "3"),
+                ImmutableDictionaryValue = new Dictionary<string, string>() { { "1", "1" }, { "2", "2" }, { "3", "3" } }.ToImmutableDictionary(),
+                ImmutableSortedDictionaryValue = new Dictionary<string, string>() { { "1", "1" }, { "2", "2" }, { "3", "3" } }.ToImmutableSortedDictionary(),
             };
         }
 
