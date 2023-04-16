@@ -60,5 +60,7 @@ namespace Riok.Mapperly.IntegrationTests.Models
         public DateTime DateTimeValueTargetDateOnly { get; set; }
 
         public DateTime DateTimeValueTargetTimeOnly { get; set; }
+
+        public String ManuallyMapped { get; set; } = "fooBar";
     }
 }

@@ -1,0 +1,90 @@
+﻿[
+  {
+    IntValue: 1,
+    RequiredValue: -1,
+    StringValue: ,
+    RenamedStringValue2: ,
+    FlatteningIdValue: 1,
+    NullableFlatteningIdValue: 0,
+    NestedNullableTargetNotNullable: {},
+    StringNullableTargetNotNullable: ,
+    SourceTargetSameObjectType: {
+      CtorValue: 2,
+      IntValue: 100,
+      IntInitOnlyValue: 4,
+      RequiredValue: 10,
+      StringValue: fooBar3,
+      RenamedStringValue: fooBar2,
+      Flattening: {
+        IdValue: 10
+      },
+      NullableFlattening: {
+        IdValue: 20
+      },
+      UnflatteningIdValue: 7,
+      StringNullableTargetNotNullable: fooBar,
+      RecursiveObject: {
+        IntValue: 1,
+        RequiredValue: -1,
+        StringValue: ,
+        RenamedStringValue: ,
+        Flattening: {
+          IdValue: 1
+        },
+        EnumValue: Value20,
+        EnumName: Value10,
+        EnumReverseStringValue: Value10,
+        ManuallyMapped: fooBar
+      },
+      EnumValue: Value20,
+      EnumName: Value10,
+      EnumRawValue: Value30,
+      EnumStringValue: Value10,
+      EnumReverseStringValue: Value10,
+      SubObject: {
+        SubIntValue: 20,
+        BaseIntValue: 10
+      },
+      IgnoredStringValue: fooBar4,
+      IgnoredIntValue: 3,
+      DateTimeValueTargetDateOnly: 2018-11-29 10:11:12,
+      DateTimeValueTargetTimeOnly: 2018-11-29 10:11:12,
+      ManuallyMapped: fooBar
+    },
+    EnumValue: DtoValue2,
+    EnumName: 10,
+    EnumStringValue: 0,
+    EnumReverseStringValue: Value10,
+    ManuallyMapped: {
+      MagicIntValue: 100,
+      StringValue: fooBar
+    }
+  },
+  {
+    CtorValue: 2,
+    IntValue: 100,
+    IntInitOnlyValue: 4,
+    RequiredValue: 10,
+    StringValue: fooBar3,
+    RenamedStringValue2: fooBar2,
+    FlatteningIdValue: 10,
+    NullableFlatteningIdValue: 20,
+    NestedNullableTargetNotNullable: {},
+    StringNullableTargetNotNullable: fooBar,
+    EnumValue: DtoValue2,
+    EnumName: 10,
+    EnumRawValue: 30,
+    EnumStringValue: Value10,
+    EnumReverseStringValue: Value10,
+    SubObject: {
+      SubIntValue: 20,
+      BaseIntValue: 10
+    },
+    DateTimeValueTargetDateOnly: 2018-11-29,
+    DateTimeValueTargetTimeOnly: 10:11 AM,
+    ManuallyMapped: {
+      MagicIntValue: 100,
+      StringValue: fooBar
+    }
+  }
+]

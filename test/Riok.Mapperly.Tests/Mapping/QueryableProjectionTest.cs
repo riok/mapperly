@@ -49,19 +49,18 @@ public class QueryableProjectionTest
     }
 
     [Fact]
-    public Task UserImplementedMethodsShouldBeIgnored()
+    public Task ClassToClassWithUserImplemented()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
                 partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
-                partial B MapToB(A source);
-                private D MapToD(C source)
-                    => new D();
+
+                D MapToD(C v) => new D { Value = v.Value + "-mapped" };
                 """,
             "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",
             "class B { public string StringValue { get; set; } public D NestedValue { get; set; } }",
-            "class C { public long Value { get; set; } }",
-            "class D { public int Value { get; set; } }");
+            "class C { public string Value { get; set; } }",
+            "class D { public string Value { get; set; } }");
 
         return TestHelper.VerifyGenerator(source);
     }
