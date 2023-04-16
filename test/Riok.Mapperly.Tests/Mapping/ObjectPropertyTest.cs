@@ -349,4 +349,23 @@ public class ObjectPropertyTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void UnmappedReadOnlyTargetPropertyShouldNotDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string Name { get; } }",
+            "class B { public string Name { set; } public string FullName { get; } }");
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Name = source.Name;
+                return target;
+                """);
+    }
 }

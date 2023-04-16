@@ -13,7 +13,7 @@ public static class EnumerableMappingBuilder
     private const string SelectMethodName = nameof(Enumerable.Select);
     private const string ToArrayMethodName = nameof(Enumerable.ToArray);
     private const string ToListMethodName = nameof(Enumerable.ToList);
-    private const string AddValueMethodName = nameof(ICollection<object>.Add);
+    private const string AddMethodName = nameof(ICollection<object>.Add);
 
     private const string ToImmutableArrayMethodName = nameof(ImmutableArray.ToImmutableArray);
     private const string ToImmutableListMethodName = nameof(ImmutableList.ToImmutableList);
@@ -86,8 +86,15 @@ public static class EnumerableMappingBuilder
         // create a foreach loop with add calls if source is not an array
         // and  ICollection.Add(T): void is implemented and not explicit
         // ensures add is not called and immutable types
-        if (!ctx.Target.IsArrayType() && ctx.Target.HasImplicitInterfaceMethod(ctx.Types.ICollectionT, AddValueMethodName))
-            return new ForEachAddEnumerableExistingTargetMapping(ctx.Source, ctx.Target, elementMapping, AddValueMethodName);
+        if (!ctx.Target.IsArrayType() && ctx.Target.HasImplicitInterfaceMethod(ctx.Types.ICollectionT, AddMethodName))
+            return new ForEachAddEnumerableExistingTargetMapping(ctx.Source, ctx.Target, elementMapping, AddMethodName);
+
+        // if a mapping could be created for an immutable collection
+        // we diagnostic when it is an existing target mapping
+        if (ResolveImmutableCollectMethod(ctx) != null)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+        }
 
         return null;
     }
@@ -156,8 +163,8 @@ public static class EnumerableMappingBuilder
         // create a foreach loop with add calls if source is not an array
         // and  ICollection.Add(T): void is implemented and not explicit
         // ensures add is not called and immutable types
-        if (!ctx.Target.IsArrayType() && ctx.Target.HasImplicitInterfaceMethod(ctx.Types.ICollectionT, AddValueMethodName))
-            return new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping, objectFactory, AddValueMethodName);
+        if (!ctx.Target.IsArrayType() && ctx.Target.HasImplicitInterfaceMethod(ctx.Types.ICollectionT, AddMethodName))
+            return new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping, objectFactory, AddMethodName);
 
         return null;
     }
@@ -233,11 +240,9 @@ public static class EnumerableMappingBuilder
 
     private static IMethodSymbol? ResolveStaticMethod(INamedTypeSymbol namedType, string methodName)
     {
-        var method = namedType.GetMembers(methodName)
-                                .OfType<IMethodSymbol>()
-                                .FirstOrDefault(m => m.IsStatic && m.IsGenericMethod);
-
-        return method;
+        return namedType.GetMembers(methodName)
+            .OfType<IMethodSymbol>()
+            .FirstOrDefault(m => m.IsStatic && m.IsGenericMethod);
     }
 
     private static ITypeSymbol? GetEnumeratedType(MappingBuilderContext ctx, ITypeSymbol type)
