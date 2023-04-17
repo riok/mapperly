@@ -1,3 +1,5 @@
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 public class SpecialTypeTest
@@ -25,6 +27,32 @@ public class SpecialTypeTest
         TestHelper.GenerateMapper(source)
             .Should()
             .HaveMapMethodBody("return (object)MapToA(source);");
+    }
+
+    [Fact]
+    public void ObjectToObjectDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "object",
+            "object",
+            TestSourceBuilderOptions.WithDeepCloning);
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveMapMethodBody("return source;")
+            .HaveDiagnostic(new(DiagnosticDescriptors.MappedObjectToObjectWithoutDeepClone));
+    }
+
+    [Fact]
+    public void NullableObjectToNullableObjectDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "object?",
+            "object?",
+            TestSourceBuilderOptions.WithDeepCloning);
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveMapMethodBody("return source == null ? default : source;")
+            .HaveDiagnostic(new(DiagnosticDescriptors.MappedObjectToObjectWithoutDeepClone));
     }
 
     [Fact]
