@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings;
@@ -14,12 +15,15 @@ public class MapperDescriptor
         Syntax = syntax;
         Symbol = symbol;
         NameBuilder = nameBuilder;
+        Name = BuildName(symbol);
 
         if (!Symbol.ContainingNamespace.IsGlobalNamespace)
         {
             Namespace = Symbol.ContainingNamespace.ToDisplayString();
         }
     }
+
+    public string Name { get; }
 
     public string? Namespace { get; }
 
@@ -33,4 +37,21 @@ public class MapperDescriptor
 
     public void AddTypeMapping(MethodMapping mapping)
         => _methodMappings.Add(mapping);
+
+    private string BuildName(INamedTypeSymbol symbol)
+    {
+        if (symbol.ContainingType == null)
+            return symbol.Name;
+
+        var sb = new StringBuilder(symbol.Name);
+        var containingType = symbol.ContainingType;
+        while (containingType != null)
+        {
+            sb.Insert(0, '.').Insert(0, containingType.Name);
+            containingType = containingType.ContainingType;
+        }
+
+        return sb.ToString();
+    }
 }
+
