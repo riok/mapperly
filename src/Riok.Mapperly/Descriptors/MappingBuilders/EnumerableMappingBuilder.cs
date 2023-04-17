@@ -63,6 +63,10 @@ public static class EnumerableMappingBuilder
         if (immutableLinqMapping is not null)
             return immutableLinqMapping;
 
+        // if target is a type that takes IEnumerable in its constructor
+        if (HasEnumerableConstructor(ctx, elementMapping.TargetType))
+            return BuildLinqConstructorMapping(ctx, elementMapping);
+
         return ctx.IsExpression
             ? null
             : BuildCustomTypeMapping(ctx, elementMapping);
@@ -117,6 +121,28 @@ public static class EnumerableMappingBuilder
         return new LinqEnumerableMapping(ctx.Source, ctx.Target, elementMapping, selectMethod, collectMethod);
     }
 
+    private static bool HasEnumerableConstructor(MappingBuilderContext ctx, ITypeSymbol typeSymbol)
+    {
+        if (ctx.Target is not INamedTypeSymbol namedType)
+            return false;
+
+        var typedEnumerable = ctx.Types.IEnumerableT.Construct(typeSymbol);
+
+        return namedType.Constructors.Any(m => m.Parameters.Length == 1
+                        && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type, typedEnumerable));
+    }
+
+    private static LinqConstructorMapping BuildLinqConstructorMapping(
+        MappingBuilderContext ctx,
+        ITypeMapping elementMapping)
+    {
+        var selectMethod = elementMapping.IsSynthetic
+            ? null
+            : ResolveStaticMethod(ctx.Types.Enumerable, SelectMethodName);
+
+        return new LinqConstructorMapping(ctx.Source, ctx.Target, elementMapping, selectMethod);
+    }
+
     private static ExistingTargetMappingMethodWrapper? BuildCustomTypeMapping(
         MappingBuilderContext ctx,
         ITypeMapping elementMapping)
@@ -126,12 +152,6 @@ public static class EnumerableMappingBuilder
             ctx.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, ctx.Target);
             return null;
         }
-
-        if (ctx.Target.ImplementsGeneric(ctx.Types.StackT, out _))
-            return new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping, objectFactory, nameof(Stack<object>.Push));
-
-        if (ctx.Target.ImplementsGeneric(ctx.Types.QueueT, out _))
-            return new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping, objectFactory, nameof(Queue<object>.Enqueue));
 
         // create a foreach loop with add calls if source is not an array
         // and  ICollection.Add(T): void is implemented and not explicit

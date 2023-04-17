@@ -682,17 +682,13 @@ public class EnumerableTest
             "A",
             "B",
             "class A { public IEnumerable<int> Value { get; } }",
-            "class B { public Stack<long> Value { get; set; } }");
+            "class B { public Stack<int> Value { get; set; } }");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMethodBody("MapToStack",
+            .HaveSingleMethodBody(
                 """
-                var target = new global::System.Collections.Generic.Stack<long>();
-                foreach (var item in source)
-                {
-                    target.Push((long)item);
-                }
-
+                var target = new global::B();
+                target.Value = new global::System.Collections.Generic.Stack<int>(source.Value);
                 return target;
                 """);
     }
@@ -704,17 +700,49 @@ public class EnumerableTest
             "A",
             "B",
             "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public Queue<int> Value { get; set; } }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = new global::System.Collections.Generic.Queue<int>(source.Value);
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void EnumerableToCreatedStackOfCastedTypes()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public Stack<long> Value { get; set; } }");
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = new global::System.Collections.Generic.Stack<long>(global::System.Linq.Enumerable.Select(source.Value, x => (long)x));
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void EnumerableToCreatedQueueOfCastedTypes()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
             "class B { public Queue<long> Value { get; set; } }");
         TestHelper.GenerateMapper(source)
             .Should()
-            .HaveMethodBody("MapToQueue",
+            .HaveSingleMethodBody(
                 """
-                var target = new global::System.Collections.Generic.Queue<long>();
-                foreach (var item in source)
-                {
-                    target.Enqueue((long)item);
-                }
-
+                var target = new global::B();
+                target.Value = new global::System.Collections.Generic.Queue<long>(global::System.Linq.Enumerable.Select(source.Value, x => (long)x));
                 return target;
                 """);
     }

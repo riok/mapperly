@@ -87,14 +87,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.StringValue = src.StringValue;
             target.FlatteningIdValue = DirectInt(src.Flattening.IdValue);
             target.SourceTargetSameObjectType = src.SourceTargetSameObjectType;
-            target.StackValue = MapToStack(src.StackValue);
-            target.QueueValue = MapToQueue(src.QueueValue);
-            target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(global::System.Linq.Enumerable.Select(src.ImmutableArrayValue, x1 => ParseableInt(x1)));
-            target.ImmutableListValue = global::System.Collections.Immutable.ImmutableList.ToImmutableList(global::System.Linq.Enumerable.Select(src.ImmutableListValue, x2 => ParseableInt(x2)));
-            target.ImmutableHashSetValue = global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(global::System.Linq.Enumerable.Select(src.ImmutableHashSetValue, x3 => ParseableInt(x3)));
-            target.ImmutableQueueValue = global::System.Collections.Immutable.ImmutableQueue.CreateRange(global::System.Linq.Enumerable.Select(src.ImmutableQueueValue, x4 => ParseableInt(x4)));
-            target.ImmutableStackValue = global::System.Collections.Immutable.ImmutableStack.CreateRange(global::System.Linq.Enumerable.Select(src.ImmutableStackValue, x5 => ParseableInt(x5)));
-            target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(global::System.Linq.Enumerable.Select(src.ImmutableSortedSetValue, x6 => ParseableInt(x6)));
+            target.StackValue = new global::System.Collections.Generic.Stack<int>(global::System.Linq.Enumerable.Select(src.StackValue, x1 => ParseableInt(x1)));
+            target.QueueValue = new global::System.Collections.Generic.Queue<int>(global::System.Linq.Enumerable.Select(src.QueueValue, x2 => ParseableInt(x2)));
+            target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(global::System.Linq.Enumerable.Select(src.ImmutableArrayValue, x3 => ParseableInt(x3)));
+            target.ImmutableListValue = global::System.Collections.Immutable.ImmutableList.ToImmutableList(global::System.Linq.Enumerable.Select(src.ImmutableListValue, x4 => ParseableInt(x4)));
+            target.ImmutableHashSetValue = global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(global::System.Linq.Enumerable.Select(src.ImmutableHashSetValue, x5 => ParseableInt(x5)));
+            target.ImmutableQueueValue = global::System.Collections.Immutable.ImmutableQueue.CreateRange(global::System.Linq.Enumerable.Select(src.ImmutableQueueValue, x6 => ParseableInt(x6)));
+            target.ImmutableStackValue = global::System.Collections.Immutable.ImmutableStack.CreateRange(global::System.Linq.Enumerable.Select(src.ImmutableStackValue, x7 => ParseableInt(x7)));
+            target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(global::System.Linq.Enumerable.Select(src.ImmutableSortedSetValue, x8 => ParseableInt(x8)));
             target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)src.EnumValue;
             target.EnumName = MapToEnumDtoByName(src.EnumName);
             target.EnumRawValue = (byte)src.EnumRawValue;
@@ -157,14 +157,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.FlatteningIdValue = DirectInt(testObject.Flattening.IdValue);
             target.Unflattening.IdValue = DirectInt(testObject.UnflatteningIdValue);
             target.SourceTargetSameObjectType = testObject.SourceTargetSameObjectType;
-            target.StackValue = MapToStack(testObject.StackValue);
-            target.QueueValue = MapToQueue(testObject.QueueValue);
-            target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(global::System.Linq.Enumerable.Select(testObject.ImmutableArrayValue, x1 => ParseableInt(x1)));
-            target.ImmutableListValue = global::System.Collections.Immutable.ImmutableList.ToImmutableList(global::System.Linq.Enumerable.Select(testObject.ImmutableListValue, x2 => ParseableInt(x2)));
-            target.ImmutableHashSetValue = global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(global::System.Linq.Enumerable.Select(testObject.ImmutableHashSetValue, x3 => ParseableInt(x3)));
-            target.ImmutableQueueValue = global::System.Collections.Immutable.ImmutableQueue.CreateRange(global::System.Linq.Enumerable.Select(testObject.ImmutableQueueValue, x4 => ParseableInt(x4)));
-            target.ImmutableStackValue = global::System.Collections.Immutable.ImmutableStack.CreateRange(global::System.Linq.Enumerable.Select(testObject.ImmutableStackValue, x5 => ParseableInt(x5)));
-            target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(global::System.Linq.Enumerable.Select(testObject.ImmutableSortedSetValue, x6 => ParseableInt(x6)));
+            target.StackValue = new global::System.Collections.Generic.Stack<int>(global::System.Linq.Enumerable.Select(testObject.StackValue, x1 => ParseableInt(x1)));
+            target.QueueValue = new global::System.Collections.Generic.Queue<int>(global::System.Linq.Enumerable.Select(testObject.QueueValue, x2 => ParseableInt(x2)));
+            target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(global::System.Linq.Enumerable.Select(testObject.ImmutableArrayValue, x3 => ParseableInt(x3)));
+            target.ImmutableListValue = global::System.Collections.Immutable.ImmutableList.ToImmutableList(global::System.Linq.Enumerable.Select(testObject.ImmutableListValue, x4 => ParseableInt(x4)));
+            target.ImmutableHashSetValue = global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(global::System.Linq.Enumerable.Select(testObject.ImmutableHashSetValue, x5 => ParseableInt(x5)));
+            target.ImmutableQueueValue = global::System.Collections.Immutable.ImmutableQueue.CreateRange(global::System.Linq.Enumerable.Select(testObject.ImmutableQueueValue, x6 => ParseableInt(x6)));
+            target.ImmutableStackValue = global::System.Collections.Immutable.ImmutableStack.CreateRange(global::System.Linq.Enumerable.Select(testObject.ImmutableStackValue, x7 => ParseableInt(x7)));
+            target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(global::System.Linq.Enumerable.Select(testObject.ImmutableSortedSetValue, x8 => ParseableInt(x8)));
             target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)testObject.EnumValue;
             target.EnumName = MapToEnumDtoByName(testObject.EnumName);
             target.EnumRawValue = (byte)testObject.EnumRawValue;
@@ -210,14 +210,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.NestedNullableTargetNotNullable = MapToTestObjectNested(dto.NestedNullableTargetNotNullable);
             target.StringNullableTargetNotNullable = dto.StringNullableTargetNotNullable;
             target.SourceTargetSameObjectType = dto.SourceTargetSameObjectType;
-            target.StackValue = MapToStack1(dto.StackValue);
-            target.QueueValue = MapToQueue1(dto.QueueValue);
-            target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(global::System.Linq.Enumerable.Select(dto.ImmutableArrayValue, x => x.ToString()));
-            target.ImmutableListValue = global::System.Collections.Immutable.ImmutableList.ToImmutableList(global::System.Linq.Enumerable.Select(dto.ImmutableListValue, x1 => x1.ToString()));
-            target.ImmutableHashSetValue = global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(global::System.Linq.Enumerable.Select(dto.ImmutableHashSetValue, x2 => x2.ToString()));
-            target.ImmutableQueueValue = global::System.Collections.Immutable.ImmutableQueue.CreateRange(global::System.Linq.Enumerable.Select(dto.ImmutableQueueValue, x3 => x3.ToString()));
-            target.ImmutableStackValue = global::System.Collections.Immutable.ImmutableStack.CreateRange(global::System.Linq.Enumerable.Select(dto.ImmutableStackValue, x4 => x4.ToString()));
-            target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(global::System.Linq.Enumerable.Select(dto.ImmutableSortedSetValue, x5 => x5.ToString()));
+            target.StackValue = new global::System.Collections.Generic.Stack<string>(global::System.Linq.Enumerable.Select(dto.StackValue, x => x.ToString()));
+            target.QueueValue = new global::System.Collections.Generic.Queue<string>(global::System.Linq.Enumerable.Select(dto.QueueValue, x1 => x1.ToString()));
+            target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(global::System.Linq.Enumerable.Select(dto.ImmutableArrayValue, x2 => x2.ToString()));
+            target.ImmutableListValue = global::System.Collections.Immutable.ImmutableList.ToImmutableList(global::System.Linq.Enumerable.Select(dto.ImmutableListValue, x3 => x3.ToString()));
+            target.ImmutableHashSetValue = global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(global::System.Linq.Enumerable.Select(dto.ImmutableHashSetValue, x4 => x4.ToString()));
+            target.ImmutableQueueValue = global::System.Collections.Immutable.ImmutableQueue.CreateRange(global::System.Linq.Enumerable.Select(dto.ImmutableQueueValue, x5 => x5.ToString()));
+            target.ImmutableStackValue = global::System.Collections.Immutable.ImmutableStack.CreateRange(global::System.Linq.Enumerable.Select(dto.ImmutableStackValue, x6 => x6.ToString()));
+            target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(global::System.Linq.Enumerable.Select(dto.ImmutableSortedSetValue, x7 => x7.ToString()));
             target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumValue;
             target.EnumName = (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumName;
             target.EnumRawValue = (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumRawValue;
@@ -281,14 +281,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.StringValue = source.StringValue;
             target.FlatteningIdValue = DirectInt(source.Flattening.IdValue);
             target.SourceTargetSameObjectType = source.SourceTargetSameObjectType;
-            target.StackValue = MapToStack(source.StackValue);
-            target.QueueValue = MapToQueue(source.QueueValue);
-            target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(global::System.Linq.Enumerable.Select(source.ImmutableArrayValue, x1 => ParseableInt(x1)));
-            target.ImmutableListValue = global::System.Collections.Immutable.ImmutableList.ToImmutableList(global::System.Linq.Enumerable.Select(source.ImmutableListValue, x2 => ParseableInt(x2)));
-            target.ImmutableHashSetValue = global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(global::System.Linq.Enumerable.Select(source.ImmutableHashSetValue, x3 => ParseableInt(x3)));
-            target.ImmutableQueueValue = global::System.Collections.Immutable.ImmutableQueue.CreateRange(global::System.Linq.Enumerable.Select(source.ImmutableQueueValue, x4 => ParseableInt(x4)));
-            target.ImmutableStackValue = global::System.Collections.Immutable.ImmutableStack.CreateRange(global::System.Linq.Enumerable.Select(source.ImmutableStackValue, x5 => ParseableInt(x5)));
-            target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(global::System.Linq.Enumerable.Select(source.ImmutableSortedSetValue, x6 => ParseableInt(x6)));
+            target.StackValue = new global::System.Collections.Generic.Stack<int>(global::System.Linq.Enumerable.Select(source.StackValue, x1 => ParseableInt(x1)));
+            target.QueueValue = new global::System.Collections.Generic.Queue<int>(global::System.Linq.Enumerable.Select(source.QueueValue, x2 => ParseableInt(x2)));
+            target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(global::System.Linq.Enumerable.Select(source.ImmutableArrayValue, x3 => ParseableInt(x3)));
+            target.ImmutableListValue = global::System.Collections.Immutable.ImmutableList.ToImmutableList(global::System.Linq.Enumerable.Select(source.ImmutableListValue, x4 => ParseableInt(x4)));
+            target.ImmutableHashSetValue = global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(global::System.Linq.Enumerable.Select(source.ImmutableHashSetValue, x5 => ParseableInt(x5)));
+            target.ImmutableQueueValue = global::System.Collections.Immutable.ImmutableQueue.CreateRange(global::System.Linq.Enumerable.Select(source.ImmutableQueueValue, x6 => ParseableInt(x6)));
+            target.ImmutableStackValue = global::System.Collections.Immutable.ImmutableStack.CreateRange(global::System.Linq.Enumerable.Select(source.ImmutableStackValue, x7 => ParseableInt(x7)));
+            target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(global::System.Linq.Enumerable.Select(source.ImmutableSortedSetValue, x8 => ParseableInt(x8)));
             target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)source.EnumValue;
             target.EnumName = MapToEnumDtoByName(source.EnumName);
             target.EnumRawValue = (byte)source.EnumRawValue;
@@ -307,28 +307,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto();
             target.IntValue = DirectInt(source.IntValue);
-            return target;
-        }
-
-        private static global::System.Collections.Generic.Stack<int> MapToStack(global::System.Collections.Generic.Stack<string> source)
-        {
-            var target = new global::System.Collections.Generic.Stack<int>();
-            foreach (var item in source)
-            {
-                target.Push(ParseableInt(item));
-            }
-
-            return target;
-        }
-
-        private static global::System.Collections.Generic.Queue<int> MapToQueue(global::System.Collections.Generic.Queue<string> source)
-        {
-            var target = new global::System.Collections.Generic.Queue<int>();
-            foreach (var item in source)
-            {
-                target.Enqueue(ParseableInt(item));
-            }
-
             return target;
         }
 
@@ -375,28 +353,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             for (var i = 0; i < source.Length; i++)
             {
                 target[i] = MapToTestObjectNested(source[i]);
-            }
-
-            return target;
-        }
-
-        private static global::System.Collections.Generic.Stack<string> MapToStack1(global::System.Collections.Generic.Stack<int> source)
-        {
-            var target = new global::System.Collections.Generic.Stack<string>();
-            foreach (var item in source)
-            {
-                target.Push(item.ToString());
-            }
-
-            return target;
-        }
-
-        private static global::System.Collections.Generic.Queue<string> MapToQueue1(global::System.Collections.Generic.Queue<int> source)
-        {
-            var target = new global::System.Collections.Generic.Queue<string>();
-            foreach (var item in source)
-            {
-                target.Enqueue(item.ToString());
             }
 
             return target;
