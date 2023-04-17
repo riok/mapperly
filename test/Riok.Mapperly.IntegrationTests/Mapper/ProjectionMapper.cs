@@ -18,5 +18,13 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapperIgnoreSource(nameof(TestObjectProjection.IgnoredStringValue))]
         [MapProperty(nameof(TestObjectProjection.RenamedStringValue), nameof(TestObjectDtoProjection.RenamedStringValue2))]
         private static partial TestObjectDtoProjection ProjectToDto(this TestObjectProjection testObject);
+
+        private static TestObjectDtoManuallyMappedProjection? MapManual(string str)
+        {
+            return new TestObjectDtoManuallyMappedProjection(100)
+            {
+                StringValue = str,
+            };
+        }
     }
 }

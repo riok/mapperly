@@ -13,6 +13,7 @@ namespace Riok.Mapperly.Descriptors;
 public class InlineExpressionMappingBuilderContext : MappingBuilderContext
 {
     private readonly MappingCollection _inlineExpressionMappings;
+    private readonly MappingBuilderContext _parentContext;
 
     public InlineExpressionMappingBuilderContext(MappingBuilderContext ctx, ITypeSymbol sourceType, ITypeSymbol targetType)
         : this(ctx, (ctx.FindMapping(sourceType, targetType) as IUserMapping)?.Method, sourceType, targetType)
@@ -26,6 +27,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         ITypeSymbol target)
         : base(ctx, userSymbol, source, target)
     {
+        _parentContext = ctx;
         _inlineExpressionMappings = new MappingCollection();
     }
 
@@ -36,6 +38,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         ITypeSymbol target)
         : base(ctx, userSymbol, source, target)
     {
+        _parentContext = ctx;
         _inlineExpressionMappings = ctx._inlineExpressionMappings;
     }
 
@@ -53,12 +56,28 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     /// <summary>
     /// Tries to find an existing mapping for the provided types.
     /// The nullable annotation of reference types is ignored and always set to non-nullable.
+    /// Only inline expression mappings and user implemented mappings are considered.
     /// </summary>
     /// <param name="sourceType">The source type.</param>
     /// <param name="targetType">The target type.</param>
     /// <returns>The <see cref="ITypeMapping"/> if a mapping was found or <c>null</c> if none was found.</returns>
     public override ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        => _inlineExpressionMappings.Find(sourceType, targetType);
+    {
+        if (_inlineExpressionMappings.Find(sourceType, targetType) is { } mapping)
+            return mapping;
+
+        // user implemented mappings are also taken into account
+        // this works as long as the user implemented methods
+        // follow the expression tree limitations:
+        // https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/expression-trees/#limitations
+        if (_parentContext.FindMapping(sourceType, targetType) is UserImplementedMethodMapping userMapping)
+        {
+            _inlineExpressionMappings.Add(userMapping);
+            return userMapping;
+        }
+
+        return null;
+    }
 
     /// <summary>
     /// Existing target instance mappings are not supported.

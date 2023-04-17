@@ -51,7 +51,7 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         public string EnumStringValue { get; set; } = string.Empty;
 
-        public TestEnumDtoByValue EnumReverseStringValue { get; set; }
+        public TestEnumDtoByName EnumReverseStringValue { get; set; }
 
         public InheritanceSubObjectDto? SubObject { get; set; }
 
@@ -61,5 +61,7 @@ namespace Riok.Mapperly.IntegrationTests.Dto
         public DateOnly DateTimeValueTargetDateOnly { get; set; }
 
         public TimeOnly DateTimeValueTargetTimeOnly { get; set; }
+
+        public TestObjectDtoManuallyMappedProjection? ManuallyMapped { get; set; }
     }
 }

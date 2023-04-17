@@ -45,10 +45,10 @@ such mappings have several limitations:
 - Object factories are not applied
 - Constructors with unmatched optional parameters are ignored
 - `ThrowOnPropertyMappingNullMismatch` is ignored
-- User implemented mappings are not supported
 - Enum mappings do not support the `ByName` strategy
 - Reference handling is not supported
 - Nullable reference types are disabled
+- User implemented mapping methods need to follow expression tree [limitations](https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/expression-trees/#limitations).
 
 :::
 

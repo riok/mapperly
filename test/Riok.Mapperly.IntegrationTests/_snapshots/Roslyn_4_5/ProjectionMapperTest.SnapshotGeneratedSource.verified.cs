@@ -6,7 +6,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection> ProjectToDto(this global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjection> q)
         {
 #nullable disable
-            return System.Linq.Queryable.Select(q, x => new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection(x.CtorValue) { IntValue = x.IntValue, IntInitOnlyValue = x.IntInitOnlyValue, RequiredValue = x.RequiredValue, StringValue = x.StringValue, RenamedStringValue2 = x.RenamedStringValue, FlatteningIdValue = x.Flattening.IdValue, NullableFlatteningIdValue = x.NullableFlattening != null ? x.NullableFlattening.IdValue : default, NestedNullableIntValue = x.NestedNullable != null ? x.NestedNullable.IntValue : default, NestedNullable = x.NestedNullable != null ? new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto() { IntValue = x.NestedNullable.IntValue } : default, NestedNullableTargetNotNullable = x.NestedNullableTargetNotNullable != null ? new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto() { IntValue = x.NestedNullableTargetNotNullable.IntValue } : new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto(), StringNullableTargetNotNullable = x.StringNullableTargetNotNullable ?? "", SourceTargetSameObjectType = x.SourceTargetSameObjectType, NullableReadOnlyObjectCollection = x.NullableReadOnlyObjectCollection != null ? global::System.Linq.Enumerable.ToArray(global::System.Linq.Enumerable.Select(x.NullableReadOnlyObjectCollection, x1 => new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto() { IntValue = x1.IntValue })) : default, EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)x.EnumValue, EnumName = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)x.EnumName, EnumRawValue = (byte)x.EnumRawValue, EnumStringValue = (string)x.EnumStringValue.ToString(), EnumReverseStringValue = System.Enum.Parse<global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue>(x.EnumReverseStringValue, false), SubObject = x.SubObject != null ? new global::Riok.Mapperly.IntegrationTests.Dto.InheritanceSubObjectDto() { SubIntValue = x.SubObject.SubIntValue, BaseIntValue = x.SubObject.BaseIntValue } : default, DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(x.DateTimeValueTargetDateOnly), DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(x.DateTimeValueTargetTimeOnly) });
+            return System.Linq.Queryable.Select(q, x => new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection(x.CtorValue) { IntValue = x.IntValue, IntInitOnlyValue = x.IntInitOnlyValue, RequiredValue = x.RequiredValue, StringValue = x.StringValue, RenamedStringValue2 = x.RenamedStringValue, FlatteningIdValue = x.Flattening.IdValue, NullableFlatteningIdValue = x.NullableFlattening != null ? x.NullableFlattening.IdValue : default, NestedNullableIntValue = x.NestedNullable != null ? x.NestedNullable.IntValue : default, NestedNullable = x.NestedNullable != null ? new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto() { IntValue = x.NestedNullable.IntValue } : default, NestedNullableTargetNotNullable = x.NestedNullableTargetNotNullable != null ? new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto() { IntValue = x.NestedNullableTargetNotNullable.IntValue } : new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto(), StringNullableTargetNotNullable = x.StringNullableTargetNotNullable ?? "", SourceTargetSameObjectType = x.SourceTargetSameObjectType, NullableReadOnlyObjectCollection = x.NullableReadOnlyObjectCollection != null ? global::System.Linq.Enumerable.ToArray(global::System.Linq.Enumerable.Select(x.NullableReadOnlyObjectCollection, x1 => new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto() { IntValue = x1.IntValue })) : default, EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)x.EnumValue, EnumName = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)x.EnumName, EnumRawValue = (byte)x.EnumRawValue, EnumStringValue = (string)x.EnumStringValue.ToString(), EnumReverseStringValue = System.Enum.Parse<global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName>(x.EnumReverseStringValue, false), SubObject = x.SubObject != null ? new global::Riok.Mapperly.IntegrationTests.Dto.InheritanceSubObjectDto() { SubIntValue = x.SubObject.SubIntValue, BaseIntValue = x.SubObject.BaseIntValue } : default, DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(x.DateTimeValueTargetDateOnly), DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(x.DateTimeValueTargetTimeOnly), ManuallyMapped = MapManual(x.ManuallyMapped) });
 #nullable enable
         }
 
@@ -53,9 +53,10 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.EnumName = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)testObject.EnumName;
             target.EnumRawValue = (byte)testObject.EnumRawValue;
             target.EnumStringValue = MapToString(testObject.EnumStringValue);
-            target.EnumReverseStringValue = MapToTestEnumDtoByValue(testObject.EnumReverseStringValue);
+            target.EnumReverseStringValue = MapToTestEnumDtoByName(testObject.EnumReverseStringValue);
             target.DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(testObject.DateTimeValueTargetDateOnly);
             target.DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(testObject.DateTimeValueTargetTimeOnly);
+            target.ManuallyMapped = MapManual(testObject.ManuallyMapped);
             return target;
         }
 
@@ -77,14 +78,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             };
         }
 
-        private static global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue MapToTestEnumDtoByValue(string source)
+        private static global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName MapToTestEnumDtoByName(string source)
         {
             return source switch
             {
-                nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue1) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue1,
-                nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue2) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue2,
-                nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue3) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue3,
-                _ => System.Enum.Parse<global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue>(source, false),
+                nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value10) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value10,
+                nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value20) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value20,
+                nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value30) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value30,
+                _ => System.Enum.Parse<global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName>(source, false),
             };
         }
 
