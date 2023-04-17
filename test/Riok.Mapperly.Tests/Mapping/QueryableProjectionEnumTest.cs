@@ -38,6 +38,23 @@ public class QueryableProjectionEnumTest
     }
 
     [Fact]
+    public void EnumToAnotherEnumByNameMissingValuesShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.Default with { EnumMappingStrategy = EnumMappingStrategy.ByName },
+            "class A { public C Value { get; set; } }",
+            "class B { public D Value { get; set; } }",
+            "enum C { Value1 }",
+            "enum D { Value1, Value2 }");
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.NotAllEnumValuesMapped, "Not all enum values in the target enum are mapped from C to D"));
+    }
+
+    [Fact]
     public Task EnumToString()
     {
         var source = TestSourceBuilder.Mapping(

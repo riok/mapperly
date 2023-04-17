@@ -83,6 +83,18 @@ public static class EnumMappingBuilder
                 ctx.Target);
         }
 
+        var targetMembers = ctx.Target
+            .GetMembers()
+            .OfType<IFieldSymbol>();
+
+        if (enumMemberMappings.Count < targetMembers.Count())
+        {
+            ctx.ReportDiagnostic(
+                DiagnosticDescriptors.NotAllEnumValuesMapped,
+                ctx.Source,
+                ctx.Target);
+        }
+
         return new EnumNameMapping(
             ctx.Source,
             ctx.Target,
