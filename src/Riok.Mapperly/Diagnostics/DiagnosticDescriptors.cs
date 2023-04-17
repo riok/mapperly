@@ -261,4 +261,13 @@ internal static class DiagnosticDescriptors
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true);
+
+    public static readonly DiagnosticDescriptor NotAllEnumValuesMapped = new DiagnosticDescriptor(
+        "RMG033",
+        "Not all enum values in the target enum are mapped",
+        "Not all enum values in the target enum are mapped from {0} to {1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        true);
+
 }

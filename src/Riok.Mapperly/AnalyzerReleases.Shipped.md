@@ -77,4 +77,5 @@ Rule ID | Category | Severity | Notes
 RMG029  | Mapper   | Error    | Queryable projection mappings do not support reference handling
 RMG030  | Mapper   | Error    | Reference loop detected while mapping to an init only property
 RMG031  | Mapper   | Warning  | Reference loop detected while mapping to a constructor property
-RMG032 | Mapper | Warning | The enum mapping strategy ByName cannot be used in projection mappings
+RMG032  | Mapper   | Warning  | The enum mapping strategy ByName cannot be used in projection mappings
+RMG033  | Mapper   | Warning  | Not all enum values in the target Enum are mapped
