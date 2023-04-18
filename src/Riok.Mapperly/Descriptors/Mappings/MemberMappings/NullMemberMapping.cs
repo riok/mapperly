@@ -2,26 +2,27 @@ using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
-namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
+namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 /// <summary>
-/// Represents a null safe <see cref="IPropertyMapping"/>.
+/// Represents a null safe <see cref="IMemberMapping"/>.
 /// (eg. <c>source?.A?.B ?? null-substitute</c> or <c>source?.A?.B != null ? MapToD(source.A.B) : null-substitute</c>)
 /// </summary>
-[DebuggerDisplay("NullPropertyMapping({SourcePath}: {_delegateMapping})")]
-public class NullPropertyMapping : IPropertyMapping
+[DebuggerDisplay("NullMemberMapping({SourcePath}: {_delegateMapping})")]
+public class NullMemberMapping : IMemberMapping
 {
     private readonly ITypeMapping _delegateMapping;
     private readonly ITypeSymbol _targetType;
     private readonly NullFallbackValue _nullFallback;
     private readonly bool _useNullConditionalAccess;
 
-    public NullPropertyMapping(
+    public NullMemberMapping(
         ITypeMapping delegateMapping,
-        PropertyPath sourcePath,
+        MemberPath sourcePath,
         ITypeSymbol targetType,
         NullFallbackValue nullFallback,
         bool useNullConditionalAccess)
@@ -33,7 +34,7 @@ public class NullPropertyMapping : IPropertyMapping
         _targetType = targetType;
     }
 
-    public PropertyPath SourcePath { get; }
+    public MemberPath SourcePath { get; }
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
@@ -66,15 +67,15 @@ public class NullPropertyMapping : IPropertyMapping
         var notNullCondition = _useNullConditionalAccess
             ? IsNotNull(SourcePath.BuildAccess(ctx.Source, nullConditional: true, skipTrailingNonNullable: true))
             : SourcePath.BuildNonNullConditionWithoutConditionalAccess(ctx.Source)!;
-        var sourcePropertyAccess = SourcePath.BuildAccess(ctx.Source, true);
-        ctx = ctx.WithSource(sourcePropertyAccess);
+        var sourceMemberAccess = SourcePath.BuildAccess(ctx.Source, true);
+        ctx = ctx.WithSource(sourceMemberAccess);
         return ConditionalExpression(
             notNullCondition,
             _delegateMapping.Build(ctx),
-            NullSubstitute(_delegateMapping.TargetType, sourcePropertyAccess, _nullFallback));
+            NullSubstitute(_delegateMapping.TargetType, sourceMemberAccess, _nullFallback));
     }
 
-    protected bool Equals(NullPropertyMapping other)
+    protected bool Equals(NullMemberMapping other)
         => _delegateMapping.Equals(other._delegateMapping)
             && _nullFallback == other._nullFallback
             && SourcePath.Equals(other.SourcePath);
@@ -90,7 +91,7 @@ public class NullPropertyMapping : IPropertyMapping
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((NullPropertyMapping)obj);
+        return Equals((NullMemberMapping)obj);
     }
 
     public override int GetHashCode()
@@ -104,9 +105,9 @@ public class NullPropertyMapping : IPropertyMapping
         }
     }
 
-    public static bool operator ==(NullPropertyMapping? left, NullPropertyMapping? right)
+    public static bool operator ==(NullMemberMapping? left, NullMemberMapping? right)
         => Equals(left, right);
 
-    public static bool operator !=(NullPropertyMapping? left, NullPropertyMapping? right)
+    public static bool operator !=(NullMemberMapping? left, NullMemberMapping? right)
         => !Equals(left, right);
 }

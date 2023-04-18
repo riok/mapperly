@@ -2,26 +2,26 @@
   Diagnostics: [
     {
       Id: RMG005,
-      Title: Mapping target property not found,
+      Title: Mapping target member not found,
       Severity: Error,
       WarningLevel: 0,
       Location: : (11,4)-(11,71),
       Description: ,
       HelpLink: ,
-      MessageFormat: Specified property {0} on mapping target type {1} was not found,
-      Message: Specified property Value.IdXXX on mapping target type B was not found,
+      MessageFormat: Specified member {0} on mapping target type {1} was not found,
+      Message: Specified member Value.IdXXX on mapping target type B was not found,
       Category: Mapper
     },
     {
       Id: RMG020,
-      Title: Source property is not mapped to any target property,
+      Title: Source member is not mapped to any target member,
       Severity: Info,
       WarningLevel: 1,
       Location: : (11,4)-(11,71),
       Description: ,
       HelpLink: ,
-      MessageFormat: The property {0} on the mapping source type {1} is not mapped to any property on the mapping target type {2},
-      Message: The property MyValueId on the mapping source type A is not mapped to any property on the mapping target type B,
+      MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
+      Message: The member MyValueId on the mapping source type A is not mapped to any member on the mapping target type B,
       Category: Mapper
     }
   ]

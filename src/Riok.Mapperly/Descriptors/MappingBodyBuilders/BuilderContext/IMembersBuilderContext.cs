@@ -1,14 +1,14 @@
-using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
 /// <summary>
-/// Context to build property mappings.
+/// Context to build member mappings.
 /// </summary>
 /// <typeparam name="T">The type of the mapping.</typeparam>
-public interface IPropertiesBuilderContext<out T>
+public interface IMembersBuilderContext<out T>
     where T : IMapping
 {
     T Mapping { get; }
@@ -17,9 +17,9 @@ public interface IPropertiesBuilderContext<out T>
 
     MappingBuilderContext BuilderContext { get; }
 
-    IReadOnlyCollection<string> IgnoredSourcePropertyNames { get; }
+    IReadOnlyCollection<string> IgnoredSourceMemberNames { get; }
 
-    Dictionary<string, IPropertySymbol> TargetProperties { get; }
+    Dictionary<string, IMappableMember> TargetMembers { get; }
 
-    Dictionary<string, List<MapPropertyAttribute>> PropertyConfigsByRootTargetName { get; }
+    Dictionary<string, List<MapPropertyAttribute>> MemberConfigsByRootTargetName { get; }
 }

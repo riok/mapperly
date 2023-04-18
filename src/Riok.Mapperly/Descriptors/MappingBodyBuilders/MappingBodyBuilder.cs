@@ -1,6 +1,6 @@
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
-using Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
+using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
@@ -22,14 +22,14 @@ public class MappingBodyBuilder
         {
             switch (typeMapping)
             {
-                case NewInstanceObjectPropertyMethodMapping mapping:
-                    NewInstanceObjectPropertyMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                case NewInstanceObjectMemberMethodMapping mapping:
+                    NewInstanceObjectMemberMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;
-                case NewInstanceObjectPropertyMapping mapping:
-                    NewInstanceObjectPropertyMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                case NewInstanceObjectMemberMapping mapping:
+                    NewInstanceObjectMemberMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;
-                case IPropertyAssignmentTypeMapping mapping:
-                    ObjectPropertyMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                case IMemberAssignmentTypeMapping mapping:
+                    ObjectMemberMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;
                 case UserDefinedNewInstanceMethodMapping mapping:
                     UserMethodMappingBodyBuilder.BuildMappingBody(ctx, mapping);

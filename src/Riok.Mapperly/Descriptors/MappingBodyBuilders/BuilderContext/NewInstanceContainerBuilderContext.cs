@@ -1,33 +1,33 @@
 using Riok.Mapperly.Descriptors.Mappings;
-using Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
+using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
 /// <summary>
 /// An implementation of an <see cref="INewInstanceBuilderContext{T}"/>
-/// which supports containers (<seealso cref="PropertiesContainerBuilderContext{T}"/>).
+/// which supports containers (<seealso cref="MembersContainerBuilderContext{T}"/>).
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public class NewInstanceContainerBuilderContext<T> :
-    PropertiesContainerBuilderContext<T>,
+    MembersContainerBuilderContext<T>,
     INewInstanceBuilderContext<T>
-    where T : INewInstanceObjectPropertyMapping, IPropertyAssignmentTypeMapping
+    where T : INewInstanceObjectMemberMapping, IMemberAssignmentTypeMapping
 {
     public NewInstanceContainerBuilderContext(MappingBuilderContext builderContext, T mapping)
         : base(builderContext, mapping)
     {
     }
 
-    public void AddInitPropertyMapping(PropertyAssignmentMapping mapping)
+    public void AddInitMemberMapping(MemberAssignmentMapping mapping)
     {
-        SetSourcePropertyMapped(mapping.SourcePath);
-        Mapping.AddInitPropertyMapping(mapping);
+        SetSourceMemberMapped(mapping.SourcePath);
+        Mapping.AddInitMemberMapping(mapping);
     }
 
     public void AddConstructorParameterMapping(ConstructorParameterMapping mapping)
     {
-        PropertyConfigsByRootTargetName.Remove(mapping.Parameter.Name);
-        SetSourcePropertyMapped(mapping.DelegateMapping.SourcePath);
+        MemberConfigsByRootTargetName.Remove(mapping.Parameter.Name);
+        SetSourceMemberMapped(mapping.DelegateMapping.SourcePath);
         Mapping.AddConstructorParameterMapping(mapping);
     }
 }

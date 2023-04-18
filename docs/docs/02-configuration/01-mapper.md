@@ -19,10 +19,10 @@ public partial class CarMapper
 }
 ```
 
-## Properties
+## Properties / fields
 
-On each mapping method declaration, property mappings can be customized.
-If a property on the target has a different name than on the source, the `MapPropertyAttribute` can be applied.
+On each mapping method declaration, property and field mappings can be customized.
+If a property or field on the target has a different name than on the source, the `MapPropertyAttribute` can be applied.
 
 ```csharp
 [Mapper]
@@ -35,9 +35,9 @@ public partial class CarMapper
 }
 ```
 
-### Ignore properties
+### Ignore properties / fields
 
-To ignore a property, the `MapperIgnoreTargetAttribute` or `MapperIgnoreSourceAttribute` can be used.
+To ignore a property or field, the `MapperIgnoreTargetAttribute` or `MapperIgnoreSourceAttribute` can be used.
 
 ```csharp
 [Mapper]
@@ -53,7 +53,10 @@ public partial class CarMapper
 
 ### Property name mapping strategy
 
-By default, property names are matched using a case sensitive strategy. If all properties differ only in casing, for example ModelName on the source and modelName on the target, the `[MapperAttribute]` can be used with the `PropertyNameMappingStrategy` option.
+By default, property and field names are matched using a case sensitive strategy.
+If all properties/fields differ only in casing, for example `ModelName` on the source
+and `modelName` on the target,
+the `MapperAttribute` can be used with the `PropertyNameMappingStrategy` option.
 
 ```csharp
 // highlight-start
@@ -78,12 +81,13 @@ public class CarDto
 ### Strict property mappings
 
 To enforce strict mappings
-(all source properties have to be mapped to a target property
-and all target properties have to be mapped from a source property,
-except for ignored properties)
+(all source members have to be mapped to a target member
+and all target members have to be mapped from a source member,
+except for ignored members)
 set the following two EditorConfig settings (see also [analyzer diagnostics](./13-analyzer-diagnostics.mdx)):
 
 ```editorconfig title=".editorconfig"
-dotnet_diagnostic.RMG012.severity = error # Unmapped target property
-dotnet_diagnostic.RMG020.severity = error # Unmapped source property
+[*.cs]
+dotnet_diagnostic.RMG012.severity = error # Unmapped target member
+dotnet_diagnostic.RMG020.severity = error # Unmapped source member
 ```

@@ -1,20 +1,21 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
-namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
+namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 /// <summary>
-/// A property initializer which initializes null properties to new objects.
+/// A member initializer which initializes null members to new objects.
 /// </summary>
-[DebuggerDisplay("PropertyNullInitializerMapping({_pathToInitialize} ??= new())")]
-public class PropertyNullAssignmentInitializerMapping : PropertyAssignmentMappingContainer
+[DebuggerDisplay("MemberNullAssignmentInitializerMapping({_pathToInitialize} ??= new())")]
+public class MemberNullAssignmentInitializerMapping : MemberAssignmentMappingContainer
 {
-    private readonly PropertyPath _pathToInitialize;
+    private readonly MemberPath _pathToInitialize;
 
-    public PropertyNullAssignmentInitializerMapping(PropertyPath pathToInitialize)
+    public MemberNullAssignmentInitializerMapping(MemberPath pathToInitialize)
     {
         _pathToInitialize = pathToInitialize;
     }
@@ -42,18 +43,18 @@ public class PropertyNullAssignmentInitializerMapping : PropertyAssignmentMappin
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((PropertyNullAssignmentInitializerMapping)obj);
+        return Equals((MemberNullAssignmentInitializerMapping)obj);
     }
 
     public override int GetHashCode()
         => _pathToInitialize.GetHashCode();
 
-    public static bool operator ==(PropertyNullAssignmentInitializerMapping? left, PropertyNullAssignmentInitializerMapping? right)
+    public static bool operator ==(MemberNullAssignmentInitializerMapping? left, MemberNullAssignmentInitializerMapping? right)
         => Equals(left, right);
 
-    public static bool operator !=(PropertyNullAssignmentInitializerMapping? left, PropertyNullAssignmentInitializerMapping? right)
+    public static bool operator !=(MemberNullAssignmentInitializerMapping? left, MemberNullAssignmentInitializerMapping? right)
         => !Equals(left, right);
 
-    protected bool Equals(PropertyNullAssignmentInitializerMapping other)
+    protected bool Equals(MemberNullAssignmentInitializerMapping other)
         => _pathToInitialize.Equals(other._pathToInitialize);
 }

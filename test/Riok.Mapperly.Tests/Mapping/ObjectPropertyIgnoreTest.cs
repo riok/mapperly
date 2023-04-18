@@ -33,8 +33,8 @@ public class ObjectPropertyIgnoreTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotMapped, "The property StringValue2 on the mapping source type A is not mapped to any property on the mapping target type B"))
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound, "The property StringValue on the mapping target type B was not found on the mapping source type A"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotMapped, "The member StringValue2 on the mapping source type A is not mapped to any member on the mapping target type B"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound, "The member StringValue on the mapping target type B was not found on the mapping source type A"))
             .HaveSingleMethodBody("target.IntValue = source.IntValue;");
     }
 
@@ -48,7 +48,7 @@ public class ObjectPropertyIgnoreTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotFound, "The property IntValue on the mapping target type B was not found on the mapping source type A"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound, "The member IntValue on the mapping target type B was not found on the mapping source type A"))
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
@@ -67,7 +67,7 @@ public class ObjectPropertyIgnoreTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotMapped, "The property IntValue on the mapping source type A is not mapped to any property on the mapping target type B"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotMapped, "The member IntValue on the mapping source type A is not mapped to any member on the mapping target type B"))
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
@@ -86,7 +86,7 @@ public class ObjectPropertyIgnoreTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.IgnoredTargetPropertyNotFound, "Ignored target property not_found on B was not found"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.IgnoredTargetMemberNotFound, "Ignored target member not_found on B was not found"))
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
@@ -104,7 +104,7 @@ public class ObjectPropertyIgnoreTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.IgnoredSourcePropertyNotFound, "Ignored source property not_found on A was not found"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.IgnoredSourceMemberNotFound, "Ignored source member not_found on A was not found"))
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
@@ -122,7 +122,7 @@ public class ObjectPropertyIgnoreTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.IgnoredTargetPropertyNotFound, "Ignored target property not_found on B was not found"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.IgnoredTargetMemberNotFound, "Ignored target member not_found on B was not found"))
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
@@ -140,7 +140,7 @@ public class ObjectPropertyIgnoreTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourcePropertyNotMapped, "The property IntValue on the mapping source type A is not mapped to any property on the mapping target type B"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotMapped, "The member IntValue on the mapping source type A is not mapped to any member on the mapping target type B"))
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();

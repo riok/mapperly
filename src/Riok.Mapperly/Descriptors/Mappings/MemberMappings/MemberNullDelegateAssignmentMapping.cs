@@ -1,22 +1,23 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
-namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
+namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 /// <summary>
-/// a property mapping container, which performs a null check before the mappings.
+/// a member mapping container, which performs a null check before the mappings.
 /// </summary>
-[DebuggerDisplay("PropertyNullDelegateMapping({_nullConditionalSourcePath} != null)")]
-public class PropertyNullDelegateAssignmentMapping : PropertyAssignmentMappingContainer
+[DebuggerDisplay("MemberNullDelegateAssignmentMapping({_nullConditionalSourcePath} != null)")]
+public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContainer
 {
-    private readonly PropertyPath _nullConditionalSourcePath;
+    private readonly MemberPath _nullConditionalSourcePath;
     private readonly bool _throwInsteadOfConditionalNullMapping;
 
-    public PropertyNullDelegateAssignmentMapping(
-        PropertyPath nullConditionalSourcePath,
-        IPropertyAssignmentMappingContainer parent,
+    public MemberNullDelegateAssignmentMapping(
+        MemberPath nullConditionalSourcePath,
+        IMemberAssignmentMappingContainer parent,
         bool throwInsteadOfConditionalNullMapping)
         : base(parent)
     {
@@ -55,7 +56,7 @@ public class PropertyNullDelegateAssignmentMapping : PropertyAssignmentMappingCo
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((PropertyNullDelegateAssignmentMapping)obj);
+        return Equals((MemberNullDelegateAssignmentMapping)obj);
     }
 
     public override int GetHashCode()
@@ -66,13 +67,13 @@ public class PropertyNullDelegateAssignmentMapping : PropertyAssignmentMappingCo
         }
     }
 
-    public static bool operator ==(PropertyNullDelegateAssignmentMapping? left, PropertyNullDelegateAssignmentMapping? right)
+    public static bool operator ==(MemberNullDelegateAssignmentMapping? left, MemberNullDelegateAssignmentMapping? right)
         => Equals(left, right);
 
-    public static bool operator !=(PropertyNullDelegateAssignmentMapping? left, PropertyNullDelegateAssignmentMapping? right)
+    public static bool operator !=(MemberNullDelegateAssignmentMapping? left, MemberNullDelegateAssignmentMapping? right)
         => !Equals(left, right);
 
-    protected bool Equals(PropertyNullDelegateAssignmentMapping other)
+    protected bool Equals(MemberNullDelegateAssignmentMapping other)
     {
         return _nullConditionalSourcePath.Equals(other._nullConditionalSourcePath)
             && _throwInsteadOfConditionalNullMapping == other._throwInsteadOfConditionalNullMapping;

@@ -166,7 +166,6 @@ public class NullableTest
     public Task ShouldUpgradeNullabilityInDisabledNullableContext()
     {
         var source = TestSourceBuilder.Mapping("A", "B", "class A {}", "class B {}");
-
         return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
     }
 

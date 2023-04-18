@@ -7,20 +7,20 @@ Rule ID | Category | Severity | Notes
 RMG001  | Mapper   | Error    | A mapping method has an unsupported signature.
 RMG002  | Mapper   | Error    | No accessible parameterless constructor found.
 RMG003  | Mapper   | Warning  | No overlapping enum members found.
-RMG004  | Mapper   | Warning  | Ignored target property not found.
-RMG005  | Mapper   | Error    | Mapping target property not found.
-RMG006  | Mapper   | Error    | Mapping source property not found.
-RMG007  | Mapper   | Error    | Could not map property.
+RMG004  | Mapper   | Warning  | Ignored target member not found.
+RMG005  | Mapper   | Error    | Mapping target member not found.
+RMG006  | Mapper   | Error    | Mapping source member not found.
+RMG007  | Mapper   | Error    | Could not map member.
 RMG008  | Mapper   | Error    | Could not create mapping.
-RMG009  | Mapper   | Info     | Cannot map to read only property.
-RMG010  | Mapper   | Info     | Cannot map from write only property.
-RMG011  | Mapper   | Info     | Cannot map to write only property path.
-RMG012  | Mapper   | Info     | Source property was not found for target property
+RMG009  | Mapper   | Info     | Cannot map to read only member.
+RMG010  | Mapper   | Info     | Cannot map from write only member.
+RMG011  | Mapper   | Info     | Cannot map to write only member path.
+RMG012  | Mapper   | Info     | Source member was not found for target member
 RMG013  | Mapper   | Error    | No accessible constructor with mappable arguments found
 RMG014  | Mapper   | Warning  | Cannot map to the configured constructor to be used by Mapperly
-RMG015  | Mapper   | Info     | Cannot map to init only property path
-RMG016  | Mapper   | Error    | Init only property cannot handle target paths
-RMG017  | Mapper   | Warning  | An init only property can have one configuration at max
+RMG015  | Mapper   | Info     | Cannot map to init only member path
+RMG016  | Mapper   | Error    | Init only member cannot handle target paths
+RMG017  | Mapper   | Warning  | An init only member can have one configuration at max
 
 ## Release 2.3
 
@@ -30,7 +30,7 @@ Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
 RMG018  | Mapper   | Error    | Partial static mapping method in an instance mapper
 RMG019  | Mapper   | Error    | Partial instance mapping method in a static mapper
-RMG020  | Mapper   | Info     | Source property is not mapped to any target property
+RMG020  | Mapper   | Info     | Source member is not mapped to any target member
 
 ## Release 2.4
 
@@ -38,7 +38,7 @@ RMG020  | Mapper   | Info     | Source property is not mapped to any target prop
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
-RMG021  | Mapper   | Warning  | Ignored source property not found
+RMG021  | Mapper   | Warning  | Ignored source member not found
 
 ## Release 2.5
 
@@ -54,7 +54,7 @@ RMG022  | Mapper   | Error    | Invalid object factory signature
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
-RMG023  | Mapper   | Error    | Mapping source property for a required target property not found
+RMG023  | Mapper   | Error    | Mapping source member for a required target member not found
 RMG024  | Mapper   | Error    | The reference handler parameter is not of the correct type
 RMG025  | Mapper   | Error    | To use reference handling it needs to be enabled on the mapper attribute
 
@@ -64,7 +64,7 @@ RMG025  | Mapper   | Error    | To use reference handling it needs to be enabled
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-RMG026  | Mapper   | Info     | Cannot map from indexed property
+RMG026  | Mapper   | Info     | Cannot map from indexed member
 RMG027  | Mapper   | Warning  | A constructor parameter can have one configuration at max
 RMG028  | Mapper   | Error    | Constructor parameter cannot handle target paths
 
@@ -75,8 +75,8 @@ RMG028  | Mapper   | Error    | Constructor parameter cannot handle target paths
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 RMG029  | Mapper   | Error    | Queryable projection mappings do not support reference handling
-RMG030  | Mapper   | Error    | Reference loop detected while mapping to an init only property
-RMG031  | Mapper   | Warning  | Reference loop detected while mapping to a constructor property
+RMG030  | Mapper   | Error    | Reference loop detected while mapping to an init only member
+RMG031  | Mapper   | Warning  | Reference loop detected while mapping to a constructor member
 RMG032  | Mapper   | Warning  | The enum mapping strategy ByName cannot be used in projection mappings
 RMG033  | Mapper   | Info     | Object mapped to another object without deep clone
 RMG034  | Mapper   | Warning  | Not all enum values in the target Enum are mapped
