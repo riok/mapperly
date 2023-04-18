@@ -34,7 +34,8 @@ public class LinqDicitonaryMapping : TypeMapping
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        var lambdaParamName = ctx.NameBuilder.New(LambdaParamName);
+        var scopedNameBuilder = ctx.NameBuilder.NewScope();
+        var lambdaParamName = scopedNameBuilder.New(LambdaParamName);
 
         // if key and value types do not change then use a simple call
         // ie: source.ToImmutableDictionary();

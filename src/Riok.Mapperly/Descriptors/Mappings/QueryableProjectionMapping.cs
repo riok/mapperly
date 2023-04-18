@@ -32,7 +32,9 @@ public class QueryableProjectionMapping : MethodMapping
         // #nullable disable
         // return System.Linq.Enumerable.Select(source, x => ...);
         // #nullable enable
-        var lambdaParamName = ctx.NameBuilder.New(SelectLambdaParameterName);
+        var scopedNameBuilder = ctx.NameBuilder.NewScope();
+        var lambdaParamName = scopedNameBuilder.New(SelectLambdaParameterName);
+
         var delegateMapping = _delegateMapping.Build(ctx.WithSource(IdentifierName(lambdaParamName)));
         var projectionLambda = SimpleLambdaExpression(Parameter(Identifier(lambdaParamName))).WithExpressionBody(delegateMapping);
         var select = StaticInvocation(QueryableReceiverName, SelectMethodName, ctx.Source, projectionLambda);
