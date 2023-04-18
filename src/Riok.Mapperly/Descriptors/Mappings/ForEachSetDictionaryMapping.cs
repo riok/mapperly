@@ -25,8 +25,9 @@ public class ForEachSetDictionaryMapping : ExistingTargetMappingMethodWrapper
         ITypeMapping valueMapping,
         bool sourceHasCount,
         ITypeSymbol? typeToInstantiate = null,
-        ObjectFactory? objectFactory = null)
-        : base(new ForEachSetDictionaryExistingTargetMapping(sourceType, targetType, keyMapping, valueMapping))
+        ObjectFactory? objectFactory = null,
+        INamedTypeSymbol? explicitCast = null)
+        : base(new ForEachSetDictionaryExistingTargetMapping(sourceType, targetType, keyMapping, valueMapping, explicitCast))
     {
         _sourceHasCount = sourceHasCount;
         _objectFactory = objectFactory;

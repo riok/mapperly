@@ -224,6 +224,166 @@ public class DictionaryTest
     }
 
     [Fact]
+    public void IDictionaryToExplicitDictionaryShouldCast()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "IDictionary<string, string>",
+            "A",
+            """
+            public class A : IDictionary<string, string>
+            {
+                string IDictionary<string, string>.this[string key]
+                {
+                    get => _dictionaryImplementation[key];
+                    set => _dictionaryImplementation[key] = value;
+                }
+            }
+            """);
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                var targetDict = (global::System.Collections.Generic.IDictionary<string, string>)target;
+                foreach (var item in source)
+                {
+                    targetDict[item.Key] = item.Value;
+                }
+
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void DictionaryToImplicitDictionaryShouldNotCast()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "Dictionary<string, string>",
+            "A",
+            """
+            public class A : IDictionary<string, string>
+            {
+                public string this[string key]
+                {
+                    get => _dictionaryImplementation[key];
+                    set => _dictionaryImplementation[key] = value;
+                }
+            }
+            """);
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                foreach (var item in source)
+                {
+                    target[item.Key] = item.Value;
+                }
+
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void DictionaryToExistingExplicitDictionaryShouldCast()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public Dictionary<string, string> Values { get; } }",
+            "class B { public C Values { get; } }",
+            """
+            public class C : IDictionary<string, string>
+            {
+                string IDictionary<string, string>.this[string key]
+                {
+                    get => _dictionaryImplementation[key];
+                    set => _dictionaryImplementation[key] = value;
+                }
+            }
+            """);
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                var targetDict = (global::System.Collections.Generic.IDictionary<string, string>)target.Values;
+                foreach (var item in source.Values)
+                {
+                    targetDict[item.Key] = item.Value;
+                }
+
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void DictionaryToExplicitDictionaryWithObjectFactoryShouldCast()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[ObjectFactory] A CreateA() => new();"
+            + "partial A Map(Dictionary<string, string> source);",
+            """
+            public class A : IDictionary<string, string>
+            {
+                string IDictionary<string, string>.this[string key]
+                {
+                    get => _dictionaryImplementation[key];
+                    set => _dictionaryImplementation[key] = value;
+                }
+            }
+            """);
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = CreateA();
+                var targetDict = (global::System.Collections.Generic.IDictionary<string, string>)target;
+                foreach (var item in source)
+                {
+                    targetDict[item.Key] = item.Value;
+                }
+
+                return target;
+                """);
+    }
+
+    [Fact]
+    public void DictionaryToImplicitDictionaryWithObjectFactoryShouldNotCast()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[ObjectFactory] A CreateA() => new();"
+            + "partial A Map(Dictionary<string, string> source);",
+            """
+            public class A : IDictionary<string, string>
+            {
+                public string this[string key]
+                {
+                    get => _dictionaryImplementation[key];
+                    set => _dictionaryImplementation[key] = value;
+                }
+            }
+            """);
+
+        TestHelper.GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = CreateA();
+                foreach (var item in source)
+                {
+                    target[item.Key] = item.Value;
+                }
+
+                return target;
+                """);
+    }
+
+    [Fact]
     public Task DictionaryToCustomDictionaryWithPrivateCtorShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(

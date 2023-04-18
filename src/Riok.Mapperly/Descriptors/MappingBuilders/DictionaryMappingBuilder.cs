@@ -11,6 +11,7 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 public static class DictionaryMappingBuilder
 {
     private const string CountPropertyName = nameof(IDictionary<object, object>.Count);
+    private const string SetterIndexerPropertyName = "set_Item";
 
     private const string ToImmutableDictionaryMethodName = nameof(ImmutableDictionary.ToImmutableDictionary);
     private const string ToImmutableSortedDictionaryMethodName = nameof(ImmutableSortedDictionary.ToImmutableSortedDictionary);
@@ -64,7 +65,8 @@ public static class DictionaryMappingBuilder
             keyMapping,
             valueMapping,
             false,
-            objectFactory: objectFactory);
+            objectFactory: objectFactory,
+            explicitCast: GetExplicitIndexer(ctx));
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
@@ -87,7 +89,8 @@ public static class DictionaryMappingBuilder
             ctx.Source,
             ctx.Target,
             keyMapping,
-            valueMapping);
+            valueMapping,
+            explicitCast: GetExplicitIndexer(ctx));
     }
 
     private static (ITypeMapping, ITypeMapping)? BuildKeyValueMapping(MappingBuilderContext ctx)
@@ -148,6 +151,14 @@ public static class DictionaryMappingBuilder
         return (enumeratedType.TypeArguments[0], enumeratedType.TypeArguments[1]);
     }
 
+    private static INamedTypeSymbol? GetExplicitIndexer(MappingBuilderContext ctx)
+    {
+        if (ctx.Target.ImplementsGeneric(ctx.Types.IDictionaryT, SetterIndexerPropertyName, out var typedInter, out var isExplicit) && !isExplicit)
+            return null;
+
+        return typedInter;
+    }
+
     private static LinqDicitonaryMapping? ResolveImmutableCollectMethod(MappingBuilderContext ctx, ITypeMapping keyMapping, ITypeMapping valueMapping)
     {
         if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableSortedDictionaryT))
@@ -159,4 +170,5 @@ public static class DictionaryMappingBuilder
 
         return null;
     }
+
 }
