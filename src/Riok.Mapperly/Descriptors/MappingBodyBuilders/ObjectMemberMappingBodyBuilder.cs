@@ -41,22 +41,25 @@ public static class ObjectMemberMappingBodyBuilder
                 continue;
             }
 
-            if (!MemberPath.TryFind(
+            if (MemberPath.TryFind(
                 ctx.Mapping.SourceType,
                 MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
                 ctx.IgnoredSourceMemberNames,
                 memberNameComparer,
                 out var sourceMemberPath))
             {
+                BuildMemberAssignmentMapping(ctx, sourceMemberPath, new MemberPath(new[] { targetMember }));
+                continue;
+            }
+
+            if (targetMember.CanSet)
+            {
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.SourceMemberNotFound,
                     targetMember.Name,
                     ctx.Mapping.TargetType,
                     ctx.Mapping.SourceType);
-                continue;
             }
-
-            BuildMemberAssignmentMapping(ctx, sourceMemberPath, new MemberPath(new[] { targetMember }));
         }
 
         ctx.AddDiagnostics();

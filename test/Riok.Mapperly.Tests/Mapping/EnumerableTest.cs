@@ -236,7 +236,7 @@ public class EnumerableTest
     }
 
     [Fact]
-    public void ArrayToArrayOfReadonlyStruct()
+    public void ArrayToArrayOfReadOnlyStruct()
     {
         var source = TestSourceBuilder.Mapping(
             "A[]",
@@ -248,7 +248,7 @@ public class EnumerableTest
     }
 
     [Fact]
-    public void ArrayToArrayOfReadonlyStructDeepCloning()
+    public void ArrayToArrayOfReadOnlyStructDeepCloning()
     {
         var source = TestSourceBuilder.Mapping(
             "A[]",
@@ -877,7 +877,7 @@ public class EnumerableTest
     }
 
     [Fact]
-    public void EnumerableToReadonlyImmutableListShouldDiagnostic()
+    public void EnumerableToReadOnlyImmutableListShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -887,11 +887,11 @@ public class EnumerableTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound));
+            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
     }
 
     [Fact]
-    public void EnumerableToReadonlyImmutableList()
+    public void EnumerableToReadOnlyImmutableArrayShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -901,37 +901,25 @@ public class EnumerableTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound));
+            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
     }
 
     [Fact]
-    public void EnumerableToReadonlyImmutableArray()
+    public void EnumerableToReadOnlyImmutableHashSetShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
             "B",
-            "class A { public IEnumerable<int> Value { get; } }",
-            "class B { public System.Collections.Immutable.ImmutableArray<int> Value { get; } }");
-
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
-            .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound));
-    }
-
-    [Fact]
-    public void EnumerableToReadonlyImmutableHashSet()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "B",
-            "class A { public IEnumerable<int? Value { get; } }",
+            "class A { public IEnumerable<int?> Value { get; } }",
             "class B { public System.Collections.Immutable.ImmutableHashSet<int> Value { get; } }");
 
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics).Should().HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound));
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
     }
 
     [Fact]
-    public void EnumerableToReadonlyImmutableQueue()
+    public void EnumerableToReadOnlyImmutableQueueShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -941,11 +929,11 @@ public class EnumerableTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound));
+            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
     }
 
     [Fact]
-    public void EnumerableToReadonlyImmutableStack()
+    public void EnumerableToReadOnlyImmutableStackShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -955,11 +943,11 @@ public class EnumerableTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound));
+            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
     }
 
     [Fact]
-    public void EnumerableToReadonlyImmutableSortedSet()
+    public void EnumerableToReadOnlyImmutableSortedSetShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -969,7 +957,7 @@ public class EnumerableTest
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourceMemberNotFound));
+            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
     }
 
     [Fact]
