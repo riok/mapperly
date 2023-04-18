@@ -119,11 +119,11 @@ public static class EnumerableMappingBuilder
     {
         var collectMethod = collectMethodName == null
             ? null
-            : ResolveStaticMethod(ctx.Types.Enumerable, collectMethodName);
+            : ctx.Types.Enumerable.GetStaticGenericMethod(collectMethodName);
 
         var selectMethod = elementMapping.IsSynthetic
             ? null
-            : ResolveStaticMethod(ctx.Types.Enumerable, SelectMethodName);
+            : ctx.Types.Enumerable.GetStaticGenericMethod(SelectMethodName);
 
         return new LinqEnumerableMapping(ctx.Source, ctx.Target, elementMapping, selectMethod, collectMethod);
     }
@@ -145,7 +145,7 @@ public static class EnumerableMappingBuilder
     {
         var selectMethod = elementMapping.IsSynthetic
             ? null
-            : ResolveStaticMethod(ctx.Types.Enumerable, SelectMethodName);
+            : ctx.Types.Enumerable.GetStaticGenericMethod(SelectMethodName);
 
         return new LinqConstructorMapping(ctx.Source, ctx.Target, elementMapping, selectMethod);
     }
@@ -210,7 +210,7 @@ public static class EnumerableMappingBuilder
 
         var selectMethod = elementMapping.IsSynthetic
             ? null
-            : ResolveStaticMethod(ctx.Types.Enumerable, SelectMethodName);
+            : ctx.Types.Enumerable.GetStaticGenericMethod(SelectMethodName);
 
         return new LinqEnumerableMapping(ctx.Source, ctx.Target, elementMapping, selectMethod, collectMethod);
     }
@@ -218,31 +218,24 @@ public static class EnumerableMappingBuilder
     private static IMethodSymbol? ResolveImmutableCollectMethod(MappingBuilderContext ctx)
     {
         if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableArrayT))
-            return ResolveStaticMethod(ctx.Types.ImmutableArray, ToImmutableArrayMethodName);
+            return ctx.Types.ImmutableArray.GetStaticGenericMethod(ToImmutableArrayMethodName);
 
         if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableListT))
-            return ResolveStaticMethod(ctx.Types.ImmutableList, ToImmutableListMethodName);
+            return ctx.Types.ImmutableList.GetStaticGenericMethod(ToImmutableListMethodName);
 
         if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableHashSetT))
-            return ResolveStaticMethod(ctx.Types.ImmutableHashSet, ToImmutableHashSetMethodName);
+            return ctx.Types.ImmutableHashSet.GetStaticGenericMethod(ToImmutableHashSetMethodName);
 
         if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableQueueT))
-            return ResolveStaticMethod(ctx.Types.ImmutableQueue, CreateRangeQueueMethodName);
+            return ctx.Types.ImmutableQueue.GetStaticGenericMethod(CreateRangeQueueMethodName);
 
         if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableStackT))
-            return ResolveStaticMethod(ctx.Types.ImmutableStack, CreateRangeStackMethodName);
+            return ctx.Types.ImmutableStack.GetStaticGenericMethod(CreateRangeStackMethodName);
 
         if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableSortedSetT))
-            return ResolveStaticMethod(ctx.Types.ImmutableSortedSet, ToImmutableSortedSetMethodName);
+            return ctx.Types.ImmutableSortedSet.GetStaticGenericMethod(ToImmutableSortedSetMethodName);
 
         return null;
-    }
-
-    private static IMethodSymbol? ResolveStaticMethod(INamedTypeSymbol namedType, string methodName)
-    {
-        return namedType.GetMembers(methodName)
-            .OfType<IMethodSymbol>()
-            .FirstOrDefault(m => m.IsStatic && m.IsGenericMethod);
     }
 
     private static ITypeSymbol? GetEnumeratedType(MappingBuilderContext ctx, ITypeSymbol type)

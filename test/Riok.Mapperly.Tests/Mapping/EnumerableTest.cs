@@ -897,7 +897,7 @@ public class EnumerableTest
             "A",
             "B",
             "class A { public IEnumerable<int> Value { get; } }",
-            "class B { public System.Collections.Immutable.ImmutableList<int> Value { get; } }");
+            "class B { public System.Collections.Immutable.ImmutableArray<int> Value { get; } }");
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
@@ -910,7 +910,7 @@ public class EnumerableTest
         var source = TestSourceBuilder.Mapping(
             "A",
             "B",
-            "class A { public IEnumerable<int?> Value { get; } }",
+            "class A { public IEnumerable<int> Value { get; } }",
             "class B { public System.Collections.Immutable.ImmutableHashSet<int> Value { get; } }");
 
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
