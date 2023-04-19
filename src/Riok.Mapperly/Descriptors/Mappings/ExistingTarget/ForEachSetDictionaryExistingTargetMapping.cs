@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -19,19 +20,22 @@ public class ForEachSetDictionaryExistingTargetMapping : ExistingTargetMapping
     private readonly ITypeMapping _keyMapping;
     private readonly ITypeMapping _valueMapping;
     private readonly INamedTypeSymbol? _explicitCast;
+    private readonly EnsureCapacity? _ensureCapacity;
 
     public ForEachSetDictionaryExistingTargetMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         ITypeMapping keyMapping,
         ITypeMapping valueMapping,
-        INamedTypeSymbol? explicitCast
+        INamedTypeSymbol? explicitCast,
+        EnsureCapacity? ensureCapacity
     )
         : base(sourceType, targetType)
     {
         _keyMapping = keyMapping;
         _valueMapping = valueMapping;
         _explicitCast = explicitCast;
+        _ensureCapacity = ensureCapacity;
     }
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
@@ -45,6 +49,11 @@ public class ForEachSetDictionaryExistingTargetMapping : ExistingTargetMapping
             target = IdentifierName(castedVariable);
 
             yield return LocalDeclarationStatement(DeclareVariable(castedVariable, cast));
+        }
+
+        if (_ensureCapacity != null)
+        {
+            yield return _ensureCapacity.Build(ctx, target);
         }
 
         var loopItemVariableName = ctx.NameBuilder.New(LoopItemVariableName);

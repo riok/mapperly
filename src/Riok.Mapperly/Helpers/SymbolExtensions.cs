@@ -116,6 +116,12 @@ internal static class SymbolExtensions
             return false;
         }
 
+        if (t.IsAbstract)
+        {
+            isExplicit = false;
+            return true;
+        }
+
         var interfaceSymbol = typedInterface.GetMembers(symbolName).First();
 
         var symbolImplementaton = t.FindImplementationForInterfaceMember(interfaceSymbol);

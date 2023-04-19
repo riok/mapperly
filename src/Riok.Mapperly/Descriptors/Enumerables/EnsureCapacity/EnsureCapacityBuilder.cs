@@ -42,6 +42,10 @@ public static class EnsureCapacityBuilder
                 x => x.ReturnType.SpecialType == SpecialType.System_Boolean && x.IsStatic && x.Parameters.Length == 2 && x.IsGenericMethod
             );
 
+        // if non enumerated method doesnt exist then don't create EnsureCapacity
+        if (nonEnumeratedCountMethod == null)
+            return null;
+
         // if source does not have a count use GetNonEnumeratedCount, calling EnusureCapacity if count is available
         var typedNonEnumeratedCount = nonEnumeratedCountMethod.Construct(iEnumerable!.TypeArguments.ToArray());
         return new EnsureCapacityNonEnumerated(targetSizeProperty, typedNonEnumeratedCount);
