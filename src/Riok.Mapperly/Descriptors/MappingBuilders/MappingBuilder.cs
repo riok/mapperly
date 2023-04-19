@@ -10,6 +10,7 @@ public class MappingBuilder
     private static readonly IReadOnlyCollection<BuildMapping> _builders = new BuildMapping[]
     {
         NullableMappingBuilder.TryBuildMapping,
+        DerivedTypeMappingBuilder.TryBuildMapping,
         SpecialTypeMappingBuilder.TryBuildMapping,
         DirectAssignmentMappingBuilder.TryBuildMapping,
         QueryableMappingBuilder.TryBuildMapping,

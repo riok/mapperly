@@ -12,7 +12,7 @@
     we use a higher version than supported by the target framework to have nullable types and other nice features
     however we need to be careful with the available features!
     -->
-    <LangVersion>10</LangVersion>
+    <LangVersion>11</LangVersion>
   </PropertyGroup>
 
 
@@ -28,7 +28,7 @@
   <!-- nullables for netstandard2.0 -->
   <!-- see https://www.meziantou.net/how-to-use-nullable-reference-types-in-dotnet-standard-2-0-and-dotnet-.htm -->
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)/Nullable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)/Polyfills/*.cs" />
   </ItemGroup>
 
   <ItemGroup>

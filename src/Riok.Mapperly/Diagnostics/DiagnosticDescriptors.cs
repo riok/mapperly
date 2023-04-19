@@ -293,4 +293,31 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Info,
         true
     );
+
+    public static readonly DiagnosticDescriptor DerivedSourceTypeDuplicated = new DiagnosticDescriptor(
+        "RMG034",
+        "Derived source type is specified multiple times, a source type may only be specified once",
+        "Derived source type {0} is specified multiple times, a source type may only be specified once",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor DerivedSourceTypeIsNotAssignableToParameterType = new DiagnosticDescriptor(
+        "RMG035",
+        "Derived source type is not assignable to parameter type",
+        "Derived source type {0} is not assignable to parameter type {1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor DerivedTargetTypeIsNotAssignableToReturnType = new DiagnosticDescriptor(
+        "RMG036",
+        "Derived target type is not assignable to return type",
+        "Derived target type {0} is not assignable to return type {1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
 }
