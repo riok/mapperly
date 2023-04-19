@@ -21,15 +21,17 @@ public class ForEachAddEnumerableMapping : ExistingTargetMappingMethodWrapper
         ITypeMapping elementMapping,
         ObjectFactory? objectFactory,
         string insertMethodName,
-        EnsureCapacity? ensureCapacityBuilder)
-        : base(new ForEachAddEnumerableExistingTargetMapping(sourceType, targetType, elementMapping, insertMethodName, ensureCapacityBuilder))
+        EnsureCapacity? ensureCapacityBuilder
+    )
+        : base(
+            new ForEachAddEnumerableExistingTargetMapping(sourceType, targetType, elementMapping, insertMethodName, ensureCapacityBuilder)
+        )
     {
         _objectFactory = objectFactory;
     }
+
     protected override ExpressionSyntax CreateTargetInstance(TypeMappingBuildContext ctx)
     {
-        return _objectFactory == null
-            ? CreateInstance(TargetType)
-            : _objectFactory.CreateType(SourceType, TargetType, ctx.Source);
+        return _objectFactory == null ? CreateInstance(TargetType) : _objectFactory.CreateType(SourceType, TargetType, ctx.Source);
     }
 }

@@ -10,16 +10,19 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { public B(string stringValue) {} { public int IntValue { get; set; } }");
+            "class B { public B(string stringValue) {} { public int IntValue { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.StringValue);
                 target.IntValue = source.IntValue;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -29,7 +32,8 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { public B(string stringValue) {} { }");
+            "class B { public B(string stringValue) {} { }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -41,15 +45,18 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { public B(string stringValue, int intValue = 10) {} }");
+            "class B { public B(string stringValue, int intValue = 10) {} }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.StringValue, source.IntValue);
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -59,16 +66,19 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { public B(string stringValue, int intValue2 = 10) {} public int IntValue { get; set; } }");
+            "class B { public B(string stringValue, int intValue2 = 10) {} public int IntValue { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.StringValue);
                 target.IntValue = source.IntValue;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -78,16 +88,19 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } public int IntValue3 { get; set; } }",
-            "class B { public B(string stringValue, int intValue2 = 10, int intValue = 20) {} public int IntValue3 { get; set; } }");
+            "class B { public B(string stringValue, int intValue2 = 10, int intValue = 20) {} public int IntValue3 { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.StringValue, intValue: source.IntValue);
                 target.IntValue3 = source.IntValue3;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -97,15 +110,18 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { public B(string x) { } public B(string stringValue, int intvalue) { } public B(string stringValue) { } { public int IntValue { get; set; } ");
+            "class B { public B(string x) { } public B(string stringValue, int intvalue) { } public B(string stringValue) { } { public int IntValue { get; set; } "
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.StringValue, source.IntValue);
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -115,7 +131,8 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { private B(){} }");
+            "class B { private B(){} }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -127,7 +144,8 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { public B(string StringValue9){} public int IntValue { get; set; } }");
+            "class B { public B(string StringValue9){} public int IntValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -139,7 +157,8 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { [MapperConstructor] public B(string StringValue9){} public B(string StringValue) {} public int IntValue { get; set; } }");
+            "class B { [MapperConstructor] public B(string StringValue9){} public B(string StringValue) {} public int IntValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -151,16 +170,19 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { public B(string x) { } [MapperConstructor] public B(string stringValue) { } public B() { } { public string StringValue { get; set; } public int IntValue { get; set; } ");
+            "class B { public B(string x) { } [MapperConstructor] public B(string stringValue) { } public B() { } { public string StringValue { get; set; } public int IntValue { get; set; } "
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.StringValue);
                 target.IntValue = source.IntValue;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -170,9 +192,11 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { public B(string x) { } public B(string stringValue, int intvalue) { } public B() { } { public string StringValue { get; set; } public int IntValue { get; set; } ");
+            "class B { public B(string x) { } public B(string stringValue, int intvalue) { } public B() { } { public string StringValue { get; set; } public int IntValue { get; set; } "
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -180,7 +204,8 @@ public class ObjectPropertyConstructorResolverTest
                 target.StringValue = source.StringValue;
                 target.IntValue = source.IntValue;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -190,15 +215,18 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { [Obsolete] public B(string StringValue) { } public B(string stringValue, int intvalue) { } { public string StringValue { get; set; } public int IntValue { get; set; } ");
+            "class B { [Obsolete] public B(string StringValue) { } public B(string stringValue, int intvalue) { } { public string StringValue { get; set; } public int IntValue { get; set; } "
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.StringValue, source.IntValue);
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -208,16 +236,19 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { [Obsolete, MapperConstructor] public B(string StringValue) { } public B(string stringValue, int intvalue) { } { public string StringValue { get; set; } public int IntValue { get; set; } ");
+            "class B { [Obsolete, MapperConstructor] public B(string StringValue) { } public B(string stringValue, int intvalue) { } { public string StringValue { get; set; } public int IntValue { get; set; } "
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.StringValue);
                 target.IntValue = source.IntValue;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -227,16 +258,19 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "record A(string StringValue) { public int IntValue { get; set; } }",
-            "record B(string StringValue) { public int IntValue { get; set; } ");
+            "record B(string StringValue) { public int IntValue { get; set; } "
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.StringValue);
                 target.IntValue = source.IntValue;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -246,35 +280,35 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "record B(string StringValue) { public int IntValue { get; set; } ");
+            "record B(string StringValue) { public int IntValue { get; set; } "
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.StringValue);
                 target.IntValue = source.IntValue;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void RecordToFlattenedRecord()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "B",
-            "record A(C Nested);",
-            "record B(string NestedValue);",
-            "record C(string Value);");
+        var source = TestSourceBuilder.Mapping("A", "B", "record A(C Nested);", "record B(string NestedValue);", "record C(string Value);");
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.Nested.Value);
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -285,34 +319,39 @@ public class ObjectPropertyConstructorResolverTest
             "B",
             "record A(C? Nested);",
             "record B(string NestedValue);",
-            "record C(string Value);");
+            "record C(string Value);"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested?.Value)));
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void RecordToFlattenedRecordNullablePathWithCustomMapping()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial B Map(A source);" +
-            "string StrConversion(string? s) => s ?? \"\";",
+            "partial B Map(A source);" + "string StrConversion(string? s) => s ?? \"\";",
             "record A(C? Nested);",
             "record B(string NestedValue);",
-            "record C(string Value);");
+            "record C(string Value);"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(StrConversion(source.Nested?.Value));
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -321,91 +360,88 @@ public class ObjectPropertyConstructorResolverTest
         var source = TestSourceBuilder.Mapping(
             "A",
             "B",
-            TestSourceBuilderOptions.Default with { ThrowOnMappingNullMismatch = false },
+            TestSourceBuilderOptions.Default with
+            {
+                ThrowOnMappingNullMismatch = false
+            },
             "record A(C? Nested);",
             "record B(string NestedValue);",
-            "record C(string Value);");
+            "record C(string Value);"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.Nested?.Value ?? "");
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void RecordToRecordNonNullableToNullablePrimitive()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "B",
-            "record A(int Value);",
-            "record B(int? Value);");
+        var source = TestSourceBuilder.Mapping("A", "B", "record A(int Value);", "record B(int? Value);");
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.Value);
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void RecordToRecordNullableToNonNullablePrimitive()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "B",
-            "record A(int? Value);",
-            "record B(int Value);");
+        var source = TestSourceBuilder.Mapping("A", "B", "record A(int? Value);", "record B(int Value);");
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.Value ?? throw new System.ArgumentNullException(nameof(source.Value)));
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void RecordToRecordNonDirectAssignmentNullHandling()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "B",
-            "record A(int? Value);",
-            "record B(double Value);");
+        var source = TestSourceBuilder.Mapping("A", "B", "record A(int? Value);", "record B(double Value);");
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.Value != null ? (double)source.Value.Value : throw new System.ArgumentNullException(nameof(source.Value.Value)));
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void RecordToRecordFlattenedNonDirectAssignmentNullHandling()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "B",
-            "record A(C? Nested);",
-            "record B(double NestedValue);",
-            "record C(int Value);");
+        var source = TestSourceBuilder.Mapping("A", "B", "record A(C? Nested);", "record B(double NestedValue);", "record C(int Value);");
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.Nested != null ? (double)source.Nested.Value : throw new System.ArgumentNullException(nameof(source.Nested.Value)));
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -424,7 +460,8 @@ public class ObjectPropertyConstructorResolverTest
                 """
                 var target = new global::B(a.Id, a.F);
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -443,6 +480,7 @@ public class ObjectPropertyConstructorResolverTest
                 """
                 var target = new global::B(a.Id, a.F);
                 return target;
-                """);
+                """
+            );
     }
 }

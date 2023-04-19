@@ -27,9 +27,10 @@ public class MemberNullAssignmentInitializerMapping : MemberAssignmentMappingCon
             Assignment(
                 _pathToInitialize.BuildAccess(targetAccess),
                 ImplicitObjectCreationExpression(),
-                SyntaxKind.CoalesceAssignmentExpression));
-        return base.Build(ctx, targetAccess)
-            .Prepend(initializer);
+                SyntaxKind.CoalesceAssignmentExpression
+            )
+        );
+        return base.Build(ctx, targetAccess).Prepend(initializer);
     }
 
     public override bool Equals(object? obj)
@@ -46,15 +47,13 @@ public class MemberNullAssignmentInitializerMapping : MemberAssignmentMappingCon
         return Equals((MemberNullAssignmentInitializerMapping)obj);
     }
 
-    public override int GetHashCode()
-        => _pathToInitialize.GetHashCode();
+    public override int GetHashCode() => _pathToInitialize.GetHashCode();
 
-    public static bool operator ==(MemberNullAssignmentInitializerMapping? left, MemberNullAssignmentInitializerMapping? right)
-        => Equals(left, right);
+    public static bool operator ==(MemberNullAssignmentInitializerMapping? left, MemberNullAssignmentInitializerMapping? right) =>
+        Equals(left, right);
 
-    public static bool operator !=(MemberNullAssignmentInitializerMapping? left, MemberNullAssignmentInitializerMapping? right)
-        => !Equals(left, right);
+    public static bool operator !=(MemberNullAssignmentInitializerMapping? left, MemberNullAssignmentInitializerMapping? right) =>
+        !Equals(left, right);
 
-    protected bool Equals(MemberNullAssignmentInitializerMapping other)
-        => _pathToInitialize.Equals(other._pathToInitialize);
+    protected bool Equals(MemberNullAssignmentInitializerMapping other) => _pathToInitialize.Equals(other._pathToInitialize);
 }

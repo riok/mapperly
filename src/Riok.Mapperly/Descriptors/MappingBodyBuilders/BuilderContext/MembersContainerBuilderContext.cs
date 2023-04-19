@@ -9,22 +9,15 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// An <see cref="IMembersContainerBuilderContext{T}"/> implementation.
 /// </summary>
 /// <typeparam name="T">The type of mapping.</typeparam>
-public class MembersContainerBuilderContext<T> :
-    MembersMappingBuilderContext<T>,
-    IMembersContainerBuilderContext<T>
+public class MembersContainerBuilderContext<T> : MembersMappingBuilderContext<T>, IMembersContainerBuilderContext<T>
     where T : IMemberAssignmentTypeMapping
 {
     private readonly Dictionary<MemberPath, MemberNullDelegateAssignmentMapping> _nullDelegateMappings = new();
 
-    public MembersContainerBuilderContext(
-        MappingBuilderContext builderContext,
-        T mapping)
-        : base(builderContext, mapping)
-    {
-    }
+    public MembersContainerBuilderContext(MappingBuilderContext builderContext, T mapping)
+        : base(builderContext, mapping) { }
 
-    public void AddMemberAssignmentMapping(IMemberAssignmentMapping memberMapping)
-        => AddMemberAssignmentMapping(Mapping, memberMapping);
+    public void AddMemberAssignmentMapping(IMemberAssignmentMapping memberMapping) => AddMemberAssignmentMapping(Mapping, memberMapping);
 
     public void AddNullDelegateMemberAssignmentMapping(IMemberAssignmentMapping memberMapping)
     {
@@ -40,7 +33,6 @@ public class MembersContainerBuilderContext<T> :
         container.AddMemberMapping(mapping);
     }
 
-
     private void AddNullMemberInitializers(IMemberAssignmentMappingContainer container, MemberPath path)
     {
         foreach (var nullableTrailPath in path.ObjectPathNullableSubPaths())
@@ -49,9 +41,7 @@ public class MembersContainerBuilderContext<T> :
             var type = nullablePath.Member.Type;
             if (!type.HasAccessibleParameterlessConstructor())
             {
-                BuilderContext.ReportDiagnostic(
-                    DiagnosticDescriptors.NoParameterlessConstructorFound,
-                    type);
+                BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, type);
                 continue;
             }
 
@@ -79,7 +69,8 @@ public class MembersContainerBuilderContext<T> :
         mapping = new MemberNullDelegateAssignmentMapping(
             nullConditionSourcePath,
             parentMapping,
-            BuilderContext.MapperConfiguration.ThrowOnPropertyMappingNullMismatch);
+            BuilderContext.MapperConfiguration.ThrowOnPropertyMappingNullMismatch
+        );
         _nullDelegateMappings[nullConditionSourcePath] = mapping;
         parentMapping.AddMemberMappingContainer(mapping);
         return mapping;

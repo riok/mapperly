@@ -24,8 +24,7 @@ public sealed class PreserveReferenceHandler : IReferenceHandler
     /// <inheritdoc cref="IReferenceHandler.SetReference{TSource,TTarget}"/>
     public void SetReference<TSource, TTarget>(TSource source, TTarget target)
         where TSource : notnull
-        where TTarget : notnull
-        => GetReferenceHolder<TSource, TTarget>().SetRef(source, target);
+        where TTarget : notnull => GetReferenceHolder<TSource, TTarget>().SetRef(source, target);
 
     private ReferenceHolder GetReferenceHolder<TSource, TTarget>()
     {

@@ -23,9 +23,7 @@ public abstract class MethodMapping : TypeMapping
     private string? _methodName;
 
     protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        : this(new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType), targetType)
-    {
-    }
+        : this(new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType), targetType) { }
 
     protected MethodMapping(MethodParameter sourceParameter, ITypeSymbol targetType)
         : base(sourceParameter.Type, targetType)
@@ -51,19 +49,18 @@ public abstract class MethodMapping : TypeMapping
 
     protected virtual ITypeSymbol? ReturnType => TargetType;
 
-    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
-        => Invocation(MethodName, SourceParameter.WithArgument(ctx.Source), ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
+        Invocation(MethodName, SourceParameter.WithArgument(ctx.Source), ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
 
     public MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
     {
-        TypeSyntax returnType = ReturnType == null
-            ? PredefinedType(Token(SyntaxKind.VoidKeyword))
-            : FullyQualifiedIdentifier(TargetType);
+        TypeSyntax returnType = ReturnType == null ? PredefinedType(Token(SyntaxKind.VoidKeyword)) : FullyQualifiedIdentifier(TargetType);
 
         var typeMappingBuildContext = new TypeMappingBuildContext(
             SourceParameter.Name,
             ReferenceHandlerParameter?.Name,
-            ctx.NameBuilder.NewScope());
+            ctx.NameBuilder.NewScope()
+        );
 
         var parameters = BuildParameterList();
         ReserveParameterNames(typeMappingBuildContext.NameBuilder, parameters);
@@ -83,11 +80,15 @@ public abstract class MethodMapping : TypeMapping
 
     internal virtual void EnableReferenceHandling(INamedTypeSymbol iReferenceHandlerType)
     {
-        ReferenceHandlerParameter ??= new MethodParameter(ReferenceHandlerParameterIndex, DefaultReferenceHandlerParameterName, iReferenceHandlerType);
+        ReferenceHandlerParameter ??= new MethodParameter(
+            ReferenceHandlerParameterIndex,
+            DefaultReferenceHandlerParameterName,
+            iReferenceHandlerType
+        );
     }
 
-    protected virtual ParameterListSyntax BuildParameterList()
-        => ParameterList(IsExtensionMethod, SourceParameter, ReferenceHandlerParameter);
+    protected virtual ParameterListSyntax BuildParameterList() =>
+        ParameterList(IsExtensionMethod, SourceParameter, ReferenceHandlerParameter);
 
     private IEnumerable<SyntaxToken> BuildModifiers(bool isStatic)
     {

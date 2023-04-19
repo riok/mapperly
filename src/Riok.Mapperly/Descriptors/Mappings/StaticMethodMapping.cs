@@ -11,11 +11,11 @@ public class StaticMethodMapping : TypeMapping
 {
     private readonly IMethodSymbol _method;
 
-    public StaticMethodMapping(IMethodSymbol method) : base(method.Parameters.Single().Type, method.ReturnType)
+    public StaticMethodMapping(IMethodSymbol method)
+        : base(method.Parameters.Single().Type, method.ReturnType)
     {
         _method = method;
     }
 
-    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
-        => StaticInvocation(_method, ctx.Source);
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) => StaticInvocation(_method, ctx.Source);
 }

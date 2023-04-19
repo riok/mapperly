@@ -15,9 +15,7 @@ public sealed class MapPropertyAttribute : Attribute
     /// <param name="source">The name of the source property. The use of `nameof()` is encouraged. A path can be specified by joining property names with a '.'.</param>
     /// <param name="target">The name of the target property. The use of `nameof()` is encouraged. A path can be specified by joining property names with a '.'.</param>
     public MapPropertyAttribute(string source, string target)
-        : this(source.Split(PropertyAccessSeparator), target.Split(PropertyAccessSeparator))
-    {
-    }
+        : this(source.Split(PropertyAccessSeparator), target.Split(PropertyAccessSeparator)) { }
 
     /// <summary>
     /// Maps a specified source property to the specified target property.

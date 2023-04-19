@@ -13,18 +13,10 @@ public class MethodNameBuilderTest
     {
         var builder = new MethodNameBuilder();
         builder.Reserve("MapToA");
-        builder.Build(NewMethodMappingMock("A"))
-            .Should()
-            .Be("MapToA1");
-        builder.Build(NewMethodMappingMock("A"))
-            .Should()
-            .Be("MapToA2");
-        builder.Build(NewMethodMappingMock("B"))
-            .Should()
-            .Be("MapToB");
-        builder.Build(NewMethodMappingMock("B"))
-            .Should()
-            .Be("MapToB1");
+        builder.Build(NewMethodMappingMock("A")).Should().Be("MapToA1");
+        builder.Build(NewMethodMappingMock("A")).Should().Be("MapToA2");
+        builder.Build(NewMethodMappingMock("B")).Should().Be("MapToB");
+        builder.Build(NewMethodMappingMock("B")).Should().Be("MapToB1");
     }
 
     private MethodMapping NewMethodMappingMock(string targetTypeName)
@@ -38,11 +30,9 @@ public class MethodNameBuilderTest
 
     private class MockedMethodMapping : MethodMapping
     {
-        public MockedMethodMapping(ITypeSymbol t) : base(t, t)
-        {
-        }
+        public MockedMethodMapping(ITypeSymbol t)
+            : base(t, t) { }
 
-        public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
-            => Enumerable.Empty<StatementSyntax>();
+        public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx) => Enumerable.Empty<StatementSyntax>();
     }
 }

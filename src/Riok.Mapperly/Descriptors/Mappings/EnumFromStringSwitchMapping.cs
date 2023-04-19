@@ -28,7 +28,8 @@ public class EnumFromStringSwitchMapping : MethodMapping
         ITypeSymbol targetType,
         IEnumerable<IFieldSymbol> enumMembers,
         bool genericParseMethodSupported,
-        bool ignoreCase)
+        bool ignoreCase
+    )
         : base(sourceType, targetType)
     {
         _enumMembers = enumMembers;
@@ -39,18 +40,13 @@ public class EnumFromStringSwitchMapping : MethodMapping
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         // fallback switch arm: _ => System.Enum.Parse<TargetType>(source, ignoreCase)
-        var fallbackArm = SwitchExpressionArm(
-            DiscardPattern(),
-            _fallbackMapping.Build(ctx));
+        var fallbackArm = SwitchExpressionArm(DiscardPattern(), _fallbackMapping.Build(ctx));
 
         // switch for each name to the enum value
-        var arms = _ignoreCase
-            ? BuildArmsIgnoreCase(ctx)
-            : _enumMembers.Select(BuildArm);
+        var arms = _ignoreCase ? BuildArmsIgnoreCase(ctx) : _enumMembers.Select(BuildArm);
         arms = arms.Append(fallbackArm);
 
-        var switchExpr = SwitchExpression(ctx.Source)
-            .WithArms(CommaSeparatedList(arms, true));
+        var switchExpr = SwitchExpression(ctx.Source).WithArms(CommaSeparatedList(arms, true));
 
         yield return ReturnStatement(switchExpr);
     }
@@ -69,28 +65,25 @@ public class EnumFromStringSwitchMapping : MethodMapping
             .WithDesignation(SingleVariableDesignation(Identifier(ignoreCaseSwitchDesignatedVariableName)));
 
         // source.Value1
-        var typeMemberAccess = MemberAccess(
-            FullyQualifiedIdentifierName(field.ContainingType.NonNullable()),
-            field.Name);
+        var typeMemberAccess = MemberAccess(FullyQualifiedIdentifierName(field.ContainingType.NonNullable()), field.Name);
 
         // when s.Equals(nameof(source.Value1), StringComparison.OrdinalIgnoreCase)
         var whenClause = WhenClause(
             Invocation(
                 MemberAccess(ignoreCaseSwitchDesignatedVariableName, StringEqualsMethodName),
                 NameOf(typeMemberAccess),
-                IdentifierName(StringComparisonFullName)));
+                IdentifierName(StringComparisonFullName)
+            )
+        );
 
         // { } s when s.Equals(nameof(source.Value1), StringComparison.OrdinalIgnoreCase) => source.Value1;
-        return SwitchExpressionArm(pattern, typeMemberAccess)
-            .WithWhenClause(whenClause);
+        return SwitchExpressionArm(pattern, typeMemberAccess).WithWhenClause(whenClause);
     }
 
     private SwitchExpressionArmSyntax BuildArm(IFieldSymbol field)
     {
         // nameof(source.Value1) => source.Value1;
-        var typeMemberAccess = MemberAccess(
-            FullyQualifiedIdentifier(field.ContainingType),
-            field.Name);
+        var typeMemberAccess = MemberAccess(FullyQualifiedIdentifier(field.ContainingType), field.Name);
         var pattern = ConstantPattern(NameOf(typeMemberAccess));
         return SwitchExpressionArm(pattern, typeMemberAccess);
     }

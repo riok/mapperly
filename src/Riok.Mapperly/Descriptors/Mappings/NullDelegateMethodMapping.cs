@@ -18,7 +18,8 @@ public class NullDelegateMethodMapping : MethodMapping
         ITypeSymbol nullableSourceType,
         ITypeSymbol nullableTargetType,
         MethodMapping delegateMapping,
-        NullFallbackValue nullFallbackValue)
+        NullFallbackValue nullFallbackValue
+    )
         : base(nullableSourceType, nullableTargetType)
     {
         _delegateMapping = delegateMapping;
@@ -40,8 +41,6 @@ public class NullDelegateMethodMapping : MethodMapping
         // call mapping only if source is not null.
         // if (source == null)
         //   return <null-substitute>;
-        return body.Prepend(IfNullReturnOrThrow(
-            source,
-            NullSubstitute(TargetType.NonNullable(), source, _nullFallbackValue)));
+        return body.Prepend(IfNullReturnOrThrow(source, NullSubstitute(TargetType.NonNullable(), source, _nullFallbackValue)));
     }
 }

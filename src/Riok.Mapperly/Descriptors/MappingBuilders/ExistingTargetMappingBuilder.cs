@@ -22,8 +22,8 @@ public class ExistingTargetMappingBuilder
         _mappings = mappings;
     }
 
-    public IExistingTargetMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType)
-        => _mappings.FindExistingInstanceMapping(sourceType, targetType);
+    public IExistingTargetMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType) =>
+        _mappings.FindExistingInstanceMapping(sourceType, targetType);
 
     public IExistingTargetMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {

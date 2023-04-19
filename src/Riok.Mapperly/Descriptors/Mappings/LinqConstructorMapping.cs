@@ -15,11 +15,7 @@ public class LinqConstructorMapping : TypeMapping
     private readonly ITypeMapping _elementMapping;
     private readonly IMethodSymbol? _selectMethod;
 
-    public LinqConstructorMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
-        ITypeMapping elementMapping,
-        IMethodSymbol? selectMethod)
+    public LinqConstructorMapping(ITypeSymbol sourceType, ITypeSymbol targetType, ITypeMapping elementMapping, IMethodSymbol? selectMethod)
         : base(sourceType, targetType)
     {
         _elementMapping = elementMapping;
@@ -37,8 +33,7 @@ public class LinqConstructorMapping : TypeMapping
         if (_selectMethod != null)
         {
             var sourceMapExpression = _elementMapping.Build(ctx.WithSource(lambdaParamName));
-            var convertLambda = SimpleLambdaExpression(Parameter(Identifier(lambdaParamName)))
-                .WithExpressionBody(sourceMapExpression);
+            var convertLambda = SimpleLambdaExpression(Parameter(Identifier(lambdaParamName))).WithExpressionBody(sourceMapExpression);
             mappedSource = StaticInvocation(_selectMethod, ctx.Source, convertLambda);
         }
         else

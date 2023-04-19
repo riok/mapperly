@@ -14,6 +14,5 @@ internal static class MappableMember
         };
     }
 
-    public static bool CanOnlySetViaInitializer(this IMappableMember member)
-        => member.IsInitOnly || member.IsRequired;
+    public static bool CanOnlySetViaInitializer(this IMappableMember member) => member.IsInitOnly || member.IsRequired;
 }

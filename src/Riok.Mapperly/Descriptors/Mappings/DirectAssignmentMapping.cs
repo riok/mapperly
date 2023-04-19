@@ -9,12 +9,10 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public class DirectAssignmentMapping : TypeMapping
 {
-    public DirectAssignmentMapping(ITypeSymbol type) : base(type, type)
-    {
-    }
+    public DirectAssignmentMapping(ITypeSymbol type)
+        : base(type, type) { }
 
-    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
-        => ctx.Source;
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) => ctx.Source;
 
     public override bool IsSynthetic => true;
 }

@@ -103,17 +103,17 @@ public class WellKnownTypes
     public INamedTypeSymbol ImmutableDictionaryT => _immutableDictionaryT ??= GetTypeSymbol(typeof(ImmutableDictionary<,>));
 
     public INamedTypeSymbol ImmutableSortedDictionary => _immutableSortedDictionary ??= GetTypeSymbol(typeof(ImmutableSortedDictionary));
-    public INamedTypeSymbol ImmutableSortedDictionaryT => _immutableSortedDictionaryT ??= GetTypeSymbol(typeof(ImmutableSortedDictionary<,>));
+    public INamedTypeSymbol ImmutableSortedDictionaryT =>
+        _immutableSortedDictionaryT ??= GetTypeSymbol(typeof(ImmutableSortedDictionary<,>));
 
     // use string type name as they are not available in netstandard2.0
     public INamedTypeSymbol? DateOnly => _dateOnly ??= GetTypeSymbol("System.DateOnly");
 
     public INamedTypeSymbol? TimeOnly => _timeOnly ??= GetTypeSymbol("System.TimeOnly");
 
-    private INamedTypeSymbol GetTypeSymbol(Type type)
-        => _compilation.GetTypeByMetadataName(type.FullName ?? throw new InvalidOperationException("Could not get name of type " + type))
-            ?? throw new InvalidOperationException("Could not get type " + type.FullName);
+    private INamedTypeSymbol GetTypeSymbol(Type type) =>
+        _compilation.GetTypeByMetadataName(type.FullName ?? throw new InvalidOperationException("Could not get name of type " + type))
+        ?? throw new InvalidOperationException("Could not get type " + type.FullName);
 
-    private INamedTypeSymbol? GetTypeSymbol(string typeFullName)
-        => _compilation.GetTypeByMetadataName(typeFullName);
+    private INamedTypeSymbol? GetTypeSymbol(string typeFullName) => _compilation.GetTypeByMetadataName(typeFullName);
 }

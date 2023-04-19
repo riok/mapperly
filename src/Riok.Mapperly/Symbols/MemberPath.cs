@@ -44,10 +44,7 @@ public class MemberPath
     /// <summary>
     /// Gets the type of the <see cref="Member"/>. If any part of the path is nullable, this type will be nullable too.
     /// </summary>
-    public ITypeSymbol MemberType =>
-        IsAnyNullable()
-            ? Member.Type.WithNullableAnnotation(NullableAnnotation.Annotated)
-            : Member.Type;
+    public ITypeSymbol MemberType => IsAnyNullable() ? Member.Type.WithNullableAnnotation(NullableAnnotation.Annotated) : Member.Type;
 
     /// <summary>
     /// Gets the full name of the path (eg. A.B.C).
@@ -58,8 +55,7 @@ public class MemberPath
     /// Builds a member path skipping trailing path items which are non nullable.
     /// </summary>
     /// <returns>The built path.</returns>
-    public IEnumerable<IMappableMember> PathWithoutTrailingNonNullable()
-        => Path.Reverse().SkipWhile(x => !x.IsNullable).Reverse();
+    public IEnumerable<IMappableMember> PathWithoutTrailingNonNullable() => Path.Reverse().SkipWhile(x => !x.IsNullable).Reverse();
 
     /// <summary>
     /// Returns an element for each nullable sub-path of the <see cref="ObjectPath"/>.
@@ -79,21 +75,18 @@ public class MemberPath
         }
     }
 
-    public bool IsAnyNullable()
-        => Path.Any(p => p.IsNullable);
+    public bool IsAnyNullable() => Path.Any(p => p.IsNullable);
 
-    public bool IsAnyObjectPathNullable()
-        => ObjectPath.Any(p => p.IsNullable);
+    public bool IsAnyObjectPathNullable() => ObjectPath.Any(p => p.IsNullable);
 
     public ExpressionSyntax BuildAccess(
         ExpressionSyntax? baseAccess,
         bool addValuePropertyOnNullable = false,
         bool nullConditional = false,
-        bool skipTrailingNonNullable = false)
+        bool skipTrailingNonNullable = false
+    )
     {
-        var path = skipTrailingNonNullable
-            ? PathWithoutTrailingNonNullable()
-            : Path;
+        var path = skipTrailingNonNullable ? PathWithoutTrailingNonNullable() : Path;
 
         if (baseAccess == null)
         {
@@ -105,16 +98,17 @@ public class MemberPath
         {
             return path.AggregateWithPrevious(
                 baseAccess,
-                (expr, prevProp, prop) => prevProp?.IsNullable == true
-                    ? ConditionalAccess(expr, prop.Name)
-                    : MemberAccess(expr, prop.Name));
+                (expr, prevProp, prop) => prevProp?.IsNullable == true ? ConditionalAccess(expr, prop.Name) : MemberAccess(expr, prop.Name)
+            );
         }
 
         if (addValuePropertyOnNullable)
         {
-            return path.Aggregate(baseAccess, (a, b) => b.Type.IsNullableValueType()
-                ? MemberAccess(MemberAccess(a, b.Name), NullableValueProperty)
-                : MemberAccess(a, b.Name));
+            return path.Aggregate(
+                baseAccess,
+                (a, b) =>
+                    b.Type.IsNullableValueType() ? MemberAccess(MemberAccess(a, b.Name), NullableValueProperty) : MemberAccess(a, b.Name)
+            );
         }
 
         return path.Aggregate(baseAccess, (a, b) => MemberAccess(a, b.Name));
@@ -175,28 +169,26 @@ public class MemberPath
         return hc;
     }
 
-    public static bool operator ==(MemberPath? left, MemberPath? right)
-        => Equals(left, right);
+    public static bool operator ==(MemberPath? left, MemberPath? right) => Equals(left, right);
 
-    public static bool operator !=(MemberPath? left, MemberPath? right)
-        => !Equals(left, right);
+    public static bool operator !=(MemberPath? left, MemberPath? right) => !Equals(left, right);
 
-    private bool Equals(MemberPath other)
-        => Path.SequenceEqual(other.Path);
+    private bool Equals(MemberPath other) => Path.SequenceEqual(other.Path);
 
     public static bool TryFind(
         ITypeSymbol type,
         IEnumerable<IEnumerable<string>> pathCandidates,
         IReadOnlyCollection<string> ignoredNames,
-        [NotNullWhen(true)] out MemberPath? memberPath)
-        => TryFind(type, pathCandidates, ignoredNames, StringComparer.Ordinal, out memberPath);
+        [NotNullWhen(true)] out MemberPath? memberPath
+    ) => TryFind(type, pathCandidates, ignoredNames, StringComparer.Ordinal, out memberPath);
 
     public static bool TryFind(
         ITypeSymbol type,
         IEnumerable<IEnumerable<string>> pathCandidates,
         IReadOnlyCollection<string> ignoredNames,
         IEqualityComparer<string> comparer,
-        [NotNullWhen(true)] out MemberPath? memberPath)
+        [NotNullWhen(true)] out MemberPath? memberPath
+    )
     {
         foreach (var pathCandidate in FindCandidates(type, pathCandidates, comparer))
         {
@@ -211,16 +203,14 @@ public class MemberPath
         return false;
     }
 
-    public static bool TryFind(
-        ITypeSymbol type,
-        IReadOnlyCollection<string> path,
-        [NotNullWhen(true)] out MemberPath? memberPath)
-        => TryFind(type, path, StringComparer.Ordinal, out memberPath);
+    public static bool TryFind(ITypeSymbol type, IReadOnlyCollection<string> path, [NotNullWhen(true)] out MemberPath? memberPath) =>
+        TryFind(type, path, StringComparer.Ordinal, out memberPath);
 
     private static IEnumerable<MemberPath> FindCandidates(
         ITypeSymbol type,
         IEnumerable<IEnumerable<string>> pathCandidates,
-        IEqualityComparer<string> comparer)
+        IEqualityComparer<string> comparer
+    )
     {
         foreach (var pathCandidate in pathCandidates)
         {
@@ -233,7 +223,8 @@ public class MemberPath
         ITypeSymbol type,
         IReadOnlyCollection<string> path,
         IEqualityComparer<string> comparer,
-        [NotNullWhen(true)] out MemberPath? memberPath)
+        [NotNullWhen(true)] out MemberPath? memberPath
+    )
     {
         var foundPath = Find(type, path, comparer).ToList();
         if (foundPath.Count != path.Count)
@@ -246,10 +237,7 @@ public class MemberPath
         return true;
     }
 
-    private static IEnumerable<IMappableMember> Find(
-        ITypeSymbol type,
-        IEnumerable<string> path,
-        IEqualityComparer<string> comparer)
+    private static IEnumerable<IMappableMember> Find(ITypeSymbol type, IEnumerable<string> path, IEqualityComparer<string> comparer)
     {
         foreach (var name in path)
         {
@@ -261,13 +249,8 @@ public class MemberPath
         }
     }
 
-    private static IMappableMember? FindMember(
-        ITypeSymbol type,
-        string name,
-        IEqualityComparer<string> comparer)
+    private static IMappableMember? FindMember(ITypeSymbol type, string name, IEqualityComparer<string> comparer)
     {
-        return type
-            .GetMappableMembers(name, comparer)
-            .FirstOrDefault();
+        return type.GetMappableMembers(name, comparer).FirstOrDefault();
     }
 }

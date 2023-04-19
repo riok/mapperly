@@ -14,15 +14,16 @@ public class GenericSourceObjectFactory : ObjectFactory
 {
     private readonly Compilation _compilation;
 
-    public GenericSourceObjectFactory(IMethodSymbol method, Compilation compilation) : base(method)
+    public GenericSourceObjectFactory(IMethodSymbol method, Compilation compilation)
+        : base(method)
     {
         _compilation = compilation;
     }
 
-    public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate)
-        => SymbolEqualityComparer.Default.Equals(Method.ReturnType, targetTypeToCreate)
-            && Method.TypeParameters[0].CanConsumeType(_compilation, sourceType);
+    public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
+        SymbolEqualityComparer.Default.Equals(Method.ReturnType, targetTypeToCreate)
+        && Method.TypeParameters[0].CanConsumeType(_compilation, sourceType);
 
-    protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source)
-        => GenericInvocation(Method.Name, new[] { NonNullableIdentifier(sourceType) }, source);
+    protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
+        GenericInvocation(Method.Name, new[] { NonNullableIdentifier(sourceType) }, source);
 }

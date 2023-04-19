@@ -12,11 +12,11 @@ public class SourceObjectMethodMapping : TypeMapping
 {
     private readonly string _methodName;
 
-    public SourceObjectMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, string methodName) : base(sourceType, targetType)
+    public SourceObjectMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, string methodName)
+        : base(sourceType, targetType)
     {
         _methodName = methodName;
     }
 
-    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
-        => InvocationExpression(MemberAccess(ctx.Source, _methodName));
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) => InvocationExpression(MemberAccess(ctx.Source, _methodName));
 }

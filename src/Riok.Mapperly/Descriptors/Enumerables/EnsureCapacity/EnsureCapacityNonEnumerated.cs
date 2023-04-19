@@ -38,10 +38,7 @@ public class EnsureCapacityNonEnumerated : EnsureCapacity
 
         var enumerableArgument = Argument(ctx.Source);
 
-        var outVarArgument = Argument(
-            DeclarationExpression(
-                VarIdentifier,
-                SingleVariableDesignation(countIdentifier)))
+        var outVarArgument = Argument(DeclarationExpression(VarIdentifier, SingleVariableDesignation(countIdentifier)))
             .WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword));
 
         var getNonEnumeratedInvocation = StaticInvocation(_getNonEnumeratedMethod, enumerableArgument, outVarArgument);

@@ -52,7 +52,8 @@ public class MapperGenerator : IIncrementalGenerator
 
             ctx.AddSource(
                 uniqueNameBuilder.New(descriptor.Name) + GeneratedFileSuffix,
-                SourceText.From(SourceEmitter.Build(descriptor).ToFullString(), Encoding.UTF8));
+                SourceText.From(SourceEmitter.Build(descriptor).ToFullString(), Encoding.UTF8)
+            );
         }
     }
 }

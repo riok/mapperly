@@ -28,25 +28,20 @@ public class Configuration
     public T GetOrDefault<T>(IMethodSymbol? userSymbol)
         where T : Attribute
     {
-        return ListConfiguration<T>(userSymbol).FirstOrDefault()
-            ?? (T)_defaultConfigurations[typeof(T)];
+        return ListConfiguration<T>(userSymbol).FirstOrDefault() ?? (T)_defaultConfigurations[typeof(T)];
     }
 
     public IEnumerable<T> ListConfiguration<T>(IMethodSymbol? userSymbol)
         where T : Attribute
     {
-        return userSymbol == null
-            ? Enumerable.Empty<T>()
-            : AttributeDataAccessor.Access<T>(_compilation, userSymbol);
+        return userSymbol == null ? Enumerable.Empty<T>() : AttributeDataAccessor.Access<T>(_compilation, userSymbol);
     }
 
     private void InitDefaultConfigurations()
     {
         _defaultConfigurations.Add(
             typeof(MapEnumAttribute),
-            new MapEnumAttribute(Mapper.EnumMappingStrategy)
-            {
-                IgnoreCase = Mapper.EnumMappingIgnoreCase
-            });
+            new MapEnumAttribute(Mapper.EnumMappingStrategy) { IgnoreCase = Mapper.EnumMappingIgnoreCase }
+        );
     }
 }

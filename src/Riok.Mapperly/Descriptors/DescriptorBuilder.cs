@@ -22,7 +22,8 @@ public class DescriptorBuilder
         SourceProductionContext sourceContext,
         Compilation compilation,
         ClassDeclarationSyntax mapperSyntax,
-        INamedTypeSymbol mapperSymbol)
+        INamedTypeSymbol mapperSymbol
+    )
     {
         _mapperDescriptor = new MapperDescriptor(mapperSyntax, mapperSymbol, _methodNameBuilder);
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
@@ -33,7 +34,8 @@ public class DescriptorBuilder
             _mapperDescriptor,
             sourceContext,
             new MappingBuilder(_mappings),
-            new ExistingTargetMappingBuilder(_mappings));
+            new ExistingTargetMappingBuilder(_mappings)
+        );
     }
 
     public MapperDescriptor Build()
@@ -62,7 +64,8 @@ public class DescriptorBuilder
                 _objectFactories,
                 userMapping.Method,
                 userMapping.SourceType,
-                userMapping.TargetType);
+                userMapping.TargetType
+            );
 
             _mappings.Add(userMapping);
             _mappings.EnqueueToBuildBody(userMapping, ctx);

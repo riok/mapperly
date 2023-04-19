@@ -15,9 +15,7 @@ public class MemberAssignmentMapping : IMemberAssignmentMapping
 {
     private readonly IMemberMapping _mapping;
 
-    public MemberAssignmentMapping(
-        MemberPath targetPath,
-        IMemberMapping mapping)
+    public MemberAssignmentMapping(MemberPath targetPath, IMemberMapping mapping)
     {
         TargetPath = targetPath;
         _mapping = mapping;
@@ -27,27 +25,18 @@ public class MemberAssignmentMapping : IMemberAssignmentMapping
 
     public MemberPath TargetPath { get; }
 
-    public IEnumerable<StatementSyntax> Build(
-        TypeMappingBuildContext ctx,
-        ExpressionSyntax targetAccess)
+    public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
-        return new[]
-        {
-            ExpressionStatement(BuildExpression(ctx, targetAccess)),
-        };
+        return new[] { ExpressionStatement(BuildExpression(ctx, targetAccess)), };
     }
 
-    public ExpressionSyntax BuildExpression(
-        TypeMappingBuildContext ctx,
-        ExpressionSyntax? targetAccess)
+    public ExpressionSyntax BuildExpression(TypeMappingBuildContext ctx, ExpressionSyntax? targetAccess)
     {
         var targetMemberAccess = TargetPath.BuildAccess(targetAccess);
         var mappedValue = _mapping.Build(ctx);
 
         // target.Member = mappedValue;
-        return Assignment(
-            targetMemberAccess,
-            mappedValue);
+        return Assignment(targetMemberAccess, mappedValue);
     }
 
     public override bool Equals(object? obj)
@@ -75,16 +64,12 @@ public class MemberAssignmentMapping : IMemberAssignmentMapping
         }
     }
 
-    public static bool operator ==(MemberAssignmentMapping? left, MemberAssignmentMapping? right)
-        => Equals(left, right);
+    public static bool operator ==(MemberAssignmentMapping? left, MemberAssignmentMapping? right) => Equals(left, right);
 
-    public static bool operator !=(MemberAssignmentMapping? left, MemberAssignmentMapping? right)
-        => !Equals(left, right);
+    public static bool operator !=(MemberAssignmentMapping? left, MemberAssignmentMapping? right) => !Equals(left, right);
 
     protected bool Equals(MemberAssignmentMapping other)
     {
-        return _mapping.Equals(other._mapping)
-            && SourcePath.Equals(other.SourcePath)
-            && TargetPath.Equals(other.TargetPath);
+        return _mapping.Equals(other._mapping) && SourcePath.Equals(other.SourcePath) && TargetPath.Equals(other.TargetPath);
     }
 }

@@ -19,11 +19,7 @@ public class EnumFromStringParseMapping : TypeMapping
     private readonly bool _genericParseMethodSupported;
     private readonly bool _ignoreCase;
 
-    public EnumFromStringParseMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
-        bool genericParseMethodSupported,
-        bool ignoreCase)
+    public EnumFromStringParseMapping(ITypeSymbol sourceType, ITypeSymbol targetType, bool genericParseMethodSupported, bool ignoreCase)
         : base(sourceType, targetType)
     {
         _genericParseMethodSupported = genericParseMethodSupported;
@@ -40,13 +36,17 @@ public class EnumFromStringParseMapping : TypeMapping
                 ParseMethodName,
                 new[] { FullyQualifiedIdentifier(TargetType) },
                 ctx.Source,
-                BooleanLiteral(_ignoreCase));
+                BooleanLiteral(_ignoreCase)
+            );
         }
 
         // (TargetType)System.Enum.Parse(typeof(TargetType), source, ignoreCase)
         var enumParseInvocation = Invocation(
             MemberAccess(EnumClassName, ParseMethodName),
-            TypeOfExpression(FullyQualifiedIdentifier(TargetType)), ctx.Source, BooleanLiteral(_ignoreCase));
+            TypeOfExpression(FullyQualifiedIdentifier(TargetType)),
+            ctx.Source,
+            BooleanLiteral(_ignoreCase)
+        );
         return CastExpression(FullyQualifiedIdentifier(TargetType), enumParseInvocation);
     }
 }

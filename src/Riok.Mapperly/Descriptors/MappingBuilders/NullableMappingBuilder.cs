@@ -14,9 +14,7 @@ public static class NullableMappingBuilder
             return null;
 
         var delegateMapping = ctx.BuildDelegateMapping(sourceNonNullable ?? ctx.Source, targetNonNullable ?? ctx.Target);
-        return delegateMapping == null
-            ? null
-            : BuildNullDelegateMapping(ctx, delegateMapping);
+        return delegateMapping == null ? null : BuildNullDelegateMapping(ctx, delegateMapping);
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
@@ -27,9 +25,7 @@ public static class NullableMappingBuilder
             return null;
 
         var delegateMapping = ctx.FindOrBuildExistingTargetMapping(sourceNonNullable ?? ctx.Source, targetNonNullable ?? ctx.Target);
-        return delegateMapping == null
-            ? null
-            : new NullDelegateExistingTargetMapping(ctx.Source, ctx.Target, delegateMapping);
+        return delegateMapping == null ? null : new NullDelegateExistingTargetMapping(ctx.Source, ctx.Target, delegateMapping);
     }
 
     private static TypeMapping BuildNullDelegateMapping(MappingBuilderContext ctx, ITypeMapping mapping)
@@ -37,11 +33,7 @@ public static class NullableMappingBuilder
         var nullFallback = ctx.GetNullFallbackValue();
         return mapping switch
         {
-            MethodMapping methodMapping => new NullDelegateMethodMapping(
-                ctx.Source,
-                ctx.Target,
-                methodMapping,
-                nullFallback),
+            MethodMapping methodMapping => new NullDelegateMethodMapping(ctx.Source, ctx.Target, methodMapping, nullFallback),
             _ => new NullDelegateMapping(ctx.Source, ctx.Target, mapping, nullFallback),
         };
     }

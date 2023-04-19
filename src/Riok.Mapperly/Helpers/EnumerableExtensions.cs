@@ -32,7 +32,8 @@ public static class EnumerableExtensions
     public static IEnumerable<T> DistinctBy<T, TProp>(
         this IEnumerable<T> enumerable,
         Func<T, TProp> selector,
-        IEqualityComparer<TProp>? equalityComparer = null)
+        IEqualityComparer<TProp>? equalityComparer = null
+    )
     {
         var set = new HashSet<TProp>(equalityComparer);
         foreach (var item in enumerable)
@@ -82,7 +83,8 @@ public static class EnumerableExtensions
     public static TAccumulate AggregateWithPrevious<T, TAccumulate>(
         this IEnumerable<T> source,
         TAccumulate seed,
-        Func<TAccumulate, T?, T, TAccumulate> func)
+        Func<TAccumulate, T?, T, TAccumulate> func
+    )
     {
         var result = seed;
         T? prev = default;

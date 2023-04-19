@@ -19,7 +19,8 @@ public class SimpleMappingBuilderContext
         MapperDescriptor descriptor,
         SourceProductionContext context,
         MappingBuilder mappingBuilder,
-        ExistingTargetMappingBuilder existingTargetMappingBuilder)
+        ExistingTargetMappingBuilder existingTargetMappingBuilder
+    )
     {
         Compilation = compilation;
         Types = types;
@@ -30,7 +31,6 @@ public class SimpleMappingBuilderContext
         ExistingTargetMappingBuilder = existingTargetMappingBuilder;
     }
 
-
     protected SimpleMappingBuilderContext(SimpleMappingBuilderContext ctx)
         : this(
             ctx.Compilation,
@@ -39,9 +39,9 @@ public class SimpleMappingBuilderContext
             ctx._descriptor,
             ctx._context,
             ctx.MappingBuilder,
-            ctx.ExistingTargetMappingBuilder)
-    {
-    }
+            ctx.ExistingTargetMappingBuilder
+        ) { }
+
     public Compilation Compilation { get; }
 
     public MapperAttribute MapperConfiguration => Configuration.Mapper;
@@ -54,15 +54,15 @@ public class SimpleMappingBuilderContext
 
     protected ExistingTargetMappingBuilder ExistingTargetMappingBuilder { get; }
 
-    public virtual bool IsConversionEnabled(MappingConversionType conversionType)
-        => MapperConfiguration.EnabledConversions.HasFlag(conversionType);
+    public virtual bool IsConversionEnabled(MappingConversionType conversionType) =>
+        MapperConfiguration.EnabledConversions.HasFlag(conversionType);
 
-    public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? location, params object[] messageArgs)
-        => ReportDiagnostic(descriptor, location?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(), messageArgs);
+    public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? location, params object[] messageArgs) =>
+        ReportDiagnostic(descriptor, location?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(), messageArgs);
 
-    public void ReportDiagnostic(DiagnosticDescriptor descriptor, SyntaxNode? location, params object[] messageArgs)
-        => ReportDiagnostic(descriptor, location?.GetLocation(), messageArgs);
+    public void ReportDiagnostic(DiagnosticDescriptor descriptor, SyntaxNode? location, params object[] messageArgs) =>
+        ReportDiagnostic(descriptor, location?.GetLocation(), messageArgs);
 
-    private void ReportDiagnostic(DiagnosticDescriptor descriptor, Location? location, params object[] messageArgs)
-        => _context.ReportDiagnostic(Diagnostic.Create(descriptor, location ?? _descriptor.Syntax.GetLocation(), messageArgs));
+    private void ReportDiagnostic(DiagnosticDescriptor descriptor, Location? location, params object[] messageArgs) =>
+        _context.ReportDiagnostic(Diagnostic.Create(descriptor, location ?? _descriptor.Syntax.GetLocation(), messageArgs));
 }

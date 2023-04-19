@@ -8,10 +8,7 @@ public class ConstructorParameterMapping
 {
     private readonly bool _selfOrPreviousIsUnmappedOptional;
 
-    public ConstructorParameterMapping(
-        IParameterSymbol parameter,
-        NullMemberMapping delegateMapping,
-        bool selfOrPreviousIsUnmappedOptional)
+    public ConstructorParameterMapping(IParameterSymbol parameter, NullMemberMapping delegateMapping, bool selfOrPreviousIsUnmappedOptional)
     {
         DelegateMapping = delegateMapping;
         Parameter = parameter;
@@ -26,15 +23,13 @@ public class ConstructorParameterMapping
     {
         var argumentExpression = DelegateMapping.Build(ctx);
         var arg = SyntaxFactory.Argument(argumentExpression);
-        return _selfOrPreviousIsUnmappedOptional
-            ? arg.WithNameColon(SyntaxFactory.NameColon(Parameter.Name))
-            : arg;
+        return _selfOrPreviousIsUnmappedOptional ? arg.WithNameColon(SyntaxFactory.NameColon(Parameter.Name)) : arg;
     }
 
-    protected bool Equals(ConstructorParameterMapping other)
-        => Parameter.Equals(other.Parameter, SymbolEqualityComparer.Default)
-            && DelegateMapping.Equals(other.DelegateMapping)
-            && _selfOrPreviousIsUnmappedOptional == other._selfOrPreviousIsUnmappedOptional;
+    protected bool Equals(ConstructorParameterMapping other) =>
+        Parameter.Equals(other.Parameter, SymbolEqualityComparer.Default)
+        && DelegateMapping.Equals(other.DelegateMapping)
+        && _selfOrPreviousIsUnmappedOptional == other._selfOrPreviousIsUnmappedOptional;
 
     public override bool Equals(object? obj)
     {

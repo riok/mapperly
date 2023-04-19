@@ -21,10 +21,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         private static TestObjectDtoManuallyMappedProjection? MapManual(string str)
         {
-            return new TestObjectDtoManuallyMappedProjection(100)
-            {
-                StringValue = str,
-            };
+            return new TestObjectDtoManuallyMappedProjection(100) { StringValue = str, };
         }
     }
 }

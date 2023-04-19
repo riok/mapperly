@@ -10,7 +10,8 @@ public class MemberPathCandidateBuilderTest
     [InlineData("MyValueId", new[] { "MyValueId", "My.ValueId", "MyValue.Id", "My.Value.Id" })]
     public void BuildMemberPathCandidatesShouldWork(string name, string[] chunks)
     {
-        MemberPathCandidateBuilder.BuildMemberPathCandidates(name)
+        MemberPathCandidateBuilder
+            .BuildMemberPathCandidates(name)
             .Select(x => string.Join(".", x))
             .Should()
             .BeEquivalentTo(chunks, o => o.WithStrictOrdering());

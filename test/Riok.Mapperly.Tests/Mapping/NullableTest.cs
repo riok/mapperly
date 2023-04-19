@@ -6,13 +6,10 @@ public class NullableTest
     [Fact]
     public void NullableToNonNullableShouldThrow()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A?",
-            "B",
-            "class A { }",
-            "class B { }");
+        var source = TestSourceBuilder.Mapping("A?", "B", "class A { }", "class B { }");
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -20,19 +17,17 @@ public class NullableTest
                     throw new System.ArgumentNullException(nameof(source));
                 var target = new global::B();
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void NullableToNullableShouldWork()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A?",
-            "B?",
-            "class A { }",
-            "class B { }");
+        var source = TestSourceBuilder.Mapping("A?", "B?", "class A { }", "class B { }");
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -40,37 +35,32 @@ public class NullableTest
                     return default;
                 var target = new global::B();
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void NullablePrimitiveToOtherNullablePrimitiveShouldWork()
     {
-        var source = TestSourceBuilder.Mapping(
-            "decimal?",
-            "int?");
+        var source = TestSourceBuilder.Mapping("decimal?", "int?");
 
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody(@"return source == null ? default : (int)source.Value;");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody(@"return source == null ? default : (int)source.Value;");
     }
 
     [Fact]
     public void NonNullableToNullableShouldWork()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "B?",
-            "class A { }",
-            "class B { }");
+        var source = TestSourceBuilder.Mapping("A", "B?", "class A { }", "class B { }");
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -79,11 +69,16 @@ public class NullableTest
         var source = TestSourceBuilder.Mapping(
             "A?",
             "B",
-            TestSourceBuilderOptions.Default with { ThrowOnMappingNullMismatch = false },
+            TestSourceBuilderOptions.Default with
+            {
+                ThrowOnMappingNullMismatch = false
+            },
             "class A { }",
-            "class B { }");
+            "class B { }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -91,7 +86,8 @@ public class NullableTest
                     return new global::B();
                 var target = new global::B();
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -100,8 +96,12 @@ public class NullableTest
         var source = TestSourceBuilder.Mapping(
             "string?",
             "B",
-            TestSourceBuilderOptions.Default with { ThrowOnMappingNullMismatch = false },
-            "class B { protected B(){} public static B Parse(string v) => new B(); }");
+            TestSourceBuilderOptions.Default with
+            {
+                ThrowOnMappingNullMismatch = false
+            },
+            "class B { protected B(){} public static B Parse(string v) => new B(); }"
+        );
         return TestHelper.VerifyGenerator(source);
     }
 
@@ -111,12 +111,14 @@ public class NullableTest
         var source = TestSourceBuilder.Mapping(
             "A?",
             "string",
-            TestSourceBuilderOptions.Default with { ThrowOnMappingNullMismatch = false },
-            "class A { }");
+            TestSourceBuilderOptions.Default with
+            {
+                ThrowOnMappingNullMismatch = false
+            },
+            "class A { }"
+        );
 
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return source == null ? \"\" : source.ToString();");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source == null ? \"\" : source.ToString();");
     }
 
     [Fact]
@@ -125,23 +127,21 @@ public class NullableTest
         var source = TestSourceBuilder.Mapping(
             "DateTime?",
             "DateTime",
-            TestSourceBuilderOptions.Default with { ThrowOnMappingNullMismatch = false });
+            TestSourceBuilderOptions.Default with
+            {
+                ThrowOnMappingNullMismatch = false
+            }
+        );
 
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return source == null ? default : source.Value;");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source == null ? default : source.Value;");
     }
 
     [Fact]
     public void NonNullableToNullableValueType()
     {
-        var source = TestSourceBuilder.Mapping(
-            "DateTime",
-            "DateTime?");
+        var source = TestSourceBuilder.Mapping("DateTime", "DateTime?");
 
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return (global::System.DateTime? )source;");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::System.DateTime? )source;");
     }
 
     [Fact]
@@ -150,16 +150,19 @@ public class NullableTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial void Map(A? source, B target)",
             "class A { public string StringValue { get; set; } }",
-            "class B { public string StringValue { get; set; } }");
+            "class B { public string StringValue { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 if (source == null)
                     return;
                 target.StringValue = source.StringValue;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -176,9 +179,11 @@ public class NullableTest
             "A",
             "B",
             "class A { public string Value { get; set; } public string[] Descriptions { get; set; } }",
-            "#nullable disable\n class B { public string Value { get; set; } public string[] Descriptions { get; set; } }\n#nullable enable");
+            "#nullable disable\n class B { public string Value { get; set; } public string[] Descriptions { get; set; } }\n#nullable enable"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveMapMethodBody(
                 """
@@ -186,6 +191,7 @@ public class NullableTest
                 target.Value = source.Value;
                 target.Descriptions = (string[])source.Descriptions;
                 return target;
-                """);
+                """
+            );
     }
 }
