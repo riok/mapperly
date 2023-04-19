@@ -15,7 +15,8 @@ public static class UserMethodMappingBodyBuilder
         // UserDefinedExistingTargetMethodMapping handles null already
         var delegateMapping = ctx.BuildExistingTargetMappingWithUserSymbol(
             mapping.SourceType.NonNullable(),
-            mapping.TargetType.NonNullable());
+            mapping.TargetType.NonNullable()
+        );
 
         if (delegateMapping != null)
         {
@@ -23,10 +24,7 @@ public static class UserMethodMappingBodyBuilder
             return;
         }
 
-        ctx.ReportDiagnostic(
-            DiagnosticDescriptors.CouldNotCreateMapping,
-            mapping.SourceType,
-            mapping.TargetType);
+        ctx.ReportDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping, mapping.SourceType, mapping.TargetType);
     }
 
     public static void BuildMappingBody(MappingBuilderContext ctx, UserDefinedNewInstanceMethodMapping mapping)
@@ -41,9 +39,6 @@ public static class UserMethodMappingBodyBuilder
             return;
         }
 
-        ctx.ReportDiagnostic(
-            DiagnosticDescriptors.CouldNotCreateMapping,
-            mapping.SourceType,
-            mapping.TargetType);
+        ctx.ReportDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping, mapping.SourceType, mapping.TargetType);
     }
 }

@@ -15,13 +15,9 @@ internal sealed class ReferenceEqualityComparer<T> : IEqualityComparer<T>
     /// </summary>
     public static readonly IEqualityComparer<T> Instance = new ReferenceEqualityComparer<T>();
 
-    private ReferenceEqualityComparer()
-    {
-    }
+    private ReferenceEqualityComparer() { }
 
-    bool IEqualityComparer<T>.Equals(T? x, T? y)
-        => ReferenceEquals(x, y);
+    bool IEqualityComparer<T>.Equals(T? x, T? y) => ReferenceEquals(x, y);
 
-    int IEqualityComparer<T>.GetHashCode(T obj)
-        => RuntimeHelpers.GetHashCode(obj);
+    int IEqualityComparer<T>.GetHashCode(T obj) => RuntimeHelpers.GetHashCode(obj);
 }

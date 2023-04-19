@@ -12,7 +12,6 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public class UserImplementedMethodMapping : TypeMapping, IUserMapping
 {
-
     private readonly MethodParameter _sourceParameter;
     private readonly MethodParameter? _referenceHandlerParameter;
 
@@ -31,10 +30,18 @@ public class UserImplementedMethodMapping : TypeMapping, IUserMapping
         // if the user implemented method is on an interface,
         // we explicitly cast to be able to use the default interface implementation or explicit implementations
         if (Method.ReceiverType?.TypeKind != TypeKind.Interface)
-            return Invocation(Method.Name, _sourceParameter.WithArgument(ctx.Source), _referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
+            return Invocation(
+                Method.Name,
+                _sourceParameter.WithArgument(ctx.Source),
+                _referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+            );
 
         var castedThis = CastExpression(FullyQualifiedIdentifier(Method.ReceiverType!), ThisExpression());
         var method = MemberAccess(ParenthesizedExpression(castedThis), Method.Name);
-        return Invocation(method, _sourceParameter.WithArgument(ctx.Source), _referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
+        return Invocation(
+            method,
+            _sourceParameter.WithArgument(ctx.Source),
+            _referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+        );
     }
 }

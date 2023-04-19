@@ -24,7 +24,8 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
         MethodParameter targetParameter,
         MethodParameter? referenceHandlerParameter,
         bool enableReferenceHandling,
-        INamedTypeSymbol referenceHandlerType)
+        INamedTypeSymbol referenceHandlerType
+    )
         : base(sourceParameter, targetParameter.Type)
     {
         _enableReferenceHandling = enableReferenceHandling;
@@ -40,8 +41,7 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
 
     public IMethodSymbol Method { get; }
 
-    public void SetDelegateMapping(IExistingTargetMapping delegateMapping)
-        => _delegateMapping = delegateMapping;
+    public void SetDelegateMapping(IExistingTargetMapping delegateMapping) => _delegateMapping = delegateMapping;
 
     private MethodParameter TargetParameter { get; }
 
@@ -49,15 +49,14 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
 
     protected override ITypeSymbol? ReturnType => null; // return type is always void.
 
-    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
-        => throw new InvalidOperationException($"{nameof(UserDefinedExistingTargetMethodMapping)} does not support {nameof(Build)}");
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
+        throw new InvalidOperationException($"{nameof(UserDefinedExistingTargetMethodMapping)} does not support {nameof(Build)}");
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         if (_delegateMapping == null)
         {
-            yield return ThrowStatement(ThrowNotImplementedException())
-                .WithLeadingTrivia(TriviaList(Comment(NoMappingComment)));
+            yield return ThrowStatement(ThrowNotImplementedException()).WithLeadingTrivia(TriviaList(Comment(NoMappingComment)));
             yield break;
         }
 
@@ -88,7 +87,8 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
 
     protected override ParameterListSyntax BuildParameterList()
         // needs to include the target parameter
-        => ParameterList(IsExtensionMethod, SourceParameter, TargetParameter, ReferenceHandlerParameter);
+        =>
+        ParameterList(IsExtensionMethod, SourceParameter, TargetParameter, ReferenceHandlerParameter);
 
     internal override void EnableReferenceHandling(INamedTypeSymbol iReferenceHandlerType)
     {
@@ -97,8 +97,6 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
 
     private StatementSyntax BuildNullGuard(TypeMappingBuildContext ctx)
     {
-        return IfStatement(
-            IfAnyNull((SourceType, ctx.Source), (TargetType, IdentifierName(TargetParameter.Name))),
-            ReturnStatement());
+        return IfStatement(IfAnyNull((SourceType, ctx.Source), (TargetType, IdentifierName(TargetParameter.Name))), ReturnStatement());
     }
 }

@@ -9,16 +9,19 @@ public class ObjectFieldTest
             "A",
             "B",
             "class A { public string StringValue; }",
-            "class B { public string StringValue; }");
+            "class B { public string StringValue; }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
                 target.StringValue = source.StringValue;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -28,15 +31,18 @@ public class ObjectFieldTest
             "A",
             "B",
             "class A { public string Value { get; set; } }",
-            "class B { public int Value { get; set; } }");
+            "class B { public int Value { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
                 target.Value = int.Parse(source.Value);
                 return target;
-                """);
+                """
+            );
     }
 }

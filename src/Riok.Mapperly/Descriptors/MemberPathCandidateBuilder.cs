@@ -21,8 +21,6 @@ public static class MemberPathCandidateBuilder
 
     private static IEnumerable<string> BuildName(IEnumerable<string> chunks, int splitPositions)
     {
-        return chunks
-            .Chunk((_, i) => (splitPositions & (1 << i)) == 0)
-            .Select(x => string.Concat(x));
+        return chunks.Chunk((_, i) => (splitPositions & (1 << i)) == 0).Select(x => string.Concat(x));
     }
 }

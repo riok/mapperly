@@ -9,40 +9,23 @@ public class EnumTest
     [Fact]
     public void EnumToOtherEnumShouldCast()
     {
-        var source = TestSourceBuilder.Mapping(
-            "E2",
-            "E1",
-            "enum E1 {A, B, C}",
-            "enum E2 {A, B, C}");
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return (global::E1)source;");
+        var source = TestSourceBuilder.Mapping("E2", "E1", "enum E1 {A, B, C}", "enum E2 {A, B, C}");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E1)source;");
     }
 
     [Fact]
     public void EnumToSameEnumShouldAssign()
     {
-        var source = TestSourceBuilder.Mapping(
-            "E1",
-            "E1",
-            "enum E1 {A, B, C}");
+        var source = TestSourceBuilder.Mapping("E1", "E1", "enum E1 {A, B, C}");
 
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return source;");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source;");
     }
 
     [Fact]
     public void EnumToOtherEnumTypeShouldCast()
     {
-        var source = TestSourceBuilder.Mapping(
-            "E1",
-            "E2",
-            "enum E1 : short {A, B, C}",
-            "enum E2 : byte {A, B, C}");
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return (global::E2)source;");
+        var source = TestSourceBuilder.Mapping("E1", "E2", "enum E1 : short {A, B, C}", "enum E2 : byte {A, B, C}");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E2)source;");
     }
 
     [Fact]
@@ -52,10 +35,9 @@ public class EnumTest
             "C",
             "E",
             "class C { public static explicit operator byte(C c) => 0; } }",
-            "enum E : byte {A, B, C}");
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return (global::E)(byte)source;");
+            "enum E : byte {A, B, C}"
+        );
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E)(byte)source;");
     }
 
     [Fact]
@@ -64,11 +46,10 @@ public class EnumTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapEnum(EnumMappingStrategy.ByValue)] partial E2 ToE1(E1 source);",
             "enum E1 {A, B, C}",
-            "enum E2 {A = 100, B, C}");
+            "enum E2 {A = 100, B, C}"
+        );
 
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return (global::E2)source;");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E2)source;");
     }
 
     [Fact]
@@ -77,9 +58,11 @@ public class EnumTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapEnum(EnumMappingStrategy.ByName, IgnoreCase = false)] partial E2 ToE1(E1 source);",
             "enum E1 {A, B, C, D, E}",
-            "enum E2 {A = 100, B, C, d, e, E}");
+            "enum E2 {A = 100, B, C, d, e, E}"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -91,7 +74,8 @@ public class EnumTest
                     global::E1.E => global::E2.E,
                     _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
                 };
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -100,9 +84,11 @@ public class EnumTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)] partial E2 ToE1(E1 source);",
             "enum E1 {A, B, C, D, E, f, F}",
-            "enum E2 {A = 100, B, C, d, e, E, f}");
+            "enum E2 {A = 100, B, C, d, e, E, f}"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -117,7 +103,8 @@ public class EnumTest
                     global::E1.F => global::E2.f,
                     _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
                 };
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -126,7 +113,8 @@ public class EnumTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapEnum(EnumMappingStrategy.ByName)] partial E2 ToE1(E1 source);",
             "enum E1 {A, B, C}",
-            "enum E2 {D, E, F}");
+            "enum E2 {D, E, F}"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -134,7 +122,8 @@ public class EnumTest
     [Fact]
     public void EnumToOtherEnumByNameViaGlobalConfigShouldSwitch()
     {
-        var source = @"
+        var source =
+            @"
 using System;
 using System.Collections.Generic;
 using Riok.Mapperly.Abstractions;
@@ -150,7 +139,8 @@ enum E1 {A, B, C}
 enum E2 {A = 100, B, C}
 ";
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -161,58 +151,44 @@ enum E2 {A = 100, B, C}
                     global::E1.C => global::E2.C,
                     _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
                 };
-                """);
+                """
+            );
     }
 
     [Fact]
     public void NullableEnumToOtherEnumShouldCastWithNullHandling()
     {
-        var source = TestSourceBuilder.Mapping(
-            "E1?",
-            "E2",
-            "enum E1 {A, B, C}",
-            "enum E2 {A, B, C}");
+        var source = TestSourceBuilder.Mapping("E1?", "E2", "enum E1 {A, B, C}", "enum E2 {A, B, C}");
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return source == null ? throw new System.ArgumentNullException(nameof(source)) : (global::E2)source.Value;");
+            .HaveSingleMethodBody(
+                "return source == null ? throw new System.ArgumentNullException(nameof(source)) : (global::E2)source.Value;"
+            );
     }
 
     [Fact]
     public void NullableEnumToOtherNullableEnumShouldCast()
     {
-        var source = TestSourceBuilder.Mapping(
-            "E1?",
-            "E2?",
-            "enum E1 {A, B, C}",
-            "enum E2 {A, B, C}");
+        var source = TestSourceBuilder.Mapping("E1?", "E2?", "enum E1 {A, B, C}", "enum E2 {A, B, C}");
 
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return source == null ? default : (global::E2)source.Value;");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source == null ? default : (global::E2)source.Value;");
     }
 
     [Fact]
     public void EnumToOtherNullableEnumShouldCast()
     {
-        var source = TestSourceBuilder.Mapping(
-            "E1",
-            "E2?",
-            "enum E1 {A, B, C}",
-            "enum E2 {A, B, C}");
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return (global::E2? )(global::E2)source;");
+        var source = TestSourceBuilder.Mapping("E1", "E2?", "enum E1 {A, B, C}", "enum E2 {A, B, C}");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E2? )(global::E2)source;");
     }
 
     [Fact]
     public void EnumToStringShouldSwitch()
     {
-        var source = TestSourceBuilder.Mapping(
-            "E1",
-            "string",
-            "enum E1 {A, B, C}");
-        TestHelper.GenerateMapper(source)
+        var source = TestSourceBuilder.Mapping("E1", "string", "enum E1 {A, B, C}");
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -223,7 +199,8 @@ enum E2 {A = 100, B, C}
                     global::E1.C => nameof(global::E1.C),
                     _ => source.ToString(),
                 };
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -231,8 +208,10 @@ enum E2 {A = 100, B, C}
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)] partial E1 ToE1(string source);",
-            "enum E1 {A, B, C}");
-        TestHelper.GenerateMapper(source)
+            "enum E1 {A, B, C}"
+        );
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -243,7 +222,8 @@ enum E2 {A = 100, B, C}
                     { } s when s.Equals(nameof(global::E1.C), System.StringComparison.OrdinalIgnoreCase) => global::E1.C,
                     _ => System.Enum.Parse<global::E1>(source, true),
                 };
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -251,8 +231,10 @@ enum E2 {A = 100, B, C}
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapEnum(EnumMappingStrategy.ByName)] partial E1 ToE1(string source);",
-            "enum E1 {A, B, C}");
-        TestHelper.GenerateMapper(source)
+            "enum E1 {A, B, C}"
+        );
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -263,7 +245,8 @@ enum E2 {A = 100, B, C}
                     nameof(global::E1.C) => global::E1.C,
                     _ => System.Enum.Parse<global::E1>(source, false),
                 };
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -274,8 +257,10 @@ enum E2 {A = 100, B, C}
             "E1",
             TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.EnumToEnum, MappingConversionType.ExplicitCast),
             "enum E1 {A, B, C}",
-            "enum E2 {A, B, C}");
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            "enum E2 {A, B, C}"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
     }
@@ -288,10 +273,9 @@ enum E2 {A = 100, B, C}
             "E1",
             TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.EnumToEnum),
             "enum E1 {A, B, C}",
-            "enum E2 {A, B, C}");
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return (global::E1)source;");
+            "enum E2 {A, B, C}"
+        );
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E1)source;");
     }
 
     [Fact]
@@ -300,8 +284,10 @@ enum E2 {A = 100, B, C}
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapEnum(EnumMappingStrategy.ByName)] partial E1 ToE1(string source);",
             TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.StringToEnum, MappingConversionType.ParseMethod),
-            "enum E1 {A, B, C}");
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            "enum E1 {A, B, C}"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
     }
@@ -312,10 +298,9 @@ enum E2 {A = 100, B, C}
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapEnum(EnumMappingStrategy.ByName)] partial E1 ToE1(string source);",
             TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.StringToEnum),
-            "enum E1 {A, B, C}");
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return (global::E1)int.Parse(source);");
+            "enum E1 {A, B, C}"
+        );
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E1)int.Parse(source);");
     }
 
     [Fact]
@@ -324,9 +309,14 @@ enum E2 {A = 100, B, C}
         var source = TestSourceBuilder.Mapping(
             "E1",
             "string",
-            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.EnumToString, MappingConversionType.ToStringMethod),
-            "enum E1 {A, B, C}");
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            TestSourceBuilderOptions.WithDisabledMappingConversion(
+                MappingConversionType.EnumToString,
+                MappingConversionType.ToStringMethod
+            ),
+            "enum E1 {A, B, C}"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
     }
@@ -338,9 +328,8 @@ enum E2 {A = 100, B, C}
             "E1",
             "string",
             TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.EnumToString),
-            "enum E1 {A, B, C}");
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return (string)source.ToString();");
+            "enum E1 {A, B, C}"
+        );
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (string)source.ToString();");
     }
 }

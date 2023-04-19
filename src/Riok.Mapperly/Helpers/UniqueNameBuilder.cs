@@ -14,11 +14,9 @@ public class UniqueNameBuilder
         _usedNames = new HashSet<string>(usedNames);
     }
 
-    public void Reserve(string name)
-        => _usedNames.Add(name);
+    public void Reserve(string name) => _usedNames.Add(name);
 
-    public UniqueNameBuilder NewScope()
-        => new(_usedNames);
+    public UniqueNameBuilder NewScope() => new(_usedNames);
 
     public string New(string name)
     {

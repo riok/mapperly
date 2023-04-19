@@ -11,13 +11,10 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 public class CtorMapping : TypeMapping
 {
     public CtorMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        : base(sourceType, targetType)
-    {
-    }
+        : base(sourceType, targetType) { }
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         return ObjectCreationExpression(FullyQualifiedIdentifier(TargetType)).WithArgumentList(ArgumentList(ctx.Source));
-
     }
 }

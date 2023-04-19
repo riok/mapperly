@@ -12,7 +12,11 @@ public abstract class EnsureCapacity
 
     public abstract StatementSyntax Build(TypeMappingBuildContext ctx, ExpressionSyntax target);
 
-    protected static ExpressionStatementSyntax EnsureCapacityStatement(ExpressionSyntax target, ExpressionSyntax sourceCount, ExpressionSyntax targetCount)
+    protected static ExpressionStatementSyntax EnsureCapacityStatement(
+        ExpressionSyntax target,
+        ExpressionSyntax sourceCount,
+        ExpressionSyntax targetCount
+    )
     {
         var sumMethod = BinaryExpression(SyntaxKind.AddExpression, sourceCount, targetCount);
         return ExpressionStatement(Invocation(MemberAccess(target, EnsureCapacityName), sumMethod));

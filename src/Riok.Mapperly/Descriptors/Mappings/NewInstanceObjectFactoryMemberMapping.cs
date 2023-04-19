@@ -20,7 +20,8 @@ public class NewInstanceObjectFactoryMemberMapping : ObjectMemberMethodMapping
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         ObjectFactory objectFactory,
-        bool enableReferenceHandling)
+        bool enableReferenceHandling
+    )
         : base(sourceType, targetType)
     {
         _objectFactory = objectFactory;
@@ -45,10 +46,9 @@ public class NewInstanceObjectFactoryMemberMapping : ObjectMemberMethodMapping
         if (_enableReferenceHandling)
         {
             // SetReference
-            yield return ExpressionStatement(ReferenceHandlingSyntaxFactoryHelper.SetReference(
-                this,
-                ctx,
-                IdentifierName(targetVariableName)));
+            yield return ExpressionStatement(
+                ReferenceHandlingSyntaxFactoryHelper.SetReference(this, ctx, IdentifierName(targetVariableName))
+            );
         }
 
         // map properties

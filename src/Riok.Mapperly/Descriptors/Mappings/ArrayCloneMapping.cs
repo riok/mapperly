@@ -13,17 +13,11 @@ public class ArrayCloneMapping : TypeMapping
 {
     private const string CloneMethodName = nameof(Array.Clone);
 
-    public ArrayCloneMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType)
-        : base(sourceType, targetType)
-    {
-    }
+    public ArrayCloneMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+        : base(sourceType, targetType) { }
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        return CastExpression(
-            FullyQualifiedIdentifier(TargetType),
-            InvocationExpression(MemberAccess(ctx.Source, CloneMethodName)));
+        return CastExpression(FullyQualifiedIdentifier(TargetType), InvocationExpression(MemberAccess(ctx.Source, CloneMethodName)));
     }
 }

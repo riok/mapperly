@@ -36,15 +36,7 @@ public class EnumerableExtensionsTest
     [Fact]
     public void DistinctByShouldWork()
     {
-        var items = new[]
-        {
-            ("item10", 10),
-            ("item11", 10),
-            ("item12", 10),
-            ("item20", 20),
-            ("item30", 30),
-            ("item31", 30),
-        };
+        var items = new[] { ("item10", 10), ("item11", 10), ("item12", 10), ("item20", 20), ("item30", 30), ("item31", 30), };
 
         items
             .DistinctBy(x => x.Item2)
@@ -60,30 +52,20 @@ public class EnumerableExtensionsTest
             .Range(0, 5)
             .Chunk((_, index) => index % 2 == 1)
             .Should()
-            .BeEquivalentTo(new[]
-            {
-                new[] { 0, 1 },
-                new[] { 2, 3 },
-                new[] { 4 }
-            }, o => o.WithStrictOrdering());
+            .BeEquivalentTo(new[] { new[] { 0, 1 }, new[] { 2, 3 }, new[] { 4 } }, o => o.WithStrictOrdering());
     }
 
     [Fact]
     public void SkipLastShouldWork()
     {
         var items = new[] { 1, 2, 5, 6, 7 };
-        items
-            .SkipLast()
-            .Should()
-            .BeEquivalentTo(items.Take(items.Length - 1), o => o.WithoutStrictOrdering());
+        items.SkipLast().Should().BeEquivalentTo(items.Take(items.Length - 1), o => o.WithoutStrictOrdering());
     }
 
     [Fact]
     public void AggregateWithPrevious()
     {
         var items = new[] { 1, 2, 5, 6, 7 };
-        items.AggregateWithPrevious(100, (agg, prev, item) => agg - prev + item)
-            .Should()
-            .Be(107);
+        items.AggregateWithPrevious(100, (agg, prev, item) => agg - prev + item).Should().Be(107);
     }
 }

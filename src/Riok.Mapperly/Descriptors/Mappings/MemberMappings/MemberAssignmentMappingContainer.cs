@@ -31,8 +31,8 @@ public abstract class MemberAssignmentMappingContainer : IMemberAssignmentMappin
         }
     }
 
-    public bool HasMemberMappingContainer(IMemberAssignmentMappingContainer container)
-        => _childContainers.Contains(container) || _parent?.HasMemberMappingContainer(container) == true;
+    public bool HasMemberMappingContainer(IMemberAssignmentMappingContainer container) =>
+        _childContainers.Contains(container) || _parent?.HasMemberMappingContainer(container) == true;
 
     public void AddMemberMapping(IMemberAssignmentMapping mapping)
     {
@@ -42,6 +42,6 @@ public abstract class MemberAssignmentMappingContainer : IMemberAssignmentMappin
         }
     }
 
-    public bool HasMemberMapping(IMemberAssignmentMapping mapping)
-        => _delegateMappings.Contains(mapping) || _parent?.HasMemberMapping(mapping) == true;
+    public bool HasMemberMapping(IMemberAssignmentMapping mapping) =>
+        _delegateMappings.Contains(mapping) || _parent?.HasMemberMapping(mapping) == true;
 }

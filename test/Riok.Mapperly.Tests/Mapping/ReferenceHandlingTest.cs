@@ -15,7 +15,8 @@ public class ReferenceHandlingTest
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -25,12 +26,13 @@ public class ReferenceHandlingTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapProperty(\"Value\", \"MyValue\")] partial B MapToB(A source);"
-            + "[MapProperty(\"Value\", \"MyValue2\")] partial B MapToB1(A source);",
+                + "[MapProperty(\"Value\", \"MyValue2\")] partial B MapToB1(A source);",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D MyValue { get; set; } public D MyValue2 { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -45,7 +47,8 @@ public class ReferenceHandlingTest
             "class A { public IEnumerable<A> Parent { get; set; } public C Value { get; set; } }",
             "class B { public IEnumerable<B> Parent { get; set; } public D Value { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -60,7 +63,8 @@ public class ReferenceHandlingTest
             "class A { public A[] Parent { get; set; } public C Value { get; set; } }",
             "class B { public B[] Parent { get; set; } public D Value { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -74,7 +78,8 @@ public class ReferenceHandlingTest
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -83,13 +88,13 @@ public class ReferenceHandlingTest
     public Task ObjectFactoryShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[ObjectFactory] B CreateB() => new B();"
-            + "partial B Map(A a);",
+            "[ObjectFactory] B CreateB() => new B();" + "partial B Map(A a);",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -103,7 +108,8 @@ public class ReferenceHandlingTest
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -118,13 +124,18 @@ public class ReferenceHandlingTest
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new DiagnosticMatcher(
-                DiagnosticDescriptors.ReferenceHandlerParameterWrongType,
-                "The reference handler parameter of Mapper.Map needs to be of type Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler but is MyRefHandler"));
+            .HaveDiagnostic(
+                new DiagnosticMatcher(
+                    DiagnosticDescriptors.ReferenceHandlerParameterWrongType,
+                    "The reference handler parameter of Mapper.Map needs to be of type Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler but is MyRefHandler"
+                )
+            );
     }
 
     [Fact]
@@ -133,26 +144,31 @@ public class ReferenceHandlingTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial B Map(A source, [ReferenceHandler] IReferenceHandler refHandler);",
             "class A { public string Value { get; set; } }",
-            "class B { public string Value { get; set; } }");
+            "class B { public string Value { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new DiagnosticMatcher(
-                DiagnosticDescriptors.ReferenceHandlingNotEnabled,
-                "Mapper.Map uses reference handling, but it is not enabled on the mapper attribute, to enable reference handling set UseReferenceHandling to true"));
+            .HaveDiagnostic(
+                new DiagnosticMatcher(
+                    DiagnosticDescriptors.ReferenceHandlingNotEnabled,
+                    "Mapper.Map uses reference handling, but it is not enabled on the mapper attribute, to enable reference handling set UseReferenceHandling to true"
+                )
+            );
     }
 
     [Fact]
     public Task CustomHandlerWithObjectFactoryShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[ObjectFactory] B CreateB() => new B();"
-            + "partial B Map(A a, [ReferenceHandler] IReferenceHandler refHandler);",
+            "[ObjectFactory] B CreateB() => new B();" + "partial B Map(A a, [ReferenceHandler] IReferenceHandler refHandler);",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -166,7 +182,8 @@ public class ReferenceHandlingTest
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -180,7 +197,8 @@ public class ReferenceHandlingTest
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -194,7 +212,8 @@ public class ReferenceHandlingTest
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -203,13 +222,13 @@ public class ReferenceHandlingTest
     public Task UserImplementedWithoutReferenceHandlerShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial B Map(A a);"
-            + "string ToStringMod(string s) => s + \"-modified\";",
+            "partial B Map(A a);" + "string ToStringMod(string s) => s + \"-modified\";",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -218,13 +237,13 @@ public class ReferenceHandlingTest
     public Task UserImplementedWithReferenceHandlerShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial B Map(A a);"
-            + "string ToStringMod(string s, [ReferenceHandler] IReferenceHandler _) => s + \"-modified\";",
+            "partial B Map(A a);" + "string ToStringMod(string s, [ReferenceHandler] IReferenceHandler _) => s + \"-modified\";",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }

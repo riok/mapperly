@@ -14,14 +14,15 @@ public class GenericTargetObjectFactory : ObjectFactory
 {
     private readonly Compilation _compilation;
 
-    public GenericTargetObjectFactory(IMethodSymbol method, Compilation compilation) : base(method)
+    public GenericTargetObjectFactory(IMethodSymbol method, Compilation compilation)
+        : base(method)
     {
         _compilation = compilation;
     }
 
-    public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate)
-        => Method.TypeParameters[0].CanConsumeType(_compilation, targetTypeToCreate);
+    public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
+        Method.TypeParameters[0].CanConsumeType(_compilation, targetTypeToCreate);
 
-    protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source)
-        => GenericInvocation(Method.Name, new[] { NonNullableIdentifier(targetTypeToCreate) });
+    protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
+        GenericInvocation(Method.Name, new[] { NonNullableIdentifier(targetTypeToCreate) });
 }

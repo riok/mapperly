@@ -18,22 +18,15 @@ public static class SourceEmitter
         member = WrapInClassesAsNeeded(descriptor.Symbol, member);
         member = WrapInNamespaceIfNeeded(descriptor.Namespace, member);
 
-        return CompilationUnit()
-            .WithMembers(SingletonList(member))
-            .WithLeadingTrivia(Nullable(true))
-            .NormalizeWhitespace();
+        return CompilationUnit().WithMembers(SingletonList(member)).WithLeadingTrivia(Nullable(true)).NormalizeWhitespace();
     }
 
-    private static IEnumerable<MemberDeclarationSyntax> BuildMembers(
-        MapperDescriptor descriptor,
-        SourceEmitterContext sourceEmitterContext)
+    private static IEnumerable<MemberDeclarationSyntax> BuildMembers(MapperDescriptor descriptor, SourceEmitterContext sourceEmitterContext)
     {
         return descriptor.MethodTypeMappings.Select(mapping => mapping.BuildMethod(sourceEmitterContext));
     }
 
-    private static MemberDeclarationSyntax WrapInClassesAsNeeded(
-        INamedTypeSymbol symbol,
-        MemberDeclarationSyntax syntax)
+    private static MemberDeclarationSyntax WrapInClassesAsNeeded(INamedTypeSymbol symbol, MemberDeclarationSyntax syntax)
     {
         var containingType = symbol.ContainingType;
         while (containingType != null)
@@ -50,8 +43,6 @@ public static class SourceEmitter
 
     private static MemberDeclarationSyntax WrapInNamespaceIfNeeded(string? namespaceName, MemberDeclarationSyntax classDeclaration)
     {
-        return namespaceName == null
-            ? classDeclaration
-            : Namespace(namespaceName).WithMembers(SingletonList(classDeclaration));
+        return namespaceName == null ? classDeclaration : Namespace(namespaceName).WithMembers(SingletonList(classDeclaration));
     }
 }

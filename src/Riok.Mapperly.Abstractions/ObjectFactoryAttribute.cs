@@ -8,6 +8,4 @@ namespace Riok.Mapperly.Abstractions;
 /// If the object factory has a parameter, the source object is provided as an argument.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
-public sealed class ObjectFactoryAttribute : Attribute
-{
-}
+public sealed class ObjectFactoryAttribute : Attribute { }

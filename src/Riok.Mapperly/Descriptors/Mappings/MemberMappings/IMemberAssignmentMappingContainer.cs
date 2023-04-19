@@ -15,7 +15,5 @@ public interface IMemberAssignmentMappingContainer
 
     void AddMemberMappingContainer(IMemberAssignmentMappingContainer container);
 
-    IEnumerable<StatementSyntax> Build(
-        TypeMappingBuildContext ctx,
-        ExpressionSyntax targetAccess);
+    IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess);
 }

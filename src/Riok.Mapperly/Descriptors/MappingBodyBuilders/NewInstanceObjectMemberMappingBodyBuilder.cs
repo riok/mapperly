@@ -46,19 +46,21 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 continue;
             }
 
-            if (!MemberPath.TryFind(
-                ctx.Mapping.SourceType,
-                MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
-                ctx.IgnoredSourceMemberNames,
-                out var sourceMemberPath))
+            if (
+                !MemberPath.TryFind(
+                    ctx.Mapping.SourceType,
+                    MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
+                    ctx.IgnoredSourceMemberNames,
+                    out var sourceMemberPath
+                )
+            )
             {
                 ctx.BuilderContext.ReportDiagnostic(
-                    targetMember.IsRequired
-                        ? DiagnosticDescriptors.RequiredMemberNotMapped
-                        : DiagnosticDescriptors.SourceMemberNotFound,
+                    targetMember.IsRequired ? DiagnosticDescriptors.RequiredMemberNotMapped : DiagnosticDescriptors.SourceMemberNotFound,
                     targetMember.Name,
                     ctx.Mapping.TargetType,
-                    ctx.Mapping.SourceType);
+                    ctx.Mapping.SourceType
+                );
                 continue;
             }
 
@@ -69,7 +71,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
     private static void BuildInitMemberMapping(
         INewInstanceBuilderContext<IMapping> ctx,
         IMappableMember targetMember,
-        IReadOnlyCollection<MapPropertyAttribute> memberConfigs)
+        IReadOnlyCollection<MapPropertyAttribute> memberConfigs
+    )
     {
         // add configured mapping
         // target paths are not supported (yet), only target properties
@@ -78,7 +81,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.MultipleConfigurationsForInitOnlyMember,
                 targetMember.Type,
-                targetMember.Name);
+                targetMember.Name
+            );
         }
 
         var memberConfig = memberConfigs.First();
@@ -87,20 +91,19 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.InitOnlyMemberDoesNotSupportPaths,
                 targetMember.Type,
-                string.Join(".", memberConfig.Target));
+                string.Join(".", memberConfig.Target)
+            );
             return;
         }
 
-        if (!MemberPath.TryFind(
-            ctx.Mapping.SourceType,
-            memberConfig.Source,
-            out var sourceMemberPath))
+        if (!MemberPath.TryFind(ctx.Mapping.SourceType, memberConfig.Source, out var sourceMemberPath))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.SourceMemberNotFound,
                 targetMember.Name,
                 ctx.Mapping.TargetType,
-                ctx.Mapping.SourceType);
+                ctx.Mapping.SourceType
+            );
             return;
         }
 
@@ -110,13 +113,15 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
     private static void BuildInitMemberMapping(
         INewInstanceBuilderContext<IMapping> ctx,
         IMappableMember targetMember,
-        MemberPath sourcePath)
+        MemberPath sourcePath
+    )
     {
         var targetPath = new MemberPath(new[] { targetMember });
         if (!ObjectMemberMappingBodyBuilder.ValidateMappingSpecification(ctx, sourcePath, targetPath, true))
             return;
 
-        var delegateMapping = ctx.BuilderContext.FindMapping(sourcePath.MemberType, targetMember.Type)
+        var delegateMapping =
+            ctx.BuilderContext.FindMapping(sourcePath.MemberType, targetMember.Type)
             ?? ctx.BuilderContext.FindOrBuildMapping(sourcePath.MemberType.NonNullable(), targetMember.Type.NonNullable());
 
         if (delegateMapping == null)
@@ -128,7 +133,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 sourcePath.Member.Type,
                 ctx.Mapping.TargetType,
                 targetPath.FullName,
-                targetPath.Member.Type);
+                targetPath.Member.Type
+            );
             return;
         }
 
@@ -139,7 +145,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 ctx.Mapping.SourceType,
                 sourcePath.FullName,
                 ctx.Mapping.TargetType,
-                targetPath.FullName);
+                targetPath.FullName
+            );
             return;
         }
 
@@ -154,10 +161,9 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             sourcePath,
             targetMember.Type,
             nullFallback,
-            !ctx.BuilderContext.IsExpression);
-        var memberAssignmentMapping = new MemberAssignmentMapping(
-            targetPath,
-            memberMapping);
+            !ctx.BuilderContext.IsExpression
+        );
+        var memberAssignmentMapping = new MemberAssignmentMapping(targetPath, memberMapping);
         ctx.AddInitMemberMapping(memberAssignmentMapping);
     }
 
@@ -181,18 +187,15 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             .ThenByDescending(x => x.Parameters.Length);
         foreach (var ctorCandidate in ctorCandidates)
         {
-            if (!TryBuildConstructorMapping(
-                ctx,
-                ctorCandidate,
-                out var mappedTargetMemberNames,
-                out var constructorParameterMappings))
+            if (!TryBuildConstructorMapping(ctx, ctorCandidate, out var mappedTargetMemberNames, out var constructorParameterMappings))
             {
                 if (ctorCandidate.HasAttribute(ctx.BuilderContext.Types.MapperConstructorAttribute))
                 {
                     ctx.BuilderContext.ReportDiagnostic(
                         DiagnosticDescriptors.CannotMapToConfiguredConstructor,
                         ctx.Mapping.SourceType,
-                        ctorCandidate);
+                        ctorCandidate
+                    );
                 }
 
                 continue;
@@ -214,7 +217,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         INewInstanceBuilderContext<IMapping> ctx,
         IMethodSymbol ctor,
         [NotNullWhen(true)] out ISet<string>? mappedTargetMemberNames,
-        [NotNullWhen(true)] out ISet<ConstructorParameterMapping>? constructorParameterMappings)
+        [NotNullWhen(true)] out ISet<ConstructorParameterMapping>? constructorParameterMappings
+    )
     {
         constructorParameterMappings = new HashSet<ConstructorParameterMapping>();
         mappedTargetMemberNames = new HashSet<string>();
@@ -233,7 +237,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
             // nullability is handled inside the member mapping
             var paramType = parameter.Type.WithNullableAnnotation(parameter.NullableAnnotation);
-            var delegateMapping = ctx.BuilderContext.FindMapping(sourcePath.MemberType, paramType)
+            var delegateMapping =
+                ctx.BuilderContext.FindMapping(sourcePath.MemberType, paramType)
                 ?? ctx.BuilderContext.FindOrBuildMapping(sourcePath.Member.Type.NonNullable(), paramType.NonNullable());
 
             if (delegateMapping == null)
@@ -252,7 +257,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                     ctx.Mapping.SourceType,
                     sourcePath.FullName,
                     ctx.Mapping.TargetType,
-                    parameter.Name);
+                    parameter.Name
+                );
                 return false;
             }
 
@@ -261,7 +267,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 sourcePath,
                 paramType,
                 ctx.BuilderContext.GetNullFallbackValue(paramType),
-                !ctx.BuilderContext.IsExpression);
+                !ctx.BuilderContext.IsExpression
+            );
             var ctorMapping = new ConstructorParameterMapping(parameter, memberMapping, skippedOptionalParam);
             constructorParameterMappings.Add(ctorMapping);
             mappedTargetMemberNames.Add(parameter.Name);
@@ -273,7 +280,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
     private static bool TryFindConstructorParameterSourcePath(
         INewInstanceBuilderContext<IMapping> ctx,
         IParameterSymbol parameter,
-        [NotNullWhen(true)] out MemberPath? sourcePath)
+        [NotNullWhen(true)] out MemberPath? sourcePath
+    )
     {
         sourcePath = null;
 
@@ -293,7 +301,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.MultipleConfigurationsForConstructorParameter,
                 parameter.Type,
-                parameter.Name);
+                parameter.Name
+            );
         }
 
         var memberConfig = memberConfigs.First();
@@ -302,20 +311,19 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ConstructorParameterDoesNotSupportPaths,
                 parameter.Type,
-                string.Join(".", memberConfig.Target));
+                string.Join(".", memberConfig.Target)
+            );
             return false;
         }
 
-        if (!MemberPath.TryFind(
-            ctx.Mapping.SourceType,
-            memberConfig.Source,
-            out sourcePath))
+        if (!MemberPath.TryFind(ctx.Mapping.SourceType, memberConfig.Source, out sourcePath))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.SourceMemberNotFound,
                 memberConfig.Source,
                 ctx.Mapping.TargetType,
-                ctx.Mapping.SourceType);
+                ctx.Mapping.SourceType
+            );
             return false;
         }
 

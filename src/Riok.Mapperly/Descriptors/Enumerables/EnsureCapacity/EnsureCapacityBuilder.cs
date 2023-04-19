@@ -16,11 +16,10 @@ public static class EnsureCapacityBuilder
 
     public static EnsureCapacity? TryBuildEnsureCapacity(ITypeSymbol sourceType, ITypeSymbol targetType, WellKnownTypes types)
     {
-        var capacityMethod = targetType.GetAllMethods(EnsureCapacityName)
-                        .OfType<IMethodSymbol>()
-                        .FirstOrDefault(x => x.Parameters.Length == 1
-                        && x.Parameters[0].Type.SpecialType == SpecialType.System_Int32
-                        && !x.IsStatic);
+        var capacityMethod = targetType
+            .GetAllMethods(EnsureCapacityName)
+            .OfType<IMethodSymbol>()
+            .FirstOrDefault(x => x.Parameters.Length == 1 && x.Parameters[0].Type.SpecialType == SpecialType.System_Int32 && !x.IsStatic);
 
         // if EnsureCapacity is not available then return null
         if (capacityMethod == null)
@@ -36,9 +35,12 @@ public static class EnsureCapacityBuilder
 
         sourceType.ImplementsGeneric(types.IEnumerableT, out var iEnumerable);
 
-        var nonEnumeratedCountMethod = types.Enumerable.GetMembers(TryGetNonEnumeratedCountMethodName)
-                                                        .OfType<IMethodSymbol>()
-                                                        .FirstOrDefault(x => x.ReturnType.SpecialType == SpecialType.System_Boolean && x.IsStatic && x.Parameters.Length == 2 && x.IsGenericMethod);
+        var nonEnumeratedCountMethod = types.Enumerable
+            .GetMembers(TryGetNonEnumeratedCountMethodName)
+            .OfType<IMethodSymbol>()
+            .FirstOrDefault(
+                x => x.ReturnType.SpecialType == SpecialType.System_Boolean && x.IsStatic && x.Parameters.Length == 2 && x.IsGenericMethod
+            );
 
         // if source does not have a count use GetNonEnumeratedCount, calling EnusureCapacity if count is available
         var typedNonEnumeratedCount = nonEnumeratedCountMethod.Construct(iEnumerable!.TypeArguments.ToArray());

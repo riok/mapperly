@@ -41,10 +41,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapProperty(nameof(TestObject.RenamedStringValue), nameof(TestObjectDto.RenamedStringValue2))]
         [MapProperty(
             new[] { nameof(TestObject.UnflatteningIdValue) },
-            new[] { nameof(TestObjectDto.Unflattening), nameof(TestObjectDto.Unflattening.IdValue) })]
+            new[] { nameof(TestObjectDto.Unflattening), nameof(TestObjectDto.Unflattening.IdValue) }
+        )]
         [MapProperty(
             nameof(TestObject.NullableUnflatteningIdValue),
-            nameof(TestObjectDto.NullableUnflattening) + "." + nameof(TestObjectDto.NullableUnflattening.IdValue))]
+            nameof(TestObjectDto.NullableUnflattening) + "." + nameof(TestObjectDto.NullableUnflattening.IdValue)
+        )]
         private partial TestObjectDto MapToDtoInternal(TestObject testObject);
 
         // disable obsolete warning, as the obsolete attribute should still be tested.

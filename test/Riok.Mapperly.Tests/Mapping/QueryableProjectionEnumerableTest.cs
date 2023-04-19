@@ -10,7 +10,8 @@ public class QueryableProjectionEnumerableTest
             "System.Linq.IQueryable<A>",
             "System.Linq.IQueryable<B>",
             "class A { public IEnumerable<long> Values { get; set; } }",
-            "class B { public IEnumerable<int> Values { get; set; } }");
+            "class B { public IEnumerable<int> Values { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -22,7 +23,8 @@ public class QueryableProjectionEnumerableTest
             "System.Linq.IQueryable<A>",
             "System.Linq.IQueryable<B>",
             "class A { public long[] Values { get; set; } }",
-            "class B { public int[] Values { get; set; } }");
+            "class B { public int[] Values { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }

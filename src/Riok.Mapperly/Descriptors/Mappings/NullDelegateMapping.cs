@@ -20,7 +20,8 @@ public class NullDelegateMapping : TypeMapping
         ITypeSymbol nullableSourceType,
         ITypeSymbol nullableTargetType,
         ITypeMapping delegateMapping,
-        NullFallbackValue nullFallbackValue)
+        NullFallbackValue nullFallbackValue
+    )
         : base(nullableSourceType, nullableTargetType)
     {
         _delegateMapping = delegateMapping;
@@ -31,7 +32,8 @@ public class NullDelegateMapping : TypeMapping
         // and no null handling is required
         // (this is the case if the delegate mapping source type accepts nulls
         // or the source type is not nullable and the target type is not a nullable value type (otherwise a conversion is needed)).
-        IsSynthetic = _delegateMapping.IsSynthetic
+        IsSynthetic =
+            _delegateMapping.IsSynthetic
             && (_delegateMapping.SourceType.IsNullable() || !SourceType.IsNullable() && !TargetType.IsNullableValueType());
     }
 
@@ -56,13 +58,12 @@ public class NullDelegateMapping : TypeMapping
         // source == null ? <null-substitute> : Map(source)
         // or for nullable value types:
         // source == null ? <null-substitute> : Map(source.Value)
-        var sourceValue = SourceType.IsNullableValueType()
-            ? MemberAccess(ctx.Source, NullableValueProperty)
-            : ctx.Source;
+        var sourceValue = SourceType.IsNullableValueType() ? MemberAccess(ctx.Source, NullableValueProperty) : ctx.Source;
 
         return ConditionalExpression(
             IsNull(ctx.Source),
             NullSubstitute(TargetType.NonNullable(), ctx.Source, _nullFallbackValue),
-            _delegateMapping.Build(ctx.WithSource(sourceValue)));
+            _delegateMapping.Build(ctx.WithSource(sourceValue))
+        );
     }
 }

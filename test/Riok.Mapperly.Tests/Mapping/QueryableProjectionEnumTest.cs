@@ -15,7 +15,8 @@ public class QueryableProjectionEnumTest
             "class A { public C Value { get; set; } }",
             "class B { public D Value { get; set; } }",
             "enum C { Value1, Value2 }",
-            "enum D { Value1, Value2 }");
+            "enum D { Value1, Value2 }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -26,15 +27,25 @@ public class QueryableProjectionEnumTest
         var source = TestSourceBuilder.Mapping(
             "System.Linq.IQueryable<A>",
             "System.Linq.IQueryable<B>",
-            TestSourceBuilderOptions.Default with { EnumMappingStrategy = EnumMappingStrategy.ByName },
+            TestSourceBuilderOptions.Default with
+            {
+                EnumMappingStrategy = EnumMappingStrategy.ByName
+            },
             "class A { public C Value { get; set; } }",
             "class B { public D Value { get; set; } }",
             "enum C { Value1, Value2 }",
-            "enum D { Value1, Value2 }");
+            "enum D { Value1, Value2 }"
+        );
 
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.EnumMappingStrategyByNameNotSupportedInProjectionMappings, "The enum mapping strategy ByName cannot be used in projection mappings to map from C to D"));
+            .HaveDiagnostic(
+                new(
+                    DiagnosticDescriptors.EnumMappingStrategyByNameNotSupportedInProjectionMappings,
+                    "The enum mapping strategy ByName cannot be used in projection mappings to map from C to D"
+                )
+            );
     }
 
     [Fact]
@@ -45,7 +56,8 @@ public class QueryableProjectionEnumTest
             "System.Linq.IQueryable<B>",
             "class A { public C Value { get; set; } }",
             "class B { public string Value { get; set; } }",
-            "enum C { Value1, Value2 }");
+            "enum C { Value1, Value2 }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -58,7 +70,8 @@ public class QueryableProjectionEnumTest
             "System.Linq.IQueryable<B>",
             "class A { public string Value { get; set; } }",
             "class B { public C Value { get; set; } }",
-            "enum C { Value1, Value2 }");
+            "enum C { Value1, Value2 }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }

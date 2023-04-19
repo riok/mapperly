@@ -9,12 +9,8 @@ public class DictionaryTest
     [Fact]
     public void DictionaryToSameDictionaryShouldAssign()
     {
-        var source = TestSourceBuilder.Mapping(
-            "Dictionary<string, long>",
-            "Dictionary<string, long>");
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return source;");
+        var source = TestSourceBuilder.Mapping("Dictionary<string, long>", "Dictionary<string, long>");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source;");
     }
 
     [Fact]
@@ -23,8 +19,10 @@ public class DictionaryTest
         var source = TestSourceBuilder.Mapping(
             "Dictionary<string, long>",
             "Dictionary<string, long>",
-            TestSourceBuilderOptions.WithDeepCloning);
-        TestHelper.GenerateMapper(source)
+            TestSourceBuilderOptions.WithDeepCloning
+        );
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -35,16 +33,16 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void DictionaryToDictionaryExplicitCastedValue()
     {
-        var source = TestSourceBuilder.Mapping(
-            "Dictionary<string, long>",
-            "Dictionary<string, int>");
-        TestHelper.GenerateMapper(source)
+        var source = TestSourceBuilder.Mapping("Dictionary<string, long>", "Dictionary<string, int>");
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -55,16 +53,16 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void DictionaryToDictionaryNullableToNonNullable()
     {
-        var source = TestSourceBuilder.Mapping(
-            "Dictionary<string, int?>",
-            "Dictionary<string, int>");
-        TestHelper.GenerateMapper(source)
+        var source = TestSourceBuilder.Mapping("Dictionary<string, int?>", "Dictionary<string, int>");
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -75,7 +73,8 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -84,8 +83,13 @@ public class DictionaryTest
         var source = TestSourceBuilder.Mapping(
             "Dictionary<string, int?>",
             "Dictionary<string, int>",
-            TestSourceBuilderOptions.Default with { ThrowOnMappingNullMismatch = false });
-        TestHelper.GenerateMapper(source)
+            TestSourceBuilderOptions.Default with
+            {
+                ThrowOnMappingNullMismatch = false
+            }
+        );
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -96,16 +100,16 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void DictionaryToIDictionaryExplicitCastedValue()
     {
-        var source = TestSourceBuilder.Mapping(
-            "Dictionary<string, long>",
-            "IDictionary<string, int>");
-        TestHelper.GenerateMapper(source)
+        var source = TestSourceBuilder.Mapping("Dictionary<string, long>", "IDictionary<string, int>");
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -116,16 +120,16 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void KeyValueEnumerableToIDictionary()
     {
-        var source = TestSourceBuilder.Mapping(
-            "IEnumerable<KeyValuePair<string, int>>",
-            "IDictionary<string, int>");
-        TestHelper.GenerateMapper(source)
+        var source = TestSourceBuilder.Mapping("IEnumerable<KeyValuePair<string, int>>", "IDictionary<string, int>");
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -136,17 +140,16 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void CustomDictionaryToIDictionary()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "IDictionary<string, int>",
-            "class A : Dictionary<string, int> {}");
-        TestHelper.GenerateMapper(source)
+        var source = TestSourceBuilder.Mapping("A", "IDictionary<string, int>", "class A : Dictionary<string, int> {}");
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -157,17 +160,16 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void CustomKeyValueListToIDictionary()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "IDictionary<string, int>",
-            "class A : List<KeyValuePair<string, int>> {}");
-        TestHelper.GenerateMapper(source)
+        var source = TestSourceBuilder.Mapping("A", "IDictionary<string, int>", "class A : List<KeyValuePair<string, int>> {}");
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -178,17 +180,16 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void DictionaryToCustomDictionary()
     {
-        var source = TestSourceBuilder.Mapping(
-            "IDictionary<string, int>",
-            "A",
-            "class A : Dictionary<string, int> {}");
-        TestHelper.GenerateMapper(source)
+        var source = TestSourceBuilder.Mapping("IDictionary<string, int>", "A", "class A : Dictionary<string, int> {}");
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -199,17 +200,19 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void DictionaryToCustomDictionaryWithObjectFactory()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[ObjectFactory] A CreateA() => new();"
-            + "partial A Map(IDictionary<string, int> source);",
-            "class A : Dictionary<string, int> {}");
-        TestHelper.GenerateMapper(source)
+            "[ObjectFactory] A CreateA() => new();" + "partial A Map(IDictionary<string, int> source);",
+            "class A : Dictionary<string, int> {}"
+        );
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -220,7 +223,8 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -238,9 +242,11 @@ public class DictionaryTest
                     set => _dictionaryImplementation[key] = value;
                 }
             }
-            """);
+            """
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -252,7 +258,8 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -270,9 +277,11 @@ public class DictionaryTest
                     set => _dictionaryImplementation[key] = value;
                 }
             }
-            """);
+            """
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -283,7 +292,8 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -303,9 +313,11 @@ public class DictionaryTest
                     set => _dictionaryImplementation[key] = value;
                 }
             }
-            """);
+            """
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -317,15 +329,15 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void DictionaryToExplicitDictionaryWithObjectFactoryShouldCast()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[ObjectFactory] A CreateA() => new();"
-            + "partial A Map(Dictionary<string, string> source);",
+            "[ObjectFactory] A CreateA() => new();" + "partial A Map(Dictionary<string, string> source);",
             """
             public class A : IDictionary<string, string>
             {
@@ -335,9 +347,11 @@ public class DictionaryTest
                     set => _dictionaryImplementation[key] = value;
                 }
             }
-            """);
+            """
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -349,15 +363,15 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void DictionaryToImplicitDictionaryWithObjectFactoryShouldNotCast()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[ObjectFactory] A CreateA() => new();"
-            + "partial A Map(Dictionary<string, string> source);",
+            "[ObjectFactory] A CreateA() => new();" + "partial A Map(Dictionary<string, string> source);",
             """
             public class A : IDictionary<string, string>
             {
@@ -367,9 +381,11 @@ public class DictionaryTest
                     set => _dictionaryImplementation[key] = value;
                 }
             }
-            """);
+            """
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -380,34 +396,31 @@ public class DictionaryTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public Task DictionaryToCustomDictionaryWithPrivateCtorShouldDiagnostic()
     {
-        var source = TestSourceBuilder.Mapping(
-            "IDictionary<string, int>",
-            "A",
-            "class A : Dictionary<string, int> { private A(){} }");
+        var source = TestSourceBuilder.Mapping("IDictionary<string, int>", "A", "class A : Dictionary<string, int> { private A(){} }");
         return TestHelper.VerifyGenerator(source);
     }
 
     [Fact]
     public void ReadOnlyDictionaryToCustomTypeReadOnlyReadOnlyDictionaryShouldIgnore()
     {
-        var source = TestSourceBuilder.Mapping(
-            "IReadOnlyDictionary<string, string>",
-            "A",
-            "class A : IReadOnlyDictionary<int, int> {}");
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+        var source = TestSourceBuilder.Mapping("IReadOnlyDictionary<string, string>", "A", "class A : IReadOnlyDictionary<int, int> {}");
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember))
             .HaveMapMethodBody(
                 """
                 var target = new global::A();
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -415,13 +428,16 @@ public class DictionaryTest
     {
         var source = TestSourceBuilder.Mapping(
             "Dictionary<string, string>",
-            "System.Collections.Immutable.ImmutableDictionary<string, string>");
-        TestHelper.GenerateMapper(source)
+            "System.Collections.Immutable.ImmutableDictionary<string, string>"
+        );
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveMapMethodBody(
                 """
                 return global::System.Collections.Immutable.ImmutableDictionary.ToImmutableDictionary(source);
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -429,41 +445,44 @@ public class DictionaryTest
     {
         var source = TestSourceBuilder.Mapping(
             "Dictionary<string, string>",
-            "System.Collections.Immutable.ImmutableSortedDictionary<string, string>");
-        TestHelper.GenerateMapper(source)
+            "System.Collections.Immutable.ImmutableSortedDictionary<string, string>"
+        );
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveMapMethodBody(
                 """
                 return global::System.Collections.Immutable.ImmutableSortedDictionary.ToImmutableSortedDictionary(source);
-                """);
+                """
+            );
     }
 
     [Fact]
     public void DictionaryToImmutableDictionaryExplicitCastedKeyValue()
     {
-        var source = TestSourceBuilder.Mapping(
-            "Dictionary<long, long>",
-            "System.Collections.Immutable.ImmutableDictionary<int, int>");
-        TestHelper.GenerateMapper(source)
+        var source = TestSourceBuilder.Mapping("Dictionary<long, long>", "System.Collections.Immutable.ImmutableDictionary<int, int>");
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveMapMethodBody(
                 """
                 return global::System.Collections.Immutable.ImmutableDictionary.ToImmutableDictionary(source, x => (int)x.Key, x => (int)x.Value);
-                """);
+                """
+            );
     }
 
     [Fact]
     public void DictionaryToImmutableDictionaryExplicitCastedValue()
     {
-        var source = TestSourceBuilder.Mapping(
-            "Dictionary<string, long>",
-            "System.Collections.Immutable.ImmutableDictionary<string, int>");
-        TestHelper.GenerateMapper(source)
+        var source = TestSourceBuilder.Mapping("Dictionary<string, long>", "System.Collections.Immutable.ImmutableDictionary<string, int>");
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveMapMethodBody(
                 """
                 return global::System.Collections.Immutable.ImmutableDictionary.ToImmutableDictionary(source, x => x.Key, x => (int)x.Value);
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -473,9 +492,11 @@ public class DictionaryTest
             "A",
             "B",
             "class A { public Dictionary<string, string> Value { get; } }",
-            "class B { public System.Collections.Immutable.ImmutableDictionary<string, string> Value { get; } }");
+            "class B { public System.Collections.Immutable.ImmutableDictionary<string, string> Value { get; } }"
+        );
 
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
     }
@@ -487,9 +508,11 @@ public class DictionaryTest
             "A",
             "B",
             "class A { public Dictionary<string, string> Value { get; } }",
-            "class B { public System.Collections.Immutable.ImmutableSortedDictionary<string, string> Value { get; } }");
+            "class B { public System.Collections.Immutable.ImmutableSortedDictionary<string, string> Value { get; } }"
+        );
 
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
     }
@@ -501,15 +524,18 @@ public class DictionaryTest
             "A",
             "B",
             "class A { public IReadOnlyDictionary<string, string> Values { get; } }",
-            "class B { public IReadOnlyDictionary<string, string> Values { get; } }");
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            "class B { public IReadOnlyDictionary<string, string> Values { get; } }"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember))
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -518,9 +544,8 @@ public class DictionaryTest
         var source = TestSourceBuilder.Mapping(
             "Dictionary<long, long>",
             "Dictionary<int, int>",
-            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.Dictionary));
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostics();
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.Dictionary)
+        );
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics).Should().HaveDiagnostics();
     }
 }

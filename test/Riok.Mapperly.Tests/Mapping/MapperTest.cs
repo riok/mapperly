@@ -27,7 +27,8 @@ public class MapperTest
                     internal partial string FooToBar(string value);
                 }
             }
-            """);
+            """
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -50,7 +51,8 @@ public class MapperTest
                     }
                 }
             }
-            """);
+            """
+        );
 
         return TestHelper.VerifyGenerator(source);
     }

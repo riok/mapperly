@@ -11,8 +11,6 @@ public class StringChunkerTest
     [InlineData("abcABC", new[] { "abc", "A", "B", "C" })]
     public void ChunkPascalCaseShouldWork(string str, string[] expected)
     {
-        StringChunker.ChunkPascalCase(str)
-            .Should()
-            .BeEquivalentTo(expected, o => o.WithStrictOrdering());
+        StringChunker.ChunkPascalCase(str).Should().BeEquivalentTo(expected, o => o.WithStrictOrdering());
     }
 }

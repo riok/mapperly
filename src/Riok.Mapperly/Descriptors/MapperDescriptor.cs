@@ -35,8 +35,7 @@ public class MapperDescriptor
 
     public IReadOnlyCollection<MethodMapping> MethodTypeMappings => _methodMappings;
 
-    public void AddTypeMapping(MethodMapping mapping)
-        => _methodMappings.Add(mapping);
+    public void AddTypeMapping(MethodMapping mapping) => _methodMappings.Add(mapping);
 
     private string BuildName(INamedTypeSymbol symbol)
     {
@@ -54,4 +53,3 @@ public class MapperDescriptor
         return sb.ToString();
     }
 }
-

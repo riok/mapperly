@@ -17,8 +17,8 @@ public abstract class ObjectFactory
 
     protected IMethodSymbol Method { get; }
 
-    public ExpressionSyntax CreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source)
-        => HandleNull(BuildCreateType(sourceType, targetTypeToCreate, source), targetTypeToCreate);
+    public ExpressionSyntax CreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
+        HandleNull(BuildCreateType(sourceType, targetTypeToCreate, source), targetTypeToCreate);
 
     public abstract bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate);
 

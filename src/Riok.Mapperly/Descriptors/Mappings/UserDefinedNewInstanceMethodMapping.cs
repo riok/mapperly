@@ -24,7 +24,8 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
         MethodParameter sourceParameter,
         MethodParameter? referenceHandlerParameter,
         bool enableReferenceHandling,
-        INamedTypeSymbol referenceHandlerType)
+        INamedTypeSymbol referenceHandlerType
+    )
         : base(sourceParameter, method.ReturnType.UpgradeNullable())
     {
         _enableReferenceHandling = enableReferenceHandling;
@@ -39,18 +40,13 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
 
     public IMethodSymbol Method { get; }
 
-    public void SetDelegateMapping(ITypeMapping delegateMapping)
-        => _delegateMapping = delegateMapping;
+    public void SetDelegateMapping(ITypeMapping delegateMapping) => _delegateMapping = delegateMapping;
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         if (_delegateMapping == null)
         {
-            return new[]
-            {
-                ThrowStatement(ThrowNotImplementedException())
-                    .WithLeadingTrivia(TriviaList(Comment(NoMappingComment))),
-            };
+            return new[] { ThrowStatement(ThrowNotImplementedException()).WithLeadingTrivia(TriviaList(Comment(NoMappingComment))), };
         }
 
         // if reference handling is enabled and no reference handler parameter is declared

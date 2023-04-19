@@ -16,15 +16,14 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     private readonly MappingBuilderContext _parentContext;
 
     public InlineExpressionMappingBuilderContext(MappingBuilderContext ctx, ITypeSymbol sourceType, ITypeSymbol targetType)
-        : this(ctx, (ctx.FindMapping(sourceType, targetType) as IUserMapping)?.Method, sourceType, targetType)
-    {
-    }
+        : this(ctx, (ctx.FindMapping(sourceType, targetType) as IUserMapping)?.Method, sourceType, targetType) { }
 
     private InlineExpressionMappingBuilderContext(
         MappingBuilderContext ctx,
         IMethodSymbol? userSymbol,
         ITypeSymbol source,
-        ITypeSymbol target)
+        ITypeSymbol target
+    )
         : base(ctx, userSymbol, source, target)
     {
         _parentContext = ctx;
@@ -35,7 +34,8 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         InlineExpressionMappingBuilderContext ctx,
         IMethodSymbol? userSymbol,
         ITypeSymbol source,
-        ITypeSymbol target)
+        ITypeSymbol target
+    )
         : base(ctx, userSymbol, source, target)
     {
         _parentContext = ctx;
@@ -48,10 +48,9 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         // cannot convert enum to string via optimized mapping since this would include a switch
         // expression, which is not valid in an expression.
         // fall back to the ToString implementation.
-        => conversionType
-                is not MappingConversionType.EnumToString
-                and not MappingConversionType.Dictionary
-            && base.IsConversionEnabled(conversionType);
+        =>
+        conversionType is not MappingConversionType.EnumToString and not MappingConversionType.Dictionary
+        && base.IsConversionEnabled(conversionType);
 
     /// <summary>
     /// Tries to find an existing mapping for the provided types.
@@ -85,8 +84,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     /// <param name="sourceType">The source type.</param>
     /// <param name="targetType">The target type.</param>
     /// <returns><c>null</c></returns>
-    public override IExistingTargetMapping? FindOrBuildExistingTargetMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        => null;
+    public override IExistingTargetMapping? FindOrBuildExistingTargetMapping(ITypeSymbol sourceType, ITypeSymbol targetType) => null;
 
     /// <summary>
     /// Existing target instance mappings are not supported.
@@ -94,8 +92,8 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     /// <param name="sourceType">The source type.</param>
     /// <param name="targetType">The target type.</param>
     /// <returns><c>null</c></returns>
-    public override IExistingTargetMapping? BuildExistingTargetMappingWithUserSymbol(ITypeSymbol sourceType, ITypeSymbol targetType)
-        => null;
+    public override IExistingTargetMapping? BuildExistingTargetMappingWithUserSymbol(ITypeSymbol sourceType, ITypeSymbol targetType) =>
+        null;
 
     /// <summary>
     /// Always builds a new mapping with the user symbol of the first user defined mapping method for the provided types
@@ -110,7 +108,12 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     /// <param name="targetType">The target type.</param>
     /// <param name="reusable">Whether the built mapping is usable by other mappings, this implementation always sets this to false.</param>
     /// <returns></returns>
-    protected override ITypeMapping? FindOrBuildMapping(IMethodSymbol? userSymbol, ITypeSymbol sourceType, ITypeSymbol targetType, bool reusable)
+    protected override ITypeMapping? FindOrBuildMapping(
+        IMethodSymbol? userSymbol,
+        ITypeSymbol sourceType,
+        ITypeSymbol targetType,
+        bool reusable
+    )
     {
         sourceType = sourceType.UpgradeNullable();
         targetType = targetType.UpgradeNullable();
@@ -129,9 +132,9 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         return mapping;
     }
 
-    protected override NullFallbackValue GetNullFallbackValue(ITypeSymbol targetType, bool throwOnMappingNullMismatch)
-        => base.GetNullFallbackValue(targetType, false); // never throw inside expressions (not translatable)
+    protected override NullFallbackValue GetNullFallbackValue(ITypeSymbol targetType, bool throwOnMappingNullMismatch) =>
+        base.GetNullFallbackValue(targetType, false); // never throw inside expressions (not translatable)
 
-    protected override MappingBuilderContext ContextForMapping(IMethodSymbol? userSymbol, ITypeSymbol sourceType, ITypeSymbol targetType)
-        => new InlineExpressionMappingBuilderContext(this, userSymbol, sourceType, targetType);
+    protected override MappingBuilderContext ContextForMapping(IMethodSymbol? userSymbol, ITypeSymbol sourceType, ITypeSymbol targetType) =>
+        new InlineExpressionMappingBuilderContext(this, userSymbol, sourceType, targetType);
 }

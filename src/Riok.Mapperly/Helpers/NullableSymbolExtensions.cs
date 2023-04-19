@@ -80,24 +80,22 @@ public static class NullableSymbolExtensions
         return nonNullable;
     }
 
-    internal static bool IsNullable(this ITypeSymbol symbol)
-        => symbol.NullableAnnotation.IsNullable()
-            || symbol.NonNullableValueType() is not null;
+    internal static bool IsNullable(this ITypeSymbol symbol) =>
+        symbol.NullableAnnotation.IsNullable() || symbol.NonNullableValueType() is not null;
 
-    internal static bool IsNullableValueType(this ITypeSymbol symbol)
-        => symbol.NonNullableValueType() is not null;
+    internal static bool IsNullableValueType(this ITypeSymbol symbol) => symbol.NonNullableValueType() is not null;
 
-    internal static bool IsNullable(this IPropertySymbol symbol)
-        => symbol.NullableAnnotation.IsNullable()
-            || symbol.Type.IsNullable();
+    internal static bool IsNullable(this IPropertySymbol symbol) => symbol.NullableAnnotation.IsNullable() || symbol.Type.IsNullable();
 
-    internal static bool IsNullable(this NullableAnnotation nullable)
-        => nullable is NullableAnnotation.Annotated or NullableAnnotation.None;
+    internal static bool IsNullable(this NullableAnnotation nullable) =>
+        nullable is NullableAnnotation.Annotated or NullableAnnotation.None;
 
     private static ITypeSymbol? NonNullableValueType(this ITypeSymbol symbol)
     {
-        if (symbol is INamedTypeSymbol { IsValueType: true, IsGenericType: true } namedType &&
-            namedType.ConstructedFrom.ToDisplayString() == NullableGenericTypeName)
+        if (
+            symbol is INamedTypeSymbol { IsValueType: true, IsGenericType: true } namedType
+            && namedType.ConstructedFrom.ToDisplayString() == NullableGenericTypeName
+        )
             return namedType.TypeArguments[0];
         return null;
     }

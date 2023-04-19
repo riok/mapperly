@@ -25,7 +25,8 @@ public class ForEachSetDictionaryExistingTargetMapping : ExistingTargetMapping
         ITypeSymbol targetType,
         ITypeMapping keyMapping,
         ITypeMapping valueMapping,
-        INamedTypeSymbol? explicitCast)
+        INamedTypeSymbol? explicitCast
+    )
         : base(sourceType, targetType)
     {
         _keyMapping = keyMapping;
@@ -51,14 +52,8 @@ public class ForEachSetDictionaryExistingTargetMapping : ExistingTargetMapping
         var convertedKeyExpression = _keyMapping.Build(ctx.WithSource(MemberAccess(loopItemVariableName, KeyPropertyName)));
         var convertedValueExpression = _valueMapping.Build(ctx.WithSource(MemberAccess(loopItemVariableName, ValuePropertyName)));
 
-        var assignment = Assignment(
-            ElementAccess(target, convertedKeyExpression),
-            convertedValueExpression);
+        var assignment = Assignment(ElementAccess(target, convertedKeyExpression), convertedValueExpression);
 
-        yield return ForEachStatement(
-                VarIdentifier,
-                Identifier(loopItemVariableName),
-                ctx.Source,
-                Block(ExpressionStatement(assignment)));
+        yield return ForEachStatement(VarIdentifier, Identifier(loopItemVariableName), ctx.Source, Block(ExpressionStatement(assignment)));
     }
 }

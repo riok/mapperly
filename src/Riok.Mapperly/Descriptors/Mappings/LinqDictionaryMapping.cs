@@ -24,7 +24,8 @@ public class LinqDicitonaryMapping : TypeMapping
         ITypeSymbol targetType,
         IMethodSymbol collectMethod,
         ITypeMapping keyMapping,
-        ITypeMapping valueMapping)
+        ITypeMapping valueMapping
+    )
         : base(sourceType, targetType)
     {
         _collectMethod = collectMethod;
@@ -45,12 +46,10 @@ public class LinqDicitonaryMapping : TypeMapping
         // create expressions mapping the key and value and then create the final expression
         // ie: source.ToImmutableDictionary(x => x.Key, x=> (int)x.Value);
         var keyMapExpression = _keyMapping.Build(ctx.WithSource(MemberAccess(lambdaParamName, KeyPropertyName)));
-        var keyExpression = SimpleLambdaExpression(Parameter(Identifier(lambdaParamName)))
-            .WithExpressionBody(keyMapExpression);
+        var keyExpression = SimpleLambdaExpression(Parameter(Identifier(lambdaParamName))).WithExpressionBody(keyMapExpression);
 
         var valueMapExpression = _valueMapping.Build(ctx.WithSource(MemberAccess(lambdaParamName, ValuePropertyName)));
-        var valueExpression = SimpleLambdaExpression(Parameter(Identifier(lambdaParamName)))
-            .WithExpressionBody(valueMapExpression);
+        var valueExpression = SimpleLambdaExpression(Parameter(Identifier(lambdaParamName))).WithExpressionBody(valueMapExpression);
 
         return StaticInvocation(_collectMethod, ctx.Source, keyExpression, valueExpression);
     }

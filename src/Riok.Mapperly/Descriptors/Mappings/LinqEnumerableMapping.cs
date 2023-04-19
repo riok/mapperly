@@ -21,7 +21,8 @@ public class LinqEnumerableMapping : TypeMapping
         ITypeSymbol targetType,
         ITypeMapping elementMapping,
         IMethodSymbol? selectMethod,
-        IMethodSymbol? collectMethod)
+        IMethodSymbol? collectMethod
+    )
         : base(sourceType, targetType)
     {
         _elementMapping = elementMapping;
@@ -40,8 +41,7 @@ public class LinqEnumerableMapping : TypeMapping
         if (_selectMethod != null)
         {
             var sourceMapExpression = _elementMapping.Build(ctx.WithSource(lambdaParamName));
-            var convertLambda = SimpleLambdaExpression(Parameter(Identifier(lambdaParamName)))
-                .WithExpressionBody(sourceMapExpression);
+            var convertLambda = SimpleLambdaExpression(Parameter(Identifier(lambdaParamName))).WithExpressionBody(sourceMapExpression);
             mappedSource = StaticInvocation(_selectMethod, ctx.Source, convertLambda);
         }
         else
@@ -49,8 +49,6 @@ public class LinqEnumerableMapping : TypeMapping
             mappedSource = _elementMapping.Build(ctx);
         }
 
-        return _collectMethod == null
-            ? mappedSource
-            : StaticInvocation(_collectMethod, mappedSource);
+        return _collectMethod == null ? mappedSource : StaticInvocation(_collectMethod, mappedSource);
     }
 }

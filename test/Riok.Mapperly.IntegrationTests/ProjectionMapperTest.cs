@@ -28,9 +28,7 @@ namespace Riok.Mapperly.IntegrationTests
             await using var connection = new SqliteConnection("Data Source=:memory:");
             await connection.OpenAsync();
 
-            var options = new DbContextOptionsBuilder()
-                .UseSqlite(connection)
-                .Options;
+            var options = new DbContextOptionsBuilder().UseSqlite(connection).Options;
 
             await using var ctx = new ProjectionDbContext(options);
             await ctx.Database.EnsureCreatedAsync();
@@ -38,14 +36,10 @@ namespace Riok.Mapperly.IntegrationTests
             await ctx.SaveChangesAsync();
 
             var query = ctx.Objects.ProjectToDto();
-            await Verifier
-                .Verify(query.ToQueryString(), "sql")
-                .UseTextForParameters("query");
+            await Verifier.Verify(query.ToQueryString(), "sql").UseTextForParameters("query");
 
             var objects = await query.ToListAsync();
-            await Verifier
-                .Verify(objects)
-                .UseTextForParameters("result");
+            await Verifier.Verify(objects).UseTextForParameters("result");
         }
 
         private TestObjectProjection CreateObject()
@@ -71,11 +65,7 @@ namespace Riok.Mapperly.IntegrationTests
                 StringValue = "fooBar3",
                 IgnoredStringValue = "fooBar4",
                 NullableFlattening = new IdObject { IdValue = 20 },
-                SubObject = new InheritanceSubObject
-                {
-                    BaseIntValue = 10,
-                    SubIntValue = 20,
-                },
+                SubObject = new InheritanceSubObject { BaseIntValue = 10, SubIntValue = 20, },
                 RecursiveObject = new TestObjectProjection
                 {
                     RequiredValue = -1,
@@ -88,9 +78,8 @@ namespace Riok.Mapperly.IntegrationTests
 
         class ProjectionDbContext : DbContext
         {
-            public ProjectionDbContext(DbContextOptions options) : base(options)
-            {
-            }
+            public ProjectionDbContext(DbContextOptions options)
+                : base(options) { }
 
             public DbSet<TestObjectProjection> Objects { get; set; } = null!;
 

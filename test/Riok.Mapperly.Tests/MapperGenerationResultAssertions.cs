@@ -20,10 +20,7 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions NotHaveDiagnostics(IReadOnlySet<DiagnosticSeverity> allowedDiagnosticSeverities)
     {
-        _mapper.Diagnostics
-            .FirstOrDefault(d => !allowedDiagnosticSeverities.Contains(d.Severity))
-            .Should()
-            .BeNull();
+        _mapper.Diagnostics.FirstOrDefault(d => !allowedDiagnosticSeverities.Contains(d.Severity)).Should().BeNull();
         return this;
     }
 
@@ -38,11 +35,7 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions HaveSingleMethodBody([StringSyntax(StringSyntax.CSharp)] string mapperMethodBody)
     {
-        _mapper.Methods.Single()
-            .Value
-            .Body
-            .Should()
-            .Be(mapperMethodBody.ReplaceLineEndings());
+        _mapper.Methods.Single().Value.Body.Should().Be(mapperMethodBody.ReplaceLineEndings());
         return this;
     }
 
@@ -82,13 +75,10 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions HaveMethodBody(string methodName, [StringSyntax(StringSyntax.CSharp)] string mapperMethodBody)
     {
-        _mapper.Methods[methodName]
-            .Body
-            .Should()
-            .Be(mapperMethodBody.ReplaceLineEndings().Trim(), $"Method: {methodName}");
+        _mapper.Methods[methodName].Body.Should().Be(mapperMethodBody.ReplaceLineEndings().Trim(), $"Method: {methodName}");
         return this;
     }
 
-    public MapperGenerationResultAssertions HaveMapMethodBody([StringSyntax(StringSyntax.CSharp)] string mapperMethodBody)
-        => HaveMethodBody(TestSourceBuilder.DefaultMapMethodName, mapperMethodBody);
+    public MapperGenerationResultAssertions HaveMapMethodBody([StringSyntax(StringSyntax.CSharp)] string mapperMethodBody) =>
+        HaveMethodBody(TestSourceBuilder.DefaultMapMethodName, mapperMethodBody);
 }

@@ -12,7 +12,9 @@ namespace Riok.Mapperly.IntegrationTests
         [Fact]
         public Task SnapshotGeneratedSource()
         {
-            var path = GetGeneratedMapperFilePath($"{nameof(NestedTestMapper)}.{nameof(NestedTestMapper.TestNesting)}.{nameof(NestedTestMapper.TestNesting.NestedMapper)}");
+            var path = GetGeneratedMapperFilePath(
+                $"{nameof(NestedTestMapper)}.{nameof(NestedTestMapper.TestNesting)}.{nameof(NestedTestMapper.TestNesting.NestedMapper)}"
+            );
             return Verifier.VerifyFile(path);
         }
 

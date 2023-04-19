@@ -12,7 +12,5 @@ public interface IMemberAssignmentMapping
 
     MemberPath TargetPath { get; }
 
-    IEnumerable<StatementSyntax> Build(
-        TypeMappingBuildContext ctx,
-        ExpressionSyntax targetAccess);
+    IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess);
 }

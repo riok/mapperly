@@ -7,9 +7,7 @@ namespace Riok.Mapperly.Tests;
 
 public static class TestHelper
 {
-    public static Task VerifyGenerator(
-        string source,
-        TestHelperOptions? options = null)
+    public static Task VerifyGenerator(string source, TestHelperOptions? options = null)
     {
         var driver = Generate(source, options);
         return Verify(driver).ToTask();
@@ -21,7 +19,8 @@ public static class TestHelper
 
         var result = Generate(source, options).GetRunResult();
 
-        var mapperClassImpl = result.GeneratedTrees.Single()
+        var mapperClassImpl = result.GeneratedTrees
+            .Single()
             .GetRoot() // compilation
             .ChildNodes()
             .OfType<ClassDeclarationSyntax>()
@@ -41,9 +40,7 @@ public static class TestHelper
         return mapperResult;
     }
 
-    private static GeneratorDriver Generate(
-        string source,
-        TestHelperOptions? options)
+    private static GeneratorDriver Generate(string source, TestHelperOptions? options)
     {
         options ??= TestHelperOptions.NoDiagnostics;
 
@@ -55,27 +52,22 @@ public static class TestHelper
         return driver.RunGenerators(compilation);
     }
 
-    private static CSharpCompilation BuildCompilation(
-        NullableContextOptions nullableOption,
-        params SyntaxTree[] syntaxTrees)
+    private static CSharpCompilation BuildCompilation(NullableContextOptions nullableOption, params SyntaxTree[] syntaxTrees)
     {
-        var references = AppDomain.CurrentDomain.GetAssemblies()
+        var references = AppDomain.CurrentDomain
+            .GetAssemblies()
             .Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location))
             .Select(x => MetadataReference.CreateFromFile(x.Location))
-            .Concat(new[]
-            {
-                MetadataReference.CreateFromFile(typeof(MapperGenerator).Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(MapperAttribute).Assembly.Location)
-            });
+            .Concat(
+                new[]
+                {
+                    MetadataReference.CreateFromFile(typeof(MapperGenerator).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(MapperAttribute).Assembly.Location)
+                }
+            );
 
-        var compilationOptions = new CSharpCompilationOptions(
-            OutputKind.DynamicallyLinkedLibrary,
-            nullableContextOptions: nullableOption);
+        var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: nullableOption);
 
-        return CSharpCompilation.Create(
-            "Tests",
-            syntaxTrees,
-            references,
-            compilationOptions);
+        return CSharpCompilation.Create("Tests", syntaxTrees, references, compilationOptions);
     }
 }

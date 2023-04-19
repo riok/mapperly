@@ -23,7 +23,8 @@ public class ForEachAddEnumerableExistingTargetMapping : ExistingTargetMapping
         ITypeSymbol targetType,
         ITypeMapping elementMapping,
         string insertMethodName,
-        EnsureCapacity? ensureCapacityBuilder)
+        EnsureCapacity? ensureCapacityBuilder
+    )
         : base(sourceType, targetType)
     {
         _elementMapping = elementMapping;
@@ -37,16 +38,16 @@ public class ForEachAddEnumerableExistingTargetMapping : ExistingTargetMapping
         var convertedSourceItemExpression = _elementMapping.Build(ctx.WithSource(loopItemVariableName));
         var addMethod = MemberAccess(target, _insertMethodName);
 
-        var ensureCapacityStatement = _ensureCapacityBuilder?.Build(ctx, target);
-        if (ensureCapacityStatement != null)
+        if (_ensureCapacityBuilder != null)
         {
-            yield return ensureCapacityStatement;
+            yield return _ensureCapacityBuilder.Build(ctx, target);
         }
 
         yield return ForEachStatement(
-                VarIdentifier,
-                Identifier(loopItemVariableName),
-                ctx.Source,
-                Block(ExpressionStatement(Invocation(addMethod, convertedSourceItemExpression))));
+            VarIdentifier,
+            Identifier(loopItemVariableName),
+            ctx.Source,
+            Block(ExpressionStatement(Invocation(addMethod, convertedSourceItemExpression)))
+        );
     }
 }

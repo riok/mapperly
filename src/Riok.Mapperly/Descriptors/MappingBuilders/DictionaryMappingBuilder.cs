@@ -28,7 +28,8 @@ public static class DictionaryMappingBuilder
         // The constructed type should be Dictionary<,>
         if (IsDictionaryType(ctx, ctx.Target))
         {
-            var sourceHasCount = ctx.Source.GetAllProperties(CountPropertyName)
+            var sourceHasCount = ctx.Source
+                .GetAllProperties(CountPropertyName)
                 .Any(x => !x.IsStatic && !x.IsIndexer && !x.IsWriteOnly && x.Type.SpecialType == SpecialType.System_Int32);
 
             var targetDictionarySymbol = ctx.Types.DictionaryT.Construct(keyMapping.TargetType, valueMapping.TargetType);
@@ -40,7 +41,8 @@ public static class DictionaryMappingBuilder
                 valueMapping,
                 sourceHasCount,
                 targetDictionarySymbol,
-                dictionaryObjectFactory);
+                dictionaryObjectFactory
+            );
         }
 
         // if target is an immutable dictionary then use LinqDictionaryMapper
@@ -50,7 +52,10 @@ public static class DictionaryMappingBuilder
 
         // the target is not a well known dictionary type
         // it should have a an object factory or a parameterless public ctor
-        if (!ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory) && !ctx.Target.HasAccessibleParameterlessConstructor())
+        if (
+            !ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory)
+            && !ctx.Target.HasAccessibleParameterlessConstructor()
+        )
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, ctx.Target);
             return null;
@@ -66,7 +71,8 @@ public static class DictionaryMappingBuilder
             valueMapping,
             false,
             objectFactory: objectFactory,
-            explicitCast: GetExplicitIndexer(ctx));
+            explicitCast: GetExplicitIndexer(ctx)
+        );
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
@@ -90,7 +96,8 @@ public static class DictionaryMappingBuilder
             ctx.Target,
             keyMapping,
             valueMapping,
-            explicitCast: GetExplicitIndexer(ctx));
+            explicitCast: GetExplicitIndexer(ctx)
+        );
     }
 
     private static (ITypeMapping, ITypeMapping)? BuildKeyValueMapping(MappingBuilderContext ctx)
@@ -153,22 +160,40 @@ public static class DictionaryMappingBuilder
 
     private static INamedTypeSymbol? GetExplicitIndexer(MappingBuilderContext ctx)
     {
-        if (ctx.Target.ImplementsGeneric(ctx.Types.IDictionaryT, SetterIndexerPropertyName, out var typedInter, out var isExplicit) && !isExplicit)
+        if (
+            ctx.Target.ImplementsGeneric(ctx.Types.IDictionaryT, SetterIndexerPropertyName, out var typedInter, out var isExplicit)
+            && !isExplicit
+        )
             return null;
 
         return typedInter;
     }
 
-    private static LinqDicitonaryMapping? ResolveImmutableCollectMethod(MappingBuilderContext ctx, ITypeMapping keyMapping, ITypeMapping valueMapping)
+    private static LinqDicitonaryMapping? ResolveImmutableCollectMethod(
+        MappingBuilderContext ctx,
+        ITypeMapping keyMapping,
+        ITypeMapping valueMapping
+    )
     {
         if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableSortedDictionaryT))
-            return new LinqDicitonaryMapping(ctx.Source, ctx.Target, ctx.Types.ImmutableSortedDictionary.GetStaticGenericMethod(ToImmutableSortedDictionaryMethodName)!, keyMapping, valueMapping);
+            return new LinqDicitonaryMapping(
+                ctx.Source,
+                ctx.Target,
+                ctx.Types.ImmutableSortedDictionary.GetStaticGenericMethod(ToImmutableSortedDictionaryMethodName)!,
+                keyMapping,
+                valueMapping
+            );
 
         // if taget is an ImmutableDictionary or implements interface IImmutableDictionary
         if (ctx.Target.OriginalDefinition.ImplementsGeneric(ctx.Types.IImmutableDictionaryT, out _))
-            return new LinqDicitonaryMapping(ctx.Source, ctx.Target, ctx.Types.ImmutableDictionary.GetStaticGenericMethod(ToImmutableDictionaryMethodName)!, keyMapping, valueMapping);
+            return new LinqDicitonaryMapping(
+                ctx.Source,
+                ctx.Target,
+                ctx.Types.ImmutableDictionary.GetStaticGenericMethod(ToImmutableDictionaryMethodName)!,
+                keyMapping,
+                valueMapping
+            );
 
         return null;
     }
-
 }

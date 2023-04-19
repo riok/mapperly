@@ -21,9 +21,7 @@ public class CastMapping : TypeMapping
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        var objToCast = _delegateMapping != null
-            ? _delegateMapping.Build(ctx)
-            : ctx.Source;
+        var objToCast = _delegateMapping != null ? _delegateMapping.Build(ctx) : ctx.Source;
         return CastExpression(SyntaxFactoryHelper.FullyQualifiedIdentifier(TargetType), objToCast);
     }
 }

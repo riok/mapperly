@@ -13,25 +13,22 @@ public static class TestSourceBuilder
     /// </summary>
     /// <param name="code">The c# code.</param>
     /// <returns>The c# code.</returns>
-    public static string CSharp([StringSyntax(StringSyntax.CSharp)] string code)
-        => code;
+    public static string CSharp([StringSyntax(StringSyntax.CSharp)] string code) => code;
 
     public static string Mapping(
         [StringSyntax(StringSyntax.CSharp)] string fromTypeName,
         [StringSyntax(StringSyntax.CSharp)] string toTypeName,
-        [StringSyntax(StringSyntax.CSharp)] params string[] types)
-        => Mapping(fromTypeName, toTypeName, null, types);
+        [StringSyntax(StringSyntax.CSharp)] params string[] types
+    ) => Mapping(fromTypeName, toTypeName, null, types);
 
     public static string Mapping(
         [StringSyntax(StringSyntax.CSharp)] string fromTypeName,
         [StringSyntax(StringSyntax.CSharp)] string toTypeName,
         TestSourceBuilderOptions? options,
-        [StringSyntax(StringSyntax.CSharp)] params string[] types)
+        [StringSyntax(StringSyntax.CSharp)] params string[] types
+    )
     {
-        return MapperWithBodyAndTypes(
-            $"partial {toTypeName} {DefaultMapMethodName}({fromTypeName} source);",
-            options,
-            types);
+        return MapperWithBodyAndTypes($"partial {toTypeName} {DefaultMapMethodName}({fromTypeName} source);", options, types);
     }
 
     public static string MapperWithBody([StringSyntax(StringSyntax.CSharp)] string body, TestSourceBuilderOptions? options = null)
@@ -56,18 +53,17 @@ public partial class Mapper
 
     public static string MapperWithBodyAndTypes(
         [StringSyntax(StringSyntax.CSharp)] string body,
-        [StringSyntax(StringSyntax.CSharp)] params string[] types)
-        => MapperWithBodyAndTypes(body, null, types);
+        [StringSyntax(StringSyntax.CSharp)] params string[] types
+    ) => MapperWithBodyAndTypes(body, null, types);
 
     public static string MapperWithBodyAndTypes(
         [StringSyntax(StringSyntax.CSharp)] string body,
         TestSourceBuilderOptions? options,
-        [StringSyntax(StringSyntax.CSharp)] params string[] types)
+        [StringSyntax(StringSyntax.CSharp)] params string[] types
+    )
     {
         var sep = Environment.NewLine + Environment.NewLine;
-        return MapperWithBody(body, options)
-            + sep
-            + string.Join(sep, types);
+        return MapperWithBody(body, options) + sep + string.Join(sep, types);
     }
 
     private static string BuildAttribute(TestSourceBuilderOptions options)
@@ -87,11 +83,11 @@ public partial class Mapper
     }
 
     private static string Attribute<T>(T value, [CallerArgumentExpression("value")] string? expression = null)
-        where T : Enum
-        => Attribute(Convert.ChangeType(value, Enum.GetUnderlyingType(typeof(T))).ToString() ?? throw new ArgumentNullException(), expression);
+        where T : Enum =>
+        Attribute(Convert.ChangeType(value, Enum.GetUnderlyingType(typeof(T))).ToString() ?? throw new ArgumentNullException(), expression);
 
-    private static string Attribute(bool value, [CallerArgumentExpression("value")] string? expression = null)
-        => Attribute(value ? "true" : "false", expression);
+    private static string Attribute(bool value, [CallerArgumentExpression("value")] string? expression = null) =>
+        Attribute(value ? "true" : "false", expression);
 
     private static string Attribute(string value, [CallerArgumentExpression("value")] string? expression = null)
     {

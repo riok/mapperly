@@ -27,9 +27,8 @@ internal class PropertyMember : IMappableMember
         => false;
 #endif
 
-    public override bool Equals(object obj)
-        => obj is PropertyMember other && SymbolEqualityComparer.IncludeNullability.Equals(_propertySymbol, other._propertySymbol);
+    public override bool Equals(object obj) =>
+        obj is PropertyMember other && SymbolEqualityComparer.IncludeNullability.Equals(_propertySymbol, other._propertySymbol);
 
-    public override int GetHashCode()
-        => SymbolEqualityComparer.IncludeNullability.GetHashCode(_propertySymbol);
+    public override int GetHashCode() => SymbolEqualityComparer.IncludeNullability.GetHashCode(_propertySymbol);
 }

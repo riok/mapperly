@@ -19,10 +19,7 @@ public class EnumToStringMapping : MethodMapping
 
     private readonly IEnumerable<IFieldSymbol> _enumMembers;
 
-    public EnumToStringMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
-        IEnumerable<IFieldSymbol> enumMembers)
+    public EnumToStringMapping(ITypeSymbol sourceType, ITypeSymbol targetType, IEnumerable<IFieldSymbol> enumMembers)
         : base(sourceType, targetType)
     {
         _enumMembers = enumMembers;
@@ -31,27 +28,20 @@ public class EnumToStringMapping : MethodMapping
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         // fallback switch arm: _ => source.ToString()
-        var fallbackArm = SwitchExpressionArm(
-            DiscardPattern(),
-            Invocation(MemberAccess(ctx.Source, ToStringMethodName)));
+        var fallbackArm = SwitchExpressionArm(DiscardPattern(), Invocation(MemberAccess(ctx.Source, ToStringMethodName)));
 
         // switch for each name to the enum value
         // eg: Enum1.Value1 => "Value1"
-        var arms = _enumMembers
-            .Select(BuildArm)
-            .Append(fallbackArm);
+        var arms = _enumMembers.Select(BuildArm).Append(fallbackArm);
 
-        var switchExpr = SwitchExpression(ctx.Source)
-            .WithArms(CommaSeparatedList(arms, true));
+        var switchExpr = SwitchExpression(ctx.Source).WithArms(CommaSeparatedList(arms, true));
 
         yield return ReturnStatement(switchExpr);
     }
 
     private SwitchExpressionArmSyntax BuildArm(IFieldSymbol field)
     {
-        var typeMemberAccess = MemberAccess(
-            FullyQualifiedIdentifier(field.ContainingType.NonNullable()),
-            field.Name);
+        var typeMemberAccess = MemberAccess(FullyQualifiedIdentifier(field.ContainingType.NonNullable()), field.Name);
         var pattern = ConstantPattern(typeMemberAccess);
         var nameOf = NameOf(typeMemberAccess);
         return SwitchExpressionArm(pattern, nameOf);
