@@ -79,3 +79,9 @@ RMG030  | Mapper   | Error    | Reference loop detected while mapping to an init
 RMG031  | Mapper   | Warning  | Reference loop detected while mapping to a constructor member
 RMG032  | Mapper   | Warning  | The enum mapping strategy ByName cannot be used in projection mappings
 RMG033  | Mapper   | Info     | Object mapped to another object without deep clone
+
+### Removed Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+RMG019  | Mapper   | Disabled | Partial instance mapping method in a static mapper
