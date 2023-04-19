@@ -240,6 +240,15 @@ public static class SyntaxFactoryHelper
             method.Name,
             arguments);
 
+    public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ArgumentSyntax[] arguments)
+    {
+        var receiverType = FullyQualifiedIdentifierName(method.ReceiverType?.NonNullable()!) ?? throw new ArgumentNullException(nameof(method.ReceiverType));
+
+        var receiverTypeIdentifier = IdentifierName(receiverType);
+        var methodAccess = MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, receiverTypeIdentifier, IdentifierName(method.Name));
+        return InvocationExpression(methodAccess).WithArgumentList(ArgumentList(arguments));
+    }
+
     public static ForStatementSyntax IncrementalForLoop(string counterName, StatementSyntax body, ExpressionSyntax maxValueExclusive)
     {
         var counterDeclaration = DeclareVariable(counterName, IntLiteral(0));

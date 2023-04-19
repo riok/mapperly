@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Diagnostics;
@@ -78,16 +79,16 @@ public static class EnumerableMappingBuilder
             return null;
 
         if (ctx.Target.ImplementsGeneric(ctx.Types.StackT, out _))
-            return new ForEachAddEnumerableExistingTargetMapping(ctx.Source, ctx.Target, elementMapping, nameof(Stack<object>.Push));
+            return CreateForEach(nameof(Stack<object>.Push));
 
         if (ctx.Target.ImplementsGeneric(ctx.Types.QueueT, out _))
-            return new ForEachAddEnumerableExistingTargetMapping(ctx.Source, ctx.Target, elementMapping, nameof(Queue<object>.Enqueue));
+            return CreateForEach(nameof(Queue<object>.Enqueue));
 
         // create a foreach loop with add calls if source is not an array
         // and  ICollection.Add(T): void is implemented and not explicit
         // ensures add is not called and immutable types
         if (!ctx.Target.IsArrayType() && ctx.Target.HasImplicitInterfaceMethod(ctx.Types.ICollectionT, AddMethodName))
-            return new ForEachAddEnumerableExistingTargetMapping(ctx.Source, ctx.Target, elementMapping, AddMethodName);
+            return CreateForEach(AddMethodName);
 
         // if a mapping could be created for an immutable collection
         // we diagnostic when it is an existing target mapping
@@ -97,6 +98,12 @@ public static class EnumerableMappingBuilder
         }
 
         return null;
+
+        ForEachAddEnumerableExistingTargetMapping CreateForEach(string methodName)
+        {
+            var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.Source, ctx.Target, ctx.Types);
+            return new ForEachAddEnumerableExistingTargetMapping(ctx.Source, ctx.Target, elementMapping, methodName, ensureCapacityStatement);
+        }
     }
 
     private static ITypeMapping? BuildElementMapping(MappingBuilderContext ctx)
@@ -164,7 +171,10 @@ public static class EnumerableMappingBuilder
         // and  ICollection.Add(T): void is implemented and not explicit
         // ensures add is not called and immutable types
         if (!ctx.Target.IsArrayType() && ctx.Target.HasImplicitInterfaceMethod(ctx.Types.ICollectionT, AddMethodName))
-            return new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping, objectFactory, AddMethodName);
+        {
+            var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.Source, ctx.Target, ctx.Types);
+            return new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping, objectFactory, AddMethodName, ensureCapacityStatement);
+        }
 
         return null;
     }
