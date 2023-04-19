@@ -31,7 +31,8 @@ public class LinqEnumerableMapping : TypeMapping
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        var lambdaParamName = ctx.NameBuilder.New(LambdaParamName);
+        var scopedNameBuilder = ctx.NameBuilder.NewScope();
+        var lambdaParamName = scopedNameBuilder.New(LambdaParamName);
 
         ExpressionSyntax mappedSource;
 
