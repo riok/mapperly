@@ -194,6 +194,7 @@ public class DictionaryTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::A();
+                target.EnsureCapacity(source.Count + target.Count);
                 foreach (var item in source)
                 {
                     target[item.Key] = item.Value;
@@ -217,12 +218,78 @@ public class DictionaryTest
             .HaveSingleMethodBody(
                 """
                 var target = CreateA();
+                target.EnsureCapacity(source.Count + target.Count);
                 foreach (var item in source)
                 {
                     target[item.Key] = item.Value;
                 }
 
                 return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MapToExistingDictionary()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(IDictionary<string, int> source, Dictionary<string, int> target);"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                target.EnsureCapacity(source.Count + target.Count);
+                foreach (var item in source)
+                {
+                    target[item.Key] = item.Value;
+                }
+                """
+            );
+    }
+
+    [Fact]
+    public void MapToExistingCustomDictionary()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(IDictionary<string, int> source, A target);",
+            "class A : Dictionary<string, int> {}"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                target.EnsureCapacity(source.Count + target.Count);
+                foreach (var item in source)
+                {
+                    target[item.Key] = item.Value;
+                }
+                """
+            );
+    }
+
+    [Fact]
+    public void KeyValueEnumerableToExistingDictionary()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(IEnumerable<KeyValuePair<string, int>> source, Dictionary<string, int> target);"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                if (global::System.Linq.Enumerable.TryGetNonEnumeratedCount(source, out var sourceCount))
+                {
+                    target.EnsureCapacity(sourceCount + target.Count);
+                }
+
+                foreach (var item in source)
+                {
+                    target[item.Key] = item.Value;
+                }
                 """
             );
     }

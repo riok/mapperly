@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.ObjectFactories;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
@@ -26,9 +27,12 @@ public class ForEachSetDictionaryMapping : ExistingTargetMappingMethodWrapper
         bool sourceHasCount,
         ITypeSymbol? typeToInstantiate = null,
         ObjectFactory? objectFactory = null,
-        INamedTypeSymbol? explicitCast = null
+        INamedTypeSymbol? explicitCast = null,
+        EnsureCapacity? ensureCapacity = null
     )
-        : base(new ForEachSetDictionaryExistingTargetMapping(sourceType, targetType, keyMapping, valueMapping, explicitCast))
+        : base(
+            new ForEachSetDictionaryExistingTargetMapping(sourceType, targetType, keyMapping, valueMapping, explicitCast, ensureCapacity)
+        )
     {
         _sourceHasCount = sourceHasCount;
         _objectFactory = objectFactory;

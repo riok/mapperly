@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Diagnostics;
@@ -64,6 +65,8 @@ public static class DictionaryMappingBuilder
         if (!ctx.Target.ImplementsGeneric(ctx.Types.IDictionaryT, out _))
             return null;
 
+        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.Source, ctx.Target, ctx.Types);
+
         return new ForEachSetDictionaryMapping(
             ctx.Source,
             ctx.Target,
@@ -71,7 +74,8 @@ public static class DictionaryMappingBuilder
             valueMapping,
             false,
             objectFactory: objectFactory,
-            explicitCast: GetExplicitIndexer(ctx)
+            explicitCast: GetExplicitIndexer(ctx),
+            ensureCapacity: ensureCapacityStatement
         );
     }
 
@@ -91,12 +95,15 @@ public static class DictionaryMappingBuilder
         }
 
         // add values to dictionary by setting key values in a foreach loop
+        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.Source, ctx.Target, ctx.Types);
+
         return new ForEachSetDictionaryExistingTargetMapping(
             ctx.Source,
             ctx.Target,
             keyMapping,
             valueMapping,
-            explicitCast: GetExplicitIndexer(ctx)
+            explicitCast: GetExplicitIndexer(ctx),
+            ensureCapacity: ensureCapacityStatement
         );
     }
 
