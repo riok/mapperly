@@ -13,27 +13,7 @@ public class UserMethodTest
     }
 
     [Fact]
-    public Task StaticMapperShouldEmitDiagnosticForInstanceMethods()
-    {
-        var source =
-            @"
-using System;
-using System.Collections.Generic;
-using Riok.Mapperly.Abstractions;
-
-[Mapper]
-public static partial class MyStaticMapper
-{
-    public partial static object StaticToObject(string s);
-
-    public partial object InstanceToObject(string s);
-}
-";
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task InstanceMapperShouldEmitDiagnosticForStaticMethods()
+    public Task InstanceMapperShouldEmitDiagnosticForPartialStaticMethods()
     {
         var source =
             @"
@@ -44,10 +24,33 @@ using Riok.Mapperly.Abstractions;
 [Mapper]
 public partial class MyMapper
 {
-    public partial static object StaticToObject(string s);
+    public static object StaticToObject(string s);
 
     public partial object InstanceToObject(string s);
 }
+";
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task InstanceMapperShouldSupportUserDefinedStaticMethods()
+    {
+        var source =
+            @"
+using System;
+using System.Collections.Generic;
+using Riok.Mapperly.Abstractions;
+
+[Mapper]
+public partial class MyMapper
+{
+    public static int StaticMapper(int s) => s;
+
+    public partial B Map(A s);
+}
+
+public record A(int Value);
+public record B(int Value);
 ";
         return TestHelper.VerifyGenerator(source);
     }

@@ -67,7 +67,7 @@ public static class UserMethodMappingExtractor
             BuildParameters(ctx, method, out var parameters)
             && !method.ReturnsVoid
             && (allowPartial || !method.IsPartialDefinition)
-            && isStatic == method.IsStatic;
+            && (!isStatic || method.IsStatic);
         return valid ? new UserImplementedMethodMapping(method, parameters.Source, parameters.ReferenceHandler) : null;
     }
 
@@ -76,15 +76,10 @@ public static class UserMethodMappingExtractor
         if (!methodSymbol.IsPartialDefinition)
             return null;
 
-        if (isStatic != methodSymbol.IsStatic)
+        if (!isStatic && methodSymbol.IsStatic)
         {
-            ctx.ReportDiagnostic(
-                isStatic
-                    ? DiagnosticDescriptors.PartialInstanceMethodInStaticMapper
-                    : DiagnosticDescriptors.PartialStaticMethodInInstanceMapper,
-                methodSymbol,
-                methodSymbol.Name
-            );
+            ctx.ReportDiagnostic(DiagnosticDescriptors.PartialStaticMethodInInstanceMapper, methodSymbol, methodSymbol.Name);
+
             return null;
         }
 

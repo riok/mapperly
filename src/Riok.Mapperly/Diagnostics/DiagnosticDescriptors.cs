@@ -168,15 +168,6 @@ internal static class DiagnosticDescriptors
         true
     );
 
-    public static readonly DiagnosticDescriptor PartialInstanceMethodInStaticMapper = new DiagnosticDescriptor(
-        "RMG019",
-        "Partial instance mapping method in a static mapper",
-        "{0} is a partial instance mapping method in a static mapper. Instance mapping methods are only supported in instance (non-static) mappers.",
-        DiagnosticCategories.Mapper,
-        DiagnosticSeverity.Error,
-        true
-    );
-
     public static readonly DiagnosticDescriptor SourceMemberNotMapped = new DiagnosticDescriptor(
         "RMG020",
         "Source member is not mapped to any target member",
