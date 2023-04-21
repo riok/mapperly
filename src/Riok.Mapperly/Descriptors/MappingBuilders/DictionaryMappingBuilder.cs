@@ -191,8 +191,11 @@ public static class DictionaryMappingBuilder
                 valueMapping
             );
 
-        // if taget is an ImmutableDictionary or implements interface IImmutableDictionary
-        if (ctx.Target.OriginalDefinition.ImplementsGeneric(ctx.Types.IImmutableDictionaryT, out _))
+        // if target is an ImmutableDictionary or IImmutableDictionary
+        if (
+            SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IImmutableDictionaryT)
+            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableDictionaryT)
+        )
             return new LinqDicitonaryMapping(
                 ctx.Source,
                 ctx.Target,

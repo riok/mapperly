@@ -237,16 +237,28 @@ public static class EnumerableMappingBuilder
         if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableArrayT))
             return ctx.Types.ImmutableArray.GetStaticGenericMethod(ToImmutableArrayMethodName);
 
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableListT))
+        if (
+            SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableListT)
+            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IImmutableListT)
+        )
             return ctx.Types.ImmutableList.GetStaticGenericMethod(ToImmutableListMethodName);
 
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableHashSetT))
+        if (
+            SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableHashSetT)
+            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IImmutableSetT)
+        )
             return ctx.Types.ImmutableHashSet.GetStaticGenericMethod(ToImmutableHashSetMethodName);
 
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableQueueT))
+        if (
+            SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableQueueT)
+            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IImmutableQueueT)
+        )
             return ctx.Types.ImmutableQueue.GetStaticGenericMethod(CreateRangeQueueMethodName);
 
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableStackT))
+        if (
+            SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableStackT)
+            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IImmutableStackT)
+        )
             return ctx.Types.ImmutableStack.GetStaticGenericMethod(CreateRangeStackMethodName);
 
         if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableSortedSetT))
