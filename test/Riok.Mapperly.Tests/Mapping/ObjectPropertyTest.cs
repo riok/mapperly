@@ -391,4 +391,26 @@ public class ObjectPropertyTest
                 """
             );
     }
+
+    [Fact]
+    public void ShouldIgnoreStaticProperty()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string Name { get; } public static string Value { get; } }",
+            "class B { public string Name { set; } public static string Value { set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Name = source.Name;
+                return target;
+                """
+            );
+    }
 }
