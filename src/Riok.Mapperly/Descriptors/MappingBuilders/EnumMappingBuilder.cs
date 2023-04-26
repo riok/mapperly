@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
@@ -40,7 +41,7 @@ public static class EnumMappingBuilder
         {
             EnumMappingStrategy.ByName when ctx.IsExpression => BuildCastMappingAndDiagnostic(ctx),
             EnumMappingStrategy.ByName => BuildNameMapping(ctx, config.IgnoreCase),
-            _ => new CastMapping(ctx.Source, ctx.Target),
+            _ => BuildEnumToEnumCastMapping(ctx),
         };
     }
 
@@ -51,12 +52,35 @@ public static class EnumMappingBuilder
             ctx.Source.ToDisplayString(),
             ctx.Target.ToDisplayString()
         );
+        return BuildEnumToEnumCastMapping(ctx);
+    }
+
+    private static TypeMapping BuildEnumToEnumCastMapping(MappingBuilderContext ctx)
+    {
+        var sourceValues = ctx.Source.GetMembers().OfType<IFieldSymbol>().Select(symbol => symbol.ConstantValue).ToList();
+
+        var targetValues = ctx.Target.GetMembers().OfType<IFieldSymbol>().Select(symbol => symbol.ConstantValue).ToList();
+
+        var missingTargetValues = targetValues.Except(sourceValues);
+        if (missingTargetValues.Any())
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.NotAllTargetEnumValuesMapped, missingTargetValues.First()!, ctx.Target, ctx.Source);
+        }
+
+        var missingSourceValues = sourceValues.Except(targetValues);
+        if (missingSourceValues.Any())
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.NotAllSourceEnumValuesMapped, missingSourceValues.First()!, ctx.Source, ctx.Target);
+        }
+
         return new CastMapping(ctx.Source, ctx.Target);
     }
 
     private static TypeMapping BuildNameMapping(MappingBuilderContext ctx, bool ignoreCase)
     {
         var targetFieldsByName = ctx.Target.GetMembers().OfType<IFieldSymbol>().ToDictionary(x => x.Name);
+        var sourceFieldsByName = ctx.Source.GetMembers().OfType<IFieldSymbol>().ToDictionary(x => x.Name);
+
         Func<IFieldSymbol, IFieldSymbol?> getTargetField;
         if (ignoreCase)
         {
@@ -83,16 +107,18 @@ public static class EnumMappingBuilder
             ctx.ReportDiagnostic(DiagnosticDescriptors.EnumNameMappingNoOverlappingValuesFound, ctx.Source, ctx.Target);
         }
 
-        var targetMembers = ctx.Target
-            .GetMembers()
-            .OfType<IFieldSymbol>();
+        var missingSourceMembers = sourceFieldsByName.Select(item => item.Key).Except(enumMemberMappings.Select(mapping => mapping.Key));
 
-        if (enumMemberMappings.Count < targetMembers.Count())
+        if (missingSourceMembers.Any())
         {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.NotAllEnumValuesMapped,
-                ctx.Source,
-                ctx.Target);
+            ctx.ReportDiagnostic(DiagnosticDescriptors.NotAllSourceEnumValuesMapped, missingSourceMembers.First(), ctx.Source, ctx.Target);
+        }
+
+        var missingTargetMembers = targetFieldsByName.Select(item => item.Key).Except(enumMemberMappings.Select(mapping => mapping.Value));
+
+        if (missingTargetMembers.Any())
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.NotAllTargetEnumValuesMapped, missingTargetMembers.First(), ctx.Target, ctx.Source);
         }
 
         return new EnumNameMapping(ctx.Source, ctx.Target, enumMemberMappings);

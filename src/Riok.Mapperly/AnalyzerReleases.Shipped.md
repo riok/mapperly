@@ -79,7 +79,8 @@ RMG030  | Mapper   | Error    | Reference loop detected while mapping to an init
 RMG031  | Mapper   | Warning  | Reference loop detected while mapping to a constructor member
 RMG032  | Mapper   | Warning  | The enum mapping strategy ByName cannot be used in projection mappings
 RMG033  | Mapper   | Info     | Object mapped to another object without deep clone
-RMG034  | Mapper   | Warning  | Not all enum values in the target Enum are mapped
+RMG034  | Mapper   | Info  	  | Not all enum values in the target enum are mapped
+RMG035  | Mapper   | Info     | Not all enum values in the source enum are mapped
 
 ### Removed Rules
 

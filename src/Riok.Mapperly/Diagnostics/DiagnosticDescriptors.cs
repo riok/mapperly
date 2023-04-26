@@ -294,13 +294,21 @@ internal static class DiagnosticDescriptors
         true
     );
 
-    public static readonly DiagnosticDescriptor NotAllEnumValuesMapped = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor NotAllTargetEnumValuesMapped = new DiagnosticDescriptor(
         "RMG034",
         "Not all enum values in the target enum are mapped",
-        "Not all enum values in the target enum are mapped from {0} to {1}",
+        "Enum member {0} on {1} not found on source enum {2}",
         DiagnosticCategories.Mapper,
-        DiagnosticSeverity.Warning,
+        DiagnosticSeverity.Info,
         true
-	);
+    );
 
+    public static readonly DiagnosticDescriptor NotAllSourceEnumValuesMapped = new DiagnosticDescriptor(
+        "RMG035",
+        "Not all enum values in the source enum are mapped",
+        "Enum member {0} on {1} not found on target enum {2}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Info,
+        true
+    );
 }

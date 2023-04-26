@@ -25,7 +25,10 @@ public class EnumTest
     public void EnumToOtherEnumTypeShouldCast()
     {
         var source = TestSourceBuilder.Mapping("E1", "E2", "enum E1 : short {A, B, C}", "enum E2 : byte {A, B, C}");
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E2)source;");
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody("return (global::E2)source;");
     }
 
     [Fact]
@@ -49,7 +52,10 @@ public class EnumTest
             "enum E2 {A = 100, B, C}"
         );
 
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E2)source;");
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody("return (global::E2)source;");
     }
 
     [Fact]
@@ -62,7 +68,7 @@ public class EnumTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -88,7 +94,7 @@ public class EnumTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -116,7 +122,7 @@ public class EnumTest
             "enum E2 {D, E, F}"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowInfoDiagnostics);
     }
 
     [Fact]
