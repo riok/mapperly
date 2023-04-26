@@ -7,15 +7,11 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// An implementation of <see cref="INewInstanceBuilderContext{T}"/>.
 /// </summary>
 /// <typeparam name="T">The type of the mapping.</typeparam>
-public class NewInstanceBuilderContext<T> :
-    MembersMappingBuilderContext<T>,
-    INewInstanceBuilderContext<T>
+public class NewInstanceBuilderContext<T> : MembersMappingBuilderContext<T>, INewInstanceBuilderContext<T>
     where T : INewInstanceObjectMemberMapping
 {
     public NewInstanceBuilderContext(MappingBuilderContext builderContext, T mapping)
-        : base(builderContext, mapping)
-    {
-    }
+        : base(builderContext, mapping) { }
 
     public void AddInitMemberMapping(MemberAssignmentMapping mapping)
     {

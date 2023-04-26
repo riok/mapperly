@@ -15,18 +15,12 @@ public class NewInstanceObjectMemberMapping : TypeMapping, INewInstanceObjectMem
     private readonly HashSet<ConstructorParameterMapping> _constructorPropertyMappings = new();
     private readonly HashSet<MemberAssignmentMapping> _initPropertyMappings = new();
 
-    public NewInstanceObjectMemberMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType)
-        : base(sourceType, targetType)
-    {
-    }
+    public NewInstanceObjectMemberMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+        : base(sourceType, targetType) { }
 
-    public void AddConstructorParameterMapping(ConstructorParameterMapping mapping)
-        => _constructorPropertyMappings.Add(mapping);
+    public void AddConstructorParameterMapping(ConstructorParameterMapping mapping) => _constructorPropertyMappings.Add(mapping);
 
-    public void AddInitMemberMapping(MemberAssignmentMapping mapping)
-        => _initPropertyMappings.Add(mapping);
+    public void AddInitMemberMapping(MemberAssignmentMapping mapping) => _initPropertyMappings.Add(mapping);
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
@@ -37,9 +31,7 @@ public class NewInstanceObjectMemberMapping : TypeMapping, INewInstanceObjectMem
         // add initializer
         if (_initPropertyMappings.Count > 0)
         {
-            var initMappings = _initPropertyMappings
-                .Select(x => x.BuildExpression(ctx, null))
-                .ToArray();
+            var initMappings = _initPropertyMappings.Select(x => x.BuildExpression(ctx, null)).ToArray();
             objectCreationExpression = objectCreationExpression.WithInitializer(ObjectInitializer(initMappings));
         }
 

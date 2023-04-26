@@ -10,9 +10,7 @@ public class PreserveReferenceHandlerTest
     [Fact]
     public void EmptyReferenceHandlerShouldReturnFalse()
     {
-        _handler.TryGetReference(new MyObj(), out MyDto _)
-            .Should()
-            .BeFalse();
+        _handler.TryGetReference(new MyObj(), out MyDto _).Should().BeFalse();
     }
 
     [Fact]
@@ -21,12 +19,8 @@ public class PreserveReferenceHandlerTest
         var myObj = new MyObj { Value = 1 };
         var myDto = new MyDto { Value = 2 };
         _handler.SetReference(myObj, myDto);
-        _handler.TryGetReference(myObj, out MyDto? mySecondDto)
-            .Should()
-            .BeTrue();
-        myDto
-            .Should()
-            .Be(mySecondDto);
+        _handler.TryGetReference(myObj, out MyDto? mySecondDto).Should().BeTrue();
+        myDto.Should().Be(mySecondDto);
     }
 
     class MyDto

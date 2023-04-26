@@ -7,9 +7,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 public class TypeMappingBuildContext
 {
     public TypeMappingBuildContext(string source, string? referenceHandler, UniqueNameBuilder nameBuilder)
-        : this(IdentifierName(source), referenceHandler == null ? null : IdentifierName(referenceHandler), nameBuilder)
-    {
-    }
+        : this(IdentifierName(source), referenceHandler == null ? null : IdentifierName(referenceHandler), nameBuilder) { }
 
     private TypeMappingBuildContext(ExpressionSyntax source, ExpressionSyntax? referenceHandler, UniqueNameBuilder nameBuilder)
     {
@@ -24,15 +22,11 @@ public class TypeMappingBuildContext
 
     public ExpressionSyntax? ReferenceHandler { get; }
 
-    public TypeMappingBuildContext WithSource(ExpressionSyntax source)
-        => new(source, ReferenceHandler, NameBuilder);
+    public TypeMappingBuildContext WithSource(ExpressionSyntax source) => new(source, ReferenceHandler, NameBuilder);
 
-    public TypeMappingBuildContext WithSource(string source)
-        => WithSource(IdentifierName(source));
+    public TypeMappingBuildContext WithSource(string source) => WithSource(IdentifierName(source));
 
-    public TypeMappingBuildContext WithRefHandler(string refHandler)
-        => WithRefHandler(IdentifierName(refHandler));
+    public TypeMappingBuildContext WithRefHandler(string refHandler) => WithRefHandler(IdentifierName(refHandler));
 
-    public TypeMappingBuildContext WithRefHandler(ExpressionSyntax refHandler)
-        => new(Source, refHandler, NameBuilder);
+    public TypeMappingBuildContext WithRefHandler(ExpressionSyntax refHandler) => new(Source, refHandler, NameBuilder);
 }

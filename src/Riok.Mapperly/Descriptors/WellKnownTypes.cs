@@ -39,16 +39,21 @@ public class WellKnownTypes
     private INamedTypeSymbol? _immutableArrayT;
     private INamedTypeSymbol? _immutableList;
     private INamedTypeSymbol? _immutableListT;
+    private INamedTypeSymbol? _iImmutableListT;
     private INamedTypeSymbol? _immutableHashSet;
     private INamedTypeSymbol? _immutableHashSetT;
+    private INamedTypeSymbol? _iImmutableSetT;
     private INamedTypeSymbol? _immutableQueue;
     private INamedTypeSymbol? _immutableQueueT;
+    private INamedTypeSymbol? _iImmutableQueueT;
     private INamedTypeSymbol? _immutableStack;
     private INamedTypeSymbol? _immutableStackT;
+    private INamedTypeSymbol? _iImmutableStackT;
     private INamedTypeSymbol? _immutableSortedSet;
     private INamedTypeSymbol? _immutableSortedSetT;
     private INamedTypeSymbol? _immutableDictionary;
     private INamedTypeSymbol? _immutableDictionaryT;
+    private INamedTypeSymbol? _iImmutableDictionaryT;
     private INamedTypeSymbol? _immutableSortedDictionary;
     private INamedTypeSymbol? _immutableSortedDictionaryT;
 
@@ -89,28 +94,34 @@ public class WellKnownTypes
     public INamedTypeSymbol ImmutableArrayT => _immutableArrayT ??= GetTypeSymbol(typeof(ImmutableArray<>));
     public INamedTypeSymbol ImmutableList => _immutableList ??= GetTypeSymbol(typeof(ImmutableList));
     public INamedTypeSymbol ImmutableListT => _immutableListT ??= GetTypeSymbol(typeof(ImmutableList<>));
+    public INamedTypeSymbol IImmutableListT => _iImmutableListT ??= GetTypeSymbol(typeof(IImmutableList<>));
     public INamedTypeSymbol ImmutableHashSet => _immutableHashSet ??= GetTypeSymbol(typeof(ImmutableHashSet));
     public INamedTypeSymbol ImmutableHashSetT => _immutableHashSetT ??= GetTypeSymbol(typeof(ImmutableHashSet<>));
+    public INamedTypeSymbol IImmutableSetT => _iImmutableSetT ??= GetTypeSymbol(typeof(IImmutableSet<>));
     public INamedTypeSymbol ImmutableQueue => _immutableQueue ??= GetTypeSymbol(typeof(ImmutableQueue));
     public INamedTypeSymbol ImmutableQueueT => _immutableQueueT ??= GetTypeSymbol(typeof(ImmutableQueue<>));
+    public INamedTypeSymbol IImmutableQueueT => _iImmutableQueueT ??= GetTypeSymbol(typeof(IImmutableQueue<>));
     public INamedTypeSymbol ImmutableStack => _immutableStack ??= GetTypeSymbol(typeof(ImmutableStack));
     public INamedTypeSymbol ImmutableStackT => _immutableStackT ??= GetTypeSymbol(typeof(ImmutableStack<>));
+    public INamedTypeSymbol IImmutableStackT => _iImmutableStackT ??= GetTypeSymbol(typeof(IImmutableStack<>));
     public INamedTypeSymbol ImmutableSortedSet => _immutableSortedSet ??= GetTypeSymbol(typeof(ImmutableSortedSet));
     public INamedTypeSymbol ImmutableSortedSetT => _immutableSortedSetT ??= GetTypeSymbol(typeof(ImmutableSortedSet<>));
     public INamedTypeSymbol ImmutableDictionary => _immutableDictionary ??= GetTypeSymbol(typeof(ImmutableDictionary));
+    public INamedTypeSymbol IImmutableDictionaryT => _iImmutableDictionaryT ??= GetTypeSymbol(typeof(IImmutableDictionary<,>));
     public INamedTypeSymbol ImmutableDictionaryT => _immutableDictionaryT ??= GetTypeSymbol(typeof(ImmutableDictionary<,>));
+
     public INamedTypeSymbol ImmutableSortedDictionary => _immutableSortedDictionary ??= GetTypeSymbol(typeof(ImmutableSortedDictionary));
-    public INamedTypeSymbol ImmutableSortedDictionaryT => _immutableSortedDictionaryT ??= GetTypeSymbol(typeof(ImmutableSortedDictionary<,>));
+    public INamedTypeSymbol ImmutableSortedDictionaryT =>
+        _immutableSortedDictionaryT ??= GetTypeSymbol(typeof(ImmutableSortedDictionary<,>));
 
     // use string type name as they are not available in netstandard2.0
     public INamedTypeSymbol? DateOnly => _dateOnly ??= GetTypeSymbol("System.DateOnly");
 
     public INamedTypeSymbol? TimeOnly => _timeOnly ??= GetTypeSymbol("System.TimeOnly");
 
-    private INamedTypeSymbol GetTypeSymbol(Type type)
-        => _compilation.GetTypeByMetadataName(type.FullName ?? throw new InvalidOperationException("Could not get name of type " + type))
-            ?? throw new InvalidOperationException("Could not get type " + type.FullName);
+    private INamedTypeSymbol GetTypeSymbol(Type type) =>
+        _compilation.GetTypeByMetadataName(type.FullName ?? throw new InvalidOperationException("Could not get name of type " + type))
+        ?? throw new InvalidOperationException("Could not get type " + type.FullName);
 
-    private INamedTypeSymbol? GetTypeSymbol(string typeFullName)
-        => _compilation.GetTypeByMetadataName(typeFullName);
+    private INamedTypeSymbol? GetTypeSymbol(string typeFullName) => _compilation.GetTypeByMetadataName(typeFullName);
 }

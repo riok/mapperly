@@ -57,19 +57,31 @@ async function buildAnalyzerRulesData(): Promise<void> {
   const targetFile = join(generatedDataDir, 'analyzer-rules.json');
   const sourceFile = '../src/Riok.Mapperly/AnalyzerReleases.Shipped.md';
 
-  let rules = [];
+  let rules = {};
+  let removingRules = true;
   const walkTokens = (token) => {
+    if (token.type === 'heading' && token.depth === 3) {
+      removingRules = token.text === 'Removed Rules';
+      return token;
+    }
+
     if (token.type !== 'table') {
       return token;
     }
 
     for (const row of token.rows) {
-      rules.push({
-        id: row[0].text,
+      const id = row[0].text;
+      if (removingRules) {
+        delete rules[id];
+        continue;
+      }
+
+      rules[id] = {
+        id,
         category: row[1].text,
         severity: row[2].text,
         notes: row[3].text,
-      });
+      };
     }
 
     return token;
@@ -78,7 +90,10 @@ async function buildAnalyzerRulesData(): Promise<void> {
 
   const analyzersMd = await readFile(sourceFile);
   marked.parse(analyzersMd.toString());
-  await writeFile(targetFile, JSON.stringify(rules, undefined, '  '));
+  await writeFile(
+    targetFile,
+    JSON.stringify(Object.values(rules), undefined, '  '),
+  );
 }
 
 async function buildSamples(): Promise<void> {

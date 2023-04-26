@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -12,41 +13,56 @@ namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 public class ForEachSetDictionaryExistingTargetMapping : ExistingTargetMapping
 {
     private const string LoopItemVariableName = "item";
-    private const string KeyValueKeyPropertyName = nameof(KeyValuePair<object, object>.Key);
-    private const string KeyValueValuePropertyName = nameof(KeyValuePair<object, object>.Value);
+    private const string ExplicitCastVariableName = "targetDict";
+    private const string KeyPropertyName = nameof(KeyValuePair<object, object>.Key);
+    private const string ValuePropertyName = nameof(KeyValuePair<object, object>.Value);
 
     private readonly ITypeMapping _keyMapping;
     private readonly ITypeMapping _valueMapping;
+    private readonly INamedTypeSymbol? _explicitCast;
+    private readonly EnsureCapacity? _ensureCapacity;
 
     public ForEachSetDictionaryExistingTargetMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         ITypeMapping keyMapping,
-        ITypeMapping valueMapping)
+        ITypeMapping valueMapping,
+        INamedTypeSymbol? explicitCast,
+        EnsureCapacity? ensureCapacity
+    )
         : base(sourceType, targetType)
     {
         _keyMapping = keyMapping;
         _valueMapping = valueMapping;
+        _explicitCast = explicitCast;
+        _ensureCapacity = ensureCapacity;
     }
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
+        if (_explicitCast != null)
+        {
+            var type = FullyQualifiedIdentifier(_explicitCast);
+            var cast = CastExpression(type, target);
+
+            var castedVariable = ctx.NameBuilder.New(ExplicitCastVariableName);
+            target = IdentifierName(castedVariable);
+
+            yield return LocalDeclarationStatement(DeclareVariable(castedVariable, cast));
+        }
+
+        if (_ensureCapacity != null)
+        {
+            yield return _ensureCapacity.Build(ctx, target);
+        }
+
         var loopItemVariableName = ctx.NameBuilder.New(LoopItemVariableName);
 
-        var convertedKeyExpression = _keyMapping.Build(ctx.WithSource(MemberAccess(loopItemVariableName, KeyValueKeyPropertyName)));
-        var convertedValueExpression = _valueMapping.Build(ctx.WithSource(MemberAccess(loopItemVariableName, KeyValueValuePropertyName)));
+        var convertedKeyExpression = _keyMapping.Build(ctx.WithSource(MemberAccess(loopItemVariableName, KeyPropertyName)));
+        var convertedValueExpression = _valueMapping.Build(ctx.WithSource(MemberAccess(loopItemVariableName, ValuePropertyName)));
 
-        var assignment = Assignment(
-            ElementAccess(target, convertedKeyExpression),
-            convertedValueExpression);
+        var assignment = Assignment(ElementAccess(target, convertedKeyExpression), convertedValueExpression);
 
-        return new StatementSyntax[]
-        {
-            ForEachStatement(
-                VarIdentifier,
-                Identifier(loopItemVariableName),
-                ctx.Source,
-                Block(ExpressionStatement(assignment))),
-        };
+        yield return ForEachStatement(VarIdentifier, Identifier(loopItemVariableName), ctx.Source, Block(ExpressionStatement(assignment)));
     }
 }

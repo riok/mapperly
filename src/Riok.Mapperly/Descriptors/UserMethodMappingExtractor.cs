@@ -9,14 +9,13 @@ namespace Riok.Mapperly.Descriptors;
 
 public static class UserMethodMappingExtractor
 {
-    public static IEnumerable<IUserMapping> ExtractUserMappings(
-        SimpleMappingBuilderContext ctx,
-        ITypeSymbol mapperSymbol)
+    public static IEnumerable<IUserMapping> ExtractUserMappings(SimpleMappingBuilderContext ctx, ITypeSymbol mapperSymbol)
     {
         // extract user implemented and user defined mappings from mapper
         foreach (var methodSymbol in ExtractMethods(mapperSymbol))
         {
-            var mapping = BuilderUserDefinedMapping(ctx, methodSymbol, mapperSymbol.IsStatic)
+            var mapping =
+                BuilderUserDefinedMapping(ctx, methodSymbol, mapperSymbol.IsStatic)
                 ?? BuildUserImplementedMapping(ctx, methodSymbol, false, mapperSymbol.IsStatic);
             if (mapping != null)
                 yield return mapping;
@@ -39,8 +38,7 @@ public static class UserMethodMappingExtractor
         }
     }
 
-    private static IEnumerable<IMethodSymbol> ExtractMethods(ITypeSymbol mapperSymbol)
-        => mapperSymbol.GetMembers().OfType<IMethodSymbol>();
+    private static IEnumerable<IMethodSymbol> ExtractMethods(ITypeSymbol mapperSymbol) => mapperSymbol.GetMembers().OfType<IMethodSymbol>();
 
     private static IEnumerable<IMethodSymbol> ExtractBaseMethods(INamedTypeSymbol objectType, ITypeSymbol mapperSymbol)
     {
@@ -49,61 +47,51 @@ public static class UserMethodMappingExtractor
         return baseMethods
             .Concat(intfMethods)
             .OfType<IMethodSymbol>()
-
             // ignore all non ordinary methods (eg. ctor, operators, etc.) and methods declared on the object type (eg. ToString)
-            .Where(x =>
-                x.MethodKind == MethodKind.Ordinary
-                && x.IsAccessible(true)
-                && !SymbolEqualityComparer.Default.Equals(x.ReceiverType, objectType));
+            .Where(
+                x =>
+                    x.MethodKind == MethodKind.Ordinary
+                    && x.IsAccessible(true)
+                    && !SymbolEqualityComparer.Default.Equals(x.ReceiverType, objectType)
+            );
     }
 
     private static IUserMapping? BuildUserImplementedMapping(
         SimpleMappingBuilderContext ctx,
         IMethodSymbol method,
         bool allowPartial,
-        bool isStatic)
+        bool isStatic
+    )
     {
-        var valid = BuildParameters(ctx, method, out var parameters)
+        var valid =
+            BuildParameters(ctx, method, out var parameters)
             && !method.ReturnsVoid
             && (allowPartial || !method.IsPartialDefinition)
-            && isStatic == method.IsStatic;
-        return valid
-            ? new UserImplementedMethodMapping(method, parameters.Source, parameters.ReferenceHandler)
-            : null;
+            && (!isStatic || method.IsStatic);
+        return valid ? new UserImplementedMethodMapping(method, parameters.Source, parameters.ReferenceHandler) : null;
     }
 
-    private static IUserMapping? BuilderUserDefinedMapping(
-        SimpleMappingBuilderContext ctx,
-        IMethodSymbol methodSymbol,
-        bool isStatic)
+    private static IUserMapping? BuilderUserDefinedMapping(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol, bool isStatic)
     {
         if (!methodSymbol.IsPartialDefinition)
             return null;
 
-        if (isStatic != methodSymbol.IsStatic)
+        if (!isStatic && methodSymbol.IsStatic)
         {
-            ctx.ReportDiagnostic(
-                isStatic ? DiagnosticDescriptors.PartialInstanceMethodInStaticMapper : DiagnosticDescriptors.PartialStaticMethodInInstanceMapper,
-                methodSymbol,
-                methodSymbol.Name);
+            ctx.ReportDiagnostic(DiagnosticDescriptors.PartialStaticMethodInInstanceMapper, methodSymbol, methodSymbol.Name);
+
             return null;
         }
 
         if (methodSymbol.IsAsync || methodSymbol.IsGenericMethod)
         {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.UnsupportedMappingMethodSignature,
-                methodSymbol,
-                methodSymbol.Name);
+            ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, methodSymbol, methodSymbol.Name);
             return null;
         }
 
         if (!BuildParameters(ctx, methodSymbol, out var parameters))
         {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.UnsupportedMappingMethodSignature,
-                methodSymbol,
-                methodSymbol.Name);
+            ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, methodSymbol, methodSymbol.Name);
             return null;
         }
 
@@ -115,7 +103,8 @@ public static class UserMethodMappingExtractor
                 parameters.Target.Value,
                 parameters.ReferenceHandler,
                 ctx.MapperConfiguration.UseReferenceHandling,
-                ctx.Types.PreserveReferenceHandler);
+                ctx.Types.PreserveReferenceHandler
+            );
         }
 
         return new UserDefinedNewInstanceMethodMapping(
@@ -123,13 +112,11 @@ public static class UserMethodMappingExtractor
             parameters.Source,
             parameters.ReferenceHandler,
             ctx.MapperConfiguration.UseReferenceHandling,
-            ctx.Types.PreserveReferenceHandler);
+            ctx.Types.PreserveReferenceHandler
+        );
     }
 
-    private static bool BuildParameters(
-        SimpleMappingBuilderContext ctx,
-        IMethodSymbol method,
-        out MappingMethodParameters parameters)
+    private static bool BuildParameters(SimpleMappingBuilderContext ctx, IMethodSymbol method, out MappingMethodParameters parameters)
     {
         // reference handler parameter is always annotated
         var refHandlerParameter = BuildReferenceHandlerParameter(ctx, method);
@@ -146,23 +133,20 @@ public static class UserMethodMappingExtractor
         // target parameter is the second parameter (except if the reference handler is the first or the second parameter)
         // if the method returns void, a target parameter is required
         // if the method doesnt return void, a target parameter is not allowed
-        var targetParameter = MethodParameter.Wrap(method.Parameters.FirstOrDefault(p => p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != refHandlerParameterOrdinal));
+        var targetParameter = MethodParameter.Wrap(
+            method.Parameters.FirstOrDefault(p => p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != refHandlerParameterOrdinal)
+        );
         if (method.ReturnsVoid == (targetParameter == null))
         {
             parameters = default;
             return false;
         }
 
-        parameters = new MappingMethodParameters(
-            sourceParameter.Value,
-            targetParameter,
-            refHandlerParameter);
+        parameters = new MappingMethodParameters(sourceParameter.Value, targetParameter, refHandlerParameter);
         return true;
     }
 
-    private static MethodParameter? BuildReferenceHandlerParameter(
-        SimpleMappingBuilderContext ctx,
-        IMethodSymbol method)
+    private static MethodParameter? BuildReferenceHandlerParameter(SimpleMappingBuilderContext ctx, IMethodSymbol method)
     {
         var refHandlerParameterSymbol = method.Parameters.FirstOrDefault(p => p.HasAttribute(ctx.Types.ReferenceHandlerAttribute));
         if (refHandlerParameterSymbol == null)
@@ -177,7 +161,8 @@ public static class UserMethodMappingExtractor
                 method.ContainingType.ToDisplayString(),
                 method.Name,
                 ctx.Types.IReferenceHandler.ToDisplayString(),
-                refHandlerParameterSymbol.Type.ToDisplayString());
+                refHandlerParameterSymbol.Type.ToDisplayString()
+            );
         }
 
         if (!ctx.MapperConfiguration.UseReferenceHandling)
@@ -186,7 +171,8 @@ public static class UserMethodMappingExtractor
                 DiagnosticDescriptors.ReferenceHandlingNotEnabled,
                 refHandlerParameterSymbol,
                 method.ContainingType.ToDisplayString(),
-                method.Name);
+                method.Name
+            );
         }
 
         return refHandlerParameter;

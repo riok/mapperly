@@ -11,15 +11,16 @@ public class GenericSourceTargetObjectFactory : ObjectFactory
     private readonly int _sourceTypeParameterIndex;
     private readonly int _targetTypeParameterIndex;
 
-    public GenericSourceTargetObjectFactory(IMethodSymbol method, Compilation compilation, int sourceTypeParameterIndex) : base(method)
+    public GenericSourceTargetObjectFactory(IMethodSymbol method, Compilation compilation, int sourceTypeParameterIndex)
+        : base(method)
     {
         _compilation = compilation;
         _sourceTypeParameterIndex = sourceTypeParameterIndex;
         _targetTypeParameterIndex = (sourceTypeParameterIndex + 1) % 2;
     }
 
-    public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate)
-        => Method.TypeParameters[_sourceTypeParameterIndex].CanConsumeType(_compilation, sourceType)
+    public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
+        Method.TypeParameters[_sourceTypeParameterIndex].CanConsumeType(_compilation, sourceType)
         && Method.TypeParameters[_targetTypeParameterIndex].CanConsumeType(_compilation, targetTypeToCreate);
 
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source)

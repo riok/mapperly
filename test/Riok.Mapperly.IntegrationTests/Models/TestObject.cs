@@ -66,6 +66,11 @@ namespace Riok.Mapperly.IntegrationTests.Models
 
         public ImmutableSortedSet<string> ImmutableSortedSetValue { get; set; } = ImmutableSortedSet<string>.Empty;
 
+        public ImmutableDictionary<string, string> ImmutableDictionaryValue { get; set; } = ImmutableDictionary<string, string>.Empty;
+
+        public ImmutableSortedDictionary<string, string> ImmutableSortedDictionaryValue { get; set; } =
+            ImmutableSortedDictionary<string, string>.Empty;
+
         public TestEnum EnumValue { get; set; }
 
         public TestEnum EnumName { get; set; }

@@ -10,16 +10,19 @@ public class ObjectPropertyFlatteningTest
             "[MapProperty($\"Value.Id\", \"MyValueId\")] partial B Map(A source);",
             "class A { public C Value { get; set; } }",
             "class B { public string MyValueId { get; set; } }",
-            "class C { public string Id { get; set; }");
+            "class C { public string Id { get; set; }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
                 target.MyValueId = source.Value.Id;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -30,16 +33,19 @@ public class ObjectPropertyFlatteningTest
             "B",
             "class A { public C Value { get; set; } }",
             "class B { public string ValueId { get; set; } }",
-            "class C { public string Id { get; set; }");
+            "class C { public string Id { get; set; }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
                 target.ValueId = source.Value.Id;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -50,16 +56,19 @@ public class ObjectPropertyFlatteningTest
             "B",
             "class A { public C Value { get; set; } public string ValueId { get; set; } }",
             "class B { public string ValueId { get; set; } }",
-            "class C { public string Id { get; set; }");
+            "class C { public string Id { get; set; }"
+        );
 
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
                 target.ValueId = source.ValueId;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -70,9 +79,11 @@ public class ObjectPropertyFlatteningTest
             "B",
             "class A { public C? Value { get; set; } }",
             "class B { public string ValueId { get; set; } }",
-            "class C { public string Id { get; set; }");
+            "class C { public string Id { get; set; }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -83,7 +94,8 @@ public class ObjectPropertyFlatteningTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -94,9 +106,11 @@ public class ObjectPropertyFlatteningTest
             "B",
             "class A { public C? Value { get; set; } }",
             "class B { public string ValueId { get; set; } public string ValueName { get; set; } }",
-            "class C { public Guid Id { get; set; } public string Name { get; set; } }");
+            "class C { public Guid Id { get; set; } public string Name { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -108,7 +122,8 @@ public class ObjectPropertyFlatteningTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -119,9 +134,11 @@ public class ObjectPropertyFlatteningTest
             "B",
             "class A { public C Value { get; set; } }",
             "class B { public string ValueId { get; set; } public string ValueName { get; set; } }",
-            "class C { public Guid Id { get; set; } public string Name { get; set; } }");
+            "class C { public Guid Id { get; set; } public string Name { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source, TestHelperOptions.DisabledNullable)
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.DisabledNullable)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -135,7 +152,8 @@ public class ObjectPropertyFlatteningTest
 
                 target.ValueName = source.Value?.Name;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -146,9 +164,11 @@ public class ObjectPropertyFlatteningTest
             "B",
             "class A { public C Value { get; set; } }",
             "class B { public string ValueName { get; set; } }",
-            "class C { public string Name { get; set; } }");
+            "class C { public string Name { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source, TestHelperOptions.DisabledNullable)
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.DisabledNullable)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -157,7 +177,8 @@ public class ObjectPropertyFlatteningTest
                 var target = new global::B();
                 target.ValueName = source.Value?.Name;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -167,16 +188,19 @@ public class ObjectPropertyFlatteningTest
             "[MapProperty($\"MyValueId\", \"Value.Id\")] partial B Map(A source);",
             "class A { public string MyValueId { get; set; } }",
             "class B { public C Value { get; set; } }",
-            "class C { public string Id { get; set; }");
+            "class C { public string Id { get; set; }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
                 target.Value.Id = source.MyValueId;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -186,9 +210,11 @@ public class ObjectPropertyFlatteningTest
             "[MapProperty($\"MyValueId\", \"Value.Id\"), MapProperty($\"MyValueId2\", \"Value.Id2\")] partial B Map(A source);",
             "class A { public string MyValueId { get; set; } public string MyValueId2 { get; set; } }",
             "class B { public C? Value { get; set; } }",
-            "class C { public string Id { get; set; } public string Id2 { get; set; } }");
+            "class C { public string Id { get; set; } public string Id2 { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -197,7 +223,8 @@ public class ObjectPropertyFlatteningTest
                 target.Value.Id = source.MyValueId;
                 target.Value.Id2 = source.MyValueId2;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -207,7 +234,8 @@ public class ObjectPropertyFlatteningTest
             "[MapProperty($\"MyValueId\", \"Value.Id\")] partial B Map(A source);",
             "class A { public string MyValueId { get; set; } }",
             "class B { public C? Value { get; set; } }",
-            "class C { public C(string arg) {} public string Id { get; set; } }");
+            "class C { public C(string arg) {} public string Id { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -219,7 +247,8 @@ public class ObjectPropertyFlatteningTest
             "[MapProperty($\"MyValueIdXXX\", \"Value.Id\")] partial B Map(A source);",
             "class A { public string MyValueId { get; set; } }",
             "class B { public C? Value { get; set; } }",
-            "class C { public C(string arg) {} public string Id { get; set; } }");
+            "class C { public C(string arg) {} public string Id { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -231,7 +260,8 @@ public class ObjectPropertyFlatteningTest
             "[MapProperty($\"MyValueId\", \"Value.Id\")] partial B Map(A source);",
             "class A { public string MyValueId { get; set; } }",
             "class B { public C? Value { set; } }",
-            "class C { public C(string arg) {} public string Id { get; set; } }");
+            "class C { public C(string arg) {} public string Id { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -243,7 +273,8 @@ public class ObjectPropertyFlatteningTest
             "[MapProperty($\"MyValueId\", \"Value.IdXXX\")] partial B Map(A source);",
             "class A { public string MyValueId { get; set; } }",
             "class B { public C? Value { get; set; } }",
-            "class C { public C(string arg) {} public string Id { get; set; } }");
+            "class C { public C(string arg) {} public string Id { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -252,18 +283,20 @@ public class ObjectPropertyFlatteningTest
     public void ManualNestedPropertyNullablePath()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty(\"Value1.Value1.Id1\", \"Value2.Value2.Id2\")]" +
-            "[MapProperty(\"Value1.Value1.Id10\", \"Value2.Value2.Id20\")]" +
-            "[MapProperty(new[] { \"Value1\", \"Id100\" }, new[] { \"Value2\", \"Id200\" })]" +
-            "partial B Map(A source);",
+            "[MapProperty(\"Value1.Value1.Id1\", \"Value2.Value2.Id2\")]"
+                + "[MapProperty(\"Value1.Value1.Id10\", \"Value2.Value2.Id20\")]"
+                + "[MapProperty(new[] { \"Value1\", \"Id100\" }, new[] { \"Value2\", \"Id200\" })]"
+                + "partial B Map(A source);",
             "class A { public C? Value1 { get; set; } }",
             "class B { public E? Value2 { get; set; } }",
             "class C { public D? Value1 { get; set; } public string Id100 { get; set; } }",
             "class D { public string Id1 { get; set; } public string Id10 { get; set; } }",
             "class E { public F? Value2 { get; set; } public string Id200 { get; set; } }",
-            "class F { public string Id2 { get; set; } public string Id20 { get; set; } }");
+            "class F { public string Id2 { get; set; } public string Id20 { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -282,6 +315,7 @@ public class ObjectPropertyFlatteningTest
                 }
 
                 return target;
-                """);
+                """
+            );
     }
 }

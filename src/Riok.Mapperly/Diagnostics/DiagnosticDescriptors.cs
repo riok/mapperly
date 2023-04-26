@@ -12,7 +12,8 @@ internal static class DiagnosticDescriptors
         "{0} has an unsupported mapping method signature",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor NoParameterlessConstructorFound = new DiagnosticDescriptor(
         "RMG002",
@@ -20,7 +21,8 @@ internal static class DiagnosticDescriptors
         "{0} has no accessible parameterless constructor",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor EnumNameMappingNoOverlappingValuesFound = new DiagnosticDescriptor(
         "RMG003",
@@ -28,7 +30,8 @@ internal static class DiagnosticDescriptors
         "{0} and {1} don't have overlapping enum member names, mapping will therefore always result in an exception",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor IgnoredTargetMemberNotFound = new DiagnosticDescriptor(
         "RMG004",
@@ -36,7 +39,8 @@ internal static class DiagnosticDescriptors
         "Ignored target member {0} on {1} was not found",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor ConfiguredMappingTargetMemberNotFound = new DiagnosticDescriptor(
         "RMG005",
@@ -44,7 +48,8 @@ internal static class DiagnosticDescriptors
         "Specified member {0} on mapping target type {1} was not found",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor ConfiguredMappingSourceMemberNotFound = new DiagnosticDescriptor(
         "RMG006",
@@ -52,7 +57,8 @@ internal static class DiagnosticDescriptors
         "Specified member {0} on source type {1} was not found",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor CouldNotMapMember = new DiagnosticDescriptor(
         "RMG007",
@@ -60,7 +66,8 @@ internal static class DiagnosticDescriptors
         "Could not map member {0}.{1} of type {2} to {3}.{4} of type {5}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor CouldNotCreateMapping = new DiagnosticDescriptor(
         "RMG008",
@@ -68,7 +75,8 @@ internal static class DiagnosticDescriptors
         "Could not create mapping from {0} to {1}. Consider implementing the mapping manually.",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor CannotMapToReadOnlyMember = new DiagnosticDescriptor(
         "RMG009",
@@ -76,7 +84,8 @@ internal static class DiagnosticDescriptors
         "Cannot map member {0}.{1} of type {2} to read only member {3}.{4} of type {5}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor CannotMapFromWriteOnlyMember = new DiagnosticDescriptor(
         "RMG010",
@@ -84,7 +93,8 @@ internal static class DiagnosticDescriptors
         "Cannot map from write only member {0}.{1} of type {2} to member {3}.{4} of type {5}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor CannotMapToWriteOnlyMemberPath = new DiagnosticDescriptor(
         "RMG011",
@@ -92,7 +102,8 @@ internal static class DiagnosticDescriptors
         "Cannot map from member {0}.{1} of type {2} to write only member path {3}.{4} of type {5}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor SourceMemberNotFound = new DiagnosticDescriptor(
         "RMG012",
@@ -100,7 +111,8 @@ internal static class DiagnosticDescriptors
         "The member {0} on the mapping target type {1} was not found on the mapping source type {2}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor NoConstructorFound = new DiagnosticDescriptor(
         "RMG013",
@@ -108,7 +120,8 @@ internal static class DiagnosticDescriptors
         "{0} has no accessible constructor with mappable arguments",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor CannotMapToConfiguredConstructor = new DiagnosticDescriptor(
         "RMG014",
@@ -116,7 +129,8 @@ internal static class DiagnosticDescriptors
         "Cannot map from {0} to the configured constructor {1}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor CannotMapToInitOnlyMemberPath = new DiagnosticDescriptor(
         "RMG015",
@@ -124,7 +138,8 @@ internal static class DiagnosticDescriptors
         "Cannot map from member {0}.{1} of type {2} to init only member path {3}.{4} of type {5}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor InitOnlyMemberDoesNotSupportPaths = new DiagnosticDescriptor(
         "RMG016",
@@ -132,7 +147,8 @@ internal static class DiagnosticDescriptors
         "Cannot map to init only member path {0}.{1}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor MultipleConfigurationsForInitOnlyMember = new DiagnosticDescriptor(
         "RMG017",
@@ -140,7 +156,8 @@ internal static class DiagnosticDescriptors
         "The init only member {0}.{1} can have one configuration at max",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor PartialStaticMethodInInstanceMapper = new DiagnosticDescriptor(
         "RMG018",
@@ -148,15 +165,8 @@ internal static class DiagnosticDescriptors
         "{0} is a partial static mapping method in an instance mapper. Static mapping methods are only supported in static mappers.",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
-
-    public static readonly DiagnosticDescriptor PartialInstanceMethodInStaticMapper = new DiagnosticDescriptor(
-        "RMG019",
-        "Partial instance mapping method in a static mapper",
-        "{0} is a partial instance mapping method in a static mapper. Instance mapping methods are only supported in instance (non-static) mappers.",
-        DiagnosticCategories.Mapper,
-        DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor SourceMemberNotMapped = new DiagnosticDescriptor(
         "RMG020",
@@ -164,7 +174,8 @@ internal static class DiagnosticDescriptors
         "The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor IgnoredSourceMemberNotFound = new DiagnosticDescriptor(
         "RMG021",
@@ -172,7 +183,8 @@ internal static class DiagnosticDescriptors
         "Ignored source member {0} on {1} was not found",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor InvalidObjectFactorySignature = new DiagnosticDescriptor(
         "RMG022",
@@ -180,7 +192,8 @@ internal static class DiagnosticDescriptors
         "The object factory {0} has an invalid signature",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor RequiredMemberNotMapped = new DiagnosticDescriptor(
         "RMG023",
@@ -188,7 +201,8 @@ internal static class DiagnosticDescriptors
         "Required member {0} on mapping target type {1} was not found on the mapping source type {2}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor ReferenceHandlerParameterWrongType = new DiagnosticDescriptor(
         "RMG024",
@@ -196,7 +210,8 @@ internal static class DiagnosticDescriptors
         "The reference handler parameter of {0}.{1} needs to be of type {2} but is {3}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor ReferenceHandlingNotEnabled = new DiagnosticDescriptor(
         "RMG025",
@@ -204,7 +219,8 @@ internal static class DiagnosticDescriptors
         $"{{0}}.{{1}} uses reference handling, but it is not enabled on the mapper attribute, to enable reference handling set {nameof(MapperAttribute.UseReferenceHandling)} to true",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor CannotMapFromIndexedMember = new DiagnosticDescriptor(
         "RMG026",
@@ -212,7 +228,8 @@ internal static class DiagnosticDescriptors
         "Cannot map from indexed member {0}.{1} to member {2}.{3}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor MultipleConfigurationsForConstructorParameter = new DiagnosticDescriptor(
         "RMG027",
@@ -220,7 +237,8 @@ internal static class DiagnosticDescriptors
         "The constructor parameter at {0}.{1} can have one configuration at max",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor ConstructorParameterDoesNotSupportPaths = new DiagnosticDescriptor(
         "RMG028",
@@ -228,7 +246,8 @@ internal static class DiagnosticDescriptors
         "Cannot map to constructor parameter target path {0}.{1}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor QueryableProjectionMappingsDoNotSupportReferenceHandling = new DiagnosticDescriptor(
         "RMG029",
@@ -236,7 +255,8 @@ internal static class DiagnosticDescriptors
         "Queryable projection mappings do not support reference handling",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor ReferenceLoopInInitOnlyMapping = new DiagnosticDescriptor(
         "RMG030",
@@ -244,7 +264,8 @@ internal static class DiagnosticDescriptors
         "Reference loop detected while mapping from {0}.{1} to the init only member {2}.{3}, consider ignoring this member",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor ReferenceLoopInCtorMapping = new DiagnosticDescriptor(
         "RMG031",
@@ -252,7 +273,8 @@ internal static class DiagnosticDescriptors
         "Reference loop detected while mapping from {0}.{1} to the constructor parameter {3} of {2}, consider ignoring this member or mark another constructor as mapping constructor",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor EnumMappingStrategyByNameNotSupportedInProjectionMappings = new DiagnosticDescriptor(
         "RMG032",
@@ -260,7 +282,8 @@ internal static class DiagnosticDescriptors
         "The enum mapping strategy ByName cannot be used in projection mappings to map from {0} to {1}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor MappedObjectToObjectWithoutDeepClone = new DiagnosticDescriptor(
         "RMG033",
@@ -268,7 +291,8 @@ internal static class DiagnosticDescriptors
         "Object mapped to another object without deep clone, consider implementing the mapping manually",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
-        true);
+        true
+    );
 
     public static readonly DiagnosticDescriptor NotAllEnumValuesMapped = new DiagnosticDescriptor(
         "RMG034",
@@ -276,6 +300,7 @@ internal static class DiagnosticDescriptors
         "Not all enum values in the target enum are mapped from {0} to {1}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
-        true);
+        true
+	);
 
 }

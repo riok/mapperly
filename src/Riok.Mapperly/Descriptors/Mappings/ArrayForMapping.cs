@@ -14,11 +14,8 @@ public class ArrayForMapping : MethodMapping
     private readonly ITypeMapping _elementMapping;
     private readonly ITypeSymbol _targetArrayElementType;
 
-    public ArrayForMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
-        ITypeMapping elementMapping,
-        ITypeSymbol targetArrayElementType) : base(sourceType, targetType)
+    public ArrayForMapping(ITypeSymbol sourceType, ITypeSymbol targetType, ITypeMapping elementMapping, ITypeSymbol targetArrayElementType)
+        : base(sourceType, targetType)
     {
         _elementMapping = elementMapping;
         _targetArrayElementType = targetArrayElementType;
@@ -30,10 +27,12 @@ public class ArrayForMapping : MethodMapping
         var loopCounterVariableName = ctx.NameBuilder.New(LoopCounterName);
 
         // var target = new T[source.Length];
-        var sourceLengthArrayRank = ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(MemberAccess(ctx.Source, ArrayLengthProperty)));
+        var sourceLengthArrayRank = ArrayRankSpecifier(
+            SingletonSeparatedList<ExpressionSyntax>(MemberAccess(ctx.Source, ArrayLengthProperty))
+        );
         var targetInitializationValue = ArrayCreationExpression(
-            ArrayType(FullyQualifiedIdentifier(_targetArrayElementType))
-                .WithRankSpecifiers(SingletonList(sourceLengthArrayRank)));
+            ArrayType(FullyQualifiedIdentifier(_targetArrayElementType)).WithRankSpecifiers(SingletonList(sourceLengthArrayRank))
+        );
         yield return DeclareLocalVariable(targetVariableName, targetInitializationValue);
 
         // target[i] = Map(source[i]);
@@ -41,7 +40,8 @@ public class ArrayForMapping : MethodMapping
         var mappedIndexedSourceValue = _elementMapping.Build(forLoopBuilderCtx);
         var assignment = Assignment(
             ElementAccess(IdentifierName(targetVariableName), IdentifierName(loopCounterVariableName)),
-            mappedIndexedSourceValue);
+            mappedIndexedSourceValue
+        );
         var assignmentBlock = Block(SingletonList<StatementSyntax>(ExpressionStatement(assignment)));
 
         // for(var i = 0; i < source.Length; i++)

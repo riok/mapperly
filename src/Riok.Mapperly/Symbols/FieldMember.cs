@@ -27,9 +27,8 @@ public class FieldMember : IMappableMember
         => false;
 #endif
 
-    public override bool Equals(object obj)
-        => obj is FieldMember other && SymbolEqualityComparer.IncludeNullability.Equals(_fieldSymbol, other._fieldSymbol);
+    public override bool Equals(object obj) =>
+        obj is FieldMember other && SymbolEqualityComparer.IncludeNullability.Equals(_fieldSymbol, other._fieldSymbol);
 
-    public override int GetHashCode()
-        => SymbolEqualityComparer.IncludeNullability.GetHashCode(_fieldSymbol);
+    public override int GetHashCode() => SymbolEqualityComparer.IncludeNullability.GetHashCode(_fieldSymbol);
 }

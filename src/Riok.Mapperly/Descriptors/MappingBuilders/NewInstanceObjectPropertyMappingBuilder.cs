@@ -13,7 +13,12 @@ public static class NewInstanceObjectPropertyMappingBuilder
             return null;
 
         if (ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory))
-            return new NewInstanceObjectFactoryMemberMapping(ctx.Source, ctx.Target.NonNullable(), objectFactory, ctx.MapperConfiguration.UseReferenceHandling);
+            return new NewInstanceObjectFactoryMemberMapping(
+                ctx.Source,
+                ctx.Target.NonNullable(),
+                objectFactory,
+                ctx.MapperConfiguration.UseReferenceHandling
+            );
 
         if (ctx.Target is not INamedTypeSymbol namedTarget || namedTarget.Constructors.All(x => !x.IsAccessible()))
             return null;

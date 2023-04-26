@@ -28,9 +28,6 @@ public static class DateTimeToDateOnlyMappingBuilder
 
     private static IMethodSymbol? ResolveFromDateTimeMethod(MappingBuilderContext ctx)
     {
-        return ctx.Types.DateOnly?
-            .GetMembers(FromDateTimeMethodName)
-            .OfType<IMethodSymbol>()
-            .FirstOrDefault(m => m.IsStatic);
+        return ctx.Types.DateOnly?.GetMembers(FromDateTimeMethodName).OfType<IMethodSymbol>().FirstOrDefault(m => m.IsStatic);
     }
 }

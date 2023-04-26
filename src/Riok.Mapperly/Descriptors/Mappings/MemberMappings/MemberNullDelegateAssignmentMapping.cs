@@ -18,16 +18,15 @@ public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContai
     public MemberNullDelegateAssignmentMapping(
         MemberPath nullConditionalSourcePath,
         IMemberAssignmentMappingContainer parent,
-        bool throwInsteadOfConditionalNullMapping)
+        bool throwInsteadOfConditionalNullMapping
+    )
         : base(parent)
     {
         _nullConditionalSourcePath = nullConditionalSourcePath;
         _throwInsteadOfConditionalNullMapping = throwInsteadOfConditionalNullMapping;
     }
 
-    public override IEnumerable<StatementSyntax> Build(
-        TypeMappingBuildContext ctx,
-        ExpressionSyntax targetAccess)
+    public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
         // if (source.Value != null)
         //   target.Value = Map(Source.Name);
@@ -39,10 +38,7 @@ public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContai
             ? ElseClause(Block(ExpressionStatement(ThrowArgumentNullException(sourceNullConditionalAccess))))
             : null;
 
-        return new[]
-        {
-            IfStatement(condition, Block(base.Build(ctx, targetAccess)), elseClause),
-        };
+        return new[] { IfStatement(condition, Block(base.Build(ctx, targetAccess)), elseClause), };
     }
 
     public override bool Equals(object? obj)
@@ -67,11 +63,11 @@ public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContai
         }
     }
 
-    public static bool operator ==(MemberNullDelegateAssignmentMapping? left, MemberNullDelegateAssignmentMapping? right)
-        => Equals(left, right);
+    public static bool operator ==(MemberNullDelegateAssignmentMapping? left, MemberNullDelegateAssignmentMapping? right) =>
+        Equals(left, right);
 
-    public static bool operator !=(MemberNullDelegateAssignmentMapping? left, MemberNullDelegateAssignmentMapping? right)
-        => !Equals(left, right);
+    public static bool operator !=(MemberNullDelegateAssignmentMapping? left, MemberNullDelegateAssignmentMapping? right) =>
+        !Equals(left, right);
 
     protected bool Equals(MemberNullDelegateAssignmentMapping other)
     {

@@ -33,8 +33,7 @@ public class MappingCollection
         return mapping;
     }
 
-    public void EnqueueToBuildBody(IMapping mapping, MappingBuilderContext ctx)
-        => _mappingsToBuildBody.Enqueue((mapping, ctx));
+    public void EnqueueToBuildBody(IMapping mapping, MappingBuilderContext ctx) => _mappingsToBuildBody.Enqueue((mapping, ctx));
 
     public void Add(ITypeMapping mapping)
     {
@@ -49,11 +48,10 @@ public class MappingCollection
         }
     }
 
-    public void AddExistingTargetMapping(IExistingTargetMapping mapping)
-        => _existingTargetMappings.Add(new TypeMappingKey(mapping), mapping);
+    public void AddExistingTargetMapping(IExistingTargetMapping mapping) =>
+        _existingTargetMappings.Add(new TypeMappingKey(mapping), mapping);
 
-    public IEnumerable<(IMapping, MappingBuilderContext)> DequeueMappingsToBuildBody()
-        => _mappingsToBuildBody.DequeueAll();
+    public IEnumerable<(IMapping, MappingBuilderContext)> DequeueMappingsToBuildBody() => _mappingsToBuildBody.DequeueAll();
 
     private readonly struct TypeMappingKey
     {
@@ -63,14 +61,10 @@ public class MappingCollection
         private readonly ITypeSymbol _target;
 
         public TypeMappingKey(ITypeMapping mapping)
-            : this(mapping.SourceType, mapping.TargetType)
-        {
-        }
+            : this(mapping.SourceType, mapping.TargetType) { }
 
         public TypeMappingKey(IExistingTargetMapping mapping)
-            : this(mapping.SourceType, mapping.TargetType)
-        {
-        }
+            : this(mapping.SourceType, mapping.TargetType) { }
 
         public TypeMappingKey(ITypeSymbol source, ITypeSymbol target)
         {
@@ -78,12 +72,9 @@ public class MappingCollection
             _target = target;
         }
 
-        private bool Equals(TypeMappingKey other)
-            => _comparer.Equals(_source, other._source)
-                && _comparer.Equals(_target, other._target);
+        private bool Equals(TypeMappingKey other) => _comparer.Equals(_source, other._source) && _comparer.Equals(_target, other._target);
 
-        public override bool Equals(object? obj)
-            => obj is TypeMappingKey other && Equals(other);
+        public override bool Equals(object? obj) => obj is TypeMappingKey other && Equals(other);
 
         public override int GetHashCode()
         {
@@ -95,10 +86,8 @@ public class MappingCollection
             }
         }
 
-        public static bool operator ==(TypeMappingKey left, TypeMappingKey right)
-            => left.Equals(right);
+        public static bool operator ==(TypeMappingKey left, TypeMappingKey right) => left.Equals(right);
 
-        public static bool operator !=(TypeMappingKey left, TypeMappingKey right)
-            => !left.Equals(right);
+        public static bool operator !=(TypeMappingKey left, TypeMappingKey right) => !left.Equals(right);
     }
 }

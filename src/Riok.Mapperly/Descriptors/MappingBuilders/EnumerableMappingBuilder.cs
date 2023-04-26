@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Diagnostics;
@@ -13,7 +14,7 @@ public static class EnumerableMappingBuilder
     private const string SelectMethodName = nameof(Enumerable.Select);
     private const string ToArrayMethodName = nameof(Enumerable.ToArray);
     private const string ToListMethodName = nameof(Enumerable.ToList);
-    private const string AddValueMethodName = nameof(ICollection<object>.Add);
+    private const string AddMethodName = nameof(ICollection<object>.Add);
 
     private const string ToImmutableArrayMethodName = nameof(ImmutableArray.ToImmutableArray);
     private const string ToImmutableListMethodName = nameof(ImmutableList.ToImmutableList);
@@ -36,9 +37,14 @@ public static class EnumerableMappingBuilder
             return new CastMapping(ctx.Source, ctx.Target);
 
         // if source is an array and target is an array or IReadOnlyCollection faster mappings can be applied
-        if (!ctx.IsExpression
+        if (
+            !ctx.IsExpression
             && ctx.Source.IsArrayType()
-            && (ctx.Target.IsArrayType() || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IReadOnlyCollectionT)))
+            && (
+                ctx.Target.IsArrayType()
+                || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IReadOnlyCollectionT)
+            )
+        )
         {
             // if element mapping is synthetic
             // a single Array.Clone / cast mapping call should be sufficient and fast,
@@ -67,9 +73,7 @@ public static class EnumerableMappingBuilder
         if (HasEnumerableConstructor(ctx, elementMapping.TargetType))
             return BuildLinqConstructorMapping(ctx, elementMapping);
 
-        return ctx.IsExpression
-            ? null
-            : BuildCustomTypeMapping(ctx, elementMapping);
+        return ctx.IsExpression ? null : BuildCustomTypeMapping(ctx, elementMapping);
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
@@ -78,18 +82,37 @@ public static class EnumerableMappingBuilder
             return null;
 
         if (ctx.Target.ImplementsGeneric(ctx.Types.StackT, out _))
-            return new ForEachAddEnumerableExistingTargetMapping(ctx.Source, ctx.Target, elementMapping, nameof(Stack<object>.Push));
+            return CreateForEach(nameof(Stack<object>.Push));
 
         if (ctx.Target.ImplementsGeneric(ctx.Types.QueueT, out _))
-            return new ForEachAddEnumerableExistingTargetMapping(ctx.Source, ctx.Target, elementMapping, nameof(Queue<object>.Enqueue));
+            return CreateForEach(nameof(Queue<object>.Enqueue));
 
         // create a foreach loop with add calls if source is not an array
         // and  ICollection.Add(T): void is implemented and not explicit
         // ensures add is not called and immutable types
-        if (!ctx.Target.IsArrayType() && ctx.Target.HasImplicitInterfaceMethod(ctx.Types.ICollectionT, AddValueMethodName))
-            return new ForEachAddEnumerableExistingTargetMapping(ctx.Source, ctx.Target, elementMapping, AddValueMethodName);
+        if (!ctx.Target.IsArrayType() && ctx.Target.HasImplicitGenericImplementation(ctx.Types.ICollectionT, AddMethodName))
+            return CreateForEach(AddMethodName);
+
+        // if a mapping could be created for an immutable collection
+        // we diagnostic when it is an existing target mapping
+        if (ResolveImmutableCollectMethod(ctx) != null)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+        }
 
         return null;
+
+        ForEachAddEnumerableExistingTargetMapping CreateForEach(string methodName)
+        {
+            var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.Source, ctx.Target, ctx.Types);
+            return new ForEachAddEnumerableExistingTargetMapping(
+                ctx.Source,
+                ctx.Target,
+                elementMapping,
+                methodName,
+                ensureCapacityStatement
+            );
+        }
     }
 
     private static ITypeMapping? BuildElementMapping(MappingBuilderContext ctx)
@@ -105,18 +128,11 @@ public static class EnumerableMappingBuilder
         return ctx.FindOrBuildMapping(enumeratedSourceType, enumeratedTargetType);
     }
 
-    private static LinqEnumerableMapping BuildLinqMapping(
-        MappingBuilderContext ctx,
-        ITypeMapping elementMapping,
-        string? collectMethodName)
+    private static LinqEnumerableMapping BuildLinqMapping(MappingBuilderContext ctx, ITypeMapping elementMapping, string? collectMethodName)
     {
-        var collectMethod = collectMethodName == null
-            ? null
-            : ResolveStaticMethod(ctx.Types.Enumerable, collectMethodName);
+        var collectMethod = collectMethodName == null ? null : ctx.Types.Enumerable.GetStaticGenericMethod(collectMethodName);
 
-        var selectMethod = elementMapping.IsSynthetic
-            ? null
-            : ResolveStaticMethod(ctx.Types.Enumerable, SelectMethodName);
+        var selectMethod = elementMapping.IsSynthetic ? null : ctx.Types.Enumerable.GetStaticGenericMethod(SelectMethodName);
 
         return new LinqEnumerableMapping(ctx.Source, ctx.Target, elementMapping, selectMethod, collectMethod);
     }
@@ -128,26 +144,24 @@ public static class EnumerableMappingBuilder
 
         var typedEnumerable = ctx.Types.IEnumerableT.Construct(typeSymbol);
 
-        return namedType.Constructors.Any(m => m.Parameters.Length == 1
-                        && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type, typedEnumerable));
+        return namedType.Constructors.Any(
+            m => m.Parameters.Length == 1 && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type, typedEnumerable)
+        );
     }
 
-    private static LinqConstructorMapping BuildLinqConstructorMapping(
-        MappingBuilderContext ctx,
-        ITypeMapping elementMapping)
+    private static LinqConstructorMapping BuildLinqConstructorMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
     {
-        var selectMethod = elementMapping.IsSynthetic
-            ? null
-            : ResolveStaticMethod(ctx.Types.Enumerable, SelectMethodName);
+        var selectMethod = elementMapping.IsSynthetic ? null : ctx.Types.Enumerable.GetStaticGenericMethod(SelectMethodName);
 
         return new LinqConstructorMapping(ctx.Source, ctx.Target, elementMapping, selectMethod);
     }
 
-    private static ExistingTargetMappingMethodWrapper? BuildCustomTypeMapping(
-        MappingBuilderContext ctx,
-        ITypeMapping elementMapping)
+    private static ExistingTargetMappingMethodWrapper? BuildCustomTypeMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
     {
-        if (!ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory) && !ctx.Target.HasAccessibleParameterlessConstructor())
+        if (
+            !ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory)
+            && !ctx.Target.HasAccessibleParameterlessConstructor()
+        )
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, ctx.Target);
             return null;
@@ -156,8 +170,18 @@ public static class EnumerableMappingBuilder
         // create a foreach loop with add calls if source is not an array
         // and  ICollection.Add(T): void is implemented and not explicit
         // ensures add is not called and immutable types
-        if (!ctx.Target.IsArrayType() && ctx.Target.HasImplicitInterfaceMethod(ctx.Types.ICollectionT, AddValueMethodName))
-            return new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping, objectFactory, AddValueMethodName);
+        if (!ctx.Target.IsArrayType() && ctx.Target.HasImplicitGenericImplementation(ctx.Types.ICollectionT, AddMethodName))
+        {
+            var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.Source, ctx.Target, ctx.Types);
+            return new ForEachAddEnumerableMapping(
+                ctx.Source,
+                ctx.Target,
+                elementMapping,
+                objectFactory,
+                AddMethodName,
+                ensureCapacityStatement
+            );
+        }
 
         return null;
     }
@@ -175,7 +199,10 @@ public static class EnumerableMappingBuilder
         // if the target is IReadOnlyCollection<T>
         // and the count of the source is known (array, IReadOnlyCollection<T>, ICollection<T>) we collect to array
         // for performance/space reasons
-        var targetIsReadOnlyCollection = SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IReadOnlyCollectionT);
+        var targetIsReadOnlyCollection = SymbolEqualityComparer.Default.Equals(
+            ctx.Target.OriginalDefinition,
+            ctx.Types.IReadOnlyCollectionT
+        );
         var sourceCountIsKnown =
             ctx.Source.IsArrayType()
             || ctx.Source.ImplementsGeneric(ctx.Types.IReadOnlyCollectionT, out _)
@@ -184,7 +211,8 @@ public static class EnumerableMappingBuilder
             return (true, ToArrayMethodName);
 
         // if target is a IReadOnlyCollection<T>, IList<T>, List<T> or ICollection<T> with ToList()
-        return targetIsReadOnlyCollection
+        return
+            targetIsReadOnlyCollection
             || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IReadOnlyListT)
             || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IListT)
             || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ListT)
@@ -193,17 +221,13 @@ public static class EnumerableMappingBuilder
             : (false, null);
     }
 
-    private static LinqEnumerableMapping? TryBuildImmutableLinqMapping(
-        MappingBuilderContext ctx,
-        ITypeMapping elementMapping)
+    private static LinqEnumerableMapping? TryBuildImmutableLinqMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
     {
         var collectMethod = ResolveImmutableCollectMethod(ctx);
         if (collectMethod is null)
             return null;
 
-        var selectMethod = elementMapping.IsSynthetic
-            ? null
-            : ResolveStaticMethod(ctx.Types.Enumerable, SelectMethodName);
+        var selectMethod = elementMapping.IsSynthetic ? null : ctx.Types.Enumerable.GetStaticGenericMethod(SelectMethodName);
 
         return new LinqEnumerableMapping(ctx.Source, ctx.Target, elementMapping, selectMethod, collectMethod);
     }
@@ -211,39 +235,40 @@ public static class EnumerableMappingBuilder
     private static IMethodSymbol? ResolveImmutableCollectMethod(MappingBuilderContext ctx)
     {
         if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableArrayT))
-            return ResolveStaticMethod(ctx.Types.ImmutableArray, ToImmutableArrayMethodName);
+            return ctx.Types.ImmutableArray.GetStaticGenericMethod(ToImmutableArrayMethodName);
 
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableListT))
-            return ResolveStaticMethod(ctx.Types.ImmutableList, ToImmutableListMethodName);
+        if (
+            SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableListT)
+            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IImmutableListT)
+        )
+            return ctx.Types.ImmutableList.GetStaticGenericMethod(ToImmutableListMethodName);
 
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableHashSetT))
-            return ResolveStaticMethod(ctx.Types.ImmutableHashSet, ToImmutableHashSetMethodName);
+        if (
+            SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableHashSetT)
+            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IImmutableSetT)
+        )
+            return ctx.Types.ImmutableHashSet.GetStaticGenericMethod(ToImmutableHashSetMethodName);
 
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableQueueT))
-            return ResolveStaticMethod(ctx.Types.ImmutableQueue, CreateRangeQueueMethodName);
+        if (
+            SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableQueueT)
+            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IImmutableQueueT)
+        )
+            return ctx.Types.ImmutableQueue.GetStaticGenericMethod(CreateRangeQueueMethodName);
 
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableStackT))
-            return ResolveStaticMethod(ctx.Types.ImmutableStack, CreateRangeStackMethodName);
+        if (
+            SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableStackT)
+            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IImmutableStackT)
+        )
+            return ctx.Types.ImmutableStack.GetStaticGenericMethod(CreateRangeStackMethodName);
 
         if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableSortedSetT))
-            return ResolveStaticMethod(ctx.Types.ImmutableSortedSet, ToImmutableSortedSetMethodName);
+            return ctx.Types.ImmutableSortedSet.GetStaticGenericMethod(ToImmutableSortedSetMethodName);
 
         return null;
     }
 
-    private static IMethodSymbol? ResolveStaticMethod(INamedTypeSymbol namedType, string methodName)
-    {
-        var method = namedType.GetMembers(methodName)
-                                .OfType<IMethodSymbol>()
-                                .FirstOrDefault(m => m.IsStatic && m.IsGenericMethod);
-
-        return method;
-    }
-
     private static ITypeSymbol? GetEnumeratedType(MappingBuilderContext ctx, ITypeSymbol type)
     {
-        return type.ImplementsGeneric(ctx.Types.IEnumerableT, out var enumerableIntf)
-            ? enumerableIntf.TypeArguments[0]
-            : null;
+        return type.ImplementsGeneric(ctx.Types.IEnumerableT, out var enumerableIntf) ? enumerableIntf.TypeArguments[0] : null;
     }
 }

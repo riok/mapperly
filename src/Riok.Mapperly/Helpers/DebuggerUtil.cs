@@ -45,11 +45,11 @@ internal static class DebuggerUtil
     [SuppressMessage(
         "MicrosoftCodeAnalysisCorrectness",
         "RS1035:Do not use APIs banned for analyzers",
-        Justification = "Only used here to launch the debugger correctly and not in included the release build")]
+        Justification = "Only used here to launch the debugger correctly and not in included the release build"
+    )]
     private static string FindSolutionFile([CallerFilePath] string? callerFile = null)
     {
-        var dir = Path.GetDirectoryName(callerFile)
-            ?? throw new InvalidOperationException("could not resolve solution directory");
+        var dir = Path.GetDirectoryName(callerFile) ?? throw new InvalidOperationException("could not resolve solution directory");
         do
         {
             var slnFiles = Directory.GetFiles(dir, "*.sln", SearchOption.TopDirectoryOnly);
@@ -57,8 +57,7 @@ internal static class DebuggerUtil
                 return slnFiles[0];
 
             dir = Path.GetDirectoryName(dir);
-        }
-        while (dir != null);
+        } while (dir != null);
 
         throw new InvalidOperationException("Could not find solution");
     }

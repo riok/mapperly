@@ -8,7 +8,8 @@ public static class ObjectFactoryBuilder
 {
     public static ObjectFactoryCollection ExtractObjectFactories(SimpleMappingBuilderContext ctx, ITypeSymbol mapperSymbol)
     {
-        var objectFactories = mapperSymbol.GetMembers()
+        var objectFactories = mapperSymbol
+            .GetMembers()
             .OfType<IMethodSymbol>()
             .Where(m => m.HasAttribute(ctx.Types.ObjectFactoryAttribute))
             .Select(x => BuildObjectFactory(ctx, x))
@@ -20,11 +21,13 @@ public static class ObjectFactoryBuilder
 
     private static ObjectFactory? BuildObjectFactory(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol)
     {
-        if (methodSymbol.IsAsync
+        if (
+            methodSymbol.IsAsync
             || methodSymbol.Parameters.Length > 1
             || methodSymbol.IsPartialDefinition
             || methodSymbol.MethodKind != MethodKind.Ordinary
-            || methodSymbol.ReturnsVoid)
+            || methodSymbol.ReturnsVoid
+        )
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature, methodSymbol, methodSymbol.Name);
             return null;
@@ -50,13 +53,18 @@ public static class ObjectFactoryBuilder
                 return null;
         }
     }
+
     private static ObjectFactory? BuildGenericSingleTypeParameterObjectFactory(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol)
     {
         var sourceParameter = methodSymbol.Parameters.FirstOrDefault();
         var typeParameter = methodSymbol.TypeParameters[0];
-        var returnTypeIsGeneric = methodSymbol.ReturnType.TypeKind == TypeKind.TypeParameter && string.Equals(methodSymbol.ReturnType.Name, typeParameter.Name, StringComparison.Ordinal);
+        var returnTypeIsGeneric =
+            methodSymbol.ReturnType.TypeKind == TypeKind.TypeParameter
+            && string.Equals(methodSymbol.ReturnType.Name, typeParameter.Name, StringComparison.Ordinal);
         var hasSourceParameter = sourceParameter != null;
-        var sourceParameterIsGeneric = sourceParameter?.Type.TypeKind == TypeKind.TypeParameter && string.Equals(sourceParameter.Type.Name, typeParameter.Name, StringComparison.Ordinal);
+        var sourceParameterIsGeneric =
+            sourceParameter?.Type.TypeKind == TypeKind.TypeParameter
+            && string.Equals(sourceParameter.Type.Name, typeParameter.Name, StringComparison.Ordinal);
 
         if (returnTypeIsGeneric && hasSourceParameter && sourceParameterIsGeneric)
         {

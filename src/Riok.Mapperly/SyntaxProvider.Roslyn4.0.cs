@@ -11,14 +11,11 @@ internal static class SyntaxProvider
     public static IncrementalValuesProvider<ClassDeclarationSyntax> GetClassDeclarations(IncrementalGeneratorInitializationContext context)
     {
         return context.SyntaxProvider
-            .CreateSyntaxProvider(
-                static (s, _) => IsSyntaxTargetForGeneration(s),
-                static (ctx, _) => GetSemanticTargetForGeneration(ctx))
+            .CreateSyntaxProvider(static (s, _) => IsSyntaxTargetForGeneration(s), static (ctx, _) => GetSemanticTargetForGeneration(ctx))
             .WhereNotNull();
     }
 
-    private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
-        => node is ClassDeclarationSyntax { AttributeLists.Count: > 0 };
+    private static bool IsSyntaxTargetForGeneration(SyntaxNode node) => node is ClassDeclarationSyntax { AttributeLists.Count: > 0 };
 
     private static ClassDeclarationSyntax? GetSemanticTargetForGeneration(GeneratorSyntaxContext ctx)
     {

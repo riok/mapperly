@@ -14,10 +14,7 @@ public class EnumNameMapping : MethodMapping
 {
     private readonly IReadOnlyDictionary<string, string> _enumMemberMappings;
 
-    public EnumNameMapping(
-        ITypeSymbol source,
-        ITypeSymbol target,
-        IReadOnlyDictionary<string, string> enumMemberMappings)
+    public EnumNameMapping(ITypeSymbol source, ITypeSymbol target, IReadOnlyDictionary<string, string> enumMemberMappings)
         : base(source, target)
     {
         _enumMemberMappings = enumMemberMappings;
@@ -28,16 +25,14 @@ public class EnumNameMapping : MethodMapping
         // fallback switch arm: _ => throw new ArgumentOutOfRangeException(nameof(source), source, message);
         var fallbackArm = SwitchExpressionArm(
             DiscardPattern(),
-            ThrowArgumentOutOfRangeException(ctx.Source, $"The value of enum {SourceType.Name} is not supported"));
+            ThrowArgumentOutOfRangeException(ctx.Source, $"The value of enum {SourceType.Name} is not supported")
+        );
 
         // switch for each name to the enum value
         // eg: Enum1.Value1 => Enum2.Value1,
-        var arms = _enumMemberMappings
-            .Select(BuildArm)
-            .Append(fallbackArm);
+        var arms = _enumMemberMappings.Select(BuildArm).Append(fallbackArm);
 
-        var switchExpr = SwitchExpression(ctx.Source)
-            .WithArms(CommaSeparatedList(arms, true));
+        var switchExpr = SwitchExpression(ctx.Source).WithArms(CommaSeparatedList(arms, true));
 
         yield return ReturnStatement(switchExpr);
     }

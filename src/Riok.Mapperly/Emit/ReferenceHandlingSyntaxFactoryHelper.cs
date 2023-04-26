@@ -11,21 +11,20 @@ public static class ReferenceHandlingSyntaxFactoryHelper
 {
     private const string ExistingTargetVariableName = "existingTargetReference";
 
-    public static IfStatementSyntax TryGetReference(
-        ITypeMapping mapping,
-        TypeMappingBuildContext ctx)
+    public static IfStatementSyntax TryGetReference(ITypeMapping mapping, TypeMappingBuildContext ctx)
     {
         // GetReference<TSource, TTarget>
         var refHandler = ctx.ReferenceHandler ?? throw new ArgumentNullException(nameof(ctx.ReferenceHandler));
         var methodName = GenericName(Identifier(nameof(IReferenceHandler.TryGetReference)))
-            .WithTypeArgumentList(TypeArgumentList(FullyQualifiedIdentifier(mapping.SourceType), FullyQualifiedIdentifier(mapping.TargetType)));
+            .WithTypeArgumentList(
+                TypeArgumentList(FullyQualifiedIdentifier(mapping.SourceType), FullyQualifiedIdentifier(mapping.TargetType))
+            );
         var method = MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, refHandler, methodName);
 
         // out var target
         var targetArgument = Argument(
-                DeclarationExpression(
-                    VarIdentifier,
-                    SingleVariableDesignation(Identifier(ExistingTargetVariableName))))
+                DeclarationExpression(VarIdentifier, SingleVariableDesignation(Identifier(ExistingTargetVariableName)))
+            )
             .WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword));
 
         // GetReference<TSource, TTarget>(source, out var target)
@@ -33,20 +32,17 @@ public static class ReferenceHandlingSyntaxFactoryHelper
 
         // if (_referenceHandler.GetReference<TSource, TTarget>(source, out var target))
         //   return target;
-        return IfStatement(
-            invocation,
-            ReturnStatement(IdentifierName(ExistingTargetVariableName)));
+        return IfStatement(invocation, ReturnStatement(IdentifierName(ExistingTargetVariableName)));
     }
 
-    public static ExpressionSyntax SetReference(
-        ITypeMapping mapping,
-        TypeMappingBuildContext ctx,
-        ExpressionSyntax target)
+    public static ExpressionSyntax SetReference(ITypeMapping mapping, TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
         // SetReference<TSource, TTarget>
         var refHandler = ctx.ReferenceHandler ?? throw new ArgumentNullException(nameof(ctx.ReferenceHandler));
         var methodName = GenericName(Identifier(nameof(IReferenceHandler.SetReference)))
-            .WithTypeArgumentList(TypeArgumentList(FullyQualifiedIdentifier(mapping.SourceType), (FullyQualifiedIdentifier(mapping.TargetType))));
+            .WithTypeArgumentList(
+                TypeArgumentList(FullyQualifiedIdentifier(mapping.SourceType), (FullyQualifiedIdentifier(mapping.TargetType)))
+            );
         var method = MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, refHandler, methodName);
 
         return Invocation(method, ctx.Source, target);

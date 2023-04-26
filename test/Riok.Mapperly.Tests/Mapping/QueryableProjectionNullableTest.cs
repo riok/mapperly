@@ -10,7 +10,8 @@ public class QueryableProjectionNullableTest
             "System.Linq.IQueryable<A>",
             "System.Linq.IQueryable<B>",
             "class A { public string? StringValue { get; set; } }",
-            "class B { public string StringValue { get; set; } }");
+            "class B { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -22,7 +23,8 @@ public class QueryableProjectionNullableTest
             "System.Linq.IQueryable<A>",
             "System.Linq.IQueryable<B>",
             "class A { public int? IntValue { get; set; } }",
-            "class B { public int IntValue { get; set; } }");
+            "class B { public int IntValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -34,7 +36,8 @@ public class QueryableProjectionNullableTest
             "System.Linq.IQueryable<A>",
             "System.Linq.IQueryable<B>",
             "class A { public string StringValue { get; set; } }",
-            "class B { public string? StringValue { get; set; } }");
+            "class B { public string? StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -46,7 +49,8 @@ public class QueryableProjectionNullableTest
             "System.Linq.IQueryable<A>",
             "System.Linq.IQueryable<B>",
             "class A { public int IntValue { get; set; } }",
-            "class B { public int? IntValue { get; set; } }");
+            "class B { public int? IntValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -58,7 +62,8 @@ public class QueryableProjectionNullableTest
             "System.Linq.IQueryable<A>",
             "System.Linq.IQueryable<B>",
             "class A { public string? StringValue { get; set; } }",
-            "class B { public string? StringValue { get; set; } }");
+            "class B { public string? StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -70,7 +75,8 @@ public class QueryableProjectionNullableTest
             "System.Linq.IQueryable<A>",
             "System.Linq.IQueryable<B>",
             "class A { public int? IntValue { get; set; } }",
-            "class B { public int? IntValue { get; set; } }");
+            "class B { public int? IntValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -83,7 +89,8 @@ public class QueryableProjectionNullableTest
             "System.Linq.IQueryable<B>",
             "class A { public C? Nested { get; set; } }",
             "class B { public int NestedValue { get; set; } }",
-            "class C { public int Value { get; set; }}");
+            "class C { public int Value { get; set; }}"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -96,7 +103,8 @@ public class QueryableProjectionNullableTest
             "System.Linq.IQueryable<B>",
             "class A { public C? Nested { get; set; } }",
             "class B { public string NestedValue { get; set; } }",
-            "class C { public string Value { get; set; }}");
+            "class C { public string Value { get; set; }}"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -112,7 +120,8 @@ public class QueryableProjectionNullableTest
             "class A { public C? Nested { get; set; } }",
             "class B { public int NestedValue4 { get; set; } }",
             "class C { public D? Nested2 { get; set; } }",
-            "class D { public int Value3 { get; set; }}");
+            "class D { public int Value3 { get; set; }}"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }

@@ -3,7 +3,6 @@ using System;
 using System.Globalization;
 using VerifyTests;
 
-
 namespace Riok.Mapperly.IntegrationTests.Helpers
 {
     /// <summary>

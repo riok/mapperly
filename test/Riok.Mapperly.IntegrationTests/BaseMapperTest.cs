@@ -28,8 +28,10 @@ namespace Riok.Mapperly.IntegrationTests
 
             VerifierSettings.DontScrubDateTimes();
 
-            Verifier.DerivePathInfo((file, _, type, method)
-                => new PathInfo(Path.Combine(Path.GetDirectoryName(file)!, "_snapshots", GetPlatformVersion()), type.Name, method.Name));
+            Verifier.DerivePathInfo(
+                (file, _, type, method) =>
+                    new PathInfo(Path.Combine(Path.GetDirectoryName(file)!, "_snapshots", GetPlatformVersion()), type.Name, method.Name)
+            );
         }
 
         protected string GetGeneratedMapperFilePath(string name, [CallerFilePath] string filePath = "")
@@ -40,7 +42,8 @@ namespace Riok.Mapperly.IntegrationTests
                 "GeneratedFiles",
                 "Riok.Mapperly",
                 "Riok.Mapperly.MapperGenerator",
-                name + ".g.cs");
+                name + ".g.cs"
+            );
         }
 
         protected TestObject NewTestObj()
@@ -68,16 +71,18 @@ namespace Riok.Mapperly.IntegrationTests
                 NullableFlattening = new() { IdValue = 100 },
                 UnflatteningIdValue = 20,
                 NullableUnflatteningIdValue = 200,
-                RecursiveObject =
-                    new(5)
-                    {
-                        EnumValue = TestEnum.Value10,
-                        EnumName = TestEnum.Value30,
-                        EnumReverseStringValue = nameof(TestEnumDtoByValue.DtoValue3),
-                        RequiredValue = 4,
-                    },
-                NullableReadOnlyObjectCollection =
-                    new[] { new TestObjectNested { IntValue = 10 }, new TestObjectNested { IntValue = 20 }, },
+                RecursiveObject = new(5)
+                {
+                    EnumValue = TestEnum.Value10,
+                    EnumName = TestEnum.Value30,
+                    EnumReverseStringValue = nameof(TestEnumDtoByValue.DtoValue3),
+                    RequiredValue = 4,
+                },
+                NullableReadOnlyObjectCollection = new[]
+                {
+                    new TestObjectNested { IntValue = 10 },
+                    new TestObjectNested { IntValue = 20 },
+                },
                 SourceTargetSameObjectType = new TestObject(8) { IntValue = 99, RequiredValue = 98, },
                 StackValue = new Stack<string>(new[] { "1", "2", "3" }),
                 QueueValue = new Queue<string>(new[] { "1", "2", "3" }),
@@ -86,7 +91,19 @@ namespace Riok.Mapperly.IntegrationTests
                 ImmutableHashSetValue = ImmutableHashSet.Create("1", "2", "3"),
                 ImmutableQueueValue = ImmutableQueue.Create("1", "2", "3"),
                 ImmutableStackValue = ImmutableStack.Create("1", "2", "3"),
-                ImmutableSortedSetValue = ImmutableSortedSet.Create("1", "2", "3")
+                ImmutableSortedSetValue = ImmutableSortedSet.Create("1", "2", "3"),
+                ImmutableDictionaryValue = new Dictionary<string, string>()
+                {
+                    { "1", "1" },
+                    { "2", "2" },
+                    { "3", "3" }
+                }.ToImmutableDictionary(),
+                ImmutableSortedDictionaryValue = new Dictionary<string, string>()
+                {
+                    { "1", "1" },
+                    { "2", "2" },
+                    { "3", "3" }
+                }.ToImmutableSortedDictionary(),
             };
         }
 

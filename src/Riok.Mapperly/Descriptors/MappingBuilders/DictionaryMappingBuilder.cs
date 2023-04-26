@@ -1,5 +1,7 @@
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Diagnostics;
@@ -10,6 +12,10 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 public static class DictionaryMappingBuilder
 {
     private const string CountPropertyName = nameof(IDictionary<object, object>.Count);
+    private const string SetterIndexerPropertyName = "set_Item";
+
+    private const string ToImmutableDictionaryMethodName = nameof(ImmutableDictionary.ToImmutableDictionary);
+    private const string ToImmutableSortedDictionaryMethodName = nameof(ImmutableSortedDictionary.ToImmutableSortedDictionary);
 
     public static ITypeMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
@@ -23,7 +29,8 @@ public static class DictionaryMappingBuilder
         // The constructed type should be Dictionary<,>
         if (IsDictionaryType(ctx, ctx.Target))
         {
-            var sourceHasCount = ctx.Source.GetAllProperties(CountPropertyName)
+            var sourceHasCount = ctx.Source
+                .GetAllProperties(CountPropertyName)
                 .Any(x => !x.IsStatic && !x.IsIndexer && !x.IsWriteOnly && x.Type.SpecialType == SpecialType.System_Int32);
 
             var targetDictionarySymbol = ctx.Types.DictionaryT.Construct(keyMapping.TargetType, valueMapping.TargetType);
@@ -35,12 +42,21 @@ public static class DictionaryMappingBuilder
                 valueMapping,
                 sourceHasCount,
                 targetDictionarySymbol,
-                dictionaryObjectFactory);
+                dictionaryObjectFactory
+            );
         }
+
+        // if target is an immutable dictionary then use LinqDictionaryMapper
+        var immutableLinqMapping = ResolveImmutableCollectMethod(ctx, keyMapping, valueMapping);
+        if (immutableLinqMapping != null)
+            return immutableLinqMapping;
 
         // the target is not a well known dictionary type
         // it should have a an object factory or a parameterless public ctor
-        if (!ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory) && !ctx.Target.HasAccessibleParameterlessConstructor())
+        if (
+            !ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory)
+            && !ctx.Target.HasAccessibleParameterlessConstructor()
+        )
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, ctx.Target);
             return null;
@@ -49,13 +65,18 @@ public static class DictionaryMappingBuilder
         if (!ctx.Target.ImplementsGeneric(ctx.Types.IDictionaryT, out _))
             return null;
 
+        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.Source, ctx.Target, ctx.Types);
+
         return new ForEachSetDictionaryMapping(
             ctx.Source,
             ctx.Target,
             keyMapping,
             valueMapping,
             false,
-            objectFactory: objectFactory);
+            objectFactory: objectFactory,
+            explicitCast: GetExplicitIndexer(ctx),
+            ensureCapacity: ensureCapacityStatement
+        );
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
@@ -66,11 +87,24 @@ public static class DictionaryMappingBuilder
         if (BuildKeyValueMapping(ctx) is not var (keyMapping, valueMapping))
             return null;
 
+        // if target is an immutable dictionary then don't create a foreach loop
+        if (ctx.Target.OriginalDefinition.ImplementsGeneric(ctx.Types.IImmutableDictionaryT, out _))
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+            return null;
+        }
+
+        // add values to dictionary by setting key values in a foreach loop
+        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.Source, ctx.Target, ctx.Types);
+
         return new ForEachSetDictionaryExistingTargetMapping(
             ctx.Source,
             ctx.Target,
             keyMapping,
-            valueMapping);
+            valueMapping,
+            explicitCast: GetExplicitIndexer(ctx),
+            ensureCapacity: ensureCapacityStatement
+        );
     }
 
     private static (ITypeMapping, ITypeMapping)? BuildKeyValueMapping(MappingBuilderContext ctx)
@@ -129,5 +163,47 @@ public static class DictionaryMappingBuilder
             return null;
 
         return (enumeratedType.TypeArguments[0], enumeratedType.TypeArguments[1]);
+    }
+
+    private static INamedTypeSymbol? GetExplicitIndexer(MappingBuilderContext ctx)
+    {
+        if (
+            ctx.Target.ImplementsGeneric(ctx.Types.IDictionaryT, SetterIndexerPropertyName, out var typedInter, out var isExplicit)
+            && !isExplicit
+        )
+            return null;
+
+        return typedInter;
+    }
+
+    private static LinqDicitonaryMapping? ResolveImmutableCollectMethod(
+        MappingBuilderContext ctx,
+        ITypeMapping keyMapping,
+        ITypeMapping valueMapping
+    )
+    {
+        if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableSortedDictionaryT))
+            return new LinqDicitonaryMapping(
+                ctx.Source,
+                ctx.Target,
+                ctx.Types.ImmutableSortedDictionary.GetStaticGenericMethod(ToImmutableSortedDictionaryMethodName)!,
+                keyMapping,
+                valueMapping
+            );
+
+        // if target is an ImmutableDictionary or IImmutableDictionary
+        if (
+            SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IImmutableDictionaryT)
+            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableDictionaryT)
+        )
+            return new LinqDicitonaryMapping(
+                ctx.Source,
+                ctx.Target,
+                ctx.Types.ImmutableDictionary.GetStaticGenericMethod(ToImmutableDictionaryMethodName)!,
+                keyMapping,
+                valueMapping
+            );
+
+        return null;
     }
 }

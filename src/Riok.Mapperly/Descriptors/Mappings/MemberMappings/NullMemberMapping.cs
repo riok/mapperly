@@ -25,7 +25,8 @@ public class NullMemberMapping : IMemberMapping
         MemberPath sourcePath,
         ITypeSymbol targetType,
         NullFallbackValue nullFallback,
-        bool useNullConditionalAccess)
+        bool useNullConditionalAccess
+    )
     {
         SourcePath = sourcePath;
         _delegateMapping = delegateMapping;
@@ -59,9 +60,7 @@ public class NullMemberMapping : IMemberMapping
             var mapping = _delegateMapping.Build(ctx.WithSource(nullConditionalSourceAccess));
             return _nullFallback == NullFallbackValue.Default && _targetType.IsNullable()
                 ? mapping
-                : Coalesce(
-                    mapping,
-                    NullSubstitute(_delegateMapping.TargetType, nullConditionalSourceAccess, _nullFallback));
+                : Coalesce(mapping, NullSubstitute(_delegateMapping.TargetType, nullConditionalSourceAccess, _nullFallback));
         }
 
         var notNullCondition = _useNullConditionalAccess
@@ -72,13 +71,12 @@ public class NullMemberMapping : IMemberMapping
         return ConditionalExpression(
             notNullCondition,
             _delegateMapping.Build(ctx),
-            NullSubstitute(_delegateMapping.TargetType, sourceMemberAccess, _nullFallback));
+            NullSubstitute(_delegateMapping.TargetType, sourceMemberAccess, _nullFallback)
+        );
     }
 
-    protected bool Equals(NullMemberMapping other)
-        => _delegateMapping.Equals(other._delegateMapping)
-            && _nullFallback == other._nullFallback
-            && SourcePath.Equals(other.SourcePath);
+    protected bool Equals(NullMemberMapping other) =>
+        _delegateMapping.Equals(other._delegateMapping) && _nullFallback == other._nullFallback && SourcePath.Equals(other.SourcePath);
 
     public override bool Equals(object? obj)
     {
@@ -105,9 +103,7 @@ public class NullMemberMapping : IMemberMapping
         }
     }
 
-    public static bool operator ==(NullMemberMapping? left, NullMemberMapping? right)
-        => Equals(left, right);
+    public static bool operator ==(NullMemberMapping? left, NullMemberMapping? right) => Equals(left, right);
 
-    public static bool operator !=(NullMemberMapping? left, NullMemberMapping? right)
-        => !Equals(left, right);
+    public static bool operator !=(NullMemberMapping? left, NullMemberMapping? right) => !Equals(left, right);
 }

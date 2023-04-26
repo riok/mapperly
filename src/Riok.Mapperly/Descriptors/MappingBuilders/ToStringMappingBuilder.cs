@@ -6,7 +6,6 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public static class ToStringMappingBuilder
 {
-
     public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         if (!ctx.IsConversionEnabled(MappingConversionType.ToStringMethod))

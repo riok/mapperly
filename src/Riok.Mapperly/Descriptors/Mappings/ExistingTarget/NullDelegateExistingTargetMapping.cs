@@ -18,7 +18,8 @@ public class NullDelegateExistingTargetMapping : ExistingTargetMapping
     public NullDelegateExistingTargetMapping(
         ITypeSymbol nullableSourceType,
         ITypeSymbol nullableTargetType,
-        IExistingTargetMapping delegateMapping)
+        IExistingTargetMapping delegateMapping
+    )
         : base(nullableSourceType, nullableTargetType)
     {
         _delegateMapping = delegateMapping;
@@ -33,11 +34,7 @@ public class NullDelegateExistingTargetMapping : ExistingTargetMapping
             return body;
 
         // if (source != null && target != null) { body }
-        return new[]
-        {
-            IfStatement(
-                IfNoneNull((SourceType, ctx.Source), (TargetType, target)),
-                Block(body)),
-        }; ;
+        return new[] { IfStatement(IfNoneNull((SourceType, ctx.Source), (TargetType, target)), Block(body)), };
+        ;
     }
 }

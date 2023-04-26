@@ -20,8 +20,9 @@ public static class EnumMappingBuilder
         // one is an enum, other may be an underlying type (eg. int)
         if (!sourceIsEnum || !targetIsEnum)
         {
-            return ctx.IsConversionEnabled(MappingConversionType.ExplicitCast)
-                    && ctx.FindOrBuildMapping(sourceEnumType ?? ctx.Source, targetEnumType ?? ctx.Target) is { } delegateMapping
+            return
+                ctx.IsConversionEnabled(MappingConversionType.ExplicitCast)
+                && ctx.FindOrBuildMapping(sourceEnumType ?? ctx.Source, targetEnumType ?? ctx.Target) is { } delegateMapping
                 ? new CastMapping(ctx.Source, ctx.Target, delegateMapping)
                 : null;
         }
@@ -48,7 +49,8 @@ public static class EnumMappingBuilder
         ctx.ReportDiagnostic(
             DiagnosticDescriptors.EnumMappingStrategyByNameNotSupportedInProjectionMappings,
             ctx.Source.ToDisplayString(),
-            ctx.Target.ToDisplayString());
+            ctx.Target.ToDisplayString()
+        );
         return new CastMapping(ctx.Source, ctx.Target);
     }
 
@@ -61,7 +63,8 @@ public static class EnumMappingBuilder
             var targetFieldsByNameIgnoreCase = targetFieldsByName
                 .DistinctBy(x => x.Key, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
-            getTargetField = source => targetFieldsByName.GetValueOrDefault(source.Name) ?? targetFieldsByNameIgnoreCase.GetValueOrDefault(source.Name);
+            getTargetField = source =>
+                targetFieldsByName.GetValueOrDefault(source.Name) ?? targetFieldsByNameIgnoreCase.GetValueOrDefault(source.Name);
         }
         else
         {
@@ -77,10 +80,7 @@ public static class EnumMappingBuilder
 
         if (enumMemberMappings.Count == 0)
         {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.EnumNameMappingNoOverlappingValuesFound,
-                ctx.Source,
-                ctx.Target);
+            ctx.ReportDiagnostic(DiagnosticDescriptors.EnumNameMappingNoOverlappingValuesFound, ctx.Source, ctx.Target);
         }
 
         var targetMembers = ctx.Target
@@ -95,9 +95,6 @@ public static class EnumMappingBuilder
                 ctx.Target);
         }
 
-        return new EnumNameMapping(
-            ctx.Source,
-            ctx.Target,
-            enumMemberMappings);
+        return new EnumNameMapping(ctx.Source, ctx.Target, enumMemberMappings);
     }
 }

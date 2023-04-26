@@ -36,8 +36,7 @@ public class MappingBuilder
     }
 
     /// <inheritdoc cref="MappingBuilderContext.FindMapping"/>
-    public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType)
-        => _mappings.Find(sourceType, targetType);
+    public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType) => _mappings.Find(sourceType, targetType);
 
     public ITypeMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {

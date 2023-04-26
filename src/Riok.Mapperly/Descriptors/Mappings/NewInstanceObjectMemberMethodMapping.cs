@@ -18,20 +18,15 @@ public class NewInstanceObjectMemberMethodMapping : ObjectMemberMethodMapping, I
     private readonly HashSet<MemberAssignmentMapping> _initPropertyMappings = new();
     private readonly bool _enableReferenceHandling;
 
-    public NewInstanceObjectMemberMethodMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
-        bool enableReferenceHandling)
+    public NewInstanceObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, bool enableReferenceHandling)
         : base(sourceType, targetType)
     {
         _enableReferenceHandling = enableReferenceHandling;
     }
 
-    public void AddConstructorParameterMapping(ConstructorParameterMapping mapping)
-        => _constructorPropertyMappings.Add(mapping);
+    public void AddConstructorParameterMapping(ConstructorParameterMapping mapping) => _constructorPropertyMappings.Add(mapping);
 
-    public void AddInitMemberMapping(MemberAssignmentMapping mapping)
-        => _initPropertyMappings.Add(mapping);
+    public void AddInitMemberMapping(MemberAssignmentMapping mapping) => _initPropertyMappings.Add(mapping);
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
@@ -50,9 +45,7 @@ public class NewInstanceObjectMemberMethodMapping : ObjectMemberMethodMapping, I
         // add initializer
         if (_initPropertyMappings.Count > 0)
         {
-            var initMappings = _initPropertyMappings
-                .Select(x => x.BuildExpression(ctx, null))
-                .ToArray();
+            var initMappings = _initPropertyMappings.Select(x => x.BuildExpression(ctx, null)).ToArray();
             objectCreationExpression = objectCreationExpression.WithInitializer(ObjectInitializer(initMappings));
         }
 
@@ -64,10 +57,9 @@ public class NewInstanceObjectMemberMethodMapping : ObjectMemberMethodMapping, I
         if (_enableReferenceHandling)
         {
             // SetReference
-            yield return ExpressionStatement(ReferenceHandlingSyntaxFactoryHelper.SetReference(
-                this,
-                ctx,
-                IdentifierName(targetVariableName)));
+            yield return ExpressionStatement(
+                ReferenceHandlingSyntaxFactoryHelper.SetReference(this, ctx, IdentifierName(targetVariableName))
+            );
         }
 
         // map properties

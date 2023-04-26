@@ -21,6 +21,11 @@
     <ROSLYN_VERSION Condition="'$(ROSLYN_VERSION)' == ''">4.5</ROSLYN_VERSION>
   </PropertyGroup>
 
+  <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0 AND '$(CI)' == ''">
+    <Exec Command="dotnet tool restore" StandardOutputImportance="Low" StandardErrorImportance="High" />
+    <Exec Command="dotnet husky install" StandardOutputImportance="Low" StandardErrorImportance="High" WorkingDirectory="../.." />
+  </Target>
+
   <Import Project="Riok.Mapperly.Roslyn$(ROSLYN_VERSION).props" />
 
   <ItemGroup>

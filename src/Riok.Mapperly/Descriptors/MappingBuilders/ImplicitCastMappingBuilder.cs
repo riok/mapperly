@@ -16,8 +16,6 @@ public static class ImplicitCastMappingBuilder
             return null;
 
         var conversion = ctx.Compilation.ClassifyConversion(ctx.Source, ctx.Target);
-        return conversion.IsImplicit
-            ? new CastMapping(ctx.Source, ctx.Target)
-            : null;
+        return conversion.IsImplicit ? new CastMapping(ctx.Source, ctx.Target) : null;
     }
 }

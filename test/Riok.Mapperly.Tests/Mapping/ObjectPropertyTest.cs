@@ -13,29 +13,27 @@ public class ObjectPropertyTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } }",
-            "class B { public string StringValue { get; set; } }");
+            "class B { public string StringValue { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
                 target.StringValue = source.StringValue;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void SameType()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "A",
-            "class A { public string StringValue { get; set; } }");
+        var source = TestSourceBuilder.Mapping("A", "A", "class A { public string StringValue { get; set; } }");
 
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return source;");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source;");
     }
 
     [Fact]
@@ -45,45 +43,41 @@ public class ObjectPropertyTest
             "A",
             "A",
             TestSourceBuilderOptions.WithDeepCloning,
-            "class A { public string StringValue { get; set; } }");
+            "class A { public string StringValue { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::A();
                 target.StringValue = source.StringValue;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
     public void CustomRefStructToSameCustomStruct()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "A",
-            "ref struct A {}");
-        TestHelper.GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return source;");
+        var source = TestSourceBuilder.Mapping("A", "A", "ref struct A {}");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source;");
     }
 
     [Fact]
     public void CustomRefStructToSameCustomStructDeepCloning()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "A",
-            TestSourceBuilderOptions.WithDeepCloning,
-            "ref struct A {}");
-        TestHelper.GenerateMapper(source)
+        var source = TestSourceBuilder.Mapping("A", "A", TestSourceBuilderOptions.WithDeepCloning, "ref struct A {}");
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::A();
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -93,16 +87,19 @@ public class ObjectPropertyTest
             "A",
             "B",
             "class A { public string Value { get; set; } }",
-            "class B { public int Value { get; set; } }");
+            "class B { public int Value { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
                 target.Value = int.Parse(source.Value);
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -112,7 +109,8 @@ public class ObjectPropertyTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public string StringValue2 { set; } }",
-            "class B { public string StringValue { get; set; } public string StringValue2 { get; set; } }");
+            "class B { public string StringValue { get; set; } public string StringValue2 { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -124,7 +122,8 @@ public class ObjectPropertyTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public string StringValue2 { get; set; } }",
-            "class B { public string StringValue { get; set; } public string StringValue2 { get; } }");
+            "class B { public string StringValue { get; set; } public string StringValue2 { get; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -136,11 +135,18 @@ public class ObjectPropertyTest
             "A",
             "B",
             "class A { public int this[int index] { get => -1; set { } } }",
-            "class B { public int this[int index] { get => -1; set { } } }");
+            "class B { public int this[int index] { get => -1; set { } } }"
+        );
 
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new DiagnosticMatcher(DiagnosticDescriptors.CannotMapFromIndexedMember, "Cannot map from indexed member A.this[] to member B.this[]"));
+            .HaveDiagnostic(
+                new DiagnosticMatcher(
+                    DiagnosticDescriptors.CannotMapFromIndexedMember,
+                    "Cannot map from indexed member A.this[] to member B.this[]"
+                )
+            );
     }
 
     [Fact]
@@ -150,7 +156,8 @@ public class ObjectPropertyTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public string StringValueA { get; set; } }",
-            "class B { public string StringValue { get; set; } public string StringValueB { get; set; } }");
+            "class B { public string StringValue { get; set; } public string StringValueB { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -161,16 +168,19 @@ public class ObjectPropertyTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapProperty(nameof(A.StringValue), nameof(B.StringValue2)] partial B Map(A source);",
             "class A { public string StringValue { get; set; } }",
-            "class B { public string StringValue2 { get; set; } }");
+            "class B { public string StringValue2 { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
                 target.StringValue2 = source.StringValue;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -178,21 +188,21 @@ public class ObjectPropertyTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial B Map(A source);",
-            new TestSourceBuilderOptions
-            {
-                PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseInsensitive
-            },
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseInsensitive },
             "class A { public string StringValue { get; set; } }",
-            "class B { public string stringvalue { get; set; } }");
+            "class B { public string stringvalue { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
                 target.stringvalue = source.StringValue;
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -200,12 +210,10 @@ public class ObjectPropertyTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial B Map(A source);",
-            new TestSourceBuilderOptions
-            {
-                PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseSensitive
-            },
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseSensitive },
             "class A { public string StringValue { get; set; } }",
-            "class B { public string stringvalue { get; set; } }");
+            "class B { public string stringvalue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -216,7 +224,8 @@ public class ObjectPropertyTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapProperty(nameof(A.StringValue), nameof(B.StringValue9)] partial B Map(A source);",
             "class A { public string StringValue { get; set; } }",
-            "class B { public string StringValue2 { get; set; } }");
+            "class B { public string StringValue2 { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -227,7 +236,8 @@ public class ObjectPropertyTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapProperty(\"StringValue9\", nameof(B.StringValue2)] partial B Map(A source);",
             "class A { public string StringValue { get; set; } }",
-            "class B { public string StringValue2 { get; set; } }");
+            "class B { public string StringValue2 { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -251,9 +261,11 @@ public class ObjectPropertyTest
             "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",
             "class B { public string StringValue { get; set; } public D NestedValue { get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
-        TestHelper.GenerateMapper(source)
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveMapMethodBody(
                 """
@@ -261,7 +273,8 @@ public class ObjectPropertyTest
                 target.StringValue = source.StringValue;
                 target.NestedValue = UserImplementedMap(source.NestedValue);
                 return target;
-                """);
+                """
+            );
     }
 
     [Fact]
@@ -271,7 +284,8 @@ public class ObjectPropertyTest
             "A",
             "B",
             "class A { public DateTime Value { get; set; } }",
-            "class B { public Version Value { get; set; } }");
+            "class B { public Version Value { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -282,7 +296,8 @@ public class ObjectPropertyTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapProperty(nameof(A.StringValue), \"not_found\")] B Map(A source);",
             "class A { public string StringValue { get; set; } }",
-            "class B { public string StringValue2 { get; set; } }");
+            "class B { public string StringValue2 { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -293,7 +308,8 @@ public class ObjectPropertyTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapProperty(\"not_found\", nameof(B.StringValue2))] partial B Map(A source);",
             "class A { public string StringValue { get; set; } }",
-            "class B { public string StringValue2 { get; set; } }");
+            "class B { public string StringValue2 { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -305,7 +321,8 @@ public class ObjectPropertyTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; private set; } }",
-            "class B { public string StringValue { get; private set; } public int IntValue { private get; set; } }");
+            "class B { public string StringValue { get; private set; } public int IntValue { private get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -319,7 +336,8 @@ public class ObjectPropertyTest
             "class A { public C NestedValue { private get; set; } public int IntValue { get; private set; } }",
             "class B { public D NestedValue { get; private set; } public int IntValue { private get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -331,7 +349,8 @@ public class ObjectPropertyTest
             "A",
             "B",
             "class A { public string StringValue { private get; set; } public int IntValue { get; private set; } }",
-            "class B { public string StringValue { get; set; } public int IntValue { private get; set; } }");
+            "class B { public string StringValue { get; set; } public int IntValue { private get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -345,8 +364,31 @@ public class ObjectPropertyTest
             "class A { public C NestedValue { private get; set; } public int IntValue { get; private set; } }",
             "class B { public D NestedValue { get; set; } public int IntValue { private get; set; } }",
             "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }");
+            "class D { public string StringValue { get; set; } }"
+        );
 
         return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void UnmappedReadOnlyTargetPropertyShouldNotDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string Name { get; } }",
+            "class B { public string Name { set; } public string FullName { get; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Name = source.Name;
+                return target;
+                """
+            );
     }
 }

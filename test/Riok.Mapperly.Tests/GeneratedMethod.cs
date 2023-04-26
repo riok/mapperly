@@ -27,14 +27,14 @@ public class GeneratedMethod
     /// <returns>The cleaned body.</returns>
     private static string ExtractBody(MethodDeclarationSyntax declarationSyntax)
     {
-        var body = declarationSyntax
-            .Body
-            ?.NormalizeWhitespace()
-            .ToFullString()
-            .Trim(' ', '\r', '\n')
-            .Trim('{', '}')
-            .Trim(' ', '\r', '\n')
-            .ReplaceLineEndings() ?? string.Empty;
+        var body =
+            declarationSyntax.Body
+                ?.NormalizeWhitespace()
+                .ToFullString()
+                .Trim(' ', '\r', '\n')
+                .Trim('{', '}')
+                .Trim(' ', '\r', '\n')
+                .ReplaceLineEndings() ?? string.Empty;
         var lines = body.Split(Environment.NewLine);
         return lines.Length == 0
             ? string.Empty

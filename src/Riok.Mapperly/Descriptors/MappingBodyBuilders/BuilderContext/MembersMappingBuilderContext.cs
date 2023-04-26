@@ -55,8 +55,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         AddUnmatchedSourceMembersDiagnostics();
     }
 
-    protected void SetSourceMemberMapped(MemberPath sourcePath)
-        => _unmappedSourceMemberNames.Remove(sourcePath.Path.First().Name);
+    protected void SetSourceMemberMapped(MemberPath sourcePath) => _unmappedSourceMemberNames.Remove(sourcePath.Path.First().Name);
 
     private HashSet<string> InitIgnoredUnmatchedProperties(IEnumerable<string> allProperties, IEnumerable<string> mappedProperties)
     {
@@ -79,25 +78,17 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
     private HashSet<string> GetIgnoredSourceMembers()
     {
-        return BuilderContext
-            .ListConfiguration<MapperIgnoreSourceAttribute>()
-            .Select(x => x.Source)
-            .ToHashSet();
+        return BuilderContext.ListConfiguration<MapperIgnoreSourceAttribute>().Select(x => x.Source).ToHashSet();
     }
 
     private HashSet<string> GetSourceMemberNames()
     {
-        return Mapping.SourceType
-            .GetAccessibleMappableMembers()
-            .Select(x => x.Name)
-            .ToHashSet();
+        return Mapping.SourceType.GetAccessibleMappableMembers().Select(x => x.Name).ToHashSet();
     }
 
     private Dictionary<string, IMappableMember> GetTargetMembers()
     {
-        return Mapping.TargetType
-            .GetAccessibleMappableMembers()
-            .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+        return Mapping.TargetType.GetAccessibleMappableMembers().ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
     }
 
     private Dictionary<string, List<MapPropertyAttribute>> GetMemberConfigurations()
@@ -112,10 +103,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     {
         foreach (var notFoundIgnoredMember in _ignoredUnmatchedTargetMemberNames)
         {
-            BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.IgnoredTargetMemberNotFound,
-                notFoundIgnoredMember,
-                Mapping.TargetType);
+            BuilderContext.ReportDiagnostic(DiagnosticDescriptors.IgnoredTargetMemberNotFound, notFoundIgnoredMember, Mapping.TargetType);
         }
     }
 
@@ -123,10 +111,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     {
         foreach (var notFoundIgnoredMember in _ignoredUnmatchedSourceMemberNames)
         {
-            BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.IgnoredSourceMemberNotFound,
-                notFoundIgnoredMember,
-                Mapping.SourceType);
+            BuilderContext.ReportDiagnostic(DiagnosticDescriptors.IgnoredSourceMemberNotFound, notFoundIgnoredMember, Mapping.SourceType);
         }
     }
 
@@ -137,7 +122,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
             BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ConfiguredMappingTargetMemberNotFound,
                 memberConfig.TargetFullName,
-                Mapping.TargetType);
+                Mapping.TargetType
+            );
         }
     }
 
@@ -149,7 +135,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
                 DiagnosticDescriptors.SourceMemberNotMapped,
                 sourceMemberName,
                 Mapping.SourceType,
-                Mapping.TargetType);
+                Mapping.TargetType
+            );
         }
     }
 }
