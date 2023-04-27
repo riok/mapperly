@@ -150,8 +150,14 @@ public class CastTest
             "A",
             "B",
             TestSourceBuilderOptions.WithDeepCloning,
-            "struct A { public static explicit operator B(A a) => new(); }",
-            "struct B {}"
+            """
+            struct A
+            {
+                public string Value { get; set; }
+                public static explicit operator B(A a) => new();
+            }
+            """,
+            "struct B { public string Value { get; set; } }"
         );
         TestHelper
             .GenerateMapper(source)
@@ -159,9 +165,23 @@ public class CastTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
+                target.Value = source.Value;
                 return target;
                 """
             );
+    }
+
+    [Fact]
+    public void OperatorExplicitStructWithUnmanagedStructTargetDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.WithDeepCloning,
+            "struct A { public static explicit operator B(A a) => new(); }",
+            "struct B {}"
+        );
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::B)source;");
     }
 
     [Fact]
@@ -282,8 +302,14 @@ public class CastTest
             "A",
             "B",
             TestSourceBuilderOptions.WithDeepCloning,
-            "struct A { public static implicit operator B(A a) => new(); }",
-            "struct B {}"
+            """
+            struct A
+            {
+                public string Value { get; set; }
+                public static implicit operator B(A a) => new();
+            }
+            """,
+            "struct B { public string Value { get; set; } }"
         );
         TestHelper
             .GenerateMapper(source)
@@ -291,9 +317,23 @@ public class CastTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
+                target.Value = source.Value;
                 return target;
                 """
             );
+    }
+
+    [Fact]
+    public void OperatorImplicitStructWithUnmanagedStructTargetDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.WithDeepCloning,
+            "struct A { public static implicit operator B(A a) => new(); }",
+            "struct B {}"
+        );
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::B)source;");
     }
 
     [Fact]

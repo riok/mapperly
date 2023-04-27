@@ -92,7 +92,19 @@ public class SpecialTypeTest
     [Fact]
     public void CustomMutableStructToObjectDeepCloning()
     {
-        var source = TestSourceBuilder.Mapping("A", "object", TestSourceBuilderOptions.WithDeepCloning, "struct A {}");
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "object",
+            TestSourceBuilderOptions.WithDeepCloning,
+            "struct A { public string Value { get; set; } }"
+        );
         TestHelper.GenerateMapper(source).Should().HaveMapMethodBody("return (object)MapToA(source);");
+    }
+
+    [Fact]
+    public void CustomUnmanagedStructToObjectDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping("A", "object", TestSourceBuilderOptions.WithDeepCloning, "struct A {}");
+        TestHelper.GenerateMapper(source).Should().HaveMapMethodBody("return (object)source;");
     }
 }

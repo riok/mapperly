@@ -221,7 +221,12 @@ public class EnumerableTest
     [Fact]
     public void ArrayToArrayOfMutableStructDeepCloning()
     {
-        var source = TestSourceBuilder.Mapping("A[]", "A[]", TestSourceBuilderOptions.WithDeepCloning, "struct A{}");
+        var source = TestSourceBuilder.Mapping(
+            "A[]",
+            "A[]",
+            TestSourceBuilderOptions.WithDeepCloning,
+            "struct A{ public string Value { get; set; } }"
+        );
         TestHelper
             .GenerateMapper(source)
             .Should()
@@ -239,12 +244,19 @@ public class EnumerableTest
     }
 
     [Fact]
+    public void ArrayToArrayOfUnmanagedStructDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping("A[]", "A[]", TestSourceBuilderOptions.WithDeepCloning, "struct A{}");
+        TestHelper.GenerateMapper(source).Should().HaveMapMethodBody("return (global::A[])source.Clone();");
+    }
+
+    [Fact]
     public void ArrayToArrayOfMutableStructDeepCloningLoopNameTaken()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial A[] Map(A[] i);",
             TestSourceBuilderOptions.WithDeepCloning,
-            "struct A{}"
+            "struct A{ public string Value { get; set; } }"
         );
         TestHelper
             .GenerateMapper(source)
@@ -268,7 +280,7 @@ public class EnumerableTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial A[] Map(A[] target);",
             TestSourceBuilderOptions.WithDeepCloning,
-            "struct A{}"
+            "struct A{ public string Value { get; set; } }"
         );
         TestHelper
             .GenerateMapper(source)

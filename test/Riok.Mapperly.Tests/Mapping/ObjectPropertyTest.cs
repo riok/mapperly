@@ -69,15 +69,7 @@ public class ObjectPropertyTest
     public void CustomRefStructToSameCustomStructDeepCloning()
     {
         var source = TestSourceBuilder.Mapping("A", "A", TestSourceBuilderOptions.WithDeepCloning, "ref struct A {}");
-        TestHelper
-            .GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::A();
-                return target;
-                """
-            );
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source;");
     }
 
     [Fact]
