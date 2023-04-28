@@ -97,7 +97,7 @@ public static class EnumMappingBuilder
             .Where(x => x.Target != null)
             .ToDictionary(x => x.Source.Name, x => x.Target!.Name);
 
-        if (enumMemberMappings.Count == 0)
+        if (!enumMemberMappings.Any())
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.EnumNameMappingNoOverlappingValuesFound, ctx.Source, ctx.Target);
         }
