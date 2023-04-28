@@ -93,13 +93,4 @@ dotnet_diagnostic.RMG020.severity = error # Unmapped source member
 ```
 
 ### Strict enum mappings
-To enforce strict enum mappings
-(all source enum values have to be mapped to a target enum value
-and all target enum values have to be mapped from a source enum value)
-set the following two EditorConfig settings (see also [analyzer diagnostics](./13-analyzer-diagnostics.mdx)):
-
-```editorconfig title=".editorconfig"
-[*.cs]
-dotnet_diagnostic.RMG034.severity = error # Unmapped target enum value
-dotnet_diagnostic.RMG035.severity = error # Unmapped source enum value
-```
+To enforce strict enum mappings set 'RMG034' and 'RMG035' to error, see [strict enum mappings](./04-enum.mdx).

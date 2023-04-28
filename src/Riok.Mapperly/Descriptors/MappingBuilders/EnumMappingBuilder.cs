@@ -57,21 +57,16 @@ public static class EnumMappingBuilder
 
     private static TypeMapping BuildEnumToEnumCastMapping(MappingBuilderContext ctx)
     {
-        var sourceValues = ctx.Source.GetMembers().OfType<IFieldSymbol>().Select(symbol => symbol.ConstantValue).ToList();
+        var sourceValues = ctx.Source.GetMembers().OfType<IFieldSymbol>().ToDictionary(field => field.Name, field => field.ConstantValue);
+        var targetValues = ctx.Target.GetMembers().OfType<IFieldSymbol>().ToDictionary(field => field.Name, field => field.ConstantValue);
 
-        var targetValues = ctx.Target.GetMembers().OfType<IFieldSymbol>().Select(symbol => symbol.ConstantValue).ToList();
+        var missingTargetValues = targetValues.Where(field => !sourceValues.ContainsValue(field.Value));
+        foreach(var member in missingTargetValues) 
+			ctx.ReportDiagnostic(DiagnosticDescriptors.SourceEnumValueNotFound, member.Key, member.Value!, ctx.Target, ctx.Source);
 
-        var missingTargetValues = targetValues.Except(sourceValues);
-        if (missingTargetValues.Any())
-        {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.NotAllTargetEnumValuesMapped, missingTargetValues.First()!, ctx.Target, ctx.Source);
-        }
-
-        var missingSourceValues = sourceValues.Except(targetValues);
-        if (missingSourceValues.Any())
-        {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.NotAllSourceEnumValuesMapped, missingSourceValues.First()!, ctx.Source, ctx.Target);
-        }
+        var missingSourceValues = sourceValues.Where(field => !targetValues.ContainsValue(field.Value));
+        foreach(var member in missingSourceValues) 
+            ctx.ReportDiagnostic(DiagnosticDescriptors.TargetEnumValueNotFound, member.Key, member.Value!, ctx.Source, ctx.Target);    
 
         return new CastMapping(ctx.Source, ctx.Target);
     }
@@ -107,20 +102,51 @@ public static class EnumMappingBuilder
             ctx.ReportDiagnostic(DiagnosticDescriptors.EnumNameMappingNoOverlappingValuesFound, ctx.Source, ctx.Target);
         }
 
-        var missingSourceMembers = sourceFieldsByName.Select(item => item.Key).Except(enumMemberMappings.Select(mapping => mapping.Key));
+        var missingSourceMembers = sourceFieldsByName.Where(field => !enumMemberMappings.ContainsKey(field.Key));
+		foreach(var member in missingSourceMembers) 
+			ctx.ReportDiagnostic(DiagnosticDescriptors.TargetEnumValueNotFound, member.Key, member.Value.ConstantValue!, ctx.Source, ctx.Target);
 
-        if (missingSourceMembers.Any())
-        {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.NotAllSourceEnumValuesMapped, missingSourceMembers.First(), ctx.Source, ctx.Target);
-        }
-
-        var missingTargetMembers = targetFieldsByName.Select(item => item.Key).Except(enumMemberMappings.Select(mapping => mapping.Value));
-
-        if (missingTargetMembers.Any())
-        {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.NotAllTargetEnumValuesMapped, missingTargetMembers.First(), ctx.Target, ctx.Source);
-        }
+        var missingTargetMembers = targetFieldsByName.Where(field => !enumMemberMappings.ContainsValue(field.Key));
+        foreach(var member in missingTargetMembers) 
+			ctx.ReportDiagnostic(DiagnosticDescriptors.SourceEnumValueNotFound, member.Key, member.Value.ConstantValue!, ctx.Target, ctx.Source);
 
         return new EnumNameMapping(ctx.Source, ctx.Target, enumMemberMappings);
+    }
+
+	private static void ReportUnmappedDiagnostics<T>(
+        MappingBuilderContext ctx,
+        Func<IFieldSymbol, T> valueExtractor,
+        IEqualityComparer<T>? comparer = null)
+    {
+        var sourceValues = ctx.Source.GetMembers().OfType<IFieldSymbol>().GroupBy(valueExtractor, comparer).ToDictionary(x => x.Key, x => x.First());
+        var targetValues = ctx.Target.GetMembers().OfType<IFieldSymbol>().GroupBy(valueExtractor, comparer).ToDictionary(x => x.Key, x => x.First());
+
+        var noOverlappingValuesFound = true;
+        foreach (var unmappedSourceValue in sourceValues)
+        {
+            if (targetValues.ContainsKey(unmappedSourceValue.Key))
+            {
+                noOverlappingValuesFound = false;
+                continue;
+            }
+
+            ctx.ReportDiagnostic(DiagnosticDescriptors.SourceEnumValueNotFound, unmappedSourceValue.Value.Name, unmappedSourceValue.Value.ConstantValue!, ctx.Source, ctx.Target);
+        }
+
+        foreach (var unmappedTargetValue in targetValues)
+        {
+            if (sourceValues.ContainsKey(unmappedTargetValue.Key))
+            {
+                noOverlappingValuesFound = false;
+                continue;
+            }
+
+            ctx.ReportDiagnostic(DiagnosticDescriptors.TargetEnumValueNotFound, unmappedTargetValue.Value.Name, unmappedTargetValue.Value.ConstantValue!, ctx.Source, ctx.Target);
+        }
+
+        if (noOverlappingValuesFound)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.EnumNameMappingNoOverlappingValuesFound, ctx.Source, ctx.Target);
+        }
     }
 }

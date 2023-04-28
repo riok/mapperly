@@ -13,27 +13,75 @@
       Category: Mapper
     },
     {
-      Id: RMG035,
-      Title: Not all enum values in the source enum are mapped,
+      Id: RMG038,
+      Title: An enum member could not be found on the target enum,
       Severity: Info,
       WarningLevel: 1,
       Location: : (11,4)-(11,69),
       Description: ,
       HelpLink: ,
-      MessageFormat: Enum member {0} on {1} not found on target enum {2},
-      Message: Enum member A on E1 not found on target enum E2,
+      MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
+      Message: Enum member A (0) on E1 not found on target enum E2,
       Category: Mapper
     },
     {
-      Id: RMG034,
-      Title: Not all enum values in the target enum are mapped,
+      Id: RMG038,
+      Title: An enum member could not be found on the target enum,
       Severity: Info,
       WarningLevel: 1,
       Location: : (11,4)-(11,69),
       Description: ,
       HelpLink: ,
-      MessageFormat: Enum member {0} on {1} not found on source enum {2},
-      Message: Enum member D on E2 not found on source enum E1,
+      MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
+      Message: Enum member B (1) on E1 not found on target enum E2,
+      Category: Mapper
+    },
+    {
+      Id: RMG038,
+      Title: An enum member could not be found on the target enum,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (11,4)-(11,69),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
+      Message: Enum member C (2) on E1 not found on target enum E2,
+      Category: Mapper
+    },
+    {
+      Id: RMG037,
+      Title: An enum member could not be found on the source enum,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (11,4)-(11,69),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
+      Message: Enum member D (0) on E2 not found on source enum E1,
+      Category: Mapper
+    },
+    {
+      Id: RMG037,
+      Title: An enum member could not be found on the source enum,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (11,4)-(11,69),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
+      Message: Enum member E (1) on E2 not found on source enum E1,
+      Category: Mapper
+    },
+    {
+      Id: RMG037,
+      Title: An enum member could not be found on the source enum,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (11,4)-(11,69),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
+      Message: Enum member F (2) on E2 not found on source enum E1,
       Category: Mapper
     }
   ]

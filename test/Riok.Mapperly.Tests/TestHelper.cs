@@ -7,10 +7,14 @@ namespace Riok.Mapperly.Tests;
 
 public static class TestHelper
 {
-    public static Task VerifyGenerator(string source, TestHelperOptions? options = null)
+    public static Task<VerifyResult> VerifyGenerator(string source, TestHelperOptions? options = null, params object?[] args)
     {
         var driver = Generate(source, options);
-        return Verify(driver).ToTask();
+        var verify = Verify(driver);
+		
+		if (args.Any()) verify.UseParameters(args);
+
+		return verify.ToTask();
     }
 
     public static MapperGenerationResult GenerateMapper(string source, TestHelperOptions? options = null)

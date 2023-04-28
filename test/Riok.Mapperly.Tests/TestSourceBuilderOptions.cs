@@ -10,7 +10,8 @@ public record TestSourceBuilderOptions(
     bool ThrowOnPropertyMappingNullMismatch = false,
     PropertyNameMappingStrategy PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseSensitive,
     MappingConversionType EnabledConversions = MappingConversionType.All,
-    EnumMappingStrategy EnumMappingStrategy = EnumMappingStrategy.ByValue
+    EnumMappingStrategy EnumMappingStrategy = EnumMappingStrategy.ByValue,
+	bool EnumMappingIgnoreCase = false
 )
 {
     public static readonly TestSourceBuilderOptions Default = new();
