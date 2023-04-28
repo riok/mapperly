@@ -13,7 +13,9 @@ public static class TestHelper
         var verify = Verify(driver);
 
         if (args.Any())
+        {
             verify.UseParameters(args);
+        }
 
         return verify.ToTask();
     }

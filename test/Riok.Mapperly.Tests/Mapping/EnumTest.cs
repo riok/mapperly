@@ -340,15 +340,18 @@ enum E2 {A = 100, B, C}
     }
 
     [Theory]
-    [InlineData(EnumMappingStrategy.ByName, "Value1", "Value1, Value2")]
-    [InlineData(EnumMappingStrategy.ByName, "Value1, Value2", "Value1")]
-    [InlineData(EnumMappingStrategy.ByName, "Value1, Value2, Value3", "Value1")]
-    [InlineData(EnumMappingStrategy.ByName, "Value1", "Value1, Value2, Value3")]
-    [InlineData(EnumMappingStrategy.ByValue, "Value1", "Value1, Value2")]
-    [InlineData(EnumMappingStrategy.ByValue, "Value1, Value2", "Value1")]
-    [InlineData(EnumMappingStrategy.ByValue, "Value1, Value2, Value3", "Value1")]
-    [InlineData(EnumMappingStrategy.ByValue, "Value1", "Value1, Value2, Value3")]
+    [InlineData("ByNameEqual", EnumMappingStrategy.ByName, "Value1, Value2", "Value1, Value2")]
+    [InlineData("ByNameMissingSource", EnumMappingStrategy.ByName, "Value1", "Value1, Value2")]
+    [InlineData("ByNameMissingTarget", EnumMappingStrategy.ByName, "Value1, Value2", "Value1")]
+    [InlineData("ByNameMissingMultipleTarget", EnumMappingStrategy.ByName, "Value1, Value2, Value3", "Value1")]
+    [InlineData("ByNameMissingMultipleSource", EnumMappingStrategy.ByName, "Value1", "Value1, Value2, Value3")]
+    [InlineData("ByValueEqual", EnumMappingStrategy.ByValue, "Value1, Value2", "Value1, Value2")]
+    [InlineData("ByValueMissingSource", EnumMappingStrategy.ByValue, "Value1", "Value1, Value2")]
+    [InlineData("ByValueMissingTarget", EnumMappingStrategy.ByValue, "Value1, Value2", "Value1")]
+    [InlineData("ByValueMissingMultipleTarget", EnumMappingStrategy.ByValue, "Value1, Value2, Value3", "Value1")]
+    [InlineData("ByValueMissingMultipleSource", EnumMappingStrategy.ByValue, "Value1", "Value1, Value2, Value3")]
     public Task EnumToAnotherEnumByStrategyMissingValues(
+        string testCase,
         EnumMappingStrategy enumMappingStrategy,
         string sourceEnumValues,
         string targetEnumValues
@@ -367,17 +370,17 @@ enum E2 {A = 100, B, C}
             $"enum D {{ {targetEnumValues} }}"
         );
 
-        return TestHelper.VerifyGenerator(source, null, enumMappingStrategy, sourceEnumValues, targetEnumValues);
+        return TestHelper.VerifyGenerator(source, null, testCase);
     }
 
     [Theory]
-    [InlineData("value1", "Value1")]
-    [InlineData("value2", "Value2, Value3")]
-    [InlineData("Value3", "value3")]
-    [InlineData("Value4, Value5", "value4")]
-    [InlineData("Value5, Value6, Value7", "value6")]
-    [InlineData("Value6", "value5, value6, value7")]
-    public Task EnumToAnotherEnumByNameCaseInsensitive(string sourceEnumValues, string targetEnumValues)
+    [InlineData("SourceLower", "value1", "Value1")]
+    [InlineData("SourceLowerMissingSource", "value2", "Value2, Value3")]
+    [InlineData("TargetLower", "Value3", "value3")]
+    [InlineData("TargetLowerMissingTarget", "Value4, Value5", "value4")]
+    [InlineData("TargetLowerMissingMultipleTarget", "Value5, Value6, Value7", "value6")]
+    [InlineData("TargetLowerMissingMultipleSource", "Value6", "value5, value6, value7")]
+    public Task EnumToAnotherEnumByNameCaseInsensitive(string testCase, string sourceEnumValues, string targetEnumValues)
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -393,6 +396,6 @@ enum E2 {A = 100, B, C}
             $"enum D {{ {targetEnumValues} }}"
         );
 
-        return TestHelper.VerifyGenerator(source, null, sourceEnumValues, targetEnumValues);
+        return TestHelper.VerifyGenerator(source, null, testCase);
     }
 }

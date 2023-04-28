@@ -62,11 +62,15 @@ public static class EnumMappingBuilder
 
         var missingTargetValues = targetValues.Where(field => !sourceValues.ContainsValue(field.Value));
         foreach (var member in missingTargetValues)
+        {
             ctx.ReportDiagnostic(DiagnosticDescriptors.TargetEnumValueNotMapped, member.Key, member.Value!, ctx.Target, ctx.Source);
+        }
 
         var missingSourceValues = sourceValues.Where(field => !targetValues.ContainsValue(field.Value));
         foreach (var member in missingSourceValues)
+        {
             ctx.ReportDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, member.Key, member.Value!, ctx.Source, ctx.Target);
+        }
 
         return new CastMapping(ctx.Source, ctx.Target);
     }
@@ -97,13 +101,14 @@ public static class EnumMappingBuilder
             .Where(x => x.Target != null)
             .ToDictionary(x => x.Source.Name, x => x.Target!.Name);
 
-        if (!enumMemberMappings.Any())
+        if (enumMemberMappings.Count == 0)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.EnumNameMappingNoOverlappingValuesFound, ctx.Source, ctx.Target);
         }
 
         var missingSourceMembers = sourceFieldsByName.Where(field => !enumMemberMappings.ContainsKey(field.Key));
         foreach (var member in missingSourceMembers)
+        {
             ctx.ReportDiagnostic(
                 DiagnosticDescriptors.SourceEnumValueNotMapped,
                 member.Key,
@@ -111,9 +116,11 @@ public static class EnumMappingBuilder
                 ctx.Source,
                 ctx.Target
             );
+        }
 
         var missingTargetMembers = targetFieldsByName.Where(field => !enumMemberMappings.ContainsValue(field.Key));
         foreach (var member in missingTargetMembers)
+        {
             ctx.ReportDiagnostic(
                 DiagnosticDescriptors.TargetEnumValueNotMapped,
                 member.Key,
@@ -121,6 +128,7 @@ public static class EnumMappingBuilder
                 ctx.Target,
                 ctx.Source
             );
+        }
 
         return new EnumNameMapping(ctx.Source, ctx.Target, enumMemberMappings);
     }
