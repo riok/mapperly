@@ -93,4 +93,5 @@ dotnet_diagnostic.RMG020.severity = error # Unmapped source member
 ```
 
 ### Strict enum mappings
+
 To enforce strict enum mappings set 'RMG037' and 'RMG038' to error, see [strict enum mappings](./04-enum.mdx).
