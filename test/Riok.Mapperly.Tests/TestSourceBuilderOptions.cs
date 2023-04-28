@@ -11,7 +11,7 @@ public record TestSourceBuilderOptions(
     PropertyNameMappingStrategy PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseSensitive,
     MappingConversionType EnabledConversions = MappingConversionType.All,
     EnumMappingStrategy EnumMappingStrategy = EnumMappingStrategy.ByValue,
-	bool EnumMappingIgnoreCase = false
+    bool EnumMappingIgnoreCase = false
 )
 {
     public static readonly TestSourceBuilderOptions Default = new();

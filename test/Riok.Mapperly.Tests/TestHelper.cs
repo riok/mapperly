@@ -11,10 +11,11 @@ public static class TestHelper
     {
         var driver = Generate(source, options);
         var verify = Verify(driver);
-		
-		if (args.Any()) verify.UseParameters(args);
 
-		return verify.ToTask();
+        if (args.Any())
+            verify.UseParameters(args);
+
+        return verify.ToTask();
     }
 
     public static MapperGenerationResult GenerateMapper(string source, TestHelperOptions? options = null)

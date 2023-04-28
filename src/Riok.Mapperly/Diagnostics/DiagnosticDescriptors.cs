@@ -320,7 +320,7 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true
     );
-    
+
     public static readonly DiagnosticDescriptor SourceEnumValueNotFound = new DiagnosticDescriptor(
         "RMG037",
         "An enum member could not be found on the source enum",

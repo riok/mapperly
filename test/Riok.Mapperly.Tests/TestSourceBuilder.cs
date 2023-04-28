@@ -77,7 +77,7 @@ public partial class Mapper
             Attribute(options.EnabledConversions),
             Attribute(options.PropertyNameMappingStrategy),
             Attribute(options.EnumMappingStrategy),
-			Attribute(options.EnumMappingIgnoreCase),
+            Attribute(options.EnumMappingIgnoreCase),
         };
 
         return $"[Mapper({string.Join(", ", attrs)})]";
