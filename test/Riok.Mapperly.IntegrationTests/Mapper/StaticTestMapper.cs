@@ -71,5 +71,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial void UpdateDto(TestObject source, TestObjectDto target);
 
         private static partial int PrivateDirectInt(int value);
+
+#if NET7_0_OR_GREATER
+        [MapDerivedType<string, int>]
+        [MapDerivedType<int, string>]
+#else
+        [MapDerivedType(typeof(string), typeof(int))]
+        [MapDerivedType(typeof(int), typeof(string))]
+#endif
+        public static partial object DerivedTypes(object source);
     }
 }

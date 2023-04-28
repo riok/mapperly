@@ -1,11 +1,10 @@
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
-
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Emit;
@@ -15,6 +14,7 @@ public static class SyntaxFactoryHelper
 {
     private const string ArgumentOutOfRangeExceptionClassName = "System.ArgumentOutOfRangeException";
     private const string ArgumentNullExceptionClassName = "System.ArgumentNullException";
+    private const string ArgumentExceptionClassName = "System.ArgumentException";
     private const string NotImplementedExceptionClassName = "System.NotImplementedException";
     private const string NullReferenceExceptionClassName = "System.NullReferenceException";
 
@@ -24,6 +24,8 @@ public static class SyntaxFactoryHelper
             SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier
         );
     private static readonly IdentifierNameSyntax _nameofIdentifier = IdentifierName("nameof");
+
+    private static readonly Regex FormattableStringPlaceholder = new Regex(@"\{(\d+)\}");
 
     public static SyntaxToken Accessibility(Accessibility accessibility)
     {
@@ -90,6 +92,35 @@ public static class SyntaxFactoryHelper
         return IfStatement(IsNull(expression), ifExpression);
     }
 
+    public static InterpolatedStringExpressionSyntax InterpolatedString(FormattableString str)
+    {
+        var matches = FormattableStringPlaceholder.Matches(str.Format);
+        var contents = new List<InterpolatedStringContentSyntax>();
+        var previousIndex = 0;
+        foreach (Match match in matches)
+        {
+            var text = str.Format.Substring(previousIndex, match.Index - previousIndex);
+            contents.Add(InterpolatedStringText(text));
+
+            var arg = str.GetArgument(int.Parse(match.Groups[1].Value));
+            InterpolatedStringContentSyntax argSyntax = arg switch
+            {
+                ExpressionSyntax x => Interpolation(x),
+                string x => InterpolatedStringText(x),
+                _ => throw new InvalidOperationException(arg.GetType() + " cannot be converted into a string interpolation"),
+            };
+            contents.Add(argSyntax);
+            previousIndex = match.Index + match.Length;
+        }
+
+        if (previousIndex <= str.Format.Length)
+        {
+            contents.Add(InterpolatedStringText(str.Format.Substring(previousIndex)));
+        }
+
+        return InterpolatedStringExpression(Token(SyntaxKind.InterpolatedStringStartToken)).WithContents(List(contents));
+    }
+
     public static LiteralExpressionSyntax DefaultLiteral() => LiteralExpression(SyntaxKind.DefaultLiteralExpression);
 
     public static LiteralExpressionSyntax NullLiteral() => LiteralExpression(SyntaxKind.NullLiteralExpression);
@@ -146,6 +177,13 @@ public static class SyntaxFactoryHelper
     {
         return ThrowExpression(
             ObjectCreationExpression(IdentifierName(ArgumentNullExceptionClassName)).WithArgumentList(ArgumentList(NameOf(arg)))
+        );
+    }
+
+    public static ThrowExpressionSyntax ThrowArgumentExpression(ExpressionSyntax message, ExpressionSyntax arg)
+    {
+        return ThrowExpression(
+            ObjectCreationExpression(IdentifierName(ArgumentExceptionClassName)).WithArgumentList(ArgumentList(message, NameOf(arg)))
         );
     }
 
@@ -324,6 +362,11 @@ public static class SyntaxFactoryHelper
         IdentifierName(FullyQualifiedIdentifierName(typeSymbol));
 
     public static string FullyQualifiedIdentifierName(ITypeSymbol typeSymbol) => typeSymbol.ToDisplayString(_fullyQualifiedNullableFormat);
+
+    private static InterpolatedStringTextSyntax InterpolatedStringText(string text) =>
+        SyntaxFactory.InterpolatedStringText(
+            Token(SyntaxTriviaList.Empty, SyntaxKind.InterpolatedStringTextToken, text, text, SyntaxTriviaList.Empty)
+        );
 
     private static IEnumerable<SyntaxNodeOrToken> JoinByComma(IEnumerable<SyntaxNode> nodes, bool insertTrailingComma = false) =>
         Join(Token(SyntaxKind.CommaToken), insertTrailingComma, nodes);

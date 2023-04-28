@@ -45,8 +45,11 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     public T GetConfigurationOrDefault<T>()
         where T : Attribute => Configuration.GetOrDefault<T>(_userSymbol);
 
-    public IEnumerable<T> ListConfiguration<T>()
-        where T : Attribute => Configuration.ListConfiguration<T>(_userSymbol);
+    public IEnumerable<TAttribute> ListConfiguration<TAttribute>()
+        where TAttribute : Attribute => ListConfiguration<TAttribute, TAttribute>();
+
+    public IEnumerable<TData> ListConfiguration<TAttribute, TData>()
+        where TAttribute : Attribute => Configuration.ListConfiguration<TAttribute, TData>(_userSymbol);
 
     /// <summary>
     /// Tries to find an existing mapping for the provided types.

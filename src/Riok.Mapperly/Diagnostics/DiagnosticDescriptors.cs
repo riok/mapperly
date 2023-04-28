@@ -294,8 +294,35 @@ internal static class DiagnosticDescriptors
         true
     );
 
-    public static readonly DiagnosticDescriptor NotAllTargetEnumValuesMapped = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor DerivedSourceTypeDuplicated = new DiagnosticDescriptor(
         "RMG034",
+        "Derived source type is specified multiple times, a source type may only be specified once",
+        "Derived source type {0} is specified multiple times, a source type may only be specified once",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor DerivedSourceTypeIsNotAssignableToParameterType = new DiagnosticDescriptor(
+        "RMG035",
+        "Derived source type is not assignable to parameter type",
+        "Derived source type {0} is not assignable to parameter type {1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor DerivedTargetTypeIsNotAssignableToReturnType = new DiagnosticDescriptor(
+        "RMG036",
+        "Derived target type is not assignable to return type",
+        "Derived target type {0} is not assignable to return type {1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+    
+    public static readonly DiagnosticDescriptor NotAllTargetEnumValuesMapped = new DiagnosticDescriptor(
+        "RMG037",
         "Not all enum values in the target enum are mapped",
         "Enum member {0} on {1} not found on source enum {2}",
         DiagnosticCategories.Mapper,
@@ -304,11 +331,10 @@ internal static class DiagnosticDescriptors
     );
 
     public static readonly DiagnosticDescriptor NotAllSourceEnumValuesMapped = new DiagnosticDescriptor(
-        "RMG035",
+        "RMG038",
         "Not all enum values in the source enum are mapped",
         "Enum member {0} on {1} not found on target enum {2}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Info,
-        true
     );
 }

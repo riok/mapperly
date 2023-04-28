@@ -311,6 +311,16 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             return value;
         }
 
+        public static partial object DerivedTypes(object source)
+        {
+            return source switch
+            {
+                string x => ParseableInt(x),
+                int x => x.ToString(),
+                _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to object as there is no known derived type mapping", nameof(source)),
+            };
+        }
+
         private static global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto MapToTestObjectNestedDto(global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested source)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto();

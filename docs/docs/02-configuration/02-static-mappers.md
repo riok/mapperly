@@ -11,7 +11,3 @@ public static partial class CarMapper
     private static int TimeSpanToHours(TimeSpan t) => t.Hours;
 }
 ```
-
-:::info
-Mapperly does not support static partial mapping methods in non-static mapper classes.
-:::

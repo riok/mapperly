@@ -87,3 +87,13 @@ RMG035  | Mapper   | Info     | Not all enum values in the source enum are mappe
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 RMG019  | Mapper   | Disabled | Partial instance mapping method in a static mapper
+
+## Release 2.9
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+RMG034  | Mapper   | Error    | Derived source type is specified multiple times, a source type may only be specified once
+RMG035  | Mapper   | Error    | Derived source type is not assignable to parameter type
+RMG036  | Mapper   | Error    | Derived target type is not assignable to return type

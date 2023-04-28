@@ -45,4 +45,26 @@ public class ObjectFieldTest
                 """
             );
     }
+
+    [Fact]
+    public void ShouldIgnoreStaticField()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string Name; public static string Value; }",
+            "class B { public string Name; public static string Value; }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Name = source.Name;
+                return target;
+                """
+            );
+    }
 }

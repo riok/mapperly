@@ -60,12 +60,17 @@ internal static class SymbolExtensions
         IEqualityComparer<string> comparer
     )
     {
-        return symbol.GetAllMembers().Where(x => comparer.Equals(name, x.Name) && !x.IsStatic).Select(MappableMember.Create).WhereNotNull();
+        return symbol.GetAllMembers().Where(x => !x.IsStatic && comparer.Equals(name, x.Name)).Select(MappableMember.Create).WhereNotNull();
     }
 
     internal static IEnumerable<IMappableMember> GetAccessibleMappableMembers(this ITypeSymbol symbol)
     {
-        return symbol.GetAllMembers().Where(x => x.IsAccessible()).DistinctBy(x => x.Name).Select(MappableMember.Create).WhereNotNull();
+        return symbol
+            .GetAllMembers()
+            .Where(x => !x.IsStatic && x.IsAccessible())
+            .DistinctBy(x => x.Name)
+            .Select(MappableMember.Create)
+            .WhereNotNull();
     }
 
     internal static IMethodSymbol? GetStaticGenericMethod(this INamedTypeSymbol namedType, string methodName)
@@ -145,6 +150,9 @@ internal static class SymbolExtensions
 
     internal static bool HasImplicitGenericImplementation(this ITypeSymbol symbol, INamedTypeSymbol inter, string methodName) =>
         symbol.ImplementsGeneric(inter, methodName, out _, out var isExplicit) && !isExplicit;
+
+    internal static bool IsAssignableTo(this ITypeSymbol symbol, Compilation compilation, ITypeSymbol type) =>
+        compilation.ClassifyConversion(symbol, type).IsImplicit;
 
     internal static bool CanConsumeType(this ITypeParameterSymbol typeParameter, Compilation compilation, ITypeSymbol type)
     {
