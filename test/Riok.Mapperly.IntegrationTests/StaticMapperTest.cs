@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using FluentAssertions;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using VerifyXunit;
 using Xunit;
@@ -29,6 +30,13 @@ namespace Riok.Mapperly.IntegrationTests
             var model = NewTestObj();
             var dto = model.MapToDtoExt();
             return Verifier.Verify(dto);
+        }
+
+        [Fact]
+        public void DerivedTypesShouldWork()
+        {
+            StaticTestMapper.DerivedTypes("10").Should().Be(10);
+            StaticTestMapper.DerivedTypes(10).Should().Be("10");
         }
     }
 }

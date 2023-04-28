@@ -74,3 +74,9 @@ Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler.SetReference<TSou
 Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler.TryGetReference<TSource, TTarget>(TSource source, out TTarget? target) -> bool
 Riok.Mapperly.Abstractions.ReferenceHandling.ReferenceHandlerAttribute
 Riok.Mapperly.Abstractions.ReferenceHandling.ReferenceHandlerAttribute.ReferenceHandlerAttribute() -> void
+Riok.Mapperly.Abstractions.MapDerivedTypeAttribute<TSource, TTarget>
+Riok.Mapperly.Abstractions.MapDerivedTypeAttribute<TSource, TTarget>.MapDerivedTypeAttribute() -> void
+Riok.Mapperly.Abstractions.MapDerivedTypeAttribute
+Riok.Mapperly.Abstractions.MapDerivedTypeAttribute.MapDerivedTypeAttribute(System.Type! sourceType, System.Type! targetType) -> void
+Riok.Mapperly.Abstractions.MapDerivedTypeAttribute.SourceType.get -> System.Type!
+Riok.Mapperly.Abstractions.MapDerivedTypeAttribute.TargetType.get -> System.Type!
