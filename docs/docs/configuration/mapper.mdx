@@ -3,11 +3,14 @@ sidebar_position: 0
 description: Define a mapper with Mapperly.
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Mapper configuration
 
 The `MapperAttribute` provides options to customize the generated mapper class.
 
-## Copy behaviour
+## Copy behavior
 
 By default, Mapperly does not create deep copies of objects to improve performance.
 If an object can be directly assigned to the target, it will do so
@@ -55,6 +58,51 @@ public partial class CarMapper
     public partial CarDto ToDto(Car car);
 }
 ```
+
+### Ignore obsolete members stratgey
+
+By default, mapperly will map source/target members marked with `ObsoleteAttribute`. This can be changed by setting the `IgnoreObsoleteMembersStrategy` of a method with `MapperIgnoreObsoleteMembersAttribute`, or by setting the `IgnoreObsoleteMembersStrategy` option of the `MapperAttribute`.
+
+| Name   | Description                                                                     |
+| ------ | ------------------------------------------------------------------------------- |
+| None   | Will map members marked with the `Obsolete` attribute (default)                 |
+| Both   | Ignores source and target members that are mapped with the `Obsolete` attribute |
+| Source | Ignores source members that are mapped with the `Obsolete` attribute            |
+| Target | Ignores target members that are mapped with the `Obsolete` attribute            |
+
+<Tabs>
+<TabItem value="global" label="Global (Mapper Level)" default>
+
+Sets the `IgnoreObsoleteMembersStrategy` for all methods within the mapper, by default it is `None` allowing obsolete source and target members to be mapped. This can be overriden by individual mapping methods using `MapperIgnoreObsoleteMembersAttribute`.
+
+```csharp
+// highlight-start
+[Mapper(IgnoreObsoleteMembersStrategy = IgnoreObsoleteMembersStrategy.Both)]
+// highlight-end
+public partial class CarMapper
+{
+    ...
+}
+```
+
+</TabItem>
+<TabItem value="method" label="Local (mapping method level)">
+
+Method will use the provided ignore obsolete mapping strategy, otherwise the `MapperAttribute` property `IgnoreObsoleteMembersStrategy` will be used.
+
+```csharp
+[Mapper]
+public partial class CarMapper
+{
+    // highlight-start
+    [MapperIgnoreObsoleteMembers(IgnoreObsoleteMembersStrategy.Both)]
+    // highlight-end
+    public partial CarMakeDto MapMake(CarMake make);
+}
+```
+
+</TabItem>
+</Tabs>
 
 ### Property name mapping strategy
 

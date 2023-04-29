@@ -14,6 +14,7 @@ public class FieldMember : IMappableMember
 
     public string Name => _fieldSymbol.Name;
     public ITypeSymbol Type => _fieldSymbol.Type;
+    public ISymbol MemberSymbol => _fieldSymbol;
     public bool IsNullable => _fieldSymbol.NullableAnnotation == NullableAnnotation.Annotated || Type.IsNullable();
     public bool IsIndexer => false;
     public bool CanGet => !_fieldSymbol.IsReadOnly && _fieldSymbol.IsAccessible();

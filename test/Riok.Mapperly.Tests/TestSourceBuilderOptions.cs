@@ -11,12 +11,16 @@ public record TestSourceBuilderOptions(
     PropertyNameMappingStrategy PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseSensitive,
     MappingConversionType EnabledConversions = MappingConversionType.All,
     EnumMappingStrategy EnumMappingStrategy = EnumMappingStrategy.ByValue,
-    bool EnumMappingIgnoreCase = false
+    bool EnumMappingIgnoreCase = false,
+    IgnoreObsoleteMembersStrategy IgnoreObsoleteMembersStrategy = IgnoreObsoleteMembersStrategy.None
 )
 {
     public static readonly TestSourceBuilderOptions Default = new();
     public static readonly TestSourceBuilderOptions WithDeepCloning = new(UseDeepCloning: true);
     public static readonly TestSourceBuilderOptions WithReferenceHandling = new(UseReferenceHandling: true);
+
+    public static TestSourceBuilderOptions WithIgnoreObsolete(IgnoreObsoleteMembersStrategy ignoreObsoleteStrategy) =>
+        new(IgnoreObsoleteMembersStrategy: ignoreObsoleteStrategy);
 
     public static TestSourceBuilderOptions WithDisabledMappingConversion(params MappingConversionType[] conversionTypes)
     {

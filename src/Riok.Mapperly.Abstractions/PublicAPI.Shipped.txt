@@ -3,6 +3,11 @@
 Riok.Mapperly.Abstractions.EnumMappingStrategy
 Riok.Mapperly.Abstractions.EnumMappingStrategy.ByName = 1 -> Riok.Mapperly.Abstractions.EnumMappingStrategy
 Riok.Mapperly.Abstractions.EnumMappingStrategy.ByValue = 0 -> Riok.Mapperly.Abstractions.EnumMappingStrategy
+Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy
+Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy.Both = -1 -> Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy
+Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy.None = 0 -> Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy
+Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy.Source = 1 -> Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy
+Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy.Target = 2 -> Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy
 Riok.Mapperly.Abstractions.MapEnumAttribute
 Riok.Mapperly.Abstractions.MapEnumAttribute.IgnoreCase.get -> bool
 Riok.Mapperly.Abstractions.MapEnumAttribute.IgnoreCase.set -> void
@@ -19,6 +24,8 @@ Riok.Mapperly.Abstractions.MapperAttribute.EnumMappingIgnoreCase.get -> bool
 Riok.Mapperly.Abstractions.MapperAttribute.EnumMappingIgnoreCase.set -> void
 Riok.Mapperly.Abstractions.MapperAttribute.EnumMappingStrategy.get -> Riok.Mapperly.Abstractions.EnumMappingStrategy
 Riok.Mapperly.Abstractions.MapperAttribute.EnumMappingStrategy.set -> void
+Riok.Mapperly.Abstractions.MapperAttribute.IgnoreObsoleteMembersStrategy.get -> Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy
+Riok.Mapperly.Abstractions.MapperAttribute.IgnoreObsoleteMembersStrategy.set -> void
 Riok.Mapperly.Abstractions.MapperAttribute.MapperAttribute() -> void
 Riok.Mapperly.Abstractions.MapperAttribute.PropertyNameMappingStrategy.get -> Riok.Mapperly.Abstractions.PropertyNameMappingStrategy
 Riok.Mapperly.Abstractions.MapperAttribute.PropertyNameMappingStrategy.set -> void
@@ -33,6 +40,9 @@ Riok.Mapperly.Abstractions.MapperConstructorAttribute.MapperConstructorAttribute
 Riok.Mapperly.Abstractions.MapperIgnoreAttribute
 Riok.Mapperly.Abstractions.MapperIgnoreAttribute.MapperIgnoreAttribute(string! target) -> void
 Riok.Mapperly.Abstractions.MapperIgnoreAttribute.Target.get -> string!
+Riok.Mapperly.Abstractions.MapperIgnoreObsoleteMembersAttribute
+Riok.Mapperly.Abstractions.MapperIgnoreObsoleteMembersAttribute.IgnoreObsoleteStrategy.get -> Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy
+Riok.Mapperly.Abstractions.MapperIgnoreObsoleteMembersAttribute.MapperIgnoreObsoleteMembersAttribute(Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy ignoreObsoleteStrategy = (Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy)-1) -> void
 Riok.Mapperly.Abstractions.MapperIgnoreSourceAttribute
 Riok.Mapperly.Abstractions.MapperIgnoreSourceAttribute.MapperIgnoreSourceAttribute(string! source) -> void
 Riok.Mapperly.Abstractions.MapperIgnoreSourceAttribute.Source.get -> string!

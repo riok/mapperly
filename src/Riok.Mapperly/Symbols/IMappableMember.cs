@@ -12,6 +12,8 @@ public interface IMappableMember
 
     ITypeSymbol Type { get; }
 
+    ISymbol MemberSymbol { get; }
+
     bool IsNullable { get; }
 
     bool IsIndexer { get; }

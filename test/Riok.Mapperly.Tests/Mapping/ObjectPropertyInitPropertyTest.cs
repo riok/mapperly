@@ -313,6 +313,66 @@ public class ObjectPropertyInitPropertyTest
     }
 
     [Fact]
+    public void IgnoredTargetRequiredPropertyWithConfiguration()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+                [MapProperty("StringValue", "StringValue")]
+                [MapperIgnoreTarget("StringValue")]
+                partial B Map(A source);
+                """,
+            "A",
+            "B",
+            "class A { public string StringValue { get; init; } public int IntValue { get; set; } }",
+            "class B { public required string StringValue { get; set; } public int IntValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    StringValue = source.StringValue
+                };
+                target.IntValue = source.IntValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void IgnoredTargetInitPropertyWithConfiguration()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+                [MapProperty("StringValue", "StringValue")]
+                [MapperIgnoreTarget("StringValue")]
+                partial B Map(A source);
+                """,
+            "A",
+            "B",
+            "class A { public string StringValue { get; init; } public int IntValue { get; set; } }",
+            "class B { public string StringValue { get; init; } public int IntValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    StringValue = source.StringValue
+                };
+                target.IntValue = source.IntValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public Task RequiredPropertySourceNotFoundShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(

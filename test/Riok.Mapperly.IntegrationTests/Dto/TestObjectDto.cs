@@ -111,6 +111,9 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         public int IgnoredIntValue { get; set; }
 
+        [Obsolete]
+        public int IgnoredObsoleteValue { get; set; }
+
         public DateOnly DateTimeValueTargetDateOnly { get; set; }
 
         public TimeOnly DateTimeValueTargetTimeOnly { get; set; }

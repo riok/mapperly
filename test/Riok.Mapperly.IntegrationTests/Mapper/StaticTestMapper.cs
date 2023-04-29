@@ -29,6 +29,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         [MapperIgnoreSource(nameof(TestObject.IgnoredIntValue))]
         [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredStringValue))]
+        [MapperIgnoreObsoleteMembers]
         public static partial TestObjectDto MapToDtoExt(this TestObject src);
 
         public static TestObjectDto MapToDto(TestObject src)
@@ -53,6 +54,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         )]
         [MapperIgnoreSource(nameof(TestObject.IgnoredIntValue))]
         [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredIntValue))]
+        [MapperIgnoreObsoleteMembers]
         private static partial TestObjectDto MapToDtoInternal(TestObject testObject);
 
         // disable obsolete warning, as the obsolete attribute should still be tested.

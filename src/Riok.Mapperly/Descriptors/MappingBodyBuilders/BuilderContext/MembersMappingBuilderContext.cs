@@ -1,3 +1,4 @@
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Diagnostics;
@@ -21,11 +22,17 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     {
         BuilderContext = builderContext;
         Mapping = mapping;
+        MemberConfigsByRootTargetName = GetMemberConfigurations();
 
         _unmappedSourceMemberNames = GetSourceMemberNames();
         TargetMembers = GetTargetMembers();
 
-        IgnoredSourceMemberNames = builderContext.Configuration.Properties.IgnoredSources;
+        IgnoredSourceMemberNames = builderContext.Configuration.Properties.IgnoredSources
+            .Concat(GetIgnoredObsoleteSourceMembers())
+            .ToHashSet();
+        var ignoredTargetMemberNames = builderContext.Configuration.Properties.IgnoredTargets
+            .Concat(GetIgnoredObsoleteTargetMembers())
+            .ToHashSet();
 
         _ignoredUnmatchedSourceMemberNames = InitIgnoredUnmatchedProperties(IgnoredSourceMemberNames, _unmappedSourceMemberNames);
         _ignoredUnmatchedTargetMemberNames = InitIgnoredUnmatchedProperties(
@@ -34,9 +41,13 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         );
 
         _unmappedSourceMemberNames.ExceptWith(IgnoredSourceMemberNames);
-        TargetMembers.RemoveRange(builderContext.Configuration.Properties.IgnoredTargets);
 
         MemberConfigsByRootTargetName = GetMemberConfigurations();
+
+        // remove explicitly mapped ignored targets from ignoredTargetMemberNames
+        // then remove all ignored targets from TargetMembers, leaving unignored and explicitly mapped ignored members
+        ignoredTargetMemberNames.ExceptWith(MemberConfigsByRootTargetName.Keys);
+        TargetMembers.RemoveRange(ignoredTargetMemberNames);
     }
 
     public MappingBuilderContext BuilderContext { get; }
@@ -64,6 +75,32 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         var unmatched = new HashSet<string>(allProperties);
         unmatched.ExceptWith(mappedProperties);
         return unmatched;
+    }
+
+    private IEnumerable<string> GetIgnoredObsoleteTargetMembers()
+    {
+        var obsoleteStrategy = BuilderContext.Configuration.Properties.IgnoreObsoleteMembersStrategy;
+
+        if (!obsoleteStrategy.HasFlag(IgnoreObsoleteMembersStrategy.Target))
+            return Enumerable.Empty<string>();
+
+        return BuilderContext.SymbolAccessor
+            .GetAllAccessibleMappableMembers(Mapping.TargetType)
+            .Where(x => BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x.MemberSymbol))
+            .Select(x => x.Name);
+    }
+
+    private IEnumerable<string> GetIgnoredObsoleteSourceMembers()
+    {
+        var obsoleteStrategy = BuilderContext.Configuration.Properties.IgnoreObsoleteMembersStrategy;
+
+        if (!obsoleteStrategy.HasFlag(IgnoreObsoleteMembersStrategy.Source))
+            return Enumerable.Empty<string>();
+
+        return BuilderContext.SymbolAccessor
+            .GetAllAccessibleMappableMembers(Mapping.SourceType)
+            .Where(x => BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x.MemberSymbol))
+            .Select(x => x.Name);
     }
 
     private HashSet<string> GetSourceMemberNames()
