@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
@@ -32,13 +31,12 @@ public static class EnumMappingBuilder
             return null;
 
         // map enums by strategy
-        var config = ctx.GetConfigurationOrDefault<MapEnumAttribute>();
         var explicitMappings = BuildExplicitValueMapping(ctx);
-        return config.Strategy switch
+        return ctx.Configuration.Enum.Strategy switch
         {
             EnumMappingStrategy.ByName when ctx.IsExpression => BuildCastMappingAndDiagnostic(ctx),
             EnumMappingStrategy.ByValue when ctx.IsExpression && explicitMappings.Count > 0 => BuildCastMappingAndDiagnostic(ctx),
-            EnumMappingStrategy.ByName => BuildNameMapping(ctx, explicitMappings, config.IgnoreCase),
+            EnumMappingStrategy.ByName => BuildNameMapping(ctx, explicitMappings),
             _ => BuildEnumToEnumCastMapping(ctx, explicitMappings),
         };
     }
@@ -95,15 +93,14 @@ public static class EnumMappingBuilder
 
     private static EnumNameMapping BuildNameMapping(
         MappingBuilderContext ctx,
-        IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> explicitMappings,
-        bool ignoreCase
+        IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> explicitMappings
     )
     {
         var targetFieldsByName = ctx.Target.GetMembers().OfType<IFieldSymbol>().ToDictionary(x => x.Name);
         var sourceFieldsByName = ctx.Source.GetMembers().OfType<IFieldSymbol>().ToDictionary(x => x.Name);
 
         Func<IFieldSymbol, IFieldSymbol?> getTargetField;
-        if (ignoreCase)
+        if (ctx.Configuration.Enum.IgnoreCase)
         {
             var targetFieldsByNameIgnoreCase = targetFieldsByName
                 .DistinctBy(x => x.Key, StringComparer.OrdinalIgnoreCase)
@@ -159,9 +156,8 @@ public static class EnumMappingBuilder
 
     private static Dictionary<IFieldSymbol, IFieldSymbol> BuildExplicitValueMapping(MappingBuilderContext ctx)
     {
-        var values = ctx.ListConfiguration<MapEnumValueAttribute, MapEnumValue>();
         var targetFieldsByExplicitValue = new Dictionary<IFieldSymbol, IFieldSymbol>(SymbolEqualityComparer.Default);
-        foreach (var (sourceConstant, targetConstant) in values)
+        foreach (var (sourceConstant, targetConstant) in ctx.Configuration.Enum.ExplicitMappings)
         {
             var source = sourceConstant.Type!.GetMembers().OfType<IFieldSymbol>().First(e => sourceConstant.Value!.Equals(e.ConstantValue));
             var target = targetConstant.Type!.GetMembers().OfType<IFieldSymbol>().First(e => targetConstant.Value!.Equals(e.ConstantValue));

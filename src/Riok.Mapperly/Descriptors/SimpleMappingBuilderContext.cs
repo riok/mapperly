@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBuilders;
 
 namespace Riok.Mapperly.Descriptors;
@@ -11,10 +12,11 @@ public class SimpleMappingBuilderContext
 {
     private readonly MapperDescriptor _descriptor;
     private readonly SourceProductionContext _context;
+    private readonly MapperConfiguration _configuration;
 
     public SimpleMappingBuilderContext(
         Compilation compilation,
-        Configuration configuration,
+        MapperConfiguration configuration,
         WellKnownTypes types,
         MapperDescriptor descriptor,
         SourceProductionContext context,
@@ -24,7 +26,7 @@ public class SimpleMappingBuilderContext
     {
         Compilation = compilation;
         Types = types;
-        Configuration = configuration;
+        _configuration = configuration;
         _descriptor = descriptor;
         _context = context;
         MappingBuilder = mappingBuilder;
@@ -34,7 +36,7 @@ public class SimpleMappingBuilderContext
     protected SimpleMappingBuilderContext(SimpleMappingBuilderContext ctx)
         : this(
             ctx.Compilation,
-            ctx.Configuration,
+            ctx._configuration,
             ctx.Types,
             ctx._descriptor,
             ctx._context,
@@ -44,11 +46,9 @@ public class SimpleMappingBuilderContext
 
     public Compilation Compilation { get; }
 
-    public MapperAttribute MapperConfiguration => Configuration.Mapper;
+    public MapperAttribute MapperConfiguration => _configuration.Mapper;
 
     public WellKnownTypes Types { get; }
-
-    protected Configuration Configuration { get; }
 
     protected MappingBuilder MappingBuilder { get; }
 
@@ -62,6 +62,8 @@ public class SimpleMappingBuilderContext
 
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, SyntaxNode? location, params object[] messageArgs) =>
         ReportDiagnostic(descriptor, location?.GetLocation(), messageArgs);
+
+    protected MappingConfiguration ReadConfiguration(IMethodSymbol? userSymbol) => _configuration.ForMethod(userSymbol);
 
     private void ReportDiagnostic(DiagnosticDescriptor descriptor, Location? location, params object[] messageArgs) =>
         _context.ReportDiagnostic(Diagnostic.Create(descriptor, location ?? _descriptor.Syntax.GetLocation(), messageArgs));

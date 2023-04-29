@@ -25,14 +25,16 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         _unmappedSourceMemberNames = GetSourceMemberNames();
         TargetMembers = GetTargetMembers();
 
-        var ignoredTargetMemberNames = GetIgnoredTargetMembers();
-        IgnoredSourceMemberNames = GetIgnoredSourceMembers();
+        IgnoredSourceMemberNames = builderContext.Configuration.Properties.IgnoredSources;
 
         _ignoredUnmatchedSourceMemberNames = InitIgnoredUnmatchedProperties(IgnoredSourceMemberNames, _unmappedSourceMemberNames);
-        _ignoredUnmatchedTargetMemberNames = InitIgnoredUnmatchedProperties(ignoredTargetMemberNames, TargetMembers.Keys);
+        _ignoredUnmatchedTargetMemberNames = InitIgnoredUnmatchedProperties(
+            builderContext.Configuration.Properties.IgnoredTargets,
+            TargetMembers.Keys
+        );
 
         _unmappedSourceMemberNames.ExceptWith(IgnoredSourceMemberNames);
-        TargetMembers.RemoveRange(ignoredTargetMemberNames);
+        TargetMembers.RemoveRange(builderContext.Configuration.Properties.IgnoredTargets);
 
         MemberConfigsByRootTargetName = GetMemberConfigurations();
     }
@@ -64,23 +66,6 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         return unmatched;
     }
 
-    private HashSet<string> GetIgnoredTargetMembers()
-    {
-        return BuilderContext
-            .ListConfiguration<MapperIgnoreTargetAttribute>()
-            .Select(x => x.Target)
-            // deprecated MapperIgnoreAttribute, but it is still supported by Mapperly.
-#pragma warning disable CS0618
-            .Concat(BuilderContext.ListConfiguration<MapperIgnoreAttribute>().Select(x => x.Target))
-#pragma warning restore CS0618
-            .ToHashSet();
-    }
-
-    private HashSet<string> GetIgnoredSourceMembers()
-    {
-        return BuilderContext.ListConfiguration<MapperIgnoreSourceAttribute>().Select(x => x.Source).ToHashSet();
-    }
-
     private HashSet<string> GetSourceMemberNames()
     {
         return Mapping.SourceType.GetAccessibleMappableMembers().Select(x => x.Name).ToHashSet();
@@ -93,8 +78,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
     private Dictionary<string, List<MapPropertyAttribute>> GetMemberConfigurations()
     {
-        return BuilderContext
-            .ListConfiguration<MapPropertyAttribute>()
+        return BuilderContext.Configuration.Properties.ExplicitMappings
             .GroupBy(x => x.Target.First())
             .ToDictionary(x => x.Key, x => x.ToList());
     }

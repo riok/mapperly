@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders;
 using Riok.Mapperly.Descriptors.MappingBuilders;
 using Riok.Mapperly.Descriptors.ObjectFactories;
@@ -31,7 +32,7 @@ public class DescriptorBuilder
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
         _builderContext = new SimpleMappingBuilderContext(
             compilation,
-            new Configuration(wellKnownTypes, mapperSymbol),
+            new MapperConfiguration(wellKnownTypes, mapperSymbol),
             wellKnownTypes,
             _mapperDescriptor,
             sourceContext,
