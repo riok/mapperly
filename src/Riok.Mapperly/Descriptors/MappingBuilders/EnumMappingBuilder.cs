@@ -40,7 +40,7 @@ public static class EnumMappingBuilder
         {
             EnumMappingStrategy.ByName when ctx.IsExpression => BuildCastMappingAndDiagnostic(ctx),
             EnumMappingStrategy.ByName => BuildNameMapping(ctx, config.IgnoreCase),
-            _ => new CastMapping(ctx.Source, ctx.Target),
+            _ => BuildEnumToEnumCastMapping(ctx),
         };
     }
 
@@ -51,12 +51,34 @@ public static class EnumMappingBuilder
             ctx.Source.ToDisplayString(),
             ctx.Target.ToDisplayString()
         );
+        return BuildEnumToEnumCastMapping(ctx);
+    }
+
+    private static TypeMapping BuildEnumToEnumCastMapping(MappingBuilderContext ctx)
+    {
+        var sourceValues = ctx.Source.GetMembers().OfType<IFieldSymbol>().ToDictionary(field => field.Name, field => field.ConstantValue);
+        var targetValues = ctx.Target.GetMembers().OfType<IFieldSymbol>().ToDictionary(field => field.Name, field => field.ConstantValue);
+
+        var missingTargetValues = targetValues.Where(field => !sourceValues.ContainsValue(field.Value));
+        foreach (var member in missingTargetValues)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.TargetEnumValueNotMapped, member.Key, member.Value!, ctx.Target, ctx.Source);
+        }
+
+        var missingSourceValues = sourceValues.Where(field => !targetValues.ContainsValue(field.Value));
+        foreach (var member in missingSourceValues)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, member.Key, member.Value!, ctx.Source, ctx.Target);
+        }
+
         return new CastMapping(ctx.Source, ctx.Target);
     }
 
     private static TypeMapping BuildNameMapping(MappingBuilderContext ctx, bool ignoreCase)
     {
         var targetFieldsByName = ctx.Target.GetMembers().OfType<IFieldSymbol>().ToDictionary(x => x.Name);
+        var sourceFieldsByName = ctx.Source.GetMembers().OfType<IFieldSymbol>().ToDictionary(x => x.Name);
+
         Func<IFieldSymbol, IFieldSymbol?> getTargetField;
         if (ignoreCase)
         {
@@ -81,6 +103,30 @@ public static class EnumMappingBuilder
         if (enumMemberMappings.Count == 0)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.EnumNameMappingNoOverlappingValuesFound, ctx.Source, ctx.Target);
+        }
+
+        var missingSourceMembers = sourceFieldsByName.Where(field => !enumMemberMappings.ContainsKey(field.Key));
+        foreach (var member in missingSourceMembers)
+        {
+            ctx.ReportDiagnostic(
+                DiagnosticDescriptors.SourceEnumValueNotMapped,
+                member.Key,
+                member.Value.ConstantValue!,
+                ctx.Source,
+                ctx.Target
+            );
+        }
+
+        var missingTargetMembers = targetFieldsByName.Where(field => !enumMemberMappings.ContainsValue(field.Key));
+        foreach (var member in missingTargetMembers)
+        {
+            ctx.ReportDiagnostic(
+                DiagnosticDescriptors.TargetEnumValueNotMapped,
+                member.Key,
+                member.Value.ConstantValue!,
+                ctx.Target,
+                ctx.Source
+            );
         }
 
         return new EnumNameMapping(ctx.Source, ctx.Target, enumMemberMappings);

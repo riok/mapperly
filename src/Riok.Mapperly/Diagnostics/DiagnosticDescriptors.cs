@@ -320,4 +320,22 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true
     );
+
+    public static readonly DiagnosticDescriptor TargetEnumValueNotMapped = new DiagnosticDescriptor(
+        "RMG037",
+        "An enum member could not be found on the source enum",
+        "Enum member {0} ({1}) on {2} not found on source enum {3}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Info,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor SourceEnumValueNotMapped = new DiagnosticDescriptor(
+        "RMG038",
+        "An enum member could not be found on the target enum",
+        "Enum member {0} ({1}) on {2} not found on target enum {3}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Info,
+        true
+    );
 }

@@ -95,3 +95,5 @@ Rule ID | Category | Severity | Notes
 RMG034  | Mapper   | Error    | Derived source type is specified multiple times, a source type may only be specified once
 RMG035  | Mapper   | Error    | Derived source type is not assignable to parameter type
 RMG036  | Mapper   | Error    | Derived target type is not assignable to return type
+RMG037  | Mapper   | Info     | An enum member could not be found on the source enum
+RMG038  | Mapper   | Info     | An enum member could not be found on the target enum

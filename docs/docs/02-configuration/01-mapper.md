@@ -91,3 +91,7 @@ set the following two EditorConfig settings (see also [analyzer diagnostics](./1
 dotnet_diagnostic.RMG012.severity = error # Unmapped target member
 dotnet_diagnostic.RMG020.severity = error # Unmapped source member
 ```
+
+### Strict enum mappings
+
+To enforce strict enum mappings set 'RMG037' and 'RMG038' to error, see [strict enum mappings](./04-enum.mdx).

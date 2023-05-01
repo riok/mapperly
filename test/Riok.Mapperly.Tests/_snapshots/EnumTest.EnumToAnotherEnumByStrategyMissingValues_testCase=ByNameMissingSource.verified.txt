@@ -1,0 +1,16 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG037,
+      Title: An enum member could not be found on the source enum,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (8,0)-(12,1),
+      Description: ,
+      HelpLink: ,
+      MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
+      Message: Enum member Value2 (1) on D not found on source enum C,
+      Category: Mapper
+    }
+  ]
+}
