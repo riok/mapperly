@@ -40,14 +40,34 @@ public class SameTypeTest
     [Fact]
     public void MutableStructToSameMutableStructDeepCloning()
     {
-        var source = TestSourceBuilder.Mapping("A", "A", TestSourceBuilderOptions.WithDeepCloning, "struct A {}");
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "A",
+            TestSourceBuilderOptions.WithDeepCloning,
+            "struct A { public string Value { get; set; } }"
+        );
         TestHelper
             .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
                 var target = new global::A();
+                target.Value = source.Value;
                 return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UnmanagedStructToSameUnmanagedStructDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping("A", "A", TestSourceBuilderOptions.WithDeepCloning, "struct A {}");
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source;
                 """
             );
     }

@@ -12,7 +12,7 @@ internal static class SymbolExtensions
         symbol.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, attributeSymbol));
 
     internal static bool IsImmutable(this ISymbol symbol) =>
-        symbol is INamedTypeSymbol namedSymbol && (namedSymbol.IsReadOnly || namedSymbol.SpecialType == SpecialType.System_String);
+        symbol is INamedTypeSymbol namedSymbol && (namedSymbol.IsUnmanagedType || namedSymbol.SpecialType == SpecialType.System_String);
 
     internal static bool IsAccessible(this ISymbol symbol, bool allowProtected = false) =>
         symbol.DeclaredAccessibility.HasFlag(Accessibility.Internal)
