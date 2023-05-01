@@ -11,7 +11,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public class DerivedTypeSwitchMapping : TypeMapping
 {
-    private const string GetTypeMethodName = "GetType";
+    private const string GetTypeMethodName = nameof(GetType);
 
     private readonly IReadOnlyCollection<ITypeMapping> _typeMappings;
 
@@ -33,7 +33,7 @@ public class DerivedTypeSwitchMapping : TypeMapping
             )
         );
 
-        // source switch { A x => MapToA(x), B x => MapToB(x) }
+        // source switch { A x => MapToADto(x), B x => MapToBDto(x) }
         var (typeArmContext, typeArmVariableName) = ctx.WithNewSource();
         var arms = _typeMappings
             .Select(x => BuildSwitchArm(typeArmVariableName, x.SourceType, x.Build(typeArmContext)))
@@ -43,7 +43,7 @@ public class DerivedTypeSwitchMapping : TypeMapping
 
     private SwitchExpressionArmSyntax BuildSwitchArm(string typeArmVariableName, ITypeSymbol type, ExpressionSyntax mapping)
     {
-        // A x => MapToA(x),
+        // A x => MapToADto(x),
         var declaration = DeclarationPattern(FullyQualifiedIdentifier(type), SingleVariableDesignation(Identifier(typeArmVariableName)));
         return SwitchExpressionArm(declaration, mapping);
     }

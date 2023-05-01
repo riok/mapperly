@@ -23,7 +23,6 @@ public class WellKnownTypes
     private INamedTypeSymbol? _iReadOnlyDictionaryT;
     private INamedTypeSymbol? _iEnumerableT;
     private INamedTypeSymbol? _enumerable;
-    private INamedTypeSymbol? _iCollection;
     private INamedTypeSymbol? _iCollectionT;
     private INamedTypeSymbol? _iReadOnlyCollectionT;
     private INamedTypeSymbol? _iListT;
@@ -34,6 +33,7 @@ public class WellKnownTypes
     private INamedTypeSymbol? _keyValuePairT;
     private INamedTypeSymbol? _dictionaryT;
     private INamedTypeSymbol? _enum;
+    private INamedTypeSymbol? _type;
 
     private INamedTypeSymbol? _immutableArray;
     private INamedTypeSymbol? _immutableArrayT;
@@ -77,7 +77,6 @@ public class WellKnownTypes
     public INamedTypeSymbol IReadOnlyDictionaryT => _iReadOnlyDictionaryT ??= GetTypeSymbol(typeof(IReadOnlyDictionary<,>));
     public INamedTypeSymbol IEnumerableT => _iEnumerableT ??= GetTypeSymbol(typeof(IEnumerable<>));
     public INamedTypeSymbol Enumerable => _enumerable ??= GetTypeSymbol(typeof(Enumerable));
-    public INamedTypeSymbol ICollection => _iCollection ??= GetTypeSymbol(typeof(System.Collections.ICollection));
     public INamedTypeSymbol ICollectionT => _iCollectionT ??= GetTypeSymbol(typeof(ICollection<>));
     public INamedTypeSymbol IReadOnlyCollectionT => _iReadOnlyCollectionT ??= GetTypeSymbol(typeof(IReadOnlyCollection<>));
     public INamedTypeSymbol IListT => _iListT ??= GetTypeSymbol(typeof(IList<>));
@@ -88,6 +87,7 @@ public class WellKnownTypes
     public INamedTypeSymbol KeyValuePairT => _keyValuePairT ??= GetTypeSymbol(typeof(KeyValuePair<,>));
     public INamedTypeSymbol DictionaryT => _dictionaryT ??= GetTypeSymbol(typeof(Dictionary<,>));
     public INamedTypeSymbol Enum => _enum ??= GetTypeSymbol(typeof(Enum));
+    public INamedTypeSymbol Type => _type ??= GetTypeSymbol(typeof(Type));
     public INamedTypeSymbol IQueryableT => _iQueryableT ??= GetTypeSymbol(typeof(IQueryable<>));
 
     public INamedTypeSymbol ImmutableArray => _immutableArray ??= GetTypeSymbol(typeof(ImmutableArray));

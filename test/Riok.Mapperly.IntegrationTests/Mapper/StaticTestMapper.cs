@@ -11,6 +11,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
     {
         public static partial int DirectInt(int value);
 
+        public static partial int? DirectIntNullable(int? value);
+
         public static partial long ImplicitCastInt(int value);
 
         public static partial int ExplicitCastInt(uint value);
@@ -80,5 +82,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapDerivedType(typeof(int), typeof(string))]
 #endif
         public static partial object DerivedTypes(object source);
+
+        public static partial object MapWithRuntimeTargetType(object source, Type targetType);
+
+        public static partial object? MapNullableWithRuntimeTargetType(object? source, Type targetType);
     }
 }

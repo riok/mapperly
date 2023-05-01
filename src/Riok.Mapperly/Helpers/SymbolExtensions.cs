@@ -23,6 +23,18 @@ internal static class SymbolExtensions
         symbol is INamedTypeSymbol { IsAbstract: false } namedTypeSymbol
         && namedTypeSymbol.Constructors.Any(c => c.Parameters.IsDefaultOrEmpty && c.IsAccessible(allowProtected));
 
+    internal static int GetInheritanceLevel(this ITypeSymbol symbol)
+    {
+        var level = 0;
+        while (symbol.BaseType != null)
+        {
+            symbol = symbol.BaseType;
+            level++;
+        }
+
+        return level;
+    }
+
     internal static bool IsArrayType(this ITypeSymbol symbol) => symbol is IArrayTypeSymbol;
 
     internal static bool IsEnum(this ITypeSymbol t) => TryGetEnumUnderlyingType(t, out _);
@@ -152,7 +164,7 @@ internal static class SymbolExtensions
         symbol.ImplementsGeneric(inter, methodName, out _, out var isExplicit) && !isExplicit;
 
     internal static bool IsAssignableTo(this ITypeSymbol symbol, Compilation compilation, ITypeSymbol type) =>
-        compilation.ClassifyConversion(symbol, type).IsImplicit;
+        compilation.ClassifyConversion(symbol, type).IsImplicit && (type.IsNullable() || !symbol.IsNullable());
 
     internal static bool CanConsumeType(this ITypeParameterSymbol typeParameter, Compilation compilation, ITypeSymbol type)
     {

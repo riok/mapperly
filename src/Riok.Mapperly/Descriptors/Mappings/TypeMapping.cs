@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Riok.Mapperly.Descriptors.Mappings;
 
 /// <inheritdoc cref="ITypeMapping"/>
-[DebuggerDisplay("{GetType()}({SourceType.Name} => {TargetType.Name})")]
+[DebuggerDisplay("{GetType()}({SourceType} => {TargetType})")]
 public abstract class TypeMapping : ITypeMapping
 {
     protected TypeMapping(ITypeSymbol sourceType, ITypeSymbol targetType)

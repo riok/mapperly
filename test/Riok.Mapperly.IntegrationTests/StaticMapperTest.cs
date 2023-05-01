@@ -38,5 +38,17 @@ namespace Riok.Mapperly.IntegrationTests
             StaticTestMapper.DerivedTypes("10").Should().Be(10);
             StaticTestMapper.DerivedTypes(10).Should().Be("10");
         }
+
+        [Fact]
+        public void RuntimeTargetTypeShouldWork()
+        {
+            StaticTestMapper.MapWithRuntimeTargetType("10", typeof(int)).Should().Be(10);
+        }
+
+        [Fact]
+        public void NullableRuntimeTargetTypeWithNullShouldReturnNull()
+        {
+            StaticTestMapper.MapNullableWithRuntimeTargetType(null, typeof(int?)).Should().BeNull();
+        }
     }
 }

@@ -8,6 +8,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             return value;
         }
 
+        public static partial int? DirectIntNullable(int? value)
+        {
+            return value == null ? default : value.Value;
+        }
+
         public static partial long ImplicitCastInt(int value)
         {
             return (long)value;
@@ -327,6 +332,45 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 string x => ParseableInt(x),
                 int x => x.ToString(),
                 _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to object as there is no known derived type mapping", nameof(source)),
+            };
+        }
+
+        public static partial object MapWithRuntimeTargetType(object source, global::System.Type targetType)
+        {
+            return source switch
+            {
+                global::Riok.Mapperly.IntegrationTests.Models.TestEnum x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)) => MapToEnumDtoByName(x),
+                int x when targetType.IsAssignableFrom(typeof(int)) => DirectInt(x),
+                int x when targetType.IsAssignableFrom(typeof(long)) => ImplicitCastInt(x),
+                uint x when targetType.IsAssignableFrom(typeof(int)) => ExplicitCastInt(x),
+                global::System.DateTime x when targetType.IsAssignableFrom(typeof(global::System.DateTime)) => DirectDateTime(x),
+                string x when targetType.IsAssignableFrom(typeof(global::System.Guid)) => ParseableGuid(x),
+                string x when targetType.IsAssignableFrom(typeof(int)) => ParseableInt(x),
+                global::Riok.Mapperly.IntegrationTests.Models.TestObject x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto)) => MapToDtoExt(x),
+                global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestObject)) => MapFromDto(x),
+                global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => MapAllDtos(x),
+                object x when targetType.IsAssignableFrom(typeof(object)) => DerivedTypes(x),
+                _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
+            };
+        }
+
+        public static partial object? MapNullableWithRuntimeTargetType(object? source, global::System.Type targetType)
+        {
+            return source switch
+            {
+                global::Riok.Mapperly.IntegrationTests.Models.TestEnum x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)) => MapToEnumDtoByName(x),
+                int x when targetType.IsAssignableFrom(typeof(int)) => DirectInt(x),
+                int x when targetType.IsAssignableFrom(typeof(long)) => ImplicitCastInt(x),
+                uint x when targetType.IsAssignableFrom(typeof(int)) => ExplicitCastInt(x),
+                global::System.DateTime x when targetType.IsAssignableFrom(typeof(global::System.DateTime)) => DirectDateTime(x),
+                string x when targetType.IsAssignableFrom(typeof(global::System.Guid)) => ParseableGuid(x),
+                string x when targetType.IsAssignableFrom(typeof(int)) => ParseableInt(x),
+                global::Riok.Mapperly.IntegrationTests.Models.TestObject x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto)) => MapToDtoExt(x),
+                global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestObject)) => MapFromDto(x),
+                global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => MapAllDtos(x),
+                object x when targetType.IsAssignableFrom(typeof(object)) => DerivedTypes(x),
+                null => default,
+                _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
             };
         }
 

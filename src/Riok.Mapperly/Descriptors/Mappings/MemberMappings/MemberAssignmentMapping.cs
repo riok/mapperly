@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Symbols;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -25,10 +24,8 @@ public class MemberAssignmentMapping : IMemberAssignmentMapping
 
     public MemberPath TargetPath { get; }
 
-    public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
-    {
-        return new[] { ExpressionStatement(BuildExpression(ctx, targetAccess)), };
-    }
+    public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess) =>
+        SingleStatement(BuildExpression(ctx, targetAccess));
 
     public ExpressionSyntax BuildExpression(TypeMappingBuildContext ctx, ExpressionSyntax? targetAccess)
     {

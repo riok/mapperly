@@ -100,6 +100,23 @@ public class ReferenceHandlingTest
     }
 
     [Fact]
+    public Task RuntimeTargetTypeShouldWork()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial object Map(object source, Type destinationType);
+
+            private partial B MapToB(A source, [ReferenceHandler] IReferenceHandler refHandler);
+            """,
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A {}",
+            "class B {}"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task CustomHandlerShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -136,6 +153,23 @@ public class ReferenceHandlingTest
                     "The reference handler parameter of Mapper.Map needs to be of type Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler but is MyRefHandler"
                 )
             );
+    }
+
+    [Fact]
+    public Task RuntimeTargetTypeWithReferenceHandlingShouldWork()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial object Map(object source, Type destinationType, [ReferenceHandler] IReferenceHandler refHandler);
+
+            private partial B MapToB(A source, [ReferenceHandler] IReferenceHandler refHandler);
+            """,
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A {}",
+            "class B {}"
+        );
+
+        return TestHelper.VerifyGenerator(source);
     }
 
     [Fact]

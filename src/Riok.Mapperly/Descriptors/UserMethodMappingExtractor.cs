@@ -89,6 +89,17 @@ public static class UserMethodMappingExtractor
             return null;
         }
 
+        if (BuildRuntimeTargetTypeMappingParameters(ctx, methodSymbol, out var runtimeTargetTypeParams))
+        {
+            return new UserDefinedNewInstanceRuntimeTargetTypeMapping(
+                methodSymbol,
+                runtimeTargetTypeParams,
+                ctx.MapperConfiguration.UseReferenceHandling,
+                ctx.Types.PreserveReferenceHandler,
+                runtimeTargetTypeParams.Source.Type.IsNullable() && methodSymbol.ReturnType.UpgradeNullable().IsNullable()
+            );
+        }
+
         if (!BuildParameters(ctx, methodSymbol, out var parameters))
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, methodSymbol, methodSymbol.Name);
@@ -116,11 +127,63 @@ public static class UserMethodMappingExtractor
         );
     }
 
-    private static bool BuildParameters(SimpleMappingBuilderContext ctx, IMethodSymbol method, out MappingMethodParameters parameters)
+    private static bool BuildRuntimeTargetTypeMappingParameters(
+        SimpleMappingBuilderContext ctx,
+        IMethodSymbol method,
+        out RuntimeTargetTypeMappingMethodParameters parameters
+    )
     {
+        var expectedParametersCount = 0;
+
         // reference handler parameter is always annotated
         var refHandlerParameter = BuildReferenceHandlerParameter(ctx, method);
         var refHandlerParameterOrdinal = refHandlerParameter?.Ordinal ?? -1;
+        if (refHandlerParameter.HasValue)
+        {
+            expectedParametersCount++;
+        }
+
+        // source parameter is the first parameter (except if the reference handler is the first parameter)
+        var sourceParameter = MethodParameter.Wrap(method.Parameters.FirstOrDefault(p => p.Ordinal != refHandlerParameterOrdinal));
+        expectedParametersCount++;
+        if (sourceParameter == null)
+        {
+            parameters = default;
+            return false;
+        }
+
+        // target type parameter is the second parameter (except if the reference handler is the first or the second parameter)
+        var targetTypeParameter = MethodParameter.Wrap(
+            method.Parameters.FirstOrDefault(p => p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != refHandlerParameterOrdinal)
+        );
+        expectedParametersCount++;
+        if (targetTypeParameter == null || !SymbolEqualityComparer.Default.Equals(targetTypeParameter.Value.Type, ctx.Types.Type))
+        {
+            parameters = default;
+            return false;
+        }
+
+        if (method.Parameters.Length != expectedParametersCount)
+        {
+            parameters = default;
+            return false;
+        }
+
+        parameters = new RuntimeTargetTypeMappingMethodParameters(sourceParameter.Value, targetTypeParameter.Value, refHandlerParameter);
+        return true;
+    }
+
+    private static bool BuildParameters(SimpleMappingBuilderContext ctx, IMethodSymbol method, out MappingMethodParameters parameters)
+    {
+        var expectedParameterCount = 1;
+
+        // reference handler parameter is always annotated
+        var refHandlerParameter = BuildReferenceHandlerParameter(ctx, method);
+        var refHandlerParameterOrdinal = refHandlerParameter?.Ordinal ?? -1;
+        if (refHandlerParameter.HasValue)
+        {
+            expectedParameterCount++;
+        }
 
         // source parameter is the first parameter (except if the reference handler is the first parameter)
         var sourceParameter = MethodParameter.Wrap(method.Parameters.FirstOrDefault(p => p.Ordinal != refHandlerParameterOrdinal));
@@ -136,7 +199,18 @@ public static class UserMethodMappingExtractor
         var targetParameter = MethodParameter.Wrap(
             method.Parameters.FirstOrDefault(p => p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != refHandlerParameterOrdinal)
         );
-        if (method.ReturnsVoid == (targetParameter == null))
+        if (method.ReturnsVoid == !targetParameter.HasValue)
+        {
+            parameters = default;
+            return false;
+        }
+
+        if (targetParameter.HasValue)
+        {
+            expectedParameterCount++;
+        }
+
+        if (method.Parameters.Length != expectedParameterCount)
         {
             parameters = default;
             return false;

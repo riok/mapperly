@@ -26,17 +26,12 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
         bool enableReferenceHandling,
         INamedTypeSymbol referenceHandlerType
     )
-        : base(sourceParameter, targetParameter.Type)
+        : base(method, sourceParameter, referenceHandlerParameter, targetParameter.Type)
     {
         _enableReferenceHandling = enableReferenceHandling;
         _referenceHandlerType = referenceHandlerType;
-        IsPartial = true;
-        IsExtensionMethod = method.IsExtensionMethod;
-        Accessibility = method.DeclaredAccessibility;
         Method = method;
-        MethodName = method.Name;
         TargetParameter = targetParameter;
-        ReferenceHandlerParameter = referenceHandlerParameter;
     }
 
     public IMethodSymbol Method { get; }
@@ -46,8 +41,6 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
     private MethodParameter TargetParameter { get; }
 
     public override bool CallableByOtherMappings => false;
-
-    protected override ITypeSymbol? ReturnType => null; // return type is always void.
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
         throw new InvalidOperationException($"{nameof(UserDefinedExistingTargetMethodMapping)} does not support {nameof(Build)}");

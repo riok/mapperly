@@ -6,6 +6,7 @@ using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using Accessibility = Microsoft.CodeAnalysis.Accessibility;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -20,41 +21,51 @@ public abstract class MethodMapping : TypeMapping
     private const int SourceParameterIndex = 0;
     private const int ReferenceHandlerParameterIndex = 1;
 
+    private readonly Accessibility _accessibility = Accessibility.Private;
+    private readonly ITypeSymbol _returnType;
+
     private string? _methodName;
 
     protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        : this(new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType), targetType) { }
+        : base(sourceType, targetType)
+    {
+        SourceParameter = new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType);
+        _returnType = targetType;
+    }
 
-    protected MethodMapping(MethodParameter sourceParameter, ITypeSymbol targetType)
+    protected MethodMapping(
+        IMethodSymbol method,
+        MethodParameter sourceParameter,
+        MethodParameter? referenceHandlerParameter,
+        ITypeSymbol targetType
+    )
         : base(sourceParameter.Type, targetType)
     {
         SourceParameter = sourceParameter;
+        IsExtensionMethod = method.IsExtensionMethod;
+        IsPartial = method.IsPartialDefinition;
+        ReferenceHandlerParameter = referenceHandlerParameter;
+        _accessibility = method.DeclaredAccessibility;
+        _methodName = method.Name;
+        _returnType = method.ReturnType.UpgradeNullable();
     }
 
-    protected Accessibility Accessibility { get; set; } = Accessibility.Private;
+    private bool IsPartial { get; }
 
-    protected bool IsPartial { get; set; }
+    protected bool IsExtensionMethod { get; }
 
-    protected bool IsExtensionMethod { get; set; }
-
-    protected string MethodName
-    {
-        get => _methodName ?? throw new InvalidOperationException();
-        set => _methodName = value;
-    }
+    private string MethodName => _methodName ?? throw new InvalidOperationException();
 
     protected MethodParameter SourceParameter { get; }
 
-    protected MethodParameter? ReferenceHandlerParameter { get; set; }
-
-    protected virtual ITypeSymbol? ReturnType => TargetType;
+    protected MethodParameter? ReferenceHandlerParameter { get; private set; }
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
         Invocation(MethodName, SourceParameter.WithArgument(ctx.Source), ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
 
     public MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
     {
-        TypeSyntax returnType = ReturnType == null ? PredefinedType(Token(SyntaxKind.VoidKeyword)) : FullyQualifiedIdentifier(TargetType);
+        var returnType = FullyQualifiedIdentifier(_returnType);
 
         var typeMappingBuildContext = new TypeMappingBuildContext(
             SourceParameter.Name,
@@ -92,7 +103,7 @@ public abstract class MethodMapping : TypeMapping
 
     private IEnumerable<SyntaxToken> BuildModifiers(bool isStatic)
     {
-        yield return Accessibility(Accessibility);
+        yield return Accessibility(_accessibility);
 
         if (isStatic)
             yield return Token(SyntaxKind.StaticKeyword);

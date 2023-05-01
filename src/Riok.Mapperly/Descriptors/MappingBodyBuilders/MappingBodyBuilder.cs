@@ -37,6 +37,9 @@ public class MappingBodyBuilder
                 case UserDefinedExistingTargetMethodMapping mapping:
                     UserMethodMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;
+                case UserDefinedNewInstanceRuntimeTargetTypeMapping mapping:
+                    RuntimeTargetTypeMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                    break;
             }
         }
     }

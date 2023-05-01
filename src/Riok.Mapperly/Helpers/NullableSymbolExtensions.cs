@@ -80,12 +80,22 @@ public static class NullableSymbolExtensions
         return nonNullable;
     }
 
+    /// <summary>
+    /// If the <see cref="symbol"/> is a value type,
+    /// this is a no-op. For any other value,
+    /// the non-nullable variant is returned.
+    /// </summary>
+    /// <param name="symbol"></param>
+    /// <returns></returns>
+    internal static ITypeSymbol NonNullableReferenceType(this ITypeSymbol symbol)
+    {
+        return symbol.IsValueType ? symbol : symbol.NonNullable();
+    }
+
     internal static bool IsNullable(this ITypeSymbol symbol) =>
         symbol.NullableAnnotation.IsNullable() || symbol.NonNullableValueType() is not null;
 
     internal static bool IsNullableValueType(this ITypeSymbol symbol) => symbol.NonNullableValueType() is not null;
-
-    internal static bool IsNullable(this IPropertySymbol symbol) => symbol.NullableAnnotation.IsNullable() || symbol.Type.IsNullable();
 
     internal static bool IsNullable(this NullableAnnotation nullable) =>
         nullable is NullableAnnotation.Annotated or NullableAnnotation.None;
