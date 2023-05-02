@@ -4,7 +4,7 @@ namespace Riok.Mapperly.Abstractions;
 /// Ignores a target property from the mapping.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public class MapperIgnoreTargetAttribute : Attribute
+public sealed class MapperIgnoreTargetAttribute : Attribute
 {
     /// <summary>
     /// Ignores the specified target property from the mapping.
