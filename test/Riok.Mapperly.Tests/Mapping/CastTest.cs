@@ -363,4 +363,14 @@ public class CastTest
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
     }
+
+    [Fact]
+    public void FromObjectExplicitCastShouldBeIgnoredAndDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping("object", "byte");
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
+    }
 }
