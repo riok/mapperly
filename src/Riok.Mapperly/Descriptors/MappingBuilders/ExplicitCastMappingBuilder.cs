@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
@@ -13,6 +14,9 @@ public static class ExplicitCastMappingBuilder
             return null;
 
         if (ctx.MapperConfiguration.UseDeepCloning && !ctx.Source.IsImmutable() && !ctx.Target.IsImmutable())
+            return null;
+
+        if (SymbolEqualityComparer.Default.Equals(ctx.Source, ctx.Compilation.ObjectType))
             return null;
 
         var conversion = ctx.Compilation.ClassifyConversion(ctx.Source, ctx.Target);
