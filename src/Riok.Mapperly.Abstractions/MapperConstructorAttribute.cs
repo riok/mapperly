@@ -4,4 +4,4 @@ namespace Riok.Mapperly.Abstractions;
 /// Marks the constructor to be used when type gets activated by Mapperly.
 /// </summary>
 [AttributeUsage(AttributeTargets.Constructor)]
-public class MapperConstructorAttribute : Attribute { }
+public sealed class MapperConstructorAttribute : Attribute { }

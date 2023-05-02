@@ -8,7 +8,7 @@ namespace Riok.Mapperly.Abstractions;
 /// Each target type needs to extend or implement the return type of the mapping method.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public class MapDerivedTypeAttribute : Attribute
+public sealed class MapDerivedTypeAttribute : Attribute
 {
     /// <summary>
     /// Registers a derived type mapping.

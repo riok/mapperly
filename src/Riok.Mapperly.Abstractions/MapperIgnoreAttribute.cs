@@ -9,7 +9,7 @@ namespace Riok.Mapperly.Abstractions;
 /// </remarks>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 [Obsolete("Renamed to " + nameof(MapperIgnoreTargetAttribute))]
-public class MapperIgnoreAttribute : Attribute
+public sealed class MapperIgnoreAttribute : Attribute
 {
     /// <summary>
     /// Ignores the specified target property from the mapping.
