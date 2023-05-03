@@ -15,7 +15,7 @@ To emit the generated files to disk set the `EmitCompilerGeneratedFiles` propert
 
 ```xml
 <PropertyGroup>
-    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 </PropertyGroup>
 ```
 
@@ -33,28 +33,22 @@ By default the files are written to `{BaseIntermediateOutpath}/generated/{Assemb
 With `BaseIntermediateOutpath` for example being `obj/Debug/net7.0`.
 
 The output path can be customized via the `CompilerGeneratedFilesOutputPath` property.
-
-<!-- do not indent this, it won't work, https://stackoverflow.com/a/67579641/3302887 -->
-
-<Tabs groupId="msbuild-flags">
-<TabItem value="proj-file" label="Project File (.csproj)" default>
+This can be used to check the generated files into VCS.
+If the project path is inside the project directory structure,
+the files are picked up by the compiler additionally to the in-memory source generator output.
+Therefore the files need to be explicitly removed from the compilation.
 
 ```xml
 <PropertyGroup>
-    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-    <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
+  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+  <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>
 </PropertyGroup>
+
+<ItemGroup>
+  <!-- Exclude the output of source generators from the compilation -->
+  <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+</ItemGroup>
 ```
-
-</TabItem>
-<TabItem value="dotnet-cli" label=".NET CLI">
-
-```bash
-dotnet build /p:EmitCompilerGeneratedFiles=true /p:CompilerGeneratedFilesOutputPath=Generated
-```
-
-</TabItem>
-</Tabs>
 
 :::info
 Mapperly only emits updated source code on build.
