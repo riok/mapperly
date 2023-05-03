@@ -45,8 +45,9 @@ Therefore the files need to be explicitly removed from the compilation.
 </PropertyGroup>
 
 <ItemGroup>
-  <!-- Exclude the output of source generators from the compilation -->
+  <!-- Exclude the output of source generators from the compilation, show it in the IDE -->
   <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+  <None Include="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
 </ItemGroup>
 ```
 
