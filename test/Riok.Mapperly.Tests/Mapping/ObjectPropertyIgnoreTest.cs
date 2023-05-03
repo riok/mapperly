@@ -27,6 +27,27 @@ public class ObjectPropertyIgnoreTest
     }
 
     [Fact]
+    public void WithIgnoredSourcesAndTargetsPropertyShouldIgnore()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapperIgnoreSources(nameof(A.IntValue), nameof(A.IntValue2))] [MapperIgnoreTargets(nameof(B.IntValue), nameof(B.IntValue2))] partial B Map(A source);",
+            "class A { public string StringValue { get; set; } public int IntValue { get; set; } public int IntValue2 { get; set; } }",
+            "class B { public string StringValue { get; set; }  public int IntValue { get; set; } public int IntValue2 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.StringValue = source.StringValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void ExistingTargetWithIgnoredSourceAndTargetPropertyShouldIgnore()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
