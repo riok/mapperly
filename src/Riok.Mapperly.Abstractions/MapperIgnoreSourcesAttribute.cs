@@ -1,15 +1,15 @@
 namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
-/// Ignores a source property from the mapping.
+/// Ignores multiple source properties from the mapping.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public sealed class MapperIgnoreSourcesAttribute : Attribute
 {
     /// <summary>
-    /// Ignores the specified source properties from the mapping.
+    /// Ignores multiple source properties from the mapping.
     /// </summary>
-    /// <param name="sources">Collection of the source property names to ignore. The use of `nameof()` is encouraged.</param>
+    /// <param name="sources">Source property names to ignore. The use of `nameof()` is encouraged.</param>
     public MapperIgnoreSourcesAttribute(params string[] sources)
     {
         Sources = sources;

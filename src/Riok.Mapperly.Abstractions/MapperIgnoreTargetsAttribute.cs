@@ -9,7 +9,7 @@ public sealed class MapperIgnoreTargetsAttribute : Attribute
     /// <summary>
     /// Ignores multiple target properties from the mapping.
     /// </summary>
-    /// <param name="targets">Collection of the target property names to ignore. The use of `nameof()` is encouraged.</param>
+    /// <param name="targets">Target property names to ignore. The use of `nameof()` is encouraged.</param>
     public MapperIgnoreTargetsAttribute(params string[] targets)
     {
         Targets = targets;
