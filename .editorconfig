@@ -201,5 +201,5 @@ indent_size = 2
 indent_size = 2
 
 # markdown
-[*.md]
+[*.{md,mdx}]
 indent_size = unset
