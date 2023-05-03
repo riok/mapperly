@@ -69,6 +69,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         return BuilderContext
             .ListConfiguration<MapperIgnoreTargetAttribute>()
             .Select(x => x.Target)
+            .Concat(BuilderContext.ListConfiguration<MapperIgnoreTargetsAttribute>().SelectMany(x => x.Targets))
             // deprecated MapperIgnoreAttribute, but it is still supported by Mapperly.
 #pragma warning disable CS0618
             .Concat(BuilderContext.ListConfiguration<MapperIgnoreAttribute>().Select(x => x.Target))
@@ -78,7 +79,11 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
     private HashSet<string> GetIgnoredSourceMembers()
     {
-        return BuilderContext.ListConfiguration<MapperIgnoreSourceAttribute>().Select(x => x.Source).ToHashSet();
+        return BuilderContext
+            .ListConfiguration<MapperIgnoreSourceAttribute>()
+            .Select(x => x.Source)
+            .Concat(BuilderContext.ListConfiguration<MapperIgnoreSourcesAttribute>().SelectMany(x => x.Sources))
+            .ToHashSet();
     }
 
     private HashSet<string> GetSourceMemberNames()
