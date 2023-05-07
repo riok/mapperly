@@ -15,6 +15,15 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 #nullable enable
         }
 
+        public static partial global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionBaseType> ProjectToDto(this global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionBaseType> q)
+        {
+#nullable disable
+            return System.Linq.Queryable.Select(q, x => (global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionBaseType)(x is global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeA ? new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionTypeA()
+            {ValueA = ((global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeA)x).ValueA, Id = ((global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeA)x).Id, BaseValue = ((global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeA)x).BaseValue} : x is global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeB ? new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionTypeB()
+            {ValueB = ((global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeB)x).ValueB, Id = ((global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeB)x).Id, BaseValue = ((global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeB)x).BaseValue} : default));
+#nullable enable
+        }
+
         private static partial global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection ProjectToDto(this global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjection testObject)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection(testObject.CtorValue)
@@ -59,6 +68,34 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(testObject.DateTimeValueTargetDateOnly);
             target.DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(testObject.DateTimeValueTargetTimeOnly);
             target.ManuallyMapped = MapManual(testObject.ManuallyMapped);
+            return target;
+        }
+
+        private static partial global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionBaseType MapDerived(global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionBaseType source)
+        {
+            return source switch
+            {
+                global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeA x => MapToTestObjectDtoProjectionTypeA(x),
+                global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeB x => MapToTestObjectDtoProjectionTypeB(x),
+                _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionBaseType as there is no known derived type mapping", nameof(source)),
+            };
+        }
+
+        private static global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionTypeA MapToTestObjectDtoProjectionTypeA(global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeA source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionTypeA();
+            target.ValueA = source.ValueA;
+            target.Id = source.Id;
+            target.BaseValue = source.BaseValue;
+            return target;
+        }
+
+        private static global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionTypeB MapToTestObjectDtoProjectionTypeB(global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeB source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionTypeB();
+            target.ValueB = source.ValueB;
+            target.Id = source.Id;
+            target.BaseValue = source.BaseValue;
             return target;
         }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using Riok.Mapperly.IntegrationTests.Models;
@@ -23,7 +24,32 @@ namespace Riok.Mapperly.IntegrationTests
 
 #if NET7_0_OR_GREATER
         [Fact]
-        public async Task ProjectionShouldTranslateToQuery()
+        public Task ProjectionShouldTranslateToQuery()
+        {
+            return RunWithDatabase(async ctx =>
+            {
+                var query = ctx.Objects.ProjectToDto();
+                await Verifier.Verify(query.ToQueryString(), "sql").UseTextForParameters("query");
+
+                var objects = await query.ToListAsync();
+                await Verifier.Verify(objects).UseTextForParameters("result");
+            });
+        }
+
+        [Fact]
+        public Task DerivedTypesProjectionShouldTranslateToQuery()
+        {
+            return RunWithDatabase(async ctx =>
+            {
+                var query = ctx.BaseTypeObjects.OrderBy(x => x.BaseValue).ProjectToDto();
+                await Verifier.Verify(query.ToQueryString(), "sql").UseTextForParameters("query");
+
+                var objects = await query.ToListAsync();
+                await Verifier.Verify(objects).UseTextForParameters("result");
+            });
+        }
+
+        private async Task RunWithDatabase(Func<ProjectionDbContext, Task> action)
         {
             await using var connection = new SqliteConnection("Data Source=:memory:");
             await connection.OpenAsync();
@@ -33,13 +59,10 @@ namespace Riok.Mapperly.IntegrationTests
             await using var ctx = new ProjectionDbContext(options);
             await ctx.Database.EnsureCreatedAsync();
             ctx.Objects.Add(CreateObject());
+            ctx.BaseTypeObjects.Add(new TestObjectProjectionTypeA { BaseValue = 10, ValueA = 10 });
+            ctx.BaseTypeObjects.Add(new TestObjectProjectionTypeB { BaseValue = 20, ValueB = 20 });
             await ctx.SaveChangesAsync();
-
-            var query = ctx.Objects.ProjectToDto();
-            await Verifier.Verify(query.ToQueryString(), "sql").UseTextForParameters("query");
-
-            var objects = await query.ToListAsync();
-            await Verifier.Verify(objects).UseTextForParameters("result");
+            await action(ctx);
         }
 
         private TestObjectProjection CreateObject()
@@ -82,6 +105,7 @@ namespace Riok.Mapperly.IntegrationTests
                 : base(options) { }
 
             public DbSet<TestObjectProjection> Objects { get; set; } = null!;
+            public DbSet<TestObjectProjectionBaseType> BaseTypeObjects { get; set; } = null!;
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
@@ -92,6 +116,12 @@ namespace Riok.Mapperly.IntegrationTests
                 modelBuilder.Entity<IdObject>().HasKey(p => p.IdValue);
                 modelBuilder.Entity<InheritanceSubObject>().HasKey(p => p.SubIntValue);
                 modelBuilder.Entity<TestObjectNested>().HasKey(p => p.IntValue);
+
+                modelBuilder
+                    .Entity<TestObjectProjectionBaseType>()
+                    .HasDiscriminator<string>("type")
+                    .HasValue<TestObjectProjectionTypeA>("A")
+                    .HasValue<TestObjectProjectionTypeB>("B");
             }
         }
 #endif
