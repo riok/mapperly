@@ -11,7 +11,6 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public class DerivedTypeMapping : TypeMapping
 {
-    private const string TypeArmVariableName = "x";
     private const string GetTypeMethodName = "GetType";
 
     private readonly IReadOnlyDictionary<ITypeSymbol, ITypeMapping> _typeMappings;
@@ -35,20 +34,15 @@ public class DerivedTypeMapping : TypeMapping
         );
 
         // source switch { A x => MapToA(x), B x => MapToB(x) }
-        var typeArmVariableName = ctx.NameBuilder.New(TypeArmVariableName);
-        var arms = _typeMappings.Select(x => BuildSwitchArm(ctx, typeArmVariableName, x.Key, x.Value)).Append(fallbackArm);
+        var (typeArmContext, typeArmVariableName) = ctx.WithNewSource();
+        var arms = _typeMappings.Select(x => BuildSwitchArm(typeArmVariableName, x.Key, x.Value.Build(typeArmContext))).Append(fallbackArm);
         return SwitchExpression(ctx.Source).WithArms(CommaSeparatedList(arms, true));
     }
 
-    private SwitchExpressionArmSyntax BuildSwitchArm(
-        TypeMappingBuildContext ctx,
-        string typeArmVariableName,
-        ITypeSymbol type,
-        ITypeMapping typeMapping
-    )
+    private SwitchExpressionArmSyntax BuildSwitchArm(string typeArmVariableName, ITypeSymbol type, ExpressionSyntax mapping)
     {
         // A x => MapToA(x),
         var declaration = DeclarationPattern(FullyQualifiedIdentifier(type), SingleVariableDesignation(Identifier(typeArmVariableName)));
-        return SwitchExpressionArm(declaration, typeMapping.Build(ctx.WithSource(typeArmVariableName)));
+        return SwitchExpressionArm(declaration, mapping);
     }
 }
