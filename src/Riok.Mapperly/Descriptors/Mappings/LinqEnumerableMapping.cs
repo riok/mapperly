@@ -10,8 +10,6 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public class LinqEnumerableMapping : TypeMapping
 {
-    private const string LambdaParamName = "x";
-
     private readonly ITypeMapping _elementMapping;
     private readonly IMethodSymbol? _selectMethod;
     private readonly IMethodSymbol? _collectMethod;
@@ -32,16 +30,14 @@ public class LinqEnumerableMapping : TypeMapping
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        var scopedNameBuilder = ctx.NameBuilder.NewScope();
-        var lambdaParamName = scopedNameBuilder.New(LambdaParamName);
-
         ExpressionSyntax mappedSource;
 
         // Select / Map if needed
         if (_selectMethod != null)
         {
-            var sourceMapExpression = _elementMapping.Build(ctx.WithSource(lambdaParamName));
-            var convertLambda = SimpleLambdaExpression(Parameter(Identifier(lambdaParamName))).WithExpressionBody(sourceMapExpression);
+            var (lambdaCtx, lambdaSourceName) = ctx.WithNewScopedSource();
+            var sourceMapExpression = _elementMapping.Build(lambdaCtx);
+            var convertLambda = SimpleLambdaExpression(Parameter(Identifier(lambdaSourceName))).WithExpressionBody(sourceMapExpression);
             mappedSource = StaticInvocation(_selectMethod, ctx.Source, convertLambda);
         }
         else

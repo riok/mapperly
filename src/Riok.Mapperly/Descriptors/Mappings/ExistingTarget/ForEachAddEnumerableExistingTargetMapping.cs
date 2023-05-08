@@ -34,8 +34,8 @@ public class ForEachAddEnumerableExistingTargetMapping : ExistingTargetMapping
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
-        var loopItemVariableName = ctx.NameBuilder.New(LoopItemVariableName);
-        var convertedSourceItemExpression = _elementMapping.Build(ctx.WithSource(loopItemVariableName));
+        var (loopItemCtx, loopItemVariableName) = ctx.WithNewSource(LoopItemVariableName);
+        var convertedSourceItemExpression = _elementMapping.Build(loopItemCtx);
         var addMethod = MemberAccess(target, _insertMethodName);
 
         if (_ensureCapacityBuilder != null)

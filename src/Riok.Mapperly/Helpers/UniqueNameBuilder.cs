@@ -9,7 +9,7 @@ public class UniqueNameBuilder
         _usedNames = new HashSet<string>();
     }
 
-    public UniqueNameBuilder(IEnumerable<string> usedNames)
+    private UniqueNameBuilder(IEnumerable<string> usedNames)
     {
         _usedNames = new HashSet<string>(usedNames);
     }

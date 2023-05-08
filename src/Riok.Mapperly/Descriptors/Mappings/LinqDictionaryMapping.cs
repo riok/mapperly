@@ -10,8 +10,6 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public class LinqDicitonaryMapping : TypeMapping
 {
-    private const string LambdaParamName = "x";
-
     private const string KeyPropertyName = nameof(KeyValuePair<object, object>.Key);
     private const string ValuePropertyName = nameof(KeyValuePair<object, object>.Value);
 
@@ -35,21 +33,20 @@ public class LinqDicitonaryMapping : TypeMapping
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        var scopedNameBuilder = ctx.NameBuilder.NewScope();
-        var lambdaParamName = scopedNameBuilder.New(LambdaParamName);
-
         // if key and value types do not change then use a simple call
         // ie: source.ToImmutableDictionary();
         if (_keyMapping.IsSynthetic && _valueMapping.IsSynthetic)
             return StaticInvocation(_collectMethod, ctx.Source);
 
         // create expressions mapping the key and value and then create the final expression
-        // ie: source.ToImmutableDictionary(x => x.Key, x=> (int)x.Value);
-        var keyMapExpression = _keyMapping.Build(ctx.WithSource(MemberAccess(lambdaParamName, KeyPropertyName)));
-        var keyExpression = SimpleLambdaExpression(Parameter(Identifier(lambdaParamName))).WithExpressionBody(keyMapExpression);
+        // ie: source.ToImmutableDictionary(x => x.Key, x => (int)x.Value);
+        var (keyLambdaCtx, keyLambdaParamName) = ctx.WithNewScopedSource(src => MemberAccess(src, KeyPropertyName));
+        var keyMapExpression = _keyMapping.Build(keyLambdaCtx);
+        var keyExpression = SimpleLambdaExpression(Parameter(Identifier(keyLambdaParamName))).WithExpressionBody(keyMapExpression);
 
-        var valueMapExpression = _valueMapping.Build(ctx.WithSource(MemberAccess(lambdaParamName, ValuePropertyName)));
-        var valueExpression = SimpleLambdaExpression(Parameter(Identifier(lambdaParamName))).WithExpressionBody(valueMapExpression);
+        var (valueLambdaCtx, valueLambdaParamName) = ctx.WithNewScopedSource(src => MemberAccess(src, ValuePropertyName));
+        var valueMapExpression = _valueMapping.Build(valueLambdaCtx);
+        var valueExpression = SimpleLambdaExpression(Parameter(Identifier(valueLambdaParamName))).WithExpressionBody(valueMapExpression);
 
         return StaticInvocation(_collectMethod, ctx.Source, keyExpression, valueExpression);
     }

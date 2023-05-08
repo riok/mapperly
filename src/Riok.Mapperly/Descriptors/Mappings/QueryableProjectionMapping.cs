@@ -11,8 +11,6 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public class QueryableProjectionMapping : MethodMapping
 {
-    private const string SelectLambdaParameterName = "x";
-
     private const string QueryableReceiverName = "System.Linq.Queryable";
     private const string SelectMethodName = nameof(Queryable.Select);
 
@@ -30,11 +28,10 @@ public class QueryableProjectionMapping : MethodMapping
         // #nullable disable
         // return System.Linq.Enumerable.Select(source, x => ...);
         // #nullable enable
-        var scopedNameBuilder = ctx.NameBuilder.NewScope();
-        var lambdaParamName = scopedNameBuilder.New(SelectLambdaParameterName);
+        var (lambdaCtx, lambdaSourceName) = ctx.WithNewScopedSource();
 
-        var delegateMapping = _delegateMapping.Build(ctx.WithSource(IdentifierName(lambdaParamName)));
-        var projectionLambda = SimpleLambdaExpression(Parameter(Identifier(lambdaParamName))).WithExpressionBody(delegateMapping);
+        var delegateMapping = _delegateMapping.Build(lambdaCtx);
+        var projectionLambda = SimpleLambdaExpression(Parameter(Identifier(lambdaSourceName))).WithExpressionBody(delegateMapping);
         var select = StaticInvocation(QueryableReceiverName, SelectMethodName, ctx.Source, projectionLambda);
         return new[]
         {
