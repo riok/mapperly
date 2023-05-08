@@ -5,6 +5,6 @@ public partial class Mapper
     private partial global::B Map(global::A source)
     {
         // Could not generate mapping
-        throw throw new System.NotImplementedException();
+        throw new System.NotImplementedException();
     }
 }
