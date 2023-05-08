@@ -1,0 +1,12 @@
+﻿[
+  {
+    ValueA: 10,
+    Id: 1,
+    BaseValue: 10
+  },
+  {
+    ValueB: 20,
+    Id: 2,
+    BaseValue: 20
+  }
+]
