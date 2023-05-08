@@ -77,6 +77,12 @@ public static class SyntaxFactoryHelper
             NullFallbackValue.Default => DefaultLiteral(),
             NullFallbackValue.EmptyString => StringLiteral(string.Empty),
             NullFallbackValue.CreateInstance => CreateInstance(t),
+            _ when argument is ElementAccessExpressionSyntax memberAccess
+                => ThrowNullReferenceException(
+                    InterpolatedString(
+                        $"Sequence {NameOf(memberAccess.Expression)}, contained a null value at index {memberAccess.ArgumentList.Arguments[0].Expression}."
+                    )
+                ),
             _ => ThrowArgumentNullException(argument),
         };
     }
@@ -162,6 +168,13 @@ public static class SyntaxFactoryHelper
     {
         return ThrowExpression(
             ObjectCreationExpression(IdentifierName(NullReferenceExceptionClassName)).WithArgumentList(ArgumentList(StringLiteral(message)))
+        );
+    }
+
+    public static ThrowExpressionSyntax ThrowNullReferenceException(ExpressionSyntax arg)
+    {
+        return ThrowExpression(
+            ObjectCreationExpression(IdentifierName(NullReferenceExceptionClassName)).WithArgumentList(ArgumentList(arg))
         );
     }
 
