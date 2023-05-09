@@ -46,7 +46,7 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
     {
         if (_delegateMapping == null)
         {
-            return new[] { ThrowStatement(ThrowNotImplementedException()).WithLeadingTrivia(TriviaList(Comment(NoMappingComment))), };
+            return new[] { ExpressionStatement(ThrowNotImplementedException()).WithLeadingTrivia(TriviaList(Comment(NoMappingComment))), };
         }
 
         // if reference handling is enabled and no reference handler parameter is declared
