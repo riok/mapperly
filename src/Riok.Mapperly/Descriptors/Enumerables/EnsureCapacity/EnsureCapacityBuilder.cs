@@ -16,6 +16,9 @@ public static class EnsureCapacityBuilder
 
     public static EnsureCapacity? TryBuildEnsureCapacity(MappingBuilderContext ctx)
     {
+        if (ctx.CollectionInfos == null)
+            return null;
+
         var capacityMethod = ctx.Target
             .GetAllMethods(EnsureCapacityName)
             .FirstOrDefault(x => x.Parameters.Length == 1 && x.Parameters[0].Type.SpecialType == SpecialType.System_Int32 && !x.IsStatic);
@@ -25,14 +28,12 @@ public static class EnsureCapacityBuilder
             return null;
 
         // if target does not have a count then return null
-        if (!TryGetNonEnumeratedCount(ctx.Target, ctx.Types, out var targetSizeProperty))
+        if (!TryGetNonEnumeratedCount(ctx.CollectionInfos.Target, out var targetSizeProperty))
             return null;
 
         // if target and source count are known then create a simple EnsureCapacity statement
-        if (TryGetNonEnumeratedCount(ctx.Source, ctx.Types, out var sourceSizeProperty))
+        if (TryGetNonEnumeratedCount(ctx.CollectionInfos.Source, out var sourceSizeProperty))
             return new EnsureCapacityMember(targetSizeProperty, sourceSizeProperty);
-
-        ctx.Source.ImplementsGeneric(ctx.Types.Get(typeof(IEnumerable<>)), out var iEnumerable);
 
         var nonEnumeratedCountMethod = ctx.Types
             .Get(typeof(Enumerable))
@@ -47,37 +48,22 @@ public static class EnsureCapacityBuilder
             return null;
 
         // if source does not have a count use GetNonEnumeratedCount, calling EnsureCapacity if count is available
-        var typedNonEnumeratedCount = nonEnumeratedCountMethod.Construct(iEnumerable!.TypeArguments.ToArray());
-        return new EnsureCapacityNonEnumerated(targetSizeProperty, typedNonEnumeratedCount);
+        return new EnsureCapacityNonEnumerated(targetSizeProperty, nonEnumeratedCountMethod);
     }
 
-    private static bool TryGetNonEnumeratedCount(ITypeSymbol value, WellKnownTypes types, [NotNullWhen(true)] out string? expression)
+    private static bool TryGetNonEnumeratedCount(CollectionInfo value, [NotNullWhen(true)] out string? expression)
     {
-        if (value.IsArrayType())
+        expression = null;
+        if (!value.CountIsKnown)
+            return false;
+
+        if (value.IsArray || value.IsMemory || value.IsSpan)
         {
             expression = LengthPropertyName;
             return true;
         }
 
-        if (
-            value.ImplementsGeneric(types.Get(typeof(ICollection<>)), CountPropertyName, out _, out var hasCollectionCount)
-            && !hasCollectionCount
-        )
-        {
-            expression = CountPropertyName;
-            return true;
-        }
-
-        if (
-            value.ImplementsGeneric(types.Get(typeof(IReadOnlyCollection<>)), CountPropertyName, out _, out var hasReadOnlyCount)
-            && !hasReadOnlyCount
-        )
-        {
-            expression = CountPropertyName;
-            return true;
-        }
-
-        expression = null;
-        return false;
+        expression = CountPropertyName;
+        return true;
     }
 }

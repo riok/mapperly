@@ -16,6 +16,8 @@ public class MappingBuilder
         DirectAssignmentMappingBuilder.TryBuildMapping,
         QueryableMappingBuilder.TryBuildMapping,
         DictionaryMappingBuilder.TryBuildMapping,
+        SpanMappingBuilder.TryBuildMapping,
+        MemoryMappingBuilder.TryBuildMapping,
         EnumerableMappingBuilder.TryBuildMapping,
         ImplicitCastMappingBuilder.TryBuildMapping,
         ParseMappingBuilder.TryBuildMapping,

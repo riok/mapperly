@@ -57,6 +57,10 @@ public static class CollectionInfoBuilder
         new CollectionTypeInfo(CollectionType.IImmutableStack, typeof(IImmutableStack<>), Immutable: true),
         new CollectionTypeInfo(CollectionType.IImmutableDictionary, typeof(IImmutableDictionary<,>), Immutable: true),
         new CollectionTypeInfo(CollectionType.ImmutableDictionary, typeof(ImmutableDictionary<,>), Immutable: true),
+        new CollectionTypeInfo(CollectionType.Span, typeof(Span<>)),
+        new CollectionTypeInfo(CollectionType.ReadOnlySpan, typeof(ReadOnlySpan<>)),
+        new CollectionTypeInfo(CollectionType.Memory, typeof(Memory<>)),
+        new CollectionTypeInfo(CollectionType.ReadOnlyMemory, typeof(ReadOnlyMemory<>)),
     };
 
     public static CollectionInfos? Build(WellKnownTypes wellKnownTypes, ITypeSymbol source, ITypeSymbol target)
@@ -89,7 +93,25 @@ public static class CollectionInfoBuilder
 
     private static ITypeSymbol? GetEnumeratedType(WellKnownTypes types, ITypeSymbol type)
     {
-        return type.ImplementsGeneric(types.Get(typeof(IEnumerable<>)), out var enumerableIntf) ? enumerableIntf.TypeArguments[0] : null;
+        if (type.ImplementsGeneric(types.Get(typeof(IEnumerable<>)), out var enumerableIntf))
+            return enumerableIntf.TypeArguments[0];
+
+        // if type is not readonly struct with one type argument then return null
+        if (type is not ({ IsValueType: true, IsReadOnly: true } and INamedTypeSymbol { TypeArguments.Length: 1 } namedType))
+            return null;
+
+        // if the collection is Span<> or Memory<> etc, get the type symbol
+        if (
+            SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, types.Get(typeof(Span<>)))
+            || SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, types.Get(typeof(ReadOnlySpan<>)))
+            || SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, types.Get(typeof(Memory<>)))
+            || SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, types.Get(typeof(ReadOnlyMemory<>)))
+        )
+        {
+            return namedType.TypeArguments[0];
+        }
+
+        return null;
     }
 
     private static bool HasValidAddMethod(WellKnownTypes types, ITypeSymbol t)

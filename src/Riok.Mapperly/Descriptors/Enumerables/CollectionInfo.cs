@@ -37,4 +37,10 @@ public record CollectionInfo(
 
         return (namedEnumeratedType.TypeArguments[0], namedEnumeratedType.TypeArguments[1]);
     }
+
+    public bool ImplementsIEnumerable => ImplementedTypes.HasFlag(CollectionType.IEnumerable);
+
+    public bool IsArray => Type is CollectionType.Array;
+    public bool IsMemory => Type is CollectionType.Memory or CollectionType.ReadOnlyMemory;
+    public bool IsSpan => Type is CollectionType.Span or CollectionType.ReadOnlySpan;
 }

@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -16,6 +17,9 @@ public class WellKnownTypes
     public INamedTypeSymbol? DateOnly => TryGet("System.DateOnly");
 
     public INamedTypeSymbol? TimeOnly => TryGet("System.TimeOnly");
+
+    public ITypeSymbol GetArrayType(ITypeSymbol type) =>
+        _compilation.CreateArrayTypeSymbol(type, elementNullableAnnotation: type.NullableAnnotation).NonNullable();
 
     public INamedTypeSymbol Get<T>() => Get(typeof(T).FullName);
 
