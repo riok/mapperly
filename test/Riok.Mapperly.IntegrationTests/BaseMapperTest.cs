@@ -46,7 +46,7 @@ namespace Riok.Mapperly.IntegrationTests
             );
         }
 
-        protected TestObject NewTestObj()
+        public static TestObject NewTestObj()
         {
             return new TestObject(7)
             {
