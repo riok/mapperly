@@ -5,15 +5,4 @@ namespace Riok.Mapperly.Symbols;
 /// <summary>
 /// A method argument (a parameter and an argument value).
 /// </summary>
-public readonly struct MethodArgument
-{
-    public MethodArgument(MethodParameter parameter, ExpressionSyntax argument)
-    {
-        Parameter = parameter;
-        Argument = argument;
-    }
-
-    public MethodParameter Parameter { get; }
-
-    public ExpressionSyntax Argument { get; }
-}
+public readonly record struct MethodArgument(MethodParameter Parameter, ExpressionSyntax Argument);

@@ -26,16 +26,11 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
         bool enableReferenceHandling,
         INamedTypeSymbol referenceHandlerType
     )
-        : base(sourceParameter, method.ReturnType.UpgradeNullable())
+        : base(method, sourceParameter, referenceHandlerParameter, method.ReturnType.UpgradeNullable())
     {
         _enableReferenceHandling = enableReferenceHandling;
         _referenceHandlerType = referenceHandlerType;
-        IsPartial = true;
-        IsExtensionMethod = method.IsExtensionMethod;
-        Accessibility = method.DeclaredAccessibility;
         Method = method;
-        MethodName = method.Name;
-        ReferenceHandlerParameter = referenceHandlerParameter;
     }
 
     public IMethodSymbol Method { get; }

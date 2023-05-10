@@ -17,19 +17,19 @@ This can be configured with the `MapDerivedTypeAttribute`:
 public static partial class ModelMapper
 {
     // highlight-start
-    [MapDerivedType<Audi, AudiDto>] // for c# language level ≥ 11
-    [MapDerivedType(typeof(Porsche), typeof(PorscheDto))] // for c# language level < 11
+    [MapDerivedType<Banana, BananaDto>] // for c# language level ≥ 11
+    [MapDerivedType(typeof(Apple), typeof(AppleDto))] // for c# language level < 11
     // highlight-end
-    public static partial CarDto MapCar(Car source);
+    public static partial FruitDto MapFruit(Fruit source);
 }
 
-abstract class Car {}
-class Audi : Car {}
-class Porsche : Car {}
+abstract class Fruit {}
+class Banana : Fruit {}
+class Apple : Fruit {}
 
-abstract class CarDto {}
-class AudiDto : CarDto {}
-class PorscheDto : CarDto {}
+abstract class FruitDto {}
+class BananaDto : FruitDto {}
+class AppleDto : FruitDto {}
 ```
 
 </TabItem>
@@ -39,17 +39,17 @@ class PorscheDto : CarDto {}
 [Mapper]
 public static partial class ModelMapper
 {
-    public static partial CarDto MapCar(Car source)
+    public static partial FruitDto MapFruit(Fruit source)
     {
         return source switch
         {
-            Audi x => MapToAudiDto(x),
-            Porsche x => MapToPorscheDto(x),
-            _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to CarDto as there is no known derived type mapping", nameof(source)),
+            Banana x => MapToBananaDto(x),
+            Apple x => MapToAppleDto(x),
+            _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to FruitDto as there is no known derived type mapping", nameof(source)),
         };
     }
 
-    // ... implementations of MapToAudiDto and MapToPorscheDto
+    // ... implementations of MapToBananaDto and MapToAppleDto
 }
 ```
 

@@ -42,6 +42,9 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public ObjectFactoryCollection ObjectFactories { get; }
 
+    /// <inheritdoc cref="MappingBuilderContext.CallableUserMappings"/>
+    public IReadOnlyCollection<IUserMapping> CallableUserMappings => MappingBuilder.CallableUserMappings;
+
     public T GetConfigurationOrDefault<T>()
         where T : Attribute => Configuration.GetOrDefault<T>(_userSymbol);
 

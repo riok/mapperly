@@ -84,7 +84,7 @@ To enforce strict mappings
 (all source members have to be mapped to a target member
 and all target members have to be mapped from a source member,
 except for ignored members)
-set the following two EditorConfig settings (see also [analyzer diagnostics](./14-analyzer-diagnostics.mdx)):
+set the following two EditorConfig settings (see also [analyzer diagnostics](./15-analyzer-diagnostics.mdx)):
 
 ```editorconfig title=".editorconfig"
 [*.cs]
@@ -94,4 +94,4 @@ dotnet_diagnostic.RMG020.severity = error # Unmapped source member
 
 ### Strict enum mappings
 
-To enforce strict enum mappings set 'RMG037' and 'RMG038' to error, see [strict enum mappings](./04-enum.mdx).
+To enforce strict enum mappings set `RMG037` and `RMG038` to error, see [strict enum mappings](./04-enum.mdx).

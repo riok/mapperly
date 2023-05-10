@@ -376,6 +376,9 @@ public static class SyntaxFactoryHelper
 
     public static string FullyQualifiedIdentifierName(ITypeSymbol typeSymbol) => typeSymbol.ToDisplayString(_fullyQualifiedNullableFormat);
 
+    public static IReadOnlyCollection<StatementSyntax> SingleStatement(ExpressionSyntax expression) =>
+        new[] { ExpressionStatement(expression) };
+
     private static InterpolatedStringTextSyntax InterpolatedStringText(string text) =>
         SyntaxFactory.InterpolatedStringText(
             Token(SyntaxTriviaList.Empty, SyntaxKind.InterpolatedStringTextToken, text, text, SyntaxTriviaList.Empty)

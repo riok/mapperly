@@ -206,7 +206,7 @@ public record B(int Value);
     }
 
     [Fact]
-    public void WithInvalidSignatureShouldDiagnostic()
+    public void InvalidSignatureReturnTypeAdditionalParameterShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes("partial string ToString(T source, string format);");
 
@@ -219,6 +219,52 @@ public record B(int Value);
                     "ToString has an unsupported mapping method signature"
                 )
             );
+    }
+
+    [Fact]
+    public void InvalidSignatureAdditionalParameterShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(A a, B b, string format);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.UnsupportedMappingMethodSignature));
+    }
+
+    [Fact]
+    public void InvalidSignatureAdditionalParameterWithReferenceHandlingShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(A a, B b, [ReferenceHandler] IReferenceHandler refHandler, string format);",
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.UnsupportedMappingMethodSignature));
+    }
+
+    [Fact]
+    public void InvalidSignatureAsyncShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial async Task<B> Map(A a);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.UnsupportedMappingMethodSignature));
     }
 
     [Fact]
