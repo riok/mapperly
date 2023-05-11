@@ -66,6 +66,7 @@ public static class UserMethodMappingExtractor
         var valid =
             BuildParameters(ctx, method, out var parameters)
             && !method.ReturnsVoid
+            && !method.IsGenericMethod
             && (allowPartial || !method.IsPartialDefinition)
             && (!isStatic || method.IsStatic);
         return valid ? new UserImplementedMethodMapping(method, parameters.Source, parameters.ReferenceHandler) : null;

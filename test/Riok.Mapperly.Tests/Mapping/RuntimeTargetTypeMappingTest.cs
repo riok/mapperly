@@ -192,6 +192,69 @@ public class RuntimeTargetTypeMappingTest
     }
 
     [Fact]
+    public void WithUserImplementedMethodsShouldBeIncluded()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapDerivedType<A, B>]
+            public partial object Map(object source, Type targetType);
+
+            private partial D MapToD(B source) => new D();
+            """,
+            "class Base {}",
+            "class BaseDto {}",
+            "class A : Base {}",
+            "class B : BaseDto {}",
+            "class C : Base {}",
+            "class D : BaseDto {}"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                return source switch
+                {
+                    global::A x when targetType.IsAssignableFrom(typeof(global::B)) => MapToB(x),
+                    global::B x when targetType.IsAssignableFrom(typeof(global::D)) => MapToD(x),
+                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
+                };
+                """
+            );
+    }
+
+    [Fact]
+    public void WithGenericUserImplementedMethodShouldBeIgnored()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapDerivedType<A, B>]
+            public partial object Map(object source, Type targetType);
+
+            private partial T MapTo<T>(B source) where T : new() => new T();
+            """,
+            "class Base {}",
+            "class BaseDto {}",
+            "class A : Base {}",
+            "class B : BaseDto {}",
+            "class C : Base {}",
+            "class D : BaseDto {}"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                return source switch
+                {
+                    global::A x when targetType.IsAssignableFrom(typeof(global::B)) => MapToB(x),
+                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
+                };
+                """
+            );
+    }
+
+    [Fact]
     public void InvalidSignatureAdditionalParameterShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
