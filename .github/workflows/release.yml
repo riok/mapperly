@@ -35,7 +35,7 @@ jobs:
       - run: sudo apt update && sudo apt -y install zipmerge # zipmerge is used to merge the multi target nupkg
       - run: |
           npm i \
-          semantic-release@20.1.1 \
+          semantic-release@21.0.2 \
           conventional-changelog-conventionalcommits@5.0.0 \
           @semantic-release/exec@6.0.3 \
           @semantic-release/commit-analyzer@9.0.2 \
