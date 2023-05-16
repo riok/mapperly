@@ -31,18 +31,14 @@ public static class EnumerableMappingBuilder
         if (BuildElementMapping(ctx) is not { } elementMapping)
             return null;
 
-        // if element mapping is synthetic
-        // and target is an IEnumerable, there is no mapping needed at all.
-        if (elementMapping.IsSynthetic && SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IEnumerableT))
-            return new CastMapping(ctx.Source, ctx.Target);
-
-        // if source is an array and target is an array or IReadOnlyCollection faster mappings can be applied
+        // if source is an array and target is an array, IEnumerable, IReadOnlyCollection faster mappings can be applied
         if (
             !ctx.IsExpression
             && ctx.Source.IsArrayType()
             && (
                 ctx.Target.IsArrayType()
                 || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IReadOnlyCollectionT)
+                || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IEnumerableT)
             )
         )
         {
