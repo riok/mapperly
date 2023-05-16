@@ -55,7 +55,7 @@ public static class EnumerableMappingBuilder
 
         // try linq mapping: x.Select(Map).ToArray/ToList
         // if that doesn't work do a foreach with add calls
-        var (canMapWithLinq, collectMethodName) = ResolveCollectMethodName(ctx);
+        var (canMapWithLinq, collectMethodName) = ResolveCollectMethodName(ctx, elementMapping.IsSynthetic);
         if (canMapWithLinq)
             return BuildLinqMapping(ctx, elementMapping, collectMethodName);
 
@@ -182,17 +182,22 @@ public static class EnumerableMappingBuilder
         return null;
     }
 
-    private static (bool CanMapWithLinq, string? CollectMethod) ResolveCollectMethodName(MappingBuilderContext ctx)
+    private static (bool CanMapWithLinq, string? CollectMethod) ResolveCollectMethodName(
+        MappingBuilderContext ctx,
+        bool elementMappingIsSynthetic
+    )
     {
         // if the target is an array we need to collect to array
         if (ctx.Target.IsArrayType())
             return (true, ToArrayMethodName);
 
-        // if the target is an IEnumerable<T> don't collect at all.
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IEnumerableT))
+        // if the target is an IEnumerable<T> don't collect at all
+        // except deep cloning is enabled.
+        var targetIsIEnumerable = SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IEnumerableT);
+        if (targetIsIEnumerable && !ctx.MapperConfiguration.UseDeepCloning)
             return (true, null);
 
-        // if the target is IReadOnlyCollection<T>
+        // if the target is IReadOnlyCollection<T> or IEnumerable<T>
         // and the count of the source is known (array, IReadOnlyCollection<T>, ICollection<T>) we collect to array
         // for performance/space reasons
         var targetIsReadOnlyCollection = SymbolEqualityComparer.Default.Equals(
@@ -203,12 +208,13 @@ public static class EnumerableMappingBuilder
             ctx.Source.IsArrayType()
             || ctx.Source.ImplementsGeneric(ctx.Types.IReadOnlyCollectionT, out _)
             || ctx.Source.ImplementsGeneric(ctx.Types.ICollectionT, out _);
-        if (targetIsReadOnlyCollection && sourceCountIsKnown)
+        if ((targetIsReadOnlyCollection || targetIsIEnumerable) && sourceCountIsKnown)
             return (true, ToArrayMethodName);
 
-        // if target is a IReadOnlyCollection<T>, IList<T>, List<T> or ICollection<T> with ToList()
+        // if target is a IReadOnlyCollection<T>, IEnumerable<T>, IList<T>, List<T> or ICollection<T> with ToList()
         return
             targetIsReadOnlyCollection
+            || targetIsIEnumerable
             || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IReadOnlyListT)
             || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IListT)
             || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ListT)
