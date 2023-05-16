@@ -10,6 +10,7 @@ const config = {
     'A .NET source generator for generating object mappings. No runtime reflection. Inspired by MapStruct.',
   url: process.env.DOCUSAURUS_URL || 'https://mapperly.riok.app',
   baseUrl: process.env.DOCUSAURUS_BASE_URL || '/',
+  trailingSlash: true,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'throw',
   favicon: 'img/logo.svg',
@@ -19,7 +20,6 @@ const config = {
     defaultLocale: 'en',
     locales: ['en'],
   },
-
   presets: [
     [
       'classic',
