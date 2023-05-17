@@ -194,4 +194,25 @@ public class EnumerableDeepCloningTest
                 """
             );
     }
+
+    [Fact]
+    public void EnumerableOfPrimitivesToEnumerableDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping("IEnumerable<int>", "IEnumerable<int>", TestSourceBuilderOptions.WithDeepCloning);
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return global::System.Linq.Enumerable.ToList(source);");
+    }
+
+    [Fact]
+    public void ReadOnlyCollectionOfPrimitivesToEnumerableDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping("IReadOnlyCollection<int>", "IEnumerable<int>", TestSourceBuilderOptions.WithDeepCloning);
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return global::System.Linq.Enumerable.ToArray(source);");
+    }
+
+    [Fact]
+    public void EnumerableOfPrimitivesToReadOnlyCollectionDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping("IEnumerable<int>", "IReadOnlyCollection<int>", TestSourceBuilderOptions.WithDeepCloning);
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return global::System.Linq.Enumerable.ToList(source);");
+    }
 }
