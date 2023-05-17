@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.CodeAnalysis;
@@ -8,11 +9,21 @@ namespace Riok.Mapperly.Helpers;
 
 internal static class SymbolExtensions
 {
+    private static readonly ImmutableHashSet<string> _wellKnownImmutableTypes = ImmutableHashSet.Create(
+        typeof(Uri).FullName,
+        typeof(Version).FullName
+    );
+
     internal static bool HasAttribute(this ISymbol symbol, INamedTypeSymbol attributeSymbol) =>
         symbol.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, attributeSymbol));
 
     internal static bool IsImmutable(this ISymbol symbol) =>
-        symbol is INamedTypeSymbol namedSymbol && (namedSymbol.IsUnmanagedType || namedSymbol.SpecialType == SpecialType.System_String);
+        symbol is INamedTypeSymbol namedSymbol
+        && (
+            namedSymbol.IsUnmanagedType
+            || namedSymbol.SpecialType == SpecialType.System_String
+            || _wellKnownImmutableTypes.Contains(namedSymbol.ToDisplayString())
+        );
 
     internal static bool IsAccessible(this ISymbol symbol, bool allowProtected = false) =>
         symbol.DeclaredAccessibility.HasFlag(Accessibility.Internal)
