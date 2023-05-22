@@ -33,4 +33,25 @@ public class CtorTest
             .Should()
             .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
     }
+
+    [Fact]
+    public void DeepCloneRecordShouldNotUseCtorMapping()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "A",
+            TestSourceBuilderOptions.WithDeepCloning,
+            "record A { public int Value { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+            var target = new global::A();
+            target.Value = source.Value;
+            return target;
+            """
+            );
+    }
 }
