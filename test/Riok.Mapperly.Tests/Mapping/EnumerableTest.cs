@@ -634,6 +634,27 @@ public class EnumerableTest
     }
 
     [Fact]
+    public void EnumerableMappingExistingTargetDisabledShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.Enumerable),
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public IReadOnlyCollection<int> Value { get; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void EnumerableToReadOnlyArrayPropertyShouldDiagnostic()
     {
         // should not create a mapping that maps to an array by adding to it in a foreach loop
