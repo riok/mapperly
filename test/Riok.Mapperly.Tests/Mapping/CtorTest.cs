@@ -48,10 +48,10 @@ public class CtorTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new global::A();
-            target.Value = source.Value;
-            return target;
-            """
+                var target = new global::A();
+                target.Value = source.Value;
+                return target;
+                """
             );
     }
 }

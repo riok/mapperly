@@ -405,4 +405,20 @@ public class ObjectPropertyTest
                 """
             );
     }
+
+    [Fact]
+    public void ShouldIgnoreStaticConstructorAndDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string StringValue { get; set; } }",
+            "class B { static B() {} private B() {} public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .Should()
+            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
+    }
 }
