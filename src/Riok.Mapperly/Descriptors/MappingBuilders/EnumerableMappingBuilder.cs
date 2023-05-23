@@ -74,6 +74,9 @@ public static class EnumerableMappingBuilder
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
     {
+        if (!ctx.IsConversionEnabled(MappingConversionType.Enumerable))
+            return null;
+
         if (BuildElementMapping(ctx) is not { } elementMapping)
             return null;
 

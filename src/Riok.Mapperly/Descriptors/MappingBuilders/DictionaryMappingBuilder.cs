@@ -81,6 +81,9 @@ public static class DictionaryMappingBuilder
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
     {
+        if (!ctx.IsConversionEnabled(MappingConversionType.Dictionary))
+            return null;
+
         if (!ctx.Target.ImplementsGeneric(ctx.Types.IDictionaryT, out _))
             return null;
 

@@ -521,4 +521,25 @@ public class DictionaryTest
         );
         TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics).Should().HaveDiagnostics();
     }
+
+    [Fact]
+    public void DictionaryMappingExistingTargetDisabledShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.Dictionary),
+            "class A { public Dictionary<long, long> Value { get; } }",
+            "class B { public Dictionary<int, int> Value { get; } }"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                return target;
+                """
+            );
+    }
 }
