@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 

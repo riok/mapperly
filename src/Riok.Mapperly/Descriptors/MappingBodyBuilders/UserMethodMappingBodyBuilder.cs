@@ -1,5 +1,4 @@
-using Riok.Mapperly.Descriptors.Mappings;
-using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
+using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 

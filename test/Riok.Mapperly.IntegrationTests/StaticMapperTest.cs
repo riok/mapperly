@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
 using FluentAssertions;
+using Riok.Mapperly.IntegrationTests.Dto;
 using Riok.Mapperly.IntegrationTests.Mapper;
+using Riok.Mapperly.IntegrationTests.Models;
 using VerifyXunit;
 using Xunit;
 
@@ -49,6 +51,14 @@ namespace Riok.Mapperly.IntegrationTests
         public void NullableRuntimeTargetTypeWithNullShouldReturnNull()
         {
             StaticTestMapper.MapNullableWithRuntimeTargetType(null, typeof(int?)).Should().BeNull();
+        }
+
+        [Fact]
+        public void GenericShouldWork()
+        {
+            var obj = NewTestObj();
+            var dto = StaticTestMapper.MapGeneric<TestObject, TestObjectDto>(obj);
+            dto.IntValue.Should().Be(obj.IntValue);
         }
     }
 }

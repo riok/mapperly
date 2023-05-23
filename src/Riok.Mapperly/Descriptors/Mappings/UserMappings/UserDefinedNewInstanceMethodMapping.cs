@@ -5,7 +5,7 @@ using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
-namespace Riok.Mapperly.Descriptors.Mappings;
+namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
 /// <summary>
 /// Represents a mapping method declared but not implemented by the user which results in a new target object instance.

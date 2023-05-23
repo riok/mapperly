@@ -20,8 +20,16 @@ public class GenericSourceTargetObjectFactory : ObjectFactory
     }
 
     public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
-        Method.TypeParameters[_sourceTypeParameterIndex].CanConsumeType(_compilation, sourceType)
-        && Method.TypeParameters[_targetTypeParameterIndex].CanConsumeType(_compilation, targetTypeToCreate);
+        Method.TypeParameters[_sourceTypeParameterIndex].CanConsumeType(
+            _compilation,
+            Method.Parameters[0].Type.NullableAnnotation,
+            sourceType
+        )
+        && Method.TypeParameters[_targetTypeParameterIndex].CanConsumeType(
+            _compilation,
+            Method.ReturnType.NullableAnnotation,
+            targetTypeToCreate
+        );
 
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source)
     {

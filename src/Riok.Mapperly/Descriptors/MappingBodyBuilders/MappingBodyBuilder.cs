@@ -1,6 +1,6 @@
 using Riok.Mapperly.Descriptors.Mappings;
-using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
+using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
@@ -37,7 +37,10 @@ public class MappingBodyBuilder
                 case UserDefinedExistingTargetMethodMapping mapping:
                     UserMethodMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;
-                case UserDefinedNewInstanceRuntimeTargetTypeMapping mapping:
+                case UserDefinedNewInstanceRuntimeTargetTypeParameterMapping mapping:
+                    RuntimeTargetTypeMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                    break;
+                case UserDefinedNewInstanceGenericTypeMapping mapping:
                     RuntimeTargetTypeMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;
             }

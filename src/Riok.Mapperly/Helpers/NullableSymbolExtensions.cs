@@ -80,25 +80,32 @@ public static class NullableSymbolExtensions
         return nonNullable;
     }
 
-    /// <summary>
-    /// If the <see cref="symbol"/> is a value type,
-    /// this is a no-op. For any other value,
-    /// the non-nullable variant is returned.
-    /// </summary>
-    /// <param name="symbol"></param>
-    /// <returns></returns>
-    internal static ITypeSymbol NonNullableReferenceType(this ITypeSymbol symbol)
-    {
-        return symbol.IsValueType ? symbol : symbol.NonNullable();
-    }
-
     internal static bool IsNullable(this ITypeSymbol symbol) =>
         symbol.NullableAnnotation.IsNullable() || symbol.NonNullableValueType() is not null;
 
-    internal static bool IsNullableValueType(this ITypeSymbol symbol) => symbol.NonNullableValueType() is not null;
+    internal static bool IsNullableValueType(this ITypeSymbol symbol) => symbol.NonNullableValueType() != null;
 
-    internal static bool IsNullable(this NullableAnnotation nullable) =>
-        nullable is NullableAnnotation.Annotated or NullableAnnotation.None;
+    /// <summary>
+    /// Whether or not the <see cref="ITypeParameterSymbol"/> is nullable.
+    /// </summary>
+    /// <param name="typeParameter">The type parameter.</param>
+    /// <param name="typeParameterUsageNullableAnnotation">Whether or not the usage of the type parameter is nullable (eg. is suffixed with ?).</param>
+    /// <returns>A boolean indicating whether <c>null</c> can be used to satisfy the type parameter constraints.</returns>
+    internal static bool IsNullable(this ITypeParameterSymbol typeParameter, NullableAnnotation typeParameterUsageNullableAnnotation)
+    {
+        if (typeParameterUsageNullableAnnotation == NullableAnnotation.Annotated)
+            return true;
+
+        if (typeParameter.HasNotNullConstraint || typeParameter.HasValueTypeConstraint || typeParameter.HasUnmanagedTypeConstraint)
+            return false;
+
+        if (typeParameter.ConstraintTypes.Length > 0 && typeParameter.ConstraintTypes.All(t => t.NullableAnnotation.IsNullable()))
+            return true;
+
+        return typeParameter.HasReferenceTypeConstraint && typeParameter.ReferenceTypeConstraintNullableAnnotation.IsNullable();
+    }
+
+    private static bool IsNullable(this NullableAnnotation nullable) => nullable is NullableAnnotation.Annotated or NullableAnnotation.None;
 
     private static ITypeSymbol? NonNullableValueType(this ITypeSymbol symbol)
     {

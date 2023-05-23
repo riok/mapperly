@@ -63,7 +63,7 @@ public abstract class MethodMapping : TypeMapping
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
         Invocation(MethodName, SourceParameter.WithArgument(ctx.Source), ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
 
-    public MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
+    public virtual MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
     {
         var returnType = FullyQualifiedIdentifier(_returnType);
 

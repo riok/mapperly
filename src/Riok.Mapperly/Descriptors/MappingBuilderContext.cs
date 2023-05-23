@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
+using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Descriptors.ObjectFactories;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;

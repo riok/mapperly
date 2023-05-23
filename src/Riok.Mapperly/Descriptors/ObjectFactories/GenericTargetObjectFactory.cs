@@ -21,7 +21,7 @@ public class GenericTargetObjectFactory : ObjectFactory
     }
 
     public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
-        Method.TypeParameters[0].CanConsumeType(_compilation, targetTypeToCreate);
+        Method.TypeParameters[0].CanConsumeType(_compilation, Method.ReturnType.NullableAnnotation, targetTypeToCreate);
 
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
         GenericInvocation(Method.Name, new[] { NonNullableIdentifier(targetTypeToCreate) });

@@ -1,11 +1,12 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
-namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
+namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
 /// <summary>
 /// Represents a mapping method declared but not implemented by the user which reuses an existing target object instance.

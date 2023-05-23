@@ -341,6 +341,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestObject)) => MapFromDto(x),
                 global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => MapAllDtos(x),
                 object x when targetType.IsAssignableFrom(typeof(object)) => DerivedTypes(x),
+                null => throw new System.ArgumentNullException(nameof(source)),
                 _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
             };
         }
@@ -362,6 +363,26 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 object x when targetType.IsAssignableFrom(typeof(object)) => DerivedTypes(x),
                 null => default,
                 _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
+            };
+        }
+
+        public static partial TTarget MapGeneric<TSource, TTarget>(TSource source)
+        {
+            return source switch
+            {
+                global::Riok.Mapperly.IntegrationTests.Models.TestEnum x when typeof(TTarget).IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)) => (TTarget)(object)MapToEnumDtoByName(x),
+                int x when typeof(TTarget).IsAssignableFrom(typeof(int)) => (TTarget)(object)DirectInt(x),
+                int x when typeof(TTarget).IsAssignableFrom(typeof(long)) => (TTarget)(object)ImplicitCastInt(x),
+                uint x when typeof(TTarget).IsAssignableFrom(typeof(int)) => (TTarget)(object)ExplicitCastInt(x),
+                global::System.DateTime x when typeof(TTarget).IsAssignableFrom(typeof(global::System.DateTime)) => (TTarget)(object)DirectDateTime(x),
+                string x when typeof(TTarget).IsAssignableFrom(typeof(global::System.Guid)) => (TTarget)(object)ParseableGuid(x),
+                string x when typeof(TTarget).IsAssignableFrom(typeof(int)) => (TTarget)(object)ParseableInt(x),
+                global::Riok.Mapperly.IntegrationTests.Models.TestObject x when typeof(TTarget).IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto)) => (TTarget)(object)MapToDtoExt(x),
+                global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto x when typeof(TTarget).IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestObject)) => (TTarget)(object)MapFromDto(x),
+                global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when typeof(TTarget).IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => (TTarget)(object)MapAllDtos(x),
+                object x when typeof(TTarget).IsAssignableFrom(typeof(object)) => (TTarget)(object)DerivedTypes(x),
+                null => throw new System.ArgumentNullException(nameof(source)),
+                _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
             };
         }
 

@@ -22,7 +22,7 @@ public class GenericSourceObjectFactory : ObjectFactory
 
     public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
         SymbolEqualityComparer.Default.Equals(Method.ReturnType, targetTypeToCreate)
-        && Method.TypeParameters[0].CanConsumeType(_compilation, sourceType);
+        && Method.TypeParameters[0].CanConsumeType(_compilation, Method.Parameters[0].Type.NullableAnnotation, sourceType);
 
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
         GenericInvocation(Method.Name, new[] { NonNullableIdentifier(sourceType) }, source);

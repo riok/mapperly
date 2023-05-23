@@ -5,44 +5,46 @@ using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
-namespace Riok.Mapperly.Descriptors.Mappings;
+namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
 /// <summary>
 /// A mapping which has a <see cref="Type"/> as a second parameter describing the target type of the mapping.
 /// Generates a switch expression based on the mapping types.
 /// </summary>
-public class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMapping, IUserMapping
+public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMapping, IUserMapping
 {
     private const string IsAssignableFromMethodName = nameof(Type.IsAssignableFrom);
     private const string GetTypeMethodName = nameof(GetType);
 
-    private readonly MethodParameter _targetTypeParameter;
-    private readonly List<ITypeMapping> _mappings = new();
-    private readonly bool _addNullArm;
+    private readonly List<RuntimeTargetTypeMapping> _mappings = new();
     private readonly bool _enableReferenceHandling;
     private readonly INamedTypeSymbol _referenceHandlerType;
+    private readonly NullFallbackValue _nullArm;
+    private readonly ITypeSymbol _objectType;
 
-    public UserDefinedNewInstanceRuntimeTargetTypeMapping(
+    protected UserDefinedNewInstanceRuntimeTargetTypeMapping(
         IMethodSymbol method,
-        RuntimeTargetTypeMappingMethodParameters parameters,
+        MethodParameter sourceParameter,
+        MethodParameter? referenceHandlerParameter,
         bool enableReferenceHandling,
         INamedTypeSymbol referenceHandlerType,
-        bool addNullArm
+        NullFallbackValue nullArm,
+        ITypeSymbol objectType
     )
-        : base(method, parameters.Source, parameters.ReferenceHandler, method.ReturnType)
+        : base(method, sourceParameter, referenceHandlerParameter, method.ReturnType)
     {
         Method = method;
         _enableReferenceHandling = enableReferenceHandling;
         _referenceHandlerType = referenceHandlerType;
-        _addNullArm = addNullArm;
-        _targetTypeParameter = parameters.TargetType;
+        _nullArm = nullArm;
+        _objectType = objectType;
     }
 
     public IMethodSymbol Method { get; }
 
     public override bool CallableByOtherMappings => false;
 
-    public void AddMappings(IEnumerable<ITypeMapping> mappings) => _mappings.AddRange(mappings);
+    public void AddMappings(IEnumerable<RuntimeTargetTypeMapping> mappings) => _mappings.AddRange(mappings);
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
@@ -54,10 +56,11 @@ public class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMapping, IUs
             var referenceHandlerName = ctx.NameBuilder.New(DefaultReferenceHandlerParameterName);
             var createRefHandler = CreateInstance(_referenceHandlerType);
             yield return DeclareLocalVariable(referenceHandlerName, createRefHandler);
+
             ctx = ctx.WithRefHandler(referenceHandlerName);
         }
 
-        var targetType = IdentifierName(_targetTypeParameter.Name);
+        var targetType = BuildTargetType();
 
         // _ => throw new ArgumentException(msg, nameof(ctx.Source)),
         var sourceType = Invocation(MemberAccess(ctx.Source, GetTypeMethodName));
@@ -73,19 +76,24 @@ public class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMapping, IUs
         var (typeArmContext, typeArmVariableName) = ctx.WithNewScopedSource();
         var arms = _mappings.Select(x => BuildSwitchArm(typeArmContext, typeArmVariableName, x, targetType));
 
-        // null => null
-        if (_addNullArm)
-        {
-            arms = arms.Append(SwitchExpressionArm(ConstantPattern(NullLiteral()), DefaultLiteral()));
-        }
+        // null => default / throw
+        arms = arms.Append(SwitchExpressionArm(ConstantPattern(NullLiteral()), NullSubstitute(TargetType, ctx.Source, _nullArm)));
 
         arms = arms.Append(fallbackArm);
         var switchExpression = SwitchExpression(ctx.Source).WithArms(CommaSeparatedList(arms, true));
         yield return ReturnStatement(switchExpression);
     }
 
-    protected override ParameterListSyntax BuildParameterList() =>
-        ParameterList(IsExtensionMethod, SourceParameter, _targetTypeParameter, ReferenceHandlerParameter);
+    protected abstract ExpressionSyntax BuildTargetType();
+
+    protected virtual ExpressionSyntax? BuildSwitchArmWhenClause(ExpressionSyntax targetType, RuntimeTargetTypeMapping mapping)
+    {
+        // targetType.IsAssignableFrom(typeof(ADto)) => MapToADto(x)
+        return Invocation(
+            MemberAccess(targetType, IsAssignableFromMethodName),
+            TypeOfExpression(FullyQualifiedIdentifier(mapping.Mapping.TargetType.NonNullable()))
+        );
+    }
 
     internal override void EnableReferenceHandling(INamedTypeSymbol iReferenceHandlerType)
     {
@@ -95,19 +103,30 @@ public class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMapping, IUs
     private SwitchExpressionArmSyntax BuildSwitchArm(
         TypeMappingBuildContext typeArmContext,
         string typeArmVariableName,
-        ITypeMapping mapping,
-        ExpressionSyntax reflectionTargetType
+        RuntimeTargetTypeMapping mapping,
+        ExpressionSyntax targetType
     )
     {
         // A x when targetType.IsAssignableFrom(typeof(ADto)) => MapToADto(x),
         var declaration = DeclarationPattern(
-            FullyQualifiedIdentifier(mapping.SourceType.NonNullable()),
+            FullyQualifiedIdentifier(mapping.Mapping.SourceType.NonNullable()),
             SingleVariableDesignation(Identifier(typeArmVariableName))
         );
-        var whenCondition = Invocation(
-            MemberAccess(reflectionTargetType, IsAssignableFromMethodName),
-            TypeOfExpression(FullyQualifiedIdentifier(mapping.TargetType.NonNullable()))
+        var whenCondition = BuildSwitchArmWhenClause(targetType, mapping);
+        var arm = SwitchExpressionArm(declaration, BuildSwitchArmMapping(mapping, typeArmContext));
+        return whenCondition == null ? arm : arm.WithWhenClause(WhenClause(whenCondition));
+    }
+
+    private ExpressionSyntax BuildSwitchArmMapping(RuntimeTargetTypeMapping mapping, TypeMappingBuildContext ctx)
+    {
+        var mappingExpression = mapping.Mapping.Build(ctx);
+        if (mapping.IsAssignableToMethodTargetType)
+            return mappingExpression;
+
+        // (TTarget)(object)MapToTarget(source);
+        return CastExpression(
+            FullyQualifiedIdentifier(TargetType),
+            CastExpression(FullyQualifiedIdentifier(_objectType), mappingExpression)
         );
-        return SwitchExpressionArm(declaration, mapping.Build(typeArmContext)).WithWhenClause(WhenClause(whenCondition));
     }
 }

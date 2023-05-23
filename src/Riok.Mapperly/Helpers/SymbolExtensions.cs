@@ -177,12 +177,17 @@ internal static class SymbolExtensions
     internal static bool IsAssignableTo(this ITypeSymbol symbol, Compilation compilation, ITypeSymbol type) =>
         compilation.ClassifyConversion(symbol, type).IsImplicit && (type.IsNullable() || !symbol.IsNullable());
 
-    internal static bool CanConsumeType(this ITypeParameterSymbol typeParameter, Compilation compilation, ITypeSymbol type)
+    internal static bool CanConsumeType(
+        this ITypeParameterSymbol typeParameter,
+        Compilation compilation,
+        NullableAnnotation typeParameterUsageNullableAnnotation,
+        ITypeSymbol type
+    )
     {
         if (typeParameter.HasConstructorConstraint && !type.HasAccessibleParameterlessConstructor())
             return false;
 
-        if (typeParameter.HasNotNullConstraint && type.IsNullable())
+        if (!typeParameter.IsNullable(typeParameterUsageNullableAnnotation) && type.IsNullable())
             return false;
 
         if (typeParameter.HasValueTypeConstraint && !type.IsValueType)
