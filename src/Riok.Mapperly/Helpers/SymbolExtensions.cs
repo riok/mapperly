@@ -32,7 +32,7 @@ internal static class SymbolExtensions
 
     internal static bool HasAccessibleParameterlessConstructor(this ITypeSymbol symbol, bool allowProtected = false) =>
         symbol is INamedTypeSymbol { IsAbstract: false } namedTypeSymbol
-        && namedTypeSymbol.Constructors.Any(c => c.Parameters.IsDefaultOrEmpty && c.IsAccessible(allowProtected));
+        && namedTypeSymbol.InstanceConstructors.Any(c => c.Parameters.IsDefaultOrEmpty && c.IsAccessible(allowProtected));
 
     internal static int GetInheritanceLevel(this ITypeSymbol symbol)
     {
