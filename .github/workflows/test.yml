@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-dotnet@v3.0.3
+      - uses: actions/setup-dotnet@v3.1.0
       - run: dotnet tool restore
       - run: dotnet csharpier --check .
       # don't run dotnet format for whitespace formatting as this is done by csharpier
@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-dotnet@v3.0.3
+      - uses: actions/setup-dotnet@v3.1.0
       - run: dotnet build /p:TreatWarningsAsErrors=true
       - run: dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
       - uses: codecov/codecov-action@v3
@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt update && sudo apt -y install zipmerge # zipmerge is used to merge the multi target nupkg
-      - uses: actions/setup-dotnet@v3.0.3
+      - uses: actions/setup-dotnet@v3.1.0
       - run: dotnet tool restore
       - run: RELEASE_VERSION="0.0.1-dev.$GITHUB_RUN_ID" ./build/package.sh
       - run: dotnet meziantou.validate-nuget-package ./artifacts/*.nupkg
@@ -65,7 +65,7 @@ jobs:
       - run: apk add --no-cache bash icu-libs krb5-libs libgcc libintl libssl1.1 libstdc++ zlib
       # delete global.json since we want to use custom versions here
       - run: rm global.json
-      - uses: actions/setup-dotnet@v3.0.3
+      - uses: actions/setup-dotnet@v3.1.0
         with:
           dotnet-version: ${{ matrix.dotnet }}
       - uses: actions/download-artifact@v3
