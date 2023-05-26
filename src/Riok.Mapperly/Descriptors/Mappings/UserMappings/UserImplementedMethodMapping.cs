@@ -5,7 +5,7 @@ using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
-namespace Riok.Mapperly.Descriptors.Mappings;
+namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
 /// <summary>
 /// Represents a mapping method on the mapper which is implemented by the user.

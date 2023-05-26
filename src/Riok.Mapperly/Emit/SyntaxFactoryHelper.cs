@@ -249,9 +249,19 @@ public static class SyntaxFactoryHelper
         return InvocationExpression(method).WithArgumentList(ArgumentList(arguments));
     }
 
+    public static TypeParameterListSyntax TypeParameterList(params ITypeParameterSymbol?[] parameters)
+    {
+        var typeParameters = parameters.WhereNotNull().OrderBy(x => x.Ordinal).Select(x => TypeParameter(x.Name));
+        return SyntaxFactory.TypeParameterList(CommaSeparatedList(typeParameters));
+    }
+
     public static ParameterListSyntax ParameterList(bool extensionMethod, params MethodParameter?[] parameters)
     {
-        var parameterSyntaxes = parameters.WhereNotNull().OrderBy(x => x.Ordinal).Select(p => Parameter(extensionMethod, p));
+        var parameterSyntaxes = parameters
+            .WhereNotNull()
+            .DistinctBy(x => x.Ordinal)
+            .OrderBy(x => x.Ordinal)
+            .Select(p => Parameter(extensionMethod, p));
         return SyntaxFactory.ParameterList(CommaSeparatedList(parameterSyntaxes));
     }
 

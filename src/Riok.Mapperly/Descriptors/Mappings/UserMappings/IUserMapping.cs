@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace Riok.Mapperly.Descriptors.Mappings;
+namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
 /// <summary>
 /// A user defined / implemented mapping.

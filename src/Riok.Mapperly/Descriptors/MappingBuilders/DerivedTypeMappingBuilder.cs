@@ -39,6 +39,12 @@ public static class DerivedTypeMappingBuilder
     {
         var derivedTypeMappingSourceTypes = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
         var derivedTypeMappings = new List<ITypeMapping>(configs.Count);
+        Func<ITypeSymbol, bool> isAssignableToSource = ctx.Source is ITypeParameterSymbol sourceTypeParameter
+            ? t => sourceTypeParameter.CanConsumeType(ctx.Compilation, ctx.Source.NullableAnnotation, t)
+            : t => t.IsAssignableTo(ctx.Compilation, ctx.Source);
+        Func<ITypeSymbol, bool> isAssignableToTarget = ctx.Target is ITypeParameterSymbol targetTypeParameter
+            ? t => targetTypeParameter.CanConsumeType(ctx.Compilation, ctx.Target.NullableAnnotation, t)
+            : t => t.IsAssignableTo(ctx.Compilation, ctx.Target);
 
         foreach (var config in configs)
         {
@@ -50,14 +56,14 @@ public static class DerivedTypeMappingBuilder
                 continue;
             }
 
-            if (!sourceType.IsAssignableTo(ctx.Compilation, ctx.Source))
+            if (!isAssignableToSource(sourceType))
             {
                 ctx.ReportDiagnostic(DiagnosticDescriptors.DerivedSourceTypeIsNotAssignableToParameterType, sourceType, ctx.Source);
                 continue;
             }
 
             var targetType = config.TargetType.NonNullable();
-            if (!targetType.IsAssignableTo(ctx.Compilation, ctx.Target))
+            if (!isAssignableToTarget(targetType))
             {
                 ctx.ReportDiagnostic(DiagnosticDescriptors.DerivedTargetTypeIsNotAssignableToReturnType, targetType, ctx.Target);
                 continue;

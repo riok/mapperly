@@ -1,6 +1,7 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
-using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
+using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
@@ -64,12 +65,12 @@ public static class UserMethodMappingExtractor
     )
     {
         var valid =
-            BuildParameters(ctx, method, out var parameters)
-            && !method.ReturnsVoid
-            && !method.IsGenericMethod
+            method is { ReturnsVoid: false, IsGenericMethod: false }
             && (allowPartial || !method.IsPartialDefinition)
             && (!isStatic || method.IsStatic);
-        return valid ? new UserImplementedMethodMapping(method, parameters.Source, parameters.ReferenceHandler) : null;
+        return valid && BuildParameters(ctx, method, out var parameters)
+            ? new UserImplementedMethodMapping(method, parameters.Source, parameters.ReferenceHandler)
+            : null;
     }
 
     private static IUserMapping? BuilderUserDefinedMapping(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol, bool isStatic)
@@ -84,24 +85,44 @@ public static class UserMethodMappingExtractor
             return null;
         }
 
-        if (methodSymbol.IsAsync || methodSymbol.IsGenericMethod)
+        if (methodSymbol.IsAsync)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, methodSymbol, methodSymbol.Name);
             return null;
         }
 
-        if (BuildRuntimeTargetTypeMappingParameters(ctx, methodSymbol, out var runtimeTargetTypeParams))
+        if (!methodSymbol.IsGenericMethod && BuildRuntimeTargetTypeMappingParameters(ctx, methodSymbol, out var runtimeTargetTypeParams))
         {
-            return new UserDefinedNewInstanceRuntimeTargetTypeMapping(
+            return new UserDefinedNewInstanceRuntimeTargetTypeParameterMapping(
                 methodSymbol,
                 runtimeTargetTypeParams,
                 ctx.MapperConfiguration.UseReferenceHandling,
                 ctx.Types.PreserveReferenceHandler,
-                runtimeTargetTypeParams.Source.Type.IsNullable() && methodSymbol.ReturnType.UpgradeNullable().IsNullable()
+                GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams, null),
+                ctx.Compilation.ObjectType
             );
         }
 
         if (!BuildParameters(ctx, methodSymbol, out var parameters))
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, methodSymbol, methodSymbol.Name);
+            return null;
+        }
+
+        if (BuildGenericTypeParameters(methodSymbol, parameters, out var typeParameters))
+        {
+            return new UserDefinedNewInstanceGenericTypeMapping(
+                methodSymbol,
+                typeParameters.Value,
+                parameters,
+                ctx.MapperConfiguration.UseReferenceHandling,
+                ctx.Types.PreserveReferenceHandler,
+                GetTypeSwitchNullArm(methodSymbol, parameters, typeParameters),
+                ctx.Compilation.ObjectType
+            );
+        }
+
+        if (methodSymbol.IsGenericMethod)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, methodSymbol, methodSymbol.Name);
             return null;
@@ -128,10 +149,54 @@ public static class UserMethodMappingExtractor
         );
     }
 
+    private static bool BuildGenericTypeParameters(
+        IMethodSymbol methodSymbol,
+        MappingMethodParameters parameters,
+        [NotNullWhen(true)] out GenericMappingTypeParameters? typeParameters
+    )
+    {
+        if (!methodSymbol.IsGenericMethod)
+        {
+            typeParameters = null;
+            return false;
+        }
+
+        var targetType = parameters.Target?.Type ?? methodSymbol.ReturnType.UpgradeNullable();
+        var targetTypeParameter = methodSymbol.TypeParameters.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x, targetType));
+        var sourceTypeParameter = methodSymbol.TypeParameters.FirstOrDefault(
+            x => SymbolEqualityComparer.Default.Equals(x, parameters.Source.Type)
+        );
+
+        var expectedTypeParametersCount = 0;
+        if (targetTypeParameter != null)
+        {
+            expectedTypeParametersCount++;
+        }
+
+        if (sourceTypeParameter != null && !SymbolEqualityComparer.Default.Equals(sourceTypeParameter, targetTypeParameter))
+        {
+            expectedTypeParametersCount++;
+        }
+
+        if (methodSymbol.TypeParameters.Length != expectedTypeParametersCount)
+        {
+            typeParameters = null;
+            return false;
+        }
+
+        typeParameters = new GenericMappingTypeParameters(
+            sourceTypeParameter,
+            parameters.Source.Type.NullableAnnotation,
+            targetTypeParameter,
+            targetType.NullableAnnotation
+        );
+        return true;
+    }
+
     private static bool BuildRuntimeTargetTypeMappingParameters(
         SimpleMappingBuilderContext ctx,
         IMethodSymbol method,
-        out RuntimeTargetTypeMappingMethodParameters parameters
+        [NotNullWhen(true)] out RuntimeTargetTypeMappingMethodParameters? parameters
     )
     {
         var expectedParametersCount = 0;
@@ -149,7 +214,7 @@ public static class UserMethodMappingExtractor
         expectedParametersCount++;
         if (sourceParameter == null)
         {
-            parameters = default;
+            parameters = null;
             return false;
         }
 
@@ -160,13 +225,13 @@ public static class UserMethodMappingExtractor
         expectedParametersCount++;
         if (targetTypeParameter == null || !SymbolEqualityComparer.Default.Equals(targetTypeParameter.Value.Type, ctx.Types.Type))
         {
-            parameters = default;
+            parameters = null;
             return false;
         }
 
         if (method.Parameters.Length != expectedParametersCount)
         {
-            parameters = default;
+            parameters = null;
             return false;
         }
 
@@ -174,7 +239,11 @@ public static class UserMethodMappingExtractor
         return true;
     }
 
-    private static bool BuildParameters(SimpleMappingBuilderContext ctx, IMethodSymbol method, out MappingMethodParameters parameters)
+    private static bool BuildParameters(
+        SimpleMappingBuilderContext ctx,
+        IMethodSymbol method,
+        [NotNullWhen(true)] out MappingMethodParameters? parameters
+    )
     {
         var expectedParameterCount = 1;
 
@@ -190,7 +259,7 @@ public static class UserMethodMappingExtractor
         var sourceParameter = MethodParameter.Wrap(method.Parameters.FirstOrDefault(p => p.Ordinal != refHandlerParameterOrdinal));
         if (sourceParameter == null)
         {
-            parameters = default;
+            parameters = null;
             return false;
         }
 
@@ -202,7 +271,7 @@ public static class UserMethodMappingExtractor
         );
         if (method.ReturnsVoid == !targetParameter.HasValue)
         {
-            parameters = default;
+            parameters = null;
             return false;
         }
 
@@ -213,7 +282,7 @@ public static class UserMethodMappingExtractor
 
         if (method.Parameters.Length != expectedParameterCount)
         {
-            parameters = default;
+            parameters = null;
             return false;
         }
 
@@ -251,5 +320,15 @@ public static class UserMethodMappingExtractor
         }
 
         return refHandlerParameter;
+    }
+
+    private static NullFallbackValue GetTypeSwitchNullArm(
+        IMethodSymbol method,
+        MappingMethodParameters parameters,
+        GenericMappingTypeParameters? typeParameters
+    )
+    {
+        var targetCanBeNull = typeParameters?.TargetNullable ?? parameters.Target?.Type.IsNullable() ?? method.ReturnType.IsNullable();
+        return targetCanBeNull ? NullFallbackValue.Default : NullFallbackValue.ThrowArgumentNullException;
     }
 }

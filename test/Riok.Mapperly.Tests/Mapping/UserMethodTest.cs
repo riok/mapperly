@@ -270,7 +270,7 @@ public record B(int Value);
     [Fact]
     public void WithInvalidGenericSignatureShouldDiagnostic()
     {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes("partial string ToString<T>(T source);");
+        var source = TestSourceBuilder.MapperWithBodyAndTypes("partial TTarget Map<TSource, TTarget, TOther>(TSource source);");
 
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
@@ -278,7 +278,7 @@ public record B(int Value);
             .HaveDiagnostic(
                 new DiagnosticMatcher(
                     DiagnosticDescriptors.UnsupportedMappingMethodSignature,
-                    "ToString has an unsupported mapping method signature"
+                    "Map has an unsupported mapping method signature"
                 )
             );
     }

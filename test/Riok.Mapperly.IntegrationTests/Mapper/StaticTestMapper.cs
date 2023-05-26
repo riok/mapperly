@@ -86,5 +86,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial object MapWithRuntimeTargetType(object source, Type targetType);
 
         public static partial object? MapNullableWithRuntimeTargetType(object? source, Type targetType);
+
+        public static partial TTarget MapGeneric<TSource, TTarget>(TSource source);
     }
 }
