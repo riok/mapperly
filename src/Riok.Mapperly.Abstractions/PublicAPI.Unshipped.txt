@@ -1,1 +1,6 @@
 #nullable enable
+
+Riok.Mapperly.Abstractions.MapEnumValueAttribute
+Riok.Mapperly.Abstractions.MapEnumValueAttribute.MapEnumValueAttribute(object! source, object! target) -> void
+Riok.Mapperly.Abstractions.MapEnumValueAttribute.Source.get -> System.Enum!
+Riok.Mapperly.Abstractions.MapEnumValueAttribute.Target.get -> System.Enum!

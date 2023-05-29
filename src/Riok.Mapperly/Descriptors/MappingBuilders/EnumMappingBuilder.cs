@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
@@ -76,6 +77,7 @@ public static class EnumMappingBuilder
 
     private static TypeMapping BuildNameMapping(MappingBuilderContext ctx, bool ignoreCase)
     {
+        var targetFieldsByExplicitValue = BuildExplicitValueMapping(ctx);
         var targetFieldsByName = ctx.Target.GetMembers().OfType<IFieldSymbol>().ToDictionary(x => x.Name);
         var sourceFieldsByName = ctx.Source.GetMembers().OfType<IFieldSymbol>().ToDictionary(x => x.Name);
 
@@ -86,11 +88,14 @@ public static class EnumMappingBuilder
                 .DistinctBy(x => x.Key, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
             getTargetField = source =>
-                targetFieldsByName.GetValueOrDefault(source.Name) ?? targetFieldsByNameIgnoreCase.GetValueOrDefault(source.Name);
+                targetFieldsByExplicitValue.GetValueOrDefault(source)
+                ?? targetFieldsByName.GetValueOrDefault(source.Name)
+                ?? targetFieldsByNameIgnoreCase.GetValueOrDefault(source.Name);
         }
         else
         {
-            getTargetField = source => targetFieldsByName.GetValueOrDefault(source.Name);
+            getTargetField = source =>
+                targetFieldsByExplicitValue.GetValueOrDefault(source) ?? targetFieldsByName.GetValueOrDefault(source.Name);
         }
 
         var enumMemberMappings = ctx.Source
@@ -130,5 +135,19 @@ public static class EnumMappingBuilder
         }
 
         return new EnumNameMapping(ctx.Source, ctx.Target, enumMemberMappings);
+    }
+
+    private static Dictionary<IFieldSymbol, IFieldSymbol> BuildExplicitValueMapping(MappingBuilderContext ctx)
+    {
+        var values = ctx.ListConfiguration<MapEnumValueAttribute, MapEnumValue>();
+        var targetFieldsByExplicitValue = new Dictionary<IFieldSymbol, IFieldSymbol>(SymbolEqualityComparer.Default);
+        foreach (var (sourceConstant, targetConstant) in values)
+        {
+            var source = sourceConstant.Type!.GetMembers().OfType<IFieldSymbol>().First(e => sourceConstant.Value!.Equals(e.ConstantValue));
+            var target = targetConstant.Type!.GetMembers().OfType<IFieldSymbol>().First(e => targetConstant.Value!.Equals(e.ConstantValue));
+            targetFieldsByExplicitValue.Add(source, target);
+        }
+
+        return targetFieldsByExplicitValue;
     }
 }

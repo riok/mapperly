@@ -62,6 +62,10 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapEnum(EnumMappingStrategy.ByName)]
         public partial TestEnumDtoByName MapToEnumDtoByName(TestEnum v);
 
+        [MapEnum(EnumMappingStrategy.ByName)]
+        [MapEnumValue(TestEnum.Value10, TestEnumDtoByName.Value10)]
+        public partial TestEnumDtoByName MapToEnumDtoByNameWithExplicit(TestEnum v);
+
         [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredIntValue))]
         [MapperIgnoreSource(nameof(TestObject.IgnoredStringValue))]
         public partial void UpdateDto(TestObject source, TestObjectDto target);
