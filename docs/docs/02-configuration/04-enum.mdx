@@ -32,6 +32,9 @@ public partial class CarMapper
 }
 ```
 
+When `MapEnumAttribute.ByName` is used explicit enum values may be overridden using
+the `MapEnumValueAttibute` to the mapping method.
+
 </TabItem>
 <TabItem value="enum" label="Enum (Mapping Method Level)">
 
@@ -44,6 +47,22 @@ public partial class CarMapper
 {
     // highlight-start
     [MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)]
+    // highlight-end
+    public partial CarMakeDto MapMake(CarMake make);
+}
+```
+
+Applied to an explicit enum value pair mapped by this method.
+Attribute is only valid on mapping method with enums as parameters and
+configured with the `ByName` strategy.
+
+```csharp
+[Mapper]
+public partial class CarMapper
+{
+    [MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)]
+    // highlight-start
+    [MapEnumValue(CarMake.Datsun, CarMakeDto.Nissan)]
     // highlight-end
     public partial CarMakeDto MapMake(CarMake make);
 }
