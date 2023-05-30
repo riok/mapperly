@@ -67,9 +67,9 @@ public partial class CarMapper
 {
     [MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)]
     // highlight-start
-    [MapEnumValue(CarMake.Datsun, CarMakeDto.Nissan)]
+    [MapEnumValue(CarFeature.AWD, CarFeatureDto.AllWheelDrive)]
     // highlight-end
-    public partial CarMakeDto MapMake(CarMake make);
+    public partial CarFeatureDto MapFeature(CarFeature feature);
 }
 ```
 
