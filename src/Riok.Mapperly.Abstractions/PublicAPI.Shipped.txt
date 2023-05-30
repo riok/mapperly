@@ -8,6 +8,10 @@ Riok.Mapperly.Abstractions.MapEnumAttribute.IgnoreCase.get -> bool
 Riok.Mapperly.Abstractions.MapEnumAttribute.IgnoreCase.set -> void
 Riok.Mapperly.Abstractions.MapEnumAttribute.MapEnumAttribute(Riok.Mapperly.Abstractions.EnumMappingStrategy strategy) -> void
 Riok.Mapperly.Abstractions.MapEnumAttribute.Strategy.get -> Riok.Mapperly.Abstractions.EnumMappingStrategy
+Riok.Mapperly.Abstractions.MapEnumValueAttribute
+Riok.Mapperly.Abstractions.MapEnumValueAttribute.MapEnumValueAttribute(object! source, object! target) -> void
+Riok.Mapperly.Abstractions.MapEnumValueAttribute.Source.get -> System.Enum!
+Riok.Mapperly.Abstractions.MapEnumValueAttribute.Target.get -> System.Enum!
 Riok.Mapperly.Abstractions.MapperAttribute
 Riok.Mapperly.Abstractions.MapperAttribute.EnabledConversions.get -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MapperAttribute.EnabledConversions.set -> void
