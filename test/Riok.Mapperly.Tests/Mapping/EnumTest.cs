@@ -36,6 +36,63 @@ public class EnumTest
     }
 
     [Fact]
+    public void EnumToOtherEnumWithExplicitEnumMappingTargetDuplicated()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnumValue(E2.e, E1.E), MapEnumValue(E2.d, E1.E), MapEnum(EnumMappingStrategy.ByName)] public partial E1 ToE1(E2 source);",
+            "public enum E1 {A, B, C, D, E, f, F}",
+            "public enum E2 {A = 100, B, C, d, e, E, f}"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    global::E2.A => global::E1.A,
+                    global::E2.B => global::E1.B,
+                    global::E2.C => global::E1.C,
+                    global::E2.d => global::E1.E,
+                    global::E2.e => global::E1.E,
+                    global::E2.E => global::E1.E,
+                    global::E2.f => global::E1.f,
+                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
+                };
+                """
+            )
+            .HaveDiagnostic(new(DiagnosticDescriptors.TargetEnumValueNotMapped));
+    }
+
+    [Fact]
+    public void EnumToOtherEnumWithExplicitEnumMappingDuplicateSource()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnumValue(E2.e, E1.E), MapEnumValue(E2.e, E1.F), MapEnum(EnumMappingStrategy.ByName)] public partial E1 ToE1(E2 source);",
+            "public enum E1 {A, B, C, D, E, f, F}",
+            "public enum E2 {A = 100, B, C, d, e, E, f}"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    global::E2.A => global::E1.A,
+                    global::E2.B => global::E1.B,
+                    global::E2.C => global::E1.C,
+                    global::E2.e => global::E1.E,
+                    global::E2.E => global::E1.E,
+                    global::E2.f => global::E1.f,
+                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
+                };
+                """
+            )
+            .HaveDiagnostic(new(DiagnosticDescriptors.EnumSourceValueDuplicated));
+    }
+
+    [Fact]
     public void EnumToOtherEnumShouldCast()
     {
         var source = TestSourceBuilder.Mapping("E2", "E1", "enum E1 {A, B, C}", "enum E2 {A, B, C}");

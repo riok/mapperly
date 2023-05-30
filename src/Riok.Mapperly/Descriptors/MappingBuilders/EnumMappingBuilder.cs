@@ -145,7 +145,14 @@ public static class EnumMappingBuilder
         {
             var source = sourceConstant.Type!.GetMembers().OfType<IFieldSymbol>().First(e => sourceConstant.Value!.Equals(e.ConstantValue));
             var target = targetConstant.Type!.GetMembers().OfType<IFieldSymbol>().First(e => targetConstant.Value!.Equals(e.ConstantValue));
-            targetFieldsByExplicitValue.Add(source, target);
+            if (targetFieldsByExplicitValue.ContainsKey(source))
+            {
+                ctx.ReportDiagnostic(DiagnosticDescriptors.EnumSourceValueDuplicated, source, ctx.Source, ctx.Target);
+            }
+            else
+            {
+                targetFieldsByExplicitValue.Add(source, target);
+            }
         }
 
         return targetFieldsByExplicitValue;

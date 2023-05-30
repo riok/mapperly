@@ -338,4 +338,12 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Info,
         true
     );
+    public static readonly DiagnosticDescriptor EnumSourceValueDuplicated = new DiagnosticDescriptor(
+        "RMG039",
+        "Enum source value is specified multiple times, a source enum value may only be specified once",
+        "enum source value {0} is specified multiple times, a source enum value may only be specified once",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
 }
