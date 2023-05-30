@@ -52,15 +52,20 @@ To work with the tests of Mapperly you may find it helpful to read the documenta
 ## Linting
 
 The source of Mapperly is linted with multiple dotnet analyzers.
-The format is checked with `dotnet format`.
 To fix issues locally run
 
 ```bash
-dotnet format
+dotnet csharpier .
+dotnet format style
+dotnet format analyzers
 ```
 
 and to verify there are no issues run
 
 ```bash
-dotnet format --verify-no-changes
+dotnet csharpier --check .
+dotnet format style --verify-no-changes
+dotnet format analyzers --verify-no-changes
 ```
+
+CSharpier should be run automatically via a git hook on commit.
