@@ -10,7 +10,7 @@ public class EnumTest
     public void EnumToOtherEnumWithExplicitEnumMapping()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapEnumValue(E2.e, E1.E), MapEnum(EnumMappingStrategy.ByName)]" + "public partial E1 ToE1(E2 source);",
+            "[MapEnumValue(E2.e, E1.E), MapEnum(EnumMappingStrategy.ByName)] public partial E1 ToE1(E2 source);",
             "public enum E1 {A, B, C, D, E, f, F}",
             "public enum E2 {A = 100, B, C, d, e, E, f}"
         );
@@ -30,7 +30,9 @@ public class EnumTest
                     _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
                 };
                 """
-            );
+            )
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceEnumValueNotMapped))
+            .HaveDiagnostic(new(DiagnosticDescriptors.TargetEnumValueNotMapped));
     }
 
     [Fact]
