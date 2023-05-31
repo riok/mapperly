@@ -97,3 +97,4 @@ RMG035  | Mapper   | Error    | Derived source type is not assignable to paramet
 RMG036  | Mapper   | Error    | Derived target type is not assignable to return type
 RMG037  | Mapper   | Info     | An enum member could not be found on the source enum
 RMG038  | Mapper   | Info     | An enum member could not be found on the target enum
+RMG039  | Mapper   | Info     | Enum source value is specified multiple times, a source enum value may only be specified once
