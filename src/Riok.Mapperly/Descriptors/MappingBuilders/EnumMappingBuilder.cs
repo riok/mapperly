@@ -145,13 +145,39 @@ public static class EnumMappingBuilder
         {
             var source = sourceConstant.Type!.GetMembers().OfType<IFieldSymbol>().First(e => sourceConstant.Value!.Equals(e.ConstantValue));
             var target = targetConstant.Type!.GetMembers().OfType<IFieldSymbol>().First(e => targetConstant.Value!.Equals(e.ConstantValue));
-            if (targetFieldsByExplicitValue.ContainsKey(source))
+            if (SymbolEqualityComparer.Default.Equals(sourceConstant.Type, ctx.Source))
             {
-                ctx.ReportDiagnostic(DiagnosticDescriptors.EnumSourceValueDuplicated, source, ctx.Source, ctx.Target);
+                if (SymbolEqualityComparer.Default.Equals(targetConstant.Type, ctx.Target))
+                {
+                    if (targetFieldsByExplicitValue.ContainsKey(source))
+                    {
+                        ctx.ReportDiagnostic(DiagnosticDescriptors.EnumSourceValueDuplicated, source, ctx.Source, ctx.Target);
+                    }
+                    else
+                    {
+                        targetFieldsByExplicitValue.Add(source, target);
+                    }
+                }
+                else
+                {
+                    ctx.ReportDiagnostic(
+                        DiagnosticDescriptors.TargetEnumValueDoesNotMatchTargetEnumType,
+                        target,
+                        targetConstant.Value ?? 0,
+                        target.Type,
+                        ctx.Target
+                    );
+                }
             }
             else
             {
-                targetFieldsByExplicitValue.Add(source, target);
+                ctx.ReportDiagnostic(
+                    DiagnosticDescriptors.SourceEnumValueDoesNotMatchSourceEnumType,
+                    source,
+                    sourceConstant.Value ?? 0,
+                    source.Type,
+                    ctx.Source
+                );
             }
         }
 

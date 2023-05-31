@@ -31,8 +31,8 @@ public class EnumTest
                 };
                 """
             )
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourceEnumValueNotMapped))
-            .HaveDiagnostic(new(DiagnosticDescriptors.TargetEnumValueNotMapped));
+            .HaveDiagnostic(new(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member d (103) on E2 not found on target enum E1"))
+            .HaveDiagnostic(new(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member D (3) on E1 not found on source enum E2"));
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class EnumTest
                 };
                 """
             )
-            .HaveDiagnostic(new(DiagnosticDescriptors.TargetEnumValueNotMapped));
+            .HaveDiagnostic(new(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member D (3) on E1 not found on source enum E2"));
     }
 
     [Fact]
@@ -89,7 +89,68 @@ public class EnumTest
                 };
                 """
             )
-            .HaveDiagnostic(new(DiagnosticDescriptors.EnumSourceValueDuplicated));
+            .HaveDiagnostic(
+                new(
+                    DiagnosticDescriptors.EnumSourceValueDuplicated,
+                    "Enum source value E2.e is specified multiple times, a source enum value may only be specified once"
+                )
+            );
+    }
+
+    [Fact]
+    public void MapEnumValueEnumTypeTargetMismatch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnumValue(E2.A, E2.A), MapEnum(EnumMappingStrategy.ByName)] public partial E1 ToE1(E2 source);",
+            "public enum E1 {A}",
+            "public enum E2 {A}"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    global::E2.A => global::E1.A,
+                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
+                };
+                """
+            )
+            .HaveDiagnostic(
+                new(
+                    DiagnosticDescriptors.TargetEnumValueDoesNotMatchTargetEnumType,
+                    "Enum member E2.A (0) on E2 does not match type of target enum E1"
+                )
+            );
+    }
+
+    [Fact]
+    public void MapEnumValueEnumTypeSourceMismatch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnumValue(E1.A, E1.A), MapEnum(EnumMappingStrategy.ByName)] public partial E1 ToE1(E2 source);",
+            "public enum E1 {A}",
+            "public enum E2 {A}"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    global::E2.A => global::E1.A,
+                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
+                };
+                """
+            )
+            .HaveDiagnostic(
+                new(
+                    DiagnosticDescriptors.SourceEnumValueDoesNotMatchSourceEnumType,
+                    "Enum member E1.A (0) on E1 does not match type of source enum E2"
+                )
+            );
     }
 
     [Fact]
