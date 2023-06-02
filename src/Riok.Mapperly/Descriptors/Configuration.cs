@@ -14,12 +14,12 @@ public class Configuration
     /// </summary>
     private readonly Dictionary<Type, object> _defaultConfigurations = new();
 
-    private readonly Compilation _compilation;
+    private readonly WellKnownTypes _knownTypes;
 
-    public Configuration(Compilation compilation, INamedTypeSymbol mapperSymbol)
+    public Configuration(WellKnownTypes knownTypes, INamedTypeSymbol mapperSymbol)
     {
-        _compilation = compilation;
-        Mapper = AttributeDataAccessor.AccessFirstOrDefault<MapperAttribute>(compilation, mapperSymbol) ?? new();
+        _knownTypes = knownTypes;
+        Mapper = AttributeDataAccessor.AccessFirstOrDefault<MapperAttribute>(knownTypes, mapperSymbol) ?? new();
         InitDefaultConfigurations();
     }
 
@@ -34,7 +34,7 @@ public class Configuration
     public IEnumerable<TData> ListConfiguration<T, TData>(IMethodSymbol? userSymbol)
         where T : Attribute
     {
-        return userSymbol == null ? Enumerable.Empty<TData>() : AttributeDataAccessor.Access<T, TData>(_compilation, userSymbol);
+        return userSymbol == null ? Enumerable.Empty<TData>() : AttributeDataAccessor.Access<T, TData>(_knownTypes, userSymbol);
     }
 
     private void InitDefaultConfigurations()

@@ -37,6 +37,7 @@ public class MapperGenerator : IIncrementalGenerator
         if (mapperAttributeSymbol == null)
             return;
 
+        var wellKnownTypes = new WellKnownTypes(compilation);
         var uniqueNameBuilder = new UniqueNameBuilder();
         foreach (var mapperSyntax in mappers.Distinct())
         {
@@ -47,7 +48,7 @@ public class MapperGenerator : IIncrementalGenerator
             if (!mapperSymbol.HasAttribute(mapperAttributeSymbol))
                 continue;
 
-            var builder = new DescriptorBuilder(ctx, compilation, mapperSyntax, mapperSymbol);
+            var builder = new DescriptorBuilder(ctx, compilation, mapperSyntax, mapperSymbol, wellKnownTypes);
             var descriptor = builder.Build();
 
             ctx.AddSource(

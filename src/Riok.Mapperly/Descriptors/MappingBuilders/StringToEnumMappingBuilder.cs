@@ -15,7 +15,8 @@ public static class StringToEnumMappingBuilder
         if (ctx.Source.SpecialType != SpecialType.System_String || !ctx.Target.IsEnum())
             return null;
 
-        var genericEnumParseMethodSupported = ctx.Types.Enum
+        var genericEnumParseMethodSupported = ctx.Types
+            .Get<Enum>()
             .GetMembers(nameof(Enum.Parse))
             .OfType<IMethodSymbol>()
             .Any(x => x.IsGenericMethod);

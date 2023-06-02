@@ -33,7 +33,7 @@ public static class DictionaryMappingBuilder
                 .GetAllProperties(CountPropertyName)
                 .Any(x => !x.IsStatic && !x.IsIndexer && !x.IsWriteOnly && x.Type.SpecialType == SpecialType.System_Int32);
 
-            var targetDictionarySymbol = ctx.Types.DictionaryT.Construct(keyMapping.TargetType, valueMapping.TargetType);
+            var targetDictionarySymbol = ctx.Types.Get(typeof(Dictionary<,>)).Construct(keyMapping.TargetType, valueMapping.TargetType);
             ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var dictionaryObjectFactory);
             return new ForEachSetDictionaryMapping(
                 ctx.Source,
@@ -62,7 +62,7 @@ public static class DictionaryMappingBuilder
             return null;
         }
 
-        if (!ctx.Target.ImplementsGeneric(ctx.Types.IDictionaryT, out _))
+        if (!ctx.Target.ImplementsGeneric(ctx.Types.Get(typeof(IDictionary<,>)), out _))
             return null;
 
         var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.Source, ctx.Target, ctx.Types);
@@ -84,14 +84,14 @@ public static class DictionaryMappingBuilder
         if (!ctx.IsConversionEnabled(MappingConversionType.Dictionary))
             return null;
 
-        if (!ctx.Target.ImplementsGeneric(ctx.Types.IDictionaryT, out _))
+        if (!ctx.Target.ImplementsGeneric(ctx.Types.Get(typeof(IDictionary<,>)), out _))
             return null;
 
         if (BuildKeyValueMapping(ctx) is not var (keyMapping, valueMapping))
             return null;
 
         // if target is an immutable dictionary then don't create a foreach loop
-        if (ctx.Target.OriginalDefinition.ImplementsGeneric(ctx.Types.IImmutableDictionaryT, out _))
+        if (ctx.Target.OriginalDefinition.ImplementsGeneric(ctx.Types.Get(typeof(IImmutableDictionary<,>)), out _))
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
             return null;
@@ -134,19 +134,19 @@ public static class DictionaryMappingBuilder
         if (symbol is not INamedTypeSymbol namedSymbol)
             return false;
 
-        return SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.DictionaryT)
-            || SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.IDictionaryT)
-            || SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.IReadOnlyDictionaryT);
+        return SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.Get(typeof(Dictionary<,>)))
+            || SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.Get(typeof(IDictionary<,>)))
+            || SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.Get(typeof(IReadOnlyDictionary<,>)));
     }
 
     private static (ITypeSymbol, ITypeSymbol)? GetDictionaryKeyValueTypes(MappingBuilderContext ctx, ITypeSymbol t)
     {
-        if (t.ImplementsGeneric(ctx.Types.IDictionaryT, out var dictionaryImpl))
+        if (t.ImplementsGeneric(ctx.Types.Get(typeof(IDictionary<,>)), out var dictionaryImpl))
         {
             return (dictionaryImpl.TypeArguments[0], dictionaryImpl.TypeArguments[1]);
         }
 
-        if (t.ImplementsGeneric(ctx.Types.IReadOnlyDictionaryT, out var readOnlyDictionaryImpl))
+        if (t.ImplementsGeneric(ctx.Types.Get(typeof(IReadOnlyDictionary<,>)), out var readOnlyDictionaryImpl))
         {
             return (readOnlyDictionaryImpl.TypeArguments[0], readOnlyDictionaryImpl.TypeArguments[1]);
         }
@@ -156,13 +156,13 @@ public static class DictionaryMappingBuilder
 
     private static (ITypeSymbol, ITypeSymbol)? GetEnumerableKeyValueTypes(MappingBuilderContext ctx, ITypeSymbol t)
     {
-        if (!t.ImplementsGeneric(ctx.Types.IEnumerableT, out var enumerableImpl))
+        if (!t.ImplementsGeneric(ctx.Types.Get(typeof(IEnumerable<>)), out var enumerableImpl))
             return null;
 
         if (enumerableImpl.TypeArguments[0] is not INamedTypeSymbol enumeratedType)
             return null;
 
-        if (!SymbolEqualityComparer.Default.Equals(enumeratedType.ConstructedFrom, ctx.Types.KeyValuePairT))
+        if (!SymbolEqualityComparer.Default.Equals(enumeratedType.ConstructedFrom, ctx.Types.Get(typeof(KeyValuePair<,>))))
             return null;
 
         return (enumeratedType.TypeArguments[0], enumeratedType.TypeArguments[1]);
@@ -171,8 +171,12 @@ public static class DictionaryMappingBuilder
     private static INamedTypeSymbol? GetExplicitIndexer(MappingBuilderContext ctx)
     {
         if (
-            ctx.Target.ImplementsGeneric(ctx.Types.IDictionaryT, SetterIndexerPropertyName, out var typedInter, out var isExplicit)
-            && !isExplicit
+            ctx.Target.ImplementsGeneric(
+                ctx.Types.Get(typeof(IDictionary<,>)),
+                SetterIndexerPropertyName,
+                out var typedInter,
+                out var isExplicit
+            ) && !isExplicit
         )
             return null;
 
@@ -185,24 +189,24 @@ public static class DictionaryMappingBuilder
         ITypeMapping valueMapping
     )
     {
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableSortedDictionaryT))
+        if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.Get(typeof(ImmutableSortedDictionary<,>))))
             return new LinqDicitonaryMapping(
                 ctx.Source,
                 ctx.Target,
-                ctx.Types.ImmutableSortedDictionary.GetStaticGenericMethod(ToImmutableSortedDictionaryMethodName)!,
+                ctx.Types.Get(typeof(ImmutableSortedDictionary)).GetStaticGenericMethod(ToImmutableSortedDictionaryMethodName)!,
                 keyMapping,
                 valueMapping
             );
 
         // if target is an ImmutableDictionary or IImmutableDictionary
         if (
-            SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.IImmutableDictionaryT)
-            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.ImmutableDictionaryT)
+            SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.Get(typeof(IImmutableDictionary<,>)))
+            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.Get(typeof(ImmutableDictionary<,>)))
         )
             return new LinqDicitonaryMapping(
                 ctx.Source,
                 ctx.Target,
-                ctx.Types.ImmutableDictionary.GetStaticGenericMethod(ToImmutableDictionaryMethodName)!,
+                ctx.Types.Get(typeof(ImmutableDictionary)).GetStaticGenericMethod(ToImmutableDictionaryMethodName)!,
                 keyMapping,
                 valueMapping
             );
