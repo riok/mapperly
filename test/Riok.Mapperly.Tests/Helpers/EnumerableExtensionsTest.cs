@@ -46,16 +46,6 @@ public class EnumerableExtensionsTest
     }
 
     [Fact]
-    public void ChunkShouldWork()
-    {
-        Enumerable
-            .Range(0, 5)
-            .Chunk((_, index) => index % 2 == 1)
-            .Should()
-            .BeEquivalentTo(new[] { new[] { 0, 1 }, new[] { 2, 3 }, new[] { 4 } }, o => o.WithStrictOrdering());
-    }
-
-    [Fact]
     public void SkipLastShouldWork()
     {
         var items = new[] { 1, 2, 5, 6, 7 };

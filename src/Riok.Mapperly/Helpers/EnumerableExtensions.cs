@@ -45,27 +45,6 @@ public static class EnumerableExtensions
         }
     }
 
-    public static IEnumerable<IReadOnlyCollection<T>> Chunk<T>(this IEnumerable<T> enumerable, Func<T, int, bool> shouldChunk)
-    {
-        var l = new List<T>();
-        var i = 0;
-        foreach (var item in enumerable)
-        {
-            l.Add(item);
-            if (!shouldChunk(item, i++))
-                continue;
-
-            if (l.Count == 0)
-                continue;
-
-            yield return l;
-            l = new();
-        }
-
-        if (l.Count != 0)
-            yield return l;
-    }
-
     public static IEnumerable<T> SkipLast<T>(this IEnumerable<T> enumerable)
     {
         using var enumerator = enumerable.GetEnumerator();
