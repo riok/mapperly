@@ -86,10 +86,13 @@ internal static class AttributeDataAccessor
     private static object? GetEnumValue(TypedConstant arg)
     {
         var enumType = GetReflectionType(arg.Type ?? throw new InvalidOperationException("Type is null"));
+        // if we can't get the enum type then it's not available to reflection (only accessible by Roslyn) so return the TypedConstant
+        if (enumType == null)
+            return arg;
         return arg.Value == null ? null : Enum.ToObject(enumType, arg.Value);
     }
 
-    private static Type GetReflectionType(ITypeSymbol type)
+    private static Type? GetReflectionType(ITypeSymbol type)
     {
         // other special types not yet supported since they are not used yet.
         if (type.SpecialType == SpecialType.System_String)
@@ -97,6 +100,6 @@ internal static class AttributeDataAccessor
 
         var assemblyName = type.ContainingAssembly.Name;
         var qualifiedTypeName = Assembly.CreateQualifiedName(assemblyName, type.ToDisplayString());
-        return Type.GetType(qualifiedTypeName) ?? throw new InvalidOperationException($"Type {qualifiedTypeName} not found");
+        return Type.GetType(qualifiedTypeName);
     }
 }

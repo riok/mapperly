@@ -338,4 +338,31 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Info,
         true
     );
+
+    public static readonly DiagnosticDescriptor EnumSourceValueDuplicated = new DiagnosticDescriptor(
+        "RMG039",
+        "Enum source value is specified multiple times, a source enum value may only be specified once",
+        "Enum source value {0} is specified multiple times, a source enum value may only be specified once",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor TargetEnumValueDoesNotMatchTargetEnumType = new DiagnosticDescriptor(
+        "RMG040",
+        "A target enum member value does not match the target enum type",
+        "Enum member {0} ({1}) on {2} does not match type of target enum {3}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor SourceEnumValueDoesNotMatchSourceEnumType = new DiagnosticDescriptor(
+        "RMG041",
+        "A source enum member value does not match the source enum type",
+        "Enum member {0} ({1}) on {2} does not match type of source enum {3}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
 }
