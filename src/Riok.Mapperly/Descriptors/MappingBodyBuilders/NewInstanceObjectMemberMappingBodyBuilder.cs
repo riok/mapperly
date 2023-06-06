@@ -181,15 +181,15 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         // ctors annotated with [Obsolete] are considered last unless they have a MapperConstructor attribute set
         var ctorCandidates = namedTargetType.InstanceConstructors
             .Where(ctor => ctor.IsAccessible())
-            .OrderByDescending(x => x.HasAttribute(ctx.BuilderContext.Types.MapperConstructorAttribute))
-            .ThenBy(x => x.HasAttribute(ctx.BuilderContext.Types.ObsoleteAttribute))
+            .OrderByDescending(x => x.HasAttribute(ctx.BuilderContext.Types.Get<MapperConstructorAttribute>()))
+            .ThenBy(x => x.HasAttribute(ctx.BuilderContext.Types.Get<ObsoleteAttribute>()))
             .ThenByDescending(x => x.Parameters.Length == 0)
             .ThenByDescending(x => x.Parameters.Length);
         foreach (var ctorCandidate in ctorCandidates)
         {
             if (!TryBuildConstructorMapping(ctx, ctorCandidate, out var mappedTargetMemberNames, out var constructorParameterMappings))
             {
-                if (ctorCandidate.HasAttribute(ctx.BuilderContext.Types.MapperConstructorAttribute))
+                if (ctorCandidate.HasAttribute(ctx.BuilderContext.Types.Get<MapperConstructorAttribute>()))
                 {
                     ctx.BuilderContext.ReportDiagnostic(
                         DiagnosticDescriptors.CannotMapToConfiguredConstructor,

@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Abstractions.ReferenceHandling;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders;
 using Riok.Mapperly.Descriptors.MappingBuilders;
 using Riok.Mapperly.Descriptors.ObjectFactories;
@@ -22,15 +23,16 @@ public class DescriptorBuilder
         SourceProductionContext sourceContext,
         Compilation compilation,
         ClassDeclarationSyntax mapperSyntax,
-        INamedTypeSymbol mapperSymbol
+        INamedTypeSymbol mapperSymbol,
+        WellKnownTypes wellKnownTypes
     )
     {
         _mapperDescriptor = new MapperDescriptor(mapperSyntax, mapperSymbol, _methodNameBuilder);
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
         _builderContext = new SimpleMappingBuilderContext(
             compilation,
-            new Configuration(compilation, mapperSymbol),
-            new WellKnownTypes(compilation),
+            new Configuration(wellKnownTypes, mapperSymbol),
+            wellKnownTypes,
             _mapperDescriptor,
             sourceContext,
             new MappingBuilder(_mappings),
@@ -95,7 +97,7 @@ public class DescriptorBuilder
 
         foreach (var methodMapping in _mappings.MethodMappings)
         {
-            methodMapping.EnableReferenceHandling(_builderContext.Types.IReferenceHandler);
+            methodMapping.EnableReferenceHandling(_builderContext.Types.Get<IReferenceHandler>());
         }
     }
 

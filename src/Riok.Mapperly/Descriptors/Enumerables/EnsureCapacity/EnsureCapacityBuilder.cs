@@ -33,9 +33,10 @@ public static class EnsureCapacityBuilder
         if (TryGetNonEnumeratedCount(sourceType, types, out var sourceSizeProperty))
             return new EnsureCapacityMember(targetSizeProperty, sourceSizeProperty);
 
-        sourceType.ImplementsGeneric(types.IEnumerableT, out var iEnumerable);
+        sourceType.ImplementsGeneric(types.Get(typeof(IEnumerable<>)), out var iEnumerable);
 
-        var nonEnumeratedCountMethod = types.Enumerable
+        var nonEnumeratedCountMethod = types
+            .Get(typeof(Enumerable))
             .GetMembers(TryGetNonEnumeratedCountMethodName)
             .OfType<IMethodSymbol>()
             .FirstOrDefault(
@@ -59,13 +60,19 @@ public static class EnsureCapacityBuilder
             return true;
         }
 
-        if (value.ImplementsGeneric(types.ICollectionT, CountPropertyName, out _, out var hasCollectionCount) && !hasCollectionCount)
+        if (
+            value.ImplementsGeneric(types.Get(typeof(ICollection<>)), CountPropertyName, out _, out var hasCollectionCount)
+            && !hasCollectionCount
+        )
         {
             expression = CountPropertyName;
             return true;
         }
 
-        if (value.ImplementsGeneric(types.IReadOnlyCollectionT, CountPropertyName, out _, out var hasReadOnlyCount) && !hasReadOnlyCount)
+        if (
+            value.ImplementsGeneric(types.Get(typeof(IReadOnlyCollection<>)), CountPropertyName, out _, out var hasReadOnlyCount)
+            && !hasReadOnlyCount
+        )
         {
             expression = CountPropertyName;
             return true;
