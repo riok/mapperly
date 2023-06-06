@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions.ReferenceHandling;
+using Riok.Mapperly.Abstractions.ReferenceHandling.Internal;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
@@ -97,7 +99,7 @@ public static class UserMethodMappingExtractor
                 methodSymbol,
                 runtimeTargetTypeParams,
                 ctx.MapperConfiguration.UseReferenceHandling,
-                ctx.Types.PreserveReferenceHandler,
+                ctx.Types.Get<PreserveReferenceHandler>(),
                 GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams, null),
                 ctx.Compilation.ObjectType
             );
@@ -116,7 +118,7 @@ public static class UserMethodMappingExtractor
                 typeParameters.Value,
                 parameters,
                 ctx.MapperConfiguration.UseReferenceHandling,
-                ctx.Types.PreserveReferenceHandler,
+                ctx.Types.Get<PreserveReferenceHandler>(),
                 GetTypeSwitchNullArm(methodSymbol, parameters, typeParameters),
                 ctx.Compilation.ObjectType
             );
@@ -136,7 +138,7 @@ public static class UserMethodMappingExtractor
                 parameters.Target.Value,
                 parameters.ReferenceHandler,
                 ctx.MapperConfiguration.UseReferenceHandling,
-                ctx.Types.PreserveReferenceHandler
+                ctx.Types.Get<PreserveReferenceHandler>()
             );
         }
 
@@ -145,7 +147,7 @@ public static class UserMethodMappingExtractor
             parameters.Source,
             parameters.ReferenceHandler,
             ctx.MapperConfiguration.UseReferenceHandling,
-            ctx.Types.PreserveReferenceHandler
+            ctx.Types.Get<PreserveReferenceHandler>()
         );
     }
 
@@ -223,7 +225,7 @@ public static class UserMethodMappingExtractor
             method.Parameters.FirstOrDefault(p => p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != refHandlerParameterOrdinal)
         );
         expectedParametersCount++;
-        if (targetTypeParameter == null || !SymbolEqualityComparer.Default.Equals(targetTypeParameter.Value.Type, ctx.Types.Type))
+        if (targetTypeParameter == null || !SymbolEqualityComparer.Default.Equals(targetTypeParameter.Value.Type, ctx.Types.Get<Type>()))
         {
             parameters = null;
             return false;
@@ -292,19 +294,19 @@ public static class UserMethodMappingExtractor
 
     private static MethodParameter? BuildReferenceHandlerParameter(SimpleMappingBuilderContext ctx, IMethodSymbol method)
     {
-        var refHandlerParameterSymbol = method.Parameters.FirstOrDefault(p => p.HasAttribute(ctx.Types.ReferenceHandlerAttribute));
+        var refHandlerParameterSymbol = method.Parameters.FirstOrDefault(p => p.HasAttribute(ctx.Types.Get<ReferenceHandlerAttribute>()));
         if (refHandlerParameterSymbol == null)
             return null;
 
         var refHandlerParameter = new MethodParameter(refHandlerParameterSymbol);
-        if (!SymbolEqualityComparer.Default.Equals(ctx.Types.IReferenceHandler, refHandlerParameter.Type))
+        if (!SymbolEqualityComparer.Default.Equals(ctx.Types.Get<IReferenceHandler>(), refHandlerParameter.Type))
         {
             ctx.ReportDiagnostic(
                 DiagnosticDescriptors.ReferenceHandlerParameterWrongType,
                 refHandlerParameterSymbol,
                 method.ContainingType.ToDisplayString(),
                 method.Name,
-                ctx.Types.IReferenceHandler.ToDisplayString(),
+                ctx.Types.Get<IReferenceHandler>().ToDisplayString(),
                 refHandlerParameterSymbol.Type.ToDisplayString()
             );
         }

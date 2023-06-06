@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Descriptors;
 
 namespace Riok.Mapperly.Configuration;
 
@@ -8,27 +9,25 @@ namespace Riok.Mapperly.Configuration;
 /// </summary>
 internal static class AttributeDataAccessor
 {
-    public static T? AccessFirstOrDefault<T>(Compilation compilation, ISymbol symbol)
-        where T : Attribute => Access<T, T>(compilation, symbol).FirstOrDefault();
+    public static T? AccessFirstOrDefault<T>(WellKnownTypes knownTypes, ISymbol symbol)
+        where T : Attribute => Access<T, T>(knownTypes, symbol).FirstOrDefault();
 
     /// <summary>
     /// Reads the attribute data and sets it on a newly created instance of <see cref="TData"/>.
     /// If <see cref="TAttribute"/> has n type parameters,
     /// <see cref="TData"/> needs to have an accessible ctor with the parameters 0 to n-1 to be of type <see cref="ITypeSymbol"/>.
     /// </summary>
-    /// <param name="compilation">The compilation.</param>
+    /// <param name="knownTypes">The knownTypes used to get the type symbol.</param>
     /// <param name="symbol">The symbol on which the attributes should be read.</param>
     /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
     /// <typeparam name="TData">The type of the data class. If no type parameters are involved, this is usually the same as <see cref="TAttribute"/>.</typeparam>
     /// <returns>The attribute data.</returns>
     /// <exception cref="InvalidOperationException">If a property or ctor argument of <see cref="TData"/> could not be read on the attribute.</exception>
-    public static IEnumerable<TData> Access<TAttribute, TData>(Compilation compilation, ISymbol symbol)
+    public static IEnumerable<TData> Access<TAttribute, TData>(WellKnownTypes knownTypes, ISymbol symbol)
         where TAttribute : Attribute
     {
         var attrType = typeof(TAttribute);
-        var attrSymbol = compilation.GetTypeByMetadataName($"{attrType.Namespace}.{attrType.Name}");
-        if (attrSymbol == null)
-            yield break;
+        var attrSymbol = knownTypes.Get($"{attrType.Namespace}.{attrType.Name}");
 
         var attrDatas = symbol
             .GetAttributes()
