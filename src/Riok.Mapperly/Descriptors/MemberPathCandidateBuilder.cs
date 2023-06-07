@@ -1,5 +1,3 @@
-using Riok.Mapperly.Helpers;
-
 namespace Riok.Mapperly.Descriptors;
 
 public static class MemberPathCandidateBuilder
@@ -12,15 +10,47 @@ public static class MemberPathCandidateBuilder
     /// <returns>The joined member path groups.</returns>
     internal static IEnumerable<IEnumerable<string>> BuildMemberPathCandidates(string name)
     {
-        var chunks = StringChunker.ChunkPascalCase(name).ToList();
-        for (var i = 1 << chunks.Count - 1; i > 0; i--)
+        if (name.Length == 0)
+            yield break;
+
+        // yield full string
+        yield return new[] { name };
+
+        var indices = GetPascalCaseSplitIndices(name).ToArray();
+
+        // try all permutations, skipping the first because the full string is already yielded
+        var permutationsCount = 1 << indices.Length;
+        for (var i = 1; i < permutationsCount; i++)
         {
-            yield return BuildName(chunks, i - 1);
+            yield return BuildName(name, indices, i);
         }
     }
 
-    private static IEnumerable<string> BuildName(IEnumerable<string> chunks, int splitPositions)
+    private static IEnumerable<string> BuildName(string source, int[] splitIndices, int enabledSplitPositions)
     {
-        return chunks.Chunk((_, i) => (splitPositions & (1 << i)) == 0).Select(x => string.Concat(x));
+        var lastSplitIndex = 0;
+        var currentSplitPosition = 1;
+        foreach (var splitIndex in splitIndices)
+        {
+            if ((enabledSplitPositions & currentSplitPosition) == currentSplitPosition)
+            {
+                yield return source.Substring(lastSplitIndex, splitIndex - lastSplitIndex);
+                lastSplitIndex = splitIndex;
+            }
+
+            currentSplitPosition <<= 1;
+        }
+
+        if (lastSplitIndex < source.Length)
+            yield return source.Substring(lastSplitIndex);
+    }
+
+    private static IEnumerable<int> GetPascalCaseSplitIndices(string str)
+    {
+        for (var i = 1; i < str.Length; i++)
+        {
+            if (char.IsUpper(str[i]))
+                yield return i;
+        }
     }
 }
