@@ -18,16 +18,8 @@ public static class EnumerableExtensions
 #nullable restore
     }
 
-    public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable, IEqualityComparer<T>? comparer = null)
-    {
-        var set = new HashSet<T>(comparer);
-        foreach (var item in enumerable)
-        {
-            set.Add(item);
-        }
-
-        return set;
-    }
+    public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable, IEqualityComparer<T>? comparer = null) =>
+        new(enumerable, comparer);
 
     public static IEnumerable<T> DistinctBy<T, TProp>(
         this IEnumerable<T> enumerable,
