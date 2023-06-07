@@ -40,6 +40,13 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMap
         _objectType = objectType;
     }
 
+    // requires the user mapping bodies
+    // as the delegate mapping of user mappings is only set after bodies are built
+    // and if reference handling is enabled,
+    // but the user mapping does not have a reference handling parameter,
+    // only the delegate mapping is callable by other mappings.
+    public override MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.AfterUserMappings;
+
     public IMethodSymbol Method { get; }
 
     public override bool CallableByOtherMappings => false;

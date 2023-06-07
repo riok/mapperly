@@ -20,14 +20,14 @@ public class MappingCollection
     private readonly List<MethodMapping> _methodMappings = new();
 
     /// <summary>
-    /// A list of all callable user mappings with <see cref="ITypeMapping.CallableByOtherMappings"/> <c>true</c>.
+    /// A list of all user mappings.
     /// </summary>
-    private readonly List<IUserMapping> _callableUserMappings = new();
+    private readonly List<IUserMapping> _userMappings = new();
 
     /// <summary>
     /// Queue of mappings which don't have the body built yet
     /// </summary>
-    private readonly Queue<(IMapping, MappingBuilderContext)> _mappingsToBuildBody = new();
+    private readonly PriorityQueue<(IMapping, MappingBuilderContext), MappingBodyBuildingPriority> _mappingsToBuildBody = new();
 
     /// <summary>
     /// All existing target mappings
@@ -36,8 +36,8 @@ public class MappingCollection
 
     public IReadOnlyCollection<MethodMapping> MethodMappings => _methodMappings;
 
-    /// <inheritdoc cref="_callableUserMappings"/>
-    public IReadOnlyCollection<IUserMapping> CallableUserMappings => _callableUserMappings;
+    /// <inheritdoc cref="_userMappings"/>
+    public IReadOnlyCollection<IUserMapping> UserMappings => _userMappings;
 
     public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType)
     {
@@ -51,13 +51,14 @@ public class MappingCollection
         return mapping;
     }
 
-    public void EnqueueToBuildBody(IMapping mapping, MappingBuilderContext ctx) => _mappingsToBuildBody.Enqueue((mapping, ctx));
+    public void EnqueueToBuildBody(IMapping mapping, MappingBuilderContext ctx) =>
+        _mappingsToBuildBody.Enqueue((mapping, ctx), mapping.BodyBuildingPriority);
 
     public void Add(ITypeMapping mapping)
     {
-        if (mapping is IUserMapping { CallableByOtherMappings: true } userMapping)
+        if (mapping is IUserMapping userMapping)
         {
-            _callableUserMappings.Add(userMapping);
+            _userMappings.Add(userMapping);
         }
 
         if (mapping is MethodMapping methodMapping)

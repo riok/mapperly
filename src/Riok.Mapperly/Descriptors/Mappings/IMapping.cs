@@ -10,4 +10,6 @@ public interface IMapping
     ITypeSymbol SourceType { get; }
 
     ITypeSymbol TargetType { get; }
+
+    MappingBodyBuildingPriority BodyBuildingPriority { get; }
 }

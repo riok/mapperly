@@ -291,4 +291,44 @@ public class RuntimeTargetTypeMappingTest
             .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature)
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public Task WithReferenceHandlingEnabled()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial object Map(object source, Type targetType);
+
+            private partial B MapToB(A source);
+            private partial D MapToD(C source);
+            """,
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A {}",
+            "class B {}",
+            "class C {}",
+            "class D {}"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithReferenceHandlerParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial object Map(object source, Type targetType, [ReferenceHandler] IReferenceHandler refHandler);
+
+            private partial B MapToB(A source);
+            private partial D MapToD(C source);
+            """,
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A {}",
+            "class B {}",
+            "class C {}",
+            "class D {}"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

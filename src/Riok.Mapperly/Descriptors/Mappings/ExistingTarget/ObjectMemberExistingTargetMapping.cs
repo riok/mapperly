@@ -18,4 +18,6 @@ public class ObjectMemberExistingTargetMapping : MemberAssignmentMappingContaine
     public ITypeSymbol SourceType { get; }
 
     public ITypeSymbol TargetType { get; }
+
+    public MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.Default;
 }

@@ -4,6 +4,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 
 /// <summary>
 /// Represents a mapping from one type to another.
+/// The target is usually a new instance.
 /// </summary>
 public interface ITypeMapping : IMapping
 {
@@ -18,5 +19,10 @@ public interface ITypeMapping : IMapping
     /// </summary>
     bool IsSynthetic { get; }
 
+    /// <summary>
+    /// Serializes the mapping as c# syntax.
+    /// </summary>
+    /// <param name="ctx">The build context.</param>
+    /// <returns>The built syntax.</returns>
     ExpressionSyntax Build(TypeMappingBuildContext ctx);
 }

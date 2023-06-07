@@ -37,8 +37,8 @@ public class MappingBuilder
         _mappings = mappings;
     }
 
-    /// <inheritdoc cref="MappingCollection.CallableUserMappings"/>
-    public IReadOnlyCollection<IUserMapping> CallableUserMappings => _mappings.CallableUserMappings;
+    /// <inheritdoc cref="MappingCollection.UserMappings"/>
+    public IReadOnlyCollection<IUserMapping> UserMappings => _mappings.UserMappings;
 
     /// <inheritdoc cref="MappingBuilderContext.FindMapping"/>
     public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType) => _mappings.Find(sourceType, targetType);
