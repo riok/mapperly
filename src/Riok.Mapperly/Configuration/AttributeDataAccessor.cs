@@ -1,6 +1,7 @@
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Configuration;
 
@@ -19,8 +20,8 @@ internal class AttributeDataAccessor
     public T AccessSingle<T>(ISymbol symbol)
         where T : Attribute => Access<T, T>(symbol).Single();
 
-    public T? AccessFirstOrDefault<T>(ISymbol symbol)
-        where T : Attribute => Access<T, T>(symbol).FirstOrDefault();
+    public TData? AccessFirstOrDefault<TAttribute, TData>(ISymbol symbol)
+        where TAttribute : Attribute => Access<TAttribute, TData>(symbol).FirstOrDefault();
 
     public IEnumerable<TAttribute> Access<TAttribute>(ISymbol symbol)
         where TAttribute : Attribute => Access<TAttribute, TAttribute>(symbol);
@@ -29,6 +30,7 @@ internal class AttributeDataAccessor
     /// Reads the attribute data and sets it on a newly created instance of <see cref="TData"/>.
     /// If <see cref="TAttribute"/> has n type parameters,
     /// <see cref="TData"/> needs to have an accessible ctor with the parameters 0 to n-1 to be of type <see cref="ITypeSymbol"/>.
+    /// <see cref="TData"/> needs to have exactly the same constructors as <see cref="TAttribute"/> with additional type arguments.
     /// </summary>
     /// <param name="symbol">The symbol on which the attributes should be read.</param>
     /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
@@ -39,6 +41,7 @@ internal class AttributeDataAccessor
         where TAttribute : Attribute
     {
         var attrType = typeof(TAttribute);
+        var dataType = typeof(TData);
         var attrSymbol = _types.Get($"{attrType.Namespace}.{attrType.Name}");
 
         var attrDatas = symbol
@@ -50,11 +53,11 @@ internal class AttributeDataAccessor
             var typeArguments = attrData.AttributeClass?.TypeArguments ?? Enumerable.Empty<ITypeSymbol>();
             var ctorArguments = attrData.ConstructorArguments.Select(BuildArgumentValue);
             var newInstanceArguments = typeArguments.Concat(ctorArguments).ToArray();
-            var attr = (TData)Activator.CreateInstance(typeof(TData), newInstanceArguments);
+            var attr = (TData)Activator.CreateInstance(dataType, newInstanceArguments);
 
             foreach (var namedArgument in attrData.NamedArguments)
             {
-                var prop = attrType.GetProperty(namedArgument.Key);
+                var prop = dataType.GetProperty(namedArgument.Key);
                 if (prop == null)
                     throw new InvalidOperationException($"Could not get property {namedArgument.Key} of attribute {attrType.FullName}");
 
@@ -89,9 +92,10 @@ internal class AttributeDataAccessor
 
         var values = arg.Values.Select(BuildArgumentValue).ToArray();
 
-        // if we can't get the element type then it's not available to reflection (only accessible by Roslyn) so use the TypedConstant
-        // if this is the case, a roslyn typed configuration class should be used which accepts the typed constants.
-        var elementType = GetReflectionType(arrayTypeSymbol.ElementType) ?? typeof(TypedConstant);
+        var elementType = GetReflectionType(arrayTypeSymbol.ElementType);
+        if (elementType == null)
+            throw new InvalidOperationException("Non reflection array configurations are not supported");
+
         var typedValues = Array.CreateInstance(elementType, values.Length);
         Array.Copy(values, typedValues, values.Length);
         return (object?[])typedValues;
@@ -99,14 +103,14 @@ internal class AttributeDataAccessor
 
     private static object? GetEnumValue(TypedConstant arg)
     {
+        if (arg.Value == null)
+            return null;
+
         var enumType = GetReflectionType(arg.Type ?? throw new InvalidOperationException("Type is null"));
 
         // if we can't get the enum type then it's not available to reflection (only accessible by Roslyn) so return the TypedConstant
         // if this is the case, a roslyn typed configuration class should be used which accepts the typed constants.
-        if (enumType == null)
-            return arg;
-
-        return arg.Value == null ? null : Enum.ToObject(enumType, arg.Value);
+        return enumType == null ? arg.Type.GetFields().First(f => Equals(f.ConstantValue, arg.Value)) : Enum.ToObject(enumType, arg.Value);
     }
 
     private static Type? GetReflectionType(ITypeSymbol type)

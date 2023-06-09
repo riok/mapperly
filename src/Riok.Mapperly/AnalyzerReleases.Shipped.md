@@ -100,3 +100,5 @@ RMG038  | Mapper   | Info     | An enum member could not be found on the target 
 RMG039  | Mapper   | Error    | Enum source value is specified multiple times, a source enum value may only be specified once
 RMG040  | Mapper   | Error    | A target enum member value does not match the target enum type
 RMG041  | Mapper   | Error    | A source enum member value does not match the source enum type
+RMG042  | Mapper   | Error    | The type of the enum fallback value does not match the target enum type
+RMG043  | Mapper   | Warning  | Enum fallback values are only supported for the ByName and ByValueCheckDefined strategies, but not for the ByValue strategy

@@ -1,12 +1,10 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 using Riok.Mapperly.Helpers;
-
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
-namespace Riok.Mapperly.Descriptors.Mappings;
+namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 
 /// <summary>
 /// Represents a mapping from an enum to a string.

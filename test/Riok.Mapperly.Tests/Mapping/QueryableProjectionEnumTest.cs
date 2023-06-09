@@ -43,7 +43,7 @@ public class QueryableProjectionEnumTest
             .HaveDiagnostic(
                 new(
                     DiagnosticDescriptors.EnumMappingStrategyByNameNotSupportedInProjectionMappings,
-                    "The enum mapping strategy ByName and explicit enum mappings cannot be used in projection mappings to map from C to D"
+                    "The enum mapping strategy ByName, ByValueCheckDefined and explicit enum mappings cannot be used in projection mappings to map from C to D"
                 )
             );
     }
@@ -74,7 +74,7 @@ public class QueryableProjectionEnumTest
             .HaveDiagnostic(
                 new(
                     DiagnosticDescriptors.EnumMappingStrategyByNameNotSupportedInProjectionMappings,
-                    "The enum mapping strategy ByName and explicit enum mappings cannot be used in projection mappings to map from C to D"
+                    "The enum mapping strategy ByName, ByValueCheckDefined and explicit enum mappings cannot be used in projection mappings to map from C to D"
                 )
             );
     }

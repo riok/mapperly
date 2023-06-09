@@ -14,4 +14,10 @@ public enum EnumMappingStrategy
     /// Matches enum members by their names.
     /// </summary>
     ByName,
+
+    /// <summary>
+    /// Matches enum members by their values.
+    /// Checks if the value is defined in the enum.
+    /// </summary>
+    ByValueCheckDefined,
 }

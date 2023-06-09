@@ -9,4 +9,4 @@ namespace Riok.Mapperly.Configuration;
 /// </summary>
 /// <param name="Source">The source constant of the enum value mapping.</param>
 /// <param name="Target">The target constant of the enum value mapping.</param>
-public record EnumValueMappingConfiguration(TypedConstant Source, TypedConstant Target);
+public record EnumValueMappingConfiguration(IFieldSymbol Source, IFieldSymbol Target);

@@ -17,6 +17,7 @@ public class MapperConfiguration
             new EnumMappingConfiguration(
                 Mapper.EnumMappingStrategy,
                 Mapper.EnumMappingIgnoreCase,
+                null,
                 Array.Empty<EnumValueMappingConfiguration>()
             ),
             new PropertiesMappingConfiguration(Array.Empty<string>(), Array.Empty<string>(), Array.Empty<MapPropertyAttribute>()),
@@ -62,11 +63,12 @@ public class MapperConfiguration
 
     private EnumMappingConfiguration BuildEnumConfig(IMethodSymbol method)
     {
-        var config = _dataAccessor.AccessFirstOrDefault<MapEnumAttribute>(method);
+        var configData = _dataAccessor.AccessFirstOrDefault<MapEnumAttribute, MapEnumAttributeData>(method);
         var explicitMappings = _dataAccessor.Access<MapEnumValueAttribute, EnumValueMappingConfiguration>(method).ToList();
         return new EnumMappingConfiguration(
-            config?.Strategy ?? _defaultConfiguration.Enum.Strategy,
-            config?.IgnoreCase ?? _defaultConfiguration.Enum.IgnoreCase,
+            configData?.Strategy ?? _defaultConfiguration.Enum.Strategy,
+            configData?.IgnoreCase ?? _defaultConfiguration.Enum.IgnoreCase,
+            configData?.FallbackValue,
             explicitMappings
         );
     }

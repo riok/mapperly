@@ -1,12 +1,10 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 using Riok.Mapperly.Helpers;
-
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
-namespace Riok.Mapperly.Descriptors.Mappings;
+namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 
 /// <summary>
 /// Represents a mapping from a string to an enum.
@@ -21,30 +19,27 @@ public class EnumFromStringSwitchMapping : MethodMapping
 
     private readonly IEnumerable<IFieldSymbol> _enumMembers;
     private readonly bool _ignoreCase;
-    private readonly EnumFromStringParseMapping _fallbackMapping;
+    private readonly EnumFallbackValueMapping _fallbackMapping;
 
     public EnumFromStringSwitchMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         IEnumerable<IFieldSymbol> enumMembers,
-        bool genericParseMethodSupported,
-        bool ignoreCase
+        bool ignoreCase,
+        EnumFallbackValueMapping fallbackMapping
     )
         : base(sourceType, targetType)
     {
         _enumMembers = enumMembers;
         _ignoreCase = ignoreCase;
-        _fallbackMapping = new EnumFromStringParseMapping(sourceType, targetType, genericParseMethodSupported, ignoreCase);
+        _fallbackMapping = fallbackMapping;
     }
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
-        // fallback switch arm: _ => System.Enum.Parse<TargetType>(source, ignoreCase)
-        var fallbackArm = SwitchExpressionArm(DiscardPattern(), _fallbackMapping.Build(ctx));
-
         // switch for each name to the enum value
         var arms = _ignoreCase ? BuildArmsIgnoreCase(ctx) : _enumMembers.Select(BuildArm);
-        arms = arms.Append(fallbackArm);
+        arms = arms.Append(_fallbackMapping.BuildDiscardArm(ctx));
 
         var switchExpr = SwitchExpression(ctx.Source).WithArms(CommaSeparatedList(arms, true));
 
