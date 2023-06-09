@@ -86,6 +86,22 @@ internal static class SymbolExtensions
         return symbol.GetAllMembers().Where(x => !x.IsStatic && comparer.Equals(name, x.Name)).Select(MappableMember.Create).WhereNotNull();
     }
 
+    internal static IMappableMember? GetMappableMembers(this ITypeSymbol symbol, ReadOnlySpan<char> name, StringComparison comparer)
+    {
+        foreach (var x in symbol.GetAllMembers().Where(x => !x.IsStatic))
+        {
+            if (MemoryExtensions.Equals(name, x.Name.AsSpan(), comparer))
+            {
+                if (MappableMember.Create(x) is { } mappableMember)
+                {
+                    return mappableMember;
+                }
+            }
+        }
+
+        return null;
+    }
+
     internal static IEnumerable<IMappableMember> GetAccessibleMappableMembers(this ITypeSymbol symbol)
     {
         return symbol

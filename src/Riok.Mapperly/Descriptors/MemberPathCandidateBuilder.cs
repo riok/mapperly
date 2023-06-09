@@ -26,7 +26,7 @@ public static class MemberPathCandidateBuilder
         }
     }
 
-    private static IEnumerable<string> BuildName(string source, int[] splitIndices, int enabledSplitPositions)
+    public static IEnumerable<string> BuildName(string source, int[] splitIndices, int enabledSplitPositions)
     {
         var lastSplitIndex = 0;
         var currentSplitPosition = 1;
@@ -45,7 +45,7 @@ public static class MemberPathCandidateBuilder
             yield return source.Substring(lastSplitIndex);
     }
 
-    private static IEnumerable<int> GetPascalCaseSplitIndices(string str)
+    public static IEnumerable<int> GetPascalCaseSplitIndices(string str)
     {
         for (var i = 1; i < str.Length; i++)
         {

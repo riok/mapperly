@@ -23,8 +23,8 @@ public static class ObjectMemberMappingBodyBuilder
     {
         var memberNameComparer =
             ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseSensitive
-                ? StringComparer.Ordinal
-                : StringComparer.OrdinalIgnoreCase;
+                ? StringComparison.Ordinal
+                : StringComparison.OrdinalIgnoreCase;
 
         foreach (var targetMember in ctx.TargetMembers.Values)
         {
@@ -44,7 +44,7 @@ public static class ObjectMemberMappingBodyBuilder
             if (
                 MemberPath.TryFind(
                     ctx.Mapping.SourceType,
-                    MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
+                    targetMember.Name,
                     ctx.IgnoredSourceMemberNames,
                     memberNameComparer,
                     out var sourceMemberPath

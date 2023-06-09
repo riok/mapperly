@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
@@ -177,20 +178,20 @@ public class MemberPath
 
     public static bool TryFind(
         ITypeSymbol type,
-        IEnumerable<IEnumerable<string>> pathCandidates,
+        string source,
         IReadOnlyCollection<string> ignoredNames,
         [NotNullWhen(true)] out MemberPath? memberPath
-    ) => TryFind(type, pathCandidates, ignoredNames, StringComparer.Ordinal, out memberPath);
+    ) => TryFind(type, source, ignoredNames, StringComparison.Ordinal, out memberPath);
 
     public static bool TryFind(
         ITypeSymbol type,
-        IEnumerable<IEnumerable<string>> pathCandidates,
+        string source,
         IReadOnlyCollection<string> ignoredNames,
-        IEqualityComparer<string> comparer,
+        StringComparison comparer,
         [NotNullWhen(true)] out MemberPath? memberPath
     )
     {
-        foreach (var pathCandidate in FindCandidates(type, pathCandidates, comparer))
+        foreach (var pathCandidate in FindCandidates(type, source, comparer))
         {
             if (ignoredNames.Contains(pathCandidate.Path.First().Name))
                 continue;
@@ -206,17 +207,76 @@ public class MemberPath
     public static bool TryFind(ITypeSymbol type, IReadOnlyCollection<string> path, [NotNullWhen(true)] out MemberPath? memberPath) =>
         TryFind(type, path, StringComparer.Ordinal, out memberPath);
 
-    private static IEnumerable<MemberPath> FindCandidates(
+    private static IEnumerable<MemberPath> FindCandidates(ITypeSymbol type, string source, StringComparison comparer)
+    {
+        if (source.Length == 0)
+            yield break;
+
+        // try full string
+        if (FindMember(type, source.AsSpan(), comparer) is { } fullMember)
+        {
+            yield return new MemberPath(new[] { fullMember });
+        }
+
+        var indices = MemberPathCandidateBuilder.GetPascalCaseSplitIndices(source).ToArray();
+
+        var final = new IMappableMember[32];
+        // try all permutations, skipping the first because the full string is already yielded
+        var permutationsCount = 1 << indices.Length;
+
+        for (var i = 1; i < permutationsCount; i++)
+        {
+            if (TryBuildMemberPath(type, source, comparer, indices, i, final) is { } memberPath)
+            {
+                yield return memberPath;
+            }
+        }
+    }
+
+    private static MemberPath? TryBuildMemberPath(
         ITypeSymbol type,
-        IEnumerable<IEnumerable<string>> pathCandidates,
-        IEqualityComparer<string> comparer
+        string source,
+        StringComparison comparer,
+        int[] indices,
+        int i,
+        IMappableMember[] final
     )
     {
-        foreach (var pathCandidate in pathCandidates)
+        var pos = 0;
+        var lastSplitIndex = 0;
+        var currentSplitPosition = 1;
+        foreach (var splitIndex in indices)
         {
-            if (TryFind(type, pathCandidate.ToList(), comparer, out var memberPath))
-                yield return memberPath;
+            if ((i & currentSplitPosition) == currentSplitPosition)
+            {
+                var slice = source.AsSpan().Slice(lastSplitIndex, splitIndex - lastSplitIndex);
+                if (FindMember(type, slice, comparer) is not { } member)
+                {
+                    return null;
+                }
+
+                final[pos] = member;
+                pos++;
+                type = member.Type;
+                lastSplitIndex = splitIndex;
+            }
+
+            currentSplitPosition <<= 1;
         }
+
+        if (lastSplitIndex < source.Length)
+        {
+            var slice = source.AsSpan().Slice(lastSplitIndex);
+            if (FindMember(type, slice, comparer) is not { } member)
+            {
+                return null;
+            }
+
+            final[pos] = member;
+            pos++;
+        }
+
+        return new MemberPath(final.Take(pos).ToArray());
     }
 
     private static bool TryFind(
@@ -252,5 +312,10 @@ public class MemberPath
     private static IMappableMember? FindMember(ITypeSymbol type, string name, IEqualityComparer<string> comparer)
     {
         return type.GetMappableMembers(name, comparer).FirstOrDefault();
+    }
+
+    private static IMappableMember? FindMember(ITypeSymbol type, ReadOnlySpan<char> name, StringComparison comparer)
+    {
+        return type.GetMappableMembers(name, comparer);
     }
 }
