@@ -28,20 +28,18 @@ public static class EnumMappingBuilder
                 : null;
         }
 
-        // since enums are immutable they can be directly assigned if they are of the same type
-        if (SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, ctx.Target))
-            return new DirectAssignmentMapping(ctx.Source);
-
         if (!ctx.IsConversionEnabled(MappingConversionType.EnumToEnum))
             return null;
 
         // map enums by strategy
         var config = ctx.GetConfigurationOrDefault<MapEnumAttribute>();
+        var explicitMappings = BuildExplicitValueMapping(ctx);
         return config.Strategy switch
         {
             EnumMappingStrategy.ByName when ctx.IsExpression => BuildCastMappingAndDiagnostic(ctx),
-            EnumMappingStrategy.ByName => BuildNameMapping(ctx, config.IgnoreCase),
-            _ => BuildEnumToEnumCastMapping(ctx),
+            EnumMappingStrategy.ByValue when ctx.IsExpression && explicitMappings.Count > 0 => BuildCastMappingAndDiagnostic(ctx),
+            EnumMappingStrategy.ByName => BuildNameMapping(ctx, explicitMappings, config.IgnoreCase),
+            _ => BuildEnumToEnumCastMapping(ctx, explicitMappings),
         };
     }
 
@@ -52,13 +50,26 @@ public static class EnumMappingBuilder
             ctx.Source.ToDisplayString(),
             ctx.Target.ToDisplayString()
         );
-        return BuildEnumToEnumCastMapping(ctx);
+        return BuildEnumToEnumCastMapping(ctx, new Dictionary<IFieldSymbol, IFieldSymbol>(SymbolEqualityComparer.Default));
     }
 
-    private static TypeMapping BuildEnumToEnumCastMapping(MappingBuilderContext ctx)
+    private static TypeMapping BuildEnumToEnumCastMapping(
+        MappingBuilderContext ctx,
+        IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> explicitMappings
+    )
     {
-        var sourceValues = ctx.Source.GetMembers().OfType<IFieldSymbol>().ToDictionary(field => field.Name, field => field.ConstantValue);
-        var targetValues = ctx.Target.GetMembers().OfType<IFieldSymbol>().ToDictionary(field => field.Name, field => field.ConstantValue);
+        var explicitMappingSourceNames = explicitMappings.Keys.Select(x => x.Name).ToHashSet();
+        var explicitMappingTargetNames = explicitMappings.Values.Select(x => x.Name).ToHashSet();
+        var sourceValues = ctx.Source
+            .GetMembers()
+            .OfType<IFieldSymbol>()
+            .Where(x => !explicitMappingSourceNames.Contains(x.Name))
+            .ToDictionary(field => field.Name, field => field.ConstantValue);
+        var targetValues = ctx.Target
+            .GetMembers()
+            .OfType<IFieldSymbol>()
+            .Where(x => !explicitMappingTargetNames.Contains(x.Name))
+            .ToDictionary(field => field.Name, field => field.ConstantValue);
 
         var missingTargetValues = targetValues.Where(field => !sourceValues.ContainsValue(field.Value));
         foreach (var member in missingTargetValues)
@@ -72,12 +83,22 @@ public static class EnumMappingBuilder
             ctx.ReportDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, member.Key, member.Value!, ctx.Source, ctx.Target);
         }
 
-        return new CastMapping(ctx.Source, ctx.Target);
+        var fallbackMapping = new CastMapping(ctx.Source, ctx.Target);
+        if (explicitMappings.Count == 0)
+            return fallbackMapping;
+
+        var explicitNameMappings = explicitMappings
+            .Where(x => !x.Value.ConstantValue!.Equals(x.Key.ConstantValue))
+            .ToDictionary(x => x.Key.Name, x => x.Value.Name);
+        return new EnumNameMapping(ctx.Source, ctx.Target, explicitNameMappings, fallbackMapping);
     }
 
-    private static TypeMapping BuildNameMapping(MappingBuilderContext ctx, bool ignoreCase)
+    private static EnumNameMapping BuildNameMapping(
+        MappingBuilderContext ctx,
+        IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> explicitMappings,
+        bool ignoreCase
+    )
     {
-        var targetFieldsByExplicitValue = BuildExplicitValueMapping(ctx);
         var targetFieldsByName = ctx.Target.GetMembers().OfType<IFieldSymbol>().ToDictionary(x => x.Name);
         var sourceFieldsByName = ctx.Source.GetMembers().OfType<IFieldSymbol>().ToDictionary(x => x.Name);
 
@@ -88,14 +109,13 @@ public static class EnumMappingBuilder
                 .DistinctBy(x => x.Key, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
             getTargetField = source =>
-                targetFieldsByExplicitValue.GetValueOrDefault(source)
+                explicitMappings.GetValueOrDefault(source)
                 ?? targetFieldsByName.GetValueOrDefault(source.Name)
                 ?? targetFieldsByNameIgnoreCase.GetValueOrDefault(source.Name);
         }
         else
         {
-            getTargetField = source =>
-                targetFieldsByExplicitValue.GetValueOrDefault(source) ?? targetFieldsByName.GetValueOrDefault(source.Name);
+            getTargetField = source => explicitMappings.GetValueOrDefault(source) ?? targetFieldsByName.GetValueOrDefault(source.Name);
         }
 
         var enumMemberMappings = ctx.Source

@@ -278,8 +278,8 @@ internal static class DiagnosticDescriptors
 
     public static readonly DiagnosticDescriptor EnumMappingStrategyByNameNotSupportedInProjectionMappings = new DiagnosticDescriptor(
         "RMG032",
-        "The enum mapping strategy ByName cannot be used in projection mappings",
-        "The enum mapping strategy ByName cannot be used in projection mappings to map from {0} to {1}",
+        "The enum mapping strategy ByName and explicit enum mappings cannot be used in projection mappings",
+        "The enum mapping strategy ByName and explicit enum mappings cannot be used in projection mappings to map from {0} to {1}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true

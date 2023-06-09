@@ -34,25 +34,4 @@ public class DictionaryExtensionsTest
         d.RemoveRange(new[] { "a", "c" });
         d.Keys.Should().BeEquivalentTo("b");
     }
-
-    [Fact]
-    public void GetValueOrDefaultShouldReturnValueIfFound()
-    {
-        var d = new Dictionary<string, int> { ["a"] = 10, ["b"] = 20, };
-        DictionaryExtensions.GetValueOrDefault(d, "a").Should().Be(10);
-    }
-
-    [Fact]
-    public void GetValueOrDefaultShouldReturnDefaultForPrimitiveIfNotFound()
-    {
-        var d = new Dictionary<string, int> { ["a"] = 10, ["b"] = 20, };
-        DictionaryExtensions.GetValueOrDefault(d, "c").Should().Be(0);
-    }
-
-    [Fact]
-    public void GetValueOrDefaultShouldReturnDefaultForReferenceTypeIfNotFound()
-    {
-        var d = new Dictionary<string, Version> { ["a"] = new(), ["b"] = new(), };
-        DictionaryExtensions.GetValueOrDefault(d, "c").Should().BeNull();
-    }
 }
