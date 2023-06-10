@@ -8,23 +8,23 @@ public static class MemberPathCandidateBuilder
     /// </summary>
     /// <param name="name">The name to build candidates from.</param>
     /// <returns>The joined member path groups.</returns>
-    internal static IEnumerable<IEnumerable<string>> BuildMemberPathCandidates(string name)
-    {
-        if (name.Length == 0)
-            yield break;
-
-        // yield full string
-        yield return new[] { name };
-
-        var indices = GetPascalCaseSplitIndices(name).ToArray();
-
-        // try all permutations, skipping the first because the full string is already yielded
-        var permutationsCount = 1 << indices.Length;
-        for (var i = 1; i < permutationsCount; i++)
-        {
-            yield return BuildName(name, indices, i);
-        }
-    }
+    // internal static IEnumerable<IEnumerable<string>> BuildMemberPathCandidates(string name)
+    // {
+    //     if (name.Length == 0)
+    //         yield break;
+    //
+    //     // yield full string
+    //     yield return new[] { name };
+    //
+    //     var indices = GetPascalCaseSplitIndices(name).ToArray();
+    //
+    //     // try all permutations, skipping the first because the full string is already yielded
+    //     var permutationsCount = 1 << indices.Length;
+    //     for (var i = 1; i < permutationsCount; i++)
+    //     {
+    //         yield return BuildName(name, indices, i);
+    //     }
+    // }
 
     public static IEnumerable<string> BuildName(string source, int[] splitIndices, int enabledSplitPositions)
     {
@@ -45,12 +45,18 @@ public static class MemberPathCandidateBuilder
             yield return source.Substring(lastSplitIndex);
     }
 
-    public static IEnumerable<int> GetPascalCaseSplitIndices(string str)
+    public static Span<int> GetPascalCaseSplitIndices(string str, Span<int> input)
     {
+        var j = 0;
         for (var i = 1; i < str.Length; i++)
         {
             if (char.IsUpper(str[i]))
-                yield return i;
+            {
+                input[j] = i;
+                j++;
+            }
         }
+
+        return input.Slice(0, j);
     }
 }

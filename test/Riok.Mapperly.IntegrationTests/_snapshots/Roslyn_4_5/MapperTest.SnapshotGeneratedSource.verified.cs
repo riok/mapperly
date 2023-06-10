@@ -185,17 +185,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             };
         }
 
-        public partial global::Riok.Mapperly.IntegrationTests.Models.TestEnum MapToEnumDtoByNameWithExplicit(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoExplicitLarger v)
-        {
-            return v switch
-            {
-                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoExplicitLarger.Value10 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10,
-                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoExplicitLarger.Value20 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20,
-                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoExplicitLarger.Value30 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
-                _ => throw new System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnumDtoExplicitLarger is not supported"),
-            };
-        }
-
         public partial void UpdateDto(global::Riok.Mapperly.IntegrationTests.Models.TestObject source, global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto target)
         {
             if (source.NullableFlattening != null)

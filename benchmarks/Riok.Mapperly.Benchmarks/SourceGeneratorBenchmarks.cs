@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Loggers;
 using Microsoft.Build.Locator;
@@ -39,6 +40,7 @@ public class SourceGeneratorBenchmarks
 
     private async Task<(Compilation, CSharpGeneratorDriver)> SetupAsync(string projectPath)
     {
+        var time1 = Stopwatch.GetTimestamp();
         _workspace = MSBuildWorkspace.Create();
         _workspace.WorkspaceFailed += (sender, args) =>
         {
@@ -53,6 +55,9 @@ public class SourceGeneratorBenchmarks
 
         ConsoleLogger.Default.WriteLine($"Project exists at {projectFile}");
 
+        ConsoleLogger.Default.WriteInfo($"Time: {Stopwatch.GetElapsedTime(time1)}\n");
+        var time2 = Stopwatch.GetTimestamp();
+
         Project project;
         try
         {
@@ -65,14 +70,21 @@ public class SourceGeneratorBenchmarks
             ConsoleLogger.Default.WriteError(ex.Message);
             throw;
         }
+        ConsoleLogger.Default.WriteInfo($"Opened Time: {Stopwatch.GetElapsedTime(time2)}\n");
+
+        var time3 = Stopwatch.GetTimestamp();
 
         var compilation = await project.GetCompilationAsync();
         if (compilation == null)
             throw new InvalidOperationException("Compilation returned null");
 
+        ConsoleLogger.Default.WriteInfo($"Comp Time: {Stopwatch.GetElapsedTime(time3)}\n");
+        var time4 = Stopwatch.GetTimestamp();
+
         var generator = new MapperGenerator().AsSourceGenerator();
 
         var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: (CSharpParseOptions)project.ParseOptions!);
+        ConsoleLogger.Default.WriteInfo($"Driver Time: {Stopwatch.GetElapsedTime(time4)}\n");
 
         return (compilation, driver);
     }

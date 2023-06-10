@@ -191,12 +191,17 @@ public class MemberPath
         [NotNullWhen(true)] out MemberPath? memberPath
     )
     {
-        foreach (var pathCandidate in FindCandidates(type, source, comparer))
+        // foreach (var pathCandidate in FindCandidate(type, source, comparer, ignoredNames))
+        // {
+        //     if (ignoredNames.Contains(pathCandidate.Path.First().Name))
+        //         continue;
+        //
+        //     memberPath = pathCandidate;
+        //     return true;
+        // }
+        memberPath = FindCandidate(type, source, comparer, ignoredNames);
+        if (memberPath != null)
         {
-            if (ignoredNames.Contains(pathCandidate.Path.First().Name))
-                continue;
-
-            memberPath = pathCandidate;
             return true;
         }
 
@@ -207,20 +212,31 @@ public class MemberPath
     public static bool TryFind(ITypeSymbol type, IReadOnlyCollection<string> path, [NotNullWhen(true)] out MemberPath? memberPath) =>
         TryFind(type, path, StringComparer.Ordinal, out memberPath);
 
-    private static IEnumerable<MemberPath> FindCandidates(ITypeSymbol type, string source, StringComparison comparer)
+    private static MemberPath? FindCandidate(
+        ITypeSymbol type,
+        string source,
+        StringComparison comparer,
+        IReadOnlyCollection<string> ignoredNames
+    )
     {
         if (source.Length == 0)
-            yield break;
+            return null;
+
+        if (source == "FlatteningIdValue")
+        {
+            // Console.WriteLine("Hey");
+        }
 
         // try full string
         if (FindMember(type, source.AsSpan(), comparer) is { } fullMember)
         {
-            yield return new MemberPath(new[] { fullMember });
+            if (!ignoredNames.Contains(source))
+                return new MemberPath(new[] { fullMember });
         }
 
-        var indices = MemberPathCandidateBuilder.GetPascalCaseSplitIndices(source).ToArray();
+        var indices = MemberPathCandidateBuilder.GetPascalCaseSplitIndices(source, stackalloc int[16]);
 
-        var final = new IMappableMember[32];
+        var final = new List<IMappableMember>(2);
         // try all permutations, skipping the first because the full string is already yielded
         var permutationsCount = 1 << indices.Length;
 
@@ -228,21 +244,24 @@ public class MemberPath
         {
             if (TryBuildMemberPath(type, source, comparer, indices, i, final) is { } memberPath)
             {
-                yield return memberPath;
+                if (!ignoredNames.Contains(memberPath.Path.First().Name))
+                    return memberPath;
             }
+            final.Clear();
         }
+
+        return null;
     }
 
     private static MemberPath? TryBuildMemberPath(
         ITypeSymbol type,
         string source,
         StringComparison comparer,
-        int[] indices,
+        Span<int> indices,
         int i,
-        IMappableMember[] final
+        List<IMappableMember> final
     )
     {
-        var pos = 0;
         var lastSplitIndex = 0;
         var currentSplitPosition = 1;
         foreach (var splitIndex in indices)
@@ -255,8 +274,7 @@ public class MemberPath
                     return null;
                 }
 
-                final[pos] = member;
-                pos++;
+                final.Add(member);
                 type = member.Type;
                 lastSplitIndex = splitIndex;
             }
@@ -272,11 +290,10 @@ public class MemberPath
                 return null;
             }
 
-            final[pos] = member;
-            pos++;
+            final.Add(member);
         }
 
-        return new MemberPath(final.Take(pos).ToArray());
+        return new MemberPath(final);
     }
 
     private static bool TryFind(
