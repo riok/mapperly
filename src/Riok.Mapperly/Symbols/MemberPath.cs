@@ -180,14 +180,16 @@ public class MemberPath
         ITypeSymbol type,
         string source,
         IReadOnlyCollection<string> ignoredNames,
+        WellKnownTypes knownTypes,
         [NotNullWhen(true)] out MemberPath? memberPath
-    ) => TryFind(type, source, ignoredNames, StringComparison.Ordinal, out memberPath);
+    ) => TryFind(type, source, ignoredNames, StringComparison.Ordinal, knownTypes, out memberPath);
 
     public static bool TryFind(
         ITypeSymbol type,
         string source,
         IReadOnlyCollection<string> ignoredNames,
         StringComparison comparer,
+        WellKnownTypes knownTypes,
         [NotNullWhen(true)] out MemberPath? memberPath
     )
     {
@@ -199,7 +201,7 @@ public class MemberPath
         //     memberPath = pathCandidate;
         //     return true;
         // }
-        memberPath = FindCandidate(type, source, comparer, ignoredNames);
+        memberPath = FindCandidate(type, source, comparer, ignoredNames, knownTypes);
         if (memberPath != null)
         {
             return true;
@@ -216,19 +218,15 @@ public class MemberPath
         ITypeSymbol type,
         string source,
         StringComparison comparer,
-        IReadOnlyCollection<string> ignoredNames
+        IReadOnlyCollection<string> ignoredNames,
+        WellKnownTypes knownTypes
     )
     {
         if (source.Length == 0)
             return null;
 
-        if (source == "FlatteningIdValue")
-        {
-            // Console.WriteLine("Hey");
-        }
-
         // try full string
-        if (FindMember(type, source.AsSpan(), comparer) is { } fullMember)
+        if (FindMember(type, source.AsSpan(), comparer, knownTypes) is { } fullMember)
         {
             if (!ignoredNames.Contains(source))
                 return new MemberPath(new[] { fullMember });
@@ -242,7 +240,7 @@ public class MemberPath
 
         for (var i = 1; i < permutationsCount; i++)
         {
-            if (TryBuildMemberPath(type, source, comparer, indices, i, final) is { } memberPath)
+            if (TryBuildMemberPath(type, source, comparer, indices, i, final, knownTypes) is { } memberPath)
             {
                 if (!ignoredNames.Contains(memberPath.Path.First().Name))
                     return memberPath;
@@ -259,7 +257,8 @@ public class MemberPath
         StringComparison comparer,
         Span<int> indices,
         int i,
-        List<IMappableMember> final
+        List<IMappableMember> final,
+        WellKnownTypes knownTypes
     )
     {
         var lastSplitIndex = 0;
@@ -269,7 +268,7 @@ public class MemberPath
             if ((i & currentSplitPosition) == currentSplitPosition)
             {
                 var slice = source.AsSpan().Slice(lastSplitIndex, splitIndex - lastSplitIndex);
-                if (FindMember(type, slice, comparer) is not { } member)
+                if (FindMember(type, slice, comparer, knownTypes) is not { } member)
                 {
                     return null;
                 }
@@ -285,7 +284,7 @@ public class MemberPath
         if (lastSplitIndex < source.Length)
         {
             var slice = source.AsSpan().Slice(lastSplitIndex);
-            if (FindMember(type, slice, comparer) is not { } member)
+            if (FindMember(type, slice, comparer, knownTypes) is not { } member)
             {
                 return null;
             }
@@ -331,8 +330,13 @@ public class MemberPath
         return type.GetMappableMembers(name, comparer).FirstOrDefault();
     }
 
-    private static IMappableMember? FindMember(ITypeSymbol type, ReadOnlySpan<char> name, StringComparison comparer)
+    private static IMappableMember? FindMember(
+        ITypeSymbol type,
+        ReadOnlySpan<char> name,
+        StringComparison comparer,
+        WellKnownTypes knownTypes
+    )
     {
-        return type.GetMappableMembers(name, comparer);
+        return knownTypes.GetMembers(type).GetMappableMembers(name, comparer);
     }
 }

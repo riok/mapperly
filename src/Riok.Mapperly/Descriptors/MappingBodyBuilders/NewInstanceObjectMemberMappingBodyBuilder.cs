@@ -46,7 +46,15 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 continue;
             }
 
-            if (!MemberPath.TryFind(ctx.Mapping.SourceType, targetMember.Name, ctx.IgnoredSourceMemberNames, out var sourceMemberPath))
+            if (
+                !MemberPath.TryFind(
+                    ctx.Mapping.SourceType,
+                    targetMember.Name,
+                    ctx.IgnoredSourceMemberNames,
+                    ctx.BuilderContext.Types,
+                    out var sourceMemberPath
+                )
+            )
             {
                 ctx.BuilderContext.ReportDiagnostic(
                     targetMember.IsRequired ? DiagnosticDescriptors.RequiredMemberNotMapped : DiagnosticDescriptors.SourceMemberNotFound,
@@ -285,6 +293,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 parameter.Name,
                 ctx.IgnoredSourceMemberNames,
                 StringComparison.OrdinalIgnoreCase,
+                ctx.BuilderContext.Types,
                 out sourcePath
             );
         }

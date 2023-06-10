@@ -47,6 +47,7 @@ public static class ObjectMemberMappingBodyBuilder
                     targetMember.Name,
                     ctx.IgnoredSourceMemberNames,
                     memberNameComparer,
+                    ctx.BuilderContext.Types,
                     out var sourceMemberPath
                 )
             )

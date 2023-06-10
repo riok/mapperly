@@ -1,4 +1,4 @@
-using Riok.Mapperly.Descriptors;
+// using Riok.Mapperly.Descriptors;
 
 namespace Riok.Mapperly.Tests.Descriptors;
 

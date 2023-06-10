@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -36,5 +37,17 @@ public class WellKnownTypes
         _cachedTypes.Add(typeFullName, typeSymbol);
 
         return typeSymbol;
+    }
+
+    private readonly Dictionary<ITypeSymbol, ISymbol[]> _cachedSymbols = new();
+
+    public IEnumerable<ISymbol> GetMembers(ITypeSymbol symbol)
+    {
+        if (_cachedSymbols.TryGetValue(symbol, out var members))
+            return members;
+
+        var symbolsMembers = symbol.GetAllMembers().Where(x => !x.IsStatic).ToArray();
+        _cachedSymbols.Add(symbol, symbolsMembers);
+        return symbolsMembers;
     }
 }
