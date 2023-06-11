@@ -13,7 +13,7 @@ namespace Riok.Mapperly.IntegrationTests.Dto
             CtorValue2 = ctorValue2;
         }
 
-        // public int ABCDEFGHIJKLM { get; set; }
+        public int ABCDEFGHIJKLM { get; set; }
         public int CtorValue { get; set; }
 
         public int CtorValue2 { get; set; }

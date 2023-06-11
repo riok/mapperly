@@ -39,9 +39,9 @@ public class WellKnownTypes
         return typeSymbol;
     }
 
-    private readonly Dictionary<ITypeSymbol, ISymbol[]> _cachedSymbols = new();
+    private readonly Dictionary<ITypeSymbol, ISymbol[]> _cachedSymbols = new(SymbolEqualityComparer.Default);
 
-    public IEnumerable<ISymbol> GetMembers(ITypeSymbol symbol)
+    public ISymbol[] GetMembers(ITypeSymbol symbol)
     {
         if (_cachedSymbols.TryGetValue(symbol, out var members))
             return members;
