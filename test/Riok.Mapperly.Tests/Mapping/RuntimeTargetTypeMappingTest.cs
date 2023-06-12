@@ -272,7 +272,8 @@ public class RuntimeTargetTypeMappingTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.UnsupportedMappingMethodSignature));
+            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature)
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -287,6 +288,7 @@ public class RuntimeTargetTypeMappingTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.UnsupportedMappingMethodSignature));
+            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature)
+            .HaveAssertedAllDiagnostics();
     }
 }

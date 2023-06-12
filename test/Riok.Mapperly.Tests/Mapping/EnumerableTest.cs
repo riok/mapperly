@@ -630,7 +630,8 @@ public class EnumerableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
+            .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -674,6 +675,6 @@ public class EnumerableTest
             return target;
             """
             )
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
     }
 }

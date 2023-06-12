@@ -347,7 +347,8 @@ public class CastTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
+            .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -361,7 +362,8 @@ public class CastTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
+            .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -371,6 +373,7 @@ public class CastTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
+            .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
+            .HaveAssertedAllDiagnostics();
     }
 }

@@ -52,6 +52,7 @@ public class ParseTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
+            .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
+            .HaveAssertedAllDiagnostics();
     }
 }

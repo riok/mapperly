@@ -148,10 +148,8 @@ public class ReferenceHandlingTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                new DiagnosticMatcher(
-                    DiagnosticDescriptors.ReferenceHandlerParameterWrongType,
-                    "The reference handler parameter of Mapper.Map needs to be of type Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler but is MyRefHandler"
-                )
+                DiagnosticDescriptors.ReferenceHandlerParameterWrongType,
+                "The reference handler parameter of Mapper.Map needs to be of type Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler but is MyRefHandler"
             );
     }
 
@@ -185,11 +183,10 @@ public class ReferenceHandlingTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                new DiagnosticMatcher(
-                    DiagnosticDescriptors.ReferenceHandlingNotEnabled,
-                    "Mapper.Map uses reference handling, but it is not enabled on the mapper attribute, to enable reference handling set UseReferenceHandling to true"
-                )
-            );
+                DiagnosticDescriptors.ReferenceHandlingNotEnabled,
+                "Mapper.Map uses reference handling, but it is not enabled on the mapper attribute, to enable reference handling set UseReferenceHandling to true"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]

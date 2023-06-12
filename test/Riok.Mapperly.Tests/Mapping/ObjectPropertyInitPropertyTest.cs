@@ -216,17 +216,14 @@ public class ObjectPropertyInitPropertyTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.CannotMapToInitOnlyMemberPath,
-                    "Cannot map from member A.StringValue of type string to init only member path B.StringValue of type string"
-                )
+                DiagnosticDescriptors.CannotMapToInitOnlyMemberPath,
+                "Cannot map from member A.StringValue of type string to init only member path B.StringValue of type string"
             )
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.SourceMemberNotMapped,
-                    "The member StringValue on the mapping source type A is not mapped to any member on the mapping target type B"
-                )
-            );
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member StringValue on the mapping source type A is not mapped to any member on the mapping target type B"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -243,17 +240,14 @@ public class ObjectPropertyInitPropertyTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.SourceMemberNotFound,
-                    "The member StringValue on the mapping target type B was not found on the mapping source type A"
-                )
+                DiagnosticDescriptors.SourceMemberNotFound,
+                "The member StringValue on the mapping target type B was not found on the mapping source type A"
             )
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.SourceMemberNotMapped,
-                    "The member StringValue2 on the mapping source type A is not mapped to any member on the mapping target type B"
-                )
-            );
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member StringValue2 on the mapping source type A is not mapped to any member on the mapping target type B"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]

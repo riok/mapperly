@@ -29,12 +29,13 @@ public class EnumExplicitMapTest
                 };
                 """
             )
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member d (103) on E2 not found on target enum E1"))
+            .HaveDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member d (103) on E2 not found on target enum E1")
             .HaveDiagnostics(
                 DiagnosticDescriptors.TargetEnumValueNotMapped,
                 "Enum member D (3) on E1 not found on source enum E2",
                 "Enum member F (6) on E1 not found on source enum E2"
-            );
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -63,7 +64,12 @@ public class EnumExplicitMapTest
                 };
                 """
             )
-            .HaveDiagnostic(new(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member D (3) on E1 not found on source enum E2"));
+            .HaveDiagnostics(
+                DiagnosticDescriptors.TargetEnumValueNotMapped,
+                "Enum member D (3) on E1 not found on source enum E2",
+                "Enum member F (6) on E1 not found on source enum E2"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -92,10 +98,8 @@ public class EnumExplicitMapTest
                 """
             )
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.EnumSourceValueDuplicated,
-                    "Enum source value E2.e is specified multiple times, a source enum value may only be specified once"
-                )
+                DiagnosticDescriptors.EnumSourceValueDuplicated,
+                "Enum source value E2.e is specified multiple times, a source enum value may only be specified once"
             );
     }
 
@@ -120,11 +124,10 @@ public class EnumExplicitMapTest
                 """
             )
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.TargetEnumValueDoesNotMatchTargetEnumType,
-                    "Enum member E2.A (0) on E2 does not match type of target enum E1"
-                )
-            );
+                DiagnosticDescriptors.TargetEnumValueDoesNotMatchTargetEnumType,
+                "Enum member E2.A (0) on E2 does not match type of target enum E1"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -148,11 +151,10 @@ public class EnumExplicitMapTest
                 """
             )
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.SourceEnumValueDoesNotMatchSourceEnumType,
-                    "Enum member E1.A (0) on E1 does not match type of source enum E2"
-                )
-            );
+                DiagnosticDescriptors.SourceEnumValueDoesNotMatchSourceEnumType,
+                "Enum member E1.A (0) on E1 does not match type of source enum E2"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -243,12 +245,11 @@ public class EnumExplicitMapTest
                 """
             )
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.EnumSourceValueDuplicated,
-                    "Enum source value E2.X is specified multiple times, a source enum value may only be specified once"
-                )
+                DiagnosticDescriptors.EnumSourceValueDuplicated,
+                "Enum source value E2.X is specified multiple times, a source enum value may only be specified once"
             )
-            .HaveDiagnostic(new(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member YY (200) on E1 not found on source enum E2"));
+            .HaveDiagnostic(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member YY (200) on E1 not found on source enum E2")
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -264,12 +265,11 @@ public class EnumExplicitMapTest
             .Should()
             .HaveSingleMethodBody("return (global::E1)source;")
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.SourceEnumValueDoesNotMatchSourceEnumType,
-                    "Enum member E1.XX (100) on E1 does not match type of source enum E2"
-                )
+                DiagnosticDescriptors.SourceEnumValueDoesNotMatchSourceEnumType,
+                "Enum member E1.XX (100) on E1 does not match type of source enum E2"
             )
-            .HaveDiagnostic(new(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member XX (100) on E1 not found on source enum E2"));
+            .HaveDiagnostic(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member XX (100) on E1 not found on source enum E2")
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -285,11 +285,10 @@ public class EnumExplicitMapTest
             .Should()
             .HaveSingleMethodBody("return (global::E1)source;")
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.TargetEnumValueDoesNotMatchTargetEnumType,
-                    "Enum member E2.XX (100) on E2 does not match type of target enum E1"
-                )
+                DiagnosticDescriptors.TargetEnumValueDoesNotMatchTargetEnumType,
+                "Enum member E2.XX (100) on E2 does not match type of target enum E1"
             )
-            .HaveDiagnostic(new(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member XX (100) on E2 not found on target enum E1"));
+            .HaveDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member XX (100) on E2 not found on target enum E1")
+            .HaveAssertedAllDiagnostics();
     }
 }

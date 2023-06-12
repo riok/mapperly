@@ -63,11 +63,10 @@ public class EnumFallbackValueTest
                 "return global::System.Enum.IsDefined(typeof(global::E2), (global::E2)source) ? (global::E2)source : global::E2.Unknown;"
             )
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.EnumFallbackValueRequiresByValueCheckDefinedStrategy,
-                    "Enum fallback values are only supported for the ByName and ByValueCheckDefined strategies, but not for the ByValue strategy"
-                )
-            );
+                DiagnosticDescriptors.EnumFallbackValueRequiresByValueCheckDefinedStrategy,
+                "Enum fallback values are only supported for the ByName and ByValueCheckDefined strategies, but not for the ByValue strategy"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]

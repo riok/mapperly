@@ -96,7 +96,7 @@ public class DictionaryImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
     }
 
     [Fact]
@@ -112,6 +112,6 @@ public class DictionaryImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
     }
 }

@@ -213,12 +213,8 @@ public record B(int Value);
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(
-                new DiagnosticMatcher(
-                    DiagnosticDescriptors.UnsupportedMappingMethodSignature,
-                    "ToString has an unsupported mapping method signature"
-                )
-            );
+            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "ToString has an unsupported mapping method signature")
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -233,7 +229,8 @@ public record B(int Value);
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.UnsupportedMappingMethodSignature));
+            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "Map has an unsupported mapping method signature")
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -249,7 +246,8 @@ public record B(int Value);
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.UnsupportedMappingMethodSignature));
+            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature)
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -264,7 +262,8 @@ public record B(int Value);
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.UnsupportedMappingMethodSignature));
+            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature)
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -275,12 +274,8 @@ public record B(int Value);
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(
-                new DiagnosticMatcher(
-                    DiagnosticDescriptors.UnsupportedMappingMethodSignature,
-                    "Map has an unsupported mapping method signature"
-                )
-            );
+            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "Map has an unsupported mapping method signature")
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]

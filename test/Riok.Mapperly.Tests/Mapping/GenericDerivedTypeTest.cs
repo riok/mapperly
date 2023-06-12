@@ -86,11 +86,10 @@ public class GenericDerivedTypeTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.DerivedTargetTypeIsNotAssignableToReturnType,
-                    "Derived target type D is not assignable to return type TTarget"
-                )
+                DiagnosticDescriptors.DerivedTargetTypeIsNotAssignableToReturnType,
+                "Derived target type D is not assignable to return type TTarget"
             )
+            .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """
                 return source switch

@@ -481,7 +481,7 @@ public class DictionaryTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember))
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
             .HaveMapMethodBody(
                 """
                 var target = new global::A();
@@ -502,7 +502,7 @@ public class DictionaryTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember))
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();

@@ -39,17 +39,14 @@ public class ObjectPropertyIgnoreTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.SourceMemberNotMapped,
-                    "The member StringValue2 on the mapping source type A is not mapped to any member on the mapping target type B"
-                )
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member StringValue2 on the mapping source type A is not mapped to any member on the mapping target type B"
             )
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.SourceMemberNotFound,
-                    "The member StringValue on the mapping target type B was not found on the mapping source type A"
-                )
+                DiagnosticDescriptors.SourceMemberNotFound,
+                "The member StringValue on the mapping target type B was not found on the mapping source type A"
             )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody("target.IntValue = source.IntValue;");
     }
 
@@ -66,11 +63,10 @@ public class ObjectPropertyIgnoreTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.SourceMemberNotFound,
-                    "The member IntValue on the mapping target type B was not found on the mapping source type A"
-                )
+                DiagnosticDescriptors.SourceMemberNotFound,
+                "The member IntValue on the mapping target type B was not found on the mapping source type A"
             )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
@@ -93,11 +89,10 @@ public class ObjectPropertyIgnoreTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.SourceMemberNotMapped,
-                    "The member IntValue on the mapping source type A is not mapped to any member on the mapping target type B"
-                )
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member IntValue on the mapping source type A is not mapped to any member on the mapping target type B"
             )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
@@ -119,7 +114,8 @@ public class ObjectPropertyIgnoreTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.IgnoredTargetMemberNotFound, "Ignored target member not_found on B was not found"))
+            .HaveDiagnostic(DiagnosticDescriptors.IgnoredTargetMemberNotFound, "Ignored target member not_found on B was not found")
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
@@ -140,7 +136,8 @@ public class ObjectPropertyIgnoreTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.IgnoredSourceMemberNotFound, "Ignored source member not_found on A was not found"))
+            .HaveDiagnostic(DiagnosticDescriptors.IgnoredSourceMemberNotFound, "Ignored source member not_found on A was not found")
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
@@ -161,7 +158,8 @@ public class ObjectPropertyIgnoreTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.IgnoredTargetMemberNotFound, "Ignored target member not_found on B was not found"))
+            .HaveDiagnostic(DiagnosticDescriptors.IgnoredTargetMemberNotFound, "Ignored target member not_found on B was not found")
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
@@ -183,11 +181,10 @@ public class ObjectPropertyIgnoreTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                new(
-                    DiagnosticDescriptors.SourceMemberNotMapped,
-                    "The member IntValue on the mapping source type A is not mapped to any member on the mapping target type B"
-                )
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member IntValue on the mapping source type A is not mapped to any member on the mapping target type B"
             )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();

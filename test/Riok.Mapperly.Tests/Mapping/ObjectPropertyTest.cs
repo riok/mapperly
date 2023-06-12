@@ -133,12 +133,7 @@ public class ObjectPropertyTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(
-                new DiagnosticMatcher(
-                    DiagnosticDescriptors.CannotMapFromIndexedMember,
-                    "Cannot map from indexed member A.this[] to member B.this[]"
-                )
-            );
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapFromIndexedMember, "Cannot map from indexed member A.this[] to member B.this[]");
     }
 
     [Fact]
@@ -419,6 +414,7 @@ public class ObjectPropertyTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
+            .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
+            .HaveAssertedAllDiagnostics();
     }
 }

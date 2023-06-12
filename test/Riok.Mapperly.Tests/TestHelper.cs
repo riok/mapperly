@@ -38,7 +38,10 @@ public static class TestHelper
             .Select(x => new GeneratedMethod(x))
             .ToDictionary(x => x.Name);
 
-        var mapperResult = new MapperGenerationResult(result.Diagnostics, methods);
+        var groupedDiagnostics = result.Diagnostics
+            .GroupBy(x => x.Descriptor.Id)
+            .ToDictionary(x => x.Key, x => (IReadOnlyCollection<Diagnostic>)x.ToList());
+        var mapperResult = new MapperGenerationResult(result.Diagnostics, groupedDiagnostics, methods);
         if (options.AllowedDiagnostics != null)
         {
             mapperResult.Should().NotHaveDiagnostics(options.AllowedDiagnostics);
