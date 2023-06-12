@@ -160,8 +160,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(global::System.Linq.Enumerable.Select(dto.ImmutableSortedSetValue, x => x.ToString()));
             target.ImmutableDictionaryValue = global::System.Collections.Immutable.ImmutableDictionary.ToImmutableDictionary(dto.ImmutableDictionaryValue, x => x.Key.ToString(), x => x.Value.ToString());
             target.ImmutableSortedDictionaryValue = global::System.Collections.Immutable.ImmutableSortedDictionary.ToImmutableSortedDictionary(dto.ImmutableSortedDictionaryValue, x => x.Key.ToString(), x => x.Value.ToString());
-            target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumValue;
-            target.EnumName = (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumName;
+            target.EnumValue = MapToEnumByValueCheckDefined(dto.EnumValue);
+            target.EnumName = MapToEnumByNameWithFallback(dto.EnumName);
             target.EnumRawValue = (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumRawValue;
             target.EnumStringValue = MapToTestEnum(dto.EnumStringValue);
             target.EnumReverseStringValue = MapToString1(dto.EnumReverseStringValue);
@@ -197,6 +197,27 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value40 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
                 _ => (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)v,
+            };
+        }
+
+        public partial global::Riok.Mapperly.IntegrationTests.Models.TestEnum MapToEnumByValueCheckDefined(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue v)
+        {
+            return global::System.Enum.IsDefined(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum), (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)v) ? (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)v : throw new System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnumDtoByValue is not supported");
+        }
+
+        public partial global::Riok.Mapperly.IntegrationTests.Models.TestEnum MapToEnumByValueCheckDefinedWithFallback(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue v)
+        {
+            return global::System.Enum.IsDefined(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum), (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)v) ? (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)v : global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10;
+        }
+
+        public partial global::Riok.Mapperly.IntegrationTests.Models.TestEnum MapToEnumByNameWithFallback(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName v)
+        {
+            return v switch
+            {
+                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value10 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10,
+                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value20 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20,
+                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value30 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
+                _ => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10,
             };
         }
 

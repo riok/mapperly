@@ -59,6 +59,23 @@ public class EnumTest
     }
 
     [Fact]
+    public void EnumToOtherEnumByValueCheckDefinedShouldCast()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByValueCheckDefined)] partial E2 ToE1(E1 source);",
+            "enum E1 {A = 20, B = 30, C = 10}",
+            "enum E2 {A = 10, B = 20, C = 30}"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """return global::System.Enum.IsDefined(typeof(global::E2), (global::E2)source) ? (global::E2)source : throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported");"""
+            );
+    }
+
+    [Fact]
     public void EnumToOtherEnumByNameShouldSwitch()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

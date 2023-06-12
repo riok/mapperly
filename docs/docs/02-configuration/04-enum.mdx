@@ -8,10 +8,11 @@ Apply the `MapEnumAttribute` and pass the strategy to be used for this enum.
 It is also possible to set the strategy for the entire mapper via the `MapperAttribute`.
 Available strategies:
 
-| Name    | Description                                    |
-| ------- | ---------------------------------------------- |
-| ByValue | Matches enum entries by their values (default) |
-| ByName  | Matches enum entries by their exact names      |
+| Name                | Description                                                                 |
+| ------------------- | --------------------------------------------------------------------------- |
+| ByValue             | Matches enum entries by their values (default)                              |
+| ByValueCheckDefined | Matches enum entries by their values, checks if the target value is defined |
+| ByName              | Matches enum entries by their exact names                                   |
 
 The `IgnoreCase` property allows to opt in for case insensitive mappings (defaults to `false`).
 
@@ -33,7 +34,7 @@ public partial class CarMapper
 ```
 
 </TabItem>
-<TabItem value="enum" label="Enum (Mapping Method Level)">
+<TabItem value="enum" label="Enum (mapping method level)">
 
 Applied to the specific enum mapped by this method.
 Attribute is only valid on mapping method with enums as parameters.
@@ -61,9 +62,27 @@ Attribute is only valid on mapping methods with enums as parameters.
 [Mapper]
 public partial class CarMapper
 {
-    [MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)]
+    [MapEnum(EnumMappingStrategy.ByName)]
     // highlight-start
     [MapEnumValue(CarFeature.AWD, CarFeatureDto.AllWheelDrive)]
+    // highlight-end
+    public partial CarFeatureDto MapFeature(CarFeature feature);
+}
+```
+
+## Fallback value
+
+To map to a fallback value instead of throwing when encountering an unknown value,
+the `FallbackValue` property on the `MapEnum` attribute can be used.
+
+`FallbackValue` is supported by `ByName` and `ByValueCheckDefined`.
+
+```csharp
+[Mapper]
+public partial class CarMapper
+{
+    // highlight-start
+    [MapEnum(EnumMappingStrategy.ByName, FallbackValue = CarFeatureDto.Unknown)]
     // highlight-end
     public partial CarFeatureDto MapFeature(CarFeature feature);
 }

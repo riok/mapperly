@@ -37,3 +37,9 @@ To support a new roslyn version via multi targeting follow these steps (see also
 6. Adjust the .NET version in the `global.json` file as needed.
 7. If generated code changes based on the new Roslyn version,
    introduce a new `roslynVersionName` in `Riok.Mapperly.IntegrationTests.BaseMapperTest.GetRoslynVersion()` and generate the new snapshots.
+
+## Mapping syntax
+
+Mapperly Mappings use Roslyn syntax trees.
+[RoslynQuoter](https://roslynquoter.azurewebsites.net/) and [SharpLab](https://sharplab.io/)
+are fantastic tools to understand and work with Roslyn syntax trees.

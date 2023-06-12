@@ -1,8 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-using Riok.Mapperly.Emit;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -22,6 +21,6 @@ public class CastMapping : TypeMapping
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         var objToCast = _delegateMapping != null ? _delegateMapping.Build(ctx) : ctx.Source;
-        return CastExpression(SyntaxFactoryHelper.FullyQualifiedIdentifier(TargetType), objToCast);
+        return CastExpression(FullyQualifiedIdentifier(TargetType), objToCast);
     }
 }

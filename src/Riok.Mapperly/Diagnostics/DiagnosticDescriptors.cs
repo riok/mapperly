@@ -278,8 +278,8 @@ internal static class DiagnosticDescriptors
 
     public static readonly DiagnosticDescriptor EnumMappingStrategyByNameNotSupportedInProjectionMappings = new DiagnosticDescriptor(
         "RMG032",
-        "The enum mapping strategy ByName and explicit enum mappings cannot be used in projection mappings",
-        "The enum mapping strategy ByName and explicit enum mappings cannot be used in projection mappings to map from {0} to {1}",
+        "The enum mapping strategy ByName, ByValueCheckDefined and explicit enum mappings cannot be used in projection mappings",
+        "The enum mapping strategy ByName, ByValueCheckDefined and explicit enum mappings cannot be used in projection mappings to map from {0} to {1}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true
@@ -363,6 +363,24 @@ internal static class DiagnosticDescriptors
         "Enum member {0} ({1}) on {2} does not match type of source enum {3}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor EnumFallbackValueTypeDoesNotMatchTargetEnumType = new DiagnosticDescriptor(
+        "RMG042",
+        "The type of the enum fallback value does not match the target enum type",
+        "Enum mapping fallback value {0} ({1}) on {2} does not match target enum type {3}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor EnumFallbackValueRequiresByValueCheckDefinedStrategy = new DiagnosticDescriptor(
+        "RMG043",
+        "Enum fallback values are only supported for the ByName and ByValueCheckDefined strategies, but not for the ByValue strategy",
+        "Enum fallback values are only supported for the ByName and ByValueCheckDefined strategies, but not for the ByValue strategy",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
         true
     );
 }

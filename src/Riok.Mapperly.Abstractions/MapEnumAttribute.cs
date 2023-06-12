@@ -24,4 +24,9 @@ public sealed class MapEnumAttribute : Attribute
     /// Whether the case should be ignored during mappings.
     /// </summary>
     public bool IgnoreCase { get; set; }
+
+    /// <summary>
+    /// The fallback value if an enum cannot be mapped, used instead of throwing.
+    /// </summary>
+    public object? FallbackValue { get; set; }
 }
