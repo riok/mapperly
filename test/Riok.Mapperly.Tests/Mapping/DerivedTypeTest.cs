@@ -131,11 +131,10 @@ public class DerivedTypeTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                new DiagnosticMatcher(
-                    DiagnosticDescriptors.DerivedTargetTypeIsNotAssignableToReturnType,
-                    "Derived target type BImpl1 is not assignable to return type B"
-                )
-            );
+                DiagnosticDescriptors.DerivedTargetTypeIsNotAssignableToReturnType,
+                "Derived target type BImpl1 is not assignable to return type B"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -199,11 +198,10 @@ public class DerivedTypeTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                new DiagnosticMatcher(
-                    DiagnosticDescriptors.DerivedSourceTypeIsNotAssignableToParameterType,
-                    "Derived source type AImpl1 is not assignable to parameter type A"
-                )
-            );
+                DiagnosticDescriptors.DerivedSourceTypeIsNotAssignableToParameterType,
+                "Derived source type AImpl1 is not assignable to parameter type A"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -225,11 +223,10 @@ public class DerivedTypeTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                new DiagnosticMatcher(
-                    DiagnosticDescriptors.DerivedSourceTypeDuplicated,
-                    "Derived source type AImpl1 is specified multiple times, a source type may only be specified once"
-                )
-            );
+                DiagnosticDescriptors.DerivedSourceTypeDuplicated,
+                "Derived source type AImpl1 is specified multiple times, a source type may only be specified once"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -245,10 +242,9 @@ public class DerivedTypeTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                new DiagnosticMatcher(
-                    DiagnosticDescriptors.CouldNotCreateMapping,
-                    "Could not create mapping from System.Version to int. Consider implementing the mapping manually."
-                )
-            );
+                DiagnosticDescriptors.CouldNotCreateMapping,
+                "Could not create mapping from System.Version to int. Consider implementing the mapping manually."
+            )
+            .HaveAssertedAllDiagnostics();
     }
 }

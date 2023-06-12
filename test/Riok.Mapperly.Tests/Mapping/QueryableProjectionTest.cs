@@ -120,6 +120,7 @@ public class QueryableProjectionTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.QueryableProjectionMappingsDoNotSupportReferenceHandling));
+            .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingsDoNotSupportReferenceHandling)
+            .HaveAssertedAllDiagnostics();
     }
 }

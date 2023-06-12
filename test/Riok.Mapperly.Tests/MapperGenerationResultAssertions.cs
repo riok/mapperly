@@ -6,15 +6,23 @@ namespace Riok.Mapperly.Tests;
 public class MapperGenerationResultAssertions
 {
     private readonly MapperGenerationResult _mapper;
+    private readonly HashSet<Diagnostic> _notAssertedDiagnostics;
 
     public MapperGenerationResultAssertions(MapperGenerationResult mapper)
     {
         _mapper = mapper;
+        _notAssertedDiagnostics = new HashSet<Diagnostic>(_mapper.Diagnostics);
     }
 
     public MapperGenerationResultAssertions HaveDiagnostics()
     {
         _mapper.Diagnostics.Should().NotBeEmpty();
+        return this;
+    }
+
+    public MapperGenerationResultAssertions HaveAssertedAllDiagnostics()
+    {
+        _notAssertedDiagnostics.Should().BeEmpty();
         return this;
     }
 
@@ -24,19 +32,43 @@ public class MapperGenerationResultAssertions
         return this;
     }
 
-    public MapperGenerationResultAssertions HaveDiagnostics(DiagnosticDescriptor descriptor, params string[] descriptions)
+    public MapperGenerationResultAssertions HaveDiagnostics(DiagnosticDescriptor descriptor, params string[] messages)
     {
-        var diags = _mapper.Diagnostics.Where(d => descriptor.Equals(d.Descriptor));
-        diags.Select(d => d.GetMessage()).Should().BeEquivalentTo(descriptions, o => o.WithStrictOrdering());
+        var i = 0;
+        foreach (var diagnostic in GetDiagnostics(descriptor))
+        {
+            diagnostic.GetMessage().Should().Be(messages[i]);
+            _notAssertedDiagnostics.Remove(diagnostic);
+            i++;
+        }
+
         return this;
     }
 
-    public MapperGenerationResultAssertions HaveDiagnostic(DiagnosticMatcher diagnosticMatcher)
+    public MapperGenerationResultAssertions HaveDiagnostic(DiagnosticDescriptor descriptor)
     {
-        var diag = _mapper.Diagnostics.FirstOrDefault(diagnosticMatcher.MatchesDescriptor);
-        var foundIds = string.Join(", ", _mapper.Diagnostics.Select(x => x.Descriptor.Id));
-        diag.Should().NotBeNull($"No diagnostic with id {diagnosticMatcher.Descriptor.Id} found, found diagnostic ids: {foundIds}");
-        diagnosticMatcher.EnsureMatches(diag!);
+        foreach (var diagnostic in GetDiagnostics(descriptor))
+        {
+            _notAssertedDiagnostics.Remove(diagnostic);
+        }
+
+        return this;
+    }
+
+    public MapperGenerationResultAssertions HaveDiagnostic(DiagnosticDescriptor descriptor, string message)
+    {
+        var diagnostics = GetDiagnostics(descriptor);
+        var matchedDiagnostic = diagnostics.FirstOrDefault(x => x.GetMessage().Equals(message));
+        if (matchedDiagnostic != null)
+        {
+            _notAssertedDiagnostics.Remove(matchedDiagnostic);
+            return this;
+        }
+
+        var matchingIdDiagnostic =
+            _notAssertedDiagnostics.FirstOrDefault(x => x.Descriptor.Equals(descriptor))
+            ?? _mapper.Diagnostics.First(x => x.Descriptor.Equals(descriptor));
+        matchingIdDiagnostic.GetMessage().Should().Be(message, $"message of {descriptor.Id} should match");
         return this;
     }
 
@@ -88,4 +120,13 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions HaveMapMethodBody([StringSyntax(StringSyntax.CSharp)] string mapperMethodBody) =>
         HaveMethodBody(TestSourceBuilder.DefaultMapMethodName, mapperMethodBody);
+
+    private IReadOnlyCollection<Diagnostic> GetDiagnostics(DiagnosticDescriptor descriptor)
+    {
+        if (_mapper.DiagnosticsByDescriptorId.TryGetValue(descriptor.Id, out var diagnostics))
+            return diagnostics;
+
+        var foundIds = string.Join(", ", _mapper.Diagnostics.Select(x => x.Descriptor.Id));
+        throw new InvalidOperationException($"No diagnostic with id {descriptor.Id} found, found diagnostic ids: {foundIds}");
+    }
 }

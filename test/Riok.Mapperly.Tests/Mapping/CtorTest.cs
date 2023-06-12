@@ -31,7 +31,11 @@ public class CtorTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CouldNotCreateMapping));
+            .HaveDiagnostic(
+                DiagnosticDescriptors.CouldNotCreateMapping,
+                "Could not create mapping from A to string. Consider implementing the mapping manually."
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]

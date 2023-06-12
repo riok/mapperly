@@ -248,7 +248,8 @@ public class EnumerableImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -264,7 +265,7 @@ public class EnumerableImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
     }
 
     [Fact]
@@ -280,7 +281,8 @@ public class EnumerableImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -296,7 +298,8 @@ public class EnumerableImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -312,7 +315,8 @@ public class EnumerableImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -328,6 +332,7 @@ public class EnumerableImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(new(DiagnosticDescriptors.CannotMapToReadOnlyMember));
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveAssertedAllDiagnostics();
     }
 }
