@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
@@ -27,10 +28,13 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Source = source;
         Target = target;
         _userSymbol = userSymbol;
+        Configuration = ReadConfiguration(_userSymbol);
     }
 
     protected MappingBuilderContext(MappingBuilderContext ctx, IMethodSymbol? userSymbol, ITypeSymbol source, ITypeSymbol target)
         : this(ctx, ctx.ObjectFactories, userSymbol, source, target) { }
+
+    public MappingConfiguration Configuration { get; }
 
     public ITypeSymbol Source { get; }
 
@@ -45,15 +49,6 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     /// <inheritdoc cref="MappingBuilderContext.CallableUserMappings"/>
     public IReadOnlyCollection<IUserMapping> CallableUserMappings => MappingBuilder.CallableUserMappings;
-
-    public T GetConfigurationOrDefault<T>()
-        where T : Attribute => Configuration.GetOrDefault<T>(_userSymbol);
-
-    public IEnumerable<TAttribute> ListConfiguration<TAttribute>()
-        where TAttribute : Attribute => ListConfiguration<TAttribute, TAttribute>();
-
-    public IEnumerable<TData> ListConfiguration<TAttribute, TData>()
-        where TAttribute : Attribute => Configuration.ListConfiguration<TAttribute, TData>(_userSymbol);
 
     /// <summary>
     /// Tries to find an existing mapping for the provided types.

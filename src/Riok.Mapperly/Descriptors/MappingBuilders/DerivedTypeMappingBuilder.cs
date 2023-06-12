@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Diagnostics;
@@ -25,15 +24,14 @@ public static class DerivedTypeMappingBuilder
         bool duplicatedSourceTypesAllowed = false
     )
     {
-        var configs = ctx.ListConfiguration<MapDerivedTypeAttribute, MapDerivedType>()
-            .Concat(ctx.ListConfiguration<MapDerivedTypeAttribute<object, object>, MapDerivedType>())
-            .ToList();
-        return configs.Count == 0 ? null : BuildContainedMappings(ctx, configs, duplicatedSourceTypesAllowed);
+        return ctx.Configuration.DerivedTypes.Count == 0
+            ? null
+            : BuildContainedMappings(ctx, ctx.Configuration.DerivedTypes, duplicatedSourceTypesAllowed);
     }
 
     private static IReadOnlyCollection<ITypeMapping> BuildContainedMappings(
         MappingBuilderContext ctx,
-        IReadOnlyCollection<MapDerivedType> configs,
+        IReadOnlyCollection<DerivedTypeMappingConfiguration> configs,
         bool duplicatedSourceTypesAllowed
     )
     {
