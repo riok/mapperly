@@ -24,9 +24,16 @@ public class MapperGenerationResultAssertions
         return this;
     }
 
+    public MapperGenerationResultAssertions HaveDiagnostics(DiagnosticDescriptor descriptor, params string[] descriptions)
+    {
+        var diags = _mapper.Diagnostics.Where(d => descriptor.Equals(d.Descriptor));
+        diags.Select(d => d.GetMessage()).Should().BeEquivalentTo(descriptions, o => o.WithStrictOrdering());
+        return this;
+    }
+
     public MapperGenerationResultAssertions HaveDiagnostic(DiagnosticMatcher diagnosticMatcher)
     {
-        var diag = _mapper.Diagnostics.FirstOrDefault(diagnosticMatcher.Matches);
+        var diag = _mapper.Diagnostics.FirstOrDefault(diagnosticMatcher.MatchesDescriptor);
         var foundIds = string.Join(", ", _mapper.Diagnostics.Select(x => x.Descriptor.Id));
         diag.Should().NotBeNull($"No diagnostic with id {diagnosticMatcher.Descriptor.Id} found, found diagnostic ids: {foundIds}");
         diagnosticMatcher.EnsureMatches(diag!);

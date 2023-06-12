@@ -43,7 +43,38 @@ public class QueryableProjectionEnumTest
             .HaveDiagnostic(
                 new(
                     DiagnosticDescriptors.EnumMappingStrategyByNameNotSupportedInProjectionMappings,
-                    "The enum mapping strategy ByName cannot be used in projection mappings to map from C to D"
+                    "The enum mapping strategy ByName and explicit enum mappings cannot be used in projection mappings to map from C to D"
+                )
+            );
+    }
+
+    [Fact]
+    public void EnumToAnotherEnumByValueWithExplicitMappingShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> q);
+
+            [MapEnumValue(C.Value2, D.Value2)]
+            partial D MapEnum(C src);
+            """,
+            TestSourceBuilderOptions.Default with
+            {
+                EnumMappingStrategy = EnumMappingStrategy.ByValue
+            },
+            "class A { public C Value { get; set; } }",
+            "class B { public D Value { get; set; } }",
+            "enum C { Value1 = 10, Value2 = 100 }",
+            "enum D { Value1 = 10, Value2 = 200 }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                new(
+                    DiagnosticDescriptors.EnumMappingStrategyByNameNotSupportedInProjectionMappings,
+                    "The enum mapping strategy ByName and explicit enum mappings cannot be used in projection mappings to map from C to D"
                 )
             );
     }

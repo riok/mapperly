@@ -52,14 +52,10 @@ public partial class CarMapper
 </TabItem>
 </Tabs>
 
-## Manually Mapped Enum Values
+## Manually mapped enum values
 
-When `MapEnumAttribute.ByName` is used, explicit enum values may be overridden using
-the `MapEnumValueAttibute` to the mapping method.
-
-Applied to an explicit enum value pair mapped by this method.
-Attribute is only valid on mapping method with enums as parameters and
-configured with the `ByName` strategy.
+To explicitly map enum values the `MapEnumValueAttibute` can be used.
+Attribute is only valid on mapping methods with enums as parameters.
 
 ```csharp
 [Mapper]

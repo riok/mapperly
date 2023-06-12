@@ -13,19 +13,28 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 public class EnumNameMapping : MethodMapping
 {
     private readonly IReadOnlyDictionary<string, string> _enumMemberMappings;
+    private readonly ITypeMapping? _fallbackMapping;
 
-    public EnumNameMapping(ITypeSymbol source, ITypeSymbol target, IReadOnlyDictionary<string, string> enumMemberMappings)
+    public EnumNameMapping(
+        ITypeSymbol source,
+        ITypeSymbol target,
+        IReadOnlyDictionary<string, string> enumMemberMappings,
+        ITypeMapping? fallbackMapping = null
+    )
         : base(source, target)
     {
         _enumMemberMappings = enumMemberMappings;
+        _fallbackMapping = fallbackMapping;
     }
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
-        // fallback switch arm: _ => throw new ArgumentOutOfRangeException(nameof(source), source, message);
+        // fallback switch arm with _fallbackMapping: _ => Map(src);
+        // fallback switch arm without _fallbackMapping: _ => throw new ArgumentOutOfRangeException(nameof(source), source, message);
         var fallbackArm = SwitchExpressionArm(
             DiscardPattern(),
-            ThrowArgumentOutOfRangeException(ctx.Source, $"The value of enum {SourceType.Name} is not supported")
+            _fallbackMapping?.Build(ctx)
+                ?? ThrowArgumentOutOfRangeException(ctx.Source, $"The value of enum {SourceType.Name} is not supported")
         );
 
         // switch for each name to the enum value
@@ -33,7 +42,6 @@ public class EnumNameMapping : MethodMapping
         var arms = _enumMemberMappings.Select(BuildArm).Append(fallbackArm);
 
         var switchExpr = SwitchExpression(ctx.Source).WithArms(CommaSeparatedList(arms, true));
-
         yield return ReturnStatement(switchExpr);
     }
 

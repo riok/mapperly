@@ -4,7 +4,7 @@ namespace Riok.Mapperly.Tests;
 
 public record DiagnosticMatcher(DiagnosticDescriptor Descriptor, string? Message = null)
 {
-    public bool Matches(Diagnostic diagnostic) => Descriptor.Equals(diagnostic.Descriptor);
+    public bool MatchesDescriptor(Diagnostic diagnostic) => Descriptor.Equals(diagnostic.Descriptor);
 
     public void EnsureMatches(Diagnostic diagnostic)
     {

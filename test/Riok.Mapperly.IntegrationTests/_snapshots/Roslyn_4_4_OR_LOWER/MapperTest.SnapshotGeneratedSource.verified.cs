@@ -179,14 +179,24 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             };
         }
 
-        public partial global::Riok.Mapperly.IntegrationTests.Models.TestEnum MapToEnumDtoByNameWithExplicit(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoExplicitLarger v)
+        public partial global::Riok.Mapperly.IntegrationTests.Models.TestEnum MapToEnumByNameWithExplicit(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue v)
         {
             return v switch
             {
-                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoExplicitLarger.Value10 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10,
-                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoExplicitLarger.Value20 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20,
-                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoExplicitLarger.Value30 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
-                _ => throw new System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnumDtoExplicitLarger is not supported"),
+                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value10 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10,
+                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value20 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20,
+                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value30 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
+                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value40 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
+                _ => throw new System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnumDtoAdditionalValue is not supported"),
+            };
+        }
+
+        public partial global::Riok.Mapperly.IntegrationTests.Models.TestEnum MapToEnumByValueWithExplicit(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue v)
+        {
+            return v switch
+            {
+                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value40 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
+                _ => (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)v,
             };
         }
 

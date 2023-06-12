@@ -64,6 +64,8 @@ internal static class SymbolExtensions
     internal static IEnumerable<IPropertySymbol> GetAllProperties(this ITypeSymbol symbol, string name) =>
         symbol.GetAllMembers(name).OfType<IPropertySymbol>();
 
+    internal static IEnumerable<IFieldSymbol> GetFields(this ITypeSymbol symbol) => symbol.GetMembers().OfType<IFieldSymbol>();
+
     internal static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol)
     {
         var members = symbol.GetMembers();
