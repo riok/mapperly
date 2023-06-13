@@ -20,6 +20,7 @@ namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 /// </remarks>
 public class EnsureCapacityNonEnumerated : EnsureCapacity
 {
+    private const string SourceCountVariableName = "sourceCount";
     private readonly string _targetAccessor;
     private readonly IMethodSymbol _getNonEnumeratedMethod;
 
@@ -33,7 +34,7 @@ public class EnsureCapacityNonEnumerated : EnsureCapacity
     {
         var targetCount = MemberAccess(target, _targetAccessor);
 
-        var countIdentifier = Identifier(ctx.NameBuilder.New("sourceCount"));
+        var countIdentifier = Identifier(ctx.NameBuilder.New(SourceCountVariableName));
         var countIdentifierName = IdentifierName(countIdentifier);
 
         var enumerableArgument = Argument(ctx.Source);
