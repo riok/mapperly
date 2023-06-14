@@ -15,6 +15,7 @@ public static class EnumerableMappingBuilder
     private const string SelectMethodName = nameof(Enumerable.Select);
     private const string ToArrayMethodName = nameof(Enumerable.ToArray);
     private const string ToListMethodName = nameof(Enumerable.ToList);
+    private const string ToHashSetMethodName = "ToHashSet";
     private const string AddMethodName = nameof(ICollection<object>.Add);
 
     private const string ToImmutableArrayMethodName = nameof(ImmutableArray.ToImmutableArray);
@@ -67,8 +68,8 @@ public static class EnumerableMappingBuilder
             return immutableLinqMapping;
 
         // if target is a type that takes IEnumerable in its constructor
-        if (HasEnumerableConstructor(ctx, elementMapping.TargetType))
-            return BuildLinqConstructorMapping(ctx, elementMapping);
+        if (GetTypeConstructableFromEnumerable(ctx, elementMapping.TargetType) is { } constructableType)
+            return BuildLinqConstructorMapping(ctx, constructableType, elementMapping);
 
         return ctx.IsExpression ? null : BuildCustomTypeMapping(ctx, elementMapping);
     }
@@ -124,22 +125,32 @@ public static class EnumerableMappingBuilder
         return new LinqEnumerableMapping(ctx.Source, ctx.Target, elementMapping, selectMethod, collectMethod);
     }
 
-    private static bool HasEnumerableConstructor(MappingBuilderContext ctx, ITypeSymbol typeSymbol)
+    private static INamedTypeSymbol? GetTypeConstructableFromEnumerable(MappingBuilderContext ctx, ITypeSymbol typeSymbol)
     {
         if (ctx.Target is not INamedTypeSymbol namedType)
-            return false;
+            return null;
 
         var typedEnumerable = ctx.Types.Get(typeof(IEnumerable<>)).Construct(typeSymbol);
-
-        return namedType.Constructors.Any(
+        var hasCtor = namedType.Constructors.Any(
             m => m.Parameters.Length == 1 && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type, typedEnumerable)
         );
+        if (hasCtor)
+            return namedType;
+
+        if (ctx.CollectionInfos!.Target.Type is CollectionType.ISet or CollectionType.IReadOnlySet)
+            return ctx.Types.Get(typeof(HashSet<>)).Construct(typeSymbol);
+
+        return null;
     }
 
-    private static LinqConstructorMapping BuildLinqConstructorMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static LinqConstructorMapping BuildLinqConstructorMapping(
+        MappingBuilderContext ctx,
+        INamedTypeSymbol targetTypeToConstruct,
+        ITypeMapping elementMapping
+    )
     {
         var selectMethod = elementMapping.IsSynthetic ? null : ctx.Types.Get(typeof(Enumerable)).GetStaticGenericMethod(SelectMethodName);
-        return new LinqConstructorMapping(ctx.Source, ctx.Target, elementMapping, selectMethod);
+        return new LinqConstructorMapping(ctx.Source, ctx.Target, targetTypeToConstruct, elementMapping, selectMethod);
     }
 
     private static ExistingTargetMappingMethodWrapper? BuildCustomTypeMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
@@ -189,6 +200,17 @@ public static class EnumerableMappingBuilder
         if ((targetIsReadOnlyCollection || targetIsIEnumerable) && ctx.CollectionInfos.Source.CountIsKnown)
             return (true, ToArrayMethodName);
 
+        // if target is Set
+        // and ToHashSet is supported (only supported for .NET5+)
+        // use ToHashSet
+        if (
+            ctx.CollectionInfos.Target.Type is CollectionType.ISet or CollectionType.IReadOnlySet or CollectionType.HashSet
+            && GetToHashSetLinqCollectMethod(ctx.Types) is { } toHashSetMethod
+        )
+        {
+            return (true, toHashSetMethod.Name);
+        }
+
         // if target is a IReadOnlyCollection<T>, IEnumerable<T>, IList<T>, List<T> or ICollection<T> with ToList()
         return
             targetIsReadOnlyCollection
@@ -234,4 +256,7 @@ public static class EnumerableMappingBuilder
 
         return null;
     }
+
+    private static IMethodSymbol? GetToHashSetLinqCollectMethod(WellKnownTypes wellKnownTypes) =>
+        wellKnownTypes.Get(typeof(Enumerable)).GetStaticGenericMethod(ToHashSetMethodName);
 }

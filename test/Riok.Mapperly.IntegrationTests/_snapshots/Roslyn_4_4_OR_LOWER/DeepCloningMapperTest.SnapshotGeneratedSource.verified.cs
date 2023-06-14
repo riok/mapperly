@@ -66,6 +66,26 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(src.ImmutableSortedSetValue);
             target.ImmutableDictionaryValue = global::System.Collections.Immutable.ImmutableDictionary.ToImmutableDictionary(src.ImmutableDictionaryValue);
             target.ImmutableSortedDictionaryValue = global::System.Collections.Immutable.ImmutableSortedDictionary.ToImmutableSortedDictionary(src.ImmutableSortedDictionaryValue);
+            foreach (var item in src.ExistingISet)
+            {
+                target.ExistingISet.Add(item);
+            }
+
+            target.ExistingHashSet.EnsureCapacity(src.ExistingHashSet.Count + target.ExistingHashSet.Count);
+            foreach (var item1 in src.ExistingHashSet)
+            {
+                target.ExistingHashSet.Add(item1);
+            }
+
+            foreach (var item2 in src.ExistingSortedSet)
+            {
+                target.ExistingSortedSet.Add(item2);
+            }
+
+            target.ISet = global::System.Linq.Enumerable.ToHashSet(src.ISet);
+            target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(src.IReadOnlySet);
+            target.HashSet = global::System.Linq.Enumerable.ToHashSet(src.HashSet);
+            target.SortedSet = new global::System.Collections.Generic.SortedSet<string>(src.SortedSet);
             target.EnumValue = src.EnumValue;
             target.EnumName = src.EnumName;
             target.EnumRawValue = src.EnumRawValue;
