@@ -671,9 +671,9 @@ public class EnumerableTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new global::B();
-            return target;
-            """
+                var target = new global::B();
+                return target;
+                """
             )
             .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
     }
