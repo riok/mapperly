@@ -87,10 +87,16 @@ public static class EnumerableMappingBuilder
             return CreateForEach(nameof(Queue<object>.Enqueue));
 
         // create a foreach loop with add calls if source is not an array
-        // and  ICollection.Add(T): void is implemented and not explicit
+        // and void ICollection.Add(T) or bool ISet.Add(T) is implemented and not explicit
         // ensures add is not called and immutable types
-        if (!ctx.Target.IsArrayType() && ctx.Target.HasImplicitGenericImplementation(ctx.Types.Get(typeof(ICollection<>)), AddMethodName))
+        // ISet.Add(T) is explicitly needed as sets implement the ICollection.Add(T) explicit,
+        // and override the add method with new
+        var hasImplicitCollectionAdd = ctx.Target.HasImplicitGenericImplementation(ctx.Types.Get(typeof(ICollection<>)), AddMethodName);
+        var hasImplicitSetAdd = ctx.Target.HasImplicitGenericImplementation(ctx.Types.Get(typeof(ISet<>)), AddMethodName);
+        if (!ctx.Target.IsArrayType() && (hasImplicitCollectionAdd || hasImplicitSetAdd))
+        {
             return CreateForEach(AddMethodName);
+        }
 
         // if a mapping could be created for an immutable collection
         // we diagnostic when it is an existing target mapping
@@ -167,22 +173,22 @@ public static class EnumerableMappingBuilder
         }
 
         // create a foreach loop with add calls if source is not an array
-        // and  ICollection.Add(T): void is implemented and not explicit
-        // ensures add is not called and immutable types
-        if (!ctx.Target.IsArrayType() && ctx.Target.HasImplicitGenericImplementation(ctx.Types.Get(typeof(ICollection<>)), AddMethodName))
-        {
-            var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.Source, ctx.Target, ctx.Types);
-            return new ForEachAddEnumerableMapping(
-                ctx.Source,
-                ctx.Target,
-                elementMapping,
-                objectFactory,
-                AddMethodName,
-                ensureCapacityStatement
-            );
-        }
+        // and void ICollection.Add(T) or bool ISet.Add(T) is implemented and not explicit
+        // ensures .Add() is not called on immutable types
+        var hasImplicitCollectionAdd = ctx.Target.HasImplicitGenericImplementation(ctx.Types.Get(typeof(ICollection<>)), AddMethodName);
+        var hasImplicitSetAdd = ctx.Target.HasImplicitGenericImplementation(ctx.Types.Get(typeof(ISet<>)), AddMethodName);
+        if (ctx.Target.IsArrayType() || (!hasImplicitCollectionAdd && !hasImplicitSetAdd))
+            return null;
 
-        return null;
+        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.Source, ctx.Target, ctx.Types);
+        return new ForEachAddEnumerableMapping(
+            ctx.Source,
+            ctx.Target,
+            elementMapping,
+            objectFactory,
+            AddMethodName,
+            ensureCapacityStatement
+        );
     }
 
     private static (bool CanMapWithLinq, string? CollectMethod) ResolveCollectMethodName(

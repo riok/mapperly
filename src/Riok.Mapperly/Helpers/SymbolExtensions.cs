@@ -153,17 +153,20 @@ internal static class SymbolExtensions
         }
 
         var interfaceSymbol = typedInterface.GetMembers(symbolName).First();
-
-        var symbolImplementaton = t.FindImplementationForInterfaceMember(interfaceSymbol);
+        var symbolImplementation = t.FindImplementationForInterfaceMember(interfaceSymbol);
 
         // if null then the method is unimplemented
         // symbol implements genericInterface but has not implemented the corresponding methods
-        // this can only occur in unit tests
-        if (symbolImplementaton == null)
-            throw new NotSupportedException("Symbol implementation cannot be null for objects implementing interface.");
+        // this is for example the case for arrays (arrays implement several interfaces at runtime)
+        // and unit tests for which not the full interface is implemented
+        if (symbolImplementation == null)
+        {
+            isExplicit = false;
+            return false;
+        }
 
         // check if symbol is explicit
-        isExplicit = symbolImplementaton switch
+        isExplicit = symbolImplementation switch
         {
             IMethodSymbol methodSymbol => methodSymbol.ExplicitInterfaceImplementations.Any(),
             IPropertySymbol propertySymbol => propertySymbol.ExplicitInterfaceImplementations.Any(),
