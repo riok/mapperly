@@ -73,6 +73,22 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         public ImmutableSortedDictionary<int, int> ImmutableSortedDictionaryValue { get; set; } = ImmutableSortedDictionary<int, int>.Empty;
 
+        public ISet<int> ExistingISet { get; } = new HashSet<int>();
+
+        public HashSet<int> ExistingHashSet { get; } = new HashSet<int>();
+
+        public SortedSet<int> ExistingSortedSet { get; } = new SortedSet<int>();
+
+        public ISet<int> ISet { get; set; } = new HashSet<int>();
+
+#if NET5_0_OR_GREATER
+        public IReadOnlySet<int> IReadOnlySet { get; set; } = new HashSet<int>();
+#endif
+
+        public HashSet<int> HashSet { get; set; } = new HashSet<int>();
+
+        public SortedSet<int> SortedSet { get; set; } = new SortedSet<int>();
+
         public TestEnumDtoByValue EnumValue { get; set; }
 
         public TestEnumDtoByName EnumName { get; set; }

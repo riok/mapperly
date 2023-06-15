@@ -109,6 +109,24 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(global::System.Linq.Enumerable.Select(testObject.ImmutableSortedSetValue, x => ParseableInt(x)));
             target.ImmutableDictionaryValue = global::System.Collections.Immutable.ImmutableDictionary.ToImmutableDictionary(testObject.ImmutableDictionaryValue, x => ParseableInt(x.Key), x => ParseableInt(x.Value));
             target.ImmutableSortedDictionaryValue = global::System.Collections.Immutable.ImmutableSortedDictionary.ToImmutableSortedDictionary(testObject.ImmutableSortedDictionaryValue, x => ParseableInt(x.Key), x => ParseableInt(x.Value));
+            foreach (var item in testObject.ExistingISet)
+            {
+                target.ExistingISet.Add(ParseableInt(item));
+            }
+
+            foreach (var item1 in testObject.ExistingHashSet)
+            {
+                target.ExistingHashSet.Add(ParseableInt(item1));
+            }
+
+            foreach (var item2 in testObject.ExistingSortedSet)
+            {
+                target.ExistingSortedSet.Add(ParseableInt(item2));
+            }
+
+            target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(testObject.ISet, x => ParseableInt(x)));
+            target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(testObject.HashSet, x => ParseableInt(x)));
+            target.SortedSet = new global::System.Collections.Generic.SortedSet<int>(global::System.Linq.Enumerable.Select(testObject.SortedSet, x => ParseableInt(x)));
             target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)testObject.EnumValue;
             target.EnumName = MapToEnumDtoByName(testObject.EnumName);
             target.EnumRawValue = (byte)testObject.EnumRawValue;
@@ -167,6 +185,24 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(global::System.Linq.Enumerable.Select(dto.ImmutableSortedSetValue, x => x.ToString()));
             target.ImmutableDictionaryValue = global::System.Collections.Immutable.ImmutableDictionary.ToImmutableDictionary(dto.ImmutableDictionaryValue, x => x.Key.ToString(), x => x.Value.ToString());
             target.ImmutableSortedDictionaryValue = global::System.Collections.Immutable.ImmutableSortedDictionary.ToImmutableSortedDictionary(dto.ImmutableSortedDictionaryValue, x => x.Key.ToString(), x => x.Value.ToString());
+            foreach (var item in dto.ExistingISet)
+            {
+                target.ExistingISet.Add(item.ToString());
+            }
+
+            foreach (var item1 in dto.ExistingHashSet)
+            {
+                target.ExistingHashSet.Add(item1.ToString());
+            }
+
+            foreach (var item2 in dto.ExistingSortedSet)
+            {
+                target.ExistingSortedSet.Add(item2.ToString());
+            }
+
+            target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.ISet, x => x.ToString()));
+            target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.HashSet, x => x.ToString()));
+            target.SortedSet = new global::System.Collections.Generic.SortedSet<string>(global::System.Linq.Enumerable.Select(dto.SortedSet, x => x.ToString()));
             target.EnumValue = MapToEnumByValueCheckDefined(dto.EnumValue);
             target.EnumName = MapToEnumByNameWithFallback(dto.EnumName);
             target.EnumRawValue = (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumRawValue;
@@ -282,6 +318,24 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(global::System.Linq.Enumerable.Select(source.ImmutableSortedSetValue, x => ParseableInt(x)));
             target.ImmutableDictionaryValue = global::System.Collections.Immutable.ImmutableDictionary.ToImmutableDictionary(source.ImmutableDictionaryValue, x => ParseableInt(x.Key), x => ParseableInt(x.Value));
             target.ImmutableSortedDictionaryValue = global::System.Collections.Immutable.ImmutableSortedDictionary.ToImmutableSortedDictionary(source.ImmutableSortedDictionaryValue, x => ParseableInt(x.Key), x => ParseableInt(x.Value));
+            foreach (var item in source.ExistingISet)
+            {
+                target.ExistingISet.Add(ParseableInt(item));
+            }
+
+            foreach (var item1 in source.ExistingHashSet)
+            {
+                target.ExistingHashSet.Add(ParseableInt(item1));
+            }
+
+            foreach (var item2 in source.ExistingSortedSet)
+            {
+                target.ExistingSortedSet.Add(ParseableInt(item2));
+            }
+
+            target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(source.ISet, x => ParseableInt(x)));
+            target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(source.HashSet, x => ParseableInt(x)));
+            target.SortedSet = new global::System.Collections.Generic.SortedSet<int>(global::System.Linq.Enumerable.Select(source.SortedSet, x => ParseableInt(x)));
             target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)source.EnumValue;
             target.EnumName = MapToEnumDtoByName(source.EnumName);
             target.EnumRawValue = (byte)source.EnumRawValue;

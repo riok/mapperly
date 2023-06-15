@@ -108,6 +108,36 @@
     2: 2,
     3: 3
   },
+  ExistingISet: [
+    1,
+    2,
+    3
+  ],
+  ExistingHashSet: [
+    1,
+    2,
+    3
+  ],
+  ExistingSortedSet: [
+    1,
+    2,
+    3
+  ],
+  ISet: [
+    1,
+    2,
+    3
+  ],
+  HashSet: [
+    1,
+    2,
+    3
+  ],
+  SortedSet: [
+    1,
+    2,
+    3
+  ],
   EnumValue: DtoValue1,
   EnumName: Value10,
   EnumRawValue: 20,

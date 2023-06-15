@@ -104,6 +104,15 @@ namespace Riok.Mapperly.IntegrationTests
                     { "2", "2" },
                     { "3", "3" }
                 }.ToImmutableSortedDictionary(),
+                ExistingISet = { "1", "2", "3", },
+                ExistingHashSet = { "1", "2", "3", },
+                ExistingSortedSet = { "1", "2", "3", },
+                ISet = new HashSet<string> { "1", "2", "3", },
+#if NET5_0_OR_GREATER
+                IReadOnlySet = new HashSet<string> { "1", "2", "3", },
+#endif
+                HashSet = new HashSet<string> { "1", "2", "3", },
+                SortedSet = new SortedSet<string> { "1", "2", "3", }
             };
         }
 

@@ -10,12 +10,20 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public class LinqConstructorMapping : TypeMapping
 {
+    private readonly INamedTypeSymbol _targetTypeToConstruct;
     private readonly ITypeMapping _elementMapping;
     private readonly IMethodSymbol? _selectMethod;
 
-    public LinqConstructorMapping(ITypeSymbol sourceType, ITypeSymbol targetType, ITypeMapping elementMapping, IMethodSymbol? selectMethod)
+    public LinqConstructorMapping(
+        ITypeSymbol sourceType,
+        ITypeSymbol targetType,
+        INamedTypeSymbol targetTypeToConstruct,
+        ITypeMapping elementMapping,
+        IMethodSymbol? selectMethod
+    )
         : base(sourceType, targetType)
     {
+        _targetTypeToConstruct = targetTypeToConstruct;
         _elementMapping = elementMapping;
         _selectMethod = selectMethod;
     }
@@ -37,6 +45,6 @@ public class LinqConstructorMapping : TypeMapping
             mappedSource = _elementMapping.Build(ctx);
         }
 
-        return CreateInstance(TargetType, mappedSource);
+        return CreateInstance(_targetTypeToConstruct, mappedSource);
     }
 }
