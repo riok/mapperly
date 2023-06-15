@@ -6,9 +6,9 @@ using Riok.Mapperly.IntegrationTests.Models;
 
 namespace Riok.Mapperly.Benchmarks;
 
+[ArtifactsPath("artifacts")]
 [MemoryDiagnoser]
 [InProcess]
-[JsonExporterAttribute.Full]
 public class MappingBenchmarks
 {
     private readonly TestObject _testObject;

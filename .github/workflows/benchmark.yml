@@ -1,0 +1,73 @@
+name: benchmark
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  BENCHMARKS_PATH: 'benchmarks/Riok.Mapperly.Benchmarks'
+  BENCHMARK_RESULT_DIR: 'benchmarks/Riok.Mapperly.Benchmarks/artifacts/results'
+  BENCHMARK_BASELINE_DIR: './benchmark-results'
+  BENCHMARK_BASELINE_FILE: './benchmark-results/benchmark-baseline-report.json'
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        BENCHMARK_NAME:
+          - MappingBenchmarks
+          - SourceGeneratorBenchmarks
+    name: ${{ matrix.BENCHMARK_NAME }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3.2.0
+      - name: Run ${{ matrix.BENCHMARK_NAME }}
+        working-directory: ${{ env.BENCHMARKS_PATH }}
+        run: dotnet run --exporters json --configuration Release --filter '*${{ matrix.BENCHMARK_NAME }}*'
+      - name: Restore baseline results
+        uses: actions/cache/restore@v3
+        id: cache-baseline-results-restore
+        with:
+          path: ${{ env.BENCHMARK_BASELINE_DIR }}
+          key: benchmarks-${{ matrix.BENCHMARK_NAME }}
+      - name: Compare benchmark result
+        uses: rhysd/github-action-benchmark@v1
+        with:
+          name: ${{ matrix.BENCHMARK_NAME }}
+          tool: benchmarkdotnet
+          external-data-json-path: ${{ env.BENCHMARK_BASELINE_FILE }}
+          output-file-path: >-
+            ${{ env.BENCHMARK_RESULT_DIR }}/Riok.Mapperly.Benchmarks.${{ matrix.BENCHMARK_NAME }}-report-full-compressed.json
+          # Show alert with commit comment on detecting possible performance regression
+          alert-threshold: '150%'
+          comment-on-alert: true
+          fail-on-alert: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      # it is not possible to update the cache
+      # delete it first https://github.com/actions/cache/issues/342
+      # needs to be done via PAT instead of GITHUB_TOKEN, since it requires additional permissions
+      # GH_REPO_PAT is only readable on the main branch / for contributors with write permissions
+      - name: Clear baseline results
+        if: steps.cache-baseline-results-restore.outputs.cache-hit == 'true' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GH_REPO_PAT }}
+        run: |
+          gh extension install actions/gh-actions-cache
+          gh actions-cache delete '${{ steps.cache-baseline-results-restore.outputs.cache-primary-key }}' --confirm
+      - name: Store baseline results
+        id: cache-baseline-results-save
+        if: github.ref == 'refs/heads/main'
+        uses: actions/cache/save@v3
+        with:
+          path: ${{ env.BENCHMARK_BASELINE_DIR }}
+          key: ${{ steps.cache-baseline-results-restore.outputs.cache-primary-key }}
