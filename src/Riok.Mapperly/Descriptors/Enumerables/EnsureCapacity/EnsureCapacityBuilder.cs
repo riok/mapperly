@@ -5,7 +5,7 @@ using Riok.Mapperly.Helpers;
 namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 
 /// <summary>
-/// Generates an <see cref="EnsureCapacity?"/> of types <see cref="EnsureCapacityNonEnumerated"/> or <see cref="EnsureCapacityMember"/> depending on type information.
+/// Generates an <see cref="EnsureCapacity"/> of types <see cref="EnsureCapacityNonEnumerated"/> or <see cref="EnsureCapacityMember"/> depending on type information.
 /// </summary>
 public static class EnsureCapacityBuilder
 {
@@ -14,11 +14,10 @@ public static class EnsureCapacityBuilder
     private const string LengthPropertyName = nameof(Array.Length);
     private const string TryGetNonEnumeratedCountMethodName = "TryGetNonEnumeratedCount";
 
-    public static EnsureCapacity? TryBuildEnsureCapacity(ITypeSymbol sourceType, ITypeSymbol targetType, WellKnownTypes types)
+    public static EnsureCapacity? TryBuildEnsureCapacity(MappingBuilderContext ctx)
     {
-        var capacityMethod = targetType
+        var capacityMethod = ctx.Target
             .GetAllMethods(EnsureCapacityName)
-            .OfType<IMethodSymbol>()
             .FirstOrDefault(x => x.Parameters.Length == 1 && x.Parameters[0].Type.SpecialType == SpecialType.System_Int32 && !x.IsStatic);
 
         // if EnsureCapacity is not available then return null
@@ -26,16 +25,16 @@ public static class EnsureCapacityBuilder
             return null;
 
         // if target does not have a count then return null
-        if (!TryGetNonEnumeratedCount(targetType, types, out var targetSizeProperty))
+        if (!TryGetNonEnumeratedCount(ctx.Target, ctx.Types, out var targetSizeProperty))
             return null;
 
         // if target and source count are known then create a simple EnsureCapacity statement
-        if (TryGetNonEnumeratedCount(sourceType, types, out var sourceSizeProperty))
+        if (TryGetNonEnumeratedCount(ctx.Source, ctx.Types, out var sourceSizeProperty))
             return new EnsureCapacityMember(targetSizeProperty, sourceSizeProperty);
 
-        sourceType.ImplementsGeneric(types.Get(typeof(IEnumerable<>)), out var iEnumerable);
+        ctx.Source.ImplementsGeneric(ctx.Types.Get(typeof(IEnumerable<>)), out var iEnumerable);
 
-        var nonEnumeratedCountMethod = types
+        var nonEnumeratedCountMethod = ctx.Types
             .Get(typeof(Enumerable))
             .GetMembers(TryGetNonEnumeratedCountMethodName)
             .OfType<IMethodSymbol>()
@@ -47,7 +46,7 @@ public static class EnsureCapacityBuilder
         if (nonEnumeratedCountMethod == null)
             return null;
 
-        // if source does not have a count use GetNonEnumeratedCount, calling EnusureCapacity if count is available
+        // if source does not have a count use GetNonEnumeratedCount, calling EnsureCapacity if count is available
         var typedNonEnumeratedCount = nonEnumeratedCountMethod.Construct(iEnumerable!.TypeArguments.ToArray());
         return new EnsureCapacityNonEnumerated(targetSizeProperty, typedNonEnumeratedCount);
     }

@@ -25,7 +25,7 @@ public class WellKnownTypes
     public INamedTypeSymbol Get(string typeFullName) =>
         TryGet(typeFullName) ?? throw new InvalidOperationException("Could not get type " + typeFullName);
 
-    private INamedTypeSymbol? TryGet(string typeFullName)
+    public INamedTypeSymbol? TryGet(string typeFullName)
     {
         if (_cachedTypes.TryGetValue(typeFullName, out var typeSymbol))
         {

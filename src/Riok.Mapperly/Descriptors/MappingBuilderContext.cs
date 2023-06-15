@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Descriptors.Enumerables;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
@@ -14,6 +15,7 @@ namespace Riok.Mapperly.Descriptors;
 public class MappingBuilderContext : SimpleMappingBuilderContext
 {
     private readonly IMethodSymbol? _userSymbol;
+    private CollectionInfos? _collectionInfos;
 
     public MappingBuilderContext(
         SimpleMappingBuilderContext parentCtx,
@@ -39,6 +41,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     public ITypeSymbol Source { get; }
 
     public ITypeSymbol Target { get; }
+
+    public CollectionInfos? CollectionInfos => _collectionInfos ??= CollectionInfoBuilder.Build(Types, Source, Target);
 
     /// <summary>
     /// Whether the current mapping code is generated for a <see cref="System.Linq.Expressions.Expression"/>.
