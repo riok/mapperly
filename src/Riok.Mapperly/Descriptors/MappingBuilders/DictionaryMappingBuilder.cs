@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Descriptors.Enumerables;
 using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
@@ -22,12 +23,20 @@ public static class DictionaryMappingBuilder
         if (!ctx.IsConversionEnabled(MappingConversionType.Dictionary))
             return null;
 
+        if (ctx.CollectionInfos == null)
+            return null;
+
         if (BuildKeyValueMapping(ctx) is not var (keyMapping, valueMapping))
             return null;
 
         // target is of type IDictionary<,>, IReadOnlyDictionary<,> or Dictionary<,>.
         // The constructed type should be Dictionary<,>
-        if (IsDictionaryType(ctx, ctx.Target))
+        if (
+            ctx.CollectionInfos?.Target.Type
+            is CollectionType.Dictionary
+                or CollectionType.IDictionary
+                or CollectionType.IReadOnlyDictionary
+        )
         {
             var sourceHasCount = ctx.Source
                 .GetAllProperties(CountPropertyName)
@@ -62,11 +71,10 @@ public static class DictionaryMappingBuilder
             return null;
         }
 
-        if (!ctx.Target.ImplementsGeneric(ctx.Types.Get(typeof(IDictionary<,>)), out _))
+        if (!ctx.CollectionInfos!.Target.ImplementedTypes.HasFlag(CollectionType.IDictionary))
             return null;
 
-        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.Source, ctx.Target, ctx.Types);
-
+        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx);
         return new ForEachSetDictionaryMapping(
             ctx.Source,
             ctx.Target,
@@ -84,21 +92,24 @@ public static class DictionaryMappingBuilder
         if (!ctx.IsConversionEnabled(MappingConversionType.Dictionary))
             return null;
 
-        if (!ctx.Target.ImplementsGeneric(ctx.Types.Get(typeof(IDictionary<,>)), out _))
+        if (ctx.CollectionInfos == null)
+            return null;
+
+        if (!ctx.CollectionInfos.Target.ImplementedTypes.HasFlag(CollectionType.IDictionary))
             return null;
 
         if (BuildKeyValueMapping(ctx) is not var (keyMapping, valueMapping))
             return null;
 
         // if target is an immutable dictionary then don't create a foreach loop
-        if (ctx.Target.OriginalDefinition.ImplementsGeneric(ctx.Types.Get(typeof(IImmutableDictionary<,>)), out _))
+        if (ctx.CollectionInfos.Target.ImplementedTypes.HasFlag(CollectionType.IImmutableDictionary))
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
             return null;
         }
 
         // add values to dictionary by setting key values in a foreach loop
-        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.Source, ctx.Target, ctx.Types);
+        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx);
 
         return new ForEachSetDictionaryExistingTargetMapping(
             ctx.Source,
@@ -112,10 +123,10 @@ public static class DictionaryMappingBuilder
 
     private static (ITypeMapping, ITypeMapping)? BuildKeyValueMapping(MappingBuilderContext ctx)
     {
-        if (GetDictionaryKeyValueTypes(ctx, ctx.Target) is not var (targetKeyType, targetValueType))
+        if (ctx.CollectionInfos!.Target.GetDictionaryKeyValueTypes(ctx, ctx.Target) is not var (targetKeyType, targetValueType))
             return null;
 
-        if (GetEnumerableKeyValueTypes(ctx, ctx.Source) is not var (sourceKeyType, sourceValueType))
+        if (ctx.CollectionInfos.Source.GetEnumeratedKeyValueTypes(ctx.Types) is not var (sourceKeyType, sourceValueType))
             return null;
 
         var keyMapping = ctx.FindOrBuildMapping(sourceKeyType, targetKeyType);
@@ -127,45 +138,6 @@ public static class DictionaryMappingBuilder
             return null;
 
         return (keyMapping, valueMapping);
-    }
-
-    private static bool IsDictionaryType(MappingBuilderContext ctx, ITypeSymbol symbol)
-    {
-        if (symbol is not INamedTypeSymbol namedSymbol)
-            return false;
-
-        return SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.Get(typeof(Dictionary<,>)))
-            || SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.Get(typeof(IDictionary<,>)))
-            || SymbolEqualityComparer.Default.Equals(namedSymbol.ConstructedFrom, ctx.Types.Get(typeof(IReadOnlyDictionary<,>)));
-    }
-
-    private static (ITypeSymbol, ITypeSymbol)? GetDictionaryKeyValueTypes(MappingBuilderContext ctx, ITypeSymbol t)
-    {
-        if (t.ImplementsGeneric(ctx.Types.Get(typeof(IDictionary<,>)), out var dictionaryImpl))
-        {
-            return (dictionaryImpl.TypeArguments[0], dictionaryImpl.TypeArguments[1]);
-        }
-
-        if (t.ImplementsGeneric(ctx.Types.Get(typeof(IReadOnlyDictionary<,>)), out var readOnlyDictionaryImpl))
-        {
-            return (readOnlyDictionaryImpl.TypeArguments[0], readOnlyDictionaryImpl.TypeArguments[1]);
-        }
-
-        return null;
-    }
-
-    private static (ITypeSymbol, ITypeSymbol)? GetEnumerableKeyValueTypes(MappingBuilderContext ctx, ITypeSymbol t)
-    {
-        if (!t.ImplementsGeneric(ctx.Types.Get(typeof(IEnumerable<>)), out var enumerableImpl))
-            return null;
-
-        if (enumerableImpl.TypeArguments[0] is not INamedTypeSymbol enumeratedType)
-            return null;
-
-        if (!SymbolEqualityComparer.Default.Equals(enumeratedType.ConstructedFrom, ctx.Types.Get(typeof(KeyValuePair<,>))))
-            return null;
-
-        return (enumeratedType.TypeArguments[0], enumeratedType.TypeArguments[1]);
     }
 
     private static INamedTypeSymbol? GetExplicitIndexer(MappingBuilderContext ctx)
