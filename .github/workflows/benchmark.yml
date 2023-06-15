@@ -1,0 +1,35 @@
+name: Benchmark
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  deployments: write
+
+jobs:
+  benchmark:
+    name: Run Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3.2.0
+        with:
+          global-json-file: global.json
+      - name: Run benchmark
+        working-directory: "benchmarks/Riok.Mapperly.Benchmarks"
+        run: dotnet run --exporters json --filter '*' --configuration Release
+
+      - name: Store benchmark result
+        uses: rhysd/github-action-benchmark@v1
+        with:
+          name: Benchmark.Net Benchmark
+          tool: "benchmarkdotnet"
+          output-file-path: "benchmarks/Riok.Mapperly.Benchmarks/BenchmarkDotNet.Artifacts/results/Benchmark-report-full-compressed.json"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          # Show alert with commit comment on detecting possible performance regression
+          alert-threshold: "150%"
+          comment-on-alert: true
+          fail-on-alert: true
