@@ -89,6 +89,8 @@ namespace Riok.Mapperly.IntegrationTests.Models
 
         public TestEnum EnumValue { get; set; }
 
+        public TestFlagsEnum FlagsEnumValue { get; set; }
+
         public TestEnum EnumName { get; set; }
 
         public TestEnum EnumRawValue { get; set; }

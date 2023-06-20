@@ -39,18 +39,29 @@ public static class SyntaxFactoryHelper
         };
     }
 
-    public static BinaryExpressionSyntax Coalesce(ExpressionSyntax expr, ExpressionSyntax coalesceExpr)
-    {
-        return BinaryExpression(SyntaxKind.CoalesceExpression, expr, coalesceExpr);
-    }
+    public static BinaryExpressionSyntax Coalesce(ExpressionSyntax expr, ExpressionSyntax coalesceExpr) =>
+        SyntaxFactory.BinaryExpression(SyntaxKind.CoalesceExpression, expr, coalesceExpr);
 
-    public static ExpressionSyntax Or(IEnumerable<ExpressionSyntax?> values) =>
-        values.WhereNotNull().Aggregate((a, b) => BinaryExpression(SyntaxKind.LogicalOrExpression, a, b));
+    public static ExpressionSyntax Or(IEnumerable<ExpressionSyntax?> values) => BinaryExpression(SyntaxKind.LogicalOrExpression, values);
 
     public static ExpressionSyntax And(params ExpressionSyntax?[] values) => And((IEnumerable<ExpressionSyntax?>)values);
 
-    public static ExpressionSyntax And(IEnumerable<ExpressionSyntax?> values) =>
-        values.WhereNotNull().Aggregate((a, b) => BinaryExpression(SyntaxKind.LogicalAndExpression, a, b));
+    public static ExpressionSyntax And(IEnumerable<ExpressionSyntax?> values) => BinaryExpression(SyntaxKind.LogicalAndExpression, values);
+
+    public static ExpressionSyntax BitwiseAnd(params ExpressionSyntax?[] values) =>
+        BinaryExpression(SyntaxKind.BitwiseAndExpression, values);
+
+    public static ExpressionSyntax BitwiseOr(IEnumerable<ExpressionSyntax?> values) =>
+        BinaryExpression(SyntaxKind.BitwiseOrExpression, values);
+
+    public static PatternSyntax OrPattern(IEnumerable<ExpressionSyntax?> values) =>
+        values
+            .WhereNotNull()
+            .Select<ExpressionSyntax, PatternSyntax>(ConstantPattern)
+            .Aggregate((left, right) => BinaryPattern(SyntaxKind.OrPattern, left, right));
+
+    public static ExpressionSyntax Equal(ExpressionSyntax left, ExpressionSyntax right) =>
+        BinaryExpression(SyntaxKind.EqualsExpression, left, right);
 
     public static ExpressionSyntax IfNoneNull(params (ITypeSymbol Type, ExpressionSyntax Access)[] values)
     {
@@ -65,10 +76,10 @@ public static class SyntaxFactoryHelper
     }
 
     public static BinaryExpressionSyntax IsNull(ExpressionSyntax expression) =>
-        BinaryExpression(SyntaxKind.EqualsExpression, expression, NullLiteral());
+        SyntaxFactory.BinaryExpression(SyntaxKind.EqualsExpression, expression, NullLiteral());
 
     public static BinaryExpressionSyntax IsNotNull(ExpressionSyntax expression) =>
-        BinaryExpression(SyntaxKind.NotEqualsExpression, expression, NullLiteral());
+        SyntaxFactory.BinaryExpression(SyntaxKind.NotEqualsExpression, expression, NullLiteral());
 
     public static ExpressionSyntax NullSubstitute(ITypeSymbol t, ExpressionSyntax argument, NullFallbackValue nullFallbackValue)
     {
@@ -388,6 +399,12 @@ public static class SyntaxFactoryHelper
 
     public static IReadOnlyCollection<StatementSyntax> SingleStatement(ExpressionSyntax expression) =>
         new[] { ExpressionStatement(expression) };
+
+    private static ExpressionSyntax BinaryExpression(SyntaxKind kind, params ExpressionSyntax?[] values) =>
+        BinaryExpression(kind, (IEnumerable<ExpressionSyntax?>)values);
+
+    private static ExpressionSyntax BinaryExpression(SyntaxKind kind, IEnumerable<ExpressionSyntax?> values) =>
+        values.WhereNotNull().Aggregate((left, right) => SyntaxFactory.BinaryExpression(kind, left, right));
 
     private static InterpolatedStringTextSyntax InterpolatedStringText(string text) =>
         SyntaxFactory.InterpolatedStringText(

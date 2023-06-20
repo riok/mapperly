@@ -91,6 +91,8 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         public TestEnumDtoByValue EnumValue { get; set; }
 
+        public TestFlagsEnumDto FlagsEnumValue { get; set; }
+
         public TestEnumDtoByName EnumName { get; set; }
 
         public byte EnumRawValue { get; set; }

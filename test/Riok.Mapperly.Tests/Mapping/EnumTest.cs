@@ -71,7 +71,24 @@ public class EnumTest
             .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
-                """return global::System.Enum.IsDefined(typeof(global::E2), (global::E2)source) ? (global::E2)source : throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported");"""
+                """return (global::E2)source is global::E2.A or global::E2.B or global::E2.C ? (global::E2)source : throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported");"""
+            );
+    }
+
+    [Fact]
+    public void FlagsEnumToOtherEnumByValueCheckDefinedShouldCast()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByValueCheckDefined)] partial E2 ToE1(E1 source);",
+            "enum E1 {B = 1 << 0, A = 1 << 1, C = 1 << 2}",
+            "[Flags] enum E2 {A = 1 << 0, B = 1 << 1, C = 1 << 2}"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """return (global::E2)source == ((global::E2)source & (global::E2.A | global::E2.B | global::E2.C)) ? (global::E2)source : throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported");"""
             );
     }
 

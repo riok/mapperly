@@ -59,29 +59,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapperIgnoreSource(nameof(TestObjectDto.IgnoredIntValue))]
         public partial TestObject MapFromDto(TestObjectDto dto);
 
-        [MapEnum(EnumMappingStrategy.ByName)]
-        public partial TestEnumDtoByName MapToEnumDtoByName(TestEnum v);
-
-        [MapEnum(EnumMappingStrategy.ByName)]
-        [MapEnumValue(TestEnumDtoAdditionalValue.Value40, TestEnum.Value30)]
-        public partial TestEnum MapToEnumByNameWithExplicit(TestEnumDtoAdditionalValue v);
-
-        [MapEnum(EnumMappingStrategy.ByValue)]
-        [MapEnumValue(TestEnumDtoAdditionalValue.Value40, TestEnum.Value30)]
-        public partial TestEnum MapToEnumByValueWithExplicit(TestEnumDtoAdditionalValue v);
-
-        [MapEnum(EnumMappingStrategy.ByValueCheckDefined)]
-        public partial TestEnum MapToEnumByValueCheckDefined(TestEnumDtoByValue v);
-
-        [MapEnum(EnumMappingStrategy.ByValueCheckDefined, FallbackValue = TestEnum.Value10)]
-        public partial TestEnum MapToEnumByValueCheckDefinedWithFallback(TestEnumDtoByValue v);
-
-        [MapEnum(EnumMappingStrategy.ByName, FallbackValue = TestEnum.Value10)]
-        public partial TestEnum MapToEnumByNameWithFallback(TestEnumDtoByName v);
-
         [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredIntValue))]
         [MapperIgnoreSource(nameof(TestObject.IgnoredStringValue))]
         public partial void UpdateDto(TestObject source, TestObjectDto target);
+
+        [MapEnum(EnumMappingStrategy.ByName)]
+        public partial TestEnumDtoByName MapToEnumDtoByName(TestEnum v);
 
         private partial int PrivateDirectInt(int value);
     }

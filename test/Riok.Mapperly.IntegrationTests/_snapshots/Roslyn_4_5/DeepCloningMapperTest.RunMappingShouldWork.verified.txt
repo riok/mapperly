@@ -135,6 +135,7 @@
     3
   ],
   EnumValue: Value10,
+  FlagsEnumValue: V1, V4,
   EnumName: Value10,
   EnumRawValue: Value20,
   EnumStringValue: Value30,
