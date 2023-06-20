@@ -13,9 +13,8 @@ public static class RuntimeTargetTypeMappingBodyBuilder
         // source nulls are filtered out by the type switch arms,
         // therefore set source type always to nun-nullable
         // as non-nullables are also assignable to nullables.
-        var mappings = ctx.CallableUserMappings.Where(
-            x => mapping.TypeParameters.CanConsumeTypes(ctx.Compilation, x.SourceType.NonNullable(), x.TargetType)
-        );
+        var mappings = GetUserMappingCandidates(ctx)
+            .Where(x => mapping.TypeParameters.CanConsumeTypes(ctx.Compilation, x.SourceType.NonNullable(), x.TargetType));
 
         BuildMappingBody(ctx, mapping, mappings);
     }
@@ -25,13 +24,30 @@ public static class RuntimeTargetTypeMappingBodyBuilder
         // source nulls are filtered out by the type switch arms,
         // therefore set source type always to nun-nullable
         // as non-nullables are also assignable to nullables.
-        var mappings = ctx.CallableUserMappings.Where(
-            x =>
-                x.SourceType.NonNullable().IsAssignableTo(ctx.Compilation, mapping.SourceType)
-                && x.TargetType.IsAssignableTo(ctx.Compilation, mapping.TargetType)
-        );
+        var mappings = GetUserMappingCandidates(ctx)
+            .Where(
+                x =>
+                    x.SourceType.NonNullable().IsAssignableTo(ctx.Compilation, mapping.SourceType)
+                    && x.TargetType.IsAssignableTo(ctx.Compilation, mapping.TargetType)
+            );
 
         BuildMappingBody(ctx, mapping, mappings);
+    }
+
+    private static IEnumerable<ITypeMapping> GetUserMappingCandidates(MappingBuilderContext ctx)
+    {
+        foreach (var userMapping in ctx.UserMappings)
+        {
+            // exclude runtime target type mappings
+            if (userMapping is UserDefinedNewInstanceRuntimeTargetTypeMapping)
+                continue;
+
+            if (userMapping.CallableByOtherMappings)
+                yield return userMapping;
+
+            if (userMapping is IDelegateUserMapping { DelegateMapping.CallableByOtherMappings: true } delegateUserMapping)
+                yield return delegateUserMapping.DelegateMapping;
+        }
     }
 
     private static void BuildMappingBody(

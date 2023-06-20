@@ -10,14 +10,12 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 /// <summary>
 /// Represents a mapping method declared but not implemented by the user which results in a new target object instance.
 /// </summary>
-public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
+public class UserDefinedNewInstanceMethodMapping : MethodMapping, IDelegateUserMapping
 {
     private const string NoMappingComment = "// Could not generate mapping";
 
     private readonly bool _enableReferenceHandling;
     private readonly INamedTypeSymbol _referenceHandlerType;
-
-    private ITypeMapping? _delegateMapping;
 
     public UserDefinedNewInstanceMethodMapping(
         IMethodSymbol method,
@@ -35,11 +33,13 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
 
     public IMethodSymbol Method { get; }
 
-    public void SetDelegateMapping(ITypeMapping delegateMapping) => _delegateMapping = delegateMapping;
+    public ITypeMapping? DelegateMapping { get; private set; }
+
+    public void SetDelegateMapping(ITypeMapping mapping) => DelegateMapping = mapping;
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
-        if (_delegateMapping == null)
+        if (DelegateMapping == null)
         {
             return new[] { ExpressionStatement(ThrowNotImplementedException()).WithLeadingTrivia(TriviaList(Comment(NoMappingComment))), };
         }
@@ -52,13 +52,13 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
             // new RefHandler();
             var createRefHandler = CreateInstance(_referenceHandlerType);
             ctx = ctx.WithRefHandler(createRefHandler);
-            return new[] { ReturnStatement(_delegateMapping.Build(ctx)) };
+            return new[] { ReturnStatement(DelegateMapping.Build(ctx)) };
         }
 
-        if (_delegateMapping is MethodMapping delegateMethodMapping)
+        if (DelegateMapping is MethodMapping delegateMethodMapping)
             return delegateMethodMapping.BuildBody(ctx);
 
-        return new[] { ReturnStatement(_delegateMapping.Build(ctx)) };
+        return new[] { ReturnStatement(DelegateMapping.Build(ctx)) };
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IUserMapping
     {
         // the parameters of user defined methods should not be manipulated
         // if the user did not define a parameter a new reference handler is initialized
-        if (_delegateMapping is MethodMapping methodMapping)
+        if (DelegateMapping is MethodMapping methodMapping)
         {
             methodMapping.EnableReferenceHandling(iReferenceHandlerType);
         }

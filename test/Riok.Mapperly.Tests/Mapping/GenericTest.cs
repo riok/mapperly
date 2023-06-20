@@ -4,7 +4,7 @@ namespace Riok.Mapperly.Tests.Mapping;
 public class GenericTest
 {
     [Fact]
-    public Task<VerifyResult> WithGenericSourceAndTarget()
+    public Task WithGenericSourceAndTarget()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -428,5 +428,43 @@ public class GenericTest
                 };
                 """
             );
+    }
+
+    [Fact]
+    public Task WithGenericSourceAndTargetAndEnabledReferenceHandling()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+                partial TTarget Map<TSource, TTarget>(TSource source);
+
+                partial B MapToB(A source);
+                partial D MapToD(C source);
+                """,
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "record struct A(string Value);",
+            "record struct B(string Value);",
+            "record C(string Value1);",
+            "record D(string Value1);"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithGenericSourceAndTargetAndEnabledReferenceHandlingAndParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+                partial TTarget Map<TSource, TTarget>(TSource source, [ReferenceHandler] IReferenceHandler refHandler);
+
+                partial B MapToB(A source);
+                partial D MapToD(C source);
+                """,
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "record struct A(string Value);",
+            "record struct B(string Value);",
+            "record C(string Value1);",
+            "record D(string Value1);"
+        );
+        return TestHelper.VerifyGenerator(source);
     }
 }

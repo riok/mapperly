@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Riok.Mapperly.Descriptors.Mappings;
 
 /// <inheritdoc cref="ITypeMapping"/>
-[DebuggerDisplay("{GetType()}({SourceType} => {TargetType})")]
+[DebuggerDisplay("{GetType().Name}({SourceType} => {TargetType})")]
 public abstract class TypeMapping : ITypeMapping
 {
     protected TypeMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
@@ -17,6 +17,8 @@ public abstract class TypeMapping : ITypeMapping
     public ITypeSymbol SourceType { get; }
 
     public ITypeSymbol TargetType { get; }
+
+    public virtual MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.Default;
 
     /// <inheritdoc cref="ITypeMapping.CallableByOtherMappings"/>
     public virtual bool CallableByOtherMappings => true;

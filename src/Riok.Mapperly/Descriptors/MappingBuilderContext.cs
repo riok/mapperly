@@ -11,7 +11,7 @@ using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
 
-[DebuggerDisplay("{GetType()}({Source.Name} => {Target.Name})")]
+[DebuggerDisplay("{GetType().Name}({Source.Name} => {Target.Name})")]
 public class MappingBuilderContext : SimpleMappingBuilderContext
 {
     private readonly IMethodSymbol? _userSymbol;
@@ -51,8 +51,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public ObjectFactoryCollection ObjectFactories { get; }
 
-    /// <inheritdoc cref="MappingBuilderContext.CallableUserMappings"/>
-    public IReadOnlyCollection<IUserMapping> CallableUserMappings => MappingBuilder.CallableUserMappings;
+    /// <inheritdoc cref="MappingBuilders.MappingBuilder.UserMappings"/>
+    public IReadOnlyCollection<IUserMapping> UserMappings => MappingBuilder.UserMappings;
 
     /// <summary>
     /// Tries to find an existing mapping for the provided types.
