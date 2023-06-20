@@ -67,7 +67,11 @@ public static class DerivedTypeMappingBuilder
                 continue;
             }
 
-            var mapping = ctx.FindOrBuildMapping(sourceType, targetType);
+            var mapping = ctx.FindOrBuildMapping(
+                sourceType,
+                targetType,
+                MappingBuildingOptions.KeepUserSymbol | MappingBuildingOptions.MarkAsReusable | MappingBuildingOptions.ClearDerivedTypes
+            );
             if (mapping == null)
             {
                 ctx.ReportDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping, sourceType, targetType);

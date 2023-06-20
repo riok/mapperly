@@ -13,7 +13,11 @@ public static class NullableMappingBuilder
         if (!sourceIsNullable && !targetIsNullable)
             return null;
 
-        var delegateMapping = ctx.BuildDelegateMapping(sourceNonNullable ?? ctx.Source, targetNonNullable ?? ctx.Target);
+        var delegateMapping = ctx.BuildMapping(
+            sourceNonNullable ?? ctx.Source,
+            targetNonNullable ?? ctx.Target,
+            MappingBuildingOptions.KeepUserSymbol
+        );
         return delegateMapping == null ? null : BuildNullDelegateMapping(ctx, delegateMapping);
     }
 
