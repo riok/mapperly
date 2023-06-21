@@ -83,7 +83,6 @@ public static class UserMethodMappingExtractor
         if (!isStatic && methodSymbol.IsStatic)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.PartialStaticMethodInInstanceMapper, methodSymbol, methodSymbol.Name);
-
             return null;
         }
 
@@ -93,6 +92,7 @@ public static class UserMethodMappingExtractor
             return null;
         }
 
+        // where method has at least one Type parameter ie Map(object obj, Type type);
         if (!methodSymbol.IsGenericMethod && BuildRuntimeTargetTypeMappingParameters(ctx, methodSymbol, out var runtimeTargetTypeParams))
         {
             return new UserDefinedNewInstanceRuntimeTargetTypeParameterMapping(
@@ -111,6 +111,7 @@ public static class UserMethodMappingExtractor
             return null;
         }
 
+        // where method has a generic target type mapping ie Map<T>(object obj);
         if (BuildGenericTypeParameters(methodSymbol, parameters, out var typeParameters))
         {
             return new UserDefinedNewInstanceGenericTypeMapping(
@@ -146,6 +147,7 @@ public static class UserMethodMappingExtractor
             methodSymbol,
             parameters.Source,
             parameters.ReferenceHandler,
+            parameters.Parameters,
             ctx.MapperConfiguration.UseReferenceHandling,
             ctx.Types.Get<PreserveReferenceHandler>()
         );
@@ -268,27 +270,29 @@ public static class UserMethodMappingExtractor
         // target parameter is the second parameter (except if the reference handler is the first or the second parameter)
         // if the method returns void, a target parameter is required
         // if the method doesnt return void, a target parameter is not allowed
-        var targetParameter = MethodParameter.Wrap(
-            method.Parameters.FirstOrDefault(p => p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != refHandlerParameterOrdinal)
-        );
-        if (method.ReturnsVoid == !targetParameter.HasValue)
+        MethodParameter? targetParameter = null;
+        if (method.ReturnsVoid)
         {
-            parameters = null;
-            return false;
-        }
-
-        if (targetParameter.HasValue)
-        {
+            targetParameter = MethodParameter.Wrap(
+                method.Parameters.FirstOrDefault(p => p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != refHandlerParameterOrdinal)
+            );
+            if (!targetParameter.HasValue)
+            {
+                parameters = null;
+                return false;
+            }
             expectedParameterCount++;
         }
 
-        if (method.Parameters.Length != expectedParameterCount)
-        {
-            parameters = null;
-            return false;
-        }
+        var parma = method.Parameters.Skip(expectedParameterCount).Select(MethodParameter.Wrap).WhereNotNull().ToArray();
+        // if (method.Parameters.Length != expectedParameterCount)
+        // {
+        //     parameters = null;
+        //     return false;
+        // }
 
-        parameters = new MappingMethodParameters(sourceParameter.Value, targetParameter, refHandlerParameter);
+        parameters = new MappingMethodParameters(sourceParameter.Value, targetParameter, refHandlerParameter, parma);
+
         return true;
     }
 

@@ -29,8 +29,8 @@ public static class UserMethodMappingBodyBuilder
     public static void BuildMappingBody(MappingBuilderContext ctx, UserDefinedNewInstanceMethodMapping mapping)
     {
         var delegateMapping = mapping.CallableByOtherMappings
-            ? ctx.BuildDelegateMapping(mapping.SourceType, mapping.TargetType)
-            : ctx.BuildMappingWithUserSymbol(mapping.SourceType, mapping.TargetType);
+            ? ctx.BuildDelegateMapping(mapping.SourceType, mapping.TargetType, mapping.Parameters)
+            : ctx.BuildMappingWithUserSymbol(mapping.SourceType, mapping.TargetType, mapping.Parameters);
 
         if (delegateMapping != null)
         {

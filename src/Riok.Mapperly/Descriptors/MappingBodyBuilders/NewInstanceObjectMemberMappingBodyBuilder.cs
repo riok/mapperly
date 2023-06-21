@@ -31,6 +31,29 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         ObjectMemberMappingBodyBuilder.BuildMappingBody(mappingCtx);
     }
 
+    private static bool TryParams(INewInstanceBuilderContext<IMapping> ctx, IMappableMember member, out MemberPath? memberPath)
+    {
+        memberPath = null;
+        foreach (var parameter in ctx.Mapping.Parameters)
+        {
+            if (
+                MemberPath.TryFind(
+                    parameter.Type,
+                    MemberPathCandidateBuilder.BuildMemberPathCandidates(member.Name),
+                    ctx.IgnoredSourceMemberNames,
+                    StringComparer.OrdinalIgnoreCase,
+                    out var sourceMemberPath
+                )
+            )
+            {
+                memberPath = sourceMemberPath;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static void BuildInitOnlyMemberMappings(INewInstanceBuilderContext<IMapping> ctx, bool includeAllMembers = false)
     {
         var initOnlyTargetMembers = includeAllMembers
@@ -52,7 +75,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                     MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
                     ctx.IgnoredSourceMemberNames,
                     out var sourceMemberPath
-                )
+                ) && !TryParams(ctx, targetMember, out sourceMemberPath)
             )
             {
                 ctx.BuilderContext.ReportDiagnostic(

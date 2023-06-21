@@ -4,6 +4,7 @@ using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -25,7 +26,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         ITypeSymbol source,
         ITypeSymbol target
     )
-        : base(ctx, userSymbol, source, target)
+        : base(ctx, userSymbol, source, target, Array.Empty<MethodParameter>())
     {
         _parentContext = ctx;
         _inlineExpressionMappings = new MappingCollection();
@@ -37,7 +38,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         ITypeSymbol source,
         ITypeSymbol target
     )
-        : base(ctx, userSymbol, source, target)
+        : base(ctx, userSymbol, source, target, Array.Empty<MethodParameter>())
     {
         _parentContext = ctx;
         _inlineExpressionMappings = ctx._inlineExpressionMappings;
@@ -136,6 +137,10 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     protected override NullFallbackValue GetNullFallbackValue(ITypeSymbol targetType, bool throwOnMappingNullMismatch) =>
         base.GetNullFallbackValue(targetType, false); // never throw inside expressions (not translatable)
 
-    protected override MappingBuilderContext ContextForMapping(IMethodSymbol? userSymbol, ITypeSymbol sourceType, ITypeSymbol targetType) =>
-        new InlineExpressionMappingBuilderContext(this, userSymbol, sourceType, targetType);
+    protected override MappingBuilderContext ContextForMapping(
+        IMethodSymbol? userSymbol,
+        ITypeSymbol sourceType,
+        MethodParameter[] parameters,
+        ITypeSymbol targetType
+    ) => new InlineExpressionMappingBuilderContext(this, userSymbol, sourceType, targetType);
 }

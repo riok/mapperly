@@ -6,6 +6,7 @@ using Riok.Mapperly.Descriptors.MappingBodyBuilders;
 using Riok.Mapperly.Descriptors.MappingBuilders;
 using Riok.Mapperly.Descriptors.ObjectFactories;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -67,6 +68,7 @@ public class DescriptorBuilder
                 _objectFactories,
                 userMapping.Method,
                 userMapping.SourceType,
+                userMapping.Parameters,
                 userMapping.TargetType
             );
 

@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Emit;
+using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -18,8 +19,13 @@ public class NewInstanceObjectMemberMethodMapping : ObjectMemberMethodMapping, I
     private readonly HashSet<MemberAssignmentMapping> _initPropertyMappings = new();
     private readonly bool _enableReferenceHandling;
 
-    public NewInstanceObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, bool enableReferenceHandling)
-        : base(sourceType, targetType)
+    public NewInstanceObjectMemberMethodMapping(
+        ITypeSymbol sourceType,
+        ITypeSymbol targetType,
+        MethodParameter[] parameters,
+        bool enableReferenceHandling
+    )
+        : base(sourceType, targetType, parameters)
     {
         _enableReferenceHandling = enableReferenceHandling;
     }

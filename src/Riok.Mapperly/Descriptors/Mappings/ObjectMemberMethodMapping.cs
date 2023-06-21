@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -12,6 +13,12 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 public abstract class ObjectMemberMethodMapping : MethodMapping, IMemberAssignmentTypeMapping
 {
     private readonly ObjectMemberExistingTargetMapping _mapping;
+
+    protected ObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, MethodParameter[] parameters)
+        : base(sourceType, targetType, parameters)
+    {
+        _mapping = new ObjectMemberExistingTargetMapping(sourceType, targetType);
+    }
 
     protected ObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
         : base(sourceType, targetType)

@@ -68,7 +68,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
     private HashSet<string> GetSourceMemberNames()
     {
-        return Mapping.SourceType.GetAccessibleMappableMembers().Select(x => x.Name).ToHashSet();
+        var additionalParams = Mapping.Parameters.Select(x => x.Name);
+        return Mapping.SourceType.GetAccessibleMappableMembers().Select(x => x.Name).Concat(additionalParams).ToHashSet();
     }
 
     private Dictionary<string, IMappableMember> GetTargetMembers()

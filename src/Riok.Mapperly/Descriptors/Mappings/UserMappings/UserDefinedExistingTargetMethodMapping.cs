@@ -27,7 +27,7 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
         bool enableReferenceHandling,
         INamedTypeSymbol referenceHandlerType
     )
-        : base(method, sourceParameter, referenceHandlerParameter, targetParameter.Type)
+        : base(method, sourceParameter, referenceHandlerParameter, Array.Empty<MethodParameter>(), targetParameter.Type)
     {
         _enableReferenceHandling = enableReferenceHandling;
         _referenceHandlerType = referenceHandlerType;

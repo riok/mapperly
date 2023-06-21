@@ -31,7 +31,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMap
         NullFallbackValue nullArm,
         ITypeSymbol objectType
     )
-        : base(method, sourceParameter, referenceHandlerParameter, method.ReturnType)
+        : base(method, sourceParameter, referenceHandlerParameter, Array.Empty<MethodParameter>(), method.ReturnType)
     {
         Method = method;
         _enableReferenceHandling = enableReferenceHandling;

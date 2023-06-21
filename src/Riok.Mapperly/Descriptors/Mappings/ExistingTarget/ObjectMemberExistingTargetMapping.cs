@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 
@@ -18,4 +19,6 @@ public class ObjectMemberExistingTargetMapping : MemberAssignmentMappingContaine
     public ITypeSymbol SourceType { get; }
 
     public ITypeSymbol TargetType { get; }
+
+    public MethodParameter[] Parameters => Array.Empty<MethodParameter>();
 }

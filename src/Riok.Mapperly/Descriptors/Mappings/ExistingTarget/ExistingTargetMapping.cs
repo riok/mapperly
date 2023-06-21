@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 
@@ -17,6 +18,8 @@ public abstract class ExistingTargetMapping : IExistingTargetMapping
     public ITypeSymbol SourceType { get; }
 
     public ITypeSymbol TargetType { get; }
+
+    public MethodParameter[] Parameters => Array.Empty<MethodParameter>();
 
     public abstract IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target);
 }

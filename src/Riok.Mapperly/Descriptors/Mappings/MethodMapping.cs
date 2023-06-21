@@ -26,6 +26,13 @@ public abstract class MethodMapping : TypeMapping
 
     private string? _methodName;
 
+    protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, MethodParameter[] parameters)
+        : base(sourceType, targetType, parameters)
+    {
+        SourceParameter = new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType);
+        _returnType = targetType;
+    }
+
     protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
         : base(sourceType, targetType)
     {
@@ -37,9 +44,10 @@ public abstract class MethodMapping : TypeMapping
         IMethodSymbol method,
         MethodParameter sourceParameter,
         MethodParameter? referenceHandlerParameter,
+        MethodParameter[] parameters,
         ITypeSymbol targetType
     )
-        : base(sourceParameter.Type, targetType)
+        : base(sourceParameter.Type, targetType, parameters)
     {
         SourceParameter = sourceParameter;
         IsExtensionMethod = method.IsExtensionMethod;
@@ -49,6 +57,17 @@ public abstract class MethodMapping : TypeMapping
         _methodName = method.Name;
         _returnType = method.ReturnType.UpgradeNullable();
     }
+
+    // protected MethodMapping(
+    //     IMethodSymbol method,
+    //     MethodParameter sourceParameter,
+    //     MethodParameter? referenceHandlerParameter,
+    //     MethodParameter[] parameters,
+    //     ITypeSymbol targetType
+    // )
+    // {
+    //
+    // }
 
     private bool IsPartial { get; }
 

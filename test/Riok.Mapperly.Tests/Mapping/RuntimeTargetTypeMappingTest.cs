@@ -262,6 +262,19 @@ public class RuntimeTargetTypeMappingTest
     }
 
     [Fact]
+    public void ExtraSignatureAdditionalParameterShouldMap()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A src, C value);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public string Value { get; init; } }",
+            "class C { public string Value { get; init; } }"
+        );
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics).Should().HaveMapMethodBody("");
+    }
+
+    [Fact]
     public void InvalidSignatureAdditionalParameterShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
