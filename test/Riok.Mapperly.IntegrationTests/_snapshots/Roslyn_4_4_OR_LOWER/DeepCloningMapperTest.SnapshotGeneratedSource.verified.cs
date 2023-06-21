@@ -87,6 +87,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.HashSet = global::System.Linq.Enumerable.ToHashSet(src.HashSet);
             target.SortedSet = new global::System.Collections.Generic.SortedSet<string>(src.SortedSet);
             target.EnumValue = src.EnumValue;
+            target.FlagsEnumValue = src.FlagsEnumValue;
             target.EnumName = src.EnumName;
             target.EnumRawValue = src.EnumRawValue;
             target.EnumStringValue = src.EnumStringValue;

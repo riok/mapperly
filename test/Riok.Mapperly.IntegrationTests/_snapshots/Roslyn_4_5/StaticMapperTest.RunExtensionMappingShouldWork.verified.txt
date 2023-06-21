@@ -139,6 +139,7 @@
     3
   ],
   EnumValue: DtoValue1,
+  FlagsEnumValue: V1, V3,
   EnumName: Value10,
   EnumRawValue: 20,
   EnumStringValue: Value30,

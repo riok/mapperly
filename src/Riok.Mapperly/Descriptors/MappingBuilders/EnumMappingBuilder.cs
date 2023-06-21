@@ -72,6 +72,7 @@ public static class EnumMappingBuilder
             .OfType<IFieldSymbol>()
             .Where(x => !explicitMappingTargetNames.Contains(x.Name))
             .ToDictionary(field => field.Name, field => field.ConstantValue);
+        var targetMemberNames = ctx.Target.GetMembers().OfType<IFieldSymbol>().Select(x => x.Name).ToHashSet();
 
         var missingTargetValues = targetValues.Where(
             field =>
@@ -95,7 +96,14 @@ public static class EnumMappingBuilder
             checkTargetDefined = true;
         }
 
-        var castFallbackMapping = new EnumCastMapping(ctx.Types.Get<Enum>(), ctx.Source, ctx.Target, checkTargetDefined, fallbackMapping);
+        var checkDefinedMode = checkTargetDefined switch
+        {
+            false => EnumCastMapping.CheckDefinedMode.NoCheck,
+            _ when ctx.Target.HasAttribute(ctx.Types.Get<FlagsAttribute>()) => EnumCastMapping.CheckDefinedMode.Flags,
+            _ => EnumCastMapping.CheckDefinedMode.Value,
+        };
+
+        var castFallbackMapping = new EnumCastMapping(ctx.Source, ctx.Target, checkDefinedMode, targetMemberNames, fallbackMapping);
         if (explicitMappings.Count == 0)
             return castFallbackMapping;
 

@@ -35,15 +35,32 @@ public class EnumFallbackValueTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapEnum(EnumMappingStrategy.ByValueCheckDefined, FallbackValue = E2.Unknown)] partial E2 ToE1(E1 source);",
-            "enum E1 {A, B, C, D, E}",
-            "enum E2 {Unknown = -1, A, B, C, D, E}"
+            "enum E1 {A, B, C}",
+            "enum E2 {Unknown = -1, A, B, C}"
         );
 
         TestHelper
             .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
-                "return global::System.Enum.IsDefined(typeof(global::E2), (global::E2)source) ? (global::E2)source : global::E2.Unknown;"
+                "return (global::E2)source is global::E2.Unknown or global::E2.A or global::E2.B or global::E2.C ? (global::E2)source : global::E2.Unknown;"
+            );
+    }
+
+    [Fact]
+    public void FlagsEnumByValueCheckDefinedWithFallback()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByValueCheckDefined, FallbackValue = E2.Unknown)] partial E2 ToE1(E1 source);",
+            "enum E1 {A = 1 << 0, B = 1 << 1, C = 1 << 2}",
+            "[Flags] enum E2 {Unknown = -1, A = 1 << 0, B = 1 << 1, C = 1 << 2}"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                "return (global::E2)source == ((global::E2)source & (global::E2.Unknown | global::E2.A | global::E2.B | global::E2.C)) ? (global::E2)source : global::E2.Unknown;"
             );
     }
 
@@ -60,7 +77,7 @@ public class EnumFallbackValueTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveSingleMethodBody(
-                "return global::System.Enum.IsDefined(typeof(global::E2), (global::E2)source) ? (global::E2)source : global::E2.Unknown;"
+                "return (global::E2)source is global::E2.Unknown or global::E2.A or global::E2.B or global::E2.C or global::E2.D or global::E2.E ? (global::E2)source : global::E2.Unknown;"
             )
             .HaveDiagnostic(
                 DiagnosticDescriptors.EnumFallbackValueRequiresByValueCheckDefinedStrategy,

@@ -53,6 +53,7 @@ namespace Riok.Mapperly.IntegrationTests
                 IntValue = 10,
                 EnumName = TestEnum.Value10,
                 EnumValue = TestEnum.Value10,
+                FlagsEnumValue = TestFlagsEnum.V1 | TestFlagsEnum.V4,
                 IntInitOnlyValue = 3,
                 RequiredValue = 4,
                 NestedNullable = new TestObjectNested { IntValue = 100, },
