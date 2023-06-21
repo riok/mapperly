@@ -61,3 +61,7 @@ need to implement or extend the type of the mapping method parameter.
 All target types provided to the `MapDerivedTypeAttribute`
 need to implement or extend the mapping method return type.
 Each source type has to be unique but multiple source types can be mapped to the same target type.
+
+Configuration attributes on methods with `MapDerivedTypeAttribute`s are used to build
+the mapping of each derived types combination unless there is a user defined mapping method for exactly
+this source/target type combination.

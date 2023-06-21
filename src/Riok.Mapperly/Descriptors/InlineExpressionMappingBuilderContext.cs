@@ -25,7 +25,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         ITypeSymbol source,
         ITypeSymbol target
     )
-        : base(ctx, userSymbol, source, target)
+        : base(ctx, userSymbol, source, target, false)
     {
         _parentContext = ctx;
         _inlineExpressionMappings = new MappingCollection();
@@ -35,9 +35,10 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         InlineExpressionMappingBuilderContext ctx,
         IMethodSymbol? userSymbol,
         ITypeSymbol source,
-        ITypeSymbol target
+        ITypeSymbol target,
+        bool clearDerivedTypes
     )
-        : base(ctx, userSymbol, source, target)
+        : base(ctx, userSymbol, source, target, clearDerivedTypes)
     {
         _parentContext = ctx;
         _inlineExpressionMappings = ctx._inlineExpressionMappings;
@@ -80,23 +81,6 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     }
 
     /// <summary>
-    /// Existing target instance mappings are not supported.
-    /// </summary>
-    /// <param name="sourceType">The source type.</param>
-    /// <param name="targetType">The target type.</param>
-    /// <returns><c>null</c></returns>
-    public override IExistingTargetMapping? FindOrBuildExistingTargetMapping(ITypeSymbol sourceType, ITypeSymbol targetType) => null;
-
-    /// <summary>
-    /// Existing target instance mappings are not supported.
-    /// </summary>
-    /// <param name="sourceType">The source type.</param>
-    /// <param name="targetType">The target type.</param>
-    /// <returns><c>null</c></returns>
-    public override IExistingTargetMapping? BuildExistingTargetMappingWithUserSymbol(ITypeSymbol sourceType, ITypeSymbol targetType) =>
-        null;
-
-    /// <summary>
     /// Always builds a new mapping with the user symbol of the first user defined mapping method for the provided types
     /// or no user symbol if no user defined mapping is available unless if this <see cref="InlineExpressionMappingBuilderContext"/>
     /// already built a mapping for the specified types, then this mapping is reused.
@@ -104,16 +88,14 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     /// This ensures, the configuration of the user defined method is reused.
     /// <seealso cref="MappingBuilderContext.FindOrBuildMapping"/>
     /// </summary>
-    /// <param name="userSymbol">The user symbol.</param>
     /// <param name="sourceType">The source type.</param>
     /// <param name="targetType">The target type.</param>
-    /// <param name="reusable">Whether the built mapping is usable by other mappings, this implementation always sets this to false.</param>
+    /// <param name="options">The options, <see cref="MappingBuildingOptions.MarkAsReusable"/> is ignored.</param>
     /// <returns></returns>
-    protected override ITypeMapping? FindOrBuildMapping(
-        IMethodSymbol? userSymbol,
+    public override ITypeMapping? FindOrBuildMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        bool reusable
+        MappingBuildingOptions options = MappingBuildingOptions.Default
     )
     {
         sourceType = sourceType.UpgradeNullable();
@@ -122,9 +104,14 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         if (mapping != null)
             return mapping;
 
+        var userSymbol = options.HasFlag(MappingBuildingOptions.KeepUserSymbol) ? UserSymbol : null;
+
         userSymbol ??= (MappingBuilder.Find(sourceType, targetType) as IUserMapping)?.Method;
 
-        mapping = BuildMapping(userSymbol, sourceType, targetType, false);
+        // unset MarkAsReusable and KeepUserSymbol as they have special handling for inline mappings
+        options &= ~(MappingBuildingOptions.MarkAsReusable | MappingBuildingOptions.KeepUserSymbol);
+
+        mapping = BuildMapping(userSymbol, sourceType, targetType, options);
         if (mapping != null)
         {
             _inlineExpressionMappings.Add(mapping);
@@ -133,9 +120,46 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         return mapping;
     }
 
+    /// <summary>
+    /// Existing target instance mappings are not supported.
+    /// </summary>
+    /// <param name="sourceType">The source type, ignored.</param>
+    /// <param name="targetType">The target type, ignored.</param>
+    /// <param name="options">The options to build a new mapping, ignored.</param>
+    /// <returns><c>null</c></returns>
+    public override IExistingTargetMapping? FindOrBuildExistingTargetMapping(
+        ITypeSymbol sourceType,
+        ITypeSymbol targetType,
+        MappingBuildingOptions options = MappingBuildingOptions.Default
+    ) => null;
+
+    /// <summary>
+    /// Existing target instance mappings are not supported.
+    /// </summary>
+    /// <param name="sourceType">The source type, ignored.</param>
+    /// <param name="targetType">The target type, ignored.</param>
+    /// <param name="options">The options to build a new mapping, ignored.</param>
+    /// <returns><c>null</c></returns>
+    public override IExistingTargetMapping? BuildExistingTargetMapping(
+        ITypeSymbol sourceType,
+        ITypeSymbol targetType,
+        MappingBuildingOptions options = MappingBuildingOptions.Default
+    ) => null;
+
     protected override NullFallbackValue GetNullFallbackValue(ITypeSymbol targetType, bool throwOnMappingNullMismatch) =>
         base.GetNullFallbackValue(targetType, false); // never throw inside expressions (not translatable)
 
-    protected override MappingBuilderContext ContextForMapping(IMethodSymbol? userSymbol, ITypeSymbol sourceType, ITypeSymbol targetType) =>
-        new InlineExpressionMappingBuilderContext(this, userSymbol, sourceType, targetType);
+    protected override MappingBuilderContext ContextForMapping(
+        IMethodSymbol? userSymbol,
+        ITypeSymbol sourceType,
+        ITypeSymbol targetType,
+        MappingBuildingOptions options
+    ) =>
+        new InlineExpressionMappingBuilderContext(
+            this,
+            userSymbol,
+            sourceType,
+            targetType,
+            options.HasFlag(MappingBuildingOptions.ClearDerivedTypes)
+        );
 }

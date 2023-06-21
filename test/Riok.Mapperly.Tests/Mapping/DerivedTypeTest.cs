@@ -182,6 +182,50 @@ public class DerivedTypeTest
     }
 
     [Fact]
+    public Task WithBaseTypeConfigShouldWork()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapDerivedType<ASubType1, BSubType1>]
+            [MapDerivedType<ASubType2, BSubType2>]
+            [MapProperty(nameof(A.BaseValueA), nameof(B.BaseValueB)]
+            public partial B Map(A src);
+            """,
+            "abstract class A { public string BaseValueA { get; set; } }",
+            "abstract class B { public string BaseValueB { get; set; } }",
+            "class ASubType1 : A { public string Value1 { get; set; } }",
+            "class ASubType2 : A { public string Value2 { get; set; } }",
+            "class BSubType1 : B { public string Value1 { get; set; } }",
+            "class BSubType2 : B { public string Value2 { get; set; } }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithBaseTypeConfigAndSeparateMethodShouldWork()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapDerivedType<ASubType1, BSubType1>]
+            [MapDerivedType<ASubType2, BSubType2>]
+            [MapProperty(nameof(A.BaseValueA), nameof(B.BaseValueB)]
+            public partial B Map(A src);
+
+            [MapperIgnoreSource(nameof(A.BaseValueA)]
+            [MapperIgnoreTarget(nameof(B.BaseValueB)]
+            public partial BSubType1 Map(ASubType1 src);
+            """,
+            "abstract class A { public string BaseValueA { get; set; } }",
+            "abstract class B { public string BaseValueB { get; set; } }",
+            "class ASubType1 : A { public string Value1 { get; set; } }",
+            "class ASubType2 : A { public string Value2 { get; set; } }",
+            "class BSubType1 : B { public string Value1 { get; set; } }",
+            "class BSubType2 : B { public string Value2 { get; set; } }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public void NotAssignableSourceTypeShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
