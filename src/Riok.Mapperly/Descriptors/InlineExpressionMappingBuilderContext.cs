@@ -114,6 +114,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         IMethodSymbol? userSymbol,
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
+        MethodParameter[] parameters,
         bool reusable
     )
     {
@@ -125,7 +126,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
 
         userSymbol ??= (MappingBuilder.Find(sourceType, targetType) as IUserMapping)?.Method;
 
-        mapping = BuildMapping(userSymbol, sourceType, targetType, false);
+        mapping = BuildMapping(userSymbol, sourceType, targetType, parameters, false);
         if (mapping != null)
         {
             _inlineExpressionMappings.Add(mapping);

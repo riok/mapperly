@@ -67,7 +67,7 @@ public static class DerivedTypeMappingBuilder
                 continue;
             }
 
-            var mapping = ctx.FindOrBuildMapping(sourceType, targetType);
+            var mapping = ctx.FindOrBuildMapping(sourceType, targetType, ctx.Parameters);
             if (mapping == null)
             {
                 ctx.ReportDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping, sourceType, targetType);

@@ -145,7 +145,11 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
         var delegateMapping =
             ctx.BuilderContext.FindMapping(sourcePath.MemberType, targetMember.Type)
-            ?? ctx.BuilderContext.FindOrBuildMapping(sourcePath.MemberType.NonNullable(), targetMember.Type.NonNullable());
+            ?? ctx.BuilderContext.FindOrBuildMapping(
+                sourcePath.MemberType.NonNullable(),
+                targetMember.Type.NonNullable(),
+                ctx.Mapping.Parameters
+            );
 
         if (delegateMapping == null)
         {
@@ -262,7 +266,11 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             var paramType = parameter.Type.WithNullableAnnotation(parameter.NullableAnnotation);
             var delegateMapping =
                 ctx.BuilderContext.FindMapping(sourcePath.MemberType, paramType)
-                ?? ctx.BuilderContext.FindOrBuildMapping(sourcePath.Member.Type.NonNullable(), paramType.NonNullable());
+                ?? ctx.BuilderContext.FindOrBuildMapping(
+                    sourcePath.Member.Type.NonNullable(),
+                    paramType.NonNullable(),
+                    ctx.Mapping.Parameters
+                );
 
             if (delegateMapping == null)
             {

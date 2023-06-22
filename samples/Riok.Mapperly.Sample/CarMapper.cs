@@ -3,14 +3,18 @@ using Riok.Mapperly.Abstractions;
 namespace Riok.Mapperly.Sample;
 
 // Enums of source and target have different numeric values -> use ByName strategy to map them
-[Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName, UseReferenceHandling = true)]
+[Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
 public static partial class CarMapper
 {
     [MapProperty(nameof(Car.Manufacturer), nameof(CarDto.Producer))] // Map property with a different name in the target type
     public static partial CarDto MapCarToDto(Car car);
+
     // public static partial C MapCarToDto(int value);
 
     // public static partial B Map(A src, int value);
+    public static partial C Map(A src, int value, int v1);
+
+    public static partial DogDto Map(Dog src, int value, int v1);
 }
 
 public class A
@@ -24,7 +28,30 @@ public class B
     public string Value { get; init; }
 }
 
-// public record C
-// {
-//     public int Value { get; set; }
-// }
+public record C
+{
+    public int Value { get; init; }
+    public int V1 { get; init; }
+}
+
+public class Dog
+{
+    public DogOwner Owner { get; set; }
+    public int Value { get; set; }
+}
+
+public class DogOwner
+{
+    public string Name { get; set; }
+}
+
+public class DogOwnerDto
+{
+    public string Name { get; set; }
+}
+
+public class DogDto
+{
+    public DogOwnerDto Owner { get; set; }
+    public int Value { get; set; }
+}

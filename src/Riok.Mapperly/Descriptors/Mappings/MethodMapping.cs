@@ -58,17 +58,6 @@ public abstract class MethodMapping : TypeMapping
         _returnType = method.ReturnType.UpgradeNullable();
     }
 
-    // protected MethodMapping(
-    //     IMethodSymbol method,
-    //     MethodParameter sourceParameter,
-    //     MethodParameter? referenceHandlerParameter,
-    //     MethodParameter[] parameters,
-    //     ITypeSymbol targetType
-    // )
-    // {
-    //
-    // }
-
     private bool IsPartial { get; }
 
     protected bool IsExtensionMethod { get; }
@@ -79,8 +68,14 @@ public abstract class MethodMapping : TypeMapping
 
     protected MethodParameter? ReferenceHandlerParameter { get; private set; }
 
-    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
-        Invocation(MethodName, SourceParameter.WithArgument(ctx.Source), ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
+    {
+        var initial = new[] { SourceParameter.WithArgument(ctx.Source), ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler) };
+
+        var extraParameters = Parameters.Zip(ctx.Parameters, (a, b) => (a, b)).Select(x => x.a.WithArgument(x.b)).Cast<MethodArgument?>();
+        var methodArguments = initial.Concat(extraParameters).ToArray();
+        return Invocation(MethodName, methodArguments);
+    }
 
     public virtual MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
     {
@@ -89,6 +84,7 @@ public abstract class MethodMapping : TypeMapping
         var typeMappingBuildContext = new TypeMappingBuildContext(
             SourceParameter.Name,
             ReferenceHandlerParameter?.Name,
+            Parameters.Select(x => x.Name),
             ctx.NameBuilder.NewScope()
         );
 

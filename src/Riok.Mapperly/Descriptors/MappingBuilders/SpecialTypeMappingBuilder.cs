@@ -17,7 +17,7 @@ public static class SpecialTypeMappingBuilder
             SpecialType.System_Object when ctx.MapperConfiguration.UseDeepCloning && ctx.Source.SpecialType == SpecialType.System_Object
                 => BuildDeepCloneObjectToObjectMapping(ctx),
             SpecialType.System_Object when ctx.MapperConfiguration.UseDeepCloning
-                => new CastMapping(ctx.Source, ctx.Target, ctx.FindOrBuildMapping(ctx.Source, ctx.Source)),
+                => new CastMapping(ctx.Source, ctx.Target, ctx.FindOrBuildMapping(ctx.Source, ctx.Source, ctx.Parameters)),
             SpecialType.System_Object => new CastMapping(ctx.Source, ctx.Target),
             _ => null,
         };

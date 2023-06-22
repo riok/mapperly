@@ -8,13 +8,24 @@ public class TypeMappingBuildContext
 {
     private const string DefaultSourceName = "x";
 
-    public TypeMappingBuildContext(string source, string? referenceHandler, UniqueNameBuilder nameBuilder)
-        : this(IdentifierName(source), referenceHandler == null ? null : IdentifierName(referenceHandler), nameBuilder) { }
+    public TypeMappingBuildContext(string source, string? referenceHandler, IEnumerable<string> parameters, UniqueNameBuilder nameBuilder)
+        : this(
+            IdentifierName(source),
+            referenceHandler == null ? null : IdentifierName(referenceHandler),
+            parameters.Select(IdentifierName).ToArray(),
+            nameBuilder
+        ) { }
 
-    private TypeMappingBuildContext(ExpressionSyntax source, ExpressionSyntax? referenceHandler, UniqueNameBuilder nameBuilder)
+    private TypeMappingBuildContext(
+        ExpressionSyntax source,
+        ExpressionSyntax? referenceHandler,
+        ExpressionSyntax[] parameters,
+        UniqueNameBuilder nameBuilder
+    )
     {
         Source = source;
         ReferenceHandler = referenceHandler;
+        Parameters = parameters;
         NameBuilder = nameBuilder;
     }
 
@@ -23,6 +34,8 @@ public class TypeMappingBuildContext
     public ExpressionSyntax Source { get; }
 
     public ExpressionSyntax? ReferenceHandler { get; }
+
+    public ExpressionSyntax[] Parameters { get; }
 
     /// <summary>
     /// Creates a new scoped name builder,
@@ -43,7 +56,7 @@ public class TypeMappingBuildContext
     {
         var scopedNameBuilder = NameBuilder.NewScope();
         var scopedSourceName = scopedNameBuilder.New(DefaultSourceName);
-        var ctx = new TypeMappingBuildContext(sourceBuilder(scopedSourceName), ReferenceHandler, scopedNameBuilder);
+        var ctx = new TypeMappingBuildContext(sourceBuilder(scopedSourceName), ReferenceHandler, Parameters, scopedNameBuilder);
         return (ctx, scopedSourceName);
     }
 
@@ -53,9 +66,9 @@ public class TypeMappingBuildContext
         return (WithSource(IdentifierName(scopedSourceName)), scopedSourceName);
     }
 
-    public TypeMappingBuildContext WithSource(ExpressionSyntax source) => new(source, ReferenceHandler, NameBuilder);
+    public TypeMappingBuildContext WithSource(ExpressionSyntax source) => new(source, ReferenceHandler, Parameters, NameBuilder);
 
     public TypeMappingBuildContext WithRefHandler(string refHandler) => WithRefHandler(IdentifierName(refHandler));
 
-    public TypeMappingBuildContext WithRefHandler(ExpressionSyntax refHandler) => new(Source, refHandler, NameBuilder);
+    public TypeMappingBuildContext WithRefHandler(ExpressionSyntax refHandler) => new(Source, refHandler, Parameters, NameBuilder);
 }

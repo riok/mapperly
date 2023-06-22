@@ -198,7 +198,8 @@ public static class ObjectMemberMappingBodyBuilder
             ctx.BuilderContext.FindMapping(sourceMemberPath.Member.Type, targetMemberPath.Member.Type)
             ?? ctx.BuilderContext.FindOrBuildMapping(
                 sourceMemberPath.Member.Type.NonNullable(),
-                targetMemberPath.Member.Type.NonNullable()
+                targetMemberPath.Member.Type.NonNullable(),
+                ctx.Mapping.Parameters
             );
 
         // couldn't build the mapping

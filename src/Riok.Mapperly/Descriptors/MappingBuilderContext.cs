@@ -87,8 +87,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="sourceType">The source type.</param>
     /// <param name="targetType">The target type.</param>
     /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
-    public ITypeMapping? FindOrBuildMapping(ITypeSymbol sourceType, ITypeSymbol targetType) =>
-        FindOrBuildMapping(null, sourceType, targetType, true);
+    public ITypeMapping? FindOrBuildMapping(ITypeSymbol sourceType, ITypeSymbol targetType, MethodParameter[] parameters) =>
+        FindOrBuildMapping(null, sourceType, targetType, parameters, true);
 
     /// <summary>
     /// Tries to build a new mapping for the given types.
@@ -160,12 +160,13 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         IMethodSymbol? userSymbol,
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
+        MethodParameter[] parameters,
         bool reusable
     )
     {
         sourceType = sourceType.UpgradeNullable();
         targetType = targetType.UpgradeNullable();
-        return MappingBuilder.Find(sourceType, targetType) ?? BuildMapping(userSymbol, sourceType, targetType, reusable);
+        return MappingBuilder.Find(sourceType, targetType) ?? BuildMapping(userSymbol, sourceType, targetType, parameters, reusable);
     }
 
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, params object[] messageArgs) =>
@@ -201,12 +202,6 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         MethodParameter[] parameters,
         ITypeSymbol targetType
     ) => new(this, userSymbol, sourceType, targetType, parameters);
-
-    protected ITypeMapping? BuildMapping(IMethodSymbol? userSymbol, ITypeSymbol sourceType, ITypeSymbol targetType, bool reusable) =>
-        MappingBuilder.Build(
-            ContextForMapping(userSymbol, sourceType.UpgradeNullable(), Array.Empty<MethodParameter>(), targetType.UpgradeNullable()),
-            reusable
-        );
 
     protected ITypeMapping? BuildMapping(
         IMethodSymbol? userSymbol,

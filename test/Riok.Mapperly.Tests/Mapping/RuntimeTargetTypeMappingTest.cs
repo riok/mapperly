@@ -336,6 +336,33 @@ return target;
     }
 
     [Fact]
+    public Task ExtraSignatureAdditionalParameterShouldMap4()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A src, int value);",
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public string Value { get; init; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+
+        //         TestHelper
+        //             .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+        //             .Should()
+        //             .HaveMapMethodBody(
+        //                 """
+        // var target = new global::B()
+        // {
+        //     Value = value.ToString()
+        // };
+        // target.StringValue = src.StringValue;
+        // return target;
+        // """
+        //             );
+    }
+
+    [Fact]
     public void InvalidSignatureAdditionalParameterShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

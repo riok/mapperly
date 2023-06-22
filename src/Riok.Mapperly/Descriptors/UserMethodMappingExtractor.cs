@@ -284,7 +284,7 @@ public static class UserMethodMappingExtractor
             expectedParameterCount++;
         }
 
-        var parma = method.Parameters.Skip(expectedParameterCount).Select(MethodParameter.Wrap).WhereNotNull().ToArray();
+        var parma = method.Parameters.Skip(expectedParameterCount).Select(MethodParameter.Wrap10).WhereNotNull().ToArray();
         // if (method.Parameters.Length != expectedParameterCount)
         // {
         //     parameters = null;
