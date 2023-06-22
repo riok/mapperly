@@ -271,7 +271,68 @@ public class RuntimeTargetTypeMappingTest
             "class C { public string Value { get; init; } }"
         );
 
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics).Should().HaveMapMethodBody("");
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .Should()
+            .HaveMapMethodBody(
+                """
+var target = new global::B()
+{
+    Value = value.ToString()
+};
+target.StringValue = src.StringValue;
+return target;
+"""
+            );
+    }
+
+    [Fact]
+    public void ExtraSignatureAdditionalParameterShouldMap2()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A src, int value);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public string Value { get; init; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .Should()
+            .HaveMapMethodBody(
+                """
+var target = new global::B()
+{
+    Value = value.ToString()
+};
+target.StringValue = src.StringValue;
+return target;
+"""
+            );
+    }
+
+    [Fact]
+    public void ExtraSignatureAdditionalParameterShouldMap3()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A src, C nested);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public string NestedValue { get; init; } }",
+            "class C { public string Value { get; init; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .Should()
+            .HaveMapMethodBody(
+                """
+var target = new global::B()
+{
+    NestedValue = nested.Value
+};
+target.StringValue = src.StringValue;
+return target;
+"""
+            );
     }
 
     [Fact]

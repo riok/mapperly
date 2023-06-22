@@ -117,8 +117,12 @@ public abstract class MethodMapping : TypeMapping
         );
     }
 
-    protected virtual ParameterListSyntax BuildParameterList() =>
-        ParameterList(IsExtensionMethod, SourceParameter, ReferenceHandlerParameter);
+    protected virtual ParameterListSyntax BuildParameterList()
+    {
+        var initial = new[] { SourceParameter, ReferenceHandlerParameter };
+        var methodParameters = initial.Concat(Parameters.Cast<MethodParameter?>()).ToArray();
+        return ParameterList(IsExtensionMethod, methodParameters);
+    }
 
     private IEnumerable<SyntaxToken> BuildModifiers(bool isStatic)
     {

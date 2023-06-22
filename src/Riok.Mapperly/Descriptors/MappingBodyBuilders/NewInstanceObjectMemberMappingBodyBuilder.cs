@@ -37,8 +37,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         foreach (var parameter in ctx.Mapping.Parameters)
         {
             if (
-                MemberPath.TryFind(
-                    parameter.Type,
+                MemberPath.TryFindParameter(
+                    parameter,
                     MemberPathCandidateBuilder.BuildMemberPathCandidates(member.Name),
                     ctx.IgnoredSourceMemberNames,
                     StringComparer.OrdinalIgnoreCase,

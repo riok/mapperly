@@ -19,11 +19,13 @@ public class MemberPath
     private const string NullableValueProperty = "Value";
 
     private IMappableMember? _member;
+    private readonly bool _direct;
 
-    public MemberPath(IReadOnlyCollection<IMappableMember> path)
+    public MemberPath(IReadOnlyCollection<IMappableMember> path, bool direct = false)
     {
         Path = path;
         FullName = string.Join(MemberAccessSeparator, Path.Select(x => x.Name));
+        _direct = direct;
     }
 
     public IReadOnlyCollection<IMappableMember> Path { get; }
@@ -87,6 +89,9 @@ public class MemberPath
     )
     {
         var path = skipTrailingNonNullable ? PathWithoutTrailingNonNullable() : Path;
+
+        if (_direct)
+            baseAccess = null;
 
         if (baseAccess == null)
         {
@@ -203,6 +208,27 @@ public class MemberPath
         return false;
     }
 
+    public static bool TryFindParameter(
+        MethodParameter parameter,
+        IEnumerable<IEnumerable<string>> pathCandidates,
+        IReadOnlyCollection<string> ignoredNames,
+        IEqualityComparer<string> comparer,
+        [NotNullWhen(true)] out MemberPath? memberPath
+    )
+    {
+        foreach (var pathCandidate in FindParameterCandidates(parameter, pathCandidates, comparer))
+        {
+            if (ignoredNames.Contains(pathCandidate.Path.First().Name))
+                continue;
+
+            memberPath = pathCandidate;
+            return true;
+        }
+
+        memberPath = null;
+        return false;
+    }
+
     public static bool TryFind(ITypeSymbol type, IReadOnlyCollection<string> path, [NotNullWhen(true)] out MemberPath? memberPath) =>
         TryFind(type, path, StringComparer.Ordinal, out memberPath);
 
@@ -215,6 +241,19 @@ public class MemberPath
         foreach (var pathCandidate in pathCandidates)
         {
             if (TryFind(type, pathCandidate.ToList(), comparer, out var memberPath))
+                yield return memberPath;
+        }
+    }
+
+    private static IEnumerable<MemberPath> FindParameterCandidates(
+        MethodParameter parameter,
+        IEnumerable<IEnumerable<string>> pathCandidates,
+        IEqualityComparer<string> comparer
+    )
+    {
+        foreach (var pathCandidate in pathCandidates)
+        {
+            if (TryFindParameter(parameter, pathCandidate.ToList(), comparer, out var memberPath))
                 yield return memberPath;
         }
     }
@@ -234,6 +273,31 @@ public class MemberPath
         }
 
         memberPath = new(foundPath);
+        return true;
+    }
+
+    private static bool TryFindParameter(
+        MethodParameter parameter,
+        IReadOnlyCollection<string> path,
+        IEqualityComparer<string> comparer,
+        [NotNullWhen(true)] out MemberPath? memberPath
+    )
+    {
+        memberPath = null;
+        if (!StringComparer.OrdinalIgnoreCase.Equals(path.First(), parameter.Name))
+            return false;
+
+        var firstMember = new ParameterMember(parameter.Type, parameter.Name);
+        var foundPath = new List<IMappableMember> { firstMember };
+        var tail = Find(parameter.Type, path.Skip(1), comparer);
+        foundPath.AddRange(tail);
+        if (foundPath.Count != path.Count)
+        {
+            memberPath = null;
+            return false;
+        }
+
+        memberPath = new(foundPath, true);
         return true;
     }
 
