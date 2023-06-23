@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
 
@@ -10,6 +11,9 @@ namespace Riok.Mapperly.Configuration;
 /// </summary>
 internal class AttributeDataAccessor
 {
+    private const string NameOfOperatorName = "nameof";
+    private const char FullNameOfPrefix = '@';
+
     private readonly SymbolAccessor _symbolAccessor;
 
     public AttributeDataAccessor(SymbolAccessor symbolAccessor)
@@ -49,23 +53,33 @@ internal class AttributeDataAccessor
 
         foreach (var attrData in attrDatas)
         {
+            var syntax = (AttributeSyntax?)attrData.ApplicationSyntaxReference?.GetSyntax();
+            var syntaxArguments =
+                (IReadOnlyList<AttributeArgumentSyntax>?)syntax?.ArgumentList?.Arguments
+                ?? new AttributeArgumentSyntax[attrData.ConstructorArguments.Length + attrData.NamedArguments.Length];
             var typeArguments = (IReadOnlyCollection<ITypeSymbol>?)attrData.AttributeClass?.TypeArguments ?? Array.Empty<ITypeSymbol>();
-            var attr = Create<TData>(typeArguments, attrData.ConstructorArguments);
+            var attr = Create<TData>(typeArguments, attrData.ConstructorArguments, syntaxArguments);
 
+            var syntaxIndex = attrData.ConstructorArguments.Length;
             foreach (var namedArgument in attrData.NamedArguments)
             {
                 var prop = dataType.GetProperty(namedArgument.Key);
                 if (prop == null)
                     throw new InvalidOperationException($"Could not get property {namedArgument.Key} of attribute {attrType.FullName}");
 
-                prop.SetValue(attr, BuildArgumentValue(namedArgument.Value, prop.PropertyType));
+                prop.SetValue(attr, BuildArgumentValue(namedArgument.Value, prop.PropertyType, syntaxArguments[syntaxIndex]));
+                syntaxIndex++;
             }
 
             yield return attr;
         }
     }
 
-    private TData Create<TData>(IReadOnlyCollection<ITypeSymbol> typeArguments, IReadOnlyCollection<TypedConstant> constructorArguments)
+    private TData Create<TData>(
+        IReadOnlyCollection<ITypeSymbol> typeArguments,
+        IReadOnlyCollection<TypedConstant> constructorArguments,
+        IReadOnlyList<AttributeArgumentSyntax> argumentSyntax
+    )
         where TData : notnull
     {
         // The data class should have a constructor
@@ -81,7 +95,7 @@ internal class AttributeDataAccessor
                 continue;
 
             var constructorArgumentValues = constructorArguments.Select(
-                (arg, i) => BuildArgumentValue(arg, parameters[i + typeArguments.Count].ParameterType)
+                (arg, i) => BuildArgumentValue(arg, parameters[i + typeArguments.Count].ParameterType, argumentSyntax[i])
             );
             var constructorTypeAndValueArguments = typeArguments.Concat(constructorArgumentValues).ToArray();
             return (TData?)Activator.CreateInstance(typeof(TData), constructorTypeAndValueArguments)
@@ -91,12 +105,12 @@ internal class AttributeDataAccessor
         throw new InvalidOperationException($"{typeof(TData)} does not have a constructor with {argCount} parameters");
     }
 
-    private static object? BuildArgumentValue(TypedConstant arg, Type targetType)
+    private static object? BuildArgumentValue(TypedConstant arg, Type targetType, AttributeArgumentSyntax? syntax)
     {
         return arg.Kind switch
         {
             _ when arg.IsNull => null,
-            _ when targetType == typeof(StringMemberPath) => CreateMemberPath(arg),
+            _ when targetType == typeof(StringMemberPath) => CreateMemberPath(arg, syntax),
             TypedConstantKind.Enum => GetEnumValue(arg, targetType),
             TypedConstantKind.Array => BuildArrayValue(arg, targetType),
             TypedConstantKind.Primitive => arg.Value,
@@ -108,12 +122,36 @@ internal class AttributeDataAccessor
         };
     }
 
-    private static StringMemberPath CreateMemberPath(TypedConstant arg)
+    private static StringMemberPath CreateMemberPath(TypedConstant arg, AttributeArgumentSyntax? syntax)
     {
         if (arg.Kind == TypedConstantKind.Array)
         {
-            var values = arg.Values.Select(x => (string?)BuildArgumentValue(x, typeof(string))).WhereNotNull().ToList();
+            var values = arg.Values.Select(x => (string?)BuildArgumentValue(x, typeof(string), null)).WhereNotNull().ToList();
             return new StringMemberPath(values);
+        }
+
+        // try to extract the full nameof path from syntax
+        if (
+            arg.Kind == TypedConstantKind.Primitive
+            && syntax?.Expression
+                is InvocationExpressionSyntax
+                {
+                    Expression: IdentifierNameSyntax { Identifier.Text: NameOfOperatorName }
+                } invocationExpressionSyntax
+        )
+        {
+            var argMemberPathStr = invocationExpressionSyntax.ArgumentList.Arguments[0].ToFullString();
+
+            // @ prefix opts-in to full nameof
+            if (argMemberPathStr.Length > 0 && argMemberPathStr[0] == FullNameOfPrefix)
+            {
+                var argMemberPath = argMemberPathStr
+                    .TrimStart(FullNameOfPrefix)
+                    .Split(StringMemberPath.PropertyAccessSeparator)
+                    .Skip(1)
+                    .ToArray();
+                return new StringMemberPath(argMemberPath);
+            }
         }
 
         if (arg is { Kind: TypedConstantKind.Primitive, Value: string v })
@@ -130,7 +168,7 @@ internal class AttributeDataAccessor
             throw new InvalidOperationException($"{nameof(IReadOnlyCollection<object>)} is the only supported array type");
 
         var elementTargetType = targetType.GetGenericArguments()[0];
-        return arg.Values.Select(x => BuildArgumentValue(x, elementTargetType)).ToArray();
+        return arg.Values.Select(x => BuildArgumentValue(x, elementTargetType, null)).ToArray();
     }
 
     private static object? GetEnumValue(TypedConstant arg, Type targetType)

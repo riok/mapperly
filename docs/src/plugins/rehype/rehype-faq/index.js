@@ -13,7 +13,7 @@ import { toHtml } from 'hast-util-to-html';
 
   If working on this script,
   testing changes needs the .docusaurus cache directory to be cleared.
-  Eg. `rm -rf .docusaurus; npm run start`
+  Eg. `npm run clear; npm run start`
 */
 
 const faqFileName = 'faq.md';
