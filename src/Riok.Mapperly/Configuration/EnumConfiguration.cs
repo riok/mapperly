@@ -7,9 +7,9 @@ namespace Riok.Mapperly.Configuration;
 /// Represents the <see cref="MapEnumAttribute"/>
 /// with enum values as typed constants.
 /// </summary>
-public class MapEnumAttributeData
+public class EnumConfiguration
 {
-    public MapEnumAttributeData(EnumMappingStrategy strategy)
+    public EnumConfiguration(EnumMappingStrategy strategy)
     {
         Strategy = strategy;
     }

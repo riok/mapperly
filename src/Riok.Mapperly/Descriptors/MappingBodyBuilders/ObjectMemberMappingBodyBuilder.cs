@@ -1,4 +1,5 @@
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -33,7 +34,7 @@ public static class ObjectMemberMappingBodyBuilder
                 // add all configured mappings
                 // order by target path count to map less nested items first (otherwise they would overwrite all others)
                 // eg. target.A = source.B should be mapped before target.A.Id = source.B.Id
-                foreach (var config in memberConfigs.OrderBy(x => x.Target.Count))
+                foreach (var config in memberConfigs.OrderBy(x => x.Target.Path.Count))
                 {
                     BuildMemberAssignmentMapping(ctx, config);
                 }
@@ -71,24 +72,24 @@ public static class ObjectMemberMappingBodyBuilder
 
     private static void BuildMemberAssignmentMapping(
         IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
-        MapPropertyAttribute config
+        PropertyMappingConfiguration config
     )
     {
-        if (!MemberPath.TryFind(ctx.Mapping.TargetType, config.Target, out var targetMemberPath))
+        if (!MemberPath.TryFind(ctx.Mapping.TargetType, config.Target.Path, out var targetMemberPath))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ConfiguredMappingTargetMemberNotFound,
-                string.Join(MemberPath.MemberAccessSeparator, config.Target),
+                config.Target.FullName,
                 ctx.Mapping.TargetType
             );
             return;
         }
 
-        if (!MemberPath.TryFind(ctx.Mapping.SourceType, config.Source, out var sourceMemberPath))
+        if (!MemberPath.TryFind(ctx.Mapping.SourceType, config.Source.Path, out var sourceMemberPath))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ConfiguredMappingSourceMemberNotFound,
-                string.Join(MemberPath.MemberAccessSeparator, config.Source),
+                config.Source.FullName,
                 ctx.Mapping.SourceType
             );
             return;

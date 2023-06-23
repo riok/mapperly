@@ -1,4 +1,4 @@
-using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Symbols;
 
@@ -21,5 +21,5 @@ public interface IMembersBuilderContext<out T>
 
     Dictionary<string, IMappableMember> TargetMembers { get; }
 
-    Dictionary<string, List<MapPropertyAttribute>> MemberConfigsByRootTargetName { get; }
+    Dictionary<string, List<PropertyMappingConfiguration>> MemberConfigsByRootTargetName { get; }
 }

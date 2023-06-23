@@ -20,7 +20,7 @@ public class MapperConfiguration
                 null,
                 Array.Empty<EnumValueMappingConfiguration>()
             ),
-            new PropertiesMappingConfiguration(Array.Empty<string>(), Array.Empty<string>(), Array.Empty<MapPropertyAttribute>()),
+            new PropertiesMappingConfiguration(Array.Empty<string>(), Array.Empty<string>(), Array.Empty<PropertyMappingConfiguration>()),
             Array.Empty<DerivedTypeMappingConfiguration>()
         );
     }
@@ -57,13 +57,13 @@ public class MapperConfiguration
             .Concat(_dataAccessor.Access<MapperIgnoreAttribute>(method).Select(x => x.Target))
 #pragma warning restore CS0618
             .ToList();
-        var explicitMappings = _dataAccessor.Access<MapPropertyAttribute>(method).ToList();
+        var explicitMappings = _dataAccessor.Access<MapPropertyAttribute, PropertyMappingConfiguration>(method).ToList();
         return new PropertiesMappingConfiguration(ignoredSourceProperties, ignoredTargetProperties, explicitMappings);
     }
 
     private EnumMappingConfiguration BuildEnumConfig(IMethodSymbol method)
     {
-        var configData = _dataAccessor.AccessFirstOrDefault<MapEnumAttribute, MapEnumAttributeData>(method);
+        var configData = _dataAccessor.AccessFirstOrDefault<MapEnumAttribute, EnumConfiguration>(method);
         var explicitMappings = _dataAccessor.Access<MapEnumValueAttribute, EnumValueMappingConfiguration>(method).ToList();
         return new EnumMappingConfiguration(
             configData?.Strategy ?? _defaultConfiguration.Enum.Strategy,
