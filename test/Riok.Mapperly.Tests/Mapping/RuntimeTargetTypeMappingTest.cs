@@ -346,20 +346,32 @@ return target;
         );
 
         return TestHelper.VerifyGenerator(source);
+    }
 
-        //         TestHelper
-        //             .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
-        //             .Should()
-        //             .HaveMapMethodBody(
-        //                 """
-        // var target = new global::B()
-        // {
-        //     Value = value.ToString()
-        // };
-        // target.StringValue = src.StringValue;
-        // return target;
-        // """
-        //             );
+    [Fact]
+    public Task ExtraSignatureAdditionalParameterShouldMap5()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A src, int value);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public string Value { get; init; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ExtraSignatureAdditionalParameterShouldMap7()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A src, int value);",
+            "class A { public string StringValue { get; set; } public C Nest { get; set; } }",
+            "class B { public string StringValue { get; set; } public string Value { get; init; } public D Nest { get; set; } }",
+            "record C(int V)",
+            "record D(int V)"
+        );
+
+        return TestHelper.VerifyGenerator(source);
     }
 
     [Fact]

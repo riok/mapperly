@@ -30,12 +30,7 @@ public static class NewInstanceObjectPropertyMappingBuilder
         // and can only map to properties via object initializers.
         return ctx.IsExpression
             ? new NewInstanceObjectMemberMapping(ctx.Source, ctx.Target.NonNullable())
-            : new NewInstanceObjectMemberMethodMapping(
-                ctx.Source,
-                ctx.Target.NonNullable(),
-                ctx.Parameters,
-                ctx.MapperConfiguration.UseReferenceHandling
-            );
+            : new NewInstanceObjectMemberMethodMapping(ctx.Source, ctx.Target.NonNullable(), ctx.MapperConfiguration.UseReferenceHandling);
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)

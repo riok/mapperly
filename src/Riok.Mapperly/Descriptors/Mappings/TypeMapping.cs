@@ -27,7 +27,7 @@ public abstract class TypeMapping : ITypeMapping
 
     public ITypeSymbol TargetType { get; }
 
-    public MethodParameter[] Parameters { get; }
+    public MethodParameter[] Parameters { get; set; } = Array.Empty<MethodParameter>();
 
     /// <inheritdoc cref="ITypeMapping.CallableByOtherMappings"/>
     public virtual bool CallableByOtherMappings => true;
@@ -36,4 +36,14 @@ public abstract class TypeMapping : ITypeMapping
     public virtual bool IsSynthetic => false;
 
     public abstract ExpressionSyntax Build(TypeMappingBuildContext ctx);
+
+    public void AddParameters(MethodParameter[] parameters)
+    {
+        var hash = new HashSet<MethodParameter>(Parameters);
+        foreach (var item in parameters)
+        {
+            hash.Add(item);
+        }
+        Parameters = hash.ToArray();
+    }
 }

@@ -19,13 +19,8 @@ public class NewInstanceObjectMemberMethodMapping : ObjectMemberMethodMapping, I
     private readonly HashSet<MemberAssignmentMapping> _initPropertyMappings = new();
     private readonly bool _enableReferenceHandling;
 
-    public NewInstanceObjectMemberMethodMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
-        MethodParameter[] parameters,
-        bool enableReferenceHandling
-    )
-        : base(sourceType, targetType, parameters)
+    public NewInstanceObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, bool enableReferenceHandling)
+        : base(sourceType, targetType)
     {
         _enableReferenceHandling = enableReferenceHandling;
     }

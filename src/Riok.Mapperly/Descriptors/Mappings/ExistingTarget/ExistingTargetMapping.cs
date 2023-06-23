@@ -19,7 +19,7 @@ public abstract class ExistingTargetMapping : IExistingTargetMapping
 
     public ITypeSymbol TargetType { get; }
 
-    public MethodParameter[] Parameters => Array.Empty<MethodParameter>();
+    public MethodParameter[] Parameters { get; set; } = Array.Empty<MethodParameter>();
 
     public abstract IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target);
 }

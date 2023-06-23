@@ -14,12 +14,6 @@ public abstract class ObjectMemberMethodMapping : MethodMapping, IMemberAssignme
 {
     private readonly ObjectMemberExistingTargetMapping _mapping;
 
-    protected ObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, MethodParameter[] parameters)
-        : base(sourceType, targetType, parameters)
-    {
-        _mapping = new ObjectMemberExistingTargetMapping(sourceType, targetType);
-    }
-
     protected ObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
         : base(sourceType, targetType)
     {

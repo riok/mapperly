@@ -12,5 +12,5 @@ public interface IMapping
 
     ITypeSymbol TargetType { get; }
 
-    MethodParameter[] Parameters { get; }
+    MethodParameter[] Parameters { get; set; }
 }

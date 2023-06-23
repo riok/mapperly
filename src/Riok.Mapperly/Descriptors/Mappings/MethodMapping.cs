@@ -26,13 +26,6 @@ public abstract class MethodMapping : TypeMapping
 
     private string? _methodName;
 
-    protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, MethodParameter[] parameters)
-        : base(sourceType, targetType, parameters)
-    {
-        SourceParameter = new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType);
-        _returnType = targetType;
-    }
-
     protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
         : base(sourceType, targetType)
     {

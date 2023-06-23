@@ -34,8 +34,10 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
     private static bool TryParams(INewInstanceBuilderContext<IMapping> ctx, IMappableMember member, out MemberPath? memberPath)
     {
         memberPath = null;
-        foreach (var parameter in ctx.Mapping.Parameters)
+        foreach (var parameter in ctx.BuilderContext.Parameters)
         {
+            Console.WriteLine(parameter.Name);
+            Console.WriteLine("Param");
             if (
                 MemberPath.TryFindParameter(
                     parameter,
@@ -46,6 +48,10 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 )
             )
             {
+                Console.WriteLine("TyrFind");
+                ctx.BuilderContext.UsedParameters.Add(parameter);
+                Console.WriteLine($"Used Params: {ctx.BuilderContext.UsedParameters.Count}");
+
                 memberPath = sourceMemberPath;
                 return true;
             }
@@ -145,11 +151,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
         var delegateMapping =
             ctx.BuilderContext.FindMapping(sourcePath.MemberType, targetMember.Type)
-            ?? ctx.BuilderContext.FindOrBuildMapping(
-                sourcePath.MemberType.NonNullable(),
-                targetMember.Type.NonNullable(),
-                ctx.Mapping.Parameters
-            );
+            ?? ctx.BuilderContext.FindOrBuildMapping(sourcePath.MemberType.NonNullable(), targetMember.Type.NonNullable());
 
         if (delegateMapping == null)
         {
@@ -266,11 +268,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             var paramType = parameter.Type.WithNullableAnnotation(parameter.NullableAnnotation);
             var delegateMapping =
                 ctx.BuilderContext.FindMapping(sourcePath.MemberType, paramType)
-                ?? ctx.BuilderContext.FindOrBuildMapping(
-                    sourcePath.Member.Type.NonNullable(),
-                    paramType.NonNullable(),
-                    ctx.Mapping.Parameters
-                );
+                ?? ctx.BuilderContext.FindOrBuildMapping(sourcePath.Member.Type.NonNullable(), paramType.NonNullable());
 
             if (delegateMapping == null)
             {

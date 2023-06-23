@@ -26,7 +26,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         ITypeSymbol source,
         ITypeSymbol target
     )
-        : base(ctx, userSymbol, source, target, Array.Empty<MethodParameter>())
+        : base(ctx, userSymbol, source, target)
     {
         _parentContext = ctx;
         _inlineExpressionMappings = new MappingCollection();
@@ -38,7 +38,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         ITypeSymbol source,
         ITypeSymbol target
     )
-        : base(ctx, userSymbol, source, target, Array.Empty<MethodParameter>())
+        : base(ctx, userSymbol, source, target)
     {
         _parentContext = ctx;
         _inlineExpressionMappings = ctx._inlineExpressionMappings;
@@ -114,7 +114,6 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         IMethodSymbol? userSymbol,
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        MethodParameter[] parameters,
         bool reusable
     )
     {
@@ -126,7 +125,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
 
         userSymbol ??= (MappingBuilder.Find(sourceType, targetType) as IUserMapping)?.Method;
 
-        mapping = BuildMapping(userSymbol, sourceType, targetType, parameters, false);
+        mapping = BuildMapping(userSymbol, sourceType, targetType, false);
         if (mapping != null)
         {
             _inlineExpressionMappings.Add(mapping);
@@ -138,10 +137,6 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     protected override NullFallbackValue GetNullFallbackValue(ITypeSymbol targetType, bool throwOnMappingNullMismatch) =>
         base.GetNullFallbackValue(targetType, false); // never throw inside expressions (not translatable)
 
-    protected override MappingBuilderContext ContextForMapping(
-        IMethodSymbol? userSymbol,
-        ITypeSymbol sourceType,
-        MethodParameter[] parameters,
-        ITypeSymbol targetType
-    ) => new InlineExpressionMappingBuilderContext(this, userSymbol, sourceType, targetType);
+    protected override MappingBuilderContext ContextForMapping(IMethodSymbol? userSymbol, ITypeSymbol sourceType, ITypeSymbol targetType) =>
+        new InlineExpressionMappingBuilderContext(this, userSymbol, sourceType, targetType);
 }

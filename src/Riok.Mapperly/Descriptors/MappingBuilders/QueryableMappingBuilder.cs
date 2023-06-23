@@ -23,7 +23,7 @@ public static class QueryableMappingBuilder
         var targetType = targetQueryable.TypeArguments[0];
 
         var inlineCtx = new InlineExpressionMappingBuilderContext(ctx, sourceType, targetType);
-        var mapping = inlineCtx.BuildDelegateMapping(sourceType, targetType, Array.Empty<MethodParameter>());
+        var mapping = inlineCtx.BuildDelegateMapping(sourceType, targetType);
         if (mapping == null)
             return null;
 

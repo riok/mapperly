@@ -45,11 +45,16 @@ public class MappingBuilder
 
     public ITypeMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {
+        var c = 0;
         foreach (var mappingBuilder in _builders)
         {
+            c++;
             if (mappingBuilder(ctx) is not { } mapping)
                 continue;
 
+            Console.WriteLine($"Params: {ctx.Parameters.Length}");
+            Console.WriteLine($"Used Params: {ctx.UsedParameters.Count}");
+            mapping.AddParameters(ctx.UsedParameters.ToArray());
             if (resultIsReusable)
             {
                 _mappings.Add(mapping);

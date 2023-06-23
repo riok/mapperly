@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -19,4 +20,6 @@ public interface ITypeMapping : IMapping
     bool IsSynthetic { get; }
 
     ExpressionSyntax Build(TypeMappingBuildContext ctx);
+
+    void AddParameters(MethodParameter[] parameters);
 }

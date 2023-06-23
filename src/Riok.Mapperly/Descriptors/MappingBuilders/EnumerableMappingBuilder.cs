@@ -33,11 +33,7 @@ public static class EnumerableMappingBuilder
         if (ctx.CollectionInfos == null)
             return null;
 
-        var elementMapping = ctx.FindOrBuildMapping(
-            ctx.CollectionInfos.Source.EnumeratedType,
-            ctx.CollectionInfos.Target.EnumeratedType,
-            ctx.Parameters
-        );
+        var elementMapping = ctx.FindOrBuildMapping(ctx.CollectionInfos.Source.EnumeratedType, ctx.CollectionInfos.Target.EnumeratedType);
         if (elementMapping == null)
             return null;
 
@@ -86,11 +82,7 @@ public static class EnumerableMappingBuilder
         if (ctx.CollectionInfos == null)
             return null;
 
-        var elementMapping = ctx.FindOrBuildMapping(
-            ctx.CollectionInfos.Source.EnumeratedType,
-            ctx.CollectionInfos.Target.EnumeratedType,
-            ctx.Parameters
-        );
+        var elementMapping = ctx.FindOrBuildMapping(ctx.CollectionInfos.Source.EnumeratedType, ctx.CollectionInfos.Target.EnumeratedType);
         if (elementMapping == null)
             return null;
 

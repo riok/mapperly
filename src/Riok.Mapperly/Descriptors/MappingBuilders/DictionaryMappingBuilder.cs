@@ -129,11 +129,11 @@ public static class DictionaryMappingBuilder
         if (ctx.CollectionInfos.Source.GetEnumeratedKeyValueTypes(ctx.Types) is not var (sourceKeyType, sourceValueType))
             return null;
 
-        var keyMapping = ctx.FindOrBuildMapping(sourceKeyType, targetKeyType, ctx.Parameters);
+        var keyMapping = ctx.FindOrBuildMapping(sourceKeyType, targetKeyType);
         if (keyMapping == null)
             return null;
 
-        var valueMapping = ctx.FindOrBuildMapping(sourceValueType, targetValueType, ctx.Parameters);
+        var valueMapping = ctx.FindOrBuildMapping(sourceValueType, targetValueType);
         if (valueMapping == null)
             return null;
 

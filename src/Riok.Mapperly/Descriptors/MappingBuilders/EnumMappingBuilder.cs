@@ -23,7 +23,7 @@ public static class EnumMappingBuilder
         {
             return
                 ctx.IsConversionEnabled(MappingConversionType.ExplicitCast)
-                && ctx.FindOrBuildMapping(sourceEnumType ?? ctx.Source, targetEnumType ?? ctx.Target, ctx.Parameters) is { } delegateMapping
+                && ctx.FindOrBuildMapping(sourceEnumType ?? ctx.Source, targetEnumType ?? ctx.Target) is { } delegateMapping
                 ? new CastMapping(ctx.Source, ctx.Target, delegateMapping)
                 : null;
         }

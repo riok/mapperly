@@ -1,7 +1,6 @@
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Helpers;
-using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
@@ -14,11 +13,7 @@ public static class NullableMappingBuilder
         if (!sourceIsNullable && !targetIsNullable)
             return null;
 
-        var delegateMapping = ctx.BuildDelegateMapping(
-            sourceNonNullable ?? ctx.Source,
-            targetNonNullable ?? ctx.Target,
-            Array.Empty<MethodParameter>()
-        );
+        var delegateMapping = ctx.BuildDelegateMapping(sourceNonNullable ?? ctx.Source, targetNonNullable ?? ctx.Target);
         return delegateMapping == null ? null : BuildNullDelegateMapping(ctx, delegateMapping);
     }
 

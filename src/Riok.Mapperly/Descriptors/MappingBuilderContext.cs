@@ -36,14 +36,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Configuration = ReadConfiguration(_userSymbol);
     }
 
-    protected MappingBuilderContext(
-        MappingBuilderContext ctx,
-        IMethodSymbol? userSymbol,
-        ITypeSymbol source,
-        ITypeSymbol target,
-        MethodParameter[] parameters
-    )
-        : this(ctx, ctx.ObjectFactories, userSymbol, source, parameters, target) { }
+    protected MappingBuilderContext(MappingBuilderContext ctx, IMethodSymbol? userSymbol, ITypeSymbol source, ITypeSymbol target)
+        : this(ctx, ctx.ObjectFactories, userSymbol, source, ctx.Parameters, target) { }
 
     public MappingConfiguration Configuration { get; }
 
@@ -64,6 +58,9 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     /// <inheritdoc cref="MappingBuilderContext.CallableUserMappings"/>
     public IReadOnlyCollection<IUserMapping> CallableUserMappings => MappingBuilder.CallableUserMappings;
+
+    // TODO: make lazy
+    public HashSet<MethodParameter> UsedParameters { get; } = new HashSet<MethodParameter>();
 
     /// <summary>
     /// Tries to find an existing mapping for the provided types.
@@ -87,8 +84,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="sourceType">The source type.</param>
     /// <param name="targetType">The target type.</param>
     /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
-    public ITypeMapping? FindOrBuildMapping(ITypeSymbol sourceType, ITypeSymbol targetType, MethodParameter[] parameters) =>
-        FindOrBuildMapping(null, sourceType, targetType, parameters, true);
+    public ITypeMapping? FindOrBuildMapping(ITypeSymbol sourceType, ITypeSymbol targetType) =>
+        FindOrBuildMapping(null, sourceType, targetType, true);
 
     /// <summary>
     /// Tries to build a new mapping for the given types.
@@ -99,8 +96,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="source">The source type.</param>
     /// <param name="target">The target type.</param>
     /// <returns>The created mapping or <c>null</c> if none could be created.</returns>
-    public ITypeMapping? BuildDelegateMapping(ITypeSymbol source, ITypeSymbol target, MethodParameter[] parameters) =>
-        BuildMapping(_userSymbol, source, target, parameters, false);
+    public ITypeMapping? BuildDelegateMapping(ITypeSymbol source, ITypeSymbol target) => BuildMapping(_userSymbol, source, target, false);
 
     /// <summary>
     /// Tries to build a new mapping for the given types while keeping the current user symbol reference.
@@ -114,7 +110,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="target">The target type.</param>
     /// <returns>The created mapping or <c>null</c> if none could be created.</returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public ITypeMapping? BuildMappingWithUserSymbol(ITypeSymbol source, ITypeSymbol target, MethodParameter[] parameters) =>
+    public ITypeMapping? BuildMappingWithUserSymbol(ITypeSymbol source, ITypeSymbol target) =>
         BuildMapping(
             _userSymbol
                 ?? throw new InvalidOperationException(
@@ -122,7 +118,6 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
                 ),
             source.UpgradeNullable(),
             target.UpgradeNullable(),
-            parameters,
             true
         );
 
@@ -140,7 +135,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
     public virtual IExistingTargetMapping? FindOrBuildExistingTargetMapping(ITypeSymbol sourceType, ITypeSymbol targetType) =>
         ExistingTargetMappingBuilder.Find(sourceType, targetType)
-        ?? ExistingTargetMappingBuilder.Build(ContextForMapping(null, sourceType, Array.Empty<MethodParameter>(), targetType), true);
+        ?? ExistingTargetMappingBuilder.Build(ContextForMapping(null, sourceType, targetType), true);
 
     /// <summary>
     /// Tries to build an existing target instance mapping.
@@ -154,19 +149,27 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="targetType">The target type.</param>
     /// <returns>The created mapping, or <c>null</c> if no mapping could be created.</returns>
     public virtual IExistingTargetMapping? BuildExistingTargetMappingWithUserSymbol(ITypeSymbol sourceType, ITypeSymbol targetType) =>
-        ExistingTargetMappingBuilder.Build(ContextForMapping(_userSymbol, sourceType, Array.Empty<MethodParameter>(), targetType), false);
+        ExistingTargetMappingBuilder.Build(ContextForMapping(_userSymbol, sourceType, targetType), false);
 
     protected virtual ITypeMapping? FindOrBuildMapping(
         IMethodSymbol? userSymbol,
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        MethodParameter[] parameters,
         bool reusable
     )
     {
         sourceType = sourceType.UpgradeNullable();
         targetType = targetType.UpgradeNullable();
-        return MappingBuilder.Find(sourceType, targetType) ?? BuildMapping(userSymbol, sourceType, targetType, parameters, reusable);
+        var mappingDelegate = MappingBuilder.Find(sourceType, targetType) ?? BuildMapping(userSymbol, sourceType, targetType, reusable);
+
+        if (mappingDelegate == null)
+            return null;
+
+        foreach (var mappingDelegateParameter in mappingDelegate.Parameters)
+        {
+            UsedParameters.Add(mappingDelegateParameter);
+        }
+        return mappingDelegate;
     }
 
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, params object[] messageArgs) =>
@@ -196,22 +199,22 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         return NullFallbackValue.ThrowArgumentNullException;
     }
 
-    protected virtual MappingBuilderContext ContextForMapping(
-        IMethodSymbol? userSymbol,
-        ITypeSymbol sourceType,
-        MethodParameter[] parameters,
-        ITypeSymbol targetType
-    ) => new(this, userSymbol, sourceType, targetType, parameters);
+    protected virtual MappingBuilderContext ContextForMapping(IMethodSymbol? userSymbol, ITypeSymbol sourceType, ITypeSymbol targetType) =>
+        new(this, userSymbol, sourceType, targetType);
 
-    protected ITypeMapping? BuildMapping(
-        IMethodSymbol? userSymbol,
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
-        MethodParameter[] parameters,
-        bool reusable
-    ) =>
-        MappingBuilder.Build(
-            ContextForMapping(userSymbol, sourceType.UpgradeNullable(), parameters, targetType.UpgradeNullable()),
-            reusable
-        );
+    protected ITypeMapping? BuildMapping(IMethodSymbol? userSymbol, ITypeSymbol sourceType, ITypeSymbol targetType, bool reusable)
+    {
+        var context = ContextForMapping(userSymbol, sourceType.UpgradeNullable(), targetType.UpgradeNullable());
+        var mappingDelegate = MappingBuilder.Build(context, reusable);
+
+        if (mappingDelegate == null)
+            return null;
+
+        foreach (var mappingDelegateParameter in mappingDelegate.Parameters)
+        {
+            UsedParameters.Add(mappingDelegateParameter);
+        }
+
+        return mappingDelegate;
+    }
 }
