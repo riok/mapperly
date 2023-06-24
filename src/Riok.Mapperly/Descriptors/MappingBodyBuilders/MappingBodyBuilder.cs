@@ -20,30 +20,35 @@ public class MappingBodyBuilder
     {
         foreach (var (typeMapping, ctx) in _mappings.DequeueMappingsToBuildBody())
         {
-            switch (typeMapping)
-            {
-                case NewInstanceObjectMemberMethodMapping mapping:
-                    NewInstanceObjectMemberMappingBodyBuilder.BuildMappingBody(ctx, mapping);
-                    break;
-                case NewInstanceObjectMemberMapping mapping:
-                    NewInstanceObjectMemberMappingBodyBuilder.BuildMappingBody(ctx, mapping);
-                    break;
-                case IMemberAssignmentTypeMapping mapping:
-                    ObjectMemberMappingBodyBuilder.BuildMappingBody(ctx, mapping);
-                    break;
-                case UserDefinedNewInstanceMethodMapping mapping:
-                    UserMethodMappingBodyBuilder.BuildMappingBody(ctx, mapping);
-                    break;
-                case UserDefinedExistingTargetMethodMapping mapping:
-                    UserMethodMappingBodyBuilder.BuildMappingBody(ctx, mapping);
-                    break;
-                case UserDefinedNewInstanceRuntimeTargetTypeParameterMapping mapping:
-                    RuntimeTargetTypeMappingBodyBuilder.BuildMappingBody(ctx, mapping);
-                    break;
-                case UserDefinedNewInstanceGenericTypeMapping mapping:
-                    RuntimeTargetTypeMappingBodyBuilder.BuildMappingBody(ctx, mapping);
-                    break;
-            }
+            BuildBody(typeMapping, ctx);
+        }
+    }
+
+    public static void BuildBody(IMapping typeMapping, MappingBuilderContext ctx)
+    {
+        switch (typeMapping)
+        {
+            case NewInstanceObjectMemberMethodMapping mapping:
+                NewInstanceObjectMemberMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                break;
+            case NewInstanceObjectMemberMapping mapping:
+                NewInstanceObjectMemberMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                break;
+            case IMemberAssignmentTypeMapping mapping:
+                ObjectMemberMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                break;
+            case UserDefinedNewInstanceMethodMapping mapping:
+                UserMethodMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                break;
+            case UserDefinedExistingTargetMethodMapping mapping:
+                UserMethodMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                break;
+            case UserDefinedNewInstanceRuntimeTargetTypeParameterMapping mapping:
+                RuntimeTargetTypeMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                break;
+            case UserDefinedNewInstanceGenericTypeMapping mapping:
+                RuntimeTargetTypeMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                break;
         }
     }
 }

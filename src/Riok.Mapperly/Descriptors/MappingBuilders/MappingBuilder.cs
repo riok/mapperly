@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Descriptors.MappingBodyBuilders;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
@@ -52,6 +53,7 @@ public class MappingBuilder
             if (mappingBuilder(ctx) is not { } mapping)
                 continue;
 
+            // MappingBodyBuilder.BuildBody(mapping, ctx);
             Console.WriteLine($"Params: {ctx.Parameters.Length}");
             Console.WriteLine($"Used Params: {ctx.UsedParameters.Count}");
             mapping.AddParameters(ctx.UsedParameters.ToArray());
