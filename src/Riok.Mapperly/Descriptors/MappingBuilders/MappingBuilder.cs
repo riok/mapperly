@@ -53,16 +53,21 @@ public class MappingBuilder
             if (mappingBuilder(ctx) is not { } mapping)
                 continue;
 
-            // MappingBodyBuilder.BuildBody(mapping, ctx);
-            Console.WriteLine($"Params: {ctx.Parameters.Length}");
+            Console.WriteLine($"Params: {ctx.Parameters.Count}");
             Console.WriteLine($"Used Params: {ctx.UsedParameters.Count}");
-            mapping.AddParameters(ctx.UsedParameters.ToArray());
+            mapping.AddParameters(ctx.UsedParameters);
+            _mappings.AddIncomplete(mapping);
+
+            MappingBodyBuilder.BuildBody(mapping, ctx);
+
+            _mappings.PopIncomplete(mapping);
+            mapping.AddParameters(ctx.UsedParameters);
             if (resultIsReusable)
             {
                 _mappings.Add(mapping);
             }
 
-            _mappings.EnqueueToBuildBody(mapping, ctx);
+            // _mappings.EnqueueToBuildBody(mapping, ctx);
             return mapping;
         }
 

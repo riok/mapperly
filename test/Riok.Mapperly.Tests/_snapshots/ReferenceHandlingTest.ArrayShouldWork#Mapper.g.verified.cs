@@ -8,17 +8,6 @@ public partial class Mapper
         return MapToB(source, new global::Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler());
     }
 
-    private global::B MapToB(global::A source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
-    {
-        if (refHandler.TryGetReference<global::A, global::B>(source, out var existingTargetReference))
-            return existingTargetReference;
-        var target = new global::B();
-        refHandler.SetReference<global::A, global::B>(source, target);
-        target.Parent = MapToBArray(source.Parent, refHandler);
-        target.Value = MapToD(source.Value, refHandler);
-        return target;
-    }
-
     private global::B[] MapToBArray(global::A[] source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
     {
         var target = new global::B[source.Length];
@@ -37,6 +26,17 @@ public partial class Mapper
         var target = new global::D();
         refHandler.SetReference<global::C, global::D>(source, target);
         target.StringValue = source.StringValue;
+        return target;
+    }
+
+    private global::B MapToB(global::A source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
+    {
+        if (refHandler.TryGetReference<global::A, global::B>(source, out var existingTargetReference))
+            return existingTargetReference;
+        var target = new global::B();
+        refHandler.SetReference<global::A, global::B>(source, target);
+        target.Parent = MapToBArray(source.Parent, refHandler);
+        target.Value = MapToD(source.Value, refHandler);
         return target;
     }
 }

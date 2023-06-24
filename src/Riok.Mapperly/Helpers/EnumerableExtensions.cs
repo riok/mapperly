@@ -21,6 +21,14 @@ public static class EnumerableExtensions
     public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable, IEqualityComparer<T>? comparer = null) =>
         new(enumerable, comparer);
 
+    public static void AddRange<T>(this HashSet<T> hashSet, IEnumerable<T> source)
+    {
+        foreach (var item in source)
+        {
+            hashSet.Add(item);
+        }
+    }
+
     public static IEnumerable<T> DistinctBy<T, TProp>(
         this IEnumerable<T> enumerable,
         Func<T, TProp> selector,

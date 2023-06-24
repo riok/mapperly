@@ -9,6 +9,16 @@ public partial class Mapper
         b.Value = MapToD(a.Value, refHandler);
     }
 
+    private global::D MapToD(global::C source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
+    {
+        if (refHandler.TryGetReference<global::C, global::D>(source, out var existingTargetReference))
+            return existingTargetReference;
+        var target = new global::D();
+        refHandler.SetReference<global::C, global::D>(source, target);
+        target.StringValue = source.StringValue;
+        return target;
+    }
+
     private global::B MapToB(global::A source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
     {
         if (refHandler.TryGetReference<global::A, global::B>(source, out var existingTargetReference))
@@ -17,16 +27,6 @@ public partial class Mapper
         refHandler.SetReference<global::A, global::B>(source, target);
         target.Parent = MapToB(source.Parent, refHandler);
         target.Value = MapToD(source.Value, refHandler);
-        return target;
-    }
-
-    private global::D MapToD(global::C source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
-    {
-        if (refHandler.TryGetReference<global::C, global::D>(source, out var existingTargetReference))
-            return existingTargetReference;
-        var target = new global::D();
-        refHandler.SetReference<global::C, global::D>(source, target);
-        target.StringValue = source.StringValue;
         return target;
     }
 }

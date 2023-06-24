@@ -34,6 +34,17 @@ public class EnumerableExtensionsTest
     }
 
     [Fact]
+    public void HashSetAddRangeShouldWork()
+    {
+        var items = new[] { 1, 1, 2, 3, 4, 5, 5 };
+        var hashSet = new HashSet<int>() { 1, 3, 6 };
+
+        hashSet.AddRange(items);
+
+        hashSet.Should().BeEquivalentTo(new[] { 1, 2, 3, 4, 5, 6 });
+    }
+
+    [Fact]
     public void DistinctByShouldWork()
     {
         var items = new[] { ("item10", 10), ("item11", 10), ("item12", 10), ("item20", 20), ("item30", 30), ("item31", 30), };

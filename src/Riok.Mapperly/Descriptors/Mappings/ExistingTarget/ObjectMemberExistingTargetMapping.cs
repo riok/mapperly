@@ -20,5 +20,5 @@ public class ObjectMemberExistingTargetMapping : MemberAssignmentMappingContaine
 
     public ITypeSymbol TargetType { get; }
 
-    public MethodParameter[] Parameters { get; set; } = Array.Empty<MethodParameter>();
+    public IReadOnlyCollection<MethodParameter> Parameters { get; set; } = Array.Empty<MethodParameter>();
 }

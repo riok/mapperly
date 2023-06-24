@@ -21,5 +21,5 @@ public interface ITypeMapping : IMapping
 
     ExpressionSyntax Build(TypeMappingBuildContext ctx);
 
-    void AddParameters(MethodParameter[] parameters);
+    void AddParameters(IEnumerable<MethodParameter> parameters);
 }

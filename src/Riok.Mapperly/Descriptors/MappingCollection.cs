@@ -34,13 +34,36 @@ public class MappingCollection
     /// </summary>
     private readonly Dictionary<TypeMappingKey, IExistingTargetMapping> _existingTargetMappings = new();
 
+    // TODO: Move to context?
+    private readonly Dictionary<TypeMappingKey, ITypeMapping> _incompleteMappings = new();
+
     public IReadOnlyCollection<MethodMapping> MethodMappings => _methodMappings;
 
     /// <inheritdoc cref="_callableUserMappings"/>
     public IReadOnlyCollection<IUserMapping> CallableUserMappings => _callableUserMappings;
 
+    public void AddIncomplete(ITypeMapping mapping)
+    {
+        _incompleteMappings.Add(new TypeMappingKey(mapping.SourceType, mapping.TargetType), mapping);
+    }
+
+    public void PopIncomplete(IMapping mapping)
+    {
+        var key = new TypeMappingKey(mapping.SourceType, mapping.TargetType);
+        _incompleteMappings.Remove(key);
+    }
+
     public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType)
     {
+        if (_incompleteMappings.Count > 0)
+        {
+            var key = new TypeMappingKey(sourceType, targetType);
+            if (_incompleteMappings.TryGetValue(key, out var value))
+            {
+                return value;
+            }
+        }
+
         _mappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var mapping);
         return mapping;
     }

@@ -23,7 +23,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         ObjectFactoryCollection objectFactories,
         IMethodSymbol? userSymbol,
         ITypeSymbol source,
-        MethodParameter[] parameters,
+        IReadOnlyCollection<MethodParameter> parameters,
         ITypeSymbol target
     )
         : base(parentCtx)
@@ -45,7 +45,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public ITypeSymbol Target { get; }
 
-    public MethodParameter[] Parameters { get; }
+    public IReadOnlyCollection<MethodParameter> Parameters { get; }
 
     public CollectionInfos? CollectionInfos => _collectionInfos ??= CollectionInfoBuilder.Build(Types, Source, Target);
 
@@ -165,10 +165,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         if (mappingDelegate == null)
             return null;
 
-        foreach (var mappingDelegateParameter in mappingDelegate.Parameters)
-        {
-            UsedParameters.Add(mappingDelegateParameter);
-        }
+        UsedParameters.AddRange(mappingDelegate.Parameters);
         return mappingDelegate;
     }
 

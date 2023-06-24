@@ -96,6 +96,19 @@ public class QueryableProjectionTest
     }
 
     [Fact]
+    public Task ReferenceLoopCtor2()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public A? Parent { get; set; } }",
+            "class B { public B(B? parent) {} }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task CtorShouldSkipUnmatchedOptionalParameters()
     {
         var source = TestSourceBuilder.Mapping(
