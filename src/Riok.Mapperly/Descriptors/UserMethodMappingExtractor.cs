@@ -71,7 +71,7 @@ public static class UserMethodMappingExtractor
             && (allowPartial || !method.IsPartialDefinition)
             && (!isStatic || method.IsStatic);
         return valid && BuildParameters(ctx, method, out var parameters)
-            ? new UserImplementedMethodMapping(method, parameters.Source, parameters.ReferenceHandler)
+            ? new UserImplementedMethodMapping(method, parameters.Source, parameters.ReferenceHandler, parameters.Parameters)
             : null;
     }
 

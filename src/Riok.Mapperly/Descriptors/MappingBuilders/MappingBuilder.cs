@@ -46,6 +46,9 @@ public class MappingBuilder
 
     public ITypeMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {
+        if (_mappings.GetIncomplete(ctx.Source, ctx.Target) is { } typeMapping)
+            return typeMapping;
+
         var c = 0;
         foreach (var mappingBuilder in _builders)
         {
@@ -56,18 +59,26 @@ public class MappingBuilder
             Console.WriteLine($"Params: {ctx.Parameters.Count}");
             Console.WriteLine($"Used Params: {ctx.UsedParameters.Count}");
             mapping.AddParameters(ctx.UsedParameters);
-            _mappings.AddIncomplete(mapping);
 
-            MappingBodyBuilder.BuildBody(mapping, ctx);
+            if (resultIsReusable)
+            {
+                _mappings.AddIncomplete(mapping);
 
-            _mappings.PopIncomplete(mapping);
+                MappingBodyBuilder.BuildBody(mapping, ctx);
+
+                _mappings.PopIncomplete(mapping);
+            }
+
             mapping.AddParameters(ctx.UsedParameters);
             if (resultIsReusable)
             {
                 _mappings.Add(mapping);
             }
+            else
+            {
+                _mappings.EnqueueToBuildBody(mapping, ctx);
+            }
 
-            // _mappings.EnqueueToBuildBody(mapping, ctx);
             return mapping;
         }
 

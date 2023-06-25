@@ -92,4 +92,35 @@ return target;
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task ExtraParameterUsesUserMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+partial B Map(A src, int value);
+public string ToString(int value) => value.ToString();
+""",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public string Value { get; init; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task UserMethodWithExtraParameters()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+partial B Map(A src, int value);
+public C MapToC(string str, int value) => new C() { StringValue = str, Value = value };
+""",
+            "class A { public string Nested { get; set; } }",
+            "class B { public C Nested { get; init; } }",
+            "class C { public string StringValue { get; init; } public string Value { get; init; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

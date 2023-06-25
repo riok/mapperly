@@ -63,11 +63,17 @@ public abstract class MethodMapping : TypeMapping
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        var initial = new[] { SourceParameter.WithArgument(ctx.Source), ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler) };
-
-        var extraParameters = Parameters.Zip(ctx.Parameters, (a, b) => (a, b)).Select(x => x.a.WithArgument(x.b)).Cast<MethodArgument?>();
-        var methodArguments = initial.Concat(extraParameters).ToArray();
-        return Invocation(MethodName, methodArguments);
+        var parameters = Parameters
+            .Zip(ctx.Parameters, (a, b) => (a, b))
+            .Select(x => x.a.WithArgument(x.b))
+            .Cast<MethodArgument?>()
+            .ToArray();
+        return Invocation(
+            MethodName,
+            SourceParameter.WithArgument(ctx.Source),
+            ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler),
+            parameters
+        );
     }
 
     public virtual MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)

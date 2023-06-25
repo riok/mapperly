@@ -42,6 +42,13 @@ public class MappingCollection
     /// <inheritdoc cref="_callableUserMappings"/>
     public IReadOnlyCollection<IUserMapping> CallableUserMappings => _callableUserMappings;
 
+    public ITypeMapping? GetIncomplete(ITypeSymbol sourceType, ITypeSymbol targetType)
+    {
+        var key = new TypeMappingKey(sourceType, targetType);
+        _incompleteMappings.TryGetValue(key, out var value);
+        return value;
+    }
+
     public void AddIncomplete(ITypeMapping mapping)
     {
         _incompleteMappings.Add(new TypeMappingKey(mapping.SourceType, mapping.TargetType), mapping);

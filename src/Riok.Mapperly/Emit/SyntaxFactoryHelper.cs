@@ -228,8 +228,27 @@ public static class SyntaxFactoryHelper
         return InvocationExpression(method).WithArgumentList(ArgumentList(arguments));
     }
 
-    public static InvocationExpressionSyntax Invocation(string methodName, params MethodArgument?[] arguments) =>
-        Invocation(IdentifierName(methodName), arguments);
+    public static InvocationExpressionSyntax Invocation(
+        string methodName,
+        MethodArgument? first,
+        MethodArgument? second,
+        params MethodArgument?[] arguments
+    )
+    {
+        var left = new[] { first, second };
+        return Invocation(IdentifierName(methodName), left.Concat(arguments).ToArray());
+    }
+
+    public static InvocationExpressionSyntax Invocation(
+        ExpressionSyntax method,
+        MethodArgument? first,
+        MethodArgument? second,
+        params MethodArgument?[] arguments
+    )
+    {
+        var left = new[] { first, second };
+        return Invocation(method, left.Concat(arguments).ToArray());
+    }
 
     public static InvocationExpressionSyntax Invocation(ExpressionSyntax method, params MethodArgument?[] arguments) =>
         Invocation(method, arguments.WhereNotNull().OrderBy(x => x.Parameter.Ordinal).Select(x => x.Argument).ToArray());
