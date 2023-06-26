@@ -94,6 +94,18 @@ return target;
     }
 
     [Fact]
+    public Task ExtraParameterEnumerable()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B[] Map(A[] src, int value);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public string Value { get; init; }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ExtraParameterUsesUserMethod()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

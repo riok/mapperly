@@ -20,6 +20,7 @@ public class MappingBodyBuilder
     {
         foreach (var (typeMapping, ctx) in _mappings.DequeueMappingsToBuildBody())
         {
+            _mappings.ClearScope();
             BuildBody(typeMapping, ctx);
         }
     }

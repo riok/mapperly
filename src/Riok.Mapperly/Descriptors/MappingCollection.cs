@@ -35,12 +35,18 @@ public class MappingCollection
     private readonly Dictionary<TypeMappingKey, IExistingTargetMapping> _existingTargetMappings = new();
 
     // TODO: Move to context?
+    // TODO: look at combining incomplete and scoped. Might prevent clever loop detection in the future.
+    // Might become a hashset in the future
     private readonly Dictionary<TypeMappingKey, ITypeMapping> _incompleteMappings = new();
+
+    private readonly Dictionary<TypeMappingKey, ITypeMapping> _scopedMappings = new();
 
     public IReadOnlyCollection<MethodMapping> MethodMappings => _methodMappings;
 
     /// <inheritdoc cref="_callableUserMappings"/>
     public IReadOnlyCollection<IUserMapping> CallableUserMappings => _callableUserMappings;
+
+    public void ClearScope() => _scopedMappings.Clear();
 
     public ITypeMapping? GetIncomplete(ITypeSymbol sourceType, ITypeSymbol targetType)
     {
@@ -71,6 +77,9 @@ public class MappingCollection
             }
         }
 
+        if (_scopedMappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var scopedMapping))
+            return scopedMapping;
+
         _mappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var mapping);
         return mapping;
     }
@@ -88,6 +97,7 @@ public class MappingCollection
         if (mapping is IUserMapping { CallableByOtherMappings: true } userMapping)
         {
             _callableUserMappings.Add(userMapping);
+            _mappings.Add(new TypeMappingKey(mapping), mapping);
         }
 
         if (mapping is MethodMapping methodMapping)
@@ -95,9 +105,16 @@ public class MappingCollection
             _methodMappings.Add(methodMapping);
         }
 
-        if (mapping.CallableByOtherMappings && Find(mapping.SourceType, mapping.TargetType) is null)
+        if (mapping.CallableByOtherMappings && Find(mapping.SourceType, mapping.TargetType) is null && mapping is not IUserMapping)
         {
-            _mappings.Add(new TypeMappingKey(mapping), mapping);
+            if (mapping.Parameters.Length == 0)
+            {
+                _mappings.Add(new TypeMappingKey(mapping), mapping);
+            }
+            else
+            {
+                _scopedMappings.Add(new TypeMappingKey(mapping), mapping);
+            }
         }
     }
 

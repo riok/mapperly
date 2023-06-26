@@ -12,5 +12,5 @@ public interface IMapping
 
     ITypeSymbol TargetType { get; }
 
-    IReadOnlyCollection<MethodParameter> Parameters { get; set; }
+    MethodParameter[] Parameters { get; set; }
 }

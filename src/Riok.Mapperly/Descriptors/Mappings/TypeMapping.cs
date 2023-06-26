@@ -27,7 +27,7 @@ public abstract class TypeMapping : ITypeMapping
 
     public ITypeSymbol TargetType { get; }
 
-    public IReadOnlyCollection<MethodParameter> Parameters { get; set; } = Array.Empty<MethodParameter>();
+    public MethodParameter[] Parameters { get; set; } = Array.Empty<MethodParameter>();
 
     /// <inheritdoc cref="ITypeMapping.CallableByOtherMappings"/>
     public virtual bool CallableByOtherMappings => true;
@@ -44,6 +44,6 @@ public abstract class TypeMapping : ITypeMapping
         {
             hash.Add(item);
         }
-        Parameters = hash;
+        Parameters = hash.ToArray();
     }
 }

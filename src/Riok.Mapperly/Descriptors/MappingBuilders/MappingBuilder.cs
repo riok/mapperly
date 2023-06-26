@@ -56,11 +56,10 @@ public class MappingBuilder
             if (mappingBuilder(ctx) is not { } mapping)
                 continue;
 
-            Console.WriteLine($"Params: {ctx.Parameters.Count}");
-            Console.WriteLine($"Used Params: {ctx.UsedParameters.Count}");
             mapping.AddParameters(ctx.UsedParameters);
 
-            if (resultIsReusable)
+            // Check for user mapping to ensure that scope rules are respected.
+            if (resultIsReusable && mapping is not IUserMapping)
             {
                 _mappings.AddIncomplete(mapping);
 
