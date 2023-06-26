@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -71,7 +72,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
     private static void BuildInitMemberMapping(
         INewInstanceBuilderContext<IMapping> ctx,
         IMappableMember targetMember,
-        IReadOnlyCollection<MapPropertyAttribute> memberConfigs
+        IReadOnlyCollection<PropertyMappingConfiguration> memberConfigs
     )
     {
         // add configured mapping
@@ -86,17 +87,17 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         }
 
         var memberConfig = memberConfigs.First();
-        if (memberConfig.Target.Count > 1)
+        if (memberConfig.Target.Path.Count > 1)
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.InitOnlyMemberDoesNotSupportPaths,
                 targetMember.Type,
-                string.Join(".", memberConfig.Target)
+                memberConfig.Target.FullName
             );
             return;
         }
 
-        if (!MemberPath.TryFind(ctx.Mapping.SourceType, memberConfig.Source, out var sourceMemberPath))
+        if (!MemberPath.TryFind(ctx.Mapping.SourceType, memberConfig.Source.Path, out var sourceMemberPath))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.SourceMemberNotFound,
@@ -306,21 +307,21 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         }
 
         var memberConfig = memberConfigs.First();
-        if (memberConfig.Target.Count > 1)
+        if (memberConfig.Target.Path.Count > 1)
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ConstructorParameterDoesNotSupportPaths,
                 parameter.Type,
-                string.Join(".", memberConfig.Target)
+                memberConfig.Target.FullName
             );
             return false;
         }
 
-        if (!MemberPath.TryFind(ctx.Mapping.SourceType, memberConfig.Source, out sourcePath))
+        if (!MemberPath.TryFind(ctx.Mapping.SourceType, memberConfig.Source.Path, out sourcePath))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.SourceMemberNotFound,
-                memberConfig.Source,
+                memberConfig.Source.FullName,
                 ctx.Mapping.TargetType,
                 ctx.Mapping.SourceType
             );

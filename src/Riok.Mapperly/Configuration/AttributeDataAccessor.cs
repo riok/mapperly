@@ -50,10 +50,8 @@ internal class AttributeDataAccessor
 
         foreach (var attrData in attrDatas)
         {
-            var typeArguments = attrData.AttributeClass?.TypeArguments ?? Enumerable.Empty<ITypeSymbol>();
-            var ctorArguments = attrData.ConstructorArguments.Select(BuildArgumentValue);
-            var newInstanceArguments = typeArguments.Concat(ctorArguments).ToArray();
-            var attr = (TData)Activator.CreateInstance(dataType, newInstanceArguments);
+            var typeArguments = (IReadOnlyCollection<ITypeSymbol>?)attrData.AttributeClass?.TypeArguments ?? Array.Empty<ITypeSymbol>();
+            var attr = Create<TData>(typeArguments, attrData.ConstructorArguments);
 
             foreach (var namedArgument in attrData.NamedArguments)
             {
@@ -61,56 +59,94 @@ internal class AttributeDataAccessor
                 if (prop == null)
                     throw new InvalidOperationException($"Could not get property {namedArgument.Key} of attribute {attrType.FullName}");
 
-                prop.SetValue(attr, BuildArgumentValue(namedArgument.Value));
+                prop.SetValue(attr, BuildArgumentValue(namedArgument.Value, prop.PropertyType));
             }
 
             yield return attr;
         }
     }
 
-    private static object? BuildArgumentValue(TypedConstant arg)
+    private TData Create<TData>(IReadOnlyCollection<ITypeSymbol> typeArguments, IReadOnlyCollection<TypedConstant> constructorArguments)
+    {
+        // The data class should have a constructor
+        // with generic type parameters of the attribute class
+        // as ITypeSymbol parameters followed by all other parameters
+        // of the attribute constructor.
+        // Multiple attribute class constructors/generic data classes are not yet supported.
+        var argCount = typeArguments.Count + constructorArguments.Count;
+        foreach (var constructor in typeof(TData).GetConstructors())
+        {
+            var parameters = constructor.GetParameters();
+            if (parameters.Length != argCount)
+                continue;
+
+            var constructorArgumentValues = constructorArguments.Select(
+                (arg, i) => BuildArgumentValue(arg, parameters[i + typeArguments.Count].ParameterType)
+            );
+            var constructorTypeAndValueArguments = typeArguments.Concat(constructorArgumentValues).ToArray();
+            return (TData)Activator.CreateInstance(typeof(TData), constructorTypeAndValueArguments);
+        }
+
+        throw new InvalidOperationException($"{typeof(TData)} does not have a constructor with {argCount} parameters");
+    }
+
+    private static object? BuildArgumentValue(TypedConstant arg, Type targetType)
     {
         return arg.Kind switch
         {
             _ when arg.IsNull => null,
-            TypedConstantKind.Enum => GetEnumValue(arg),
-            TypedConstantKind.Array => BuildArrayValue(arg),
+            _ when targetType == typeof(StringMemberPath) => CreateMemberPath(arg),
+            TypedConstantKind.Enum => GetEnumValue(arg, targetType),
+            TypedConstantKind.Array => BuildArrayValue(arg, targetType),
             TypedConstantKind.Primitive => arg.Value,
-            TypedConstantKind.Type => arg.Value,
+            TypedConstantKind.Type when targetType == typeof(ITypeSymbol) => arg.Value,
             _
                 => throw new ArgumentOutOfRangeException(
-                    $"{nameof(AttributeDataAccessor)} does not support constructor arguments of kind {arg.Kind.ToString()}"
+                    $"{nameof(AttributeDataAccessor)} does not support constructor arguments of kind {arg.Kind.ToString()} or cannot convert it to {targetType}"
                 ),
         };
     }
 
-    private static object?[] BuildArrayValue(TypedConstant arg)
+    private static StringMemberPath CreateMemberPath(TypedConstant arg)
     {
-        var arrayTypeSymbol =
-            arg.Type as IArrayTypeSymbol
-            ?? throw new InvalidOperationException("Array typed constant is not of type " + nameof(IArrayTypeSymbol));
+        if (arg.Kind == TypedConstantKind.Array)
+        {
+            var values = arg.Values.Select(x => (string?)BuildArgumentValue(x, typeof(string))).WhereNotNull().ToList();
+            return new StringMemberPath(values);
+        }
 
-        var values = arg.Values.Select(BuildArgumentValue).ToArray();
+        if (arg is { Kind: TypedConstantKind.Primitive, Value: string v })
+        {
+            return new StringMemberPath(v.Split(StringMemberPath.PropertyAccessSeparator));
+        }
 
-        var elementType = GetReflectionType(arrayTypeSymbol.ElementType);
-        if (elementType == null)
-            throw new InvalidOperationException("Non reflection array configurations are not supported");
-
-        var typedValues = Array.CreateInstance(elementType, values.Length);
-        Array.Copy(values, typedValues, values.Length);
-        return (object?[])typedValues;
+        throw new InvalidOperationException($"Cannot create {nameof(StringMemberPath)} from {arg.Kind}");
     }
 
-    private static object? GetEnumValue(TypedConstant arg)
+    private static object?[] BuildArrayValue(TypedConstant arg, Type targetType)
+    {
+        if (!targetType.IsGenericType || targetType.GetGenericTypeDefinition() != typeof(IReadOnlyCollection<>))
+            throw new InvalidOperationException($"{nameof(IReadOnlyCollection<object>)} is the only supported array type");
+
+        var elementTargetType = targetType.GetGenericArguments()[0];
+        return arg.Values.Select(x => BuildArgumentValue(x, elementTargetType)).ToArray();
+    }
+
+    private static object? GetEnumValue(TypedConstant arg, Type targetType)
     {
         if (arg.Value == null)
             return null;
 
-        var enumType = GetReflectionType(arg.Type ?? throw new InvalidOperationException("Type is null"));
+        var enumRoslynType = arg.Type ?? throw new InvalidOperationException("Type is null");
+        if (targetType == typeof(IFieldSymbol))
+            return enumRoslynType.GetFields().First(f => Equals(f.ConstantValue, arg.Value));
 
-        // if we can't get the enum type then it's not available to reflection (only accessible by Roslyn) so return the TypedConstant
-        // if this is the case, a roslyn typed configuration class should be used which accepts the typed constants.
-        return enumType == null ? arg.Type.GetFields().First(f => Equals(f.ConstantValue, arg.Value)) : Enum.ToObject(enumType, arg.Value);
+        var enumReflectionType = GetReflectionType(enumRoslynType);
+        return enumReflectionType == null
+            ? throw new InvalidOperationException(
+                $"Could not resolve enum reflection type of {enumRoslynType.Name} or {targetType} is not supported"
+            )
+            : Enum.ToObject(enumReflectionType, arg.Value);
     }
 
     private static Type? GetReflectionType(ITypeSymbol type)

@@ -1,4 +1,4 @@
-using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
@@ -47,7 +47,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
     public Dictionary<string, IMappableMember> TargetMembers { get; }
 
-    public Dictionary<string, List<MapPropertyAttribute>> MemberConfigsByRootTargetName { get; }
+    public Dictionary<string, List<PropertyMappingConfiguration>> MemberConfigsByRootTargetName { get; }
 
     public void AddDiagnostics()
     {
@@ -76,10 +76,10 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         return Mapping.TargetType.GetAccessibleMappableMembers().ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
     }
 
-    private Dictionary<string, List<MapPropertyAttribute>> GetMemberConfigurations()
+    private Dictionary<string, List<PropertyMappingConfiguration>> GetMemberConfigurations()
     {
         return BuilderContext.Configuration.Properties.ExplicitMappings
-            .GroupBy(x => x.Target.First())
+            .GroupBy(x => x.Target.Path.First())
             .ToDictionary(x => x.Key, x => x.ToList());
     }
 
@@ -105,7 +105,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         {
             BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ConfiguredMappingTargetMemberNotFound,
-                memberConfig.TargetFullName,
+                memberConfig.Target.FullName,
                 Mapping.TargetType
             );
         }
