@@ -121,6 +121,61 @@ public string ToString(int value) => value.ToString();
     }
 
     [Fact]
+    public Task GeneratedExtraParameterMethodsShouldNotBeReused()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+partial D Map(A src, int value);
+partial D Map(B src, int value);
+""",
+            "class A { public C Nested { get; set; } }",
+            "class B { public C Nested { get; set; } }",
+            "class C { public string Name { get; set; } }",
+            "class D { public E Nested { get; set; } }",
+            "class E { public string Name { get; init; } public string Value { get; init; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task GeneratedExtraParameterMethodsCanReuseInScope()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+partial D Map(A src, int value);
+partial F Map(B src, int value);
+""",
+            "class A { public C Nested { get; set; } }",
+            "class B { public C Nested { get; set; } public C Other { get; set; } }",
+            "class C { public string Name { get; set; } }",
+            "class D { public E Nested { get; set; } }",
+            "class E { public string Name { get; init; } public string Value { get; init; } }",
+            "class F { public E Nested { get; set; } public E Other { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task UsedDefinedMethodsShouldNotReuseExtraParameterMethods()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+partial D Map(A src, int value);
+partial D Map(B src, int value);
+""",
+            "class A { public C Nested { get; set; } }",
+            "class B { public C Nested { get; set; } }",
+            "class C { public string Name { get; set; } }",
+            "class D { public E Nested { get; set; } }",
+            "class E { public string Name { get; init; } public string Value { get; init; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task UserMethodWithExtraParameters()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

@@ -31,7 +31,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         ObjectFactories = objectFactories;
         Source = source;
         Target = target;
-        Parameters = parameters;
+        Parameters = parameters.ToArray();
         _userSymbol = userSymbol;
         Configuration = ReadConfiguration(_userSymbol);
     }
@@ -45,7 +45,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public ITypeSymbol Target { get; }
 
-    public IReadOnlyCollection<MethodParameter> Parameters { get; }
+    public MethodParameter[] Parameters { get; }
 
     public CollectionInfos? CollectionInfos => _collectionInfos ??= CollectionInfoBuilder.Build(Types, Source, Target);
 
@@ -71,7 +71,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
     public virtual ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
     {
-        var mapping = MappingBuilder.Find(sourceType.UpgradeNullable(), targetType.UpgradeNullable());
+        var mapping = MappingBuilder.Find(sourceType.UpgradeNullable(), targetType.UpgradeNullable(), Parameters);
         if (mapping == null)
             return mapping;
 
@@ -167,7 +167,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     {
         sourceType = sourceType.UpgradeNullable();
         targetType = targetType.UpgradeNullable();
-        var mappingDelegate = MappingBuilder.Find(sourceType, targetType) ?? BuildMapping(userSymbol, sourceType, targetType, reusable);
+        var mappingDelegate =
+            MappingBuilder.Find(sourceType, targetType, Parameters) ?? BuildMapping(userSymbol, sourceType, targetType, reusable);
 
         if (mappingDelegate == null)
             return null;

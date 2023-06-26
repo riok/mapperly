@@ -3,6 +3,7 @@ using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -12,7 +13,7 @@ public class MappingCollection
     /// The first callable mapping of each type pair.
     /// Contains mappings to build and already built mappings
     /// </summary>
-    private readonly Dictionary<TypeMappingKey, ITypeMapping> _mappings = new();
+    private readonly Dictionary<TypeMappingKey, List<ITypeMapping>> _mappings = new();
 
     /// <summary>
     /// A list of all method mappings (extra mappings and mappings)
@@ -66,7 +67,7 @@ public class MappingCollection
         _incompleteMappings.Remove(key);
     }
 
-    public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType)
+    public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType, MethodParameter[] parameters)
     {
         if (_incompleteMappings.Count > 0)
         {
@@ -80,8 +81,18 @@ public class MappingCollection
         if (_scopedMappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var scopedMapping))
             return scopedMapping;
 
-        _mappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var mapping);
-        return mapping;
+        if (!_mappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var mapping))
+        {
+            return null;
+        }
+
+        foreach (var item in mapping.OrderByDescending(x => x.Parameters.Length))
+        {
+            if (MethodParameter.MappableTo(parameters, item.Parameters))
+                return item;
+        }
+
+        return null;
     }
 
     public IExistingTargetMapping? FindExistingInstanceMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
@@ -97,7 +108,17 @@ public class MappingCollection
         if (mapping is IUserMapping { CallableByOtherMappings: true } userMapping)
         {
             _callableUserMappings.Add(userMapping);
-            _mappings.Add(new TypeMappingKey(mapping), mapping);
+
+            var key = new TypeMappingKey(mapping);
+            if (_mappings.TryGetValue(key, out var value))
+            {
+                value.Add(mapping);
+            }
+            else
+            {
+                var list = new List<ITypeMapping>() { mapping };
+                _mappings.Add(new TypeMappingKey(mapping), list);
+            }
         }
 
         if (mapping is MethodMapping methodMapping)
@@ -105,11 +126,24 @@ public class MappingCollection
             _methodMappings.Add(methodMapping);
         }
 
-        if (mapping.CallableByOtherMappings && Find(mapping.SourceType, mapping.TargetType) is null && mapping is not IUserMapping)
+        if (
+            mapping.CallableByOtherMappings
+            && Find(mapping.SourceType, mapping.TargetType, mapping.Parameters) is null
+            && mapping is not IUserMapping
+        )
         {
             if (mapping.Parameters.Length == 0)
             {
-                _mappings.Add(new TypeMappingKey(mapping), mapping);
+                var key = new TypeMappingKey(mapping);
+                if (_mappings.TryGetValue(key, out var value))
+                {
+                    value.Add(mapping);
+                }
+                else
+                {
+                    var list = new List<ITypeMapping>() { mapping };
+                    _mappings.Add(new TypeMappingKey(mapping), list);
+                }
             }
             else
             {

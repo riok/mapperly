@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
@@ -42,7 +43,8 @@ public class MappingBuilder
     public IReadOnlyCollection<IUserMapping> CallableUserMappings => _mappings.CallableUserMappings;
 
     /// <inheritdoc cref="MappingBuilderContext.FindMapping"/>
-    public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType) => _mappings.Find(sourceType, targetType);
+    public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType, MethodParameter[] parameters) =>
+        _mappings.Find(sourceType, targetType, parameters);
 
     public ITypeMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {
