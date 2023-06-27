@@ -11,7 +11,7 @@ namespace Riok.Mapperly.Descriptors;
 public class SimpleMappingBuilderContext
 {
     private readonly MapperDescriptor _descriptor;
-    private readonly SourceProductionContext _context;
+    private readonly List<Diagnostic> _diagnostics;
     private readonly MapperConfiguration _configuration;
 
     public SimpleMappingBuilderContext(
@@ -20,7 +20,7 @@ public class SimpleMappingBuilderContext
         WellKnownTypes types,
         SymbolAccessor symbolAccessor,
         MapperDescriptor descriptor,
-        SourceProductionContext context,
+        List<Diagnostic> diagnostics,
         MappingBuilder mappingBuilder,
         ExistingTargetMappingBuilder existingTargetMappingBuilder
     )
@@ -30,7 +30,7 @@ public class SimpleMappingBuilderContext
         SymbolAccessor = symbolAccessor;
         _configuration = configuration;
         _descriptor = descriptor;
-        _context = context;
+        _diagnostics = diagnostics;
         MappingBuilder = mappingBuilder;
         ExistingTargetMappingBuilder = existingTargetMappingBuilder;
     }
@@ -42,7 +42,7 @@ public class SimpleMappingBuilderContext
             ctx.Types,
             ctx.SymbolAccessor,
             ctx._descriptor,
-            ctx._context,
+            ctx._diagnostics,
             ctx.MappingBuilder,
             ctx.ExistingTargetMappingBuilder
         ) { }
@@ -61,14 +61,12 @@ public class SimpleMappingBuilderContext
     public virtual bool IsConversionEnabled(MappingConversionType conversionType) =>
         MapperConfiguration.EnabledConversions.HasFlag(conversionType);
 
-    public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? location, params object[] messageArgs) =>
-        ReportDiagnostic(descriptor, location?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax(), messageArgs);
-
-    public void ReportDiagnostic(DiagnosticDescriptor descriptor, SyntaxNode? location, params object[] messageArgs) =>
-        ReportDiagnostic(descriptor, location?.GetLocation(), messageArgs);
+    public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? location, params object[] messageArgs)
+    {
+        var syntaxNode = location?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
+        var nodeLocation = syntaxNode?.GetLocation();
+        _diagnostics.Add(Diagnostic.Create(descriptor, nodeLocation ?? _descriptor.Syntax.GetLocation(), messageArgs));
+    }
 
     protected MappingConfiguration ReadConfiguration(IMethodSymbol? userSymbol) => _configuration.ForMethod(userSymbol);
-
-    private void ReportDiagnostic(DiagnosticDescriptor descriptor, Location? location, params object[] messageArgs) =>
-        _context.ReportDiagnostic(Diagnostic.Create(descriptor, location ?? _descriptor.Syntax.GetLocation(), messageArgs));
 }

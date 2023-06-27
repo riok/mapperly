@@ -10,4 +10,31 @@ internal static class IncrementalValuesProviderExtensions
         return source.Where(x => x != null);
 #nullable enable
     }
+
+    /// <summary>
+    /// Registers an output node into an <see cref="IncrementalGeneratorInitializationContext"/> to output diagnostics.
+    /// </summary>
+    /// <param name="context">The input <see cref="IncrementalGeneratorInitializationContext"/> instance.</param>
+    /// <param name="diagnostics">The input <see cref="IncrementalValuesProvider{TValues}"/> sequence of diagnostics.</param>
+    public static void ReportDiagnostics(
+        this IncrementalGeneratorInitializationContext context,
+        IncrementalValueProvider<ImmutableEquatableArray<Diagnostic>> diagnostics
+    )
+    {
+        context.RegisterSourceOutput(
+            diagnostics,
+            static (context, diagnostics) =>
+            {
+                foreach (var diagnostic in diagnostics)
+                {
+                    context.ReportDiagnostic(diagnostic);
+                }
+            }
+        );
+    }
+
+#if !ROSLYN4_4_OR_GREATER
+    public static IncrementalValueProvider<TSource> WithTrackingName<TSource>(this IncrementalValueProvider<TSource> source, string name) =>
+        source;
+#endif
 }

@@ -18,11 +18,11 @@ public class DescriptorBuilder
     private readonly MethodNameBuilder _methodNameBuilder = new();
     private readonly MappingBodyBuilder _mappingBodyBuilder;
     private readonly SimpleMappingBuilderContext _builderContext;
+    private readonly List<Diagnostic> _diagnostics = new();
 
     private ObjectFactoryCollection _objectFactories = ObjectFactoryCollection.Empty;
 
     public DescriptorBuilder(
-        SourceProductionContext sourceContext,
         Compilation compilation,
         ClassDeclarationSyntax mapperSyntax,
         INamedTypeSymbol mapperSymbol,
@@ -39,13 +39,13 @@ public class DescriptorBuilder
             wellKnownTypes,
             _symbolAccessor,
             _mapperDescriptor,
-            sourceContext,
+            _diagnostics,
             new MappingBuilder(_mappings),
             new ExistingTargetMappingBuilder(_mappings)
         );
     }
 
-    public MapperDescriptor Build()
+    public (MapperDescriptor descriptor, List<Diagnostic> diagnostics) Build()
     {
         ReserveMethodNames();
         ExtractObjectFactories();
@@ -54,7 +54,7 @@ public class DescriptorBuilder
         BuildMappingMethodNames();
         BuildReferenceHandlingParameters();
         AddMappingsToDescriptor();
-        return _mapperDescriptor;
+        return (_mapperDescriptor, _diagnostics);
     }
 
     private void ExtractObjectFactories()
