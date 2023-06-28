@@ -33,7 +33,7 @@ public static class SpanMappingBuilder
         if (ctx.FindOrBuildMapping(source.EnumeratedType, target.EnumeratedType) is not { } elementMapping)
             return null;
 
-        return (source.Type, target.Type) switch
+        return (source.CollectionType, target.CollectionType) switch
         {
             // if target is Enumerable then source is Span/ReadOnlySpan
             (_, not CollectionType.Array) when target.ImplementsIEnumerable => BuildSpanToEnumerable(ctx, elementMapping),
@@ -82,17 +82,17 @@ public static class SpanMappingBuilder
         if (ctx.FindOrBuildMapping(source.EnumeratedType, target.EnumeratedType) is not { } elementMapping)
             return null;
 
-        if (target.Type is CollectionType.Stack)
+        if (target.CollectionType is CollectionType.Stack)
             return CreateForEach(nameof(Stack<object>.Push));
 
-        if (target.Type is CollectionType.Queue)
+        if (target.CollectionType is CollectionType.Queue)
             return CreateForEach(nameof(Queue<object>.Enqueue));
 
         // create a foreach loop with add calls if source is not an array
         // and ICollection.Add(T): void is implemented and not explicit
         // ensures add is not called and immutable types
         if (
-            target.Type is not CollectionType.Array
+            target.CollectionType is not CollectionType.Array
             && ctx.Target.HasImplicitGenericImplementation(ctx.Types.Get(typeof(ICollection<>)), AddMethodName)
         )
             return CreateForEach(AddMethodName);
@@ -124,11 +124,11 @@ public static class SpanMappingBuilder
         var target = ctx.CollectionInfos!.Target;
 
         // if IEnumerable or IReadOnlyCollection map to array
-        if (target.Type is CollectionType.IEnumerable or CollectionType.IReadOnlyCollection)
+        if (target.CollectionType is CollectionType.IEnumerable or CollectionType.IReadOnlyCollection)
             return BuildToArrayOrMap(ctx, elementMapping);
 
         // if target is IList, IReadOnlyList or ICollection map to List
-        if (target.Type is CollectionType.ICollection or CollectionType.IReadOnlyList or CollectionType.IList)
+        if (target.CollectionType is CollectionType.ICollection or CollectionType.IReadOnlyList or CollectionType.IList)
             return BuildSpanToList(ctx, elementMapping);
 
         if (
@@ -139,17 +139,17 @@ public static class SpanMappingBuilder
             return MapSpanArrayToEnumerableMethod(ctx);
         }
 
-        if (target.Type is CollectionType.Stack)
+        if (target.CollectionType is CollectionType.Stack)
             return CreateForEach(nameof(Stack<object>.Push), objectFactory);
 
-        if (target.Type is CollectionType.Queue)
+        if (target.CollectionType is CollectionType.Queue)
             return CreateForEach(nameof(Queue<object>.Enqueue), objectFactory);
 
         // create a foreach loop with add calls if source is not an array
         // and ICollection.Add(T): void is implemented and not explicit
         // ensures add is not called and immutable types
         if (
-            target.Type is not CollectionType.Array
+            target.CollectionType is not CollectionType.Array
             && ctx.Target.HasImplicitGenericImplementation(ctx.Types.Get(typeof(ICollection<>)), AddMethodName)
         )
             return CreateForEach(AddMethodName, objectFactory);

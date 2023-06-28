@@ -30,7 +30,7 @@ public static class MemoryMappingBuilder
         if (ctx.FindOrBuildMapping(source.EnumeratedType, target.EnumeratedType) is not { } elementMapping)
             return null;
 
-        return (source.Type, target.Type) switch
+        return (source.CollectionType, target.CollectionType) switch
         {
             // if source is Enumerable then target must be Memory
             // use MapToArray(enumerable)

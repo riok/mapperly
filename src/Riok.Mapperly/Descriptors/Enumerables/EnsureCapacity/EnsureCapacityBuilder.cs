@@ -28,19 +28,21 @@ public static class EnsureCapacityBuilder
             return null;
 
         // if target does not have a count then return null
-        if (!TryGetNonEnumeratedCount(ctx.CollectionInfos.Target, out var targetSizeProperty))
+        if (!ctx.CollectionInfos.Target.CountIsKnown)
             return null;
 
         // if target and source count are known then create a simple EnsureCapacity statement
-        if (TryGetNonEnumeratedCount(ctx.CollectionInfos.Source, out var sourceSizeProperty))
-            return new EnsureCapacityMember(targetSizeProperty, sourceSizeProperty);
+        if (ctx.CollectionInfos.Source.CountIsKnown)
+            return new EnsureCapacityMember(ctx.CollectionInfos.Target.CountPropertyName, ctx.CollectionInfos.Source.CountPropertyName);
 
         var nonEnumeratedCountMethod = ctx.Types
             .Get(typeof(Enumerable))
             .GetMembers(TryGetNonEnumeratedCountMethodName)
             .OfType<IMethodSymbol>()
             .FirstOrDefault(
-                x => x.ReturnType.SpecialType == SpecialType.System_Boolean && x.IsStatic && x.Parameters.Length == 2 && x.IsGenericMethod
+                x =>
+                    x.ReturnType.SpecialType == SpecialType.System_Boolean
+                    && x is { IsStatic: true, Parameters.Length: 2, IsGenericMethod: true }
             );
 
         // if non enumerated method doesnt exist then don't create EnsureCapacity
@@ -48,16 +50,18 @@ public static class EnsureCapacityBuilder
             return null;
 
         // if source does not have a count use GetNonEnumeratedCount, calling EnsureCapacity if count is available
-        return new EnsureCapacityNonEnumerated(targetSizeProperty, nonEnumeratedCountMethod);
+        return new EnsureCapacityNonEnumerated(ctx.CollectionInfos.Target.CountPropertyName, nonEnumeratedCountMethod);
     }
 
     private static bool TryGetNonEnumeratedCount(CollectionInfo value, [NotNullWhen(true)] out string? expression)
     {
-        expression = null;
         if (!value.CountIsKnown)
+        {
+            expression = null;
             return false;
+        }
 
-        if (value.IsArray || value.IsMemory || value.IsSpan)
+        if (value.IsArray)
         {
             expression = LengthPropertyName;
             return true;

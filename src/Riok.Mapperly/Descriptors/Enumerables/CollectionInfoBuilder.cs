@@ -82,10 +82,11 @@ public static class CollectionInfoBuilder
 
         var collectionTypeInfo = GetCollectionTypeInfo(wellKnownTypes, type);
         return new CollectionInfo(
+            type,
             collectionTypeInfo?.CollectionType ?? CollectionType.None,
             GetImplementedCollectionTypes(wellKnownTypes, type),
             enumeratedType,
-            IsCountKnown(wellKnownTypes, type),
+            FindCountProperty(wellKnownTypes, type),
             HasValidAddMethod(wellKnownTypes, type),
             collectionTypeInfo?.Immutable == true
         );
@@ -120,15 +121,16 @@ public static class CollectionInfoBuilder
             || t.HasImplicitGenericImplementation(types.Get(typeof(ISet<>)), nameof(ISet<object>.Add));
     }
 
-    private static bool IsCountKnown(WellKnownTypes types, ITypeSymbol t)
+    private static string? FindCountProperty(WellKnownTypes types, ITypeSymbol t)
     {
         var intType = types.Get<int>();
-        return t.GetAccessibleMappableMembers()
-            .Any(
+        var member = t.GetAccessibleMappableMembers()
+            .FirstOrDefault(
                 x =>
                     x.Name is nameof(ICollection<object>.Count) or nameof(Array.Length)
                     && SymbolEqualityComparer.IncludeNullability.Equals(intType, x.Type)
             );
+        return member?.Name;
     }
 
     private static CollectionTypeInfo? GetCollectionTypeInfo(WellKnownTypes types, ITypeSymbol type)
