@@ -1,5 +1,5 @@
 const { exec } = require('child_process');
-const { readFile, writeFile, copyFile, mkdir, rmdir, readdir, rm } =
+const { readFile, writeFile, copyFile, mkdir, readdir, rm } =
   require('fs').promises;
 const { join } = require('path');
 const util = require('util');
@@ -8,30 +8,21 @@ const execPromise = util.promisify(exec);
 
 const generatedDataDir = './src/data/generated';
 
-async function clearGeneratedFiles(): Promise<void> {
+async function emptyDirectory(dir: string): Promise<void> {
   try {
-    await rm(generatedDataDir, { recursive: true });
+    await rm(dir, { recursive: true });
   } catch {}
 
-  await mkdir(generatedDataDir, { recursive: true });
-}
-
-async function deleteFilesWithExtension(dir, extension): Promise<void> {
-  const fileNames = await readdir(dir);
-  for (const fileName of fileNames) {
-    if (fileName.endsWith(extension)) {
-      await rm(join(dir, fileName));
-    }
-  }
+  await mkdir(dir, { recursive: true });
 }
 
 async function buildApiDocs(): Promise<void> {
-  const targetDir = './docs/99-api';
+  const targetDir = './docs/api';
   const dll =
     '../src/Riok.Mapperly.Abstractions/bin/Debug/netstandard2.0/Riok.Mapperly.Abstractions.dll';
 
   // clean target directory
-  await deleteFilesWithExtension(targetDir, '.md');
+  await emptyDirectory(targetDir);
 
   // use xmldoc2md to convert the dotnet xml documentation to markdown
   await execPromise('dotnet tool restore');
@@ -107,9 +98,6 @@ async function buildSamples(): Promise<void> {
     'obj/Debug/net7.0/generated/Riok.Mapperly/Riok.Mapperly.MapperGenerator/CarMapper.g.cs',
   );
 
-  // clean target directory
-  await deleteFilesWithExtension(targetDir, '.cs');
-
   // Copy generated mapper to target dir
   await copyFile(generatedMapperFile, join(targetDir, 'CarMapper.g.cs'));
 
@@ -120,7 +108,7 @@ async function buildSamples(): Promise<void> {
 }
 
 (async () => {
-  await clearGeneratedFiles();
+  await emptyDirectory(generatedDataDir);
   await buildApiDocs();
   await buildAnalyzerRulesData();
   await buildSamples();

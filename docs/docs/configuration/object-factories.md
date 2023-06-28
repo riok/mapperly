@@ -1,7 +1,12 @@
+---
+sidebar_position: 7
+description: Construct and resolve objects using object factories
+---
+
 # Object Factories
 
 By default the generated code will instantiate objects using the default parameterless constructor if available.
-If no parameterless constructor is available, Mapperly will try to map to the constructor arguments (see [constructor mappings](./07-ctor-mappings.md)).
+If no parameterless constructor is available, Mapperly will try to map to the constructor arguments (see [constructor mappings](./ctor-mappings.md)).
 
 Alternatively custom object factories can be used to construct or resolve target objects.
 To make use of object factories create an object factory method inside the mapper class

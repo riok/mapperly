@@ -1,3 +1,8 @@
+---
+sidebar_position: 1
+description: The architecture of Mapperly.
+---
+
 # Architecture
 
 Mapperly is an incremental .NET source generator implementation.
@@ -43,4 +48,4 @@ while still supporting older compiler versions.
 
 See `build/package.sh` for details.
 
-To introduce support for a new roslyn version see [common tasks](05-common-tasks.md#add-support-for-a-new-roslyn-version).
+To introduce support for a new roslyn version see [common tasks](./common-tasks.md#add-support-for-a-new-roslyn-version).
