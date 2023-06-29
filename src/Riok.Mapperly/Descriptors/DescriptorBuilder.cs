@@ -13,6 +13,7 @@ public class DescriptorBuilder
 {
     private readonly MapperDescriptor _mapperDescriptor;
 
+    private readonly WellKnownTypes _wellKnownTypes;
     private readonly MappingCollection _mappings = new();
     private readonly MethodNameBuilder _methodNameBuilder = new();
     private readonly MappingBodyBuilder _mappingBodyBuilder;
@@ -28,6 +29,7 @@ public class DescriptorBuilder
         WellKnownTypes wellKnownTypes
     )
     {
+        _wellKnownTypes = wellKnownTypes;
         _mapperDescriptor = new MapperDescriptor(mapperSyntax, mapperSymbol, _methodNameBuilder);
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
         _builderContext = new SimpleMappingBuilderContext(
@@ -77,7 +79,7 @@ public class DescriptorBuilder
 
     private void ReserveMethodNames()
     {
-        foreach (var methodSymbol in _mapperDescriptor.Symbol.GetAllMembers())
+        foreach (var methodSymbol in _mapperDescriptor.Symbol.GetAllMembers(_wellKnownTypes))
         {
             _methodNameBuilder.Reserve(methodSymbol.Name);
         }

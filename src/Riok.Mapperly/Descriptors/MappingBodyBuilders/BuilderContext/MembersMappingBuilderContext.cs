@@ -68,12 +68,14 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
     private HashSet<string> GetSourceMemberNames()
     {
-        return Mapping.SourceType.GetAccessibleMappableMembers().Select(x => x.Name).ToHashSet();
+        return Mapping.SourceType.GetAccessibleMappableMembers(BuilderContext.Types).Select(x => x.Name).ToHashSet();
     }
 
     private Dictionary<string, IMappableMember> GetTargetMembers()
     {
-        return Mapping.TargetType.GetAccessibleMappableMembers().ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+        return Mapping.TargetType
+            .GetAccessibleMappableMembers(BuilderContext.Types)
+            .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
     }
 
     private Dictionary<string, List<PropertyMappingConfiguration>> GetMemberConfigurations()

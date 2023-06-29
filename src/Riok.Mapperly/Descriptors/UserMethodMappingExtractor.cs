@@ -29,7 +29,7 @@ public static class UserMethodMappingExtractor
             yield break;
 
         // extract user implemented mappings from base methods
-        foreach (var method in ExtractBaseMethods(ctx.Compilation.ObjectType, mapperSymbol))
+        foreach (var method in ExtractBaseMethods(ctx.Compilation.ObjectType, mapperSymbol, ctx.Types))
         {
             // Partial method declarations are allowed for base classes,
             // but still treated as user implemented methods,
@@ -43,10 +43,14 @@ public static class UserMethodMappingExtractor
 
     private static IEnumerable<IMethodSymbol> ExtractMethods(ITypeSymbol mapperSymbol) => mapperSymbol.GetMembers().OfType<IMethodSymbol>();
 
-    private static IEnumerable<IMethodSymbol> ExtractBaseMethods(INamedTypeSymbol objectType, ITypeSymbol mapperSymbol)
+    private static IEnumerable<IMethodSymbol> ExtractBaseMethods(
+        INamedTypeSymbol objectType,
+        ITypeSymbol mapperSymbol,
+        WellKnownTypes types
+    )
     {
-        var baseMethods = mapperSymbol.BaseType?.GetAllMethods() ?? Enumerable.Empty<ISymbol>();
-        var intfMethods = mapperSymbol.AllInterfaces.SelectMany(x => x.GetAllMethods());
+        var baseMethods = mapperSymbol.BaseType?.GetAllMethods(types) ?? Enumerable.Empty<ISymbol>();
+        var intfMethods = mapperSymbol.AllInterfaces.SelectMany(x => x.GetAllMethods(types));
         return baseMethods
             .Concat(intfMethods)
             .OfType<IMethodSymbol>()
@@ -294,7 +298,9 @@ public static class UserMethodMappingExtractor
 
     private static MethodParameter? BuildReferenceHandlerParameter(SimpleMappingBuilderContext ctx, IMethodSymbol method)
     {
-        var refHandlerParameterSymbol = method.Parameters.FirstOrDefault(p => p.HasAttribute(ctx.Types.Get<ReferenceHandlerAttribute>()));
+        var refHandlerParameterSymbol = method.Parameters.FirstOrDefault(
+            p => p.HasAttribute(ctx.Types.Get<ReferenceHandlerAttribute>(), ctx.Types)
+        );
         if (refHandlerParameterSymbol == null)
             return null;
 

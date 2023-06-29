@@ -39,7 +39,7 @@ public static class DictionaryMappingBuilder
         )
         {
             var sourceHasCount = ctx.Source
-                .GetAllProperties(CountPropertyName)
+                .GetAllProperties(CountPropertyName, ctx.Types)
                 .Any(x => !x.IsStatic && !x.IsIndexer && !x.IsWriteOnly && x.Type.SpecialType == SpecialType.System_Int32);
 
             var targetDictionarySymbol = ctx.Types.Get(typeof(Dictionary<,>)).Construct(keyMapping.TargetType, valueMapping.TargetType);

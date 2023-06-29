@@ -17,7 +17,7 @@ public static class EnsureCapacityBuilder
     public static EnsureCapacity? TryBuildEnsureCapacity(MappingBuilderContext ctx)
     {
         var capacityMethod = ctx.Target
-            .GetAllMethods(EnsureCapacityName)
+            .GetAllMethods(EnsureCapacityName, ctx.Types)
             .FirstOrDefault(x => x.Parameters.Length == 1 && x.Parameters[0].Type.SpecialType == SpecialType.System_Int32 && !x.IsStatic);
 
         // if EnsureCapacity is not available then return null

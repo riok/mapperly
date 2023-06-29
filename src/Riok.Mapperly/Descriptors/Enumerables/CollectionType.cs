@@ -40,4 +40,5 @@ public enum CollectionType
     IImmutableStack = 1 << 25,
     ImmutableDictionary = 1 << 26,
     IImmutableDictionary = 1 << 27,
+    ImmutableSortedDictionary = 1 << 28,
 }

@@ -99,7 +99,7 @@ public static class EnumMappingBuilder
         var checkDefinedMode = checkTargetDefined switch
         {
             false => EnumCastMapping.CheckDefinedMode.NoCheck,
-            _ when ctx.Target.HasAttribute(ctx.Types.Get<FlagsAttribute>()) => EnumCastMapping.CheckDefinedMode.Flags,
+            _ when ctx.Target.HasAttribute(ctx.Types.Get<FlagsAttribute>(), ctx.Types) => EnumCastMapping.CheckDefinedMode.Flags,
             _ => EnumCastMapping.CheckDefinedMode.Value,
         };
 

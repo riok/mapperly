@@ -45,7 +45,7 @@ public class MapperGenerator : IIncrementalGenerator
             if (mapperModel.GetDeclaredSymbol(mapperSyntax) is not INamedTypeSymbol mapperSymbol)
                 continue;
 
-            if (!mapperSymbol.HasAttribute(mapperAttributeSymbol))
+            if (!mapperSymbol.HasAttribute(mapperAttributeSymbol, wellKnownTypes))
                 continue;
 
             var builder = new DescriptorBuilder(ctx, compilation, mapperSyntax, mapperSymbol, wellKnownTypes);

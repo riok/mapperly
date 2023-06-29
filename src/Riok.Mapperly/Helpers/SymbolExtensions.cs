@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Helpers;
@@ -14,8 +15,8 @@ internal static class SymbolExtensions
         typeof(Version).FullName
     );
 
-    internal static bool HasAttribute(this ISymbol symbol, INamedTypeSymbol attributeSymbol) =>
-        symbol.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, attributeSymbol));
+    internal static bool HasAttribute(this ISymbol symbol, INamedTypeSymbol attributeSymbol, WellKnownTypes knownTypes) =>
+        knownTypes.GetAttributes(symbol).Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, attributeSymbol));
 
     internal static bool IsImmutable(this ISymbol symbol) =>
         symbol is INamedTypeSymbol namedSymbol
@@ -56,46 +57,35 @@ internal static class SymbolExtensions
         return enumType != null;
     }
 
-    internal static IEnumerable<IMethodSymbol> GetAllMethods(this ITypeSymbol symbol) => symbol.GetAllMembers().OfType<IMethodSymbol>();
+    internal static IEnumerable<IMethodSymbol> GetAllMethods(this ITypeSymbol symbol, WellKnownTypes types) =>
+        symbol.GetAllMembers(types).OfType<IMethodSymbol>();
 
-    internal static IEnumerable<IMethodSymbol> GetAllMethods(this ITypeSymbol symbol, string name) =>
-        symbol.GetAllMembers(name).OfType<IMethodSymbol>();
+    internal static IEnumerable<IMethodSymbol> GetAllMethods(this ITypeSymbol symbol, string name, WellKnownTypes types) =>
+        symbol.GetAllMembers(name, types).OfType<IMethodSymbol>();
 
-    internal static IEnumerable<IPropertySymbol> GetAllProperties(this ITypeSymbol symbol, string name) =>
-        symbol.GetAllMembers(name).OfType<IPropertySymbol>();
+    internal static IEnumerable<IPropertySymbol> GetAllProperties(this ITypeSymbol symbol, string name, WellKnownTypes types) =>
+        symbol.GetAllMembers(name, types).OfType<IPropertySymbol>();
 
     internal static IEnumerable<IFieldSymbol> GetFields(this ITypeSymbol symbol) => symbol.GetMembers().OfType<IFieldSymbol>();
 
-    internal static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol)
+    internal static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol, WellKnownTypes types)
     {
-        var members = symbol.GetMembers();
-
-        if (symbol.TypeKind == TypeKind.Interface)
-        {
-            var interfaceProperties = symbol.AllInterfaces.SelectMany(i => i.GetAllMembers());
-            return members.Concat(interfaceProperties);
-        }
-
-        return symbol.BaseType == null ? members : members.Concat(symbol.BaseType.GetAllMembers());
+        return types.GetAllMembers(symbol);
     }
 
     internal static IEnumerable<IMappableMember> GetMappableMembers(
         this ITypeSymbol symbol,
         string name,
-        IEqualityComparer<string> comparer
+        IEqualityComparer<string> comparer,
+        WellKnownTypes types
     )
     {
-        return symbol.GetAllMembers().Where(x => !x.IsStatic && comparer.Equals(name, x.Name)).Select(MappableMember.Create).WhereNotNull();
+        return symbol.GetAccessibleMappableMembers(types).Where(x => comparer.Equals(name, x.Name));
     }
 
-    internal static IEnumerable<IMappableMember> GetAccessibleMappableMembers(this ITypeSymbol symbol)
+    internal static IEnumerable<IMappableMember> GetAccessibleMappableMembers(this ITypeSymbol symbol, WellKnownTypes types)
     {
-        return symbol
-            .GetAllMembers()
-            .Where(x => !x.IsStatic && x.IsAccessible())
-            .DistinctBy(x => x.Name)
-            .Select(MappableMember.Create)
-            .WhereNotNull();
+        return types.GetAllAccessibleMappableMembers(symbol);
     }
 
     internal static IMethodSymbol? GetStaticGenericMethod(this INamedTypeSymbol namedType, string methodName)
@@ -210,6 +200,6 @@ internal static class SymbolExtensions
         return true;
     }
 
-    private static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol, string name) =>
-        symbol.GetAllMembers().Where(x => name.Equals(x.Name));
+    private static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol, string name, WellKnownTypes types) =>
+        symbol.GetAllMembers(types).Where(x => name.Equals(x.Name));
 }

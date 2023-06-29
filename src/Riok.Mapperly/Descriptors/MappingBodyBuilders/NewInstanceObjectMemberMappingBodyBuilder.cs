@@ -52,6 +52,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                     ctx.Mapping.SourceType,
                     MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
                     ctx.IgnoredSourceMemberNames,
+                    ctx.BuilderContext.Types,
                     out var sourceMemberPath
                 )
             )
@@ -97,7 +98,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             return;
         }
 
-        if (!MemberPath.TryFind(ctx.Mapping.SourceType, memberConfig.Source.Path, out var sourceMemberPath))
+        if (!MemberPath.TryFind(ctx.Mapping.SourceType, memberConfig.Source.Path, ctx.BuilderContext.Types, out var sourceMemberPath))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.SourceMemberNotFound,
@@ -182,15 +183,15 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         // ctors annotated with [Obsolete] are considered last unless they have a MapperConstructor attribute set
         var ctorCandidates = namedTargetType.InstanceConstructors
             .Where(ctor => ctor.IsAccessible())
-            .OrderByDescending(x => x.HasAttribute(ctx.BuilderContext.Types.Get<MapperConstructorAttribute>()))
-            .ThenBy(x => x.HasAttribute(ctx.BuilderContext.Types.Get<ObsoleteAttribute>()))
+            .OrderByDescending(x => x.HasAttribute(ctx.BuilderContext.Types.Get<MapperConstructorAttribute>(), ctx.BuilderContext.Types))
+            .ThenBy(x => x.HasAttribute(ctx.BuilderContext.Types.Get<ObsoleteAttribute>(), ctx.BuilderContext.Types))
             .ThenByDescending(x => x.Parameters.Length == 0)
             .ThenByDescending(x => x.Parameters.Length);
         foreach (var ctorCandidate in ctorCandidates)
         {
             if (!TryBuildConstructorMapping(ctx, ctorCandidate, out var mappedTargetMemberNames, out var constructorParameterMappings))
             {
-                if (ctorCandidate.HasAttribute(ctx.BuilderContext.Types.Get<MapperConstructorAttribute>()))
+                if (ctorCandidate.HasAttribute(ctx.BuilderContext.Types.Get<MapperConstructorAttribute>(), ctx.BuilderContext.Types))
                 {
                     ctx.BuilderContext.ReportDiagnostic(
                         DiagnosticDescriptors.CannotMapToConfiguredConstructor,
@@ -293,6 +294,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 MemberPathCandidateBuilder.BuildMemberPathCandidates(parameter.Name),
                 ctx.IgnoredSourceMemberNames,
                 StringComparer.OrdinalIgnoreCase,
+                ctx.BuilderContext.Types,
                 out sourcePath
             );
         }
@@ -317,7 +319,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             return false;
         }
 
-        if (!MemberPath.TryFind(ctx.Mapping.SourceType, memberConfig.Source.Path, out sourcePath))
+        if (!MemberPath.TryFind(ctx.Mapping.SourceType, memberConfig.Source.Path, ctx.BuilderContext.Types, out sourcePath))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.SourceMemberNotFound,
