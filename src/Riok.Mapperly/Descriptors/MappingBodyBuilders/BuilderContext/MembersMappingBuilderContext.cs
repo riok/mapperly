@@ -78,9 +78,28 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
     private Dictionary<string, List<PropertyMappingConfiguration>> GetMemberConfigurations()
     {
-        return BuilderContext.Configuration.Properties.ExplicitMappings
-            .GroupBy(x => x.Target.Path.First())
-            .ToDictionary(x => x.Key, x => x.ToList());
+        var simpleMappings = BuilderContext.Configuration.Properties.ExplicitMappings
+            .Where(x => x.Target.FullName != ".")
+            .GroupBy(x => x.Target.Path.First());
+
+        var wildcardMappings = BuilderContext.Configuration.Properties.ExplicitMappings
+            .Where(x => x.Target.FullName == ".")
+            .SelectMany(x =>
+            {
+                return Mapping.SourceType
+                    .GetAccessibleMappableMembers()
+                    .Where(i => i.Name == x.Source.Path.Last())
+                    .SelectMany(i => i.Type.GetAccessibleMappableMembers())
+                    .Select(i =>
+                    {
+                        var list = x.Source.Path.ToList();
+                        list.Add(i.Name);
+                        return new PropertyMappingConfiguration(new StringMemberPath(list), new StringMemberPath(new[] { i.Name }));
+                    });
+            })
+            .GroupBy(x => x.Target.Path.Last());
+
+        return simpleMappings.Union(wildcardMappings).ToDictionary(x => x.Key, x => x.ToList());
     }
 
     private void AddUnmatchedIgnoredTargetMembersDiagnostics()
