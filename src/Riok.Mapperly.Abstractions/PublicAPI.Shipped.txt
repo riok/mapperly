@@ -89,3 +89,9 @@ Riok.Mapperly.Abstractions.MapDerivedTypeAttribute.TargetType.get -> System.Type
 Riok.Mapperly.Abstractions.EnumMappingStrategy.ByValueCheckDefined = 2 -> Riok.Mapperly.Abstractions.EnumMappingStrategy
 Riok.Mapperly.Abstractions.MapEnumAttribute.FallbackValue.get -> object?
 Riok.Mapperly.Abstractions.MapEnumAttribute.FallbackValue.set -> void
+Riok.Mapperly.Abstractions.MapperIgnoreSourceValueAttribute
+Riok.Mapperly.Abstractions.MapperIgnoreSourceValueAttribute.MapperIgnoreSourceValueAttribute(object! source) -> void
+Riok.Mapperly.Abstractions.MapperIgnoreTargetValueAttribute
+Riok.Mapperly.Abstractions.MapperIgnoreTargetValueAttribute.MapperIgnoreTargetValueAttribute(object! target) -> void
+Riok.Mapperly.Abstractions.MapperIgnoreSourceValueAttribute.SourceValue.get -> System.Enum?
+Riok.Mapperly.Abstractions.MapperIgnoreTargetValueAttribute.TargetValue.get -> System.Enum?

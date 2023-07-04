@@ -29,7 +29,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Source = source;
         Target = target;
         UserSymbol = userSymbol;
-        Configuration = ReadConfiguration(UserSymbol);
+        Configuration = ReadConfiguration(new MappingConfigurationReference(UserSymbol, source, target));
     }
 
     protected MappingBuilderContext(

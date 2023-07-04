@@ -12,13 +12,13 @@ namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 /// </summary>
 public class EnumNameMapping : MethodMapping
 {
-    private readonly IReadOnlyDictionary<string, string> _enumMemberMappings;
+    private readonly IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> _enumMemberMappings;
     private readonly EnumFallbackValueMapping _fallback;
 
     public EnumNameMapping(
         ITypeSymbol source,
         ITypeSymbol target,
-        IReadOnlyDictionary<string, string> enumMemberMappings,
+        IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> enumMemberMappings,
         EnumFallbackValueMapping fallback
     )
         : base(source, target)
@@ -31,16 +31,16 @@ public class EnumNameMapping : MethodMapping
     {
         // switch for each name to the enum value
         // eg: Enum1.Value1 => Enum2.Value1,
-        var arms = _enumMemberMappings.Select(BuildArm).Append(_fallback.BuildDiscardArm(ctx));
+        var arms = _enumMemberMappings.Select(x => BuildArm(x.Key, x.Value)).Append(_fallback.BuildDiscardArm(ctx));
 
         var switchExpr = SwitchExpression(ctx.Source).WithArms(CommaSeparatedList(arms, true));
         yield return ReturnStatement(switchExpr);
     }
 
-    private SwitchExpressionArmSyntax BuildArm(KeyValuePair<string, string> sourceTargetField)
+    private SwitchExpressionArmSyntax BuildArm(IFieldSymbol sourceMemberField, IFieldSymbol targetMemberField)
     {
-        var sourceMember = MemberAccess(FullyQualifiedIdentifier(SourceType), sourceTargetField.Key);
-        var targetMember = MemberAccess(FullyQualifiedIdentifier(TargetType), sourceTargetField.Value);
+        var sourceMember = MemberAccess(FullyQualifiedIdentifier(SourceType), sourceMemberField.Name);
+        var targetMember = MemberAccess(FullyQualifiedIdentifier(TargetType), targetMemberField.Name);
         var pattern = ConstantPattern(sourceMember);
         return SwitchExpressionArm(pattern, targetMember);
     }

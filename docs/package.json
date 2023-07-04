@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "prebuild": "ts-node prebuild.ts",
+    "prestart": "ts-node prebuild.ts",
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
     "build": "docusaurus build",

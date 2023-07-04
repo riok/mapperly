@@ -515,6 +515,16 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             };
         }
 
+        public static partial global::Riok.Mapperly.IntegrationTests.Models.TestEnum MapToEnumByNameWithIgnored(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue v)
+        {
+            return v switch
+            {
+                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value10 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10,
+                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value20 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20,
+                _ => throw new System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnumDtoAdditionalValue is not supported"),
+            };
+        }
+
         public static partial global::Riok.Mapperly.IntegrationTests.Models.TestEnum MapToEnumByValueCheckDefined(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue v)
         {
             return (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)v is global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10 or global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20 or global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30 ? (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)v : throw new System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnumDtoByValue is not supported");

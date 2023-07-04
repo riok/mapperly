@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Configuration;
 
@@ -18,6 +19,8 @@ public class MapperConfiguration
                 Mapper.EnumMappingStrategy,
                 Mapper.EnumMappingIgnoreCase,
                 null,
+                Array.Empty<IFieldSymbol>(),
+                Array.Empty<IFieldSymbol>(),
                 Array.Empty<EnumValueMappingConfiguration>()
             ),
             new PropertiesMappingConfiguration(Array.Empty<string>(), Array.Empty<string>(), Array.Empty<PropertyMappingConfiguration>()),
@@ -27,14 +30,14 @@ public class MapperConfiguration
 
     public MapperAttribute Mapper { get; }
 
-    public MappingConfiguration ForMethod(IMethodSymbol? method)
+    public MappingConfiguration BuildFor(MappingConfigurationReference reference)
     {
-        if (method == null)
+        if (reference.Method == null)
             return _defaultConfiguration;
 
-        var enumConfig = BuildEnumConfig(method);
-        var propertiesConfig = BuildPropertiesConfig(method);
-        var derivedTypesConfig = BuildDerivedTypeConfigs(method);
+        var enumConfig = BuildEnumConfig(reference);
+        var propertiesConfig = BuildPropertiesConfig(reference.Method);
+        var derivedTypesConfig = BuildDerivedTypeConfigs(reference.Method);
         return new MappingConfiguration(enumConfig, propertiesConfig, derivedTypesConfig);
     }
 
@@ -48,7 +51,11 @@ public class MapperConfiguration
 
     private PropertiesMappingConfiguration BuildPropertiesConfig(IMethodSymbol method)
     {
-        var ignoredSourceProperties = _dataAccessor.Access<MapperIgnoreSourceAttribute>(method).Select(x => x.Source).ToList();
+        var ignoredSourceProperties = _dataAccessor
+            .Access<MapperIgnoreSourceAttribute>(method)
+            .Select(x => x.Source)
+            .WhereNotNull()
+            .ToList();
         var ignoredTargetProperties = _dataAccessor
             .Access<MapperIgnoreTargetAttribute>(method)
             .Select(x => x.Target)
@@ -56,19 +63,33 @@ public class MapperConfiguration
 #pragma warning disable CS0618
             .Concat(_dataAccessor.Access<MapperIgnoreAttribute>(method).Select(x => x.Target))
 #pragma warning restore CS0618
+            .WhereNotNull()
             .ToList();
         var explicitMappings = _dataAccessor.Access<MapPropertyAttribute, PropertyMappingConfiguration>(method).ToList();
         return new PropertiesMappingConfiguration(ignoredSourceProperties, ignoredTargetProperties, explicitMappings);
     }
 
-    private EnumMappingConfiguration BuildEnumConfig(IMethodSymbol method)
+    private EnumMappingConfiguration BuildEnumConfig(MappingConfigurationReference configRef)
     {
-        var configData = _dataAccessor.AccessFirstOrDefault<MapEnumAttribute, EnumConfiguration>(method);
-        var explicitMappings = _dataAccessor.Access<MapEnumValueAttribute, EnumValueMappingConfiguration>(method).ToList();
+        if (configRef.Method == null || !configRef.Source.IsEnum() && !configRef.Target.IsEnum())
+            return _defaultConfiguration.Enum;
+
+        var configData = _dataAccessor.AccessFirstOrDefault<MapEnumAttribute, EnumConfiguration>(configRef.Method);
+        var explicitMappings = _dataAccessor.Access<MapEnumValueAttribute, EnumValueMappingConfiguration>(configRef.Method).ToList();
+        var ignoredSources = _dataAccessor
+            .Access<MapperIgnoreSourceValueAttribute, MapperIgnoreEnumValueConfiguration>(configRef.Method)
+            .Select(x => x.Value)
+            .ToList();
+        var ignoredTargets = _dataAccessor
+            .Access<MapperIgnoreTargetValueAttribute, MapperIgnoreEnumValueConfiguration>(configRef.Method)
+            .Select(x => x.Value)
+            .ToList();
         return new EnumMappingConfiguration(
             configData?.Strategy ?? _defaultConfiguration.Enum.Strategy,
             configData?.IgnoreCase ?? _defaultConfiguration.Enum.IgnoreCase,
             configData?.FallbackValue,
+            ignoredSources,
+            ignoredTargets,
             explicitMappings
         );
     }

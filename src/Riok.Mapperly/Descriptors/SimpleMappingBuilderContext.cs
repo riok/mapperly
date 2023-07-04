@@ -68,5 +68,5 @@ public class SimpleMappingBuilderContext
         _diagnostics.Add(Diagnostic.Create(descriptor, nodeLocation ?? _descriptor.Syntax.GetLocation(), messageArgs));
     }
 
-    protected MappingConfiguration ReadConfiguration(IMethodSymbol? userSymbol) => _configuration.ForMethod(userSymbol);
+    protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef) => _configuration.BuildFor(configRef);
 }
