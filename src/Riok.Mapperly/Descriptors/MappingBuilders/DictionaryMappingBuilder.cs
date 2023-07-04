@@ -32,7 +32,7 @@ public static class DictionaryMappingBuilder
         // target is of type IDictionary<,>, IReadOnlyDictionary<,> or Dictionary<,>.
         // The constructed type should be Dictionary<,>
         if (
-            ctx.CollectionInfos?.Target.Type
+            ctx.CollectionInfos?.Target.CollectionType
             is CollectionType.Dictionary
                 or CollectionType.IDictionary
                 or CollectionType.IReadOnlyDictionary
@@ -40,7 +40,7 @@ public static class DictionaryMappingBuilder
         {
             var sourceHasCount = ctx.Source
                 .GetAllProperties(CountPropertyName)
-                .Any(x => !x.IsStatic && !x.IsIndexer && !x.IsWriteOnly && x.Type.SpecialType == SpecialType.System_Int32);
+                .Any(x => !x.IsStatic && x is { IsIndexer: false, IsWriteOnly: false, Type.SpecialType: SpecialType.System_Int32 });
 
             var targetDictionarySymbol = ctx.Types.Get(typeof(Dictionary<,>)).Construct(keyMapping.TargetType, valueMapping.TargetType);
             ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var dictionaryObjectFactory);
@@ -123,7 +123,7 @@ public static class DictionaryMappingBuilder
 
     private static (ITypeMapping, ITypeMapping)? BuildKeyValueMapping(MappingBuilderContext ctx)
     {
-        if (ctx.CollectionInfos!.Target.GetDictionaryKeyValueTypes(ctx, ctx.Target) is not var (targetKeyType, targetValueType))
+        if (ctx.CollectionInfos!.Target.GetDictionaryKeyValueTypes(ctx) is not var (targetKeyType, targetValueType))
             return null;
 
         if (ctx.CollectionInfos.Source.GetEnumeratedKeyValueTypes(ctx.Types) is not var (sourceKeyType, sourceValueType))
