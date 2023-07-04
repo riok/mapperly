@@ -26,6 +26,9 @@
     StringValue: ,
     RenamedStringValue: ,
     Flattening: {},
+    MemoryValue: {
+      IsEmpty: true
+    },
     ImmutableArrayValue: null,
     ImmutableQueueValue: [],
     ImmutableStackValue: [],
@@ -41,6 +44,9 @@
     StringValue: ,
     RenamedStringValue: ,
     Flattening: {},
+    MemoryValue: {
+      IsEmpty: true
+    },
     ImmutableArrayValue: null,
     ImmutableQueueValue: [],
     ImmutableStackValue: [],
@@ -54,6 +60,10 @@
       IntValue: 20
     }
   ],
+  MemoryValue: {
+    Length: 3,
+    IsEmpty: false
+  },
   StackValue: [
     1,
     2,

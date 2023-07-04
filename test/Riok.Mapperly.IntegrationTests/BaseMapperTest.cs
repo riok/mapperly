@@ -85,6 +85,7 @@ namespace Riok.Mapperly.IntegrationTests
                     new TestObjectNested { IntValue = 20 },
                 },
                 SourceTargetSameObjectType = new TestObject(8) { IntValue = 99, RequiredValue = 98, },
+                MemoryValue = new[] { "1", "2", "3" },
                 StackValue = new Stack<string>(new[] { "1", "2", "3" }),
                 QueueValue = new Queue<string>(new[] { "1", "2", "3" }),
                 ImmutableArrayValue = ImmutableArray.Create("1", "2", "3"),

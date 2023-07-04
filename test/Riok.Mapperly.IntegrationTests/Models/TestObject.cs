@@ -50,6 +50,10 @@ namespace Riok.Mapperly.IntegrationTests.Models
 
         public IReadOnlyCollection<TestObjectNested>? NullableReadOnlyObjectCollection { get; set; }
 
+        public Span<string> SpanValue => new[] { "1", "2", "3" };
+
+        public Memory<string> MemoryValue { get; set; }
+
         public Stack<string> StackValue { get; set; } = new();
 
         public Queue<string> QueueValue { get; set; } = new();

@@ -11,6 +11,8 @@ public class ExistingTargetMappingBuilder
     {
         NullableMappingBuilder.TryBuildExistingTargetMapping,
         DictionaryMappingBuilder.TryBuildExistingTargetMapping,
+        SpanMappingBuilder.TryBuildExistingTargetMapping,
+        MemoryMappingBuilder.TryBuildExistingTargetMapping,
         EnumerableMappingBuilder.TryBuildExistingTargetMapping,
         NewInstanceObjectPropertyMappingBuilder.TryBuildExistingTargetMapping,
     };

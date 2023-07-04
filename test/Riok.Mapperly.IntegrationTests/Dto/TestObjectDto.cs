@@ -53,6 +53,10 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         public TestObjectNestedDto[]? NullableReadOnlyObjectCollection { get; set; }
 
+        public int[]? SpanValue { get; set; }
+
+        public Memory<int> MemoryValue { get; set; }
+
         public Stack<int> StackValue { get; set; } = new();
 
         public Queue<int> QueueValue { get; set; } = new();

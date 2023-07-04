@@ -33,6 +33,9 @@ public static class EnumerableMappingBuilder
         if (ctx.CollectionInfos == null)
             return null;
 
+        if (!ctx.CollectionInfos.Source.ImplementsIEnumerable || !ctx.CollectionInfos.Target.ImplementsIEnumerable)
+            return null;
+
         var elementMapping = ctx.FindOrBuildMapping(ctx.CollectionInfos.Source.EnumeratedType, ctx.CollectionInfos.Target.EnumeratedType);
         if (elementMapping == null)
             return null;
@@ -80,6 +83,9 @@ public static class EnumerableMappingBuilder
             return null;
 
         if (ctx.CollectionInfos == null)
+            return null;
+
+        if (!ctx.CollectionInfos.Source.ImplementsIEnumerable || !ctx.CollectionInfos.Target.ImplementsIEnumerable)
             return null;
 
         var elementMapping = ctx.FindOrBuildMapping(ctx.CollectionInfos.Source.EnumeratedType, ctx.CollectionInfos.Target.EnumeratedType);
