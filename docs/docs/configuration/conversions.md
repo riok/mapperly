@@ -1,3 +1,8 @@
+---
+sidebar_position: 13
+description: A list of conversions supported by Mapperly
+---
+
 # Conversions
 
 Mapperly implements several types of automatic conversions (in order of priority):
@@ -11,7 +16,7 @@ Mapperly implements several types of automatic conversions (in order of priority
 | Span                 | Maps a `Span<>`, `ReadOnlySpan<>` to or from `Span<>`, `ReadOnlySpan<>` or enumerable                                     | Source or target type is a `Span<>`, `ReadOnlySpan<>`                                                           |
 | Memory               | Maps a `Memory<>`, `ReadOnlyMemory<>` to or from `Memory<>`, `ReadOnlyMemory<>`, `Span<>`, `ReadOnlySpan<>` or enumerable | Source or target type is a `Memory<>` or `ReadOnlyMemory<>`                                                     |
 | Implicit cast        | Implicit cast operator                                                                                                    | An implicit cast operator is defined to cast from the source type to the target type                            |
-| Parse method         | Uses a static `Parse` method on the source type                                                                           | Source type is a `string` and target has a static method with the following signature: `TTarget Parse(string)`. |
+| Parse method         | Uses a static `Parse` method on the target type                                                                           | Source type is a `string` and target has a static method with the following signature: `TTarget Parse(string)`. |
 | Constructor          | Uses a constructor on the target type with the source as single parameter                                                 | Target type has a visible constructor with a single parameter of the source type.                               |
 | String to enum       | Maps a string to an enum member name                                                                                      | Source type is a `string` and the target type is an enum                                                        |
 | Enum to string       | Maps an enum member name to a string                                                                                      | Source type is an enum and the target type is a `string`                                                        |

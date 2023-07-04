@@ -53,6 +53,21 @@ const config = {
             docId: 'intro',
             position: 'left',
             label: 'Documentation',
+            sidebarId: 'docs',
+          },
+          {
+            type: 'doc',
+            docId: '/category/api',
+            position: 'left',
+            label: 'API',
+            sidebarId: 'api',
+          },
+          {
+            type: 'doc',
+            docId: 'contributing/index',
+            position: 'left',
+            label: 'Contributing',
+            sidebarId: 'contributing',
           },
           {
             href: 'https://github.com/riok/mapperly',

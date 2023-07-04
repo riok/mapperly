@@ -1,3 +1,8 @@
+---
+sidebar_position: 4
+description: Run custom logic before or after the generated mapping.
+---
+
 # Before / after map
 
 To run custom code before or after a mapping, the generated map method can be wrapped in a custom method:

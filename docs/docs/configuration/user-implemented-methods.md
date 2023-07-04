@@ -1,3 +1,8 @@
+---
+sidebar_position: 5
+description: Manually implement mappings
+---
+
 # User implemented mapping methods
 
 If Mapperly cannot generate a mapping, one can implement it manually simply by providing a method body in the mapper declaration:

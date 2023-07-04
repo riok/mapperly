@@ -1,3 +1,8 @@
+---
+sidebar_position: 2
+description: How Mapperly is tested and linted.
+---
+
 # Tests and linting
 
 Mapperly is continuously tested by GitHub Actions.
@@ -40,7 +45,7 @@ Debugging integration tests is a lot harder than debugging unit tests.
 Therefore if an integration test needs to be debugged,
 it is often easier to implement an unit test for the to be tested behaviour
 and debug the unit test instead of the integration test.
-See also the [debugging documentation](./03-debugging.md) topic on how to debug Mapperly.
+See also the [debugging documentation](./debugging.md) topic on how to debug Mapperly.
 
 ## VerifyTests
 

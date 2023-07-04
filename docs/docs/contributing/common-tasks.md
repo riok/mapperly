@@ -1,3 +1,8 @@
+---
+sidebar_position: 5
+description: Step by step guides for common tasks one may encounter when contributing to Mapperly.
+---
+
 # Common tasks
 
 This page provides to-do lists for some common tasks one may encounter while contributing to Mapperly.
@@ -25,7 +30,7 @@ Mapperly does not use the `PublicAPI.Unshipped.txt` file.
 
 ## Add support for a new roslyn version
 
-To support a new roslyn version via multi targeting follow these steps (see also [architecture/roslyn multi targeting](01-architecture.md#roslyn-multi-targeting)):
+To support a new roslyn version via multi targeting follow these steps (see also [architecture/roslyn multi targeting](./architecture.md#roslyn-multi-targeting)):
 
 1. Include the new version in `roslyn_versions` in `build/package.sh`.
 2. Create a new file `Riok.Mapperly.Roslyn$(Version).props` in `src/Riok.Mapperly` similar to the existing ones

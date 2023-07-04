@@ -1,3 +1,8 @@
+---
+sidebar_position: 1
+description: Use static mappers and extension methods.
+---
+
 # Static mappers and extension methods
 
 Mapperly supports static mappers and extension methods:

@@ -1,3 +1,8 @@
+---
+sidebar_position: 0
+description: A guide on how to contribute to Mapperly.
+---
+
 # Contributing
 
 We would love for you to contribute to Mapperly and help make it even better than it is today!

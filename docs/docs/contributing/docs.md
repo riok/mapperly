@@ -1,3 +1,8 @@
+---
+sidebar_position: 4
+description: How the documentation of Mapperly is built.
+---
+
 # Documentation
 
 The Mapperly documentation is built using [Docusaurus 2](https://docusaurus.io/)

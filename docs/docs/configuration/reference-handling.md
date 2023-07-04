@@ -1,3 +1,8 @@
+---
+sidebar_position: 11
+description: Use reference handling to handle reference loops
+---
+
 # Reference handling
 
 Mapperly can support mapping object structures with circular references.

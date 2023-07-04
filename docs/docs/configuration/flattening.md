@@ -1,3 +1,8 @@
+---
+sidebar_position: 2
+description: Flatten properties and fields
+---
+
 # Flattening and unflattening
 
 It is pretty common to flatten objects during mapping, eg. `Car.Make.Id => CarDto.MakeId`.

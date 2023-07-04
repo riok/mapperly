@@ -1,3 +1,8 @@
+---
+sidebar_position: 10
+description: Create a generic mapping method
+---
+
 # Generic mappings
 
 Mapperly supports generic user defined mapping methods.
@@ -54,7 +59,7 @@ class AppleDto {}
 If the source or target type of a runtime target type mapping is not `object` or the generic type has constraints,
 only user mappings of which the source/target type is assignable to the source/target type of the mapping method are considered.
 
-Generic mappings and runtime target type parameter mappings support [derived type mappings](./10-derived-type-mapping.md).
+Generic mappings and runtime target type parameter mappings support [derived type mappings](./derived-type-mapping.md).
 The `MapDerivedTypeAttribute` can be directly applied to a mapping method.
 
 :::info

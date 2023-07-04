@@ -1,3 +1,8 @@
+---
+sidebar_position: 8
+description: Map to an existing target object
+---
+
 # Existing target object
 
 If an existing object instance should be used as target, you can define the mapping method as void with the target as second parameter:

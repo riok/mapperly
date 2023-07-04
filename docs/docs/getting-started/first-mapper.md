@@ -1,3 +1,8 @@
+---
+sidebar_position: 1
+description: Create your first mapper with Mapperly.
+---
+
 # Create your first mapper
 
 Create a mapper declaration as a partial class

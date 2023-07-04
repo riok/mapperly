@@ -1,3 +1,8 @@
+---
+sidebar_position: 9
+description: Map derived types and interfaces
+---
+
 # Derived types and interfaces
 
 import Tabs from '@theme/Tabs';
