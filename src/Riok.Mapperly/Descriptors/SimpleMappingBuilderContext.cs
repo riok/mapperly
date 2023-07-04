@@ -18,6 +18,7 @@ public class SimpleMappingBuilderContext
         Compilation compilation,
         MapperConfiguration configuration,
         WellKnownTypes types,
+        SymbolAccessor symbolAccessor,
         MapperDescriptor descriptor,
         SourceProductionContext context,
         MappingBuilder mappingBuilder,
@@ -26,6 +27,7 @@ public class SimpleMappingBuilderContext
     {
         Compilation = compilation;
         Types = types;
+        SymbolAccessor = symbolAccessor;
         _configuration = configuration;
         _descriptor = descriptor;
         _context = context;
@@ -38,6 +40,7 @@ public class SimpleMappingBuilderContext
             ctx.Compilation,
             ctx._configuration,
             ctx.Types,
+            ctx.SymbolAccessor,
             ctx._descriptor,
             ctx._context,
             ctx.MappingBuilder,
@@ -49,6 +52,7 @@ public class SimpleMappingBuilderContext
     public MapperAttribute MapperConfiguration => _configuration.Mapper;
 
     public WellKnownTypes Types { get; }
+    public SymbolAccessor SymbolAccessor { get; }
 
     protected MappingBuilder MappingBuilder { get; }
 

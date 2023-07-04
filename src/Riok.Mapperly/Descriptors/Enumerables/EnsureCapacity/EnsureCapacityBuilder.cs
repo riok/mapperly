@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
-using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 
@@ -19,8 +18,8 @@ public static class EnsureCapacityBuilder
         if (ctx.CollectionInfos == null)
             return null;
 
-        var capacityMethod = ctx.Target
-            .GetAllMethods(EnsureCapacityName)
+        var capacityMethod = ctx.SymbolAccessor
+            .GetAllMethods(ctx.Target, EnsureCapacityName)
             .FirstOrDefault(x => x.Parameters.Length == 1 && x.Parameters[0].Type.SpecialType == SpecialType.System_Int32 && !x.IsStatic);
 
         // if EnsureCapacity is not available then return null

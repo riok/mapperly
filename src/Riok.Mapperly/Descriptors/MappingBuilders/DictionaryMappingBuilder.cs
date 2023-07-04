@@ -38,8 +38,8 @@ public static class DictionaryMappingBuilder
                 or CollectionType.IReadOnlyDictionary
         )
         {
-            var sourceHasCount = ctx.Source
-                .GetAllProperties(CountPropertyName)
+            var sourceHasCount = ctx.SymbolAccessor
+                .GetAllProperties(ctx.Source, CountPropertyName)
                 .Any(x => !x.IsStatic && x is { IsIndexer: false, IsWriteOnly: false, Type.SpecialType: SpecialType.System_Int32 });
 
             var targetDictionarySymbol = ctx.Types.Get(typeof(Dictionary<,>)).Construct(keyMapping.TargetType, valueMapping.TargetType);

@@ -63,7 +63,12 @@ public static class CollectionInfoBuilder
         new CollectionTypeInfo(CollectionType.ReadOnlyMemory, typeof(ReadOnlyMemory<>)),
     };
 
-    public static CollectionInfos? Build(WellKnownTypes wellKnownTypes, ITypeSymbol source, ITypeSymbol target)
+    public static CollectionInfos? Build(
+        WellKnownTypes wellKnownTypes,
+        SymbolAccessor symbolAccessor,
+        ITypeSymbol source,
+        ITypeSymbol target
+    )
     {
         // check for enumerated type to quickly check that both are collection types
         var enumeratedSourceType = GetEnumeratedType(wellKnownTypes, source);
@@ -74,13 +79,18 @@ public static class CollectionInfoBuilder
         if (enumeratedTargetType == null)
             return null;
 
-        var sourceInfo = BuildCollectionInfo(wellKnownTypes, source, enumeratedSourceType);
-        var targetInfo = BuildCollectionInfo(wellKnownTypes, target, enumeratedTargetType);
+        var sourceInfo = BuildCollectionInfo(wellKnownTypes, symbolAccessor, source, enumeratedSourceType);
+        var targetInfo = BuildCollectionInfo(wellKnownTypes, symbolAccessor, target, enumeratedTargetType);
 
         return new CollectionInfos(sourceInfo, targetInfo);
     }
 
-    private static CollectionInfo BuildCollectionInfo(WellKnownTypes wellKnownTypes, ITypeSymbol type, ITypeSymbol enumeratedType)
+    private static CollectionInfo BuildCollectionInfo(
+        WellKnownTypes wellKnownTypes,
+        SymbolAccessor symbolAccessor,
+        ITypeSymbol type,
+        ITypeSymbol enumeratedType
+    )
     {
         var collectionTypeInfo = GetCollectionTypeInfo(wellKnownTypes, type);
         var typeInfo = collectionTypeInfo?.CollectionType ?? CollectionType.None;
@@ -90,7 +100,7 @@ public static class CollectionInfoBuilder
             typeInfo,
             GetImplementedCollectionTypes(wellKnownTypes, type, typeInfo),
             enumeratedType,
-            FindCountProperty(wellKnownTypes, type, typeInfo),
+            FindCountProperty(wellKnownTypes, symbolAccessor, type, typeInfo),
             HasValidAddMethod(wellKnownTypes, type, typeInfo),
             collectionTypeInfo?.Immutable == true
         );
@@ -139,7 +149,7 @@ public static class CollectionInfoBuilder
             || t.HasImplicitGenericImplementation(types.Get(typeof(ISet<>)), nameof(ISet<object>.Add));
     }
 
-    private static string? FindCountProperty(WellKnownTypes types, ITypeSymbol t, CollectionType typeInfo)
+    private static string? FindCountProperty(WellKnownTypes types, SymbolAccessor symbolAccessor, ITypeSymbol t, CollectionType typeInfo)
     {
         if (typeInfo is CollectionType.IEnumerable)
             return null;
@@ -158,7 +168,8 @@ public static class CollectionInfoBuilder
             return "Count";
 
         var intType = types.Get<int>();
-        var member = t.GetAccessibleMappableMembers()
+        var member = symbolAccessor
+            .GetAllAccessibleMappableMembers(t)
             .FirstOrDefault(
                 x =>
                     x.Name is nameof(ICollection<object>.Count) or nameof(Array.Length)

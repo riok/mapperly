@@ -9,9 +9,9 @@ public class MapperConfiguration
     private readonly MappingConfiguration _defaultConfiguration;
     private readonly AttributeDataAccessor _dataAccessor;
 
-    public MapperConfiguration(WellKnownTypes wellKnownTypes, ISymbol mapperSymbol)
+    public MapperConfiguration(SymbolAccessor symbolAccessor, ISymbol mapperSymbol)
     {
-        _dataAccessor = new AttributeDataAccessor(wellKnownTypes);
+        _dataAccessor = new AttributeDataAccessor(symbolAccessor);
         Mapper = _dataAccessor.AccessSingle<MapperAttribute>(mapperSymbol);
         _defaultConfiguration = new MappingConfiguration(
             new EnumMappingConfiguration(

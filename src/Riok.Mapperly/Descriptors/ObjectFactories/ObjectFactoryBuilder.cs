@@ -12,7 +12,7 @@ public static class ObjectFactoryBuilder
         var objectFactories = mapperSymbol
             .GetMembers()
             .OfType<IMethodSymbol>()
-            .Where(m => m.HasAttribute(ctx.Types.Get<ObjectFactoryAttribute>()))
+            .Where(m => ctx.SymbolAccessor.HasAttribute<ObjectFactoryAttribute>(m))
             .Select(x => BuildObjectFactory(ctx, x))
             .WhereNotNull()
             .ToList();

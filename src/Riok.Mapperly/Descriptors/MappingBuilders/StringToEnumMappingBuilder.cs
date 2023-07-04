@@ -37,7 +37,7 @@ public static class StringToEnumMappingBuilder
         // however we currently don't support all features of Enum.Parse yet (ex. flags)
         // therefore we use Enum.Parse as fallback.
         var fallbackMapping = BuildFallbackParseMapping(ctx, genericEnumParseMethodSupported);
-        var members = ctx.Target.GetFields();
+        var members = ctx.SymbolAccessor.GetAllFields(ctx.Target);
         if (fallbackMapping.FallbackMember != null)
         {
             // no need to explicitly map fallback value
