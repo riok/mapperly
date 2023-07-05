@@ -6,7 +6,7 @@ namespace Riok.Mapperly.Descriptors.Enumerables;
 
 public static class CollectionInfoBuilder
 {
-    private record CollectionTypeInfo(
+    private readonly record struct CollectionTypeInfo(
         CollectionType CollectionType,
         Type? ReflectionType = null,
         string? TypeFullName = null,
@@ -52,11 +52,11 @@ public static class CollectionInfoBuilder
         new CollectionTypeInfo(CollectionType.ImmutableSortedSet, typeof(ImmutableSortedSet<>), Immutable: true),
         new CollectionTypeInfo(CollectionType.ImmutableQueue, typeof(ImmutableQueue<>), Immutable: true),
         new CollectionTypeInfo(CollectionType.IImmutableQueue, typeof(IImmutableQueue<>), Immutable: true),
-        new CollectionTypeInfo(CollectionType.IImmutableQueue, typeof(IImmutableQueue<>), Immutable: true),
         new CollectionTypeInfo(CollectionType.ImmutableStack, typeof(ImmutableStack<>), Immutable: true),
         new CollectionTypeInfo(CollectionType.IImmutableStack, typeof(IImmutableStack<>), Immutable: true),
         new CollectionTypeInfo(CollectionType.IImmutableDictionary, typeof(IImmutableDictionary<,>), Immutable: true),
         new CollectionTypeInfo(CollectionType.ImmutableDictionary, typeof(ImmutableDictionary<,>), Immutable: true),
+        new CollectionTypeInfo(CollectionType.ImmutableSortedDictionary, typeof(ImmutableSortedDictionary<,>), Immutable: true),
         new CollectionTypeInfo(CollectionType.Span, typeof(Span<>)),
         new CollectionTypeInfo(CollectionType.ReadOnlySpan, typeof(ReadOnlySpan<>)),
         new CollectionTypeInfo(CollectionType.Memory, typeof(Memory<>)),
@@ -65,29 +65,33 @@ public static class CollectionInfoBuilder
 
     public static CollectionInfos? Build(WellKnownTypes wellKnownTypes, ITypeSymbol source, ITypeSymbol target)
     {
-        if (Build(wellKnownTypes, source) is not { } sourceInfo)
+        // check for enumerated type to quickly check that both are collection types
+        var enumeratedSourceType = GetEnumeratedType(wellKnownTypes, source);
+        if (enumeratedSourceType == null)
             return null;
 
-        if (Build(wellKnownTypes, target) is not { } targetInfo)
+        var enumeratedTargetType = GetEnumeratedType(wellKnownTypes, target);
+        if (enumeratedTargetType == null)
             return null;
+
+        var sourceInfo = BuildCollectionInfo(wellKnownTypes, source, enumeratedSourceType);
+        var targetInfo = BuildCollectionInfo(wellKnownTypes, target, enumeratedTargetType);
 
         return new CollectionInfos(sourceInfo, targetInfo);
     }
 
-    private static CollectionInfo? Build(WellKnownTypes wellKnownTypes, ITypeSymbol type)
+    private static CollectionInfo BuildCollectionInfo(WellKnownTypes wellKnownTypes, ITypeSymbol type, ITypeSymbol enumeratedType)
     {
-        var enumeratedType = GetEnumeratedType(wellKnownTypes, type);
-        if (enumeratedType == null)
-            return null;
-
         var collectionTypeInfo = GetCollectionTypeInfo(wellKnownTypes, type);
+        var typeInfo = collectionTypeInfo?.CollectionType ?? CollectionType.None;
+
         return new CollectionInfo(
             type,
-            collectionTypeInfo?.CollectionType ?? CollectionType.None,
+            typeInfo,
             GetImplementedCollectionTypes(wellKnownTypes, type),
             enumeratedType,
-            FindCountProperty(wellKnownTypes, type),
-            HasValidAddMethod(wellKnownTypes, type),
+            FindCountProperty(wellKnownTypes, type, typeInfo),
+            HasValidAddMethod(wellKnownTypes, type, typeInfo),
             collectionTypeInfo?.Immutable == true
         );
     }
@@ -115,14 +119,44 @@ public static class CollectionInfoBuilder
         return null;
     }
 
-    private static bool HasValidAddMethod(WellKnownTypes types, ITypeSymbol t)
+    private static bool HasValidAddMethod(WellKnownTypes types, ITypeSymbol t, CollectionType typeInfo)
     {
+        if (
+            typeInfo
+            is CollectionType.ICollection
+                or CollectionType.IList
+                or CollectionType.List
+                or CollectionType.ISet
+                or CollectionType.HashSet
+                or CollectionType.SortedSet
+        )
+            return true;
+
+        if (typeInfo is not CollectionType.None)
+            return false;
+
         return t.HasImplicitGenericImplementation(types.Get(typeof(ICollection<>)), nameof(ICollection<object>.Add))
             || t.HasImplicitGenericImplementation(types.Get(typeof(ISet<>)), nameof(ISet<object>.Add));
     }
 
-    private static string? FindCountProperty(WellKnownTypes types, ITypeSymbol t)
+    private static string? FindCountProperty(WellKnownTypes types, ITypeSymbol t, CollectionType typeInfo)
     {
+        if (typeInfo is CollectionType.IEnumerable)
+            return null;
+
+        if (
+            typeInfo
+            is CollectionType.Array
+                or CollectionType.Span
+                or CollectionType.ReadOnlySpan
+                or CollectionType.Memory
+                or CollectionType.ReadOnlyMemory
+        )
+            return "Length";
+
+        if (typeInfo is not CollectionType.None)
+            return "Count";
+
         var intType = types.Get<int>();
         var member = t.GetAccessibleMappableMembers()
             .FirstOrDefault(
@@ -137,6 +171,10 @@ public static class CollectionInfoBuilder
     {
         if (type.IsArrayType())
             return _collectionTypeInfoArray;
+
+        // string is a collection but does implement IEnumerable, return early
+        if (type.SpecialType == SpecialType.System_String)
+            return null;
 
         foreach (var typeInfo in _collectionTypeInfos)
         {
