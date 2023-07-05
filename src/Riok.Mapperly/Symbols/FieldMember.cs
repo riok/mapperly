@@ -21,12 +21,7 @@ public class FieldMember : IMappableMember
     public bool CanSet => true;
     public bool IsInitOnly => false;
 
-    public bool IsRequired
-#if ROSLYN4_4_OR_GREATER
-        => _fieldSymbol.IsRequired;
-#else
-        => false;
-#endif
+    public bool IsRequired => _fieldSymbol.IsRequired();
 
     public override bool Equals(object obj) =>
         obj is FieldMember other && SymbolEqualityComparer.IncludeNullability.Equals(_fieldSymbol, other._fieldSymbol);

@@ -1,5 +1,9 @@
 <Project>
 
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);ROSLYN3_9_OR_GREATER;ROSLYN3_10_OR_GREATER;ROSLYN4_0_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" PrivateAssets="all" />
   </ItemGroup>

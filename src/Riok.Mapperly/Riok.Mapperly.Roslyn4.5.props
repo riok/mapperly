@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <DefineConstants>$(DefineConstants);ROSLYN4_4_OR_GREATER</DefineConstants>
+    <DefineConstants>$(DefineConstants);ROSLYN3_9_OR_GREATER;ROSLYN3_10_OR_GREATER;ROSLYN4_0_OR_GREATER;ROSLYN4_4_OR_GREATER;ROSLYN4_5_OR_GREATER</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

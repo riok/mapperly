@@ -1,9 +1,7 @@
 ﻿using System.Collections.Immutable;
-using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Diagnostics;
@@ -13,42 +11,13 @@ using Riok.Mapperly.Helpers;
 namespace Riok.Mapperly;
 
 [Generator]
-public class MapperGenerator : IIncrementalGenerator
+public partial class MapperGenerator
 {
     private const string GeneratedFileSuffix = ".g.cs";
     public const string AddMappersStep = "ImplementationSourceOutput";
     public const string ReportDiagnosticsStep = "Diagnostics";
 
     public static readonly string MapperAttributeName = typeof(MapperAttribute).FullName;
-
-    public void Initialize(IncrementalGeneratorInitializationContext context)
-    {
-        var mapperClassDeclarations = SyntaxProvider.GetClassDeclarations(context);
-
-        context.ReportDiagnostics(context.CompilationProvider.Select(static (compilation, _) => BuildCompilationDiagnostics(compilation)));
-
-        var compilationAndMappers = context.CompilationProvider.Combine(mapperClassDeclarations.Collect());
-        var mappersWithDiagnostics = compilationAndMappers.Select(
-            static (x, cancellationToken) => BuildDescriptors(x.Left, x.Right, cancellationToken)
-        );
-
-        // output the diagnostics
-        context.ReportDiagnostics(
-            mappersWithDiagnostics.Select(static (source, _) => source.Diagnostics).WithTrackingName(ReportDiagnosticsStep)
-        );
-
-        // split into mapper name pairs
-        var mappers = mappersWithDiagnostics.SelectMany(static (x, _) => x.Mappers);
-
-        context.RegisterImplementationSourceOutput(
-            mappers,
-            static (spc, source) =>
-            {
-                var mapperText = source.Body.NormalizeWhitespace().ToFullString();
-                spc.AddSource(source.FileName, SourceText.From(mapperText, Encoding.UTF8));
-            }
-        );
-    }
 
     private static MapperResults BuildDescriptors(
         Compilation compilation,

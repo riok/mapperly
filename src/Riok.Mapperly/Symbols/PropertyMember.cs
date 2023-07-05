@@ -26,12 +26,7 @@ internal class PropertyMember : IMappableMember
         !_propertySymbol.IsReadOnly && (_propertySymbol.SetMethod == null || _symbolAccessor.IsAccessible(_propertySymbol.SetMethod));
     public bool IsInitOnly => _propertySymbol.SetMethod?.IsInitOnly == true;
 
-    public bool IsRequired
-#if ROSLYN4_4_OR_GREATER
-        => _propertySymbol.IsRequired;
-#else
-        => false;
-#endif
+    public bool IsRequired => _propertySymbol.IsRequired();
 
     public override bool Equals(object obj) =>
         obj is PropertyMember other && SymbolEqualityComparer.IncludeNullability.Equals(_propertySymbol, other._propertySymbol);

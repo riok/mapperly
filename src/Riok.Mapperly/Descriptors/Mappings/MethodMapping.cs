@@ -43,7 +43,7 @@ public abstract class MethodMapping : TypeMapping
     {
         SourceParameter = sourceParameter;
         IsExtensionMethod = method.IsExtensionMethod;
-        IsPartial = method.IsPartialDefinition;
+        IsPartial = method.IsPartialDefinition();
         ReferenceHandlerParameter = referenceHandlerParameter;
         _accessibility = method.DeclaredAccessibility;
         _methodName = method.Name;

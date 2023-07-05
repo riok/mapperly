@@ -1,18 +1,25 @@
-﻿#if ROSLYN4_0_OR_GREATER && !ROSLYN4_4_OR_GREATER
+﻿#if ROSLYN3_9_OR_GREATER && !ROSLYN4_0_OR_GREATER
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly;
 
-internal static class SyntaxProvider
+internal class SyntaxProvider : ISyntaxContextReceiver
 {
-    public static IncrementalValuesProvider<ClassDeclarationSyntax> GetClassDeclarations(IncrementalGeneratorInitializationContext context)
+    public IEnumerable<ClassDeclarationSyntax> ClassDeclarations => _classDeclarations;
+    private readonly List<ClassDeclarationSyntax> _classDeclarations = new();
+
+    public void OnVisitSyntaxNode(GeneratorSyntaxContext context)
     {
-        return context.SyntaxProvider
-            .CreateSyntaxProvider(static (s, _) => IsSyntaxTargetForGeneration(s), static (ctx, _) => GetSemanticTargetForGeneration(ctx))
-            .WhereNotNull();
+        if (!IsSyntaxTargetForGeneration(context.Node))
+            return;
+
+        var syntax = GetSemanticTargetForGeneration(context);
+        if (syntax == null)
+            return;
+
+        _classDeclarations.Add(syntax);
     }
 
     private static bool IsSyntaxTargetForGeneration(SyntaxNode node) => node is ClassDeclarationSyntax { AttributeLists.Count: > 0 };

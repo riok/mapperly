@@ -1,3 +1,4 @@
+#if ROSLYN4_0_OR_GREATER
 using Microsoft.CodeAnalysis;
 
 namespace Riok.Mapperly.Helpers;
@@ -38,3 +39,4 @@ internal static class IncrementalValuesProviderExtensions
         source;
 #endif
 }
+#endif

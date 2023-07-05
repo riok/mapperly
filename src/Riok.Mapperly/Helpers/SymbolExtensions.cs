@@ -6,6 +6,8 @@ namespace Riok.Mapperly.Helpers;
 
 internal static class SymbolExtensions
 {
+    private const string RequiredKeyword = "required";
+
     private static readonly ImmutableHashSet<string> _wellKnownImmutableTypes = ImmutableHashSet.Create(
         typeof(Uri).FullName,
         typeof(Version).FullName
@@ -130,4 +132,53 @@ internal static class SymbolExtensions
 
     internal static bool HasImplicitGenericImplementation(this ITypeSymbol symbol, INamedTypeSymbol inter, string methodName) =>
         symbol.ImplementsGeneric(inter, methodName, out _, out var isExplicit) && !isExplicit;
+
+    internal static bool IsPartialDefinition(this IMethodSymbol method)
+    {
+#if ROSLYN3_10_OR_GREATER
+        return method.IsPartialDefinition;
+#else
+        if (method.Locations.Any(loc => loc.IsInMetadata))
+            return false;
+
+        var isPartial = method.DeclaringSyntaxReferences
+            .Select(r => r.GetSyntax())
+            .Where(s => s.IsKind(SyntaxKind.MethodDeclaration))
+            .Cast<Microsoft.CodeAnalysis.CSharp.Syntax.MethodDeclarationSyntax>()
+            .Any(s => s.Modifiers.Any(SyntaxKind.PartialKeyword));
+        return isPartial && method.PartialImplementationPart == null && method.PartialDefinitionPart == null;
+#endif
+    }
+
+    internal static bool IsRequired(this IPropertySymbol property)
+    {
+#if ROSLYN4_4_OR_GREATER
+        return property.IsRequired;
+#else
+        if (property.Locations.Any(loc => loc.IsInMetadata))
+            return false;
+
+        return property.DeclaringSyntaxReferences
+            .Select(r => r.GetSyntax())
+            .Where(s => s.IsKind(SyntaxKind.PropertyDeclaration))
+            .Cast<Microsoft.CodeAnalysis.CSharp.Syntax.PropertyDeclarationSyntax>()
+            .Any(s => s.Modifiers.Any(t => t.ToString() == RequiredKeyword));
+#endif
+    }
+
+    internal static bool IsRequired(this IFieldSymbol field)
+    {
+#if ROSLYN4_4_OR_GREATER
+        return field.IsRequired;
+#else
+        if (field.Locations.Any(loc => loc.IsInMetadata))
+            return false;
+
+        return field.DeclaringSyntaxReferences
+            .Select(r => r.GetSyntax())
+            .Where(s => s.IsKind(SyntaxKind.FieldDeclaration))
+            .Cast<Microsoft.CodeAnalysis.CSharp.Syntax.FieldDeclarationSyntax>()
+            .Any(s => s.Modifiers.Any(t => t.ToString() == RequiredKeyword));
+#endif
+    }
 }

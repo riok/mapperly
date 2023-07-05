@@ -39,7 +39,13 @@ public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContai
             ? ElseClause(Block(ExpressionStatement(ThrowArgumentNullException(nameofSourceAccess))))
             : null;
 
+#if !ROSLYN3_10_OR_GREATER
+        // for old roslyn version (<= 3.10), ElseClauseSyntax param is not nullable:
+        // IfStatement(ExpressionSyntax condition, StatementSyntax statement, ElseClauseSyntax @else)
+        return new[] { IfStatement(condition, Block(base.Build(ctx, targetAccess)), elseClause!), };
+#else
         return new[] { IfStatement(condition, Block(base.Build(ctx, targetAccess)), elseClause), };
+#endif
     }
 
     public override bool Equals(object? obj)

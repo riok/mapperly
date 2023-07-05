@@ -68,7 +68,7 @@ public static class UserMethodMappingExtractor
     {
         var valid =
             method is { ReturnsVoid: false, IsGenericMethod: false }
-            && (allowPartial || !method.IsPartialDefinition)
+            && (allowPartial || !method.IsPartialDefinition())
             && (!isStatic || method.IsStatic);
         return valid && BuildParameters(ctx, method, out var parameters)
             ? new UserImplementedMethodMapping(method, parameters.Source, parameters.ReferenceHandler)
@@ -77,7 +77,7 @@ public static class UserMethodMappingExtractor
 
     private static IUserMapping? BuilderUserDefinedMapping(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol, bool isStatic)
     {
-        if (!methodSymbol.IsPartialDefinition)
+        if (!methodSymbol.IsPartialDefinition())
             return null;
 
         if (!isStatic && methodSymbol.IsStatic)

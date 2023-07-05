@@ -25,7 +25,7 @@ public static class ObjectFactoryBuilder
         if (
             methodSymbol.IsAsync
             || methodSymbol.Parameters.Length > 1
-            || methodSymbol.IsPartialDefinition
+            || methodSymbol.IsPartialDefinition()
             || methodSymbol.MethodKind != MethodKind.Ordinary
             || methodSymbol.ReturnsVoid
         )
