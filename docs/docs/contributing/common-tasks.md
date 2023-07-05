@@ -42,6 +42,7 @@ To support a new roslyn version via multi targeting follow these steps (see also
 6. Adjust the .NET version in the `global.json` file as needed.
 7. If generated code changes based on the new Roslyn version,
    introduce a new `roslynVersionName` in `Riok.Mapperly.IntegrationTests.BaseMapperTest.GetRoslynVersion()` and generate the new snapshots.
+8. Adjust the documentation as needed.
 
 ## Mapping syntax
 
