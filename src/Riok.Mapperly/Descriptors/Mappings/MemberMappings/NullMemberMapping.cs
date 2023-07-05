@@ -57,10 +57,11 @@ public class NullMemberMapping : IMemberMapping
         if (_delegateMapping.IsSynthetic && (_useNullConditionalAccess || !SourcePath.IsAnyObjectPathNullable()))
         {
             var nullConditionalSourceAccess = SourcePath.BuildAccess(ctx.Source, nullConditional: true);
+            var nameofSourceAccess = SourcePath.BuildAccess(ctx.Source, nullConditional: false);
             var mapping = _delegateMapping.Build(ctx.WithSource(nullConditionalSourceAccess));
             return _nullFallback == NullFallbackValue.Default && _targetType.IsNullable()
                 ? mapping
-                : Coalesce(mapping, NullSubstitute(_delegateMapping.TargetType, nullConditionalSourceAccess, _nullFallback));
+                : Coalesce(mapping, NullSubstitute(_delegateMapping.TargetType, nameofSourceAccess, _nullFallback));
         }
 
         var notNullCondition = _useNullConditionalAccess

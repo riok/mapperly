@@ -327,7 +327,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new global::B(source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested?.Value)));
+                var target = new global::B(source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested.Value)));
                 return target;
                 """
             );
