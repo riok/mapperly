@@ -37,7 +37,10 @@ public static class SourceEmitter
             if (containingType.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not ClassDeclarationSyntax containingTypeSyntax)
                 return syntax;
 
-            syntax = containingTypeSyntax.WithMembers(SingletonList(syntax));
+            syntax = containingTypeSyntax
+                .WithMembers(SingletonList(syntax))
+                .WithAttributeLists(List<AttributeListSyntax>())
+                .WithBaseList(null);
             containingType = containingType.ContainingType;
         }
 
