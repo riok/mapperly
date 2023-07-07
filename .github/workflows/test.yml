@@ -23,10 +23,17 @@ jobs:
   test:
     needs: lint
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        roslyn:
+          - '3.9'
+          - '4.0'
+          - '4.4'
+          - '4.5'
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-dotnet@v3.2.0
-      - run: dotnet build /p:TreatWarningsAsErrors=true
+      - run: dotnet build /p:TreatWarningsAsErrors=true /p:ROSLYN_VERSION=${{ matrix.roslyn }}
       - run: dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
       - uses: codecov/codecov-action@v3
         with:

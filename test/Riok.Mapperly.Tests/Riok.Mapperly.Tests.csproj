@@ -1,7 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <!-- default roslyn version -->
+    <ROSLYN_VERSION Condition="'$(ROSLYN_VERSION)' == ''">4.5</ROSLYN_VERSION>
+  </PropertyGroup>
+
+  <Import Project="Riok.Mapperly.Tests.Roslyn$(ROSLYN_VERSION).props" />
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
     <PackageReference Include="Verify.SourceGenerators" Version="2.1.0" />
   </ItemGroup>
 
