@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Enumerables;
@@ -15,8 +14,9 @@ public static class DictionaryMappingBuilder
     private const string CountPropertyName = nameof(IDictionary<object, object>.Count);
     private const string SetterIndexerPropertyName = "set_Item";
 
-    private const string ToImmutableDictionaryMethodName = nameof(ImmutableDictionary.ToImmutableDictionary);
-    private const string ToImmutableSortedDictionaryMethodName = nameof(ImmutableSortedDictionary.ToImmutableSortedDictionary);
+    private const string ToImmutableDictionaryMethodName = "global::System.Collections.Immutable.ImmutableDictionary.ToImmutableDictionary";
+    private const string ToImmutableSortedDictionaryMethodName =
+        "global::System.Collections.Immutable.ImmutableSortedDictionary.ToImmutableSortedDictionary";
 
     public static ITypeMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
@@ -155,34 +155,21 @@ public static class DictionaryMappingBuilder
         return typedInter;
     }
 
-    private static LinqDicitonaryMapping? ResolveImmutableCollectMethod(
+    private static LinqDictionaryMapping? ResolveImmutableCollectMethod(
         MappingBuilderContext ctx,
         ITypeMapping keyMapping,
         ITypeMapping valueMapping
     )
     {
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.Get(typeof(ImmutableSortedDictionary<,>))))
-            return new LinqDicitonaryMapping(
-                ctx.Source,
-                ctx.Target,
-                ctx.Types.Get(typeof(ImmutableSortedDictionary)).GetStaticGenericMethod(ToImmutableSortedDictionaryMethodName)!,
-                keyMapping,
-                valueMapping
-            );
+        return ctx.CollectionInfos!.Target.CollectionType switch
+        {
+            CollectionType.ImmutableSortedDictionary
+                => new LinqDictionaryMapping(ctx.Source, ctx.Target, ToImmutableSortedDictionaryMethodName, keyMapping, valueMapping),
+            CollectionType.ImmutableDictionary
+            or CollectionType.IImmutableDictionary
+                => new LinqDictionaryMapping(ctx.Source, ctx.Target, ToImmutableDictionaryMethodName, keyMapping, valueMapping),
 
-        // if target is an ImmutableDictionary or IImmutableDictionary
-        if (
-            SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.Get(typeof(IImmutableDictionary<,>)))
-            || SymbolEqualityComparer.Default.Equals(ctx.Target.OriginalDefinition, ctx.Types.Get(typeof(ImmutableDictionary<,>)))
-        )
-            return new LinqDicitonaryMapping(
-                ctx.Source,
-                ctx.Target,
-                ctx.Types.Get(typeof(ImmutableDictionary)).GetStaticGenericMethod(ToImmutableDictionaryMethodName)!,
-                keyMapping,
-                valueMapping
-            );
-
-        return null;
+            _ => null,
+        };
     }
 }

@@ -11,15 +11,15 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 public class LinqEnumerableMapping : TypeMapping
 {
     private readonly ITypeMapping _elementMapping;
-    private readonly IMethodSymbol? _selectMethod;
-    private readonly IMethodSymbol? _collectMethod;
+    private readonly string? _selectMethod;
+    private readonly string? _collectMethod;
 
     public LinqEnumerableMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         ITypeMapping elementMapping,
-        IMethodSymbol? selectMethod,
-        IMethodSymbol? collectMethod
+        string? selectMethod,
+        string? collectMethod
     )
         : base(sourceType, targetType)
     {
@@ -38,13 +38,13 @@ public class LinqEnumerableMapping : TypeMapping
             var (lambdaCtx, lambdaSourceName) = ctx.WithNewScopedSource();
             var sourceMapExpression = _elementMapping.Build(lambdaCtx);
             var convertLambda = SimpleLambdaExpression(Parameter(Identifier(lambdaSourceName))).WithExpressionBody(sourceMapExpression);
-            mappedSource = StaticInvocation(_selectMethod, ctx.Source, convertLambda);
+            mappedSource = Invocation(_selectMethod, ctx.Source, convertLambda);
         }
         else
         {
             mappedSource = _elementMapping.Build(ctx);
         }
 
-        return _collectMethod == null ? mappedSource : StaticInvocation(_collectMethod, mappedSource);
+        return _collectMethod == null ? mappedSource : Invocation(_collectMethod, mappedSource);
     }
 }

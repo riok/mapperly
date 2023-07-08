@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Enumerables;
@@ -6,24 +5,25 @@ using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Diagnostics;
+using Riok.Mapperly.Emit;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public static class EnumerableMappingBuilder
 {
-    private const string SelectMethodName = nameof(Enumerable.Select);
-    private const string ToArrayMethodName = nameof(Enumerable.ToArray);
-    private const string ToListMethodName = nameof(Enumerable.ToList);
+    private const string SelectMethodName = "global::System.Linq.Enumerable.Select";
+    private const string ToArrayMethodName = "global::System.Linq.Enumerable.ToArray";
+    private const string ToListMethodName = "global::System.Linq.Enumerable.ToList";
     private const string ToHashSetMethodName = "ToHashSet";
     private const string AddMethodName = nameof(ICollection<object>.Add);
 
-    private const string ToImmutableArrayMethodName = nameof(ImmutableArray.ToImmutableArray);
-    private const string ToImmutableListMethodName = nameof(ImmutableList.ToImmutableList);
-    private const string ToImmutableHashSetMethodName = nameof(ImmutableHashSet.ToImmutableHashSet);
-    private const string CreateRangeQueueMethodName = nameof(ImmutableQueue.CreateRange);
-    private const string CreateRangeStackMethodName = nameof(ImmutableStack.CreateRange);
-    private const string ToImmutableSortedSetMethodName = nameof(ImmutableSortedSet.ToImmutableSortedSet);
+    private const string ToImmutableArrayMethodName = "global::System.Collections.Immutable.ImmutableArray.ToImmutableArray";
+    private const string ToImmutableListMethodName = "global::System.Collections.Immutable.ImmutableList.ToImmutableList";
+    private const string ToImmutableHashSetMethodName = "global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet";
+    private const string CreateRangeQueueMethodName = "global::System.Collections.Immutable.ImmutableQueue.CreateRange";
+    private const string CreateRangeStackMethodName = "global::System.Collections.Immutable.ImmutableStack.CreateRange";
+    private const string ToImmutableSortedSetMethodName = "global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet";
 
     public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
@@ -127,10 +127,9 @@ public static class EnumerableMappingBuilder
         }
     }
 
-    private static LinqEnumerableMapping BuildLinqMapping(MappingBuilderContext ctx, ITypeMapping elementMapping, string? collectMethodName)
+    private static LinqEnumerableMapping BuildLinqMapping(MappingBuilderContext ctx, ITypeMapping elementMapping, string? collectMethod)
     {
-        var collectMethod = collectMethodName == null ? null : ctx.Types.Get(typeof(Enumerable)).GetStaticGenericMethod(collectMethodName);
-        var selectMethod = elementMapping.IsSynthetic ? null : ctx.Types.Get(typeof(Enumerable)).GetStaticGenericMethod(SelectMethodName);
+        var selectMethod = elementMapping.IsSynthetic ? null : SelectMethodName;
         return new LinqEnumerableMapping(ctx.Source, ctx.Target, elementMapping, selectMethod, collectMethod);
     }
 
@@ -158,7 +157,7 @@ public static class EnumerableMappingBuilder
         ITypeMapping elementMapping
     )
     {
-        var selectMethod = elementMapping.IsSynthetic ? null : ctx.Types.Get(typeof(Enumerable)).GetStaticGenericMethod(SelectMethodName);
+        var selectMethod = elementMapping.IsSynthetic ? null : SelectMethodName;
         return new LinqConstructorMapping(ctx.Source, ctx.Target, targetTypeToConstruct, elementMapping, selectMethod);
     }
 
@@ -219,7 +218,7 @@ public static class EnumerableMappingBuilder
             && GetToHashSetLinqCollectMethod(ctx.Types) is { } toHashSetMethod
         )
         {
-            return (true, toHashSetMethod.Name);
+            return (true, SyntaxFactoryHelper.StaticMethodString(toHashSetMethod));
         }
 
         // if target is a IReadOnlyCollection<T>, IEnumerable<T>, IList<T>, List<T> or ICollection<T> with ToList()
@@ -241,31 +240,22 @@ public static class EnumerableMappingBuilder
         if (collectMethod is null)
             return null;
 
-        var selectMethod = elementMapping.IsSynthetic ? null : ctx.Types.Get(typeof(Enumerable)).GetStaticGenericMethod(SelectMethodName);
+        var selectMethod = elementMapping.IsSynthetic ? null : SelectMethodName;
         return new LinqEnumerableMapping(ctx.Source, ctx.Target, elementMapping, selectMethod, collectMethod);
     }
 
-    private static IMethodSymbol? ResolveImmutableCollectMethod(MappingBuilderContext ctx)
+    private static string? ResolveImmutableCollectMethod(MappingBuilderContext ctx)
     {
-        if (ctx.CollectionInfos!.Target.CollectionType == CollectionType.ImmutableArray)
-            return ctx.Types.Get(typeof(ImmutableArray)).GetStaticGenericMethod(ToImmutableArrayMethodName);
-
-        if (ctx.CollectionInfos.Target.CollectionType is CollectionType.ImmutableList or CollectionType.IImmutableList)
-            return ctx.Types.Get(typeof(ImmutableList)).GetStaticGenericMethod(ToImmutableListMethodName);
-
-        if (ctx.CollectionInfos.Target.CollectionType is CollectionType.ImmutableHashSet or CollectionType.IImmutableSet)
-            return ctx.Types.Get(typeof(ImmutableHashSet)).GetStaticGenericMethod(ToImmutableHashSetMethodName);
-
-        if (ctx.CollectionInfos.Target.CollectionType is CollectionType.ImmutableQueue or CollectionType.IImmutableQueue)
-            return ctx.Types.Get(typeof(ImmutableQueue)).GetStaticGenericMethod(CreateRangeQueueMethodName);
-
-        if (ctx.CollectionInfos.Target.CollectionType is CollectionType.ImmutableStack or CollectionType.IImmutableStack)
-            return ctx.Types.Get(typeof(ImmutableStack)).GetStaticGenericMethod(CreateRangeStackMethodName);
-
-        if (ctx.CollectionInfos.Target.CollectionType is CollectionType.ImmutableSortedSet)
-            return ctx.Types.Get(typeof(ImmutableSortedSet)).GetStaticGenericMethod(ToImmutableSortedSetMethodName);
-
-        return null;
+        return ctx.CollectionInfos!.Target.CollectionType switch
+        {
+            CollectionType.ImmutableArray => ToImmutableArrayMethodName,
+            CollectionType.ImmutableList or CollectionType.IImmutableList => ToImmutableListMethodName,
+            CollectionType.ImmutableHashSet or CollectionType.IImmutableSet => ToImmutableHashSetMethodName,
+            CollectionType.ImmutableQueue or CollectionType.IImmutableQueue => CreateRangeQueueMethodName,
+            CollectionType.ImmutableStack or CollectionType.IImmutableStack => CreateRangeStackMethodName,
+            CollectionType.ImmutableSortedSet => ToImmutableSortedSetMethodName,
+            _ => null
+        };
     }
 
     private static IMethodSymbol? GetToHashSetLinqCollectMethod(WellKnownTypes wellKnownTypes) =>
