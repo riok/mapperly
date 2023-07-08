@@ -70,10 +70,17 @@ internal static class SymbolExtensions
             return true;
         }
 
-        typedInterface = t.AllInterfaces.FirstOrDefault(
-            x => x.IsGenericType && SymbolEqualityComparer.Default.Equals(x.OriginalDefinition, genericInterfaceSymbol)
-        );
-        return typedInterface != null;
+        foreach (var typeSymbol in t.AllInterfaces)
+        {
+            if (typeSymbol.IsGenericType && SymbolEqualityComparer.Default.Equals(typeSymbol.OriginalDefinition, genericInterfaceSymbol))
+            {
+                typedInterface = typeSymbol;
+                return true;
+            }
+        }
+
+        typedInterface = null;
+        return false;
     }
 
     internal static bool ImplementsGeneric(
