@@ -48,7 +48,7 @@ public static class ObjectMemberMappingBodyBuilder
                     ctx.IgnoredSourceMemberNames,
                     memberNameComparer,
                     out var sourceMemberPath
-                )
+                ) || MemberPath.TryParams(ctx, targetMember, out sourceMemberPath)
             )
             {
                 BuildMemberAssignmentMapping(ctx, sourceMemberPath, new MemberPath(new[] { targetMember }));

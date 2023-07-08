@@ -11,6 +11,28 @@ public class ExtraParametersTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial B Map(A src, int value);",
             "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public string Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .Should()
+            .HaveMapMethodBody(
+                """
+var target = new global::B();
+target.StringValue = src.StringValue;
+target.Value = value.ToString();
+return target;
+"""
+            );
+    }
+
+    [Fact]
+    public void ExtraInitParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A src, int value);",
+            "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } public string Value { get; init; } }"
         );
 

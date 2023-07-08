@@ -2,6 +2,9 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors;
+using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
+using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
@@ -180,12 +183,34 @@ public class MemberPath
 
     private bool Equals(MemberPath other) => Path.SequenceEqual(other.Path);
 
-    public static bool TryFind(
-        ITypeSymbol type,
-        IEnumerable<IEnumerable<string>> pathCandidates,
-        IReadOnlyCollection<string> ignoredNames,
-        [NotNullWhen(true)] out MemberPath? memberPath
-    ) => TryFind(type, pathCandidates, ignoredNames, StringComparer.Ordinal, out memberPath);
+    public static bool TryParams(IMembersBuilderContext<IMapping> ctx, IMappableMember member, out MemberPath? memberPath)
+    {
+        memberPath = null;
+        foreach (var parameter in ctx.BuilderContext.Parameters)
+        {
+            Console.WriteLine(parameter.Name);
+            Console.WriteLine("Param");
+            if (
+                MemberPath.TryFindParameter(
+                    parameter,
+                    MemberPathCandidateBuilder.BuildMemberPathCandidates(member.Name),
+                    ctx.IgnoredSourceMemberNames,
+                    StringComparer.OrdinalIgnoreCase,
+                    out var sourceMemberPath
+                )
+            )
+            {
+                Console.WriteLine("TyrFind");
+                ctx.BuilderContext.UsedParameters.Add(parameter);
+                Console.WriteLine($"Used Params: {ctx.BuilderContext.UsedParameters.Count}");
+
+                memberPath = sourceMemberPath;
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public static bool TryFind(
         ITypeSymbol type,
