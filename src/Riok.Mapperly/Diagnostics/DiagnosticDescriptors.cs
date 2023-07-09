@@ -410,4 +410,13 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true
     );
+
+    public static readonly DiagnosticDescriptor CannotMapToTemporarySourceMember = new DiagnosticDescriptor(
+        "RMG047",
+        "Cannot map to member path due to modifying a temporary value, see CS1612",
+        "Cannot map from member {0}.{1} of type {2} to member path {3}.{4} of type {5} because {6}.{7} is a value type, returning a temporary value, see CS1612",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
 }

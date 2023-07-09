@@ -443,4 +443,59 @@ public class ObjectPropertyTest
             .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public void ModifyingTemporaryStructShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("StringValue", "NestedValue.StringValue")]
+            partial B Map(A src);
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public C NestedValue { get; set; } }",
+            "struct C { public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.CannotMapToTemporarySourceMember,
+                "Cannot map from member A.StringValue of type string to member path B.NestedValue.StringValue of type string because NestedValue.C is a value type, returning a temporary value, see CS1612"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ModifyingPathIfClassPrecedesShouldNotDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("StringValue", "NestedValue.StringValue")]
+            partial B Map(A src);
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "struct B { public C NestedValue { get; set; } }",
+            "class C { public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.NestedValue.StringValue = src.StringValue;
+                return target;
+                """
+            );
+    }
 }
