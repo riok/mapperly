@@ -167,13 +167,10 @@ public static class CollectionInfoBuilder
         if (typeInfo is not CollectionType.None)
             return "Count";
 
-        var intType = types.Get<int>();
         var member = symbolAccessor
             .GetAllAccessibleMappableMembers(t)
             .FirstOrDefault(
-                x =>
-                    x.Name is nameof(ICollection<object>.Count) or nameof(Array.Length)
-                    && SymbolEqualityComparer.IncludeNullability.Equals(intType, x.Type)
+                x => x.Name is nameof(ICollection<object>.Count) or nameof(Array.Length) && x.Type.SpecialType == SpecialType.System_Int32
             );
         return member?.Name;
     }
