@@ -176,8 +176,8 @@ public class ObjectPropertyTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial B Map(A source);",
             new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseInsensitive },
-            "class A { public string StringValue { get; set; } }",
-            "class B { public string stringvalue { get; set; } }"
+            "class A { public string StringValue { get; set; } public int Value { get; set; } }",
+            "class B { public string stringvalue { get; set; } public required int value { get; init; } }"
         );
 
         TestHelper
@@ -185,7 +185,10 @@ public class ObjectPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new global::B();
+                var target = new global::B()
+                {
+                    value = source.Value
+                };
                 target.stringvalue = source.StringValue;
                 return target;
                 """
