@@ -53,12 +53,11 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             }
 
             if (
-                !MemberPath.TryFind(
+                !ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
                     ctx.Mapping.SourceType,
                     MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
                     ctx.IgnoredSourceMemberNames,
                     memberNameComparer,
-                    ctx.BuilderContext.SymbolAccessor,
                     out var sourceMemberPath
                 )
             )
@@ -105,12 +104,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         }
 
         if (
-            !MemberPath.TryFind(
-                ctx.Mapping.SourceType,
-                memberConfig.Source.Path,
-                ctx.BuilderContext.SymbolAccessor,
-                out var sourceMemberPath
-            )
+            !ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.SourceType, memberConfig.Source.Path, out var sourceMemberPath)
         )
         {
             ctx.BuilderContext.ReportDiagnostic(
@@ -302,12 +296,11 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
         if (!ctx.MemberConfigsByRootTargetName.TryGetValue(parameter.Name, out var memberConfigs))
         {
-            return MemberPath.TryFind(
+            return ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
                 ctx.Mapping.SourceType,
                 MemberPathCandidateBuilder.BuildMemberPathCandidates(parameter.Name),
                 ctx.IgnoredSourceMemberNames,
                 StringComparer.OrdinalIgnoreCase,
-                ctx.BuilderContext.SymbolAccessor,
                 out sourcePath
             );
         }
@@ -332,7 +325,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             return false;
         }
 
-        if (!MemberPath.TryFind(ctx.Mapping.SourceType, memberConfig.Source.Path, ctx.BuilderContext.SymbolAccessor, out sourcePath))
+        if (!ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.SourceType, memberConfig.Source.Path, out sourcePath))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.SourceMemberNotFound,

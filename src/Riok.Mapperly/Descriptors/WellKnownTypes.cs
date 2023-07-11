@@ -29,11 +29,9 @@ public class WellKnownTypes
         {
             type = type.GetGenericTypeDefinition();
         }
+
         return Get(type.FullName ?? throw new InvalidOperationException("Could not get name of type " + type));
     }
-
-    public INamedTypeSymbol Get(string typeFullName) =>
-        TryGet(typeFullName) ?? throw new InvalidOperationException("Could not get type " + typeFullName);
 
     public INamedTypeSymbol? TryGet(string typeFullName)
     {
@@ -47,4 +45,7 @@ public class WellKnownTypes
 
         return typeSymbol;
     }
+
+    private INamedTypeSymbol Get(string typeFullName) =>
+        TryGet(typeFullName) ?? throw new InvalidOperationException("Could not get type " + typeFullName);
 }

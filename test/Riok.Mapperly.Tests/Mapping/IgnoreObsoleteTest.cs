@@ -6,7 +6,8 @@ namespace Riok.Mapperly.Tests.Mapping;
 [UsesVerify]
 public class IgnoreObsoleteTest
 {
-    private const string _classA = """
+    private readonly string _classA = TestSourceBuilder.CSharp(
+        """
         class A
         {
             public int Value { get; set; }
@@ -14,9 +15,11 @@ public class IgnoreObsoleteTest
             [Obsolete]
             public int Ignored { get; set; }
         }
-        """;
+        """
+    );
 
-    private const string _classB = """
+    private readonly string _classB = TestSourceBuilder.CSharp(
+        """
         class B
         {
             public int Value { get; set; }
@@ -24,7 +27,8 @@ public class IgnoreObsoleteTest
             [Obsolete]
             public int Ignored { get; set; }
         }
-        """;
+        """
+    );
 
     [Fact]
     public void ClassAttributeIgnoreObsoleteNone()
