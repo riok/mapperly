@@ -180,14 +180,6 @@ public class MemberPath
         ITypeSymbol type,
         IEnumerable<IEnumerable<string>> pathCandidates,
         IReadOnlyCollection<string> ignoredNames,
-        SymbolAccessor symbolAccessor,
-        [NotNullWhen(true)] out MemberPath? memberPath
-    ) => TryFind(type, pathCandidates, ignoredNames, StringComparer.Ordinal, symbolAccessor, out memberPath);
-
-    public static bool TryFind(
-        ITypeSymbol type,
-        IEnumerable<IEnumerable<string>> pathCandidates,
-        IReadOnlyCollection<string> ignoredNames,
         IEqualityComparer<string> comparer,
         SymbolAccessor symbolAccessor,
         [NotNullWhen(true)] out MemberPath? memberPath
