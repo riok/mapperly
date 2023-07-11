@@ -72,6 +72,7 @@ namespace Riok.Mapperly.IntegrationTests
                 NullableFlattening = new() { IdValue = 100 },
                 UnflatteningIdValue = 20,
                 NullableUnflatteningIdValue = 200,
+                TupleValue = ("10", "20"),
                 RecursiveObject = new(5)
                 {
                     EnumValue = TestEnum.Value10,

@@ -74,6 +74,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.StringNullableTargetNotNullable = src.StringNullableTargetNotNullable;
             }
 
+            if (src.TupleValue != null)
+            {
+                target.TupleValue = MapToValueTuple(src.TupleValue.Value);
+            }
+
             if (src.RecursiveObject != null)
             {
                 target.RecursiveObject = MapToDtoExt(src.RecursiveObject);
@@ -167,6 +172,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.StringNullableTargetNotNullable = testObject.StringNullableTargetNotNullable;
             }
 
+            if (testObject.TupleValue != null)
+            {
+                target.TupleValue = MapToValueTuple(testObject.TupleValue.Value);
+            }
+
             if (testObject.RecursiveObject != null)
             {
                 target.RecursiveObject = MapToDtoExt(testObject.RecursiveObject);
@@ -243,6 +253,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             if (dto.NestedNullable != null)
             {
                 target.NestedNullable = MapToTestObjectNested(dto.NestedNullable);
+            }
+
+            if (dto.TupleValue != null)
+            {
+                target.TupleValue = MapToValueTuple1(dto.TupleValue.Value);
             }
 
             if (dto.RecursiveObject != null)
@@ -327,6 +342,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             if (source.StringNullableTargetNotNullable != null)
             {
                 target.StringNullableTargetNotNullable = source.StringNullableTargetNotNullable;
+            }
+
+            if (source.TupleValue != null)
+            {
+                target.TupleValue = MapToValueTuple(source.TupleValue.Value);
             }
 
             if (source.RecursiveObject != null)
@@ -554,6 +574,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             return target;
         }
 
+        private static (int A, int) MapToValueTuple((string A, string) source)
+        {
+            var target = (A: ParseableInt(source.A), ParseableInt(source.Item2));
+            return target;
+        }
+
         private static int[] MapToInt32Array(global::System.Span<string> source)
         {
             var target = new int[source.Length];
@@ -610,6 +636,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested();
             target.IntValue = DirectInt(source.IntValue);
+            return target;
+        }
+
+        private static (string A, string) MapToValueTuple1((int A, int) source)
+        {
+            var target = (A: source.A.ToString(), source.Item2.ToString());
             return target;
         }
 

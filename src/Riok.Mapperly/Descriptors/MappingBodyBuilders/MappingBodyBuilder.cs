@@ -28,6 +28,12 @@ public class MappingBodyBuilder
                 case NewInstanceObjectMemberMapping mapping:
                     NewInstanceObjectMemberMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;
+                case NewValueTupleExpressionMapping mapping:
+                    NewValueTupleMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                    break;
+                case NewValueTupleConstructorMapping mapping:
+                    NewValueTupleMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                    break;
                 case IMemberAssignmentTypeMapping mapping:
                     ObjectMemberMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;

@@ -108,6 +108,13 @@ public enum MappingConversionType
     Memory = 1 << 14,
 
     /// <summary>
+    /// If the target is a <see cref="ValueTuple{T, U}"/> or tuple expression (A: 10, B: 12).
+    /// Supports positional and named mapping.
+    /// Only uses <see cref="ValueTuple{T, U}"/> in <see cref="IQueryable{T}"/>.
+    /// </summary>
+    Tuple = 1 << 15,
+
+    /// <summary>
     /// Enables all supported conversions.
     /// </summary>
     All = ~None,

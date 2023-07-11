@@ -185,6 +185,11 @@ public class SymbolAccessor
 
     private IEnumerable<IMappableMember> GetAllAccessibleMappableMembersCore(ITypeSymbol symbol)
     {
+        if (symbol.IsTupleType && symbol is INamedTypeSymbol namedType)
+        {
+            return namedType.TupleElements.Select(MappableMember.Create).WhereNotNull();
+        }
+
         return GetAllMembers(symbol)
             .Where(x => x is { IsStatic: false, Kind: SymbolKind.Property or SymbolKind.Field } && x.IsAccessible())
             .DistinctBy(x => x.Name)
