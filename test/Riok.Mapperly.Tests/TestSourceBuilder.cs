@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Riok.Mapperly.Tests;
 
@@ -64,6 +66,11 @@ public partial class Mapper
     {
         var sep = Environment.NewLine + Environment.NewLine;
         return MapperWithBody(body, options) + sep + string.Join(sep, types);
+    }
+
+    public static SyntaxTree SyntaxTree([StringSyntax(StringSyntax.CSharp)] string source)
+    {
+        return CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);
     }
 
     private static string BuildAttribute(TestSourceBuilderOptions options)
