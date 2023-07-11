@@ -62,11 +62,11 @@ public class MapperGenerator : IIncrementalGenerator
 #if DEBUG_SOURCE_GENERATOR
         DebuggerUtil.AttachDebugger();
 #endif
-        var mapperAttributeSymbol = compilation.GetTypeByMetadataName(MapperAttributeName);
+        var wellKnownTypes = new WellKnownTypes(compilation);
+        var mapperAttributeSymbol = wellKnownTypes.TryGet(MapperAttributeName);
         if (mapperAttributeSymbol == null)
             return MapperResults.Empty;
 
-        var wellKnownTypes = new WellKnownTypes(compilation);
         var symbolAccessor = new SymbolAccessor(wellKnownTypes);
         var uniqueNameBuilder = new UniqueNameBuilder();
 
