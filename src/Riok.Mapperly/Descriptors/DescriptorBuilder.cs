@@ -12,6 +12,7 @@ namespace Riok.Mapperly.Descriptors;
 public class DescriptorBuilder
 {
     private readonly MapperDescriptor _mapperDescriptor;
+    private readonly SymbolAccessor _symbolAccessor;
 
     private readonly MappingCollection _mappings = new();
     private readonly MethodNameBuilder _methodNameBuilder = new();
@@ -25,15 +26,18 @@ public class DescriptorBuilder
         Compilation compilation,
         ClassDeclarationSyntax mapperSyntax,
         INamedTypeSymbol mapperSymbol,
-        WellKnownTypes wellKnownTypes
+        WellKnownTypes wellKnownTypes,
+        SymbolAccessor symbolAccessor
     )
     {
         _mapperDescriptor = new MapperDescriptor(mapperSyntax, mapperSymbol, _methodNameBuilder);
+        _symbolAccessor = symbolAccessor;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
         _builderContext = new SimpleMappingBuilderContext(
             compilation,
-            new MapperConfiguration(wellKnownTypes, mapperSymbol),
+            new MapperConfiguration(symbolAccessor, mapperSymbol),
             wellKnownTypes,
+            _symbolAccessor,
             _mapperDescriptor,
             sourceContext,
             new MappingBuilder(_mappings),
@@ -77,7 +81,7 @@ public class DescriptorBuilder
 
     private void ReserveMethodNames()
     {
-        foreach (var methodSymbol in _mapperDescriptor.Symbol.GetAllMembers())
+        foreach (var methodSymbol in _symbolAccessor.GetAllMembers(_mapperDescriptor.Symbol))
         {
             _methodNameBuilder.Reserve(methodSymbol.Name);
         }

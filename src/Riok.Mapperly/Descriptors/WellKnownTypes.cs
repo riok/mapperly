@@ -21,10 +21,16 @@ public class WellKnownTypes
     public ITypeSymbol GetArrayType(ITypeSymbol type) =>
         _compilation.CreateArrayTypeSymbol(type, elementNullableAnnotation: type.NullableAnnotation).NonNullable();
 
-    public INamedTypeSymbol Get<T>() => Get(typeof(T).FullName);
+    public INamedTypeSymbol Get<T>() => Get(typeof(T));
 
-    public INamedTypeSymbol Get(Type type) =>
-        Get(type.FullName ?? throw new InvalidOperationException("Could not get name of type " + type));
+    public INamedTypeSymbol Get(Type type)
+    {
+        if (type.IsConstructedGenericType)
+        {
+            type = type.GetGenericTypeDefinition();
+        }
+        return Get(type.FullName ?? throw new InvalidOperationException("Could not get name of type " + type));
+    }
 
     public INamedTypeSymbol Get(string typeFullName) =>
         TryGet(typeFullName) ?? throw new InvalidOperationException("Could not get type " + typeFullName);

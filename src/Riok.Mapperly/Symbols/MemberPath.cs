@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
@@ -179,18 +180,20 @@ public class MemberPath
         ITypeSymbol type,
         IEnumerable<IEnumerable<string>> pathCandidates,
         IReadOnlyCollection<string> ignoredNames,
+        SymbolAccessor symbolAccessor,
         [NotNullWhen(true)] out MemberPath? memberPath
-    ) => TryFind(type, pathCandidates, ignoredNames, StringComparer.Ordinal, out memberPath);
+    ) => TryFind(type, pathCandidates, ignoredNames, StringComparer.Ordinal, symbolAccessor, out memberPath);
 
     public static bool TryFind(
         ITypeSymbol type,
         IEnumerable<IEnumerable<string>> pathCandidates,
         IReadOnlyCollection<string> ignoredNames,
         IEqualityComparer<string> comparer,
+        SymbolAccessor symbolAccessor,
         [NotNullWhen(true)] out MemberPath? memberPath
     )
     {
-        foreach (var pathCandidate in FindCandidates(type, pathCandidates, comparer))
+        foreach (var pathCandidate in FindCandidates(type, pathCandidates, comparer, symbolAccessor))
         {
             if (ignoredNames.Contains(pathCandidate.Path.First().Name))
                 continue;
@@ -203,18 +206,23 @@ public class MemberPath
         return false;
     }
 
-    public static bool TryFind(ITypeSymbol type, IReadOnlyCollection<string> path, [NotNullWhen(true)] out MemberPath? memberPath) =>
-        TryFind(type, path, StringComparer.Ordinal, out memberPath);
+    public static bool TryFind(
+        ITypeSymbol type,
+        IReadOnlyCollection<string> path,
+        SymbolAccessor symbolAccessor,
+        [NotNullWhen(true)] out MemberPath? memberPath
+    ) => TryFind(type, path, StringComparer.Ordinal, symbolAccessor, out memberPath);
 
     private static IEnumerable<MemberPath> FindCandidates(
         ITypeSymbol type,
         IEnumerable<IEnumerable<string>> pathCandidates,
-        IEqualityComparer<string> comparer
+        IEqualityComparer<string> comparer,
+        SymbolAccessor symbolAccessor
     )
     {
         foreach (var pathCandidate in pathCandidates)
         {
-            if (TryFind(type, pathCandidate.ToList(), comparer, out var memberPath))
+            if (TryFind(type, pathCandidate.ToList(), comparer, symbolAccessor, out var memberPath))
                 yield return memberPath;
         }
     }
@@ -223,10 +231,11 @@ public class MemberPath
         ITypeSymbol type,
         IReadOnlyCollection<string> path,
         IEqualityComparer<string> comparer,
+        SymbolAccessor symbolAccessor,
         [NotNullWhen(true)] out MemberPath? memberPath
     )
     {
-        var foundPath = Find(type, path, comparer).ToList();
+        var foundPath = Find(type, path, comparer, symbolAccessor).ToList();
         if (foundPath.Count != path.Count)
         {
             memberPath = null;
@@ -237,11 +246,16 @@ public class MemberPath
         return true;
     }
 
-    private static IEnumerable<IMappableMember> Find(ITypeSymbol type, IEnumerable<string> path, IEqualityComparer<string> comparer)
+    private static IEnumerable<IMappableMember> Find(
+        ITypeSymbol type,
+        IEnumerable<string> path,
+        IEqualityComparer<string> comparer,
+        SymbolAccessor symbolAccessor
+    )
     {
         foreach (var name in path)
         {
-            if (FindMember(type, name, comparer) is not { } member)
+            if (FindMember(type, name, comparer, symbolAccessor) is not { } member)
                 break;
 
             type = member.Type;
@@ -249,8 +263,13 @@ public class MemberPath
         }
     }
 
-    private static IMappableMember? FindMember(ITypeSymbol type, string name, IEqualityComparer<string> comparer)
+    private static IMappableMember? FindMember(
+        ITypeSymbol type,
+        string name,
+        IEqualityComparer<string> comparer,
+        SymbolAccessor symbolAccessor
+    )
     {
-        return type.GetMappableMembers(name, comparer).FirstOrDefault();
+        return symbolAccessor.GetMappableMembers(type, name, comparer).FirstOrDefault();
     }
 }

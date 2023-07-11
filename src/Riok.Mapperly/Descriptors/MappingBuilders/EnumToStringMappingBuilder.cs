@@ -18,6 +18,6 @@ public static class EnumToStringMappingBuilder
 
         // to string => use an optimized method of Enum.ToString which would use slow reflection
         // use Enum.ToString as fallback (for ex. for flags)
-        return new EnumToStringMapping(ctx.Source, ctx.Target, ctx.Source.GetMembers().OfType<IFieldSymbol>());
+        return new EnumToStringMapping(ctx.Source, ctx.Target, ctx.SymbolAccessor.GetAllFields(ctx.Source));
     }
 }

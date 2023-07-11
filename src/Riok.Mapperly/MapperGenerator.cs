@@ -38,6 +38,7 @@ public class MapperGenerator : IIncrementalGenerator
             return;
 
         var wellKnownTypes = new WellKnownTypes(compilation);
+        var symbolAccessor = new SymbolAccessor(wellKnownTypes);
         var uniqueNameBuilder = new UniqueNameBuilder();
         foreach (var mapperSyntax in mappers.Distinct())
         {
@@ -45,10 +46,10 @@ public class MapperGenerator : IIncrementalGenerator
             if (mapperModel.GetDeclaredSymbol(mapperSyntax) is not INamedTypeSymbol mapperSymbol)
                 continue;
 
-            if (!mapperSymbol.HasAttribute(mapperAttributeSymbol))
+            if (!symbolAccessor.HasAttribute<MapperAttribute>(mapperSymbol))
                 continue;
 
-            var builder = new DescriptorBuilder(ctx, compilation, mapperSyntax, mapperSymbol, wellKnownTypes);
+            var builder = new DescriptorBuilder(ctx, compilation, mapperSyntax, mapperSymbol, wellKnownTypes, symbolAccessor);
             var descriptor = builder.Build();
 
             ctx.AddSource(

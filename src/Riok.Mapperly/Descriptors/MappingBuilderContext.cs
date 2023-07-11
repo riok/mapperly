@@ -53,7 +53,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public ITypeSymbol Target { get; }
 
-    public CollectionInfos? CollectionInfos => _collectionInfos ??= CollectionInfoBuilder.Build(Types, Source, Target);
+    public CollectionInfos? CollectionInfos => _collectionInfos ??= CollectionInfoBuilder.Build(Types, SymbolAccessor, Source, Target);
 
     protected IMethodSymbol? UserSymbol { get; }
 

@@ -62,17 +62,15 @@ public static class EnumMappingBuilder
     {
         var explicitMappingSourceNames = explicitMappings.Keys.Select(x => x.Name).ToHashSet();
         var explicitMappingTargetNames = explicitMappings.Values.Select(x => x.Name).ToHashSet();
-        var sourceValues = ctx.Source
-            .GetMembers()
-            .OfType<IFieldSymbol>()
+        var sourceValues = ctx.SymbolAccessor
+            .GetAllFields(ctx.Source)
             .Where(x => !explicitMappingSourceNames.Contains(x.Name))
             .ToDictionary(field => field.Name, field => field.ConstantValue);
-        var targetValues = ctx.Target
-            .GetMembers()
-            .OfType<IFieldSymbol>()
+        var targetValues = ctx.SymbolAccessor
+            .GetAllFields(ctx.Target)
             .Where(x => !explicitMappingTargetNames.Contains(x.Name))
             .ToDictionary(field => field.Name, field => field.ConstantValue);
-        var targetMemberNames = ctx.Target.GetMembers().OfType<IFieldSymbol>().Select(x => x.Name).ToHashSet();
+        var targetMemberNames = ctx.SymbolAccessor.GetAllFields(ctx.Target).Select(x => x.Name).ToHashSet();
 
         var missingTargetValues = targetValues.Where(
             field =>
@@ -99,7 +97,7 @@ public static class EnumMappingBuilder
         var checkDefinedMode = checkTargetDefined switch
         {
             false => EnumCastMapping.CheckDefinedMode.NoCheck,
-            _ when ctx.Target.HasAttribute(ctx.Types.Get<FlagsAttribute>()) => EnumCastMapping.CheckDefinedMode.Flags,
+            _ when ctx.SymbolAccessor.HasAttribute<FlagsAttribute>(ctx.Target) => EnumCastMapping.CheckDefinedMode.Flags,
             _ => EnumCastMapping.CheckDefinedMode.Value,
         };
 
@@ -124,8 +122,8 @@ public static class EnumMappingBuilder
     )
     {
         var fallbackMapping = BuildFallbackMapping(ctx);
-        var targetFieldsByName = ctx.Target.GetMembers().OfType<IFieldSymbol>().ToDictionary(x => x.Name);
-        var sourceFieldsByName = ctx.Source.GetMembers().OfType<IFieldSymbol>().ToDictionary(x => x.Name);
+        var targetFieldsByName = ctx.SymbolAccessor.GetAllFields(ctx.Target).ToDictionary(x => x.Name);
+        var sourceFieldsByName = ctx.SymbolAccessor.GetAllFields(ctx.Source).ToDictionary(x => x.Name);
 
         Func<IFieldSymbol, IFieldSymbol?> getTargetField;
         if (ctx.Configuration.Enum.IgnoreCase)
@@ -143,9 +141,8 @@ public static class EnumMappingBuilder
             getTargetField = source => explicitMappings.GetValueOrDefault(source) ?? targetFieldsByName.GetValueOrDefault(source.Name);
         }
 
-        var enumMemberMappings = ctx.Source
-            .GetMembers()
-            .OfType<IFieldSymbol>()
+        var enumMemberMappings = ctx.SymbolAccessor
+            .GetAllFields(ctx.Source)
             .Select(x => (Source: x, Target: getTargetField(x)))
             .Where(x => x.Target != null)
             .ToDictionary(x => x.Source.Name, x => x.Target!.Name);

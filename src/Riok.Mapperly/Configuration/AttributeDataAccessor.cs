@@ -10,11 +10,11 @@ namespace Riok.Mapperly.Configuration;
 /// </summary>
 internal class AttributeDataAccessor
 {
-    private readonly WellKnownTypes _types;
+    private readonly SymbolAccessor _symbolAccessor;
 
-    public AttributeDataAccessor(WellKnownTypes types)
+    public AttributeDataAccessor(SymbolAccessor symbolAccessor)
     {
-        _types = types;
+        _symbolAccessor = symbolAccessor;
     }
 
     public T AccessSingle<T>(ISymbol symbol)
@@ -42,11 +42,8 @@ internal class AttributeDataAccessor
     {
         var attrType = typeof(TAttribute);
         var dataType = typeof(TData);
-        var attrSymbol = _types.Get($"{attrType.Namespace}.{attrType.Name}");
 
-        var attrDatas = symbol
-            .GetAttributes()
-            .Where(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass?.ConstructedFrom ?? x.AttributeClass, attrSymbol));
+        var attrDatas = _symbolAccessor.GetAttributes<TAttribute>(symbol);
 
         foreach (var attrData in attrDatas)
         {
