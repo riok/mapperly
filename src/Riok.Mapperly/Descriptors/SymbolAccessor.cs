@@ -22,8 +22,13 @@ public class SymbolAccessor
         where T : Attribute
     {
         var attributeSymbol = _types.Get<T>();
-        return GetAttributesCore(symbol)
-            .Where(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass?.ConstructedFrom ?? x.AttributeClass, attributeSymbol));
+        foreach (var attr in GetAttributesCore(symbol))
+        {
+            if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass?.ConstructedFrom ?? attr.AttributeClass, attributeSymbol))
+            {
+                yield return attr;
+            }
+        }
     }
 
     internal bool HasAttribute<T>(ISymbol symbol)
@@ -67,7 +72,13 @@ public class SymbolAccessor
 
     internal IEnumerable<IMappableMember> GetMappableMembers(ITypeSymbol symbol, string name, IEqualityComparer<string> comparer)
     {
-        return GetAllAccessibleMappableMembers(symbol).Where(x => comparer.Equals(name, x.Name));
+        foreach (var member in GetAllAccessibleMappableMembers(symbol))
+        {
+            if (comparer.Equals(name, member.Name))
+            {
+                yield return member;
+            }
+        }
     }
 
     private IEnumerable<ISymbol> GetAllMembers(ITypeSymbol symbol, string name) => GetAllMembers(symbol).Where(x => name.Equals(x.Name));

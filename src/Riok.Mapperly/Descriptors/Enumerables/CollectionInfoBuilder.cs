@@ -100,7 +100,7 @@ public static class CollectionInfoBuilder
             typeInfo,
             GetImplementedCollectionTypes(wellKnownTypes, type, typeInfo),
             enumeratedType,
-            FindCountProperty(wellKnownTypes, symbolAccessor, type, typeInfo),
+            FindCountProperty(symbolAccessor, type, typeInfo),
             HasValidAddMethod(wellKnownTypes, type, typeInfo),
             collectionTypeInfo?.Immutable == true
         );
@@ -115,11 +115,20 @@ public static class CollectionInfoBuilder
         if (type is not ({ IsValueType: true, IsReadOnly: true } and INamedTypeSymbol { TypeArguments.Length: 1 } namedType))
             return null;
 
-        // if the collection is Span<> or Memory<> etc, get the type symbol
+        // if the collection is a ref type the check for Span<> or ReadOnlySpanSpan<>
         if (
-            SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, types.Get(typeof(Span<>)))
-            || SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, types.Get(typeof(ReadOnlySpan<>)))
-            || SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, types.Get(typeof(Memory<>)))
+            namedType.IsRefLikeType
+            && (
+                SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, types.Get(typeof(Span<>)))
+                || SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, types.Get(typeof(ReadOnlySpan<>)))
+            )
+        )
+        {
+            return namedType.TypeArguments[0];
+        }
+        // Memory<> or ReadOnlyMemory<> etc, get the type symbol
+        if (
+            SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, types.Get(typeof(Memory<>)))
             || SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, types.Get(typeof(ReadOnlyMemory<>)))
         )
         {
@@ -149,7 +158,7 @@ public static class CollectionInfoBuilder
             || t.HasImplicitGenericImplementation(types.Get(typeof(ISet<>)), nameof(ISet<object>.Add));
     }
 
-    private static string? FindCountProperty(WellKnownTypes types, SymbolAccessor symbolAccessor, ITypeSymbol t, CollectionType typeInfo)
+    private static string? FindCountProperty(SymbolAccessor symbolAccessor, ITypeSymbol t, CollectionType typeInfo)
     {
         if (typeInfo is CollectionType.IEnumerable)
             return null;
@@ -170,7 +179,7 @@ public static class CollectionInfoBuilder
         var member = symbolAccessor
             .GetAllAccessibleMappableMembers(t)
             .FirstOrDefault(
-                x => x.Name is nameof(ICollection<object>.Count) or nameof(Array.Length) && x.Type.SpecialType == SpecialType.System_Int32
+                x => x.Type.SpecialType == SpecialType.System_Int32 && x.Name is nameof(ICollection<object>.Count) or nameof(Array.Length)
             );
         return member?.Name;
     }
