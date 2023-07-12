@@ -47,7 +47,7 @@ jobs:
       - run: dotnet build
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version-file: './docs/.node-version'
       - run: npm ci
         working-directory: ./docs
       - run: npm run prebuild
