@@ -333,6 +333,29 @@ public class ObjectPropertyTest
     }
 
     [Fact]
+    public void PrivateMemberPropertyShouldNotOverride()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { private int MyValue { get; set; } public C My { get; set; } }",
+            "class B { public int MyValue { get; set; } }",
+            "class C { public int Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.MyValue = source.My.Value;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public Task WithPrivateSourceGetterShouldIgnoreAndDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
