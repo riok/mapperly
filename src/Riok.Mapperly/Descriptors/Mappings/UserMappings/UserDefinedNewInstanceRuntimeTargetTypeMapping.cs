@@ -15,10 +15,11 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMap
 {
     private const string IsAssignableFromMethodName = nameof(Type.IsAssignableFrom);
     private const string GetTypeMethodName = nameof(GetType);
+    private const string ReferenceHandlerTypeName =
+        "global::Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler";
 
     private readonly List<RuntimeTargetTypeMapping> _mappings = new();
     private readonly bool _enableReferenceHandling;
-    private readonly INamedTypeSymbol _referenceHandlerType;
     private readonly NullFallbackValue _nullArm;
     private readonly ITypeSymbol _objectType;
 
@@ -27,7 +28,6 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMap
         MethodParameter sourceParameter,
         MethodParameter? referenceHandlerParameter,
         bool enableReferenceHandling,
-        INamedTypeSymbol referenceHandlerType,
         NullFallbackValue nullArm,
         ITypeSymbol objectType
     )
@@ -35,7 +35,6 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMap
     {
         Method = method;
         _enableReferenceHandling = enableReferenceHandling;
-        _referenceHandlerType = referenceHandlerType;
         _nullArm = nullArm;
         _objectType = objectType;
     }
@@ -61,7 +60,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMap
         {
             // var refHandler = new RefHandler();
             var referenceHandlerName = ctx.NameBuilder.New(DefaultReferenceHandlerParameterName);
-            var createRefHandler = CreateInstance(_referenceHandlerType);
+            var createRefHandler = CreateInstance(ReferenceHandlerTypeName);
             yield return DeclareLocalVariable(referenceHandlerName, createRefHandler);
 
             ctx = ctx.WithRefHandler(referenceHandlerName);

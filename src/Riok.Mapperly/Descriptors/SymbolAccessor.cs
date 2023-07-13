@@ -21,8 +21,14 @@ public class SymbolAccessor
     internal IEnumerable<AttributeData> GetAttributes<T>(ISymbol symbol)
         where T : Attribute
     {
+        var attributes = GetAttributesCore(symbol);
+        if (attributes.IsEmpty)
+        {
+            yield break;
+        }
+
         var attributeSymbol = _types.Get<T>();
-        foreach (var attr in GetAttributesCore(symbol))
+        foreach (var attr in attributes)
         {
             if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass?.ConstructedFrom ?? attr.AttributeClass, attributeSymbol))
             {

@@ -354,6 +354,12 @@ public static class SyntaxFactoryHelper
     public static StatementSyntax CreateInstance(string variableName, ITypeSymbol typeSymbol) =>
         DeclareLocalVariable(variableName, CreateInstance(typeSymbol));
 
+    public static ObjectCreationExpressionSyntax CreateInstance(string typeName)
+    {
+        var type = IdentifierName(typeName);
+        return ObjectCreationExpression(type).WithArgumentList(SyntaxFactory.ArgumentList());
+    }
+
     public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol)
     {
         var type = NonNullableIdentifier(typeSymbol);
