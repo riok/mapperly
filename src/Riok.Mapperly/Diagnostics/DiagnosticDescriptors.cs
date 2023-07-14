@@ -401,4 +401,13 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         true
     );
+
+    public static readonly DiagnosticDescriptor LanguageVersionNotSupported = new DiagnosticDescriptor(
+        "RMG046",
+        "The used C# language version is not supported by Mapperly, Mapperly requires at least C# 9.0",
+        "Mapperly does not support the C# language version {0} but requires at C# least version {1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
 }

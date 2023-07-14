@@ -1,10 +1,12 @@
 ﻿using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors;
+using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Emit;
 using Riok.Mapperly.Helpers;
 
@@ -22,6 +24,8 @@ public class MapperGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
         var mapperClassDeclarations = SyntaxProvider.GetClassDeclarations(context);
+
+        context.ReportDiagnostics(context.CompilationProvider.Select(static (compilation, ct) => BuildCompilationDiagnostics(compilation)));
 
         var compilationAndMappers = context.CompilationProvider.Combine(mapperClassDeclarations.Collect());
         var mappersWithDiagnostics = compilationAndMappers.Select(
@@ -88,5 +92,21 @@ public class MapperGenerator : IIncrementalGenerator
 
         cancellationToken.ThrowIfCancellationRequested();
         return new MapperResults(members.ToImmutableEquatableArray(), diagnostics.ToImmutableEquatableArray());
+    }
+
+    private static ImmutableEquatableArray<Diagnostic> BuildCompilationDiagnostics(Compilation compilation)
+    {
+        if (compilation is CSharpCompilation { LanguageVersion: < LanguageVersion.CSharp9 } cSharpCompilation)
+        {
+            var diagnostic = Diagnostic.Create(
+                DiagnosticDescriptors.LanguageVersionNotSupported,
+                null,
+                cSharpCompilation.LanguageVersion.ToDisplayString(),
+                LanguageVersion.CSharp9.ToDisplayString()
+            );
+            return ImmutableEquatableArray.Create(diagnostic);
+        }
+
+        return ImmutableEquatableArray.Empty<Diagnostic>();
     }
 }
