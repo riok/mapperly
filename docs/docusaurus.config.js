@@ -43,6 +43,12 @@ async function createConfig() {
     themeConfig:
       /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
       ({
+        metadata: [
+          {
+            name: 'keywords',
+            content: '.NET, SourceGenerator, Mapping, Roslyn, dotnet',
+          },
+        ],
         colorMode: {
           disableSwitch: true,
         },
@@ -176,6 +182,7 @@ async function createConfig() {
     ],
     customFields: {
       mapperlyVersion: process.env.MAPPERLY_VERSION || '0.0.1-dev',
+      environment: process.env.ENVIRONMENT,
     },
   };
 }

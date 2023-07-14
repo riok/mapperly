@@ -107,9 +107,19 @@ async function buildSamples(): Promise<void> {
   }
 }
 
+async function buildRobotsTxt(): Promise<void> {
+  const targetFile = 'static/robots.txt';
+  const content =
+    process.env.ENVIRONMENT === 'next'
+      ? 'User-agent: *\nDisallow: /\n'
+      : 'User-agent: *\n';
+  await writeFile(targetFile, content);
+}
+
 (async () => {
   await emptyDirectory(generatedDataDir);
   await buildApiDocs();
   await buildAnalyzerRulesData();
   await buildSamples();
+  await buildRobotsTxt();
 })();

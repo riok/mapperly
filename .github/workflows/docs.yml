@@ -50,14 +50,13 @@ jobs:
           node-version-file: './docs/.node-version'
       - run: npm ci
         working-directory: ./docs
-      - run: npm run prebuild
-        working-directory: ./docs
       - run: npm run lint
         working-directory: ./docs
       - run: npm run build
         working-directory: ./docs
         env:
           MAPPERLY_VERSION: ${{ inputs.version }}
+          ENVIRONMENT: ${{ inputs.environment }}
       - uses: actions/upload-artifact@v3
         with:
           name: mapperly-docs

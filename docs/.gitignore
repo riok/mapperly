@@ -24,3 +24,4 @@ yarn-error.log*
 
 # generated data files
 /src/data/generated/
+/static/robots.txt
