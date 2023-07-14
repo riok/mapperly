@@ -276,10 +276,10 @@ internal static class DiagnosticDescriptors
         true
     );
 
-    public static readonly DiagnosticDescriptor EnumMappingStrategyByNameNotSupportedInProjectionMappings = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor EnumMappingNotSupportedInProjectionMappings = new DiagnosticDescriptor(
         "RMG032",
-        "The enum mapping strategy ByName, ByValueCheckDefined and explicit enum mappings cannot be used in projection mappings",
-        "The enum mapping strategy ByName, ByValueCheckDefined and explicit enum mappings cannot be used in projection mappings to map from {0} to {1}",
+        "The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings",
+        "The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings to map from {0} to {1}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true
@@ -379,6 +379,24 @@ internal static class DiagnosticDescriptors
         "RMG043",
         "Enum fallback values are only supported for the ByName and ByValueCheckDefined strategies, but not for the ByValue strategy",
         "Enum fallback values are only supported for the ByName and ByValueCheckDefined strategies, but not for the ByValue strategy",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor IgnoredEnumSourceMemberNotFound = new DiagnosticDescriptor(
+        "RMG044",
+        "An ignored enum member can not be found on the source enum",
+        "Ignored enum member {0} ({1}) on {2} not found on source enum {3}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor IgnoredEnumTargetMemberNotFound = new DiagnosticDescriptor(
+        "RMG045",
+        "An ignored enum member can not be found on the target enum",
+        "Ignored enum member {0} ({1}) not found on target enum {3}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true

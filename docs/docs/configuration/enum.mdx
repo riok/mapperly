@@ -75,6 +75,23 @@ public partial class CarMapper
 }
 ```
 
+## Ignore enum values
+
+To ignore an enum value the `MapperIgnoreSourceValue` or `MapperIgnoreTargetValue` attributes can be used.
+This is especially useful when applying [strict enum mappings](#strict-enum-mappings).
+
+```csharp
+[Mapper]
+public partial class CarMapper
+{
+    // highlight-start
+    [MapperIgnoreSourceValue(Fruit.Apple)]
+    [MapperIgnoreTargetValue(FruitDto.Pineapple)]
+    // highlight-end
+    public partial FruitDto Map(Fruit source);
+}
+```
+
 ## Fallback value
 
 To map to a fallback value instead of throwing when encountering an unknown value,

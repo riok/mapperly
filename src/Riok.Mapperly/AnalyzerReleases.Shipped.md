@@ -102,3 +102,5 @@ RMG040  | Mapper   | Error    | A target enum member value does not match the ta
 RMG041  | Mapper   | Error    | A source enum member value does not match the source enum type
 RMG042  | Mapper   | Error    | The type of the enum fallback value does not match the target enum type
 RMG043  | Mapper   | Warning  | Enum fallback values are only supported for the ByName and ByValueCheckDefined strategies, but not for the ByValue strategy
+RMG044  | Mapper   | Warning  | An ignored enum member can not be found on the source enum
+RMG045  | Mapper   | Warning  | An ignored enum member can not be found on the target enum

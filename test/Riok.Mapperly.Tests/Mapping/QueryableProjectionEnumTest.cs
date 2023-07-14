@@ -41,8 +41,8 @@ public class QueryableProjectionEnumTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                DiagnosticDescriptors.EnumMappingStrategyByNameNotSupportedInProjectionMappings,
-                "The enum mapping strategy ByName, ByValueCheckDefined and explicit enum mappings cannot be used in projection mappings to map from C to D"
+                DiagnosticDescriptors.EnumMappingNotSupportedInProjectionMappings,
+                "The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings to map from C to D"
             )
             .HaveAssertedAllDiagnostics();
     }
@@ -71,8 +71,8 @@ public class QueryableProjectionEnumTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
-                DiagnosticDescriptors.EnumMappingStrategyByNameNotSupportedInProjectionMappings,
-                "The enum mapping strategy ByName, ByValueCheckDefined and explicit enum mappings cannot be used in projection mappings to map from C to D"
+                DiagnosticDescriptors.EnumMappingNotSupportedInProjectionMappings,
+                "The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings to map from C to D"
             )
             .HaveDiagnostic(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member Value2 (200) on D not found on source enum C")
             .HaveDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member Value2 (100) on C not found on target enum D")

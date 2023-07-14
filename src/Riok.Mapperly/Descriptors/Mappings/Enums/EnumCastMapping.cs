@@ -12,7 +12,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 public class EnumCastMapping : CastMapping
 {
     private readonly CheckDefinedMode _checkDefinedMode;
-    private readonly IReadOnlyCollection<string> _targetEnumMemberNames;
+    private readonly IReadOnlyCollection<IFieldSymbol> _targetEnumMembers;
     private readonly EnumFallbackValueMapping _fallback;
 
     public enum CheckDefinedMode
@@ -37,13 +37,13 @@ public class EnumCastMapping : CastMapping
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         CheckDefinedMode checkDefinedMode,
-        IReadOnlyCollection<string> targetEnumMemberNames,
+        IReadOnlyCollection<IFieldSymbol> targetEnumMembers,
         EnumFallbackValueMapping fallback
     )
         : base(sourceType, targetType)
     {
         _checkDefinedMode = checkDefinedMode;
-        _targetEnumMemberNames = targetEnumMemberNames;
+        _targetEnumMembers = targetEnumMembers;
         _fallback = fallback;
     }
 
@@ -59,7 +59,7 @@ public class EnumCastMapping : CastMapping
 
     private ExpressionSyntax BuildIsDefinedCondition(ExpressionSyntax convertedSourceValue)
     {
-        var allEnumMembers = _targetEnumMemberNames.Select(x => MemberAccess(FullyQualifiedIdentifier(TargetType), x));
+        var allEnumMembers = _targetEnumMembers.Select(x => MemberAccess(FullyQualifiedIdentifier(TargetType), x.Name));
         return _checkDefinedMode switch
         {
             // (TargetEnum)v is TargetEnum.A or TargetEnum.B or ...
