@@ -20,11 +20,10 @@ public class UserDefinedNewInstanceGenericTypeMapping : UserDefinedNewInstanceRu
         GenericMappingTypeParameters typeParameters,
         MappingMethodParameters parameters,
         bool enableReferenceHandling,
-        INamedTypeSymbol referenceHandlerType,
         NullFallbackValue nullArm,
         ITypeSymbol objectType
     )
-        : base(method, parameters.Source, parameters.ReferenceHandler, enableReferenceHandling, referenceHandlerType, nullArm, objectType)
+        : base(method, parameters.Source, parameters.ReferenceHandler, enableReferenceHandling, nullArm, objectType)
     {
         TypeParameters = typeParameters;
     }

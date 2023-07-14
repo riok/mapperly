@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
-using Riok.Mapperly.Abstractions.ReferenceHandling.Internal;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
@@ -104,7 +103,6 @@ public static class UserMethodMappingExtractor
                 methodSymbol,
                 runtimeTargetTypeParams,
                 ctx.MapperConfiguration.UseReferenceHandling,
-                ctx.Types.Get<PreserveReferenceHandler>(),
                 GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams, null),
                 ctx.Compilation.ObjectType
             );
@@ -123,7 +121,6 @@ public static class UserMethodMappingExtractor
                 typeParameters.Value,
                 parameters,
                 ctx.MapperConfiguration.UseReferenceHandling,
-                ctx.Types.Get<PreserveReferenceHandler>(),
                 GetTypeSwitchNullArm(methodSymbol, parameters, typeParameters),
                 ctx.Compilation.ObjectType
             );
@@ -142,8 +139,7 @@ public static class UserMethodMappingExtractor
                 parameters.Source,
                 parameters.Target.Value,
                 parameters.ReferenceHandler,
-                ctx.MapperConfiguration.UseReferenceHandling,
-                ctx.Types.Get<PreserveReferenceHandler>()
+                ctx.MapperConfiguration.UseReferenceHandling
             );
         }
 
@@ -151,8 +147,7 @@ public static class UserMethodMappingExtractor
             methodSymbol,
             parameters.Source,
             parameters.ReferenceHandler,
-            ctx.MapperConfiguration.UseReferenceHandling,
-            ctx.Types.Get<PreserveReferenceHandler>()
+            ctx.MapperConfiguration.UseReferenceHandling
         );
     }
 

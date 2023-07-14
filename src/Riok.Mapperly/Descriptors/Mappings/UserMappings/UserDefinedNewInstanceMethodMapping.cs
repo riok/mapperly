@@ -13,21 +13,20 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 public class UserDefinedNewInstanceMethodMapping : MethodMapping, IDelegateUserMapping
 {
     private const string NoMappingComment = "// Could not generate mapping";
+    private const string ReferenceHandlerTypeName =
+        "global::Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler";
 
     private readonly bool _enableReferenceHandling;
-    private readonly INamedTypeSymbol _referenceHandlerType;
 
     public UserDefinedNewInstanceMethodMapping(
         IMethodSymbol method,
         MethodParameter sourceParameter,
         MethodParameter? referenceHandlerParameter,
-        bool enableReferenceHandling,
-        INamedTypeSymbol referenceHandlerType
+        bool enableReferenceHandling
     )
         : base(method, sourceParameter, referenceHandlerParameter, method.ReturnType.UpgradeNullable())
     {
         _enableReferenceHandling = enableReferenceHandling;
-        _referenceHandlerType = referenceHandlerType;
         Method = method;
     }
 
@@ -50,7 +49,7 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IDelegateUserM
         if (_enableReferenceHandling && ReferenceHandlerParameter == null)
         {
             // new RefHandler();
-            var createRefHandler = CreateInstance(_referenceHandlerType);
+            var createRefHandler = CreateInstance(ReferenceHandlerTypeName);
             ctx = ctx.WithRefHandler(createRefHandler);
             return new[] { ReturnStatement(DelegateMapping.Build(ctx)) };
         }

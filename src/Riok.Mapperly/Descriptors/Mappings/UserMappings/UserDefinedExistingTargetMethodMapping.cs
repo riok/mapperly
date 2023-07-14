@@ -15,8 +15,10 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
 {
     private const string NoMappingComment = "// Could not generate mapping";
 
+    private const string ReferenceHandlerTypeName =
+        "global::Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler";
+
     private readonly bool _enableReferenceHandling;
-    private readonly INamedTypeSymbol _referenceHandlerType;
     private IExistingTargetMapping? _delegateMapping;
 
     public UserDefinedExistingTargetMethodMapping(
@@ -24,13 +26,11 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
         MethodParameter sourceParameter,
         MethodParameter targetParameter,
         MethodParameter? referenceHandlerParameter,
-        bool enableReferenceHandling,
-        INamedTypeSymbol referenceHandlerType
+        bool enableReferenceHandling
     )
         : base(method, sourceParameter, referenceHandlerParameter, targetParameter.Type)
     {
         _enableReferenceHandling = enableReferenceHandling;
-        _referenceHandlerType = referenceHandlerType;
         Method = method;
         TargetParameter = targetParameter;
     }
@@ -68,7 +68,7 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
         {
             // var refHandler = new RefHandler();
             var referenceHandlerName = ctx.NameBuilder.New(DefaultReferenceHandlerParameterName);
-            var createRefHandler = CreateInstance(_referenceHandlerType);
+            var createRefHandler = CreateInstance(ReferenceHandlerTypeName);
             yield return DeclareLocalVariable(referenceHandlerName, createRefHandler);
             ctx = ctx.WithRefHandler(referenceHandlerName);
         }
