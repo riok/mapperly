@@ -11,8 +11,12 @@ Check [here](../configuration/generated-source.mdx) on how to inspect the genera
 To debug the Mapperly in unit tests set a breakpoint
 in the code of Mappery which you want to debug and run the tests in debug mode.
 
-Since Mapperly runs integrated into the build pipeline,
-debugging integration tests and other applications needs some more effort.
+If your IDE supports the `DebugRoslynComponent` launch configuration command,
+you can just set your breakpoints and debug the preconfigured `integration-tests` profile which will debug Mapperly
+in the context of the integration tests.
+
+If your IDE does not support `DebugRoslynComponent`,
+debugging the integration tests requires some more effort.
 Mapperly uses a compile constant `DEBUG_SOURCE_GENERATOR` to determine whether to attach a debugger.
 If it is set, it tries to attach a debugger
 (it uses `Debugger.Launch()` on windows, on other operating systems it tries to launch JetBrains Rider)

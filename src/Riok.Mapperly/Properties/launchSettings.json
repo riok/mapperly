@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "integration-tests": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "../../test/Riok.Mapperly.IntegrationTests/Riok.Mapperly.IntegrationTests.csproj"
+    }
+  }
+}
