@@ -1,3 +1,6 @@
+using Microsoft.CodeAnalysis.CSharp;
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 [UsesVerify]
@@ -107,5 +110,19 @@ public class MapperTest
         );
 
         return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void LanguageLevelLower9ShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping("string", "int");
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics with { LanguageVersion = LanguageVersion.CSharp8 })
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.LanguageVersionNotSupported,
+                "Mapperly does not support the C# language version 8.0 but requires at C# least version 9.0"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 }

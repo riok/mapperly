@@ -35,17 +35,17 @@ public class IncrementalGeneratorTest
 
         var secondary = TestSourceBuilder.SyntaxTree(
             """
-                    using Riok.Mapperly.Abstractions;
+            using Riok.Mapperly.Abstractions;
 
-                    namespace Test.B
-                    {
-                        [Mapper]
-                        internal partial class BarFooMapper
-                        {
-                            internal partial string BarToFoo(string value);
-                        }
-                    }
-                    """
+            namespace Test.B
+            {
+                [Mapper]
+                internal partial class BarFooMapper
+                {
+                    internal partial string BarToFoo(string value);
+                }
+            }
+            """
         );
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);

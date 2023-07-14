@@ -104,3 +104,4 @@ RMG042  | Mapper   | Error    | The type of the enum fallback value does not mat
 RMG043  | Mapper   | Warning  | Enum fallback values are only supported for the ByName and ByValueCheckDefined strategies, but not for the ByValue strategy
 RMG044  | Mapper   | Warning  | An ignored enum member can not be found on the source enum
 RMG045  | Mapper   | Warning  | An ignored enum member can not be found on the target enum
+RMG046  | Mapper   | Error    | The used C# language version is not supported by Mapperly, Mapperly requires at least C# 9.0
