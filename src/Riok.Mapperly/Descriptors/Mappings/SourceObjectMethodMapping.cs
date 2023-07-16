@@ -13,16 +13,16 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// target = Map(source.ToArray());
 /// </code>
 /// </summary>
-public class SourceObjectMethodMapping : TypeMapping
+public class SourceObjectMethodMapping : NewInstanceMapping
 {
     private readonly string _methodName;
-    private readonly ITypeMapping? _delegateMapping;
+    private readonly INewInstanceMapping? _delegateMapping;
 
     public SourceObjectMethodMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         string methodName,
-        ITypeMapping? delegateMapping = null
+        INewInstanceMapping? delegateMapping = null
     )
         : base(sourceType, targetType)
     {

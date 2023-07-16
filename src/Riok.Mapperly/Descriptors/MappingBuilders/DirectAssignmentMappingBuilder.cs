@@ -6,7 +6,7 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public static class DirectAssignmentMappingBuilder
 {
-    public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         return
             SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, ctx.Target)

@@ -14,14 +14,14 @@ public class ForEachAddEnumerableExistingTargetMapping : ExistingTargetMapping
 {
     private const string LoopItemVariableName = "item";
 
-    private readonly ITypeMapping _elementMapping;
+    private readonly INewInstanceMapping _elementMapping;
     private readonly string _insertMethodName;
     private readonly EnsureCapacityInfo? _ensureCapacityBuilder;
 
     public ForEachAddEnumerableExistingTargetMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        ITypeMapping elementMapping,
+        INewInstanceMapping elementMapping,
         string insertMethodName,
         EnsureCapacityInfo? ensureCapacityBuilder
     )

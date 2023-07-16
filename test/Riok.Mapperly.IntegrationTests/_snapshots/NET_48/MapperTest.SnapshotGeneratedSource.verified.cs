@@ -131,6 +131,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.ExistingSortedSet.Add(ParseableInt(item2));
             }
 
+            foreach (var item3 in testObject.ExistingList)
+            {
+                target.ExistingList.Add(ParseableInt(item3));
+            }
+
             target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(testObject.ISet, x => ParseableInt(x)));
             target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(testObject.HashSet, x => ParseableInt(x)));
             target.SortedSet = new global::System.Collections.Generic.SortedSet<int>(global::System.Linq.Enumerable.Select(testObject.SortedSet, x => ParseableInt(x)));
@@ -212,6 +217,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             foreach (var item2 in dto.ExistingSortedSet)
             {
                 target.ExistingSortedSet.Add(item2.ToString());
+            }
+
+            foreach (var item3 in dto.ExistingList)
+            {
+                target.ExistingList.Add(item3.ToString());
             }
 
             target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.ISet, x => x.ToString()));
@@ -300,6 +310,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             foreach (var item2 in source.ExistingSortedSet)
             {
                 target.ExistingSortedSet.Add(ParseableInt(item2));
+            }
+
+            foreach (var item3 in source.ExistingList)
+            {
+                target.ExistingList.Add(ParseableInt(item3));
             }
 
             target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(source.ISet, x => ParseableInt(x)));

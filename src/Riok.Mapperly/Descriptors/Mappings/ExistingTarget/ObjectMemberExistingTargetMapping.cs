@@ -19,5 +19,9 @@ public class ObjectMemberExistingTargetMapping : MemberAssignmentMappingContaine
 
     public ITypeSymbol TargetType { get; }
 
+    public bool CallableByOtherMappings => true;
+
+    public bool IsSynthetic => false;
+
     public MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.Default;
 }

@@ -17,16 +17,16 @@ public class ForEachSetDictionaryExistingTargetMapping : ExistingTargetMapping
     private const string KeyPropertyName = nameof(KeyValuePair<object, object>.Key);
     private const string ValuePropertyName = nameof(KeyValuePair<object, object>.Value);
 
-    private readonly ITypeMapping _keyMapping;
-    private readonly ITypeMapping _valueMapping;
+    private readonly INewInstanceMapping _keyMapping;
+    private readonly INewInstanceMapping _valueMapping;
     private readonly INamedTypeSymbol? _explicitCast;
     private readonly EnsureCapacityInfo? _ensureCapacity;
 
     public ForEachSetDictionaryExistingTargetMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        ITypeMapping keyMapping,
-        ITypeMapping valueMapping,
+        INewInstanceMapping keyMapping,
+        INewInstanceMapping valueMapping,
         INamedTypeSymbol? explicitCast,
         EnsureCapacityInfo? ensureCapacity
     )

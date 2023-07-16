@@ -9,13 +9,13 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// A derived type mapping maps one base type or interface to another
 /// by implementing a type switch over known types and performs the provided mapping for each type.
 /// </summary>
-public class DerivedTypeSwitchMapping : TypeMapping
+public class DerivedTypeSwitchMapping : NewInstanceMapping
 {
     private const string GetTypeMethodName = nameof(GetType);
 
-    private readonly IReadOnlyCollection<ITypeMapping> _typeMappings;
+    private readonly IReadOnlyCollection<INewInstanceMapping> _typeMappings;
 
-    public DerivedTypeSwitchMapping(ITypeSymbol sourceType, ITypeSymbol targetType, IReadOnlyCollection<ITypeMapping> typeMappings)
+    public DerivedTypeSwitchMapping(ITypeSymbol sourceType, ITypeSymbol targetType, IReadOnlyCollection<INewInstanceMapping> typeMappings)
         : base(sourceType, targetType)
     {
         _typeMappings = typeMappings;

@@ -18,7 +18,7 @@ public static class DictionaryMappingBuilder
     private const string ToImmutableSortedDictionaryMethodName =
         "global::System.Collections.Immutable.ImmutableSortedDictionary.ToImmutableSortedDictionary";
 
-    public static ITypeMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static INewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         if (!ctx.IsConversionEnabled(MappingConversionType.Dictionary))
             return null;
@@ -117,7 +117,7 @@ public static class DictionaryMappingBuilder
         );
     }
 
-    private static (ITypeMapping, ITypeMapping)? BuildKeyValueMapping(MappingBuilderContext ctx)
+    private static (INewInstanceMapping, INewInstanceMapping)? BuildKeyValueMapping(MappingBuilderContext ctx)
     {
         if (ctx.CollectionInfos!.Target.GetDictionaryKeyValueTypes(ctx) is not var (targetKeyType, targetValueType))
             return null;
@@ -153,8 +153,8 @@ public static class DictionaryMappingBuilder
 
     private static LinqDictionaryMapping? ResolveImmutableCollectMethod(
         MappingBuilderContext ctx,
-        ITypeMapping keyMapping,
-        ITypeMapping valueMapping
+        INewInstanceMapping keyMapping,
+        INewInstanceMapping valueMapping
     )
     {
         return ctx.CollectionInfos!.Target.CollectionType switch

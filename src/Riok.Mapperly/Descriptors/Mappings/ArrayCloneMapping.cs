@@ -9,7 +9,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Represents a mapping from an array to an array of the same type by using Array.Clone.
 /// </summary>
-public class ArrayCloneMapping : TypeMapping
+public class ArrayCloneMapping : NewInstanceMapping
 {
     private const string CloneMethodName = nameof(Array.Clone);
 

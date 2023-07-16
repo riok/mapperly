@@ -8,7 +8,7 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public static class NewInstanceObjectPropertyMappingBuilder
 {
-    public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         if (ctx.Target.SpecialType != SpecialType.None || ctx.Source.SpecialType != SpecialType.None)
             return null;

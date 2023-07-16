@@ -126,6 +126,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.ExistingSortedSet.Add(ParseableInt(item2));
             }
 
+            MapExistingList(src.ExistingList, target.ExistingList);
             target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(src.ISet, x => ParseableInt(x)));
             target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(src.IReadOnlySet, x => ParseableInt(x)));
             target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(src.HashSet, x => ParseableInt(x)));
@@ -226,6 +227,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.ExistingSortedSet.Add(ParseableInt(item2));
             }
 
+            MapExistingList(testObject.ExistingList, target.ExistingList);
             target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(testObject.ISet, x => ParseableInt(x)));
             target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(testObject.IReadOnlySet, x => ParseableInt(x)));
             target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(testObject.HashSet, x => ParseableInt(x)));
@@ -306,6 +308,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             foreach (var item2 in dto.ExistingSortedSet)
             {
                 target.ExistingSortedSet.Add(item2.ToString());
+            }
+
+            target.ExistingList.EnsureCapacity(dto.ExistingList.Count + target.ExistingList.Count);
+            foreach (var item3 in dto.ExistingList)
+            {
+                target.ExistingList.Add(item3.ToString());
             }
 
             target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.ISet, x => x.ToString()));
@@ -398,6 +406,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.ExistingSortedSet.Add(ParseableInt(item2));
             }
 
+            MapExistingList(source.ExistingList, target.ExistingList);
             target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(source.ISet, x => ParseableInt(x)));
             target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(source.IReadOnlySet, x => ParseableInt(x)));
             target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(source.HashSet, x => ParseableInt(x)));

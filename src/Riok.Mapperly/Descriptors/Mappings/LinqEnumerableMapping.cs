@@ -8,16 +8,16 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Represents an enumerable mapping which works by using linq (select + collect).
 /// </summary>
-public class LinqEnumerableMapping : TypeMapping
+public class LinqEnumerableMapping : NewInstanceMapping
 {
-    private readonly ITypeMapping _elementMapping;
+    private readonly INewInstanceMapping _elementMapping;
     private readonly string? _selectMethod;
     private readonly string? _collectMethod;
 
     public LinqEnumerableMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        ITypeMapping elementMapping,
+        INewInstanceMapping elementMapping,
         string? selectMethod,
         string? collectMethod
     )

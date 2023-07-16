@@ -32,9 +32,9 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IDelegateUserM
 
     public IMethodSymbol Method { get; }
 
-    public ITypeMapping? DelegateMapping { get; private set; }
+    public INewInstanceMapping? DelegateMapping { get; private set; }
 
-    public void SetDelegateMapping(ITypeMapping mapping) => DelegateMapping = mapping;
+    public void SetDelegateMapping(INewInstanceMapping mapping) => DelegateMapping = mapping;
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {

@@ -110,6 +110,7 @@ namespace Riok.Mapperly.IntegrationTests
                 ExistingISet = { "1", "2", "3", },
                 ExistingHashSet = { "1", "2", "3", },
                 ExistingSortedSet = { "1", "2", "3", },
+                ExistingList = { "1", "2", "3", },
                 ISet = new HashSet<string> { "1", "2", "3", },
 #if NET5_0_OR_GREATER
                 IReadOnlySet = new HashSet<string> { "1", "2", "3", },

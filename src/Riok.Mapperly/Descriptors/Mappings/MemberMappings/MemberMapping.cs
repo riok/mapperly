@@ -9,11 +9,16 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// </summary>
 public class MemberMapping : IMemberMapping
 {
-    private readonly ITypeMapping _delegateMapping;
+    private readonly INewInstanceMapping _delegateMapping;
     private readonly bool _nullConditionalAccess;
     private readonly bool _addValuePropertyOnNullable;
 
-    public MemberMapping(ITypeMapping delegateMapping, MemberPath sourcePath, bool nullConditionalAccess, bool addValuePropertyOnNullable)
+    public MemberMapping(
+        INewInstanceMapping delegateMapping,
+        MemberPath sourcePath,
+        bool nullConditionalAccess,
+        bool addValuePropertyOnNullable
+    )
     {
         _delegateMapping = delegateMapping;
         SourcePath = sourcePath;

@@ -45,7 +45,7 @@ public static class RuntimeTargetTypeMappingBodyBuilder
     {
         foreach (var userMapping in ctx.UserMappings)
         {
-            // exclude runtime target type mappings
+            // exclude runtime target type
             if (userMapping is UserDefinedNewInstanceRuntimeTargetTypeMapping)
                 continue;
 
@@ -76,6 +76,7 @@ public static class RuntimeTargetTypeMappingBodyBuilder
         // in the type switch
         // to use the most specific mapping
         var runtimeTargetTypeMappings = childMappings
+            .OfType<INewInstanceMapping>()
             .OrderByDescending(x => x.SourceType.GetInheritanceLevel())
             .ThenByDescending(x => x.TargetType.GetInheritanceLevel())
             .ThenBy(x => x.TargetType.IsNullable())

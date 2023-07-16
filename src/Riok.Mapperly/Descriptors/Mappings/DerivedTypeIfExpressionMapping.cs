@@ -10,11 +10,15 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// A derived type mapping maps one base type or interface to another
 /// by implementing a if with instance checks over known types and performs the provided mapping for each type.
 /// </summary>
-public class DerivedTypeIfExpressionMapping : TypeMapping
+public class DerivedTypeIfExpressionMapping : NewInstanceMapping
 {
-    private readonly IReadOnlyCollection<ITypeMapping> _typeMappings;
+    private readonly IReadOnlyCollection<INewInstanceMapping> _typeMappings;
 
-    public DerivedTypeIfExpressionMapping(ITypeSymbol sourceType, ITypeSymbol targetType, IReadOnlyCollection<ITypeMapping> typeMappings)
+    public DerivedTypeIfExpressionMapping(
+        ITypeSymbol sourceType,
+        ITypeSymbol targetType,
+        IReadOnlyCollection<INewInstanceMapping> typeMappings
+    )
         : base(sourceType, targetType)
     {
         _typeMappings = typeMappings;
@@ -25,14 +29,21 @@ public class DerivedTypeIfExpressionMapping : TypeMapping
         // source is A x ? MapToA(x) : <other cases>
         var typeExpressions = _typeMappings
             .Reverse()
-            .Aggregate<ITypeMapping, ExpressionSyntax>(DefaultLiteral(), (aggregate, current) => BuildConditional(ctx, aggregate, current));
+            .Aggregate<INewInstanceMapping, ExpressionSyntax>(
+                DefaultLiteral(),
+                (aggregate, current) => BuildConditional(ctx, aggregate, current)
+            );
 
         // cast to target type, to ensure the compiler picks the correct type
         // (B)(<ifs...>
         return CastExpression(FullyQualifiedIdentifier(TargetType), ParenthesizedExpression(typeExpressions));
     }
 
-    private ConditionalExpressionSyntax BuildConditional(TypeMappingBuildContext ctx, ExpressionSyntax notMatched, ITypeMapping mapping)
+    private ConditionalExpressionSyntax BuildConditional(
+        TypeMappingBuildContext ctx,
+        ExpressionSyntax notMatched,
+        INewInstanceMapping mapping
+    )
     {
         // cannot use is pattern matching is operator due to expression limitations
         // use is with a cast instead

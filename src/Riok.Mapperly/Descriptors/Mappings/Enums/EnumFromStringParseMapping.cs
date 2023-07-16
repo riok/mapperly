@@ -11,7 +11,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 /// Less efficient than <see cref="EnumFromStringSwitchMapping"/>
 /// but works in <see cref="System.Linq.Expressions.Expression{T}"/>.
 /// </summary>
-public class EnumFromStringParseMapping : TypeMapping
+public class EnumFromStringParseMapping : NewInstanceMapping
 {
     private const string EnumClassName = "System.Enum";
     private const string ParseMethodName = "Parse";

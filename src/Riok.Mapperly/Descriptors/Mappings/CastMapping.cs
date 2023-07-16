@@ -8,11 +8,11 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Represents a cast mapping.
 /// </summary>
-public class CastMapping : TypeMapping
+public class CastMapping : NewInstanceMapping
 {
-    private readonly ITypeMapping? _delegateMapping;
+    private readonly INewInstanceMapping? _delegateMapping;
 
-    public CastMapping(ITypeSymbol sourceType, ITypeSymbol targetType, ITypeMapping? delegateMapping = null)
+    public CastMapping(ITypeSymbol sourceType, ITypeSymbol targetType, INewInstanceMapping? delegateMapping = null)
         : base(sourceType, targetType)
     {
         _delegateMapping = delegateMapping;

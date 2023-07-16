@@ -8,7 +8,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Represents a mapping where the target type has the source as single ctor argument.
 /// </summary>
-public class CtorMapping : TypeMapping
+public class CtorMapping : NewInstanceMapping
 {
     public CtorMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
         : base(sourceType, targetType) { }

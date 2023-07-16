@@ -39,6 +39,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             return target;
         }
 
+        public static void MapExistingList(List<string> src, List<int> dst)
+        {
+            foreach (var item in src)
+            {
+                dst.Add(int.Parse(item));
+            }
+        }
+
         [MapProperty(nameof(TestObject.RenamedStringValue), nameof(TestObjectDto.RenamedStringValue2))]
         [MapProperty(
             new[] { nameof(TestObject.UnflatteningIdValue) },

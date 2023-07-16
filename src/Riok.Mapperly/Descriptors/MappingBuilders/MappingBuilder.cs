@@ -6,7 +6,7 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public class MappingBuilder
 {
-    private delegate ITypeMapping? BuildMapping(MappingBuilderContext context);
+    private delegate INewInstanceMapping? BuildMapping(MappingBuilderContext context);
 
     private static readonly IReadOnlyCollection<BuildMapping> _builders = new BuildMapping[]
     {
@@ -43,9 +43,9 @@ public class MappingBuilder
     public IReadOnlyCollection<IUserMapping> UserMappings => _mappings.UserMappings;
 
     /// <inheritdoc cref="MappingBuilderContext.FindMapping"/>
-    public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType) => _mappings.Find(sourceType, targetType);
+    public INewInstanceMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType) => _mappings.Find(sourceType, targetType);
 
-    public ITypeMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
+    public INewInstanceMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {
         foreach (var mappingBuilder in _builders)
         {
@@ -54,7 +54,7 @@ public class MappingBuilder
 
             if (resultIsReusable)
             {
-                _mappings.Add(mapping);
+                _mappings.AddNewInstanceMapping(mapping);
             }
 
             _mappings.EnqueueToBuildBody(mapping, ctx);

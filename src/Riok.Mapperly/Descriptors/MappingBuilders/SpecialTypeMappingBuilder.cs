@@ -7,7 +7,7 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public static class SpecialTypeMappingBuilder
 {
-    public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         if (!ctx.IsConversionEnabled(MappingConversionType.ExplicitCast))
             return null;

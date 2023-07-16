@@ -14,9 +14,9 @@ public class QueryableProjectionMapping : MethodMapping
     private const string QueryableReceiverName = "System.Linq.Queryable";
     private const string SelectMethodName = nameof(Queryable.Select);
 
-    private readonly ITypeMapping _delegateMapping;
+    private readonly INewInstanceMapping _delegateMapping;
 
-    public QueryableProjectionMapping(ITypeSymbol sourceType, ITypeSymbol targetType, ITypeMapping delegateMapping)
+    public QueryableProjectionMapping(ITypeSymbol sourceType, ITypeSymbol targetType, INewInstanceMapping delegateMapping)
         : base(sourceType, targetType)
     {
         _delegateMapping = delegateMapping;

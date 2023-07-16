@@ -10,7 +10,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 /// <summary>
 /// Represents a mapping method on the mapper which is implemented by the user.
 /// </summary>
-public class UserImplementedMethodMapping : TypeMapping, IUserMapping
+public class UserImplementedMethodMapping : NewInstanceMapping, IUserMapping
 {
     private readonly MethodParameter _sourceParameter;
     private readonly MethodParameter? _referenceHandlerParameter;
