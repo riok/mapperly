@@ -70,4 +70,10 @@ public sealed class MapperAttribute : Attribute
     /// to keep track of and reuse existing target object instances.
     /// </summary>
     public bool UseReferenceHandling { get; set; }
+
+    /// <summary>
+    /// The ignore obsolete attribute strategy. Determines how <see cref="ObsoleteAttribute"/> marked members are mapped.
+    /// Defaults to <see cref="IgnoreObsoleteMembersStrategy.None"/>.
+    /// </summary>
+    public IgnoreObsoleteMembersStrategy IgnoreObsoleteMembersStrategy { get; set; } = IgnoreObsoleteMembersStrategy.None;
 }

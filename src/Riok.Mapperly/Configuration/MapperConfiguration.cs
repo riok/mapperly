@@ -23,7 +23,12 @@ public class MapperConfiguration
                 Array.Empty<IFieldSymbol>(),
                 Array.Empty<EnumValueMappingConfiguration>()
             ),
-            new PropertiesMappingConfiguration(Array.Empty<string>(), Array.Empty<string>(), Array.Empty<PropertyMappingConfiguration>()),
+            new PropertiesMappingConfiguration(
+                Array.Empty<string>(),
+                Array.Empty<string>(),
+                Array.Empty<PropertyMappingConfiguration>(),
+                Mapper.IgnoreObsoleteMembersStrategy
+            ),
             Array.Empty<DerivedTypeMappingConfiguration>()
         );
     }
@@ -66,7 +71,11 @@ public class MapperConfiguration
             .WhereNotNull()
             .ToList();
         var explicitMappings = _dataAccessor.Access<MapPropertyAttribute, PropertyMappingConfiguration>(method).ToList();
-        return new PropertiesMappingConfiguration(ignoredSourceProperties, ignoredTargetProperties, explicitMappings);
+        var ignoreObsolete = _dataAccessor.Access<MapperIgnoreObsoleteMembersAttribute>(method).FirstOrDefault() is not { } methodIgnore
+            ? _defaultConfiguration.Properties.IgnoreObsoleteMembersStrategy
+            : methodIgnore.IgnoreObsoleteStrategy;
+
+        return new PropertiesMappingConfiguration(ignoredSourceProperties, ignoredTargetProperties, explicitMappings, ignoreObsolete);
     }
 
     private EnumMappingConfiguration BuildEnumConfig(MappingConfigurationReference configRef)
