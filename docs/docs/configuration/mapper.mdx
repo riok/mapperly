@@ -59,21 +59,25 @@ public partial class CarMapper
 }
 ```
 
-### Ignore obsolete members stratgey
+### Ignore obsolete members
 
-By default, mapperly will map source/target members marked with `ObsoleteAttribute`. This can be changed by setting the `IgnoreObsoleteMembersStrategy` of a method with `MapperIgnoreObsoleteMembersAttribute`, or by setting the `IgnoreObsoleteMembersStrategy` option of the `MapperAttribute`.
+By default, Mapperly will map source/target members marked with `ObsoleteAttribute`.
+This can be changed by setting the `IgnoreObsoleteMembersStrategy` of a method with `MapperIgnoreObsoleteMembersAttribute`,
+or by setting the `IgnoreObsoleteMembersStrategy` option of the `MapperAttribute`.
 
-| Name   | Description                                                                     |
-| ------ | ------------------------------------------------------------------------------- |
-| None   | Will map members marked with the `Obsolete` attribute (default)                 |
-| Both   | Ignores source and target members that are mapped with the `Obsolete` attribute |
-| Source | Ignores source members that are mapped with the `Obsolete` attribute            |
-| Target | Ignores target members that are mapped with the `Obsolete` attribute            |
+| Name   | Description                                                     |
+| ------ | --------------------------------------------------------------- |
+| None   | Will map members marked with the `Obsolete` attribute (default) |
+| Both   | Ignores source and target members with the `Obsolete` attribute |
+| Source | Ignores source members with the `Obsolete` attribute            |
+| Target | Ignores target members with the `Obsolete` attribute            |
 
 <Tabs>
-<TabItem value="global" label="Global (Mapper Level)" default>
+<TabItem value="global" label="Global (mapper level)" default>
 
-Sets the `IgnoreObsoleteMembersStrategy` for all methods within the mapper, by default it is `None` allowing obsolete source and target members to be mapped. This can be overriden by individual mapping methods using `MapperIgnoreObsoleteMembersAttribute`.
+Sets the `IgnoreObsoleteMembersStrategy` for all methods within the mapper,
+by default it is `None` allowing obsolete source and target members to be mapped.
+This can be overriden by individual mapping methods using `MapperIgnoreObsoleteMembersAttribute`.
 
 ```csharp
 // highlight-start
@@ -88,7 +92,8 @@ public partial class CarMapper
 </TabItem>
 <TabItem value="method" label="Local (mapping method level)">
 
-Method will use the provided ignore obsolete mapping strategy, otherwise the `MapperAttribute` property `IgnoreObsoleteMembersStrategy` will be used.
+Method will use the provided ignore obsolete mapping strategy,
+otherwise the `MapperAttribute` property `IgnoreObsoleteMembersStrategy` will be used.
 
 ```csharp
 [Mapper]

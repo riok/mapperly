@@ -45,7 +45,7 @@ public class DescriptorBuilder
         );
     }
 
-    public (MapperDescriptor descriptor, List<Diagnostic> diagnostics) Build()
+    public (MapperDescriptor descriptor, IReadOnlyCollection<Diagnostic> diagnostics) Build()
     {
         ReserveMethodNames();
         ExtractObjectFactories();

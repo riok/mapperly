@@ -27,7 +27,7 @@ public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableAr
     public override int GetHashCode()
     {
         var hash = 0;
-        foreach (T value in _values)
+        foreach (var value in _values)
         {
             hash = HashHelper.Combine(hash, value.GetHashCode());
         }
@@ -56,13 +56,11 @@ public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableAr
         {
             var newIndex = _index + 1;
 
-            if ((uint)newIndex < (uint)_values.Length)
-            {
-                _index = newIndex;
-                return true;
-            }
+            if ((uint)newIndex >= (uint)_values.Length)
+                return false;
 
-            return false;
+            _index = newIndex;
+            return true;
         }
 
         public readonly T Current => _values[_index];

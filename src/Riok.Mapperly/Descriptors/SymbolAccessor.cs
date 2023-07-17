@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
@@ -76,14 +77,79 @@ public class SymbolAccessor
         return members;
     }
 
-    internal IEnumerable<IMappableMember> GetMappableMembers(ITypeSymbol symbol, string name, IEqualityComparer<string> comparer)
+    internal bool TryFindMemberPath(
+        ITypeSymbol type,
+        IEnumerable<IEnumerable<string>> pathCandidates,
+        IReadOnlyCollection<string> ignoredNames,
+        IEqualityComparer<string> comparer,
+        [NotNullWhen(true)] out MemberPath? memberPath
+    )
+    {
+        foreach (var pathCandidate in FindMemberPathCandidates(type, pathCandidates, comparer))
+        {
+            if (ignoredNames.Contains(pathCandidate.Path.First().Name))
+                continue;
+
+            memberPath = pathCandidate;
+            return true;
+        }
+
+        memberPath = null;
+        return false;
+    }
+
+    internal bool TryFindMemberPath(ITypeSymbol type, IReadOnlyCollection<string> path, [NotNullWhen(true)] out MemberPath? memberPath) =>
+        TryFindMemberPath(type, path, StringComparer.Ordinal, out memberPath);
+
+    private IEnumerable<MemberPath> FindMemberPathCandidates(
+        ITypeSymbol type,
+        IEnumerable<IEnumerable<string>> pathCandidates,
+        IEqualityComparer<string> comparer
+    )
+    {
+        foreach (var pathCandidate in pathCandidates)
+        {
+            if (TryFindMemberPath(type, pathCandidate.ToList(), comparer, out var memberPath))
+                yield return memberPath;
+        }
+    }
+
+    private bool TryFindMemberPath(
+        ITypeSymbol type,
+        IReadOnlyCollection<string> path,
+        IEqualityComparer<string> comparer,
+        [NotNullWhen(true)] out MemberPath? memberPath
+    )
+    {
+        var foundPath = FindMemberPath(type, path, comparer).ToList();
+        if (foundPath.Count != path.Count)
+        {
+            memberPath = null;
+            return false;
+        }
+
+        memberPath = new(foundPath);
+        return true;
+    }
+
+    private IEnumerable<IMappableMember> FindMemberPath(ITypeSymbol type, IEnumerable<string> path, IEqualityComparer<string> comparer)
+    {
+        foreach (var name in path)
+        {
+            if (GetMappableMembers(type, name, comparer).FirstOrDefault() is not { } member)
+                break;
+
+            type = member.Type;
+            yield return member;
+        }
+    }
+
+    private IEnumerable<IMappableMember> GetMappableMembers(ITypeSymbol symbol, string name, IEqualityComparer<string> comparer)
     {
         foreach (var member in GetAllAccessibleMappableMembers(symbol))
         {
-            if (comparer.Equals(name, member.Name))
-            {
+            if (comparer.Equals(member.Name, name))
                 yield return member;
-            }
         }
     }
 
