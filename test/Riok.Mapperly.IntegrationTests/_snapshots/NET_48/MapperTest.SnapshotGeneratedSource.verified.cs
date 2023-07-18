@@ -178,10 +178,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.NestedNullableTargetNotNullable = MapToTestObjectNested(dto.NestedNullableTargetNotNullable);
             target.StringNullableTargetNotNullable = dto.StringNullableTargetNotNullable;
             target.SourceTargetSameObjectType = dto.SourceTargetSameObjectType;
-            if (dto.SpanValue != null)
-            {
-            }
-
             target.MemoryValue = MapToStringArray(dto.MemoryValue.Span);
             target.StackValue = new global::System.Collections.Generic.Stack<string>(global::System.Linq.Enumerable.Select(dto.StackValue, x => x.ToString()));
             target.QueueValue = new global::System.Collections.Generic.Queue<string>(global::System.Linq.Enumerable.Select(dto.QueueValue, x => x.ToString()));

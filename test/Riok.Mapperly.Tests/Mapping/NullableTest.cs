@@ -166,6 +166,42 @@ public class NullableTest
     }
 
     [Fact]
+    public void ToTargetShouldNotGenerateEmptyIfStatement()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source)",
+            "class A { public C Value { get; set; } }",
+            "class B { public D? Value { get; } }",
+            "class C { public int Id { get; set; } }",
+            "class D { public int Id { get;  } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ExistingTargetShouldNotGenerateEmptyIfStatement()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(A source, B destination)",
+            "class A { public C Value { get; set; } }",
+            "class B { public D? Value { get; } }",
+            "class C { public int Id { get; set; } }",
+            "class D { public int Id { get;  } }"
+        );
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics).Should().HaveSingleMethodBody("");
+    }
+
+    [Fact]
     public Task ShouldUpgradeNullabilityInDisabledNullableContext()
     {
         var source = TestSourceBuilder.Mapping("A", "B", "class A {}", "class B {}");
