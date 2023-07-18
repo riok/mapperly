@@ -136,7 +136,9 @@ public class SymbolAccessor
     {
         foreach (var name in path)
         {
-            if (GetMappableMembers(type, name, comparer).FirstOrDefault() is not { } member)
+            // get T if type is Nullable<T>, prevents Value being treated as a member
+            var actualType = type.NonNullableValueType() ?? type;
+            if (GetMappableMembers(actualType, name, comparer).FirstOrDefault() is not { } member)
                 break;
 
             type = member.Type;

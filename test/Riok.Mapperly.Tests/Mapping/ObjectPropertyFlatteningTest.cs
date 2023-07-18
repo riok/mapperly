@@ -1,3 +1,5 @@
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 [UsesVerify]
@@ -121,6 +123,79 @@ public class ObjectPropertyFlatteningTest
                     target.ValueName = source.Value.Name;
                 }
 
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AutoFlattenedPropertyNullableValueTypePath()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "public class A { public C Id { get; set; } }",
+            "public class B { public int IdValue { get; set; } }",
+            "public class C { public int? Value { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.Id.Value != null)
+                {
+                    target.IdValue = source.Id.Value.Value;
+                }
+
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AutoFlattenedPropertyNullableValueTypePathShouldResolve()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "public class A { public C? Prop { get; set; } }",
+            "public class B { public string PropInteger { get; set; } }",
+            "public struct C { public int Integer { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.Prop != null)
+                {
+                    target.PropInteger = source.Prop.Value.Integer.ToString();
+                }
+
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AutoFlattenedPropertyNullableValueTypePathShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "public record A(int? Id);",
+            "public record B { public int IdValue { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
                 return target;
                 """
             );

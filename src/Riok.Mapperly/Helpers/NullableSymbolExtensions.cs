@@ -83,6 +83,13 @@ public static class NullableSymbolExtensions
 
     internal static bool IsNullableValueType(this ITypeSymbol symbol) => symbol.NonNullableValueType() != null;
 
+    internal static ITypeSymbol? NonNullableValueType(this ITypeSymbol symbol)
+    {
+        if (symbol.IsValueType && symbol is INamedTypeSymbol { OriginalDefinition.SpecialType: SpecialType.System_Nullable_T } namedType)
+            return namedType.TypeArguments[0];
+        return null;
+    }
+
     /// <summary>
     /// Whether or not the <see cref="ITypeParameterSymbol"/> is nullable.
     /// </summary>
@@ -104,11 +111,4 @@ public static class NullableSymbolExtensions
     }
 
     private static bool IsNullable(this NullableAnnotation nullable) => nullable is NullableAnnotation.Annotated or NullableAnnotation.None;
-
-    private static ITypeSymbol? NonNullableValueType(this ITypeSymbol symbol)
-    {
-        if (symbol.IsValueType && symbol is INamedTypeSymbol { OriginalDefinition.SpecialType: SpecialType.System_Nullable_T } namedType)
-            return namedType.TypeArguments[0];
-        return null;
-    }
 }
