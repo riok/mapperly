@@ -33,8 +33,15 @@ public class NullDelegateExistingTargetMapping : ExistingTargetMapping
         if (!SourceType.IsNullable() && !TargetType.IsNullable())
             return body;
 
+        var enumerated = body.ToArray();
+
+        // if body is empty don't generate an if statement
+        if (!enumerated.Any())
+        {
+            return Enumerable.Empty<StatementSyntax>();
+        }
+
         // if (source != null && target != null) { body }
-        return new[] { IfStatement(IfNoneNull((SourceType, ctx.Source), (TargetType, target)), Block(body)), };
-        ;
+        return new[] { IfStatement(IfNoneNull((SourceType, ctx.Source), (TargetType, target)), Block(enumerated)), };
     }
 }
