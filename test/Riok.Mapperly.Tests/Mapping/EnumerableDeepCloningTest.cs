@@ -148,6 +148,40 @@ public class EnumerableDeepCloningTest
     }
 
     [Fact]
+    public void CollectionToArrayOfMutableStructDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "ICollection<A>",
+            "A[]",
+            TestSourceBuilderOptions.WithDeepCloning,
+            "struct A { public string Value { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::A[source.Count];
+                var i = 0;
+                foreach (var item in source)
+                {
+                    target[i] = MapToA(item);
+                    i++;
+                }
+
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void CollectionToArrayOfUnmanagedStructDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping("ICollection<A>", "A[]", TestSourceBuilderOptions.WithDeepCloning, "struct A{}");
+        TestHelper.GenerateMapper(source).Should().HaveMapMethodBody("return global::System.Linq.Enumerable.ToArray(source);");
+    }
+
+    [Fact]
     public void ArrayToArrayOfMutableStructDeepCloningLoopNameTaken()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

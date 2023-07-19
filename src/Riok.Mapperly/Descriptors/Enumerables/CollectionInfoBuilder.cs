@@ -236,7 +236,6 @@ public static class CollectionInfoBuilder
                 => CollectionType.Array
                     | CollectionType.IList
                     | CollectionType.IReadOnlyList
-                    | CollectionType.IList
                     | CollectionType.ICollection
                     | CollectionType.IReadOnlyCollection
                     | CollectionType.IEnumerable,

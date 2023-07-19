@@ -174,6 +174,62 @@ public class EnumerableTest
     }
 
     [Fact]
+    public void CollectionToReadOnlyCollectionOfPrimitiveTypes()
+    {
+        var source = TestSourceBuilder.Mapping("ICollection<int>", "IReadOnlyCollection<int>");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return global::System.Linq.Enumerable.ToArray(source);");
+    }
+
+    [Fact]
+    public void ReadOnlyCollectionToCollectionOfPrimitiveTypes()
+    {
+        var source = TestSourceBuilder.Mapping("IReadOnlyCollection<int>", "ICollection<int>");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return global::System.Linq.Enumerable.ToList(source);");
+    }
+
+    [Fact]
+    public void ReadOnlyCollectionToIListOfDifferentTypes()
+    {
+        var source = TestSourceBuilder.Mapping("IReadOnlyCollection<int>", "IList<long>");
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::System.Collections.Generic.List<long>(source.Count);
+                foreach (var item in source)
+                {
+                    target.Add((long)item);
+                }
+
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ReadOnlyCollectionToArrayOfDifferentTypes()
+    {
+        var source = TestSourceBuilder.Mapping("IReadOnlyCollection<int>", "string[]");
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new string[source.Count];
+                var i = 0;
+                foreach (var item in source)
+                {
+                    target[i] = item.ToString();
+                    i++;
+                }
+
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void EnumerableToReadOnlyCollectionOfImplicitTypes()
     {
         var source = TestSourceBuilder.Mapping("IEnumerable<int>", "IReadOnlyCollection<long>");
@@ -194,6 +250,35 @@ public class EnumerableTest
             .Should()
             .HaveSingleMethodBody(
                 "return global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(source, x => (int)x));"
+            );
+    }
+
+    [Fact]
+    public void ListToArrayOfPrimitiveTypes()
+    {
+        var source = TestSourceBuilder.Mapping("List<int>", "int[]");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return global::System.Linq.Enumerable.ToArray(source);");
+    }
+
+    [Fact]
+    public void ListToArrayOfCastedTypes()
+    {
+        var source = TestSourceBuilder.Mapping("List<int>", "long[]");
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new long[source.Count];
+                var i = 0;
+                foreach (var item in source)
+                {
+                    target[i] = (long)item;
+                    i++;
+                }
+
+                return target;
+                """
             );
     }
 
@@ -473,6 +558,32 @@ public class EnumerableTest
             "A",
             "B",
             "class A { public int[] Value { get; set;} }",
+            "class B { public IReadOnlyCollection<string> Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
+
+    [Fact]
+    public Task ArrayToCollectionShouldUpgradeNullability()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public int[] Value { get; set;} }",
+            "class B { public ICollection<string> Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
+
+    [Fact]
+    public Task CollectionToReadOnlyCollectionShouldUpgradeNullability()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public ICollection<int> Value { get; set;} }",
             "class B { public IReadOnlyCollection<string> Value { get; set; } }"
         );
 

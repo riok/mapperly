@@ -50,7 +50,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
             if (src.NullableReadOnlyObjectCollection != null)
             {
-                target.NullableReadOnlyObjectCollection = global::System.Linq.Enumerable.ToArray(global::System.Linq.Enumerable.Select(src.NullableReadOnlyObjectCollection, x => MapToTestObjectNested(x)));
+                target.NullableReadOnlyObjectCollection = MapToIReadOnlyCollection(src.NullableReadOnlyObjectCollection);
             }
 
             if (src.SubObject != null)
@@ -119,6 +119,19 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         private static (string A, string) MapToValueTuple((string A, string) source)
         {
             var target = (A: source.A, source.Item2);
+            return target;
+        }
+
+        private static global::System.Collections.Generic.IReadOnlyCollection<global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested> MapToIReadOnlyCollection(global::System.Collections.Generic.IReadOnlyCollection<global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested> source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested[source.Count];
+            var i = 0;
+            foreach (var item in source)
+            {
+                target[i] = MapToTestObjectNested(item);
+                i++;
+            }
+
             return target;
         }
 

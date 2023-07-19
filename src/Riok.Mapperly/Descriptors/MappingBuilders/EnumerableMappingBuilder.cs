@@ -40,33 +40,11 @@ public static class EnumerableMappingBuilder
         if (elementMapping == null)
             return null;
 
-        // if source is an array and target is an array, IEnumerable, IReadOnlyCollection faster mappings can be applied
-        if (
-            !ctx.IsExpression
-            && ctx.CollectionInfos.Source.CollectionType == CollectionType.Array
-            && ctx.CollectionInfos.Target.CollectionType
-                is CollectionType.Array
-                    or CollectionType.IReadOnlyCollection
-                    or CollectionType.IEnumerable
-        )
-        {
-            // if element mapping is synthetic
-            // a single Array.Clone / cast mapping call should be sufficient and fast,
-            // use a for loop mapping otherwise.
-            if (!elementMapping.IsSynthetic)
-            {
-                // upgrade nullability of element type
-                var targetValue =
-                    ctx.CollectionInfos.Target.CollectionType == CollectionType.Array
-                        ? ctx.Types.GetArrayType(elementMapping.TargetType)
-                        : ((INamedTypeSymbol)ctx.Target).ConstructedFrom.Construct(elementMapping.TargetType);
-                return new ArrayForMapping(ctx.Source, targetValue, elementMapping, elementMapping.TargetType);
-            }
+        if (TryBuildCastMapping(ctx, elementMapping) is { } implicitMapping)
+            return implicitMapping;
 
-            return ctx.MapperConfiguration.UseDeepCloning
-                ? new ArrayCloneMapping(ctx.Source, ctx.Target)
-                : new CastMapping(ctx.Source, ctx.Target);
-        }
+        if (TryBuildFastConversion(ctx, elementMapping) is { } fastLoopMapping)
+            return fastLoopMapping;
 
         // try linq mapping: x.Select(Map).ToArray/ToList
         // if that doesn't work do a foreach with add calls
@@ -132,6 +110,133 @@ public static class EnumerableMappingBuilder
                 ensureCapacityStatement
             );
         }
+    }
+
+    private static NewInstanceMapping? TryBuildCastMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    {
+        // cannot cast if the method mapping is synthetic, deep clone is enabled or target is an unknown collection
+        if (
+            !elementMapping.IsSynthetic
+            || ctx.MapperConfiguration.UseDeepCloning
+            || ctx.CollectionInfos!.Target.CollectionType == CollectionType.None
+        )
+        {
+            return null;
+        }
+
+        // manually check if source is an Array as it implements IList and ICollection at runtime, see https://stackoverflow.com/q/47361775/3302887
+        if (
+            ctx.CollectionInfos.Source.IsArray
+            && ctx.CollectionInfos.Target.CollectionType is CollectionType.ICollection or CollectionType.IList
+        )
+        {
+            return null;
+        }
+
+        // if not an array check if source implements the target type
+        if (ctx.CollectionInfos.Source.ImplementedTypes.HasFlag(ctx.CollectionInfos.Target.CollectionType))
+        {
+            return new CastMapping(ctx.Source, ctx.Target);
+        }
+
+        return null;
+    }
+
+    private static NewInstanceMapping? TryBuildFastConversion(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    {
+        if (
+            ctx.IsExpression
+            || !ctx.CollectionInfos!.Source.CountIsKnown
+            || ctx.CollectionInfos.Target.CollectionType == CollectionType.None
+        )
+            return null;
+
+        // if target is a list or type implemented by list
+        if (ctx.CollectionInfos.Target.CollectionType is CollectionType.List or CollectionType.ICollection or CollectionType.IList)
+        {
+            return BuildEnumerableToListMapping(ctx, elementMapping);
+        }
+
+        // if target is not an array or a type implemented by array return early
+        if (
+            ctx.CollectionInfos.Target.CollectionType
+            is not (
+                CollectionType.Array
+                or CollectionType.IReadOnlyCollection
+                or CollectionType.IReadOnlyList
+                or CollectionType.IEnumerable
+            )
+        )
+        {
+            return null;
+        }
+
+        // if source is not an array use a foreach mapping
+        // if source is an array and target is an array, IEnumerable, IReadOnlyCollection faster mappings can be applied
+        return ctx.CollectionInfos.Source.CollectionType != CollectionType.Array
+            ? BuildEnumerableToArrayMapping(ctx, elementMapping)
+            : BuildArrayToArrayMapping(ctx, elementMapping);
+    }
+
+    private static NewInstanceMapping? BuildEnumerableToListMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    {
+        // if mapping is synthetic then ToList is probably faster
+        if (elementMapping.IsSynthetic)
+            return null;
+
+        // upgrade nullability of element type
+        var targetValue = ((INamedTypeSymbol)ctx.CollectionInfos!.Target.Type.OriginalDefinition).Construct(elementMapping.TargetType);
+        var targetCollection = ctx.Types.Get(typeof(List<>)).Construct(elementMapping.TargetType);
+
+        return new ForEachAddEnumerableMapping(
+            ctx.Source,
+            targetValue,
+            elementMapping,
+            AddMethodName,
+            targetCollection,
+            ctx.CollectionInfos.Source.CountPropertyName
+        );
+    }
+
+    private static NewInstanceMapping BuildArrayToArrayMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    {
+        // if element mapping is synthetic
+        // a single Array.Clone / cast mapping call should be sufficient and fast,
+        // use a for loop mapping otherwise.
+        if (!elementMapping.IsSynthetic)
+        {
+            // upgrade nullability of element type
+            var targetValue =
+                ctx.CollectionInfos!.Target.CollectionType == CollectionType.Array
+                    ? ctx.Types.GetArrayType(elementMapping.TargetType)
+                    : ((INamedTypeSymbol)ctx.Target).ConstructedFrom.Construct(elementMapping.TargetType);
+            return new ArrayForMapping(ctx.Source, targetValue, elementMapping, elementMapping.TargetType);
+        }
+
+        return ctx.MapperConfiguration.UseDeepCloning
+            ? new ArrayCloneMapping(ctx.Source, ctx.Target)
+            : new CastMapping(ctx.Source, ctx.Target);
+    }
+
+    private static NewInstanceMapping? BuildEnumerableToArrayMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    {
+        // if mapping is synthetic then ToArray is probably faster
+        if (elementMapping.IsSynthetic)
+            return null;
+
+        // upgrade nullability of element type
+        var targetValue =
+            ctx.CollectionInfos!.Target.CollectionType == CollectionType.Array
+                ? ctx.Types.GetArrayType(elementMapping.TargetType)
+                : ((INamedTypeSymbol)ctx.Target).ConstructedFrom.Construct(elementMapping.TargetType);
+
+        return new ArrayForEachMapping(
+            ctx.Source,
+            targetValue,
+            elementMapping,
+            elementMapping.TargetType,
+            ctx.CollectionInfos.Source.CountPropertyName!
+        );
     }
 
     private static LinqEnumerableMapping BuildLinqMapping(
