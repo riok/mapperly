@@ -136,18 +136,14 @@ public static class NewValueTupleMappingBodyBuilder
         sourcePath = null;
 
         if (!ctx.MemberConfigsByRootTargetName.TryGetValue(field.Name, out var memberConfigs))
-        {
             return TryBuildConstructorParameterSourcePath(ctx, field, out sourcePath);
-        }
 
         // remove nested targets
         var initMemberPaths = memberConfigs.Where(x => x.Target.Path.Count == 1).ToArray();
 
         // if all memberConfigs are nested than do normal mapping
         if (initMemberPaths.Length == 0)
-        {
             return TryBuildConstructorParameterSourcePath(ctx, field, out sourcePath);
-        }
 
         if (initMemberPaths.Length > 1)
         {
@@ -159,19 +155,16 @@ public static class NewValueTupleMappingBodyBuilder
         }
 
         var memberConfig = initMemberPaths.First();
+        if (ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.SourceType, memberConfig.Source.Path, out sourcePath))
+            return true;
 
-        if (!ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.SourceType, memberConfig.Source.Path, out sourcePath))
-        {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.SourceMemberNotFound,
-                memberConfig.Source,
-                ctx.Mapping.TargetType,
-                ctx.Mapping.SourceType
-            );
-            return false;
-        }
-
-        return true;
+        ctx.BuilderContext.ReportDiagnostic(
+            DiagnosticDescriptors.SourceMemberNotFound,
+            memberConfig.Source,
+            ctx.Mapping.TargetType,
+            ctx.Mapping.SourceType
+        );
+        return false;
     }
 
     private static bool TryBuildConstructorParameterSourcePath(
@@ -194,31 +187,30 @@ public static class NewValueTupleMappingBodyBuilder
                 out sourcePath
             )
         )
+        {
             return true;
+        }
 
         // if standard matching fails, try to use the positional fields
         // if source is a tuple compare the underlying field ie, Item1, Item2
-        if (ctx.Mapping.SourceType.IsTupleType)
+        if (!ctx.Mapping.SourceType.IsTupleType || ctx.Mapping.SourceType is not INamedTypeSymbol namedType)
+            return false;
+
+        var mappableMember = namedType.TupleElements
+            .Where(
+                x =>
+                    x.CorrespondingTupleField != default
+                    && !ctx.IgnoredSourceMemberNames.Contains(x.Name)
+                    && string.Equals(field.CorrespondingTupleField!.Name, x.CorrespondingTupleField!.Name)
+            )
+            .Select(MappableMember.Create)
+            .WhereNotNull()
+            .FirstOrDefault();
+
+        if (mappableMember != default)
         {
-            if (ctx.Mapping.SourceType is not INamedTypeSymbol namedType)
-                return false;
-
-            var mappableMember = namedType.TupleElements
-                .Where(
-                    x =>
-                        x.CorrespondingTupleField != default
-                        && !ctx.IgnoredSourceMemberNames.Contains(x.Name)
-                        && string.Equals(field.CorrespondingTupleField!.Name, x.CorrespondingTupleField!.Name)
-                )
-                .Select(MappableMember.Create)
-                .WhereNotNull()
-                .FirstOrDefault();
-
-            if (mappableMember != default)
-            {
-                sourcePath = new MemberPath(new[] { mappableMember });
-                return true;
-            }
+            sourcePath = new MemberPath(new[] { mappableMember });
+            return true;
         }
 
         return false;

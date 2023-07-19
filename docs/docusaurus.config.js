@@ -164,7 +164,7 @@ async function createConfig() {
         prism: {
           theme: lightCodeTheme,
           darkTheme: darkCodeTheme,
-          additionalLanguages: ['csharp', 'powershell', 'editorconfig'],
+          additionalLanguages: ['csharp', 'powershell', 'editorconfig', 'bash'],
         },
       }),
     plugins: [

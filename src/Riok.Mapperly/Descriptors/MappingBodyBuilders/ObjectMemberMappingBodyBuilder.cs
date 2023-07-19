@@ -225,9 +225,14 @@ public static class ObjectMemberMappingBodyBuilder
             return;
         }
 
-        // the source is nullable, or the mapping is a direct assignment and the target allows nulls
+        // If null property assignments are allowed,
+        // and the delegate mapping accepts nullable types (and converts it to a non-nullable type),
+        // or the mapping is synthetic and the target accepts nulls
         // access the source in a null save matter (via ?.) but no other special handling required.
-        if (delegateMapping.SourceType.IsNullable() || delegateMapping.IsSynthetic && targetMemberPath.Member.IsNullable)
+        if (
+            ctx.BuilderContext.MapperConfiguration.AllowNullPropertyAssignment
+            && (delegateMapping.SourceType.IsNullable() || delegateMapping.IsSynthetic && targetMemberPath.Member.IsNullable)
+        )
         {
             var memberMapping = new MemberMapping(delegateMapping, sourceMemberPath, true, false);
             ctx.AddMemberAssignmentMapping(new MemberAssignmentMapping(targetMemberPath, memberMapping));

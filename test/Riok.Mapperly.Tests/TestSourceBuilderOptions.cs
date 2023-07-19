@@ -4,15 +4,16 @@ namespace Riok.Mapperly.Tests;
 
 public record TestSourceBuilderOptions(
     string? Namespace = null,
-    bool UseDeepCloning = false,
-    bool UseReferenceHandling = false,
-    bool ThrowOnMappingNullMismatch = true,
-    bool ThrowOnPropertyMappingNullMismatch = false,
-    PropertyNameMappingStrategy PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseSensitive,
-    MappingConversionType EnabledConversions = MappingConversionType.All,
-    EnumMappingStrategy EnumMappingStrategy = EnumMappingStrategy.ByValue,
-    bool EnumMappingIgnoreCase = false,
-    IgnoreObsoleteMembersStrategy IgnoreObsoleteMembersStrategy = IgnoreObsoleteMembersStrategy.None
+    bool? UseDeepCloning = null,
+    bool? UseReferenceHandling = null,
+    bool? ThrowOnMappingNullMismatch = null,
+    bool? ThrowOnPropertyMappingNullMismatch = null,
+    bool? AllowNullPropertyAssignment = null,
+    PropertyNameMappingStrategy? PropertyNameMappingStrategy = null,
+    MappingConversionType? EnabledConversions = null,
+    EnumMappingStrategy? EnumMappingStrategy = null,
+    bool? EnumMappingIgnoreCase = null,
+    IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy = null
 )
 {
     public static readonly TestSourceBuilderOptions Default = new();
