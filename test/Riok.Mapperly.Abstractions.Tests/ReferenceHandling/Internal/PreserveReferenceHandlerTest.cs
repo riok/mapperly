@@ -10,7 +10,7 @@ public class PreserveReferenceHandlerTest
     [Fact]
     public void EmptyReferenceHandlerShouldReturnFalse()
     {
-        _handler.TryGetReference(new MyObj(), out MyDto _).Should().BeFalse();
+        _handler.TryGetReference(new MyObj(), out MyDto? _).Should().BeFalse();
     }
 
     [Fact]
