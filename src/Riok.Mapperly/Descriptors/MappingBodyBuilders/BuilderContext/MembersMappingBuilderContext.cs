@@ -42,8 +42,6 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
         _unmappedSourceMemberNames.ExceptWith(IgnoredSourceMemberNames);
 
-        MemberConfigsByRootTargetName = GetMemberConfigurations();
-
         // remove explicitly mapped ignored targets from ignoredTargetMemberNames
         // then remove all ignored targets from TargetMembers, leaving unignored and explicitly mapped ignored members
         ignoredTargetMemberNames.ExceptWith(MemberConfigsByRootTargetName.Keys);
@@ -117,9 +115,25 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
     private Dictionary<string, List<PropertyMappingConfiguration>> GetMemberConfigurations()
     {
-        return BuilderContext.Configuration.Properties.ExplicitMappings
-            .GroupBy(x => x.Target.Path.First())
-            .ToDictionary(x => x.Key, x => x.ToList());
+        var simpleMappings = BuilderContext.Configuration.Properties.ExplicitMappings.GroupBy(x => x.Target.Path.First());
+
+        var wildcardMappings = BuilderContext.Configuration.Properties.NestedMappings
+            .SelectMany(x =>
+            {
+                return BuilderContext.SymbolAccessor
+                    .GetAllAccessibleMappableMembers(Mapping.SourceType)
+                    .Where(i => i.Name == x.Source.Path.Last())
+                    .SelectMany(i => BuilderContext.SymbolAccessor.GetAllAccessibleMappableMembers(i.Type))
+                    .Select(i =>
+                    {
+                        var list = x.Source.Path.ToList();
+                        list.Add(i.Name);
+                        return new PropertyMappingConfiguration(new StringMemberPath(list), new StringMemberPath(new[] { i.Name }));
+                    });
+            })
+            .GroupBy(x => x.Target.Path.Last());
+
+        return simpleMappings.Union(wildcardMappings).ToDictionary(x => x.Key, x => x.ToList());
     }
 
     private void AddUnmatchedIgnoredTargetMembersDiagnostics()

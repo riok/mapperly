@@ -27,6 +27,7 @@ public class MapperConfiguration
                 Array.Empty<string>(),
                 Array.Empty<string>(),
                 Array.Empty<PropertyMappingConfiguration>(),
+                Array.Empty<NestedPropertyMappingConfiguration>(),
                 Mapper.IgnoreObsoleteMembersStrategy
             ),
             Array.Empty<DerivedTypeMappingConfiguration>()
@@ -74,8 +75,14 @@ public class MapperConfiguration
         var ignoreObsolete = _dataAccessor.Access<MapperIgnoreObsoleteMembersAttribute>(method).FirstOrDefault() is not { } methodIgnore
             ? _defaultConfiguration.Properties.IgnoreObsoleteMembersStrategy
             : methodIgnore.IgnoreObsoleteStrategy;
-
-        return new PropertiesMappingConfiguration(ignoredSourceProperties, ignoredTargetProperties, explicitMappings, ignoreObsolete);
+        var nestedMappings = _dataAccessor.Access<MapperNestedPropertiesAttribute, NestedPropertyMappingConfiguration>(method).ToList();
+        return new PropertiesMappingConfiguration(
+            ignoredSourceProperties,
+            ignoredTargetProperties,
+            explicitMappings,
+            nestedMappings,
+            ignoreObsolete
+        );
     }
 
     private EnumMappingConfiguration BuildEnumConfig(MappingConfigurationReference configRef)

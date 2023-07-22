@@ -209,6 +209,19 @@ public class ObjectPropertyTest
     }
 
     [Fact]
+    public Task WithPropertyNameMappingStrategyCaseSensitiveAndManualMappedProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(nameof(A.stringvalue), nameof(B.StringValue2)] partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseSensitive },
+            "class A { public string stringvalue { get; set; } }",
+            "class B { public string StringValue2 { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task WithManualMappedNotFoundTargetPropertyShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -442,5 +455,34 @@ public class ObjectPropertyTest
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
             .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void ShouldFlattedNestedToTargetRootMapping()
+    {
+        var mapperBody = """
+            [MapperNestedProperties(nameof(A.NestedValue)]
+            public partial C Map(A source);
+            """;
+
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            mapperBody,
+            "class A { public B NestedValue { get; set; } public string DummyValue { get; set; } }",
+            "class B { public string GoodProp1 { get; set; } public string GoodProp2 { get; set; } }",
+            "class C { public string GoodProp1 { get; set; } public string GoodProp2 { get; set; } public string DummyValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::C();
+                target.GoodProp1 = source.NestedValue.GoodProp1;
+                target.GoodProp2 = source.NestedValue.GoodProp2;
+                target.DummyValue = source.DummyValue;
+                return target;
+                """
+            );
     }
 }
