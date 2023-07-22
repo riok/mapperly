@@ -96,6 +96,18 @@ public enum MappingConversionType
     Dictionary = 1 << 12,
 
     /// <summary>
+    /// If the source or target is a Span&lt;T&gt; or ReadOnlySpan&lt;T&gt;
+    /// Maps each element individually.
+    /// </summary>
+    Span = 1 << 13,
+
+    /// <summary>
+    /// If the source or target is a Memory&lt;T&gt; or ReadOnlyMemory&lt;T&gt;
+    /// Maps each element individually.
+    /// </summary>
+    Memory = 1 << 14,
+
+    /// <summary>
     /// Enables all supported conversions.
     /// </summary>
     All = ~None,

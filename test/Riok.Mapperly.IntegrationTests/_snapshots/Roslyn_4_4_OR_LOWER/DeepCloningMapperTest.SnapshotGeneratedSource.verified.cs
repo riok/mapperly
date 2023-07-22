@@ -57,6 +57,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.UnflatteningIdValue = src.UnflatteningIdValue;
             target.NullableUnflatteningIdValue = src.NullableUnflatteningIdValue;
             target.StringNullableTargetNotNullable = src.StringNullableTargetNotNullable;
+            target.MemoryValue = src.MemoryValue.Span.ToArray();
             target.StackValue = new global::System.Collections.Generic.Stack<string>(src.StackValue);
             target.QueueValue = new global::System.Collections.Generic.Queue<string>(src.QueueValue);
             target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(src.ImmutableArrayValue);

@@ -299,21 +299,26 @@ public static class SyntaxFactoryHelper
         return InvocationExpression(methodAccess).WithArgumentList(ArgumentList(arguments));
     }
 
-    public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ExpressionSyntax[] arguments) =>
-        StaticInvocation(
-            FullyQualifiedIdentifierName(method.ReceiverType?.NonNullable()!)
-                ?? throw new ArgumentNullException(nameof(method.ReceiverType)),
-            method.Name,
-            arguments
-        );
+    public static string StaticMethodString(IMethodSymbol method)
+    {
+        var receiver = method.ReceiverType ?? throw new NullReferenceException(nameof(method.ReceiverType) + " is null");
+        var qualifiedReceiverName = FullyQualifiedIdentifierName(receiver.NonNullable());
+        return $"{qualifiedReceiverName}.{method.Name}";
+    }
+
+    public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ExpressionSyntax[] arguments)
+    {
+        var receiver = method.ReceiverType ?? throw new NullReferenceException(nameof(method.ReceiverType) + " is null");
+        var qualifiedReceiverName = FullyQualifiedIdentifierName(receiver.NonNullable());
+        return StaticInvocation(qualifiedReceiverName, method.Name, arguments);
+    }
 
     public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ArgumentSyntax[] arguments)
     {
-        var receiverType =
-            FullyQualifiedIdentifierName(method.ReceiverType?.NonNullable()!)
-            ?? throw new ArgumentNullException(nameof(method.ReceiverType));
+        var receiver = method.ReceiverType ?? throw new NullReferenceException(nameof(method.ReceiverType) + " is null");
+        var qualifiedReceiverName = FullyQualifiedIdentifierName(receiver.NonNullable());
 
-        var receiverTypeIdentifier = IdentifierName(receiverType);
+        var receiverTypeIdentifier = IdentifierName(qualifiedReceiverName);
         var methodAccess = MemberAccessExpression(
             SyntaxKind.SimpleMemberAccessExpression,
             receiverTypeIdentifier,
@@ -348,6 +353,12 @@ public static class SyntaxFactoryHelper
 
     public static StatementSyntax CreateInstance(string variableName, ITypeSymbol typeSymbol) =>
         DeclareLocalVariable(variableName, CreateInstance(typeSymbol));
+
+    public static ObjectCreationExpressionSyntax CreateInstance(string typeName)
+    {
+        var type = IdentifierName(typeName);
+        return ObjectCreationExpression(type).WithArgumentList(SyntaxFactory.ArgumentList());
+    }
 
     public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol)
     {

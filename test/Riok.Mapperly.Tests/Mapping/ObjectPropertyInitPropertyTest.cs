@@ -172,7 +172,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    NestedValue = source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested?.Value))
+                    NestedValue = source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested.Value))
                 };
                 return target;
                 """
@@ -295,6 +295,66 @@ public class ObjectPropertyInitPropertyTest
             "B",
             "class A { public string StringValue { get; init; } public int IntValue { get; set; } }",
             "class B { public required string StringValue { get; set; } public int IntValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    StringValue = source.StringValue
+                };
+                target.IntValue = source.IntValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void IgnoredTargetRequiredPropertyWithConfiguration()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+                [MapProperty("StringValue", "StringValue")]
+                [MapperIgnoreTarget("StringValue")]
+                partial B Map(A source);
+                """,
+            "A",
+            "B",
+            "class A { public string StringValue { get; init; } public int IntValue { get; set; } }",
+            "class B { public required string StringValue { get; set; } public int IntValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    StringValue = source.StringValue
+                };
+                target.IntValue = source.IntValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void IgnoredTargetInitPropertyWithConfiguration()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+                [MapProperty("StringValue", "StringValue")]
+                [MapperIgnoreTarget("StringValue")]
+                partial B Map(A source);
+                """,
+            "A",
+            "B",
+            "class A { public string StringValue { get; init; } public int IntValue { get; set; } }",
+            "class B { public string StringValue { get; init; } public int IntValue { get; set; } }"
         );
 
         TestHelper

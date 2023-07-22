@@ -1,0 +1,42 @@
+---
+sidebar_position: 2
+description: An example of a Mapperly generated mapper.
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import CarSource from '!!raw-loader!../../src/data/generated/samples/Car.cs';
+import CarDtoSource from '!!raw-loader!../../src/data/generated/samples/CarDto.cs';
+import CarMapperSource from '!!raw-loader!../../src/data/generated/samples/CarMapper.cs';
+import GeneratedCarMapperSource from '!!raw-loader!../../src/data/generated/samples/CarMapper.g.cs';
+
+# Generated mapper example
+
+This example will show you what kind of code Mapperly generates.
+It is based on the [Mapperly sample](https://github.com/riok/mapperly/tree/main/samples/Riok.Mapperly.Sample).
+To view the generated code of your own mapper, refer to the [generated source configuration](../configuration/generated-source.mdx).
+
+## The source classes
+
+In this example, we have a car class with some general information.
+
+<CodeBlock language="csharp">{CarSource}</CodeBlock>
+
+## The target classes
+
+Our sample target classes are mostly the same as the source classes.
+For demonstration purposes, we named the manufacturer property differently to show how Mapperly can handle this use case.
+
+<CodeBlock language="csharp">{CarDtoSource}</CodeBlock>
+
+## The mapper
+
+The actual mapper is pretty simple. We use a static mapper class in this example.
+As usual, we need to mark the mapper with the `[Mapper]` attribute, so that the source generator is able to recognize it.
+Because the manufacturer/producer properties are named differently, we also need to configure that via an attribute.
+In addition, because the `CarColor` and `CarColorDto` entries have different numeric values, we need to configure Mapperly to map them by their name.
+
+<CodeBlock language="csharp">{CarMapperSource}</CodeBlock>
+
+## The generated code
+
+<CodeBlock language="csharp">{GeneratedCarMapperSource}</CodeBlock>

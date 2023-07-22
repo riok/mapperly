@@ -47,6 +47,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             nameof(TestObject.NullableUnflatteningIdValue),
             nameof(TestObjectDto.NullableUnflattening) + "." + nameof(TestObjectDto.NullableUnflattening.IdValue)
         )]
+        [MapperIgnoreObsoleteMembers]
         private partial TestObjectDto MapToDtoInternal(TestObject testObject);
 
         // disable obsolete warning, as the obsolete attribute should still be tested.

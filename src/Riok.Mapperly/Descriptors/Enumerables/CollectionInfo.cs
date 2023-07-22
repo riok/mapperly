@@ -1,25 +1,36 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.Enumerables;
 
 public record CollectionInfo(
-    CollectionType Type,
+    ITypeSymbol Type,
+    CollectionType CollectionType,
     CollectionType ImplementedTypes,
     ITypeSymbol EnumeratedType,
-    bool CountIsKnown,
+    string? CountPropertyName,
     bool HasImplicitCollectionAddMethod,
     bool IsImmutableCollectionType
 )
 {
-    public (ITypeSymbol, ITypeSymbol)? GetDictionaryKeyValueTypes(MappingBuilderContext ctx, ITypeSymbol t)
+    public bool ImplementsIEnumerable => ImplementedTypes.HasFlag(CollectionType.IEnumerable);
+
+    public bool IsArray => CollectionType is CollectionType.Array;
+    public bool IsMemory => CollectionType is CollectionType.Memory or CollectionType.ReadOnlyMemory;
+    public bool IsSpan => CollectionType is CollectionType.Span or CollectionType.ReadOnlySpan;
+
+    [MemberNotNullWhen(true, nameof(CountPropertyName))]
+    public bool CountIsKnown => CountPropertyName != null;
+
+    public (ITypeSymbol, ITypeSymbol)? GetDictionaryKeyValueTypes(MappingBuilderContext ctx)
     {
-        if (t.ImplementsGeneric(ctx.Types.Get(typeof(IDictionary<,>)), out var dictionaryImpl))
+        if (Type.ImplementsGeneric(ctx.Types.Get(typeof(IDictionary<,>)), out var dictionaryImpl))
         {
             return (dictionaryImpl.TypeArguments[0], dictionaryImpl.TypeArguments[1]);
         }
 
-        if (t.ImplementsGeneric(ctx.Types.Get(typeof(IReadOnlyDictionary<,>)), out var readOnlyDictionaryImpl))
+        if (Type.ImplementsGeneric(ctx.Types.Get(typeof(IReadOnlyDictionary<,>)), out var readOnlyDictionaryImpl))
         {
             return (readOnlyDictionaryImpl.TypeArguments[0], readOnlyDictionaryImpl.TypeArguments[1]);
         }

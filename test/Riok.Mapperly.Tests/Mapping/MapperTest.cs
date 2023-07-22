@@ -1,3 +1,6 @@
+using Microsoft.CodeAnalysis.CSharp;
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 [UsesVerify]
@@ -55,5 +58,71 @@ public class MapperTest
         );
 
         return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapperInNestedClassesWithAttributesShouldWork()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+
+            [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+            public static partial class CarFeature
+            {
+                [Obsolete]
+                public static partial class Mappers
+                {
+                    [Mapper]
+                    public partial class CarMapper
+                    {
+                        public partial int ToInt(double value);
+                    }
+                }
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapperInNestedClassesWithBaseTypeShouldWork()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+
+            public abstract class BaseClass { }
+
+            public static partial class CarFeature : BaseClass
+            {
+                public static partial class Mappers : BaseClass
+                {
+                    [Mapper]
+                    public partial class CarMapper
+                    {
+                        public partial int ToInt(double value);
+                    }
+                }
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void LanguageLevelLower9ShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping("string", "int");
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics with { LanguageVersion = LanguageVersion.CSharp8 })
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.LanguageVersionNotSupported,
+                "Mapperly does not support the C# language version 8.0 but requires at C# least version 9.0"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 }

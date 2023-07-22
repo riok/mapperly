@@ -47,10 +47,8 @@ jobs:
       - run: dotnet build
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version-file: './docs/.node-version'
       - run: npm ci
-        working-directory: ./docs
-      - run: npm run prebuild
         working-directory: ./docs
       - run: npm run lint
         working-directory: ./docs
@@ -58,6 +56,7 @@ jobs:
         working-directory: ./docs
         env:
           MAPPERLY_VERSION: ${{ inputs.version }}
+          ENVIRONMENT: ${{ inputs.environment }}
       - uses: actions/upload-artifact@v3
         with:
           name: mapperly-docs

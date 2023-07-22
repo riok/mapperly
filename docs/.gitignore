@@ -20,9 +20,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Generated api documentation
-/docs/99-api/
-# keep the category file which produces the generated overview
-!/docs/99-api/_category_.yml
+/docs/api/
 
 # generated data files
 /src/data/generated/
+/static/robots.txt

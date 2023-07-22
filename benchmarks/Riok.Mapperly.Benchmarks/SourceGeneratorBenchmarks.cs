@@ -19,10 +19,10 @@ public class SourceGeneratorBenchmarks
 
     private MSBuildWorkspace? _workspace;
 
-    private CSharpGeneratorDriver? _sampleDriver;
+    private GeneratorDriver? _sampleDriver;
     private Compilation? _sampleCompilation;
 
-    private CSharpGeneratorDriver? _largeDriver;
+    private GeneratorDriver? _largeDriver;
     private Compilation? _largeCompilation;
 
     public SourceGeneratorBenchmarks()

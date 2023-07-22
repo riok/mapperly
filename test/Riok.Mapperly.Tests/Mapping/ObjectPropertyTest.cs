@@ -176,8 +176,8 @@ public class ObjectPropertyTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial B Map(A source);",
             new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseInsensitive },
-            "class A { public string StringValue { get; set; } }",
-            "class B { public string stringvalue { get; set; } }"
+            "class A { public string StringValue { get; set; } public int Value { get; set; } }",
+            "class B { public string stringvalue { get; set; } public required int value { get; init; } }"
         );
 
         TestHelper
@@ -185,7 +185,10 @@ public class ObjectPropertyTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new global::B();
+                var target = new global::B()
+                {
+                    value = source.Value
+                };
                 target.stringvalue = source.StringValue;
                 return target;
                 """
@@ -340,6 +343,29 @@ public class ObjectPropertyTest
         );
 
         return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void PrivateMemberPropertyShouldNotOverride()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { private int MyValue { get; set; } public C My { get; set; } }",
+            "class B { public int MyValue { get; set; } }",
+            "class C { public int Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.MyValue = source.My.Value;
+                return target;
+                """
+            );
     }
 
     [Fact]

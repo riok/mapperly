@@ -1,7 +1,7 @@
 namespace Riok.Mapperly.Descriptors.Enumerables;
 
 [Flags]
-public enum CollectionType
+public enum CollectionType : ulong
 {
     None = 0,
     Array = 1 << 0,
@@ -40,4 +40,10 @@ public enum CollectionType
     IImmutableStack = 1 << 25,
     ImmutableDictionary = 1 << 26,
     IImmutableDictionary = 1 << 27,
+    ImmutableSortedDictionary = 1 << 28,
+
+    Span = 1 << 29,
+    ReadOnlySpan = 1 << 30,
+    Memory = 1L << 31,
+    ReadOnlyMemory = 1L << 32,
 }

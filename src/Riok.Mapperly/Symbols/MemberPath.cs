@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
@@ -15,18 +14,16 @@ namespace Riok.Mapperly.Symbols;
 [DebuggerDisplay("{FullName}")]
 public class MemberPath
 {
-    internal const string MemberAccessSeparator = ".";
+    private const string MemberAccessSeparator = ".";
     private const string NullableValueProperty = "Value";
 
-    private IMappableMember? _member;
-
-    public MemberPath(IReadOnlyCollection<IMappableMember> path)
+    public MemberPath(IReadOnlyList<IMappableMember> path)
     {
         Path = path;
         FullName = string.Join(MemberAccessSeparator, Path.Select(x => x.Name));
     }
 
-    public IReadOnlyCollection<IMappableMember> Path { get; }
+    public IReadOnlyList<IMappableMember> Path { get; }
 
     /// <summary>
     /// Gets the path without the very last element (the path of the object containing the <see cref="Member"/>).
@@ -36,10 +33,7 @@ public class MemberPath
     /// <summary>
     /// Gets the last part of the path or throws if there is none.
     /// </summary>
-    public IMappableMember Member
-    {
-        get => _member ??= Path.Last();
-    }
+    public IMappableMember Member => Path.Last();
 
     /// <summary>
     /// Gets the type of the <see cref="Member"/>. If any part of the path is nullable, this type will be nullable too.
@@ -62,7 +56,7 @@ public class MemberPath
     /// If the <see cref="Member"/> is nullable, the entire <see cref="Path"/> is not returned.
     /// </summary>
     /// <returns>All nullable sub-paths of the <see cref="ObjectPath"/>.</returns>
-    public IEnumerable<IReadOnlyCollection<IMappableMember>> ObjectPathNullableSubPaths()
+    public IEnumerable<IReadOnlyList<IMappableMember>> ObjectPathNullableSubPaths()
     {
         var pathParts = new List<IMappableMember>(Path.Count);
         foreach (var pathPart in ObjectPath)
@@ -174,83 +168,4 @@ public class MemberPath
     public static bool operator !=(MemberPath? left, MemberPath? right) => !Equals(left, right);
 
     private bool Equals(MemberPath other) => Path.SequenceEqual(other.Path);
-
-    public static bool TryFind(
-        ITypeSymbol type,
-        IEnumerable<IEnumerable<string>> pathCandidates,
-        IReadOnlyCollection<string> ignoredNames,
-        [NotNullWhen(true)] out MemberPath? memberPath
-    ) => TryFind(type, pathCandidates, ignoredNames, StringComparer.Ordinal, out memberPath);
-
-    public static bool TryFind(
-        ITypeSymbol type,
-        IEnumerable<IEnumerable<string>> pathCandidates,
-        IReadOnlyCollection<string> ignoredNames,
-        IEqualityComparer<string> comparer,
-        [NotNullWhen(true)] out MemberPath? memberPath
-    )
-    {
-        foreach (var pathCandidate in FindCandidates(type, pathCandidates, comparer))
-        {
-            if (ignoredNames.Contains(pathCandidate.Path.First().Name))
-                continue;
-
-            memberPath = pathCandidate;
-            return true;
-        }
-
-        memberPath = null;
-        return false;
-    }
-
-    public static bool TryFind(ITypeSymbol type, IReadOnlyCollection<string> path, [NotNullWhen(true)] out MemberPath? memberPath) =>
-        TryFind(type, path, StringComparer.Ordinal, out memberPath);
-
-    private static IEnumerable<MemberPath> FindCandidates(
-        ITypeSymbol type,
-        IEnumerable<IEnumerable<string>> pathCandidates,
-        IEqualityComparer<string> comparer
-    )
-    {
-        foreach (var pathCandidate in pathCandidates)
-        {
-            if (TryFind(type, pathCandidate.ToList(), comparer, out var memberPath))
-                yield return memberPath;
-        }
-    }
-
-    private static bool TryFind(
-        ITypeSymbol type,
-        IReadOnlyCollection<string> path,
-        IEqualityComparer<string> comparer,
-        [NotNullWhen(true)] out MemberPath? memberPath
-    )
-    {
-        var foundPath = Find(type, path, comparer).ToList();
-        if (foundPath.Count != path.Count)
-        {
-            memberPath = null;
-            return false;
-        }
-
-        memberPath = new(foundPath);
-        return true;
-    }
-
-    private static IEnumerable<IMappableMember> Find(ITypeSymbol type, IEnumerable<string> path, IEqualityComparer<string> comparer)
-    {
-        foreach (var name in path)
-        {
-            if (FindMember(type, name, comparer) is not { } member)
-                break;
-
-            type = member.Type;
-            yield return member;
-        }
-    }
-
-    private static IMappableMember? FindMember(ITypeSymbol type, string name, IEqualityComparer<string> comparer)
-    {
-        return type.GetMappableMembers(name, comparer).FirstOrDefault();
-    }
 }

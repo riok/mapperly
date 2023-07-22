@@ -8,19 +8,19 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Represents an enumerable mapping which works by using linq (select + collect).
 /// </summary>
-public class LinqDicitonaryMapping : TypeMapping
+public class LinqDictionaryMapping : TypeMapping
 {
     private const string KeyPropertyName = nameof(KeyValuePair<object, object>.Key);
     private const string ValuePropertyName = nameof(KeyValuePair<object, object>.Value);
 
-    private readonly IMethodSymbol _collectMethod;
+    private readonly string _collectMethod;
     private readonly ITypeMapping _keyMapping;
     private readonly ITypeMapping _valueMapping;
 
-    public LinqDicitonaryMapping(
+    public LinqDictionaryMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        IMethodSymbol collectMethod,
+        string collectMethod,
         ITypeMapping keyMapping,
         ITypeMapping valueMapping
     )
@@ -36,7 +36,7 @@ public class LinqDicitonaryMapping : TypeMapping
         // if key and value types do not change then use a simple call
         // ie: source.ToImmutableDictionary();
         if (_keyMapping.IsSynthetic && _valueMapping.IsSynthetic)
-            return StaticInvocation(_collectMethod, ctx.Source);
+            return Invocation(_collectMethod, ctx.Source);
 
         // create expressions mapping the key and value and then create the final expression
         // ie: source.ToImmutableDictionary(x => x.Key, x => (int)x.Value);
@@ -48,6 +48,6 @@ public class LinqDicitonaryMapping : TypeMapping
         var valueMapExpression = _valueMapping.Build(valueLambdaCtx);
         var valueExpression = SimpleLambdaExpression(Parameter(Identifier(valueLambdaParamName))).WithExpressionBody(valueMapExpression);
 
-        return StaticInvocation(_collectMethod, ctx.Source, keyExpression, valueExpression);
+        return Invocation(_collectMethod, ctx.Source, keyExpression, valueExpression);
     }
 }

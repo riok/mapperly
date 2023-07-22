@@ -1,9 +1,7 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Helpers;
 
@@ -13,9 +11,6 @@ internal static class SymbolExtensions
         typeof(Uri).FullName,
         typeof(Version).FullName
     );
-
-    internal static bool HasAttribute(this ISymbol symbol, INamedTypeSymbol attributeSymbol) =>
-        symbol.GetAttributes().Any(a => SymbolEqualityComparer.Default.Equals(a.AttributeClass, attributeSymbol));
 
     internal static bool IsImmutable(this ISymbol symbol) =>
         symbol is INamedTypeSymbol namedSymbol
@@ -56,47 +51,7 @@ internal static class SymbolExtensions
         return enumType != null;
     }
 
-    internal static IEnumerable<IMethodSymbol> GetAllMethods(this ITypeSymbol symbol) => symbol.GetAllMembers().OfType<IMethodSymbol>();
-
-    internal static IEnumerable<IMethodSymbol> GetAllMethods(this ITypeSymbol symbol, string name) =>
-        symbol.GetAllMembers(name).OfType<IMethodSymbol>();
-
-    internal static IEnumerable<IPropertySymbol> GetAllProperties(this ITypeSymbol symbol, string name) =>
-        symbol.GetAllMembers(name).OfType<IPropertySymbol>();
-
     internal static IEnumerable<IFieldSymbol> GetFields(this ITypeSymbol symbol) => symbol.GetMembers().OfType<IFieldSymbol>();
-
-    internal static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol)
-    {
-        var members = symbol.GetMembers();
-
-        if (symbol.TypeKind == TypeKind.Interface)
-        {
-            var interfaceProperties = symbol.AllInterfaces.SelectMany(i => i.GetAllMembers());
-            return members.Concat(interfaceProperties);
-        }
-
-        return symbol.BaseType == null ? members : members.Concat(symbol.BaseType.GetAllMembers());
-    }
-
-    internal static IEnumerable<IMappableMember> GetMappableMembers(
-        this ITypeSymbol symbol,
-        string name,
-        IEqualityComparer<string> comparer
-    )
-    {
-        return symbol.GetAllMembers().Where(x => !x.IsStatic && comparer.Equals(name, x.Name)).Select(MappableMember.Create).WhereNotNull();
-    }
-
-    internal static IEnumerable<IMappableMember> GetAccessibleMappableMembers(this ITypeSymbol symbol)
-    {
-        return symbol
-            .GetAllMembers()
-            .Where(x => !x.IsStatic && x.IsAccessible())
-            .DistinctBy(x => x.Name)
-            .Select(MappableMember.Create)
-            .WhereNotNull();
-    }
 
     internal static IMethodSymbol? GetStaticGenericMethod(this INamedTypeSymbol namedType, string methodName)
     {
@@ -115,10 +70,17 @@ internal static class SymbolExtensions
             return true;
         }
 
-        typedInterface = t.AllInterfaces.FirstOrDefault(
-            x => x.IsGenericType && SymbolEqualityComparer.Default.Equals(x.OriginalDefinition, genericInterfaceSymbol)
-        );
-        return typedInterface != null;
+        foreach (var typeSymbol in t.AllInterfaces)
+        {
+            if (typeSymbol.IsGenericType && SymbolEqualityComparer.Default.Equals(typeSymbol.OriginalDefinition, genericInterfaceSymbol))
+            {
+                typedInterface = typeSymbol;
+                return true;
+            }
+        }
+
+        typedInterface = null;
+        return false;
     }
 
     internal static bool ImplementsGeneric(
@@ -209,7 +171,4 @@ internal static class SymbolExtensions
 
         return true;
     }
-
-    private static IEnumerable<ISymbol> GetAllMembers(this ITypeSymbol symbol, string name) =>
-        symbol.GetAllMembers().Where(x => name.Equals(x.Name));
 }

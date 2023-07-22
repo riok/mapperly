@@ -7,6 +7,9 @@ namespace Riok.Mapperly.Tests;
 
 public static class TestHelper
 {
+    private static readonly GeneratorDriverOptions _enableIncrementalTrackingDriverOptions =
+        new(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true);
+
     public static Task<VerifyResult> VerifyGenerator(string source, TestHelperOptions? options = null, params object?[] args)
     {
         var driver = Generate(source, options);
@@ -50,19 +53,7 @@ public static class TestHelper
         return mapperResult;
     }
 
-    private static GeneratorDriver Generate(string source, TestHelperOptions? options)
-    {
-        options ??= TestHelperOptions.NoDiagnostics;
-
-        var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default.WithLanguageVersion(options.LanguageVersion));
-        var compilation = BuildCompilation(options.NullableOption, syntaxTree);
-        var generator = new MapperGenerator();
-
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
-        return driver.RunGenerators(compilation);
-    }
-
-    private static CSharpCompilation BuildCompilation(NullableContextOptions nullableOption, params SyntaxTree[] syntaxTrees)
+    public static CSharpCompilation BuildCompilation(NullableContextOptions nullableOption, params SyntaxTree[] syntaxTrees)
     {
         var references = AppDomain.CurrentDomain
             .GetAssemblies()
@@ -79,5 +70,28 @@ public static class TestHelper
         var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: nullableOption);
 
         return CSharpCompilation.Create("Tests", syntaxTrees, references, compilationOptions);
+    }
+
+    public static GeneratorDriver GenerateTracked(Compilation compilation)
+    {
+        var generator = new MapperGenerator();
+
+        var driver = CSharpGeneratorDriver.Create(
+            new[] { generator.AsSourceGenerator() },
+            driverOptions: _enableIncrementalTrackingDriverOptions
+        );
+        return driver.RunGenerators(compilation);
+    }
+
+    private static GeneratorDriver Generate(string source, TestHelperOptions? options)
+    {
+        options ??= TestHelperOptions.NoDiagnostics;
+
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default.WithLanguageVersion(options.LanguageVersion));
+        var compilation = BuildCompilation(options.NullableOption, syntaxTree);
+        var generator = new MapperGenerator();
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+        return driver.RunGenerators(compilation);
     }
 }

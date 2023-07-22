@@ -29,6 +29,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         [MapperIgnoreSource(nameof(TestObject.IgnoredIntValue))]
         [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredStringValue))]
+        [MapperIgnoreObsoleteMembers]
         public static partial TestObjectDto MapToDtoExt(this TestObject src);
 
         public static TestObjectDto MapToDto(TestObject src)
@@ -53,6 +54,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         )]
         [MapperIgnoreSource(nameof(TestObject.IgnoredIntValue))]
         [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredIntValue))]
+        [MapperIgnoreObsoleteMembers]
         private static partial TestObjectDto MapToDtoInternal(TestObject testObject);
 
         // disable obsolete warning, as the obsolete attribute should still be tested.
@@ -96,6 +98,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapEnum(EnumMappingStrategy.ByValue)]
         [MapEnumValue(TestEnumDtoAdditionalValue.Value40, TestEnum.Value30)]
         public static partial TestEnum MapToEnumByValueWithExplicit(TestEnumDtoAdditionalValue v);
+
+        [MapEnum(EnumMappingStrategy.ByName)]
+        [MapperIgnoreSourceValue(TestEnumDtoAdditionalValue.Value30)]
+        [MapperIgnoreSourceValue(TestEnumDtoAdditionalValue.Value40)]
+        [MapperIgnoreTargetValue(TestEnum.Value30)]
+        public static partial TestEnum MapToEnumByNameWithIgnored(TestEnumDtoAdditionalValue v);
 
         [MapEnum(EnumMappingStrategy.ByValueCheckDefined)]
         public static partial TestEnum MapToEnumByValueCheckDefined(TestEnumDtoByValue v);

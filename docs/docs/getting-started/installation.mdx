@@ -1,0 +1,37 @@
+---
+sidebar_position: 0
+description: How to install Mapperly.
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+
+# Installation
+
+## Add the NuGet Package to your project
+
+All you need to do, to install Mapperly is to add a NuGet reference pointing to the package `Riok.Mapperly`.
+
+<!-- do not indent this, it won't work, https://stackoverflow.com/a/67579641/3302887 -->
+
+<Tabs>
+<TabItem value="csproj" label="PackageReference" default>
+    <CodeBlock language="xml">{`<PackageReference Include="Riok.Mapperly" Version="${useDocusaurusContext().siteConfig.customFields.mapperlyVersion}" />`}</CodeBlock>
+</TabItem>
+<TabItem value="dontet-cli" label=".NET CLI">
+
+```bash
+dotnet add package Riok.Mapperly
+```
+
+</TabItem>
+<TabItem value="pkg-manager" label="Package Manager">
+
+```powershell
+Install-Package Riok.Mapperly
+```
+
+</TabItem>
+</Tabs>

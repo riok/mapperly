@@ -34,6 +34,11 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
     private static void BuildInitOnlyMemberMappings(INewInstanceBuilderContext<IMapping> ctx, bool includeAllMembers = false)
     {
+        var memberNameComparer =
+            ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseSensitive
+                ? StringComparer.Ordinal
+                : StringComparer.OrdinalIgnoreCase;
+
         var initOnlyTargetMembers = includeAllMembers
             ? ctx.TargetMembers.Values.ToArray()
             : ctx.TargetMembers.Values.Where(x => x.CanOnlySetViaInitializer()).ToArray();
@@ -48,10 +53,11 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             }
 
             if (
-                !MemberPath.TryFind(
+                !ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
                     ctx.Mapping.SourceType,
                     MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
                     ctx.IgnoredSourceMemberNames,
+                    memberNameComparer,
                     out var sourceMemberPath
                 )
             )
@@ -97,7 +103,9 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             return;
         }
 
-        if (!MemberPath.TryFind(ctx.Mapping.SourceType, memberConfig.Source.Path, out var sourceMemberPath))
+        if (
+            !ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.SourceType, memberConfig.Source.Path, out var sourceMemberPath)
+        )
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.SourceMemberNotFound,
@@ -182,15 +190,15 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         // ctors annotated with [Obsolete] are considered last unless they have a MapperConstructor attribute set
         var ctorCandidates = namedTargetType.InstanceConstructors
             .Where(ctor => ctor.IsAccessible())
-            .OrderByDescending(x => x.HasAttribute(ctx.BuilderContext.Types.Get<MapperConstructorAttribute>()))
-            .ThenBy(x => x.HasAttribute(ctx.BuilderContext.Types.Get<ObsoleteAttribute>()))
+            .OrderByDescending(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
+            .ThenBy(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
             .ThenByDescending(x => x.Parameters.Length == 0)
             .ThenByDescending(x => x.Parameters.Length);
         foreach (var ctorCandidate in ctorCandidates)
         {
             if (!TryBuildConstructorMapping(ctx, ctorCandidate, out var mappedTargetMemberNames, out var constructorParameterMappings))
             {
-                if (ctorCandidate.HasAttribute(ctx.BuilderContext.Types.Get<MapperConstructorAttribute>()))
+                if (ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(ctorCandidate))
                 {
                     ctx.BuilderContext.ReportDiagnostic(
                         DiagnosticDescriptors.CannotMapToConfiguredConstructor,
@@ -288,7 +296,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
         if (!ctx.MemberConfigsByRootTargetName.TryGetValue(parameter.Name, out var memberConfigs))
         {
-            return MemberPath.TryFind(
+            return ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
                 ctx.Mapping.SourceType,
                 MemberPathCandidateBuilder.BuildMemberPathCandidates(parameter.Name),
                 ctx.IgnoredSourceMemberNames,
@@ -317,7 +325,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             return false;
         }
 
-        if (!MemberPath.TryFind(ctx.Mapping.SourceType, memberConfig.Source.Path, out sourcePath))
+        if (!ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.SourceType, memberConfig.Source.Path, out sourcePath))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.SourceMemberNotFound,

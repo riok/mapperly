@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
-using Riok.Mapperly.Abstractions.ReferenceHandling.Internal;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
@@ -29,7 +28,7 @@ public static class UserMethodMappingExtractor
             yield break;
 
         // extract user implemented mappings from base methods
-        foreach (var method in ExtractBaseMethods(ctx.Compilation.ObjectType, mapperSymbol))
+        foreach (var method in ExtractBaseMethods(ctx.Compilation.ObjectType, mapperSymbol, ctx.SymbolAccessor))
         {
             // Partial method declarations are allowed for base classes,
             // but still treated as user implemented methods,
@@ -43,10 +42,15 @@ public static class UserMethodMappingExtractor
 
     private static IEnumerable<IMethodSymbol> ExtractMethods(ITypeSymbol mapperSymbol) => mapperSymbol.GetMembers().OfType<IMethodSymbol>();
 
-    private static IEnumerable<IMethodSymbol> ExtractBaseMethods(INamedTypeSymbol objectType, ITypeSymbol mapperSymbol)
+    private static IEnumerable<IMethodSymbol> ExtractBaseMethods(
+        INamedTypeSymbol objectType,
+        ITypeSymbol mapperSymbol,
+        SymbolAccessor symbolAccessor
+    )
     {
-        var baseMethods = mapperSymbol.BaseType?.GetAllMethods() ?? Enumerable.Empty<ISymbol>();
-        var intfMethods = mapperSymbol.AllInterfaces.SelectMany(x => x.GetAllMethods());
+        var baseMethods =
+            mapperSymbol.BaseType != null ? symbolAccessor.GetAllMethods(mapperSymbol.BaseType!) : Enumerable.Empty<ISymbol>();
+        var intfMethods = mapperSymbol.AllInterfaces.SelectMany(symbolAccessor.GetAllMethods);
         return baseMethods
             .Concat(intfMethods)
             .OfType<IMethodSymbol>()
@@ -99,7 +103,6 @@ public static class UserMethodMappingExtractor
                 methodSymbol,
                 runtimeTargetTypeParams,
                 ctx.MapperConfiguration.UseReferenceHandling,
-                ctx.Types.Get<PreserveReferenceHandler>(),
                 GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams, null),
                 ctx.Compilation.ObjectType
             );
@@ -118,7 +121,6 @@ public static class UserMethodMappingExtractor
                 typeParameters.Value,
                 parameters,
                 ctx.MapperConfiguration.UseReferenceHandling,
-                ctx.Types.Get<PreserveReferenceHandler>(),
                 GetTypeSwitchNullArm(methodSymbol, parameters, typeParameters),
                 ctx.Compilation.ObjectType
             );
@@ -137,8 +139,7 @@ public static class UserMethodMappingExtractor
                 parameters.Source,
                 parameters.Target.Value,
                 parameters.ReferenceHandler,
-                ctx.MapperConfiguration.UseReferenceHandling,
-                ctx.Types.Get<PreserveReferenceHandler>()
+                ctx.MapperConfiguration.UseReferenceHandling
             );
         }
 
@@ -146,8 +147,7 @@ public static class UserMethodMappingExtractor
             methodSymbol,
             parameters.Source,
             parameters.ReferenceHandler,
-            ctx.MapperConfiguration.UseReferenceHandling,
-            ctx.Types.Get<PreserveReferenceHandler>()
+            ctx.MapperConfiguration.UseReferenceHandling
         );
     }
 
@@ -294,7 +294,9 @@ public static class UserMethodMappingExtractor
 
     private static MethodParameter? BuildReferenceHandlerParameter(SimpleMappingBuilderContext ctx, IMethodSymbol method)
     {
-        var refHandlerParameterSymbol = method.Parameters.FirstOrDefault(p => p.HasAttribute(ctx.Types.Get<ReferenceHandlerAttribute>()));
+        var refHandlerParameterSymbol = method.Parameters.FirstOrDefault(
+            p => ctx.SymbolAccessor.HasAttribute<ReferenceHandlerAttribute>(p)
+        );
         if (refHandlerParameterSymbol == null)
             return null;
 

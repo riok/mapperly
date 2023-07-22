@@ -29,7 +29,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Source = source;
         Target = target;
         UserSymbol = userSymbol;
-        Configuration = ReadConfiguration(UserSymbol);
+        Configuration = ReadConfiguration(new MappingConfigurationReference(UserSymbol, source, target));
     }
 
     protected MappingBuilderContext(
@@ -53,7 +53,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public ITypeSymbol Target { get; }
 
-    public CollectionInfos? CollectionInfos => _collectionInfos ??= CollectionInfoBuilder.Build(Types, Source, Target);
+    public CollectionInfos? CollectionInfos => _collectionInfos ??= CollectionInfoBuilder.Build(Types, SymbolAccessor, Source, Target);
 
     protected IMethodSymbol? UserSymbol { get; }
 

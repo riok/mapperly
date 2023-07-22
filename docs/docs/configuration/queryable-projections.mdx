@@ -1,0 +1,78 @@
+---
+sidebar_position: 12
+description: Use queryable projections to map queryable objects and optimize ORM performance
+---
+
+import Tabs from '@theme/Tabs';
+
+# IQueryable projections
+
+Mapperly does support `IQueryable<T>` projections:
+
+<!-- do not indent this, it won't work, https://stackoverflow.com/a/67579641/3302887 -->
+
+<Tabs>
+<TabItem value="definition" label="Mapper definition">
+
+```csharp
+[Mapper]
+public static partial class CarMapper
+{
+    // highlight-start
+    public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q);
+    // highlight-end
+}
+```
+
+</TabItem>
+<TabItem value="usage" label="Usage">
+
+```csharp
+var dtos = await DbContext.Cars
+    .Where(...)
+    // highlight-start
+    .ProjectToDto()
+    // highlight-end
+    .ToListAsync();
+```
+
+</TabItem>
+</Tabs>
+
+This is useful in combination with Entity Framework and other ORM solutions which expose `IQueryable<T>`.
+Only fields present in the target class will be retrieved from the database.
+
+:::info
+
+Since queryable projection mappings use `System.Linq.Expressions.Expression<T>` under the hood,
+such mappings have several limitations:
+
+- Object factories are not applied
+- Constructors with unmatched optional parameters are ignored
+- `ThrowOnPropertyMappingNullMismatch` is ignored
+- Enum mappings do not support the `ByName` strategy
+- Reference handling is not supported
+- Nullable reference types are disabled
+- User implemented mapping methods need to follow expression tree [limitations](https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/expression-trees/#limitations).
+
+:::
+
+## Property configurations
+
+To configure property mappings add partial mapping method definitions with attributes as needed.
+Set these methods to private to hide them from callers.
+
+```csharp
+[Mapper]
+public static partial class CarMapper
+{
+    // highlight-start
+    public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q);
+    // highlight-end
+
+    // highlight-start
+    [MapProperty(nameof(Car.Manufacturer), nameof(CarDto.Producer)]
+    // highlight-end
+    private static partial CarDto Map(Car car);
+}
+```

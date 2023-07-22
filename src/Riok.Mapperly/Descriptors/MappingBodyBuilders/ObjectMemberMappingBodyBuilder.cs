@@ -43,7 +43,7 @@ public static class ObjectMemberMappingBodyBuilder
             }
 
             if (
-                MemberPath.TryFind(
+                ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
                     ctx.Mapping.SourceType,
                     MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
                     ctx.IgnoredSourceMemberNames,
@@ -75,7 +75,7 @@ public static class ObjectMemberMappingBodyBuilder
         PropertyMappingConfiguration config
     )
     {
-        if (!MemberPath.TryFind(ctx.Mapping.TargetType, config.Target.Path, out var targetMemberPath))
+        if (!ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.TargetType, config.Target.Path, out var targetMemberPath))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ConfiguredMappingTargetMemberNotFound,
@@ -85,7 +85,7 @@ public static class ObjectMemberMappingBodyBuilder
             return;
         }
 
-        if (!MemberPath.TryFind(ctx.Mapping.SourceType, config.Source.Path, out var sourceMemberPath))
+        if (!ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.SourceType, config.Source.Path, out var sourceMemberPath))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ConfiguredMappingSourceMemberNotFound,

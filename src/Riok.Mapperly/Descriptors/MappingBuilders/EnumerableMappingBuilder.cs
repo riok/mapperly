@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Enumerables;
@@ -6,24 +5,25 @@ using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Diagnostics;
+using Riok.Mapperly.Emit;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public static class EnumerableMappingBuilder
 {
-    private const string SelectMethodName = nameof(Enumerable.Select);
-    private const string ToArrayMethodName = nameof(Enumerable.ToArray);
-    private const string ToListMethodName = nameof(Enumerable.ToList);
+    private const string SelectMethodName = "global::System.Linq.Enumerable.Select";
+    private const string ToArrayMethodName = "global::System.Linq.Enumerable.ToArray";
+    private const string ToListMethodName = "global::System.Linq.Enumerable.ToList";
     private const string ToHashSetMethodName = "ToHashSet";
     private const string AddMethodName = nameof(ICollection<object>.Add);
 
-    private const string ToImmutableArrayMethodName = nameof(ImmutableArray.ToImmutableArray);
-    private const string ToImmutableListMethodName = nameof(ImmutableList.ToImmutableList);
-    private const string ToImmutableHashSetMethodName = nameof(ImmutableHashSet.ToImmutableHashSet);
-    private const string CreateRangeQueueMethodName = nameof(ImmutableQueue.CreateRange);
-    private const string CreateRangeStackMethodName = nameof(ImmutableStack.CreateRange);
-    private const string ToImmutableSortedSetMethodName = nameof(ImmutableSortedSet.ToImmutableSortedSet);
+    private const string ToImmutableArrayMethodName = "global::System.Collections.Immutable.ImmutableArray.ToImmutableArray";
+    private const string ToImmutableListMethodName = "global::System.Collections.Immutable.ImmutableList.ToImmutableList";
+    private const string ToImmutableHashSetMethodName = "global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet";
+    private const string CreateRangeQueueMethodName = "global::System.Collections.Immutable.ImmutableQueue.CreateRange";
+    private const string CreateRangeStackMethodName = "global::System.Collections.Immutable.ImmutableStack.CreateRange";
+    private const string ToImmutableSortedSetMethodName = "global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet";
 
     public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
@@ -33,6 +33,9 @@ public static class EnumerableMappingBuilder
         if (ctx.CollectionInfos == null)
             return null;
 
+        if (!ctx.CollectionInfos.Source.ImplementsIEnumerable || !ctx.CollectionInfos.Target.ImplementsIEnumerable)
+            return null;
+
         var elementMapping = ctx.FindOrBuildMapping(ctx.CollectionInfos.Source.EnumeratedType, ctx.CollectionInfos.Target.EnumeratedType);
         if (elementMapping == null)
             return null;
@@ -40,8 +43,11 @@ public static class EnumerableMappingBuilder
         // if source is an array and target is an array, IEnumerable, IReadOnlyCollection faster mappings can be applied
         if (
             !ctx.IsExpression
-            && ctx.CollectionInfos.Source.Type == CollectionType.Array
-            && ctx.CollectionInfos.Target.Type is CollectionType.Array or CollectionType.IReadOnlyCollection or CollectionType.IEnumerable
+            && ctx.CollectionInfos.Source.CollectionType == CollectionType.Array
+            && ctx.CollectionInfos.Target.CollectionType
+                is CollectionType.Array
+                    or CollectionType.IReadOnlyCollection
+                    or CollectionType.IEnumerable
         )
         {
             // if element mapping is synthetic
@@ -82,20 +88,23 @@ public static class EnumerableMappingBuilder
         if (ctx.CollectionInfos == null)
             return null;
 
+        if (!ctx.CollectionInfos.Source.ImplementsIEnumerable || !ctx.CollectionInfos.Target.ImplementsIEnumerable)
+            return null;
+
         var elementMapping = ctx.FindOrBuildMapping(ctx.CollectionInfos.Source.EnumeratedType, ctx.CollectionInfos.Target.EnumeratedType);
         if (elementMapping == null)
             return null;
 
-        if (ctx.CollectionInfos.Target.Type == CollectionType.Stack)
+        if (ctx.CollectionInfos.Target.CollectionType == CollectionType.Stack)
             return CreateForEach(nameof(Stack<object>.Push));
 
-        if (ctx.CollectionInfos.Target.Type == CollectionType.Queue)
+        if (ctx.CollectionInfos.Target.CollectionType == CollectionType.Queue)
             return CreateForEach(nameof(Queue<object>.Enqueue));
 
         // create a foreach loop with add calls if source is not an array
         // and has an implicit .Add() method
         // the implicit check is an easy way to exclude for example immutable types.
-        if (ctx.CollectionInfos.Target.Type != CollectionType.Array && ctx.CollectionInfos.Target.HasImplicitCollectionAddMethod)
+        if (ctx.CollectionInfos.Target.CollectionType != CollectionType.Array && ctx.CollectionInfos.Target.HasImplicitCollectionAddMethod)
             return CreateForEach(AddMethodName);
 
         if (ctx.CollectionInfos.Target.IsImmutableCollectionType)
@@ -118,10 +127,9 @@ public static class EnumerableMappingBuilder
         }
     }
 
-    private static LinqEnumerableMapping BuildLinqMapping(MappingBuilderContext ctx, ITypeMapping elementMapping, string? collectMethodName)
+    private static LinqEnumerableMapping BuildLinqMapping(MappingBuilderContext ctx, ITypeMapping elementMapping, string? collectMethod)
     {
-        var collectMethod = collectMethodName == null ? null : ctx.Types.Get(typeof(Enumerable)).GetStaticGenericMethod(collectMethodName);
-        var selectMethod = elementMapping.IsSynthetic ? null : ctx.Types.Get(typeof(Enumerable)).GetStaticGenericMethod(SelectMethodName);
+        var selectMethod = elementMapping.IsSynthetic ? null : SelectMethodName;
         return new LinqEnumerableMapping(ctx.Source, ctx.Target, elementMapping, selectMethod, collectMethod);
     }
 
@@ -137,7 +145,7 @@ public static class EnumerableMappingBuilder
         if (hasCtor)
             return namedType;
 
-        if (ctx.CollectionInfos!.Target.Type is CollectionType.ISet or CollectionType.IReadOnlySet)
+        if (ctx.CollectionInfos!.Target.CollectionType is CollectionType.ISet or CollectionType.IReadOnlySet)
             return ctx.Types.Get(typeof(HashSet<>)).Construct(typeSymbol);
 
         return null;
@@ -149,7 +157,7 @@ public static class EnumerableMappingBuilder
         ITypeMapping elementMapping
     )
     {
-        var selectMethod = elementMapping.IsSynthetic ? null : ctx.Types.Get(typeof(Enumerable)).GetStaticGenericMethod(SelectMethodName);
+        var selectMethod = elementMapping.IsSynthetic ? null : SelectMethodName;
         return new LinqConstructorMapping(ctx.Source, ctx.Target, targetTypeToConstruct, elementMapping, selectMethod);
     }
 
@@ -167,7 +175,9 @@ public static class EnumerableMappingBuilder
         // create a foreach loop with add calls if source is not an array
         // and has an implicit .Add() method
         // the implicit check is an easy way to exclude for example immutable types.
-        if (ctx.CollectionInfos!.Target.Type == CollectionType.Array || !ctx.CollectionInfos.Target.HasImplicitCollectionAddMethod)
+        if (
+            ctx.CollectionInfos!.Target.CollectionType == CollectionType.Array || !ctx.CollectionInfos.Target.HasImplicitCollectionAddMethod
+        )
             return null;
 
         var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx);
@@ -189,14 +199,14 @@ public static class EnumerableMappingBuilder
 
         // if the target is an IEnumerable<T> don't collect at all
         // except deep cloning is enabled.
-        var targetIsIEnumerable = ctx.CollectionInfos!.Target.Type == CollectionType.IEnumerable;
+        var targetIsIEnumerable = ctx.CollectionInfos!.Target.CollectionType == CollectionType.IEnumerable;
         if (targetIsIEnumerable && !ctx.MapperConfiguration.UseDeepCloning)
             return (true, null);
 
         // if the target is IReadOnlyCollection<T> or IEnumerable<T>
         // and the count of the source is known (array, IReadOnlyCollection<T>, ICollection<T>) we collect to array
         // for performance/space reasons
-        var targetIsReadOnlyCollection = ctx.CollectionInfos.Target.Type == CollectionType.IReadOnlyCollection;
+        var targetIsReadOnlyCollection = ctx.CollectionInfos.Target.CollectionType == CollectionType.IReadOnlyCollection;
         if ((targetIsReadOnlyCollection || targetIsIEnumerable) && ctx.CollectionInfos.Source.CountIsKnown)
             return (true, ToArrayMethodName);
 
@@ -204,18 +214,18 @@ public static class EnumerableMappingBuilder
         // and ToHashSet is supported (only supported for .NET5+)
         // use ToHashSet
         if (
-            ctx.CollectionInfos.Target.Type is CollectionType.ISet or CollectionType.IReadOnlySet or CollectionType.HashSet
+            ctx.CollectionInfos.Target.CollectionType is CollectionType.ISet or CollectionType.IReadOnlySet or CollectionType.HashSet
             && GetToHashSetLinqCollectMethod(ctx.Types) is { } toHashSetMethod
         )
         {
-            return (true, toHashSetMethod.Name);
+            return (true, SyntaxFactoryHelper.StaticMethodString(toHashSetMethod));
         }
 
         // if target is a IReadOnlyCollection<T>, IEnumerable<T>, IList<T>, List<T> or ICollection<T> with ToList()
         return
             targetIsReadOnlyCollection
             || targetIsIEnumerable
-            || ctx.CollectionInfos.Target.Type
+            || ctx.CollectionInfos.Target.CollectionType
                 is CollectionType.IReadOnlyList
                     or CollectionType.IList
                     or CollectionType.List
@@ -230,31 +240,22 @@ public static class EnumerableMappingBuilder
         if (collectMethod is null)
             return null;
 
-        var selectMethod = elementMapping.IsSynthetic ? null : ctx.Types.Get(typeof(Enumerable)).GetStaticGenericMethod(SelectMethodName);
+        var selectMethod = elementMapping.IsSynthetic ? null : SelectMethodName;
         return new LinqEnumerableMapping(ctx.Source, ctx.Target, elementMapping, selectMethod, collectMethod);
     }
 
-    private static IMethodSymbol? ResolveImmutableCollectMethod(MappingBuilderContext ctx)
+    private static string? ResolveImmutableCollectMethod(MappingBuilderContext ctx)
     {
-        if (ctx.CollectionInfos!.Target.Type == CollectionType.ImmutableArray)
-            return ctx.Types.Get(typeof(ImmutableArray)).GetStaticGenericMethod(ToImmutableArrayMethodName);
-
-        if (ctx.CollectionInfos.Target.Type is CollectionType.ImmutableList or CollectionType.IImmutableList)
-            return ctx.Types.Get(typeof(ImmutableList)).GetStaticGenericMethod(ToImmutableListMethodName);
-
-        if (ctx.CollectionInfos.Target.Type is CollectionType.ImmutableHashSet or CollectionType.IImmutableSet)
-            return ctx.Types.Get(typeof(ImmutableHashSet)).GetStaticGenericMethod(ToImmutableHashSetMethodName);
-
-        if (ctx.CollectionInfos.Target.Type is CollectionType.ImmutableQueue or CollectionType.IImmutableQueue)
-            return ctx.Types.Get(typeof(ImmutableQueue)).GetStaticGenericMethod(CreateRangeQueueMethodName);
-
-        if (ctx.CollectionInfos.Target.Type is CollectionType.ImmutableStack or CollectionType.IImmutableStack)
-            return ctx.Types.Get(typeof(ImmutableStack)).GetStaticGenericMethod(CreateRangeStackMethodName);
-
-        if (ctx.CollectionInfos.Target.Type is CollectionType.ImmutableSortedSet)
-            return ctx.Types.Get(typeof(ImmutableSortedSet)).GetStaticGenericMethod(ToImmutableSortedSetMethodName);
-
-        return null;
+        return ctx.CollectionInfos!.Target.CollectionType switch
+        {
+            CollectionType.ImmutableArray => ToImmutableArrayMethodName,
+            CollectionType.ImmutableList or CollectionType.IImmutableList => ToImmutableListMethodName,
+            CollectionType.ImmutableHashSet or CollectionType.IImmutableSet => ToImmutableHashSetMethodName,
+            CollectionType.ImmutableQueue or CollectionType.IImmutableQueue => CreateRangeQueueMethodName,
+            CollectionType.ImmutableStack or CollectionType.IImmutableStack => CreateRangeStackMethodName,
+            CollectionType.ImmutableSortedSet => ToImmutableSortedSetMethodName,
+            _ => null
+        };
     }
 
     private static IMethodSymbol? GetToHashSetLinqCollectMethod(WellKnownTypes wellKnownTypes) =>
