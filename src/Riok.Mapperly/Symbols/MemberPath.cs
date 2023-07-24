@@ -65,7 +65,7 @@ public class MemberPath
             if (!pathPart.IsNullable)
                 continue;
 
-            yield return pathParts;
+            yield return pathParts.ToArray();
         }
     }
 

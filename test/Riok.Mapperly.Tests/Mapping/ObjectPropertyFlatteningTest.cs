@@ -303,6 +303,32 @@ public class ObjectPropertyFlatteningTest
     }
 
     [Fact]
+    public void ManualUnflattenedPropertyDeepNullablePath()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty($\"MyValueId\", \"Value.Nested.Id\"), MapProperty($\"MyValueId2\", \"Value.Nested.Id2\")] partial B Map(A source);",
+            "class A { public string MyValueId { get; set; } public string MyValueId2 { get; set; } }",
+            "class B { public C? Value { get; set; } }",
+            "class C { public D? Nested { get; set; } }",
+            "class D { public string Id { get; set; } public string Id2 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value ??= new();
+                target.Value.Nested ??= new();
+                target.Value.Nested.Id = source.MyValueId;
+                target.Value.Nested.Id2 = source.MyValueId2;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public Task ManualUnflattenedPropertyNullablePathNoParameterlessCtorShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
