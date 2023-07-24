@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -59,6 +60,12 @@ public class NullDelegateMapping : TypeMapping
         // or for nullable value types:
         // source == null ? <null-substitute> : Map(source.Value)
         var sourceValue = SourceType.IsNullableValueType() ? MemberAccess(ctx.Source, NullableValueProperty) : ctx.Source;
+
+        // disable nullable waring if accessing array
+        if (sourceValue is ElementAccessExpressionSyntax)
+        {
+            sourceValue = PostfixUnaryExpression(SyntaxKind.SuppressNullableWarningExpression, sourceValue);
+        }
 
         return ConditionalExpression(
             IsNull(ctx.Source),
