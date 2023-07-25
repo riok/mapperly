@@ -16,7 +16,3 @@ by either using the source and target property path names as arrays or using a d
 [MapProperty("Make.Id", "MakeId")]
 partial CarDto Map(Car car);
 ```
-
-:::info
-Unflattening is not automatically configured by Mapperly and needs to be configured manually via `MapPropertyAttribute`.
-:::

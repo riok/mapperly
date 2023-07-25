@@ -92,6 +92,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.SubObject = MapToInheritanceSubObjectDto(src.SubObject);
             }
 
+            if (src.NullableUnflatteningIdValue != null)
+            {
+                target.NullableUnflattening ??= new global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto();
+                target.NullableUnflattening.IdValue = DirectInt(src.NullableUnflatteningIdValue.Value);
+            }
+
             target.IntValue = DirectInt(src.IntValue);
             target.StringValue = src.StringValue;
             target.FlatteningIdValue = DirectInt(src.Flattening.IdValue);
@@ -134,6 +140,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.EnumReverseStringValue = MapToTestEnumDtoByValue(src.EnumReverseStringValue);
             target.DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(src.DateTimeValueTargetDateOnly);
             target.DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(src.DateTimeValueTargetTimeOnly);
+            target.Unflattening.IdValue = DirectInt(src.UnflatteningIdValue);
             return target;
         }
 
@@ -265,6 +272,13 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.SubObject = MapToInheritanceSubObject(dto.SubObject);
             }
 
+            if (dto.NullableFlatteningIdValue != null)
+            {
+                target.NullableFlattening ??= new();
+                target.NullableFlattening.IdValue = DirectInt(dto.NullableFlatteningIdValue.Value);
+            }
+
+            target.NestedNullable ??= new();
             target.IntValue = DirectInt(dto.IntValue);
             target.StringValue = dto.StringValue;
             target.UnflatteningIdValue = DirectInt(dto.Unflattening.IdValue);
@@ -306,6 +320,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.EnumRawValue = (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumRawValue;
             target.EnumStringValue = MapToTestEnum(dto.EnumStringValue);
             target.EnumReverseStringValue = MapToString1(dto.EnumReverseStringValue);
+            target.Flattening.IdValue = DirectInt(dto.FlatteningIdValue);
+            target.NestedNullable.IntValue = DirectInt(dto.NestedNullableIntValue);
             return target;
         }
 
@@ -345,6 +361,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             if (source.SubObject != null)
             {
                 target.SubObject = MapToInheritanceSubObjectDto(source.SubObject);
+            }
+
+            if (source.NullableUnflatteningIdValue != null)
+            {
+                target.NullableUnflattening ??= new();
+                target.NullableUnflattening.IdValue = DirectInt(source.NullableUnflatteningIdValue.Value);
             }
 
             target.CtorValue = DirectInt(source.CtorValue);
@@ -391,6 +413,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.EnumReverseStringValue = MapToTestEnumDtoByValue(source.EnumReverseStringValue);
             target.DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(source.DateTimeValueTargetDateOnly);
             target.DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(source.DateTimeValueTargetTimeOnly);
+            target.Unflattening.IdValue = DirectInt(source.UnflatteningIdValue);
         }
 
         private static partial int PrivateDirectInt(int value)

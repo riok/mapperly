@@ -8,7 +8,12 @@
   RenamedStringValue2: ,
   FlatteningIdValue: 10,
   NullableFlatteningIdValue: 100,
-  Unflattening: {},
+  Unflattening: {
+    IdValue: 20
+  },
+  NullableUnflattening: {
+    IdValue: 200
+  },
   NestedNullableIntValue: 100,
   NestedNullable: {
     IntValue: 100

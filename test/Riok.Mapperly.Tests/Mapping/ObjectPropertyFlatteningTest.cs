@@ -35,7 +35,7 @@ public class ObjectPropertyFlatteningTest
             "B",
             "class A { public C Value { get; set; } }",
             "class B { public string ValueId { get; set; } }",
-            "class C { public string Id { get; set; }"
+            "class C { public string Id { get; set; } }"
         );
 
         TestHelper
@@ -45,6 +45,249 @@ public class ObjectPropertyFlatteningTest
                 """
                 var target = new global::B();
                 target.ValueId = source.Value.Id;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AutoUnflattenedProperty()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "B",
+            "A",
+            "class A { public C Value { get; set; } }",
+            "class B { public string ValueId { get; set; } }",
+            "class C { public string Id { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                target.Value.Id = source.ValueId;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AutoUnflattenedManuallyConfiguredPropertyShouldOnlySetOnce()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty($\"ValueId\", \"Value.Id\")] partial A Map(B source);",
+            "class A { public C Value { get; set; } }",
+            "class B { public string ValueId { get; set; } }",
+            "class C { public string Id { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                target.Value.Id = source.ValueId;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AutoUnflattenedPropertyNullablePath()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "B",
+            "A",
+            "class A { public C? Value { get; set; } }",
+            "class B { public string ValueId { get; set; } }",
+            "class C { public string Id { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                target.Value ??= new();
+                target.Value.Id = source.ValueId;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AutoUnflattenedPropertyShouldPreferFlattened()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "B",
+            "A",
+            "class A { public C Value { get; set; } public string ValueId { get; set; } }",
+            "class B { public C Value { get; set; } public string ValueId { get; set; } }",
+            "class C { public string Id { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                target.Value = source.Value;
+                target.ValueId = source.ValueId;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AutoUnflattenedPropertyMultiple()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "B",
+            "A",
+            "class A { public C Value { get; set; } }",
+            "class B { public string ValueId { get; set; } public int ValueValueId { get; set; } }",
+            "class C { public string Id { get; set; } public D Value { get; set; } }",
+            "class D { public int Id { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                target.Value.Id = source.ValueId;
+                target.Value.Value.Id = source.ValueValueId;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AutoUnflattenedPropertyMultipleShouldPreferFlattened()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "B",
+            "A",
+            "class A { public C Value { get; set; } public string ValueId { get; set; } }",
+            "class B { public string ValueId { get; set; } public string ValueValue { get; set; } }",
+            "class C { public string Id { get; set; } public string Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                target.ValueId = source.ValueId;
+                target.Value.Value = source.ValueValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AutoUnflattenedPropertyMultipleShouldPreferAndRewriteFlattened()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "B",
+            "A",
+            "class A { public C Value { get; set; } public string ValueId { get; set; } }",
+            "class B { public C Value { get; set; } public string ValueValue { get; set; } }",
+            "class C { public string Id { get; set; } public string Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                target.Value = source.Value;
+                target.ValueId = source.Value.Id;
+                target.Value.Value = source.ValueValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AutoUnflattenedPropertyMultipleShouldPreferFlattenedNullablePath()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "B",
+            "A",
+            "class A { public C? Value { get; set; } public string ValueId { get; set; } }",
+            "class B { public string ValueId { get; set; } public string ValueValue { get; set; } }",
+            "class C { public string Id { get; set; } public string Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                target.Value ??= new();
+                target.ValueId = source.ValueId;
+                target.Value.Value = source.ValueValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AutoUnflattenedPropertyMultipleNullablePath()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "B",
+            "A",
+            "class A { public C? Value { get; set; } }",
+            "class B { public string ValueId { get; set; } public int ValueValueId { get; set; } }",
+            "class C { public string Id { get; set; } public D? Value { get; set; } }",
+            "class D { public int Id { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                target.Value ??= new();
+                target.Value.Value ??= new();
+                target.Value.Id = source.ValueId;
+                target.Value.Value.Id = source.ValueValueId;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AutoUnflattenedPropertyAvailableShouldPreferShortened()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public C Value { get; set; } public string ValueId { get; set; } }",
+            "class B { public C Value { get; set; } }",
+            "class C { public string Id { get; set; }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = source.Value;
+                target.Value.Id = source.ValueId;
                 return target;
                 """
             );
@@ -273,6 +516,28 @@ public class ObjectPropertyFlatteningTest
                 """
                 var target = new global::B();
                 target.Value.Id = source.MyValueId;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ManualUnflattenedPropertyShouldIgnoreAuto()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty($\"ValueId2\", \"Value.Id\")] partial A Map(B source);",
+            "class A { public C Value { get; set; } }",
+            "class B { public string ValueId { get; set; } public string ValueId2 }",
+            "class C { public string Id { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                target.Value.Id = source.ValueId2;
                 return target;
                 """
             );

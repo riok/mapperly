@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
@@ -27,6 +29,10 @@ public static class ObjectMemberMappingBodyBuilder
                 ? StringComparer.Ordinal
                 : StringComparer.OrdinalIgnoreCase;
 
+        var targetMembersSet = ctx.TargetMembers.Values.ToHashSet();
+        var targetMembersAdded = new HashSet<MemberPath>();
+        var sourceMemberNotFoundDiagnosticTargetMembers = new HashSet<IMappableMember>();
+
         foreach (var targetMember in ctx.TargetMembers.Values)
         {
             if (ctx.MemberConfigsByRootTargetName.Remove(targetMember.Name, out var memberConfigs))
@@ -36,7 +42,15 @@ public static class ObjectMemberMappingBodyBuilder
                 // eg. target.A = source.B should be mapped before target.A.Id = source.B.Id
                 foreach (var config in memberConfigs.OrderBy(x => x.Target.Path.Count))
                 {
-                    BuildMemberAssignmentMapping(ctx, config);
+                    if (
+                        GetMemberPaths(ctx, config, out var targetMemberPath, out var innerSourceMemberPath)
+                        && targetMemberPath is not null
+                        && innerSourceMemberPath is not null
+                    )
+                    {
+                        targetMembersAdded.Add(targetMemberPath);
+                        BuildMemberAssignmentMapping(ctx, innerSourceMemberPath, targetMemberPath);
+                    }
                 }
 
                 continue;
@@ -52,50 +66,82 @@ public static class ObjectMemberMappingBodyBuilder
                 )
             )
             {
-                BuildMemberAssignmentMapping(ctx, sourceMemberPath, new MemberPath(new[] { targetMember }));
+                var targetMemberPath = new MemberPath(new[] { targetMember });
+                targetMembersAdded.Add(targetMemberPath);
+                BuildMemberAssignmentMapping(ctx, sourceMemberPath, targetMemberPath);
                 continue;
             }
 
             if (targetMember.CanSet)
             {
-                ctx.BuilderContext.ReportDiagnostic(
-                    DiagnosticDescriptors.SourceMemberNotFound,
-                    targetMember.Name,
-                    ctx.Mapping.TargetType,
-                    ctx.Mapping.SourceType
-                );
+                sourceMemberNotFoundDiagnosticTargetMembers.Add(targetMember);
             }
+        }
+
+        foreach (var sourceMember in ctx.SourceMembers.Values)
+        {
+            if (
+                ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
+                    ctx.Mapping.TargetType,
+                    MemberPathCandidateBuilder.BuildMemberPathCandidates(sourceMember.Name),
+                    new ReadOnlyCollection<string>(new List<string>()),
+                    memberNameComparer,
+                    out var targetMemberPath
+                )
+                && !targetMembersAdded.Contains(targetMemberPath)
+                && targetMembersSet.Contains(targetMemberPath.Path[0])
+            )
+            {
+                var sourceMemberPath = new MemberPath(new[] { sourceMember });
+                BuildMemberAssignmentMapping(ctx, sourceMemberPath, targetMemberPath);
+
+                sourceMemberNotFoundDiagnosticTargetMembers.Remove(targetMemberPath.Path[0]);
+            }
+        }
+
+        foreach (var targetMember in sourceMemberNotFoundDiagnosticTargetMembers)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotFound,
+                targetMember.Name,
+                ctx.Mapping.TargetType,
+                ctx.Mapping.SourceType
+            );
         }
 
         ctx.AddDiagnostics();
     }
 
-    private static void BuildMemberAssignmentMapping(
+    private static bool GetMemberPaths(
         IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
-        PropertyMappingConfiguration config
+        PropertyMappingConfiguration config,
+        out MemberPath? targetMemberPath,
+        out MemberPath? sourceMemberPath
     )
     {
-        if (!ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.TargetType, config.Target.Path, out var targetMemberPath))
+        sourceMemberPath = null;
+
+        if (!ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.TargetType, config.Target.Path, out targetMemberPath))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ConfiguredMappingTargetMemberNotFound,
                 config.Target.FullName,
                 ctx.Mapping.TargetType
             );
-            return;
+            return false;
         }
 
-        if (!ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.SourceType, config.Source.Path, out var sourceMemberPath))
+        if (!ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.SourceType, config.Source.Path, out sourceMemberPath))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ConfiguredMappingSourceMemberNotFound,
                 config.Source.FullName,
                 ctx.Mapping.SourceType
             );
-            return;
+            return false;
         }
 
-        BuildMemberAssignmentMapping(ctx, sourceMemberPath, targetMemberPath);
+        return true;
     }
 
     public static bool ValidateMappingSpecification(

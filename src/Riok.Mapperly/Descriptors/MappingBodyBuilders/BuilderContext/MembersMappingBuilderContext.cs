@@ -26,6 +26,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
         _unmappedSourceMemberNames = GetSourceMemberNames();
         TargetMembers = GetTargetMembers();
+        SourceMembers = GetSourceMembers();
 
         IgnoredSourceMemberNames = builderContext.Configuration.Properties.IgnoredSources
             .Concat(GetIgnoredObsoleteSourceMembers())
@@ -48,6 +49,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         // then remove all ignored targets from TargetMembers, leaving unignored and explicitly mapped ignored members
         ignoredTargetMemberNames.ExceptWith(MemberConfigsByRootTargetName.Keys);
         TargetMembers.RemoveRange(ignoredTargetMemberNames);
+
+        SourceMembers.RemoveRange(IgnoredSourceMemberNames);
     }
 
     public MappingBuilderContext BuilderContext { get; }
@@ -57,6 +60,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     public IReadOnlyCollection<string> IgnoredSourceMemberNames { get; }
 
     public Dictionary<string, IMappableMember> TargetMembers { get; }
+
+    public Dictionary<string, IMappableMember> SourceMembers { get; }
 
     public Dictionary<string, List<PropertyMappingConfiguration>> MemberConfigsByRootTargetName { get; }
 
@@ -112,6 +117,13 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     {
         return BuilderContext.SymbolAccessor
             .GetAllAccessibleMappableMembers(Mapping.TargetType)
+            .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private Dictionary<string, IMappableMember> GetSourceMembers()
+    {
+        return BuilderContext.SymbolAccessor
+            .GetAllAccessibleMappableMembers(Mapping.SourceType)
             .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
     }
 

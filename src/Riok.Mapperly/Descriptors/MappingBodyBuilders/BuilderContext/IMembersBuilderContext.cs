@@ -21,5 +21,7 @@ public interface IMembersBuilderContext<out T>
 
     Dictionary<string, IMappableMember> TargetMembers { get; }
 
+    Dictionary<string, IMappableMember> SourceMembers { get; }
+
     Dictionary<string, List<PropertyMappingConfiguration>> MemberConfigsByRootTargetName { get; }
 }
