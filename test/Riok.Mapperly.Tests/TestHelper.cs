@@ -13,7 +13,7 @@ public static class TestHelper
     public static Task<VerifyResult> VerifyGenerator(string source, TestHelperOptions? options = null, params object?[] args)
     {
         var driver = Generate(source, options);
-        var verify = Verify(driver);
+        var verify = Verify(driver).UseStringComparer(CompareSyntaxTree);
 
         if (args.Any())
         {
@@ -21,6 +21,13 @@ public static class TestHelper
         }
 
         return verify.ToTask();
+    }
+
+    private static Task<CompareResult> CompareSyntaxTree(string received, string verified, IReadOnlyDictionary<string, object> context)
+    {
+        var receivedTree = CSharpSyntaxTree.ParseText(received);
+        var verifiedTree = CSharpSyntaxTree.ParseText(verified);
+        return Task.FromResult(receivedTree.IsEquivalentTo(verifiedTree) ? CompareResult.Equal : CompareResult.NotEqual());
     }
 
     public static MapperGenerationResult GenerateMapper(

@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using FluentAssertions.Execution;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Riok.Mapperly.Tests;
 
@@ -74,7 +76,11 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions HaveSingleMethodBody([StringSyntax(StringSyntax.CSharp)] string mapperMethodBody)
     {
-        _mapper.Methods.Single().Value.Body.Should().Be(mapperMethodBody.ReplaceLineEndings());
+        var actual = CSharpSyntaxTree.ParseText(_mapper.Methods.Single().Value.Body);
+        var expected = CSharpSyntaxTree.ParseText(mapperMethodBody);
+        Execute.Assertion
+            .ForCondition(actual.IsEquivalentTo(expected))
+            .FailWith($"method body was expected to be equal to `{expected}`, but was `{actual}` instead");
         return this;
     }
 
@@ -114,7 +120,11 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions HaveMethodBody(string methodName, [StringSyntax(StringSyntax.CSharp)] string mapperMethodBody)
     {
-        _mapper.Methods[methodName].Body.Should().Be(mapperMethodBody.ReplaceLineEndings().Trim(), $"Method: {methodName}");
+        var actual = CSharpSyntaxTree.ParseText(_mapper.Methods[methodName].Body);
+        var expected = CSharpSyntaxTree.ParseText(mapperMethodBody);
+        Execute.Assertion
+            .ForCondition(actual.IsEquivalentTo(expected))
+            .FailWith($"method body was expected to be equal to `{expected}`, but was `{actual}` instead");
         return this;
     }
 
