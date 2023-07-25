@@ -12,7 +12,7 @@ namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 /// target.EnsureCapacity(source.Length + target.Count);
 /// </code>
 /// </remarks>
-public class EnsureCapacityMember : EnsureCapacity
+public class EnsureCapacityMember : EnsureCapacityInfo
 {
     private readonly string _targetAccessor;
     private readonly string _sourceAccessor;

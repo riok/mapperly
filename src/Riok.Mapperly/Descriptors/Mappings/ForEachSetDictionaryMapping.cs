@@ -28,7 +28,7 @@ public class ForEachSetDictionaryMapping : ExistingTargetMappingMethodWrapper
         ITypeSymbol? typeToInstantiate = null,
         ObjectFactory? objectFactory = null,
         INamedTypeSymbol? explicitCast = null,
-        EnsureCapacity? ensureCapacity = null
+        EnsureCapacityInfo? ensureCapacity = null
     )
         : base(
             new ForEachSetDictionaryExistingTargetMapping(sourceType, targetType, keyMapping, valueMapping, explicitCast, ensureCapacity)

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Helpers;
 
@@ -223,6 +224,7 @@ public static class CollectionInfoBuilder
         return null;
     }
 
+    [SuppressMessage("Design", "MA0051:Method is too long", Justification = "Just one large switch, static data, no logic")]
     private static CollectionType GetImplementedCollectionTypes(WellKnownTypes types, ITypeSymbol type, CollectionType collectionType)
     {
         // if the collectionType is not CollectionType.None, return the known implemented types

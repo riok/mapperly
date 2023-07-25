@@ -21,7 +21,7 @@ public class ForEachAddEnumerableMapping : ExistingTargetMappingMethodWrapper
         ITypeMapping elementMapping,
         ObjectFactory? objectFactory,
         string insertMethodName,
-        EnsureCapacity? ensureCapacityBuilder
+        EnsureCapacityInfo? ensureCapacityBuilder
     )
         : base(
             new ForEachAddEnumerableExistingTargetMapping(sourceType, targetType, elementMapping, insertMethodName, ensureCapacityBuilder)

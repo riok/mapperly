@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -25,7 +26,11 @@ public static class SyntaxFactoryHelper
         );
     private static readonly IdentifierNameSyntax _nameofIdentifier = IdentifierName("nameof");
 
-    private static readonly Regex FormattableStringPlaceholder = new Regex(@"\{(\d+)\}");
+    private static readonly Regex FormattableStringPlaceholder = new Regex(
+        @"\{(?<placeholder>\d+)\}",
+        RegexOptions.Compiled,
+        TimeSpan.FromMilliseconds(100)
+    );
 
     public static SyntaxToken Accessibility(Accessibility accessibility)
     {
@@ -119,7 +124,7 @@ public static class SyntaxFactoryHelper
             var text = str.Format.Substring(previousIndex, match.Index - previousIndex);
             contents.Add(InterpolatedStringText(text));
 
-            var arg = str.GetArgument(int.Parse(match.Groups[1].Value));
+            var arg = str.GetArgument(int.Parse(match.Groups["placeholder"].Value, CultureInfo.InvariantCulture));
             InterpolatedStringContentSyntax argSyntax = arg switch
             {
                 ExpressionSyntax x => Interpolation(x),
@@ -301,21 +306,21 @@ public static class SyntaxFactoryHelper
 
     public static string StaticMethodString(IMethodSymbol method)
     {
-        var receiver = method.ReceiverType ?? throw new NullReferenceException(nameof(method.ReceiverType) + " is null");
+        var receiver = method.ReceiverType ?? throw new ArgumentException(nameof(method.ReceiverType) + " is null", nameof(method));
         var qualifiedReceiverName = FullyQualifiedIdentifierName(receiver.NonNullable());
         return $"{qualifiedReceiverName}.{method.Name}";
     }
 
     public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ExpressionSyntax[] arguments)
     {
-        var receiver = method.ReceiverType ?? throw new NullReferenceException(nameof(method.ReceiverType) + " is null");
+        var receiver = method.ReceiverType ?? throw new ArgumentException(nameof(method.ReceiverType) + " is null", nameof(method));
         var qualifiedReceiverName = FullyQualifiedIdentifierName(receiver.NonNullable());
         return StaticInvocation(qualifiedReceiverName, method.Name, arguments);
     }
 
     public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ArgumentSyntax[] arguments)
     {
-        var receiver = method.ReceiverType ?? throw new NullReferenceException(nameof(method.ReceiverType) + " is null");
+        var receiver = method.ReceiverType ?? throw new ArgumentException(nameof(method.ReceiverType) + " is null", nameof(method));
         var qualifiedReceiverName = FullyQualifiedIdentifierName(receiver.NonNullable());
 
         var receiverTypeIdentifier = IdentifierName(qualifiedReceiverName);

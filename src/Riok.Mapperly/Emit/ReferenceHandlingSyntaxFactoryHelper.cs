@@ -14,7 +14,7 @@ public static class ReferenceHandlingSyntaxFactoryHelper
     public static IfStatementSyntax TryGetReference(ITypeMapping mapping, TypeMappingBuildContext ctx)
     {
         // GetReference<TSource, TTarget>
-        var refHandler = ctx.ReferenceHandler ?? throw new ArgumentNullException(nameof(ctx.ReferenceHandler));
+        var refHandler = ctx.ReferenceHandler ?? throw new ArgumentException("Reference handler is not set", nameof(ctx));
         var methodName = GenericName(Identifier(nameof(IReferenceHandler.TryGetReference)))
             .WithTypeArgumentList(
                 TypeArgumentList(FullyQualifiedIdentifier(mapping.SourceType), FullyQualifiedIdentifier(mapping.TargetType))
@@ -38,7 +38,7 @@ public static class ReferenceHandlingSyntaxFactoryHelper
     public static ExpressionSyntax SetReference(ITypeMapping mapping, TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
         // SetReference<TSource, TTarget>
-        var refHandler = ctx.ReferenceHandler ?? throw new ArgumentNullException(nameof(ctx.ReferenceHandler));
+        var refHandler = ctx.ReferenceHandler ?? throw new ArgumentException("Reference handler is not set", nameof(ctx));
         var methodName = GenericName(Identifier(nameof(IReferenceHandler.SetReference)))
             .WithTypeArgumentList(
                 TypeArgumentList(FullyQualifiedIdentifier(mapping.SourceType), (FullyQualifiedIdentifier(mapping.TargetType)))

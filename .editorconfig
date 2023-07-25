@@ -155,6 +155,13 @@ csharp_space_between_square_brackets = false
 # unused imports
 dotnet_diagnostic.IDE0005.severity = error
 
+# Meziantou.Analyzer
+dotnet_diagnostic.MA0002.severity = suggestion # IEqualityComparer<string> or IComparer<string> is missing
+dotnet_diagnostic.MA0016.severity = suggestion # Prefer using collection abstraction instead of implementation
+
+MA0051.maximum_lines_per_method = 80
+MA0062.allow_all_bits_set_value = true # flag enums
+
 # Xml project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,nativeproj,locproj}]
 indent_size = 2

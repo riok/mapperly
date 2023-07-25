@@ -6,7 +6,7 @@ using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 
-public abstract class EnsureCapacity
+public abstract class EnsureCapacityInfo
 {
     private const string EnsureCapacityName = "EnsureCapacity";
 

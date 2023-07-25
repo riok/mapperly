@@ -14,7 +14,8 @@ public readonly struct MapperNode : IEquatable<MapperNode>
     public CompilationUnitSyntax Body { get; }
     public string FileName { get; }
 
-    public bool Equals(MapperNode other) => Body.IsEquivalentTo(other.Body) && FileName == other.FileName;
+    public bool Equals(MapperNode other) =>
+        Body.IsEquivalentTo(other.Body) && string.Equals(FileName, other.FileName, StringComparison.Ordinal);
 
     public override bool Equals(object? obj) => obj is MapperNode other && Equals(other);
 }
