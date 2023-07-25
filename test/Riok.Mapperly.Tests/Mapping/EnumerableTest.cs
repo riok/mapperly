@@ -82,7 +82,7 @@ public class EnumerableTest
                 var target = new global::B[source.Length];
                 for (var i = 0; i < source.Length; i++)
                 {
-                    target[i] = source[i] == null ? throw new System.NullReferenceException($"Sequence {nameof(source)}, contained a null value at index {i}.") : source[i];
+                    target[i] = source[i] == null ? throw new System.NullReferenceException($"Sequence {nameof(source)}, contained a null value at index {i}.") : source[i]!;
                 }
 
                 return target;
