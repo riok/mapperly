@@ -30,6 +30,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.NestedNullableTargetNotNullable = MapToTestObjectNested(src.NestedNullableTargetNotNullable);
             }
 
+            if (src.TupleValue != null)
+            {
+                target.TupleValue = MapToValueTuple(src.TupleValue.Value);
+            }
+
             if (src.RecursiveObject != null)
             {
                 target.RecursiveObject = Copy(src.RecursiveObject);
@@ -102,6 +107,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested();
             target.IntValue = source.IntValue;
+            return target;
+        }
+
+        private static (string A, string) MapToValueTuple((string A, string) source)
+        {
+            var target = (A: source.A, source.Item2);
             return target;
         }
 

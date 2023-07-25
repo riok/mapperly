@@ -19,6 +19,10 @@
   },
   NestedNullableTargetNotNullable: {},
   StringNullableTargetNotNullable: fooBar3,
+  TupleValue: {
+    Item1: 10,
+    Item2: 20
+  },
   RecursiveObject: {
     CtorValue: 5,
     CtorValue2: 100,

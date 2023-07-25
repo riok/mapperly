@@ -396,7 +396,12 @@ public static class SyntaxFactoryHelper
     public static TypeArgumentListSyntax TypeArgumentList(params TypeSyntax[] argSyntaxes) =>
         SyntaxFactory.TypeArgumentList(CommaSeparatedList(argSyntaxes));
 
+    public static TypeArgumentListSyntax TypeArgumentList(IEnumerable<TypeSyntax> argSyntaxes) =>
+        SyntaxFactory.TypeArgumentList(CommaSeparatedList(argSyntaxes));
+
     public static ArgumentListSyntax ArgumentList(params ArgumentSyntax[] args) => SyntaxFactory.ArgumentList(CommaSeparatedList(args));
+
+    public static ArgumentListSyntax ArgumentList(IEnumerable<ArgumentSyntax> args) => SyntaxFactory.ArgumentList(CommaSeparatedList(args));
 
     public static SeparatedSyntaxList<T> CommaSeparatedList<T>(IEnumerable<T> nodes, bool insertTrailingComma = false)
         where T : SyntaxNode => SeparatedList<T>(JoinByComma(nodes, insertTrailingComma));

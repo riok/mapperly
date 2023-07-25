@@ -47,6 +47,8 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         public string StringNullableTargetNotNullable { get; set; } = string.Empty;
 
+        public (int A, int)? TupleValue { get; set; }
+
         public TestObjectDto? RecursiveObject { get; set; }
 
         public TestObject? SourceTargetSameObjectType { get; set; }
