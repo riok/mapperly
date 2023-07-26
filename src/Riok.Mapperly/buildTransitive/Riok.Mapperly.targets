@@ -1,0 +1,15 @@
+﻿<Project>
+
+  <!-- Required for supporting .NET SDK < 6 (and VS < 2022) which would otherwise also reference the v4 assembly -->
+  <Target Name="_RiokMapperlyRemoveAnalyzersNotMatchingRoslynVersion"
+          Condition="'$(SupportsRoslynComponentVersioning)' != 'true'"
+          AfterTargets="ResolvePackageDependenciesForBuild;ResolveNuGetPackageAssets">
+
+    <ItemGroup>
+      <Analyzer Remove="@(Analyzer)" Condition="
+        '%(Analyzer.NuGetPackageId)' == 'Riok.Mapperly'
+        and $([System.String]::Copy('%(Analyzer.Identity)').Contains('roslyn4'))" />
+    </ItemGroup>
+  </Target>
+
+</Project>

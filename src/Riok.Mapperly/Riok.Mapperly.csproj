@@ -56,5 +56,6 @@
     <None Include="$(OutputPath)\$(AssemblyName).Abstractions.dll" Pack="true" PackagePath="analyzers/roslyn$(ROSLYN_VERSION)/dotnet/cs" Visible="false" />
     <None Include="$(OutputPath)\$(AssemblyName).Abstractions.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
     <None Include="$(OutputPath)\$(AssemblyName).Abstractions.xml" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
+    <None Include="buildTransitive\**\*" Pack="true" PackagePath="buildTransitive" />
   </ItemGroup>
 </Project>
