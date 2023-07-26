@@ -176,7 +176,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         if (targetType.SpecialType == SpecialType.System_String)
             return NullFallbackValue.EmptyString;
 
-        if (targetType.HasAccessibleParameterlessConstructor())
+        if (SymbolAccessor.HasAccessibleParameterlessConstructor(targetType))
             return NullFallbackValue.CreateInstance;
 
         ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, targetType);

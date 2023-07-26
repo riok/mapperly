@@ -13,7 +13,7 @@ public class IncrementalGeneratorTest
         var source = TestSourceBuilder.Mapping("string", "string");
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);
-        var compilation1 = TestHelper.BuildCompilation(TestHelperOptions.NoDiagnostics.NullableOption, syntaxTree);
+        var compilation1 = TestHelper.BuildCompilation(syntaxTree);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
 
@@ -49,7 +49,7 @@ public class IncrementalGeneratorTest
         );
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);
-        var compilation1 = TestHelper.BuildCompilation(TestHelperOptions.NoDiagnostics.NullableOption, syntaxTree);
+        var compilation1 = TestHelper.BuildCompilation(syntaxTree);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
 
@@ -65,7 +65,7 @@ public class IncrementalGeneratorTest
     {
         var source = TestSourceBuilder.Mapping("string", "string");
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);
-        var compilation1 = TestHelper.BuildCompilation(TestHelperOptions.NoDiagnostics.NullableOption, syntaxTree);
+        var compilation1 = TestHelper.BuildCompilation(syntaxTree);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
 
@@ -90,7 +90,7 @@ public class IncrementalGeneratorTest
             "class B { }"
         );
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);
-        var compilation1 = TestHelper.BuildCompilation(TestHelperOptions.NoDiagnostics.NullableOption, syntaxTree);
+        var compilation1 = TestHelper.BuildCompilation(syntaxTree);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
 

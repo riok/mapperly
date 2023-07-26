@@ -67,7 +67,6 @@ public class MapperGenerator : IIncrementalGenerator
         if (mapperAttributeSymbol == null)
             return MapperResults.Empty;
 
-        var symbolAccessor = new SymbolAccessor(wellKnownTypes);
         var uniqueNameBuilder = new UniqueNameBuilder();
 
         var diagnostics = new List<Diagnostic>();
@@ -80,6 +79,7 @@ public class MapperGenerator : IIncrementalGenerator
             if (mapperModel.GetDeclaredSymbol(mapperSyntax) is not INamedTypeSymbol mapperSymbol)
                 continue;
 
+            var symbolAccessor = new SymbolAccessor(wellKnownTypes, compilation, mapperSymbol);
             if (!symbolAccessor.HasAttribute<MapperAttribute>(mapperSymbol))
                 continue;
 

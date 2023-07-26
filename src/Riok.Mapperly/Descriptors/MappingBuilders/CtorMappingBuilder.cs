@@ -17,7 +17,7 @@ public static class CtorMappingBuilder
 
         // resolve ctors which have the source as single argument
         var ctorMethod = namedTarget.InstanceConstructors
-            .Where(x => x.IsAccessible())
+            .Where(ctx.SymbolAccessor.IsAccessible)
             .FirstOrDefault(
                 m =>
                     m.Parameters.Length == 1

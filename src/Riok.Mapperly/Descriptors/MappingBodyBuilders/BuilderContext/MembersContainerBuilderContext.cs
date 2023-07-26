@@ -1,6 +1,5 @@
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
-using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
@@ -39,7 +38,7 @@ public class MembersContainerBuilderContext<T> : MembersMappingBuilderContext<T>
         {
             var nullablePath = new MemberPath(nullableTrailPath);
             var type = nullablePath.Member.Type;
-            if (!type.HasAccessibleParameterlessConstructor())
+            if (!BuilderContext.SymbolAccessor.HasAccessibleParameterlessConstructor(type))
             {
                 BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, type);
                 continue;

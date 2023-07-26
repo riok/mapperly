@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 
 namespace Riok.Mapperly.Helpers;
 
@@ -19,15 +18,6 @@ internal static class SymbolExtensions
             || namedSymbol.SpecialType == SpecialType.System_String
             || _wellKnownImmutableTypes.Contains(namedSymbol.ToDisplayString())
         );
-
-    internal static bool IsAccessible(this ISymbol symbol, bool allowProtected = false) =>
-        symbol.DeclaredAccessibility.HasFlag(Accessibility.Internal)
-        || symbol.DeclaredAccessibility.HasFlag(Accessibility.Public)
-        || (symbol.DeclaredAccessibility.HasFlag(Accessibility.Protected) && allowProtected);
-
-    internal static bool HasAccessibleParameterlessConstructor(this ITypeSymbol symbol, bool allowProtected = false) =>
-        symbol is INamedTypeSymbol { IsAbstract: false } namedTypeSymbol
-        && namedTypeSymbol.InstanceConstructors.Any(c => c.Parameters.IsDefaultOrEmpty && c.IsAccessible(allowProtected));
 
     internal static int GetInheritanceLevel(this ITypeSymbol symbol)
     {
@@ -140,35 +130,4 @@ internal static class SymbolExtensions
 
     internal static bool HasImplicitGenericImplementation(this ITypeSymbol symbol, INamedTypeSymbol inter, string methodName) =>
         symbol.ImplementsGeneric(inter, methodName, out _, out var isExplicit) && !isExplicit;
-
-    internal static bool IsAssignableTo(this ITypeSymbol symbol, Compilation compilation, ITypeSymbol type) =>
-        compilation.ClassifyConversion(symbol, type).IsImplicit && (type.IsNullable() || !symbol.IsNullable());
-
-    internal static bool CanConsumeType(
-        this ITypeParameterSymbol typeParameter,
-        Compilation compilation,
-        NullableAnnotation typeParameterUsageNullableAnnotation,
-        ITypeSymbol type
-    )
-    {
-        if (typeParameter.HasConstructorConstraint && !type.HasAccessibleParameterlessConstructor())
-            return false;
-
-        if (!typeParameter.IsNullable(typeParameterUsageNullableAnnotation) && type.IsNullable())
-            return false;
-
-        if (typeParameter.HasValueTypeConstraint && !type.IsValueType)
-            return false;
-
-        if (typeParameter.HasReferenceTypeConstraint && !type.IsReferenceType)
-            return false;
-
-        foreach (var constraintType in typeParameter.ConstraintTypes)
-        {
-            if (!compilation.ClassifyConversion(type, constraintType.UpgradeNullable()).IsImplicit)
-                return false;
-        }
-
-        return true;
-    }
 }

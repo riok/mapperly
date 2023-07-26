@@ -189,7 +189,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         // then by descending parameter count
         // ctors annotated with [Obsolete] are considered last unless they have a MapperConstructor attribute set
         var ctorCandidates = namedTargetType.InstanceConstructors
-            .Where(ctor => ctor.IsAccessible())
+            .Where(ctor => ctx.BuilderContext.SymbolAccessor.IsAccessible(ctor))
             .OrderByDescending(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
             .ThenBy(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
             .ThenByDescending(x => x.Parameters.Length == 0)

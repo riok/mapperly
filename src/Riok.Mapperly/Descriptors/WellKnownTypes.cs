@@ -40,7 +40,7 @@ public class WellKnownTypes
             return typeSymbol;
         }
 
-        typeSymbol = _compilation.GetTypeByMetadataName(typeFullName);
+        typeSymbol = _compilation.GetBestTypeByMetadataName(typeFullName);
         _cachedTypes.Add(typeFullName, typeSymbol);
 
         return typeSymbol;

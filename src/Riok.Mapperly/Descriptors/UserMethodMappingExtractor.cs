@@ -28,7 +28,7 @@ public static class UserMethodMappingExtractor
             yield break;
 
         // extract user implemented mappings from base methods
-        foreach (var method in ExtractBaseMethods(ctx.Compilation.ObjectType, mapperSymbol, ctx.SymbolAccessor))
+        foreach (var method in ExtractBaseMethods(ctx, mapperSymbol))
         {
             // Partial method declarations are allowed for base classes,
             // but still treated as user implemented methods,
@@ -42,15 +42,11 @@ public static class UserMethodMappingExtractor
 
     private static IEnumerable<IMethodSymbol> ExtractMethods(ITypeSymbol mapperSymbol) => mapperSymbol.GetMembers().OfType<IMethodSymbol>();
 
-    private static IEnumerable<IMethodSymbol> ExtractBaseMethods(
-        INamedTypeSymbol objectType,
-        ITypeSymbol mapperSymbol,
-        SymbolAccessor symbolAccessor
-    )
+    private static IEnumerable<IMethodSymbol> ExtractBaseMethods(SimpleMappingBuilderContext ctx, ITypeSymbol mapperSymbol)
     {
         var baseMethods =
-            mapperSymbol.BaseType != null ? symbolAccessor.GetAllMethods(mapperSymbol.BaseType!) : Enumerable.Empty<ISymbol>();
-        var intfMethods = mapperSymbol.AllInterfaces.SelectMany(symbolAccessor.GetAllMethods);
+            mapperSymbol.BaseType != null ? ctx.SymbolAccessor.GetAllMethods(mapperSymbol.BaseType!) : Enumerable.Empty<ISymbol>();
+        var intfMethods = mapperSymbol.AllInterfaces.SelectMany(ctx.SymbolAccessor.GetAllMethods);
         return baseMethods
             .Concat(intfMethods)
             .OfType<IMethodSymbol>()
@@ -58,8 +54,8 @@ public static class UserMethodMappingExtractor
             .Where(
                 x =>
                     x.MethodKind == MethodKind.Ordinary
-                    && x.IsAccessible(true)
-                    && !SymbolEqualityComparer.Default.Equals(x.ReceiverType, objectType)
+                    && ctx.SymbolAccessor.IsAccessible(x)
+                    && !SymbolEqualityComparer.Default.Equals(x.ReceiverType, ctx.Compilation.ObjectType)
             );
     }
 
