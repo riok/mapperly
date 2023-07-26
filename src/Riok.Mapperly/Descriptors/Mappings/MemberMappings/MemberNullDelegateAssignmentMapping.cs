@@ -33,9 +33,10 @@ public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContai
         // else
         //   throw ...
         var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, true, true, true);
+        var nameofSourceAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, true, false, true);
         var condition = IsNotNull(sourceNullConditionalAccess);
         var elseClause = _throwInsteadOfConditionalNullMapping
-            ? ElseClause(Block(ExpressionStatement(ThrowArgumentNullException(sourceNullConditionalAccess))))
+            ? ElseClause(Block(ExpressionStatement(ThrowArgumentNullException(nameofSourceAccess))))
             : null;
 
         return new[] { IfStatement(condition, Block(base.Build(ctx, targetAccess)), elseClause), };

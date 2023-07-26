@@ -59,7 +59,7 @@ public partial class CarMapper
 }
 ```
 
-### Ignore obsolete members
+#### Ignore obsolete members
 
 By default, Mapperly will map source/target members marked with `ObsoleteAttribute`.
 This can be changed by setting the `IgnoreObsoleteMembersStrategy` of a method with `MapperIgnoreObsoleteMembersAttribute`,
@@ -135,6 +135,37 @@ public class CarDto
     public string modelName { get; set; }
 }
 ```
+
+### `null` values
+
+Mapperly allows the customization of how `null` values are handled when mapping properties.
+
+`AllowNullPropertyAssignment` allows to configure whether `null` values are assigned to nullable target properties.
+If it is `true` and the source value is `null`, the target property is explicitly set to `null`.
+If it is `false`, the property mapping is ignored or an exception is thrown,
+depending on the value of `ThrowOnPropertyMappingNullMismatch`.
+`AllowNullPropertyAssignment` is `true` by default.
+
+`ThrowOnPropertyMappingNullMismatch` controls how `null` source values are handled,
+if the target property is not nullable or `AllowNullPropertyAssignment` is set to `false`.
+If `ThrowOnPropertyMappingNullMismatch` is enabled, an `ArgumentNullException` is thrown.
+If `ThrowOnPropertyMappingNullMismatch` is disabled, the property mapping is ignored.
+`ThrowOnPropertyMappingNullMismatch` is `false` by default.
+
+For mapping methods the behaviour can be specified via `ThrowOnMappingNullMismatch`.
+When the mapper tries to return a `null` value from a mapping method with a non-nullable return type,
+and `ThrowOnMappingNullMismatch` is set to `false`,
+Mapperly tries to return a default value.
+For strings the default value is the empty string,
+for value types, it is `default`,
+for reference types with a public parameterless constructor, a new instance is created.
+If no such constructor exists an `ArgumentNullException` is thrown.
+If `ThrowOnMappingNullMismatch` is `true` (default), an `ArgumentNullException` is thrown.
+
+:::info
+`AllowNullPropertyAssignment`, `ThrowOnPropertyMappingNullMismatch` and `ThrowOnMappingNullMismatch`
+are ignored for required init properties and `IQueryable<T>` projection mappings.
+:::
 
 ### Strict property mappings
 

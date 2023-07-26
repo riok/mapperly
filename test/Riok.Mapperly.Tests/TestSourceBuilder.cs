@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Tests;
 
@@ -81,25 +82,34 @@ public partial class Mapper
             Attribute(options.UseReferenceHandling),
             Attribute(options.ThrowOnMappingNullMismatch),
             Attribute(options.ThrowOnPropertyMappingNullMismatch),
+            Attribute(options.AllowNullPropertyAssignment),
             Attribute(options.EnabledConversions),
             Attribute(options.PropertyNameMappingStrategy),
             Attribute(options.EnumMappingStrategy),
             Attribute(options.EnumMappingIgnoreCase),
             Attribute(options.IgnoreObsoleteMembersStrategy),
-        };
+        }.WhereNotNull();
 
         return $"[Mapper({string.Join(", ", attrs)})]";
     }
 
-    private static string Attribute<T>(T value, [CallerArgumentExpression("value")] string? expression = null)
-        where T : Enum =>
-        Attribute(Convert.ChangeType(value, Enum.GetUnderlyingType(typeof(T))).ToString() ?? throw new ArgumentNullException(), expression);
+    private static string? Attribute<T>(T? value, [CallerArgumentExpression("value")] string? expression = null)
+        where T : struct, Enum =>
+        value.HasValue
+            ? Attribute(
+                Convert.ChangeType(value.Value, Enum.GetUnderlyingType(typeof(T))).ToString() ?? throw new ArgumentNullException(),
+                expression
+            )
+            : null;
 
-    private static string Attribute(bool value, [CallerArgumentExpression("value")] string? expression = null) =>
-        Attribute(value ? "true" : "false", expression);
+    private static string? Attribute(bool? value, [CallerArgumentExpression("value")] string? expression = null) =>
+        value.HasValue ? Attribute(value.Value ? "true" : "false", expression) : null;
 
-    private static string Attribute(string value, [CallerArgumentExpression("value")] string? expression = null)
+    private static string? Attribute(string? value, [CallerArgumentExpression("value")] string? expression = null)
     {
+        if (value == null)
+            return null;
+
         if (expression == null)
             throw new ArgumentNullException(nameof(expression));
 

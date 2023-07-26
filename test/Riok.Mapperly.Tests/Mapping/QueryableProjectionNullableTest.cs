@@ -69,6 +69,24 @@ public class QueryableProjectionNullableTest
     }
 
     [Fact]
+    public Task ClassToClassNullableSourceAndTargetPropertyWithNoNullAssignmentAndThrowShouldBeIgnored()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "System.Linq.IQueryable<A>",
+            "System.Linq.IQueryable<B>",
+            TestSourceBuilderOptions.Default with
+            {
+                AllowNullPropertyAssignment = false,
+                ThrowOnPropertyMappingNullMismatch = true
+            },
+            "class A { public string? StringValue { get; set; } }",
+            "class B { public string? StringValue { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ClassToClassNullableSourceAndTargetValueTypeProperty()
     {
         var source = TestSourceBuilder.Mapping(

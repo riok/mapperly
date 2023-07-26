@@ -38,8 +38,18 @@ public sealed class MapperAttribute : Attribute
     /// Specifies the behaviour in the case when the mapper tries to set a non-nullable property to a <c>null</c> value.
     /// If set to <c>true</c> an <see cref="ArgumentNullException"/> is thrown.
     /// If set to <c>false</c> the property assignment is ignored.
+    /// This is ignored for required init properties and <see cref="IQueryable{T}"/> projection mappings.
     /// </summary>
     public bool ThrowOnPropertyMappingNullMismatch { get; set; }
+
+    /// <summary>
+    /// Specifies whether <c>null</c> values are assigned to the target.
+    /// If <c>true</c> (default), the source is <c>null</c>, and the target does allow <c>null</c> values,
+    /// <c>null</c> is assigned.
+    /// If <c>false</c>, <c>null</c> values are never assigned to the target property.
+    /// This is ignored for required init properties and <see cref="IQueryable{T}"/> projection mappings.
+    /// </summary>
+    public bool AllowNullPropertyAssignment { get; set; } = true;
 
     /// <summary>
     /// Whether to always deep copy objects.

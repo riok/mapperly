@@ -106,3 +106,5 @@ Riok.Mapperly.Abstractions.MapperIgnoreTargetValueAttribute
 Riok.Mapperly.Abstractions.MapperIgnoreTargetValueAttribute.MapperIgnoreTargetValueAttribute(object! target) -> void
 Riok.Mapperly.Abstractions.MapperIgnoreSourceValueAttribute.SourceValue.get -> System.Enum?
 Riok.Mapperly.Abstractions.MapperIgnoreTargetValueAttribute.TargetValue.get -> System.Enum?
+Riok.Mapperly.Abstractions.MapperAttribute.AllowNullPropertyAssignment.get -> bool
+Riok.Mapperly.Abstractions.MapperAttribute.AllowNullPropertyAssignment.set -> void

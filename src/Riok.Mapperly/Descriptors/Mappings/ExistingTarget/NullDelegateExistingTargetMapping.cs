@@ -36,7 +36,7 @@ public class NullDelegateExistingTargetMapping : ExistingTargetMapping
         var enumerated = body.ToArray();
 
         // if body is empty don't generate an if statement
-        if (!enumerated.Any())
+        if (enumerated.Length == 0)
         {
             return Enumerable.Empty<StatementSyntax>();
         }
