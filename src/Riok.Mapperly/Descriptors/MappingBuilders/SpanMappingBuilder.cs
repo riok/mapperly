@@ -91,10 +91,7 @@ public static class SpanMappingBuilder
         // create a foreach loop with add calls if source is not an array
         // and ICollection.Add(T): void is implemented and not explicit
         // ensures add is not called and immutable types
-        if (
-            target.CollectionType is not CollectionType.Array
-            && ctx.Target.HasImplicitGenericImplementation(ctx.Types.Get(typeof(ICollection<>)), AddMethodName)
-        )
+        if (target.CollectionType is not CollectionType.Array && target.HasImplicitCollectionAddMethod)
             return CreateForEach(AddMethodName);
 
         // if a mapping could be created for an immutable collection
@@ -148,10 +145,7 @@ public static class SpanMappingBuilder
         // create a foreach loop with add calls if source is not an array
         // and ICollection.Add(T): void is implemented and not explicit
         // ensures add is not called and immutable types
-        if (
-            target.CollectionType is not CollectionType.Array
-            && ctx.Target.HasImplicitGenericImplementation(ctx.Types.Get(typeof(ICollection<>)), AddMethodName)
-        )
+        if (target.CollectionType is not CollectionType.Array && target.HasImplicitCollectionAddMethod)
             return CreateForEach(AddMethodName, objectFactory);
 
         return MapSpanArrayToEnumerableMethod(ctx);

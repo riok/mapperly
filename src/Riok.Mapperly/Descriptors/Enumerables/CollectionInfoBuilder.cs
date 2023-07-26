@@ -94,14 +94,15 @@ public static class CollectionInfoBuilder
     {
         var collectionTypeInfo = GetCollectionTypeInfo(wellKnownTypes, type);
         var typeInfo = collectionTypeInfo?.CollectionType ?? CollectionType.None;
+        var implementedTypes = GetImplementedCollectionTypes(wellKnownTypes, type, typeInfo);
 
         return new CollectionInfo(
             type,
             typeInfo,
-            GetImplementedCollectionTypes(wellKnownTypes, type, typeInfo),
+            implementedTypes,
             enumeratedType,
             FindCountProperty(symbolAccessor, type, typeInfo),
-            HasValidAddMethod(wellKnownTypes, type, typeInfo),
+            HasValidAddMethod(wellKnownTypes, type, typeInfo, implementedTypes),
             collectionTypeInfo?.Immutable == true
         );
     }
@@ -138,7 +139,7 @@ public static class CollectionInfoBuilder
         return null;
     }
 
-    private static bool HasValidAddMethod(WellKnownTypes types, ITypeSymbol t, CollectionType typeInfo)
+    private static bool HasValidAddMethod(WellKnownTypes types, ITypeSymbol t, CollectionType typeInfo, CollectionType implementedTypes)
     {
         if (
             typeInfo
@@ -154,8 +155,24 @@ public static class CollectionInfoBuilder
         if (typeInfo is not CollectionType.None)
             return false;
 
-        return t.HasImplicitGenericImplementation(types.Get(typeof(ICollection<>)), nameof(ICollection<object>.Add))
-            || t.HasImplicitGenericImplementation(types.Get(typeof(ISet<>)), nameof(ISet<object>.Add));
+        // has valid add if type implements ICollection and has implicit Add method
+        if (
+            implementedTypes.HasFlag(CollectionType.ICollection)
+            && t.HasImplicitGenericImplementation(types.Get(typeof(ICollection<>)), nameof(ICollection<object>.Add))
+        )
+        {
+            return true;
+        }
+        // has valid add if type implements ISet and has implicit Add method
+        if (
+            implementedTypes.HasFlag(CollectionType.ISet)
+            && t.HasImplicitGenericImplementation(types.Get(typeof(ISet<>)), nameof(ISet<object>.Add))
+        )
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private static string? FindCountProperty(SymbolAccessor symbolAccessor, ITypeSymbol t, CollectionType typeInfo)
