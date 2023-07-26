@@ -177,7 +177,7 @@ public class ObjectPropertyTest
             "partial B Map(A source);",
             new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseInsensitive },
             "class A { public string StringValue { get; set; } public int Value { get; set; } }",
-            "class B { public string stringvalue { get; set; } public required int value { get; init; } }"
+            "class B { public string stringvalue { get; set; } public int value { get; init; } }"
         );
 
         TestHelper

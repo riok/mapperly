@@ -287,6 +287,7 @@ public class ObjectPropertyInitPropertyTest
         return TestHelper.VerifyGenerator(source);
     }
 
+#if ROSLYN4_4_OR_GREATER
     [Fact]
     public void RequiredProperty()
     {
@@ -384,4 +385,5 @@ public class ObjectPropertyInitPropertyTest
 
         return TestHelper.VerifyGenerator(source);
     }
+#endif
 }

@@ -345,6 +345,7 @@ public class IgnoreObsoleteTest
             );
     }
 
+#if ROSLYN4_0_OR_GREATER
     [Fact]
     public void MapRequiredPropertyWhenIgnoreObsoleteTarget()
     {
@@ -380,4 +381,5 @@ public class IgnoreObsoleteTest
                 """
             );
     }
+#endif
 }
