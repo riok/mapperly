@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Riok.Mapperly.Helpers;
@@ -49,9 +50,50 @@ using Riok.Mapperly.Abstractions.ReferenceHandling;
 {BuildAttribute(options)}
 public partial class Mapper
 {{
-    {body}
+    {PatchCode(body)}
 }}
 ";
+    }
+
+    private static string PatchCode(string body)
+    {
+#if !ROSLYN4_0_OR_GREATER
+        body = PatchForGenericAttributes(body);
+        body = PatchForRecordStruct(body);
+#endif
+        return body;
+    }
+
+    private static string PatchForGenericAttributes(string body)
+    {
+        return Regex.Replace(
+            body,
+            @"\[(\w+)(<(.+)>)\]",
+            m =>
+            {
+                var name = m.Groups[1].ToString();
+                var genericArgs = m.Groups[3].ToString();
+                var constructorArgs = string.Join(", ", Regex.Split(genericArgs, ",\\s*").Select(x => $"typeof({x})"));
+                return $"[{name}({constructorArgs})]";
+            },
+            RegexOptions.Multiline
+        );
+    }
+
+    private static string PatchForRecordStruct(string body)
+    {
+        return Regex.Replace(
+            body,
+            @"record\s+struct\s+(\w+)\s*\((.+)\);",
+            m =>
+            {
+                var name = m.Groups[1].ToString();
+                var args = m.Groups[2].ToString();
+                var structBody = string.Join(" ", Regex.Split(args, ",\\s*").Select(x => $"public {x};"));
+                return $"struct {name} {{ {structBody} }}";
+            },
+            RegexOptions.Multiline
+        );
     }
 
     public static string MapperWithBodyAndTypes(
@@ -66,7 +108,7 @@ public partial class Mapper
     )
     {
         var sep = Environment.NewLine + Environment.NewLine;
-        return MapperWithBody(body, options) + sep + string.Join(sep, types);
+        return MapperWithBody(body, options) + sep + string.Join(sep, types.Select(PatchCode));
     }
 
     public static SyntaxTree SyntaxTree([StringSyntax(StringSyntax.CSharp)] string source)
