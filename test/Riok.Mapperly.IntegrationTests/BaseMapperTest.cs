@@ -126,7 +126,7 @@ namespace Riok.Mapperly.IntegrationTests
 #elif NET7_0_OR_GREATER
             return "Roslyn_4_5";
 #elif NET6_0_OR_GREATER
-            return "Roslyn_4_4_OR_LOWER";
+            return "Roslyn_4_0";
 #else
             return "Roslyn_3_x";
 #endif
