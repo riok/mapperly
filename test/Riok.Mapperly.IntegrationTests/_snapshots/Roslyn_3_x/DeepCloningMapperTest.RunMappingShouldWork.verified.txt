@@ -1,0 +1,159 @@
+﻿{
+  CtorValue: 7,
+  CtorValue2: 100,
+  IntValue: 10,
+  IntInitOnlyValue: 3,
+  RequiredValue: 4,
+  StringValue: fooBar,
+  RenamedStringValue: fooBar2,
+  Flattening: {
+    IdValue: 10
+  },
+  NullableFlattening: {
+    IdValue: 100
+  },
+  UnflatteningIdValue: 20,
+  NullableUnflatteningIdValue: 200,
+  NestedNullable: {
+    IntValue: 100
+  },
+  NestedNullableTargetNotNullable: {},
+  StringNullableTargetNotNullable: fooBar3,
+  RecursiveObject: {
+    CtorValue: 5,
+    CtorValue2: 100,
+    RequiredValue: 4,
+    StringValue: ,
+    RenamedStringValue: ,
+    Flattening: {},
+    MemoryValue: {
+      IsEmpty: true
+    },
+    ImmutableArrayValue: null,
+    ImmutableQueueValue: [],
+    ImmutableStackValue: [],
+    EnumValue: Value10,
+    EnumName: Value30,
+    EnumReverseStringValue: DtoValue3
+  },
+  SourceTargetSameObjectType: {
+    CtorValue: 8,
+    CtorValue2: 100,
+    IntValue: 99,
+    RequiredValue: 98,
+    StringValue: ,
+    RenamedStringValue: ,
+    Flattening: {},
+    MemoryValue: {
+      IsEmpty: true
+    },
+    ImmutableArrayValue: null,
+    ImmutableQueueValue: [],
+    ImmutableStackValue: [],
+    EnumReverseStringValue: 
+  },
+  NullableReadOnlyObjectCollection: [
+    {
+      IntValue: 10
+    },
+    {
+      IntValue: 20
+    }
+  ],
+  MemoryValue: {
+    Length: 3,
+    IsEmpty: false
+  },
+  StackValue: [
+    1,
+    2,
+    3
+  ],
+  QueueValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableArrayValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableListValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableQueueValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableStackValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableSortedSetValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableDictionaryValue: {
+    1: 1,
+    2: 2,
+    3: 3
+  },
+  ImmutableSortedDictionaryValue: {
+    1: 1,
+    2: 2,
+    3: 3
+  },
+  ExistingISet: [
+    1,
+    2,
+    3
+  ],
+  ExistingHashSet: [
+    1,
+    2,
+    3
+  ],
+  ExistingSortedSet: [
+    1,
+    2,
+    3
+  ],
+  ISet: [
+    1,
+    2,
+    3
+  ],
+  IReadOnlySet: [
+    1,
+    2,
+    3
+  ],
+  HashSet: [
+    1,
+    2,
+    3
+  ],
+  SortedSet: [
+    1,
+    2,
+    3
+  ],
+  EnumValue: Value10,
+  FlagsEnumValue: V1, V4,
+  EnumName: Value10,
+  EnumRawValue: Value20,
+  EnumStringValue: Value30,
+  EnumReverseStringValue: DtoValue3,
+  SubObject: {
+    SubIntValue: 2,
+    BaseIntValue: 1
+  },
+  DateTimeValueTargetDateOnly: 2020-01-03 15:10:05 Utc,
+  DateTimeValueTargetTimeOnly: 2020-01-03 15:10:05 Utc
+}
