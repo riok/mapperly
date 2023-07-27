@@ -196,23 +196,17 @@ public static class NewValueTupleMappingBodyBuilder
         if (!ctx.Mapping.SourceType.IsTupleType || ctx.Mapping.SourceType is not INamedTypeSymbol namedType)
             return false;
 
-        var mappableMember = namedType.TupleElements
-            .Where(
-                x =>
-                    x.CorrespondingTupleField != default
-                    && !ctx.IgnoredSourceMemberNames.Contains(x.Name)
-                    && string.Equals(field.CorrespondingTupleField!.Name, x.CorrespondingTupleField!.Name)
-            )
-            .Select(MappableMember.Create)
-            .WhereNotNull()
-            .FirstOrDefault();
+        var mappableField = namedType.TupleElements.FirstOrDefault(
+            x =>
+                x.CorrespondingTupleField != default
+                && !ctx.IgnoredSourceMemberNames.Contains(x.Name)
+                && string.Equals(field.CorrespondingTupleField!.Name, x.CorrespondingTupleField!.Name)
+        );
 
-        if (mappableMember != default)
-        {
-            sourcePath = new MemberPath(new[] { mappableMember });
-            return true;
-        }
+        if (mappableField == default)
+            return false;
 
-        return false;
+        sourcePath = new MemberPath(new[] { new FieldMember(mappableField) });
+        return true;
     }
 }

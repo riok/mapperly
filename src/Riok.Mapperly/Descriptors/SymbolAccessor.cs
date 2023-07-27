@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 
@@ -9,14 +10,54 @@ namespace Riok.Mapperly.Descriptors;
 public class SymbolAccessor
 {
     private readonly WellKnownTypes _types;
+    private readonly Compilation _compilation;
+    private readonly INamedTypeSymbol _mapperSymbol;
     private readonly Dictionary<ISymbol, ImmutableArray<AttributeData>> _attributes = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<ISymbol>> _allMembers = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<IMappableMember>> _allAccessibleMembers =
         new(SymbolEqualityComparer.Default);
 
-    public SymbolAccessor(WellKnownTypes types)
+    public SymbolAccessor(WellKnownTypes types, Compilation compilation, INamedTypeSymbol mapperSymbol)
     {
         _types = types;
+        _compilation = compilation;
+        _mapperSymbol = mapperSymbol;
+    }
+
+    public bool HasAccessibleParameterlessConstructor(ITypeSymbol symbol) =>
+        symbol is INamedTypeSymbol { IsAbstract: false } namedTypeSymbol
+        && namedTypeSymbol.InstanceConstructors.Any(c => c.Parameters.IsDefaultOrEmpty && IsAccessible(c));
+
+    public bool IsAccessible(ISymbol symbol) => _compilation.IsSymbolAccessibleWithin(symbol, _mapperSymbol);
+
+    public bool HasImplicitConversion(ITypeSymbol source, ITypeSymbol destination) =>
+        _compilation.ClassifyConversion(source, destination).IsImplicit && (destination.IsNullable() || !source.IsNullable());
+
+    public bool DoesTypeSatisfyTypeParameterConstraints(
+        ITypeParameterSymbol typeParameter,
+        ITypeSymbol type,
+        NullableAnnotation typeParameterUsageNullableAnnotation
+    )
+    {
+        if (typeParameter.HasConstructorConstraint && !HasAccessibleParameterlessConstructor(type))
+            return false;
+
+        if (!typeParameter.IsNullable(typeParameterUsageNullableAnnotation) && type.IsNullable())
+            return false;
+
+        if (typeParameter.HasValueTypeConstraint && !type.IsValueType)
+            return false;
+
+        if (typeParameter.HasReferenceTypeConstraint && !type.IsReferenceType)
+            return false;
+
+        foreach (var constraintType in typeParameter.ConstraintTypes)
+        {
+            if (!_compilation.ClassifyConversion(type, constraintType.UpgradeNullable()).IsImplicit)
+                return false;
+        }
+
+        return true;
     }
 
     internal IEnumerable<AttributeData> GetAttributes<T>(ISymbol symbol)
@@ -187,13 +228,13 @@ public class SymbolAccessor
     {
         if (symbol.IsTupleType && symbol is INamedTypeSymbol namedType)
         {
-            return namedType.TupleElements.Select(MappableMember.Create).WhereNotNull();
+            return namedType.TupleElements.Select(x => MappableMember.Create(this, x)).WhereNotNull();
         }
 
         return GetAllMembers(symbol)
-            .Where(x => x is { IsStatic: false, Kind: SymbolKind.Property or SymbolKind.Field } && x.IsAccessible())
+            .Where(x => x is { IsStatic: false, Kind: SymbolKind.Property or SymbolKind.Field })
             .DistinctBy(x => x.Name)
-            .Select(MappableMember.Create)
+            .Select(x => MappableMember.Create(this, x))
             .WhereNotNull();
     }
 }

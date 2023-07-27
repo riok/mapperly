@@ -1,34 +1,31 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Helpers;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.ObjectFactories;
 
 public class GenericSourceTargetObjectFactory : ObjectFactory
 {
-    private readonly Compilation _compilation;
     private readonly int _sourceTypeParameterIndex;
     private readonly int _targetTypeParameterIndex;
 
-    public GenericSourceTargetObjectFactory(IMethodSymbol method, Compilation compilation, int sourceTypeParameterIndex)
-        : base(method)
+    public GenericSourceTargetObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol method, int sourceTypeParameterIndex)
+        : base(symbolAccessor, method)
     {
-        _compilation = compilation;
         _sourceTypeParameterIndex = sourceTypeParameterIndex;
         _targetTypeParameterIndex = (sourceTypeParameterIndex + 1) % 2;
     }
 
     public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
-        Method.TypeParameters[_sourceTypeParameterIndex].CanConsumeType(
-            _compilation,
-            Method.Parameters[0].Type.NullableAnnotation,
-            sourceType
+        SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(
+            Method.TypeParameters[_sourceTypeParameterIndex],
+            sourceType,
+            Method.Parameters[0].Type.NullableAnnotation
         )
-        && Method.TypeParameters[_targetTypeParameterIndex].CanConsumeType(
-            _compilation,
-            Method.ReturnType.NullableAnnotation,
-            targetTypeToCreate
+        && SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(
+            Method.TypeParameters[_targetTypeParameterIndex],
+            targetTypeToCreate,
+            Method.ReturnType.NullableAnnotation
         );
 
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source)

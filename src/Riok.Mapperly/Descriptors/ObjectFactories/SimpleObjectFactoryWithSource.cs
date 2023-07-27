@@ -11,8 +11,8 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 /// </summary>
 public class SimpleObjectFactoryWithSource : SimpleObjectFactory
 {
-    public SimpleObjectFactoryWithSource(IMethodSymbol method)
-        : base(method) { }
+    public SimpleObjectFactoryWithSource(SymbolAccessor symbolAccessor, IMethodSymbol method)
+        : base(symbolAccessor, method) { }
 
     public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
         base.CanCreateType(sourceType, targetTypeToCreate) && SymbolEqualityComparer.Default.Equals(sourceType, Method.Parameters[0].Type);

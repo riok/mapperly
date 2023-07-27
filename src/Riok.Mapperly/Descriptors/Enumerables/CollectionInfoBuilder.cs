@@ -163,6 +163,7 @@ public static class CollectionInfoBuilder
         {
             return true;
         }
+
         // has valid add if type implements ISet and has implicit Add method
         if (
             implementedTypes.HasFlag(CollectionType.ISet)

@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Symbols;
@@ -35,9 +36,15 @@ public readonly struct GenericMappingTypeParameters
 
     public bool? TargetNullable { get; }
 
-    public bool CanConsumeTypes(Compilation compilation, ITypeSymbol sourceType, ITypeSymbol targetType)
+    public bool DoesTypesSatisfyTypeParameterConstraints(SymbolAccessor symbolAccessor, ITypeSymbol sourceType, ITypeSymbol targetType)
     {
-        return SourceType?.CanConsumeType(compilation, _sourceNullableAnnotation, sourceType) != false
-            && TargetType?.CanConsumeType(compilation, _targetNullableAnnotation, targetType) != false;
+        return (
+                SourceType == null
+                || symbolAccessor.DoesTypeSatisfyTypeParameterConstraints(SourceType, sourceType, _sourceNullableAnnotation)
+            )
+            && (
+                TargetType == null
+                || symbolAccessor.DoesTypeSatisfyTypeParameterConstraints(TargetType, targetType, _targetNullableAnnotation)
+            );
     }
 }

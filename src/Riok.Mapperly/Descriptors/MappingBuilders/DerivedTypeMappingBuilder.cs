@@ -38,11 +38,11 @@ public static class DerivedTypeMappingBuilder
         var derivedTypeMappingSourceTypes = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
         var derivedTypeMappings = new List<ITypeMapping>(configs.Count);
         Func<ITypeSymbol, bool> isAssignableToSource = ctx.Source is ITypeParameterSymbol sourceTypeParameter
-            ? t => sourceTypeParameter.CanConsumeType(ctx.Compilation, ctx.Source.NullableAnnotation, t)
-            : t => t.IsAssignableTo(ctx.Compilation, ctx.Source);
+            ? t => ctx.SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(sourceTypeParameter, t, ctx.Source.NullableAnnotation)
+            : t => ctx.SymbolAccessor.HasImplicitConversion(t, ctx.Source);
         Func<ITypeSymbol, bool> isAssignableToTarget = ctx.Target is ITypeParameterSymbol targetTypeParameter
-            ? t => targetTypeParameter.CanConsumeType(ctx.Compilation, ctx.Target.NullableAnnotation, t)
-            : t => t.IsAssignableTo(ctx.Compilation, ctx.Target);
+            ? t => ctx.SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(targetTypeParameter, t, ctx.Target.NullableAnnotation)
+            : t => ctx.SymbolAccessor.HasImplicitConversion(t, ctx.Target);
 
         foreach (var config in configs)
         {

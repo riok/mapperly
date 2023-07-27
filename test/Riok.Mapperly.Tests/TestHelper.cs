@@ -23,11 +23,15 @@ public static class TestHelper
         return verify.ToTask();
     }
 
-    public static MapperGenerationResult GenerateMapper(string source, TestHelperOptions? options = null)
+    public static MapperGenerationResult GenerateMapper(
+        string source,
+        TestHelperOptions? options = null,
+        IReadOnlyCollection<TestAssembly>? additionalAssemblies = null
+    )
     {
         options ??= TestHelperOptions.NoDiagnostics;
 
-        var result = Generate(source, options).GetRunResult();
+        var result = Generate(source, options, additionalAssemblies).GetRunResult();
 
         var mapperClassImpl = result.GeneratedTrees
             .Single()
@@ -53,23 +57,13 @@ public static class TestHelper
         return mapperResult;
     }
 
-    public static CSharpCompilation BuildCompilation(NullableContextOptions nullableOption, params SyntaxTree[] syntaxTrees)
+    public static CSharpCompilation BuildCompilation(params SyntaxTree[] syntaxTrees) =>
+        BuildCompilation("Tests", NullableContextOptions.Enable, true, syntaxTrees);
+
+    public static TestAssembly BuildAssembly(string name, params SyntaxTree[] syntaxTrees)
     {
-        var references = AppDomain.CurrentDomain
-            .GetAssemblies()
-            .Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location))
-            .Select(x => MetadataReference.CreateFromFile(x.Location))
-            .Concat(
-                new[]
-                {
-                    MetadataReference.CreateFromFile(typeof(MapperGenerator).Assembly.Location),
-                    MetadataReference.CreateFromFile(typeof(MapperAttribute).Assembly.Location)
-                }
-            );
-
-        var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: nullableOption);
-
-        return CSharpCompilation.Create("Tests", syntaxTrees, references, compilationOptions);
+        var compilation = BuildCompilation(name, NullableContextOptions.Enable, false, syntaxTrees);
+        return new TestAssembly(compilation);
     }
 
     public static GeneratorDriver GenerateTracked(Compilation compilation)
@@ -83,15 +77,51 @@ public static class TestHelper
         return driver.RunGenerators(compilation);
     }
 
-    private static GeneratorDriver Generate(string source, TestHelperOptions? options)
+    private static GeneratorDriver Generate(
+        string source,
+        TestHelperOptions? options,
+        IReadOnlyCollection<TestAssembly>? additionalAssemblies = null
+    )
     {
         options ??= TestHelperOptions.NoDiagnostics;
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default.WithLanguageVersion(options.LanguageVersion));
-        var compilation = BuildCompilation(options.NullableOption, syntaxTree);
+        var compilation = BuildCompilation(options.AssemblyName, options.NullableOption, true, syntaxTree);
+        if (additionalAssemblies != null)
+        {
+            compilation = compilation.AddReferences(additionalAssemblies.Select(x => x.MetadataReference));
+        }
+
         var generator = new MapperGenerator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
         return driver.RunGenerators(compilation);
+    }
+
+    private static CSharpCompilation BuildCompilation(
+        string name,
+        NullableContextOptions nullableOption,
+        bool addMapperlyReferences,
+        params SyntaxTree[] syntaxTrees
+    )
+    {
+        var compilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: nullableOption);
+        var compilation = CSharpCompilation.Create(name, syntaxTrees, options: compilationOptions);
+
+        var references = AppDomain.CurrentDomain
+            .GetAssemblies()
+            .Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location))
+            .Select(x => MetadataReference.CreateFromFile(x.Location));
+        compilation = compilation.AddReferences(references);
+
+        if (addMapperlyReferences)
+        {
+            compilation = compilation.AddReferences(
+                MetadataReference.CreateFromFile(typeof(MapperGenerator).Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(MapperAttribute).Assembly.Location)
+            );
+        }
+
+        return compilation;
     }
 }

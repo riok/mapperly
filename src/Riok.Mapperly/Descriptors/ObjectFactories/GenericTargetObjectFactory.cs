@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Helpers;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.ObjectFactories;
@@ -12,16 +11,15 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 /// </summary>
 public class GenericTargetObjectFactory : ObjectFactory
 {
-    private readonly Compilation _compilation;
-
-    public GenericTargetObjectFactory(IMethodSymbol method, Compilation compilation)
-        : base(method)
-    {
-        _compilation = compilation;
-    }
+    public GenericTargetObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol method)
+        : base(symbolAccessor, method) { }
 
     public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
-        Method.TypeParameters[0].CanConsumeType(_compilation, Method.ReturnType.NullableAnnotation, targetTypeToCreate);
+        SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(
+            Method.TypeParameters[0],
+            targetTypeToCreate,
+            Method.ReturnType.NullableAnnotation
+        );
 
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
         GenericInvocation(Method.Name, new[] { NonNullableIdentifier(targetTypeToCreate) });

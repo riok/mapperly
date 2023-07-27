@@ -64,7 +64,7 @@ public static class DictionaryMappingBuilder
         // it should have a an object factory or a parameterless public ctor
         if (
             !ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory)
-            && !ctx.Target.HasAccessibleParameterlessConstructor()
+            && !ctx.SymbolAccessor.HasAccessibleParameterlessConstructor(ctx.Target)
         )
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, ctx.Target);

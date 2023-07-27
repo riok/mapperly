@@ -6,7 +6,8 @@ namespace Riok.Mapperly.Tests;
 public record TestHelperOptions(
     NullableContextOptions NullableOption = NullableContextOptions.Enable,
     LanguageVersion LanguageVersion = LanguageVersion.Default,
-    IReadOnlySet<DiagnosticSeverity>? AllowedDiagnostics = null
+    IReadOnlySet<DiagnosticSeverity>? AllowedDiagnostics = null,
+    string AssemblyName = "Tests"
 )
 {
     public static readonly TestHelperOptions AllowDiagnostics = new();

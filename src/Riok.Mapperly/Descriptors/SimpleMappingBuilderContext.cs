@@ -52,6 +52,7 @@ public class SimpleMappingBuilderContext
     public MapperAttribute MapperConfiguration => _configuration.Mapper;
 
     public WellKnownTypes Types { get; }
+
     public SymbolAccessor SymbolAccessor { get; }
 
     protected MappingBuilder MappingBuilder { get; }

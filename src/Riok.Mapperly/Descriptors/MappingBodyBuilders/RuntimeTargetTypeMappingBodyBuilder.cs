@@ -14,7 +14,14 @@ public static class RuntimeTargetTypeMappingBodyBuilder
         // therefore set source type always to nun-nullable
         // as non-nullables are also assignable to nullables.
         var mappings = GetUserMappingCandidates(ctx)
-            .Where(x => mapping.TypeParameters.CanConsumeTypes(ctx.Compilation, x.SourceType.NonNullable(), x.TargetType));
+            .Where(
+                x =>
+                    mapping.TypeParameters.DoesTypesSatisfyTypeParameterConstraints(
+                        ctx.SymbolAccessor,
+                        x.SourceType.NonNullable(),
+                        x.TargetType
+                    )
+            );
 
         BuildMappingBody(ctx, mapping, mappings);
     }
@@ -27,8 +34,8 @@ public static class RuntimeTargetTypeMappingBodyBuilder
         var mappings = GetUserMappingCandidates(ctx)
             .Where(
                 x =>
-                    x.SourceType.NonNullable().IsAssignableTo(ctx.Compilation, mapping.SourceType)
-                    && x.TargetType.IsAssignableTo(ctx.Compilation, mapping.TargetType)
+                    ctx.SymbolAccessor.HasImplicitConversion(x.SourceType.NonNullable(), mapping.SourceType)
+                    && ctx.SymbolAccessor.HasImplicitConversion(x.TargetType, mapping.TargetType)
             );
 
         BuildMappingBody(ctx, mapping, mappings);
@@ -74,7 +81,7 @@ public static class RuntimeTargetTypeMappingBodyBuilder
             .ThenBy(x => x.TargetType.IsNullable())
             .GroupBy(x => new TypeMappingKey(x, false))
             .Select(x => x.First())
-            .Select(x => new RuntimeTargetTypeMapping(x, x.TargetType.IsAssignableTo(ctx.Compilation, ctx.Target)));
+            .Select(x => new RuntimeTargetTypeMapping(x, ctx.Compilation.HasImplicitConversion(x.TargetType, ctx.Target)));
         mapping.AddMappings(runtimeTargetTypeMappings);
     }
 }

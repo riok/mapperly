@@ -5,7 +5,6 @@ using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.ObjectFactories;
 using Riok.Mapperly.Diagnostics;
-using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
@@ -130,7 +129,7 @@ public static class SpanMappingBuilder
 
         if (
             !ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory)
-            && !ctx.Target.HasAccessibleParameterlessConstructor()
+            && !ctx.SymbolAccessor.HasAccessibleParameterlessConstructor(ctx.Target)
         )
         {
             return MapSpanArrayToEnumerableMethod(ctx);
