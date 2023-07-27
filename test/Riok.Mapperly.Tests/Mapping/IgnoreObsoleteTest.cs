@@ -345,7 +345,7 @@ public class IgnoreObsoleteTest
             );
     }
 
-#if ROSLYN4_0_OR_GREATER
+#if ROSLYN4_4_OR_GREATER
     [Fact]
     public void MapRequiredPropertyWhenIgnoreObsoleteTarget()
     {

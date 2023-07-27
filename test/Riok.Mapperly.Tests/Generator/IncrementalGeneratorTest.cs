@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿#if ROSLYN4_4_OR_GREATER
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -116,3 +117,4 @@ public class IncrementalGeneratorTest
         step.Select(x => x.Reason).Should().BeEquivalentTo(runReasons, o => o.WithStrictOrdering());
     }
 }
+#endif

@@ -7,8 +7,10 @@ namespace Riok.Mapperly.Tests;
 
 public static class TestHelper
 {
+#if ROSLYN4_4_OR_GREATER
     private static readonly GeneratorDriverOptions _enableIncrementalTrackingDriverOptions =
         new(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true);
+#endif
 
     public static Task<VerifyResult> VerifyGenerator(string source, TestHelperOptions? options = null, params object?[] args)
     {
@@ -70,8 +72,11 @@ public static class TestHelper
         var generator = new MapperGenerator();
 
         var driver = CSharpGeneratorDriver.Create(
-            new[] { generator.AsSourceGenerator() },
+            new[] { generator.AsSourceGenerator() }
+#if ROSLYN4_4_OR_GREATER
+            ,
             driverOptions: _enableIncrementalTrackingDriverOptions
+#endif
         );
         return driver.RunGenerators(compilation);
     }
