@@ -22,10 +22,7 @@ public static class ObjectMemberMappingBodyBuilder
 
     public static void BuildMappingBody(IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx)
     {
-        var memberNameComparer =
-            ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseSensitive
-                ? StringComparer.Ordinal
-                : StringComparer.OrdinalIgnoreCase;
+        var ignoreCase = ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
 
         foreach (var targetMember in ctx.TargetMembers.Values)
         {
@@ -47,7 +44,7 @@ public static class ObjectMemberMappingBodyBuilder
                     ctx.Mapping.SourceType,
                     MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
                     ctx.IgnoredSourceMemberNames,
-                    memberNameComparer,
+                    ignoreCase,
                     out var sourceMemberPath
                 )
             )

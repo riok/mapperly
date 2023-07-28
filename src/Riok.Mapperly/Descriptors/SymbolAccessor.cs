@@ -16,6 +16,10 @@ public class SymbolAccessor
     private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<ISymbol>> _allMembers = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<IMappableMember>> _allAccessibleMembers =
         new(SymbolEqualityComparer.Default);
+    private readonly Dictionary<ITypeSymbol, IReadOnlyDictionary<string, IMappableMember>> _allAccessibleMembersCaseInsensitive =
+        new(SymbolEqualityComparer.Default);
+    private readonly Dictionary<ITypeSymbol, IReadOnlyDictionary<string, IMappableMember>> _allAccessibleMembersCaseSensitive =
+        new(SymbolEqualityComparer.Default);
 
     public SymbolAccessor(WellKnownTypes types, Compilation compilation, INamedTypeSymbol mapperSymbol)
     {
@@ -85,10 +89,7 @@ public class SymbolAccessor
     internal IEnumerable<IMethodSymbol> GetAllMethods(ITypeSymbol symbol) => GetAllMembers(symbol).OfType<IMethodSymbol>();
 
     internal IEnumerable<IMethodSymbol> GetAllMethods(ITypeSymbol symbol, string name) =>
-        GetAllMembers(symbol, name).OfType<IMethodSymbol>();
-
-    internal IEnumerable<IPropertySymbol> GetAllProperties(ITypeSymbol symbol, string name) =>
-        GetAllMembers(symbol, name).OfType<IPropertySymbol>();
+        GetAllMembers(symbol).Where(x => x.Name == name).OfType<IMethodSymbol>();
 
     internal IEnumerable<IFieldSymbol> GetAllFields(ITypeSymbol symbol) => GetAllMembers(symbol).OfType<IFieldSymbol>();
 
@@ -122,11 +123,11 @@ public class SymbolAccessor
         ITypeSymbol type,
         IEnumerable<IEnumerable<string>> pathCandidates,
         IReadOnlyCollection<string> ignoredNames,
-        IEqualityComparer<string> comparer,
+        bool ignoreCase,
         [NotNullWhen(true)] out MemberPath? memberPath
     )
     {
-        foreach (var pathCandidate in FindMemberPathCandidates(type, pathCandidates, comparer))
+        foreach (var pathCandidate in FindMemberPathCandidates(type, pathCandidates, ignoreCase))
         {
             if (ignoredNames.Contains(pathCandidate.Path.First().Name))
                 continue;
@@ -140,17 +141,17 @@ public class SymbolAccessor
     }
 
     internal bool TryFindMemberPath(ITypeSymbol type, IReadOnlyCollection<string> path, [NotNullWhen(true)] out MemberPath? memberPath) =>
-        TryFindMemberPath(type, path, StringComparer.Ordinal, out memberPath);
+        TryFindMemberPath(type, path, false, out memberPath);
 
     private IEnumerable<MemberPath> FindMemberPathCandidates(
         ITypeSymbol type,
         IEnumerable<IEnumerable<string>> pathCandidates,
-        IEqualityComparer<string> comparer
+        bool ignoreCase
     )
     {
         foreach (var pathCandidate in pathCandidates)
         {
-            if (TryFindMemberPath(type, pathCandidate.ToList(), comparer, out var memberPath))
+            if (TryFindMemberPath(type, pathCandidate.ToList(), ignoreCase, out var memberPath))
                 yield return memberPath;
         }
     }
@@ -158,11 +159,11 @@ public class SymbolAccessor
     private bool TryFindMemberPath(
         ITypeSymbol type,
         IReadOnlyCollection<string> path,
-        IEqualityComparer<string> comparer,
+        bool ignoreCase,
         [NotNullWhen(true)] out MemberPath? memberPath
     )
     {
-        var foundPath = FindMemberPath(type, path, comparer).ToList();
+        var foundPath = FindMemberPath(type, path, ignoreCase).ToList();
         if (foundPath.Count != path.Count)
         {
             memberPath = null;
@@ -173,13 +174,13 @@ public class SymbolAccessor
         return true;
     }
 
-    private IEnumerable<IMappableMember> FindMemberPath(ITypeSymbol type, IEnumerable<string> path, IEqualityComparer<string> comparer)
+    private IEnumerable<IMappableMember> FindMemberPath(ITypeSymbol type, IEnumerable<string> path, bool ignoreCase)
     {
         foreach (var name in path)
         {
             // get T if type is Nullable<T>, prevents Value being treated as a member
             var actualType = type.NonNullableValueType() ?? type;
-            if (GetMappableMembers(actualType, name, comparer).FirstOrDefault() is not { } member)
+            if (GetMappableMember(actualType, name, ignoreCase) is not { } member)
                 break;
 
             type = member.Type;
@@ -187,16 +188,19 @@ public class SymbolAccessor
         }
     }
 
-    private IEnumerable<IMappableMember> GetMappableMembers(ITypeSymbol symbol, string name, IEqualityComparer<string> comparer)
+    private IMappableMember? GetMappableMember(ITypeSymbol symbol, string name, bool ignoreCase)
     {
-        foreach (var member in GetAllAccessibleMappableMembers(symbol))
-        {
-            if (comparer.Equals(member.Name, name))
-                yield return member;
-        }
-    }
+        var membersBySymbol = ignoreCase ? _allAccessibleMembersCaseInsensitive : _allAccessibleMembersCaseSensitive;
 
-    private IEnumerable<ISymbol> GetAllMembers(ITypeSymbol symbol, string name) => GetAllMembers(symbol).Where(x => name.Equals(x.Name));
+        if (membersBySymbol.TryGetValue(symbol, out var symbolMembers))
+            return symbolMembers.GetValueOrDefault(name);
+
+        var comparer = ignoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+        membersBySymbol[symbol] = symbolMembers = GetAllAccessibleMappableMembers(symbol)
+            .GroupBy(x => x.Name, comparer)
+            .ToDictionary(x => x.Key, x => x.First(), comparer);
+        return symbolMembers.GetValueOrDefault(name);
+    }
 
     private ImmutableArray<AttributeData> GetAttributesCore(ISymbol symbol)
     {

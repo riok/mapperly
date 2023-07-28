@@ -34,10 +34,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
     private static void BuildInitOnlyMemberMappings(INewInstanceBuilderContext<IMapping> ctx, bool includeAllMembers = false)
     {
-        var memberNameComparer =
-            ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseSensitive
-                ? StringComparer.Ordinal
-                : StringComparer.OrdinalIgnoreCase;
+        var ignoreCase = ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
 
         var initOnlyTargetMembers = includeAllMembers
             ? ctx.TargetMembers.Values.ToArray()
@@ -57,7 +54,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                     ctx.Mapping.SourceType,
                     MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
                     ctx.IgnoredSourceMemberNames,
-                    memberNameComparer,
+                    ignoreCase,
                     out var sourceMemberPath
                 )
             )
@@ -300,7 +297,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 ctx.Mapping.SourceType,
                 MemberPathCandidateBuilder.BuildMemberPathCandidates(parameter.Name),
                 ctx.IgnoredSourceMemberNames,
-                StringComparer.OrdinalIgnoreCase,
+                true,
                 out sourcePath
             );
         }

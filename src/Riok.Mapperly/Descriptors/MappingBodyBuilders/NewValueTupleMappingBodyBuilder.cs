@@ -173,17 +173,14 @@ public static class NewValueTupleMappingBodyBuilder
         out MemberPath? sourcePath
     )
     {
-        var memberNameComparer =
-            ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseSensitive
-                ? StringComparer.Ordinal
-                : StringComparer.OrdinalIgnoreCase;
+        var ignoreCase = ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
 
         if (
             ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
                 ctx.Mapping.SourceType,
                 MemberPathCandidateBuilder.BuildMemberPathCandidates(field.Name),
                 ctx.IgnoredSourceMemberNames,
-                memberNameComparer,
+                ignoreCase,
                 out sourcePath
             )
         )
