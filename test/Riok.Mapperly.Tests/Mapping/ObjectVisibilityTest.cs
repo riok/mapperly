@@ -2,6 +2,7 @@ using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
 
+[UsesVerify]
 public class ObjectVisibilityTest
 {
     [Fact]
@@ -189,5 +190,26 @@ public class ObjectVisibilityTest
                 return target;
                 """
             );
+    }
+
+    [Fact]
+    public Task PrivateInTheSameClassShouldMap()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            public partial class A
+            {
+                private string _value;
+
+                [Riok.Mapperly.Abstractions.Mapper(UseDeepCloning = true)]
+                internal partial class Mapper
+                {
+                    public partial A Clone(A source);
+                }
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
     }
 }

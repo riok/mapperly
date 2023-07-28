@@ -33,15 +33,7 @@ public static class TestHelper
 
         var result = Generate(source, options, additionalAssemblies).GetRunResult();
 
-        var mapperClassImpl = result.GeneratedTrees
-            .Single()
-            .GetRoot() // compilation
-            .ChildNodes()
-            .OfType<ClassDeclarationSyntax>()
-            .Single();
-        var methods = mapperClassImpl
-            .ChildNodes()
-            .OfType<MethodDeclarationSyntax>()
+        var methods = ExtractAllMethods(result.GeneratedTrees.Single().GetRoot())
             .Select(x => new GeneratedMethod(x))
             .ToDictionary(x => x.Name);
 
@@ -123,5 +115,34 @@ public static class TestHelper
         }
 
         return compilation;
+    }
+
+    private static IEnumerable<MethodDeclarationSyntax> ExtractAllMethods(SyntaxNode root)
+    {
+        foreach (var node in root.ChildNodes())
+        {
+            // a namespace can contain classes
+            if (node is NamespaceDeclarationSyntax)
+            {
+                foreach (var method in ExtractAllMethods(node))
+                {
+                    yield return method;
+                }
+            }
+
+            // a class can contain methods or other classes
+            if (node is not ClassDeclarationSyntax classNode)
+                continue;
+
+            foreach (var method in classNode.ChildNodes().OfType<MethodDeclarationSyntax>())
+            {
+                yield return method;
+            }
+
+            foreach (var method in ExtractAllMethods(node))
+            {
+                yield return method;
+            }
+        }
     }
 }
