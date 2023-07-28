@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 
 /// <summary>
-/// Generates an <see cref="EnsureCapacity"/> of types <see cref="EnsureCapacityNonEnumerated"/> or <see cref="EnsureCapacityMember"/> depending on type information.
+/// Generates an <see cref="EnsureCapacityInfo"/> of types <see cref="EnsureCapacityNonEnumerated"/> or <see cref="EnsureCapacityMember"/> depending on type information.
 /// </summary>
 public static class EnsureCapacityBuilder
 {
@@ -13,7 +13,7 @@ public static class EnsureCapacityBuilder
     private const string LengthPropertyName = nameof(Array.Length);
     private const string TryGetNonEnumeratedCountMethodName = "TryGetNonEnumeratedCount";
 
-    public static EnsureCapacity? TryBuildEnsureCapacity(MappingBuilderContext ctx)
+    public static EnsureCapacityInfo? TryBuildEnsureCapacity(MappingBuilderContext ctx)
     {
         if (ctx.CollectionInfos == null)
             return null;

@@ -122,7 +122,7 @@ internal static class SymbolExtensions
         {
             IMethodSymbol methodSymbol => methodSymbol.ExplicitInterfaceImplementations.Any(),
             IPropertySymbol propertySymbol => propertySymbol.ExplicitInterfaceImplementations.Any(),
-            _ => throw new NotImplementedException(),
+            _ => throw new NotSupportedException(symbolImplementation.GetType().Name + " is not supported"),
         };
 
         return true;

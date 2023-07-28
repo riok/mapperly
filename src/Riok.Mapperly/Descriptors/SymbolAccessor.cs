@@ -89,7 +89,7 @@ public class SymbolAccessor
     internal IEnumerable<IMethodSymbol> GetAllMethods(ITypeSymbol symbol) => GetAllMembers(symbol).OfType<IMethodSymbol>();
 
     internal IEnumerable<IMethodSymbol> GetAllMethods(ITypeSymbol symbol, string name) =>
-        GetAllMembers(symbol).Where(x => x.Name == name).OfType<IMethodSymbol>();
+        GetAllMembers(symbol).Where(x => string.Equals(x.Name, name, StringComparison.Ordinal)).OfType<IMethodSymbol>();
 
     internal IEnumerable<IFieldSymbol> GetAllFields(ITypeSymbol symbol) => GetAllMembers(symbol).OfType<IFieldSymbol>();
 

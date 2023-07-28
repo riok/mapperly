@@ -18,7 +18,7 @@ namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 ///     target.EnsureCapacity(sourceCount + target.Count);
 /// </code>
 /// </remarks>
-public class EnsureCapacityNonEnumerated : EnsureCapacity
+public class EnsureCapacityNonEnumerated : EnsureCapacityInfo
 {
     private const string SourceCountVariableName = "sourceCount";
     private readonly string _targetAccessor;

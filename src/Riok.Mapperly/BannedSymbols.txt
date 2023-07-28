@@ -1,0 +1,2 @@
+# todo
+# M:Microsoft.CodeAnalysis.Compilation.GetTypeByMetadataName(System.String); Use GetBestTypeByMetadataName instead

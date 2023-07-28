@@ -20,7 +20,7 @@ public class ForEachSetDictionaryExistingTargetMapping : ExistingTargetMapping
     private readonly ITypeMapping _keyMapping;
     private readonly ITypeMapping _valueMapping;
     private readonly INamedTypeSymbol? _explicitCast;
-    private readonly EnsureCapacity? _ensureCapacity;
+    private readonly EnsureCapacityInfo? _ensureCapacity;
 
     public ForEachSetDictionaryExistingTargetMapping(
         ITypeSymbol sourceType,
@@ -28,7 +28,7 @@ public class ForEachSetDictionaryExistingTargetMapping : ExistingTargetMapping
         ITypeMapping keyMapping,
         ITypeMapping valueMapping,
         INamedTypeSymbol? explicitCast,
-        EnsureCapacity? ensureCapacity
+        EnsureCapacityInfo? ensureCapacity
     )
         : base(sourceType, targetType)
     {

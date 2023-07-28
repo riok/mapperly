@@ -7,12 +7,12 @@ public class UniqueNameBuilder
 
     public UniqueNameBuilder()
     {
-        _usedNames = new HashSet<string>();
+        _usedNames = new HashSet<string>(StringComparer.Ordinal);
     }
 
     private UniqueNameBuilder(UniqueNameBuilder parentScope)
     {
-        _usedNames = new HashSet<string>();
+        _usedNames = new HashSet<string>(StringComparer.Ordinal);
         _parentScope = parentScope;
     }
 
