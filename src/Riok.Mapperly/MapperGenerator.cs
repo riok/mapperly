@@ -25,7 +25,7 @@ public class MapperGenerator : IIncrementalGenerator
     {
         var mapperClassDeclarations = SyntaxProvider.GetClassDeclarations(context);
 
-        context.ReportDiagnostics(context.CompilationProvider.Select(static (compilation, ct) => BuildCompilationDiagnostics(compilation)));
+        context.ReportDiagnostics(context.CompilationProvider.Select(static (compilation, _) => BuildCompilationDiagnostics(compilation)));
 
         var compilationAndMappers = context.CompilationProvider.Combine(mapperClassDeclarations.Collect());
         var mappersWithDiagnostics = compilationAndMappers.Select(
