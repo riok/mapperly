@@ -38,10 +38,6 @@ public static class DictionaryMappingBuilder
                 or CollectionType.IReadOnlyDictionary
         )
         {
-            var sourceHasCount = ctx.SymbolAccessor
-                .GetAllProperties(ctx.Source, CountPropertyName)
-                .Any(x => !x.IsStatic && x is { IsIndexer: false, IsWriteOnly: false, Type.SpecialType: SpecialType.System_Int32 });
-
             var targetDictionarySymbol = ctx.Types.Get(typeof(Dictionary<,>)).Construct(keyMapping.TargetType, valueMapping.TargetType);
             ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var dictionaryObjectFactory);
             return new ForEachSetDictionaryMapping(
@@ -49,7 +45,7 @@ public static class DictionaryMappingBuilder
                 ctx.Target,
                 keyMapping,
                 valueMapping,
-                sourceHasCount,
+                ctx.CollectionInfos.Source.CountIsKnown,
                 targetDictionarySymbol,
                 dictionaryObjectFactory
             );
