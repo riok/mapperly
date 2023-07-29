@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 
 namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 
@@ -9,8 +8,6 @@ namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 public static class EnsureCapacityBuilder
 {
     private const string EnsureCapacityName = "EnsureCapacity";
-    private const string CountPropertyName = nameof(ICollection<object>.Count);
-    private const string LengthPropertyName = nameof(Array.Length);
     private const string TryGetNonEnumeratedCountMethodName = "TryGetNonEnumeratedCount";
 
     public static EnsureCapacityInfo? TryBuildEnsureCapacity(MappingBuilderContext ctx)
@@ -50,23 +47,5 @@ public static class EnsureCapacityBuilder
 
         // if source does not have a count use GetNonEnumeratedCount, calling EnsureCapacity if count is available
         return new EnsureCapacityNonEnumerated(ctx.CollectionInfos.Target.CountPropertyName, nonEnumeratedCountMethod);
-    }
-
-    private static bool TryGetNonEnumeratedCount(CollectionInfo value, [NotNullWhen(true)] out string? expression)
-    {
-        if (!value.CountIsKnown)
-        {
-            expression = null;
-            return false;
-        }
-
-        if (value.IsArray)
-        {
-            expression = LengthPropertyName;
-            return true;
-        }
-
-        expression = CountPropertyName;
-        return true;
     }
 }
