@@ -22,4 +22,123 @@ public class ExtraParametersTest
         );
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void MapWithParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B MapTo(A source, string stringValue);",
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; set; } public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = source.Value;
+                target.StringValue = stringValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MapWithParameterShouldConvert()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B MapTo(A source, int stringValue);",
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; set; } public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = source.Value;
+                target.StringValue = stringValue.ToString();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ExistingTargetMapWithParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B MapTo(A source, IEnumerable<int> collection);",
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; set; } public List<int> Collection { get; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = source.Value;
+                if (global::System.Linq.Enumerable.TryGetNonEnumeratedCount(collection, out var sourceCount))
+                {
+                    target.Collection.EnsureCapacity(sourceCount + target.Collection.Count);
+                }
+
+                foreach (var item in collection)
+                {
+                    target.Collection.Add(item);
+                }
+
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MapShouldUseOtherMultiParamMapper()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source, int intValue); partial string MapWith(int src, int intValue)",
+            "class A { public int Value { get; set; } }",
+            "class B { public string Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Value = MapWith(source.Value, intValue);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void TwoExtraParameters()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A src, int value, int id);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public string Value { get; set; } public int Id { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.StringValue = src.StringValue;
+                target.Value = value.ToString();
+                target.Id = id;
+                return target;
+                """
+            );
+    }
 }

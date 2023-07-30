@@ -53,6 +53,24 @@ public static class ObjectMemberMappingBodyBuilder
                 continue;
             }
 
+            var exit = false;
+            foreach (var parameter in ctx.BuilderContext.Parameters)
+            {
+                if (string.Equals(parameter.Name, targetMember.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    var parameterMember = new ParameterMember(parameter.Type, parameter.Name);
+                    var memberPath = new MemberPath(new[] { parameterMember }, true);
+                    BuildMemberAssignmentMapping(ctx, memberPath, new MemberPath(new[] { targetMember }));
+                    exit = true;
+                    break;
+                }
+            }
+
+            if (exit)
+            {
+                continue;
+            }
+
             if (targetMember.CanSet)
             {
                 ctx.BuilderContext.ReportDiagnostic(

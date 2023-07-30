@@ -14,11 +14,13 @@ namespace Riok.Mapperly.Symbols;
 [DebuggerDisplay("{FullName}")]
 public class MemberPath
 {
+    private readonly bool _direct;
     private const string MemberAccessSeparator = ".";
     private const string NullableValueProperty = "Value";
 
-    public MemberPath(IReadOnlyList<IMappableMember> path)
+    public MemberPath(IReadOnlyList<IMappableMember> path, bool direct = false)
     {
+        _direct = direct;
         Path = path;
         FullName = string.Join(MemberAccessSeparator, Path.Select(x => x.Name));
     }
@@ -81,6 +83,9 @@ public class MemberPath
     )
     {
         var path = skipTrailingNonNullable ? PathWithoutTrailingNonNullable() : Path;
+
+        if (_direct)
+            baseAccess = null;
 
         if (baseAccess == null)
         {
