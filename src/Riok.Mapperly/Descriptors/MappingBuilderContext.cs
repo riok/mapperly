@@ -40,9 +40,10 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         IMethodSymbol? userSymbol,
         ITypeSymbol source,
         ITypeSymbol target,
+        ImmutableEquatableArray<MethodParameter> parameters,
         bool clearDerivedTypes
     )
-        : this(ctx, ctx.ObjectFactories, userSymbol, source, target, ImmutableEquatableArray<MethodParameter>.Empty)
+        : this(ctx, ctx.ObjectFactories, userSymbol, source, target, parameters)
     {
         if (clearDerivedTypes)
         {
@@ -199,7 +200,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         MappingBuildingOptions options
     )
     {
-        return new(this, userSymbol, sourceType, targetType, options.HasFlag(MappingBuildingOptions.ClearDerivedTypes));
+        var parameters = userSymbol == null ? ImmutableEquatableArray<MethodParameter>.Empty : Parameters;
+        return new(this, userSymbol, sourceType, targetType, parameters, options.HasFlag(MappingBuildingOptions.ClearDerivedTypes));
     }
 
     protected ITypeMapping? BuildMapping(

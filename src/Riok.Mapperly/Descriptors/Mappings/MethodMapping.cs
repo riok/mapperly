@@ -61,8 +61,20 @@ public abstract class MethodMapping : TypeMapping
 
     protected MethodParameter? ReferenceHandlerParameter { get; private set; }
 
-    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
-        Invocation(MethodName, SourceParameter.WithArgument(ctx.Source), ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
+    {
+        var parameters = Parameters
+            .Zip(ctx.Parameters, (a, b) => (a, b))
+            .Select(x => x.a.WithArgument(x.b))
+            .Cast<MethodArgument?>()
+            .ToArray();
+        return Invocation(
+            MethodName,
+            SourceParameter.WithArgument(ctx.Source),
+            ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler),
+            parameters
+        );
+    }
 
     public virtual MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
     {
@@ -71,6 +83,7 @@ public abstract class MethodMapping : TypeMapping
         var typeMappingBuildContext = new TypeMappingBuildContext(
             SourceParameter.Name,
             ReferenceHandlerParameter?.Name,
+            Parameters.Select(x => x.Name),
             ctx.NameBuilder.NewScope()
         );
 
@@ -99,8 +112,12 @@ public abstract class MethodMapping : TypeMapping
         );
     }
 
-    protected virtual ParameterListSyntax BuildParameterList() =>
-        ParameterList(IsExtensionMethod, SourceParameter, ReferenceHandlerParameter);
+    protected virtual ParameterListSyntax BuildParameterList()
+    {
+        var initial = new[] { SourceParameter, ReferenceHandlerParameter };
+        var methodParameters = initial.Concat(Parameters.Cast<MethodParameter?>()).ToArray();
+        return ParameterList(IsExtensionMethod, methodParameters);
+    }
 
     private IEnumerable<SyntaxToken> BuildModifiers(bool isStatic)
     {

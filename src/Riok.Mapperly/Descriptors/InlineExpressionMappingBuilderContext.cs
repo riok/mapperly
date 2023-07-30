@@ -25,12 +25,13 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         ITypeSymbol source,
         ITypeSymbol target
     )
-        : base(ctx, userSymbol, source, target, false)
+        : base(ctx, userSymbol, source, target, ctx.Parameters, false)
     {
         _parentContext = ctx;
         _inlineExpressionMappings = new MappingCollection();
     }
 
+    //TODO: Look at how params should be passed.
     private InlineExpressionMappingBuilderContext(
         InlineExpressionMappingBuilderContext ctx,
         IMethodSymbol? userSymbol,
@@ -38,7 +39,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         ITypeSymbol target,
         bool clearDerivedTypes
     )
-        : base(ctx, userSymbol, source, target, clearDerivedTypes)
+        : base(ctx, userSymbol, source, target, ctx.Parameters, clearDerivedTypes)
     {
         _parentContext = ctx;
         _inlineExpressionMappings = ctx._inlineExpressionMappings;
