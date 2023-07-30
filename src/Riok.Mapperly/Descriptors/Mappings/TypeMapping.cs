@@ -16,6 +16,13 @@ public abstract class TypeMapping : ITypeMapping
         Parameters = ImmutableEquatableArray<MethodParameter>.Empty;
     }
 
+    protected TypeMapping(ITypeSymbol sourceType, ITypeSymbol targetType, ImmutableEquatableArray<MethodParameter> parameters)
+    {
+        SourceType = sourceType;
+        TargetType = targetType;
+        Parameters = parameters;
+    }
+
     public ITypeSymbol SourceType { get; }
 
     public ITypeSymbol TargetType { get; }

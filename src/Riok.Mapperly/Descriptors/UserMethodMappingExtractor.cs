@@ -100,7 +100,8 @@ public static class UserMethodMappingExtractor
                 runtimeTargetTypeParams,
                 ctx.MapperConfiguration.UseReferenceHandling,
                 GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams, null),
-                ctx.Compilation.ObjectType
+                ctx.Compilation.ObjectType,
+                ImmutableEquatableArray<MethodParameter>.Empty
             );
         }
 
@@ -117,6 +118,7 @@ public static class UserMethodMappingExtractor
                 typeParameters.Value,
                 parameters,
                 ctx.MapperConfiguration.UseReferenceHandling,
+                ImmutableEquatableArray<MethodParameter>.Empty,
                 GetTypeSwitchNullArm(methodSymbol, parameters, typeParameters),
                 ctx.Compilation.ObjectType
             );
@@ -135,7 +137,8 @@ public static class UserMethodMappingExtractor
                 parameters.Source,
                 parameters.Target.Value,
                 parameters.ReferenceHandler,
-                ctx.MapperConfiguration.UseReferenceHandling
+                ctx.MapperConfiguration.UseReferenceHandling,
+                parameters.Parameters
             );
         }
 
@@ -143,7 +146,8 @@ public static class UserMethodMappingExtractor
             methodSymbol,
             parameters.Source,
             parameters.ReferenceHandler,
-            ctx.MapperConfiguration.UseReferenceHandling
+            ctx.MapperConfiguration.UseReferenceHandling,
+            parameters.Parameters
         );
     }
 
@@ -283,7 +287,11 @@ public static class UserMethodMappingExtractor
         //     parameters = null;
         //     return false;
         // }
-        var extraParams = method.Parameters.Skip(expectedParameterCount).Select(MethodParameter.Wrap10).WhereNotNull().ToArray();
+        var extraParams = method.Parameters
+            .Skip(expectedParameterCount)
+            .Select(MethodParameter.Wrap10)
+            .WhereNotNull()
+            .ToImmutableEquatableArray();
 
         parameters = new MappingMethodParameters(sourceParameter.Value, targetParameter, refHandlerParameter, extraParams);
         return true;

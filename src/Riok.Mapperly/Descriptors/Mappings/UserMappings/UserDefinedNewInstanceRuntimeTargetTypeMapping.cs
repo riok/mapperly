@@ -28,10 +28,11 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMap
         MethodParameter sourceParameter,
         MethodParameter? referenceHandlerParameter,
         bool enableReferenceHandling,
+        ImmutableEquatableArray<MethodParameter> parameters,
         NullFallbackValue nullArm,
         ITypeSymbol objectType
     )
-        : base(method, sourceParameter, referenceHandlerParameter, method.ReturnType)
+        : base(method, sourceParameter, referenceHandlerParameter, method.ReturnType, parameters)
     {
         Method = method;
         _enableReferenceHandling = enableReferenceHandling;

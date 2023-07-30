@@ -19,9 +19,10 @@ public class UserDefinedNewInstanceRuntimeTargetTypeParameterMapping : UserDefin
         RuntimeTargetTypeMappingMethodParameters parameters,
         bool enableReferenceHandling,
         NullFallbackValue nullArm,
-        ITypeSymbol objectType
+        ITypeSymbol objectType,
+        ImmutableEquatableArray<MethodParameter> extraParameters
     )
-        : base(method, parameters.Source, parameters.ReferenceHandler, enableReferenceHandling, nullArm, objectType)
+        : base(method, parameters.Source, parameters.ReferenceHandler, enableReferenceHandling, extraParameters, nullArm, objectType)
     {
         _targetTypeParameter = parameters.TargetType;
     }

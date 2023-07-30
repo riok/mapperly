@@ -7,5 +7,5 @@ public record MappingMethodParameters(
     MethodParameter Source,
     MethodParameter? Target,
     MethodParameter? ReferenceHandler,
-    MethodParameter[] Parameters
+    ImmutableEquatableArray<MethodParameter> Parameters
 );

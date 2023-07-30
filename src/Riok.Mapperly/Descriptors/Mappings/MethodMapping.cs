@@ -37,9 +37,10 @@ public abstract class MethodMapping : TypeMapping
         IMethodSymbol method,
         MethodParameter sourceParameter,
         MethodParameter? referenceHandlerParameter,
-        ITypeSymbol targetType
+        ITypeSymbol targetType,
+        ImmutableEquatableArray<MethodParameter> parameters
     )
-        : base(sourceParameter.Type, targetType)
+        : base(sourceParameter.Type, targetType, parameters)
     {
         SourceParameter = sourceParameter;
         IsExtensionMethod = method.IsExtensionMethod;

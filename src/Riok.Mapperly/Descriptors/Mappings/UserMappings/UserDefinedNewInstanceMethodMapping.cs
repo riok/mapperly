@@ -22,9 +22,10 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IDelegateUserM
         IMethodSymbol method,
         MethodParameter sourceParameter,
         MethodParameter? referenceHandlerParameter,
-        bool enableReferenceHandling
+        bool enableReferenceHandling,
+        ImmutableEquatableArray<MethodParameter> parameters
     )
-        : base(method, sourceParameter, referenceHandlerParameter, method.ReturnType.UpgradeNullable())
+        : base(method, sourceParameter, referenceHandlerParameter, method.ReturnType.UpgradeNullable(), parameters)
     {
         _enableReferenceHandling = enableReferenceHandling;
         Method = method;

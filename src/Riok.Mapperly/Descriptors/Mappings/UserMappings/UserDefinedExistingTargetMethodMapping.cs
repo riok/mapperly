@@ -26,9 +26,10 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
         MethodParameter sourceParameter,
         MethodParameter targetParameter,
         MethodParameter? referenceHandlerParameter,
-        bool enableReferenceHandling
+        bool enableReferenceHandling,
+        ImmutableEquatableArray<MethodParameter> parameters
     )
-        : base(method, sourceParameter, referenceHandlerParameter, targetParameter.Type)
+        : base(method, sourceParameter, referenceHandlerParameter, targetParameter.Type, parameters)
     {
         _enableReferenceHandling = enableReferenceHandling;
         Method = method;

@@ -20,10 +20,11 @@ public class UserDefinedNewInstanceGenericTypeMapping : UserDefinedNewInstanceRu
         GenericMappingTypeParameters typeParameters,
         MappingMethodParameters parameters,
         bool enableReferenceHandling,
+        ImmutableEquatableArray<MethodParameter> extraParameters,
         NullFallbackValue nullArm,
         ITypeSymbol objectType
     )
-        : base(method, parameters.Source, parameters.ReferenceHandler, enableReferenceHandling, nullArm, objectType)
+        : base(method, parameters.Source, parameters.ReferenceHandler, enableReferenceHandling, extraParameters, nullArm, objectType)
     {
         TypeParameters = typeParameters;
     }
