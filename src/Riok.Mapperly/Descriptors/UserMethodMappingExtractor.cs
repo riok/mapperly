@@ -264,27 +264,28 @@ public static class UserMethodMappingExtractor
         // target parameter is the second parameter (except if the reference handler is the first or the second parameter)
         // if the method returns void, a target parameter is required
         // if the method doesnt return void, a target parameter is not allowed
-        var targetParameter = MethodParameter.Wrap(
-            method.Parameters.FirstOrDefault(p => p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != refHandlerParameterOrdinal)
-        );
-        if (method.ReturnsVoid == !targetParameter.HasValue)
+        MethodParameter? targetParameter = null;
+        if (method.ReturnsVoid)
         {
-            parameters = null;
-            return false;
-        }
-
-        if (targetParameter.HasValue)
-        {
+            targetParameter = MethodParameter.Wrap(
+                method.Parameters.FirstOrDefault(p => p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != refHandlerParameterOrdinal)
+            );
+            if (!targetParameter.HasValue)
+            {
+                parameters = null;
+                return false;
+            }
             expectedParameterCount++;
         }
 
-        if (method.Parameters.Length != expectedParameterCount)
-        {
-            parameters = null;
-            return false;
-        }
+        // if (method.Parameters.Length != expectedParameterCount)
+        // {
+        //     parameters = null;
+        //     return false;
+        // }
+        var extraParams = method.Parameters.Skip(expectedParameterCount).Select(MethodParameter.Wrap10).WhereNotNull().ToArray();
 
-        parameters = new MappingMethodParameters(sourceParameter.Value, targetParameter, refHandlerParameter);
+        parameters = new MappingMethodParameters(sourceParameter.Value, targetParameter, refHandlerParameter, extraParams);
         return true;
     }
 

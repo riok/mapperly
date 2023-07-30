@@ -71,7 +71,8 @@ public class DescriptorBuilder
                 _objectFactories,
                 userMapping.Method,
                 userMapping.SourceType,
-                userMapping.TargetType
+                userMapping.TargetType,
+                userMapping.Parameters
             );
 
             _mappings.Add(userMapping);

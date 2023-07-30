@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
@@ -24,8 +25,11 @@ public class ExistingTargetMappingBuilder
         _mappings = mappings;
     }
 
-    public IExistingTargetMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType) =>
-        _mappings.FindExistingInstanceMapping(sourceType, targetType);
+    public IExistingTargetMapping? Find(
+        ITypeSymbol sourceType,
+        ITypeSymbol targetType,
+        ImmutableEquatableArray<MethodParameter> parameters
+    ) => _mappings.FindExistingInstanceMapping(sourceType, targetType, parameters);
 
     public IExistingTargetMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {

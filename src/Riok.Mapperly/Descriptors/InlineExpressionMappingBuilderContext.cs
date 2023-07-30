@@ -64,7 +64,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     /// <returns>The <see cref="ITypeMapping"/> if a mapping was found or <c>null</c> if none was found.</returns>
     public override ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
     {
-        if (_inlineExpressionMappings.Find(sourceType, targetType) is { } mapping)
+        if (_inlineExpressionMappings.Find(sourceType, targetType, Parameters) is { } mapping)
             return mapping;
 
         // user implemented mappings are also taken into account
@@ -100,13 +100,13 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     {
         sourceType = sourceType.UpgradeNullable();
         targetType = targetType.UpgradeNullable();
-        var mapping = _inlineExpressionMappings.Find(sourceType, targetType);
+        var mapping = _inlineExpressionMappings.Find(sourceType, targetType, Parameters);
         if (mapping != null)
             return mapping;
 
         var userSymbol = options.HasFlag(MappingBuildingOptions.KeepUserSymbol) ? UserSymbol : null;
 
-        userSymbol ??= (MappingBuilder.Find(sourceType, targetType) as IUserMapping)?.Method;
+        userSymbol ??= (MappingBuilder.Find(sourceType, targetType, Parameters) as IUserMapping)?.Method;
 
         // unset MarkAsReusable and KeepUserSymbol as they have special handling for inline mappings
         options &= ~(MappingBuildingOptions.MarkAsReusable | MappingBuildingOptions.KeepUserSymbol);

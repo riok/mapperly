@@ -8,6 +8,7 @@ using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Descriptors.ObjectFactories;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -21,13 +22,15 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         ObjectFactoryCollection objectFactories,
         IMethodSymbol? userSymbol,
         ITypeSymbol source,
-        ITypeSymbol target
+        ITypeSymbol target,
+        ImmutableEquatableArray<MethodParameter> parameters
     )
         : base(parentCtx)
     {
         ObjectFactories = objectFactories;
         Source = source;
         Target = target;
+        Parameters = parameters;
         UserSymbol = userSymbol;
         Configuration = ReadConfiguration(new MappingConfigurationReference(UserSymbol, source, target));
     }
@@ -39,7 +42,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         ITypeSymbol target,
         bool clearDerivedTypes
     )
-        : this(ctx, ctx.ObjectFactories, userSymbol, source, target)
+        : this(ctx, ctx.ObjectFactories, userSymbol, source, target, ImmutableEquatableArray<MethodParameter>.Empty)
     {
         if (clearDerivedTypes)
         {
@@ -52,6 +55,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     public ITypeSymbol Source { get; }
 
     public ITypeSymbol Target { get; }
+
+    public ImmutableEquatableArray<MethodParameter> Parameters { get; } = ImmutableEquatableArray.Empty<MethodParameter>();
 
     public CollectionInfos? CollectionInfos => _collectionInfos ??= CollectionInfoBuilder.Build(Types, SymbolAccessor, Source, Target);
 
@@ -75,7 +80,9 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="targetType">The target type.</param>
     /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
     public virtual ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType) =>
-        MappingBuilder.Find(sourceType.UpgradeNullable(), targetType.UpgradeNullable());
+        MappingBuilder.Find(sourceType.UpgradeNullable(), targetType.UpgradeNullable(), Parameters);
+
+    //TODO: updagrade nullable
 
     /// <summary>
     /// Tries to find an existing mapping for the provided types.
@@ -98,7 +105,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     {
         sourceType = sourceType.UpgradeNullable();
         targetType = targetType.UpgradeNullable();
-        return MappingBuilder.Find(sourceType, targetType) ?? BuildMapping(sourceType, targetType, options);
+        return MappingBuilder.Find(sourceType, targetType, Parameters) ?? BuildMapping(sourceType, targetType, options);
     }
 
     /// <summary>
@@ -131,7 +138,9 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         MappingBuildingOptions options = MappingBuildingOptions.Default
-    ) => ExistingTargetMappingBuilder.Find(sourceType, targetType) ?? BuildExistingTargetMapping(sourceType, targetType, options);
+    ) =>
+        ExistingTargetMappingBuilder.Find(sourceType, targetType, Parameters)
+        ?? BuildExistingTargetMapping(sourceType, targetType, options);
 
     /// <summary>
     /// Tries to build an existing target instance mapping.

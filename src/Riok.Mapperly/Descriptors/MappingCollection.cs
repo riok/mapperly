@@ -3,6 +3,7 @@ using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -39,15 +40,19 @@ public class MappingCollection
     /// <inheritdoc cref="_userMappings"/>
     public IReadOnlyCollection<IUserMapping> UserMappings => _userMappings;
 
-    public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType)
+    public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType, ImmutableEquatableArray<MethodParameter> parameters)
     {
-        _mappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var mapping);
+        _mappings.TryGetValue(new TypeMappingKey(sourceType, targetType, parameters), out var mapping);
         return mapping;
     }
 
-    public IExistingTargetMapping? FindExistingInstanceMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    public IExistingTargetMapping? FindExistingInstanceMapping(
+        ITypeSymbol sourceType,
+        ITypeSymbol targetType,
+        ImmutableEquatableArray<MethodParameter> parameters
+    )
     {
-        _existingTargetMappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var mapping);
+        _existingTargetMappings.TryGetValue(new TypeMappingKey(sourceType, targetType, parameters), out var mapping);
         return mapping;
     }
 
@@ -66,7 +71,7 @@ public class MappingCollection
             _methodMappings.Add(methodMapping);
         }
 
-        if (mapping.CallableByOtherMappings && Find(mapping.SourceType, mapping.TargetType) is null)
+        if (mapping.CallableByOtherMappings && Find(mapping.SourceType, mapping.TargetType, mapping.Parameters) is null)
         {
             _mappings.Add(new TypeMappingKey(mapping), mapping);
         }

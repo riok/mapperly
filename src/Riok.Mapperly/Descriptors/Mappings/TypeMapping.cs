@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -12,11 +13,14 @@ public abstract class TypeMapping : ITypeMapping
     {
         SourceType = sourceType;
         TargetType = targetType;
+        Parameters = ImmutableEquatableArray<MethodParameter>.Empty;
     }
 
     public ITypeSymbol SourceType { get; }
 
     public ITypeSymbol TargetType { get; }
+
+    public ImmutableEquatableArray<MethodParameter> Parameters { get; }
 
     public virtual MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.Default;
 
