@@ -105,3 +105,4 @@ RMG043  | Mapper   | Warning  | Enum fallback values are only supported for the 
 RMG044  | Mapper   | Warning  | An ignored enum member can not be found on the source enum
 RMG045  | Mapper   | Warning  | An ignored enum member can not be found on the target enum
 RMG046  | Mapper   | Error    | The used C# language version is not supported by Mapperly, Mapperly requires at least C# 9.0
+RMG048  | Mapper   | Info     | Source parameter is not mapped to any target member

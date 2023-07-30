@@ -3,10 +3,11 @@
 #nullable enable
 public partial class Mapper
 {
-    private partial global::B MapTo(global::A source, string format)
+    private partial global::B MapTo(global::A source, string stringValue)
     {
         var target = new global::B();
         target.Collection = MapToStringArray(source.Collection);
+        target.StringValue = stringValue;
         return target;
     }
 

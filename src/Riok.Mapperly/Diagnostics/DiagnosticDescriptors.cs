@@ -410,4 +410,13 @@ internal static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true
     );
+
+    public static readonly DiagnosticDescriptor SourceParameterNotMapped = new DiagnosticDescriptor(
+        "RMG048",
+        "Source parameter is not mapped to any target member",
+        "The parameter {0} of type {1} is not mapped to any member on the mapping target type {2}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Info,
+        true
+    );
 }

@@ -15,6 +15,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     where T : IMapping
 {
     private readonly HashSet<string> _unmappedSourceMemberNames;
+    private readonly HashSet<string> _unmappedSourceParameters;
     private readonly IReadOnlyCollection<string> _ignoredUnmatchedTargetMemberNames;
     private readonly IReadOnlyCollection<string> _ignoredUnmatchedSourceMemberNames;
 
@@ -24,6 +25,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         Mapping = mapping;
         MemberConfigsByRootTargetName = GetMemberConfigurations();
 
+        _unmappedSourceParameters = BuilderContext.Parameters.Select(x => x.Name).ToHashSet();
         _unmappedSourceMemberNames = GetSourceMemberNames();
         TargetMembers = GetTargetMembers();
 
@@ -66,9 +68,26 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         AddUnmatchedIgnoredSourceMembersDiagnostics();
         AddUnmatchedTargetMembersDiagnostics();
         AddUnmatchedSourceMembersDiagnostics();
+        AddUnmatchedParametersDiagnostics();
     }
 
-    protected void SetSourceMemberMapped(MemberPath sourcePath) => _unmappedSourceMemberNames.Remove(sourcePath.Path.First().Name);
+    protected void SetSourceMemberMapped(MemberPath sourcePath)
+    {
+        var first = sourcePath.Path.First();
+        if (first is ParameterMember)
+        {
+            _unmappedSourceParameters.Remove(first.Name);
+        }
+        _unmappedSourceMemberNames.Remove(first.Name);
+    }
+
+    protected void SetTypeMapping(ITypeMapping typeMapping)
+    {
+        foreach (var parameter in typeMapping.Parameters)
+        {
+            _unmappedSourceParameters.Remove(parameter.Name);
+        }
+    }
 
     private HashSet<string> InitIgnoredUnmatchedProperties(IEnumerable<string> allProperties, IEnumerable<string> mappedProperties)
     {
@@ -158,6 +177,19 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
                 DiagnosticDescriptors.SourceMemberNotMapped,
                 sourceMemberName,
                 Mapping.SourceType,
+                Mapping.TargetType
+            );
+        }
+    }
+
+    private void AddUnmatchedParametersDiagnostics()
+    {
+        foreach (var sourceParameterName in _unmappedSourceParameters)
+        {
+            BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.SourceParameterNotMapped,
+                sourceParameterName,
+                BuilderContext.Parameters.First(x => string.Equals(x.Name, sourceParameterName, StringComparison.Ordinal)).Type,
                 Mapping.TargetType
             );
         }

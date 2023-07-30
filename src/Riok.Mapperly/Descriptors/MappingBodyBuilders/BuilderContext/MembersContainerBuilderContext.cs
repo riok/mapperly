@@ -1,3 +1,4 @@
+using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Symbols;
@@ -15,6 +16,8 @@ public class MembersContainerBuilderContext<T> : MembersMappingBuilderContext<T>
 
     public MembersContainerBuilderContext(MappingBuilderContext builderContext, T mapping)
         : base(builderContext, mapping) { }
+
+    public void AddTypeMapping(ITypeMapping typeMapping) => SetTypeMapping(typeMapping);
 
     public void AddMemberAssignmentMapping(IMemberAssignmentMapping memberMapping) => AddMemberAssignmentMapping(Mapping, memberMapping);
 

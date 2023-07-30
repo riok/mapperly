@@ -53,6 +53,7 @@ public static class ObjectMemberMappingBodyBuilder
                 continue;
             }
 
+            // TODO:convert to method
             var exit = false;
             foreach (var parameter in ctx.BuilderContext.Parameters)
             {
@@ -231,6 +232,9 @@ public static class ObjectMemberMappingBodyBuilder
             );
             return;
         }
+
+        // mark used extra parameters as matched
+        ctx.AddTypeMapping(delegateMapping);
 
         // no member of the source path is nullable, no null handling needed
         if (!sourceMemberPath.IsAnyNullable())

@@ -16,9 +16,9 @@ public class ExtraParametersTest
     public Task MapShouldNotPassParametersDown()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial B MapTo(A source, string format);",
+            "partial B MapTo(A source, string stringValue);",
             "class A { public int[] Collection { get; set; } }",
-            "class B { public string[] Collection { get; set; } }"
+            "class B { public string[] Collection { get; set; } public string StringValue { get; set; } }"
         );
         return TestHelper.VerifyGenerator(source);
     }
@@ -140,5 +140,21 @@ public class ExtraParametersTest
                 return target;
                 """
             );
+    }
+
+    [Fact]
+    public void UnusedParameterShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A src, int value);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.SourceParameterNotMapped)
+            .HaveAssertedAllDiagnostics();
     }
 }

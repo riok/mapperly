@@ -55,12 +55,11 @@ public readonly struct MethodParameter : IEquatable<MethodParameter>
         }
 
         var pos = 0;
-        foreach (var t in target)
+        foreach (var tar in target)
         {
             if (pos >= current.Length)
                 return false;
 
-            var tar = t;
             for (var k = pos; k < current.Length; k++)
             {
                 var l = current[k];
