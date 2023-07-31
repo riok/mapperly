@@ -143,6 +143,57 @@ public class ExtraParametersTest
     }
 
     [Fact]
+    public void WithMapProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+        [MapProperty("value", "Id")]
+        partial B Map(A src, int value);
+        """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public int Id { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.StringValue = src.StringValue;
+                target.Id = value;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void WithNestedMapProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+        [MapProperty("value.Id", "Id")]
+        partial B Map(A src, C value);
+        """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public int Id { get; set; } }",
+            "class C { public int Id { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.StringValue = src.StringValue;
+                target.Id = value.Id;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void UnusedParameterShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

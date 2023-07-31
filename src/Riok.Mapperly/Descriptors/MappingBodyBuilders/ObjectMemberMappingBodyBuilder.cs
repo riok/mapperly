@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
@@ -53,22 +54,9 @@ public static class ObjectMemberMappingBodyBuilder
                 continue;
             }
 
-            // TODO:convert to method
-            var exit = false;
-            foreach (var parameter in ctx.BuilderContext.Parameters)
+            if (TryBuildParameterMapping(ctx, targetMember, out var sourceParameterPath))
             {
-                if (string.Equals(parameter.Name, targetMember.Name, StringComparison.OrdinalIgnoreCase))
-                {
-                    var parameterMember = new ParameterMember(parameter.Type, parameter.Name);
-                    var memberPath = new MemberPath(new[] { parameterMember }, true);
-                    BuildMemberAssignmentMapping(ctx, memberPath, new MemberPath(new[] { targetMember }));
-                    exit = true;
-                    break;
-                }
-            }
-
-            if (exit)
-            {
+                BuildMemberAssignmentMapping(ctx, sourceParameterPath, new MemberPath(new[] { targetMember }));
                 continue;
             }
 
@@ -84,6 +72,26 @@ public static class ObjectMemberMappingBodyBuilder
         }
 
         ctx.AddDiagnostics();
+    }
+
+    private static bool TryBuildParameterMapping(
+        IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
+        IMappableMember targetMember,
+        [NotNullWhen(true)] out MemberPath? sourceMemberPath
+    )
+    {
+        sourceMemberPath = null;
+        foreach (var parameter in ctx.BuilderContext.Parameters)
+        {
+            if (!string.Equals(parameter.Name, targetMember.Name, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var parameterMember = new ParameterMember(parameter.Type, parameter.Name);
+            sourceMemberPath = new MemberPath(new[] { parameterMember }, true);
+            return true;
+        }
+
+        return false;
     }
 
     private static void BuildMemberAssignmentMapping(
@@ -103,15 +111,44 @@ public static class ObjectMemberMappingBodyBuilder
 
         if (!ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.SourceType, config.Source.Path, out var sourceMemberPath))
         {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.ConfiguredMappingSourceMemberNotFound,
-                config.Source.FullName,
-                ctx.Mapping.SourceType
-            );
-            return;
+            if (!TryFindParameterPath(ctx, config.Source.Path, out sourceMemberPath))
+            {
+                ctx.BuilderContext.ReportDiagnostic(
+                    DiagnosticDescriptors.ConfiguredMappingSourceMemberNotFound,
+                    config.Source.FullName,
+                    ctx.Mapping.SourceType
+                );
+                return;
+            }
         }
 
         BuildMemberAssignmentMapping(ctx, sourceMemberPath, targetMemberPath);
+    }
+
+    public static bool TryFindParameterPath(
+        IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
+        IReadOnlyCollection<string> path,
+        [NotNullWhen(true)] out MemberPath? parameterPath
+    )
+    {
+        parameterPath = null;
+        if (path.Count == 0)
+            return false;
+
+        foreach (var parameter in ctx.BuilderContext.Parameters)
+        {
+            if (!string.Equals(parameter.Name, path.First()))
+                continue;
+
+            if (ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.TargetType, path.Skip(1).ToList(), out var memberPath))
+            {
+                var pathStart = new[] { new ParameterMember(parameter.Type, parameter.Name) };
+                parameterPath = new MemberPath(pathStart.Concat(memberPath.Path).ToList(), true);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static bool ValidateMappingSpecification(
