@@ -1,6 +1,10 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
+#pragma warning disable IDE0005
+// this using directive is needed for lower versions of Roslyn
+using Microsoft.CodeAnalysis.CSharp;
+#pragma warning restore IDE0005
 
 namespace Riok.Mapperly.Helpers;
 
