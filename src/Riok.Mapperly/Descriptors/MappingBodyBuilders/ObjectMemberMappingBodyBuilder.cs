@@ -54,7 +54,7 @@ public static class ObjectMemberMappingBodyBuilder
                 continue;
             }
 
-            if (TryBuildParameterMapping(ctx, targetMember, out var sourceParameterPath))
+            if (TryBuildParameterMapping(ctx, targetMember.Name, out var sourceParameterPath))
             {
                 BuildMemberAssignmentMapping(ctx, sourceParameterPath, new MemberPath(new[] { targetMember }));
                 continue;
@@ -74,16 +74,16 @@ public static class ObjectMemberMappingBodyBuilder
         ctx.AddDiagnostics();
     }
 
-    private static bool TryBuildParameterMapping(
-        IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
-        IMappableMember targetMember,
+    public static bool TryBuildParameterMapping(
+        IMembersBuilderContext<IMapping> ctx,
+        string targetMemberName,
         [NotNullWhen(true)] out MemberPath? sourceMemberPath
     )
     {
         sourceMemberPath = null;
         foreach (var parameter in ctx.BuilderContext.Parameters)
         {
-            if (!string.Equals(parameter.Name, targetMember.Name, StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(parameter.Name, targetMemberName, StringComparison.OrdinalIgnoreCase))
                 continue;
 
             var parameterMember = new ParameterMember(parameter.Type, parameter.Name);
@@ -126,7 +126,7 @@ public static class ObjectMemberMappingBodyBuilder
     }
 
     public static bool TryFindParameterPath(
-        IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
+        IMembersBuilderContext<IMapping> ctx,
         IReadOnlyCollection<string> path,
         [NotNullWhen(true)] out MemberPath? parameterPath
     )

@@ -31,25 +31,9 @@ public readonly struct MethodParameter : IEquatable<MethodParameter>
     public static MethodParameter? Wrap10(IParameterSymbol? symbol, int offset) =>
         symbol == null ? null : new(symbol.Ordinal + 10, symbol.Name, symbol.Type.UpgradeNullable());
 
-    public static bool Equals(MethodParameter[] left, MethodParameter[] right)
+    public static bool MappableTo(ImmutableEquatableArray<MethodParameter> current, ImmutableEquatableArray<MethodParameter> target)
     {
-        if (left.Length != right.Length)
-        {
-            return false;
-        }
-
-        for (var i = 0; i < left.Length; i++)
-        {
-            if (left[i].Equals(right[i]))
-                return false;
-        }
-
-        return true;
-    }
-
-    public static bool MappableTo(MethodParameter[] current, MethodParameter[] target)
-    {
-        if (current.Length < target.Length)
+        if (current.Count < target.Count)
         {
             return false;
         }
@@ -57,10 +41,10 @@ public readonly struct MethodParameter : IEquatable<MethodParameter>
         var pos = 0;
         foreach (var tar in target)
         {
-            if (pos >= current.Length)
+            if (pos >= current.Count)
                 return false;
 
-            for (var k = pos; k < current.Length; k++)
+            for (var k = pos; k < current.Count; k++)
             {
                 var l = current[k];
                 if (StringComparer.Ordinal.Equals(tar.Name, l.Name))
@@ -73,7 +57,7 @@ public readonly struct MethodParameter : IEquatable<MethodParameter>
             }
         }
 
-        return pos <= current.Length;
+        return pos <= current.Count;
     }
 
     public bool Equals(MethodParameter other) =>

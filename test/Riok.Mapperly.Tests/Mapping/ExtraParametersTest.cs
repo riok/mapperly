@@ -27,7 +27,7 @@ public class ExtraParametersTest
     public void MapWithParameter()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial B MapTo(A source, string stringValue);",
+            "partial B Map(A source, string stringValue);",
             "class A { public int Value { get; set; } }",
             "class B { public int Value { get; set; } public string StringValue { get; set; } }"
         );
@@ -40,6 +40,51 @@ public class ExtraParametersTest
                 var target = new global::B();
                 target.Value = source.Value;
                 target.StringValue = stringValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MapConstructorWithParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source, string stringValue);",
+            "class A { public int Value { get; set; } }",
+            "class B { public B(string stringValue) { } public int Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B(stringValue);
+                target.Value = source.Value;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MapRequiredWithParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source, string stringValue);",
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; set; } public required string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    StringValue = stringValue
+                };
+                target.Value = source.Value;
                 return target;
                 """
             );
@@ -162,6 +207,57 @@ public class ExtraParametersTest
                 var target = new global::B();
                 target.StringValue = src.StringValue;
                 target.Id = value;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MapRequiredWithMapProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+                [MapProperty("stringValue", "StringValue")]
+                partial B MapTo(A source, string stringValue);
+                """,
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; set; } public required string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    StringValue = stringValue
+                };
+                target.Value = source.Value;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MapConstructorWithMapProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+                [MapProperty("input", "stringValue")]
+                partial B MapTo(A source, string input);
+                """,
+            "class A { public int Value { get; set; } }",
+            "class B { public B(string stringValue) { } public int Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B(input);
+                target.Value = source.Value;
                 return target;
                 """
             );

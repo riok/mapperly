@@ -17,8 +17,6 @@ public class MembersContainerBuilderContext<T> : MembersMappingBuilderContext<T>
     public MembersContainerBuilderContext(MappingBuilderContext builderContext, T mapping)
         : base(builderContext, mapping) { }
 
-    public void AddTypeMapping(ITypeMapping typeMapping) => SetTypeMapping(typeMapping);
-
     public void AddMemberAssignmentMapping(IMemberAssignmentMapping memberMapping) => AddMemberAssignmentMapping(Mapping, memberMapping);
 
     public void AddNullDelegateMemberAssignmentMapping(IMemberAssignmentMapping memberMapping)

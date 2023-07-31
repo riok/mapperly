@@ -81,7 +81,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         _unmappedSourceMemberNames.Remove(first.Name);
     }
 
-    protected void SetTypeMapping(ITypeMapping typeMapping)
+    public void AddTypeMapping(ITypeMapping typeMapping)
     {
         foreach (var parameter in typeMapping.Parameters)
         {

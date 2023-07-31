@@ -11,8 +11,6 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 public interface IMembersContainerBuilderContext<out T> : IMembersBuilderContext<T>
     where T : IMemberAssignmentTypeMapping
 {
-    void AddTypeMapping(ITypeMapping typeMapping);
-
     void AddMemberAssignmentMapping(IMemberAssignmentMapping memberMapping);
 
     void AddNullDelegateMemberAssignmentMapping(IMemberAssignmentMapping memberMapping);

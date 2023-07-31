@@ -15,6 +15,8 @@ public interface IMembersBuilderContext<out T>
 
     void AddDiagnostics();
 
+    void AddTypeMapping(ITypeMapping typeMapping);
+
     MappingBuilderContext BuilderContext { get; }
 
     IReadOnlyCollection<string> IgnoredSourceMemberNames { get; }
