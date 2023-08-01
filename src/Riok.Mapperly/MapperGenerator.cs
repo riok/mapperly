@@ -76,7 +76,7 @@ public class MapperGenerator : IIncrementalGenerator
         {
             cancellationToken.ThrowIfCancellationRequested();
             var mapperModel = compilation.GetSemanticModel(mapperSyntax.SyntaxTree);
-            if (mapperModel.GetDeclaredSymbol(mapperSyntax) is not INamedTypeSymbol mapperSymbol)
+            if (mapperModel.GetDeclaredSymbol(mapperSyntax) is not { } mapperSymbol)
                 continue;
 
             var symbolAccessor = new SymbolAccessor(wellKnownTypes, compilation, mapperSymbol);

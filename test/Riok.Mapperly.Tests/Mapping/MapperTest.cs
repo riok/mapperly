@@ -95,9 +95,9 @@ public class MapperTest
 
             public abstract class BaseClass { }
 
-            public static partial class CarFeature : BaseClass
+            public partial class CarFeature : BaseClass
             {
-                public static partial class Mappers : BaseClass
+                public partial class Mappers : BaseClass
                 {
                     [Mapper]
                     public partial class CarMapper
