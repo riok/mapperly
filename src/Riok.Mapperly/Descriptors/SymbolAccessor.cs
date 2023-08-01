@@ -235,8 +235,9 @@ public class SymbolAccessor
             return namedType.TupleElements.Select(x => MappableMember.Create(this, x)).WhereNotNull();
         }
 
+        // member must be property or a none backing variable field
         return GetAllMembers(symbol)
-            .Where(x => x is { IsStatic: false, Kind: SymbolKind.Property or SymbolKind.Field })
+            .Where(x => x is { IsStatic: false, Kind: SymbolKind.Property } or IFieldSymbol { IsStatic: false, AssociatedSymbol: null })
             .DistinctBy(x => x.Name)
             .Select(x => MappableMember.Create(this, x))
             .WhereNotNull();
