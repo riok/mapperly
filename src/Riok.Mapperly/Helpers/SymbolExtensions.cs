@@ -166,7 +166,7 @@ internal static class SymbolExtensions
             .Select(r => r.GetSyntax())
             .Where(s => s.IsKind(SyntaxKind.PropertyDeclaration))
             .Cast<Microsoft.CodeAnalysis.CSharp.Syntax.PropertyDeclarationSyntax>()
-            .Any(s => s.Modifiers.Any(t => t.ToString() == RequiredKeyword));
+            .Any(s => s.Modifiers.Any(t => string.Equals(t.ToString(), RequiredKeyword, StringComparison.Ordinal)));
 #endif
     }
 
@@ -182,7 +182,7 @@ internal static class SymbolExtensions
             .Select(r => r.GetSyntax())
             .Where(s => s.IsKind(SyntaxKind.FieldDeclaration))
             .Cast<Microsoft.CodeAnalysis.CSharp.Syntax.FieldDeclarationSyntax>()
-            .Any(s => s.Modifiers.Any(t => t.ToString() == RequiredKeyword));
+            .Any(s => s.Modifiers.Any(t => string.Equals(t.ToString(), RequiredKeyword, StringComparison.Ordinal)));
 #endif
     }
 }
