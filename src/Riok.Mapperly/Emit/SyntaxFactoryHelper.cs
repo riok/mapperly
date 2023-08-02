@@ -393,6 +393,17 @@ public static class SyntaxFactoryHelper
         return Trivia(NullableDirectiveTrivia(Token(enabled ? SyntaxKind.EnableKeyword : SyntaxKind.DisableKeyword), true));
     }
 
+    public static SyntaxTrivia PragmaSuppress(string errorId)
+    {
+        return Trivia(
+            PragmaWarningDirectiveTrivia(
+                Token(SyntaxKind.DisableKeyword),
+                SingletonSeparatedList<ExpressionSyntax>(IdentifierName(errorId)),
+                true
+            )
+        );
+    }
+
     public static NamespaceDeclarationSyntax Namespace(string ns) => NamespaceDeclaration(IdentifierName(ns));
 
     public static ArgumentListSyntax ArgumentList(params ExpressionSyntax[] argSyntaxes) =>
