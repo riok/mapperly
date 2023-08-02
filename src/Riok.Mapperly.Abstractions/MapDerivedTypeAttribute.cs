@@ -40,4 +40,4 @@ public sealed class MapDerivedTypeAttribute : Attribute
 /// Each target type needs to extend or implement the return type of the mapping method.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public class MapDerivedTypeAttribute<TSource, TTarget> : Attribute { }
+public sealed class MapDerivedTypeAttribute<TSource, TTarget> : Attribute { }

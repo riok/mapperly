@@ -4,7 +4,7 @@ namespace Riok.Mapperly.Abstractions;
 /// Ignores a source enum value from the mapping.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public class MapperIgnoreSourceValueAttribute : Attribute
+public sealed class MapperIgnoreSourceValueAttribute : Attribute
 {
     /// <summary>
     /// Ignores the specified source enum value from the mapping.
