@@ -4,7 +4,7 @@ namespace Riok.Mapperly.Abstractions;
 /// Ignores a target enum value from the mapping.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public class MapperIgnoreTargetValueAttribute : Attribute
+public sealed class MapperIgnoreTargetValueAttribute : Attribute
 {
     /// <summary>
     /// Ignores the specified target enum value from the mapping.
