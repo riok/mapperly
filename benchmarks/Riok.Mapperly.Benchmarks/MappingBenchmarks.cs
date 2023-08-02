@@ -8,7 +8,6 @@ namespace Riok.Mapperly.Benchmarks;
 
 [MemoryDiagnoser]
 [InProcess]
-[HtmlExporter]
 [JsonExporterAttribute.Full]
 public class MappingBenchmarks
 {

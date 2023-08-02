@@ -19,7 +19,7 @@ public class MapperGenerator : IIncrementalGenerator
     public const string AddMappersStep = "ImplementationSourceOutput";
     public const string ReportDiagnosticsStep = "Diagnostics";
 
-    public static readonly string MapperAttributeName = typeof(MapperAttribute).FullName;
+    public static readonly string MapperAttributeName = typeof(MapperAttribute).FullName!;
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {

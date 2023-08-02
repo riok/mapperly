@@ -8,13 +8,13 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 public enum MappingBodyBuildingPriority
 {
     /// <summary>
+    /// Default mapping priority.
+    /// </summary>
+    Default,
+
+    /// <summary>
     /// Priority for mappings which require the body of user mappings to be built.
     /// (Depend on the user mapping bodies).
     /// </summary>
     AfterUserMappings,
-
-    /// <summary>
-    /// Default mapping priority.
-    /// </summary>
-    Default,
 }
