@@ -64,10 +64,6 @@ public class MapperConfiguration
         var ignoredTargetProperties = _dataAccessor
             .Access<MapperIgnoreTargetAttribute>(method)
             .Select(x => x.Target)
-            // deprecated MapperIgnoreAttribute, but it is still supported by Mapperly.
-#pragma warning disable CS0618
-            .Concat(_dataAccessor.Access<MapperIgnoreAttribute>(method).Select(x => x.Target))
-#pragma warning restore CS0618
             .WhereNotNull()
             .ToList();
         var explicitMappings = _dataAccessor.Access<MapPropertyAttribute, PropertyMappingConfiguration>(method).ToList();
