@@ -29,7 +29,7 @@ internal static class SyntaxProvider
 
                 var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
                 var fullName = attributeContainingTypeSymbol.ToDisplayString();
-                if (fullName == MapperGenerator.MapperAttributeName)
+                if (string.Equals(fullName, MapperGenerator.MapperAttributeName, StringComparison.Ordinal))
                     return classDeclaration;
             }
         }
