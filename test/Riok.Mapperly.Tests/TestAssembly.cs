@@ -1,3 +1,4 @@
+using FluentAssertions.Execution;
 using Microsoft.CodeAnalysis;
 
 namespace Riok.Mapperly.Tests;
@@ -8,7 +9,8 @@ public class TestAssembly : IDisposable
 
     internal TestAssembly(Compilation compilation)
     {
-        compilation.Emit(_data).Success.Should().BeTrue();
+        var result = compilation.Emit(_data);
+        Execute.Assertion.ForCondition(result.Success).FailWith(string.Join("\n", result.Diagnostics.Select(x => x.ToString())));
 
         _data.Seek(0, SeekOrigin.Begin);
         MetadataReference = MetadataReference.CreateFromStream(_data);
