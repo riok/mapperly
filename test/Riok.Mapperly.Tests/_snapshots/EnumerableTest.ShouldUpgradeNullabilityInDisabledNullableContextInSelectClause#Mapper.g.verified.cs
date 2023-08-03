@@ -25,7 +25,7 @@ public partial class Mapper
         return target;
     }
 
-    private global::D[] MapToDArray(global::C[] source)
+    private global::D?[] MapToDArray(global::C[] source)
     {
         var target = new global::D?[source.Length];
         for (var i = 0; i < source.Length; i++)
