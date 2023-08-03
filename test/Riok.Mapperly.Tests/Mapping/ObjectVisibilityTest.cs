@@ -76,7 +76,7 @@ public class ObjectVisibilityTest
     [Fact]
     public void InternalOtherAssemblyToInternalShouldIgnore()
     {
-        var aSource = TestSourceBuilder.SyntaxTree("namespace A; public class A { internal string Value { get; set; } }");
+        var aSource = TestSourceBuilder.SyntaxTree("namespace A { public class A { internal string Value { get; set; } } }");
         using var aAssembly = TestHelper.BuildAssembly("A", aSource);
 
         var source = TestSourceBuilder.Mapping("A.A", "B", "class B { internal string Value { get; set; } }");
@@ -99,8 +99,9 @@ public class ObjectVisibilityTest
     {
         var aSource = TestSourceBuilder.SyntaxTree(
             """
-            namespace A;
-            public class A { public string PublicValue { get; set; } internal string InternalValue { get; set; } private string PrivateValue { get; set; } }
+            namespace A {
+                public class A { public string PublicValue { get; set; } internal string InternalValue { get; set; } private string PrivateValue { get; set; } }
+            }
             """
         );
 
@@ -133,8 +134,9 @@ public class ObjectVisibilityTest
             """
             [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tests")]
 
-            namespace A;
-            public class A { public string PublicValue { get; set; } internal string InternalValue { get; set; } private string PrivateValue { get; set; } }
+            namespace A {
+                public class A { public string PublicValue { get; set; } internal string InternalValue { get; set; } private string PrivateValue { get; set; } }
+            }
             """
         );
 
@@ -166,8 +168,9 @@ public class ObjectVisibilityTest
             """
             [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Tests")]
 
-            namespace A;
-            internal class A { public string PublicValue { get; set; } internal string InternalValue { get; set; } private string PrivateValue { get; set; } }
+            namespace A {
+                internal class A { public string PublicValue { get; set; } internal string InternalValue { get; set; } private string PrivateValue { get; set; } }
+            }
             """
         );
 
