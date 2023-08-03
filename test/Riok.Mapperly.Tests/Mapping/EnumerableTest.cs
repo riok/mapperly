@@ -467,6 +467,19 @@ public class EnumerableTest
     }
 
     [Fact]
+    public Task ArrayToReadOnlyCollectionShouldUpgradeNullability()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public int[] Value { get; set;} }",
+            "class B { public IReadOnlyCollection<string> Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
+
+    [Fact]
     public Task ShouldUpgradeNullabilityInDisabledNullableContextInSelectClause()
     {
         var source = TestSourceBuilder.Mapping(
