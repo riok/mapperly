@@ -54,7 +54,14 @@ public static class EnumerableMappingBuilder
             // a single Array.Clone / cast mapping call should be sufficient and fast,
             // use a for loop mapping otherwise.
             if (!elementMapping.IsSynthetic)
-                return new ArrayForMapping(ctx.Source, ctx.Target, elementMapping, elementMapping.TargetType);
+            {
+                // upgrade nullability of element type
+                var targetValue =
+                    ctx.CollectionInfos.Target.CollectionType == CollectionType.Array
+                        ? ctx.Types.GetArrayType(elementMapping.TargetType)
+                        : ((INamedTypeSymbol)ctx.Target).ConstructedFrom.Construct(elementMapping.TargetType);
+                return new ArrayForMapping(ctx.Source, targetValue, elementMapping, elementMapping.TargetType);
+            }
 
             return ctx.MapperConfiguration.UseDeepCloning
                 ? new ArrayCloneMapping(ctx.Source, ctx.Target)
