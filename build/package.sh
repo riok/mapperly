@@ -18,6 +18,7 @@ for roslyn_version in "${roslyn_versions[@]}"; do
     dotnet pack \
         "${script_dir}/../src/Riok.Mapperly" \
         -c Release \
+        /p:TargetFrameworks="netstandard2.0" \
         /p:ROSLYN_VERSION="${roslyn_version}" \
         -o "${artifacts_dir}/roslyn-${roslyn_version}" \
         /p:Version="${RELEASE_VERSION}" \

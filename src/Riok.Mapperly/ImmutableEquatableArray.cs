@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections;
-using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly;
 
@@ -26,13 +25,13 @@ public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableAr
 
     public override int GetHashCode()
     {
-        var hash = 0;
+        var hash = new HashCode();
         foreach (var value in _values)
         {
-            hash = HashHelper.Combine(hash, value.GetHashCode());
+            hash.Add(value);
         }
 
-        return hash;
+        return hash.ToHashCode();
     }
 
     public Enumerator GetEnumerator() => new Enumerator(_values);

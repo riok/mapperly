@@ -7,8 +7,8 @@ namespace Riok.Mapperly.Helpers;
 internal static class SymbolExtensions
 {
     private static readonly ImmutableHashSet<string> _wellKnownImmutableTypes = ImmutableHashSet.Create(
-        typeof(Uri).FullName,
-        typeof(Version).FullName
+        typeof(Uri).FullName!,
+        typeof(Version).FullName!
     );
 
     internal static bool IsImmutable(this ISymbol symbol) =>
