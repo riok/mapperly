@@ -39,10 +39,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             return target;
         }
 
-        // disable obsolete warning, as the obsolete attribute should still be tested.
-#pragma warning disable CS0618
-        [MapperIgnore(nameof(TestObjectDto.IgnoredStringValue))]
-#pragma warning restore CS0618
         [MapProperty(nameof(TestObject.RenamedStringValue), nameof(TestObjectDto.RenamedStringValue2))]
         [MapProperty(
             new[] { nameof(TestObject.UnflatteningIdValue) },
@@ -52,17 +48,15 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             nameof(TestObject.NullableUnflatteningIdValue),
             nameof(TestObjectDto.NullableUnflattening) + "." + nameof(TestObjectDto.NullableUnflattening.IdValue)
         )]
+        [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredStringValue))]
         [MapperIgnoreSource(nameof(TestObject.IgnoredIntValue))]
         [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredIntValue))]
         [MapperIgnoreObsoleteMembers]
         private static partial TestObjectDto MapToDtoInternal(TestObject testObject);
 
-        // disable obsolete warning, as the obsolete attribute should still be tested.
-#pragma warning disable CS0618
-        [MapperIgnore(nameof(TestObject.IgnoredStringValue))]
-        [MapperIgnore(nameof(TestObjectDto.DateTimeValueTargetDateOnly))]
-        [MapperIgnore(nameof(TestObjectDto.DateTimeValueTargetTimeOnly))]
-#pragma warning restore CS0618
+        [MapperIgnoreTarget(nameof(TestObject.DateTimeValueTargetDateOnly))]
+        [MapperIgnoreTarget(nameof(TestObject.DateTimeValueTargetTimeOnly))]
+        [MapperIgnoreTarget(nameof(TestObject.IgnoredStringValue))]
         [MapperIgnoreTarget(nameof(TestObject.IgnoredIntValue))]
         [MapperIgnoreSource(nameof(TestObjectDto.IgnoredIntValue))]
         public static partial TestObject MapFromDto(TestObjectDto dto);

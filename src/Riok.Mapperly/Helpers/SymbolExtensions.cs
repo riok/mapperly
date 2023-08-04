@@ -13,8 +13,8 @@ internal static class SymbolExtensions
     private const string RequiredKeyword = "required";
 
     private static readonly ImmutableHashSet<string> _wellKnownImmutableTypes = ImmutableHashSet.Create(
-        typeof(Uri).FullName,
-        typeof(Version).FullName
+        typeof(Uri).FullName!,
+        typeof(Version).FullName!
     );
 
     internal static bool IsImmutable(this ISymbol symbol) =>

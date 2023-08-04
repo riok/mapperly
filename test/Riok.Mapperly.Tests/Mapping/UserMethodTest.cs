@@ -161,38 +161,6 @@ public record B(int Value);
     }
 
     [Fact]
-    public void WithMultipleUserDefinedMethodDifferentConfigShouldWork()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapperIgnore(nameof(B.IntValue))] partial B Map(A source);"
-                + "[MapperIgnore(nameof(B.StringValue))] partial B Map2(A source);",
-            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { public string StringValue { get; set; }  public int IntValue { get; set; } }"
-        );
-
-        var mapper = TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics);
-        mapper
-            .Should()
-            .HaveOnlyMethods("Map", "Map2")
-            .HaveMethodBody(
-                "Map",
-                """
-                var target = new global::B();
-                target.StringValue = source.StringValue;
-                return target;
-                """
-            )
-            .HaveMethodBody(
-                "Map2",
-                """
-                var target = new global::B();
-                target.IntValue = source.IntValue;
-                return target;
-                """
-            );
-    }
-
-    [Fact]
     public void WithSameNamesShouldGenerateUniqueMethodNames()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

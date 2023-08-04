@@ -21,7 +21,8 @@ internal class AttributeDataAccessor
         where T : Attribute => Access<T, T>(symbol).Single();
 
     public TData? AccessFirstOrDefault<TAttribute, TData>(ISymbol symbol)
-        where TAttribute : Attribute => Access<TAttribute, TData>(symbol).FirstOrDefault();
+        where TAttribute : Attribute
+        where TData : notnull => Access<TAttribute, TData>(symbol).FirstOrDefault();
 
     public IEnumerable<TAttribute> Access<TAttribute>(ISymbol symbol)
         where TAttribute : Attribute => Access<TAttribute, TAttribute>(symbol);
@@ -39,6 +40,7 @@ internal class AttributeDataAccessor
     /// <exception cref="InvalidOperationException">If a property or ctor argument of <see cref="TData"/> could not be read on the attribute.</exception>
     public IEnumerable<TData> Access<TAttribute, TData>(ISymbol symbol)
         where TAttribute : Attribute
+        where TData : notnull
     {
         var attrType = typeof(TAttribute);
         var dataType = typeof(TData);
@@ -64,6 +66,7 @@ internal class AttributeDataAccessor
     }
 
     private TData Create<TData>(IReadOnlyCollection<ITypeSymbol> typeArguments, IReadOnlyCollection<TypedConstant> constructorArguments)
+        where TData : notnull
     {
         // The data class should have a constructor
         // with generic type parameters of the attribute class
@@ -81,7 +84,8 @@ internal class AttributeDataAccessor
                 (arg, i) => BuildArgumentValue(arg, parameters[i + typeArguments.Count].ParameterType)
             );
             var constructorTypeAndValueArguments = typeArguments.Concat(constructorArgumentValues).ToArray();
-            return (TData)Activator.CreateInstance(typeof(TData), constructorTypeAndValueArguments);
+            return (TData?)Activator.CreateInstance(typeof(TData), constructorTypeAndValueArguments)
+                ?? throw new InvalidOperationException($"Could not create instance of {typeof(TData)}");
         }
 
         throw new InvalidOperationException($"{typeof(TData)} does not have a constructor with {argCount} parameters");

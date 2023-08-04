@@ -123,18 +123,27 @@ public static class EnumMappingBuilder
         Func<IFieldSymbol, T> propertySelector,
         params IEqualityComparer<T>[] propertyComparer
     )
+        where T : notnull
     {
         var ignoredSourceMembers = ignoreExplicitAndIgnoredMappings
             ? new HashSet<IFieldSymbol>(SymbolEqualityComparer.Default)
-            : ctx.Configuration.Enum.IgnoredSourceMembers.ToHashSet();
+            : ctx.Configuration.Enum.IgnoredSourceMembers.ToHashSet(FieldSymbolEqualityComparer.Default);
         var ignoredTargetMembers = ignoreExplicitAndIgnoredMappings
             ? new HashSet<IFieldSymbol>(SymbolEqualityComparer.Default)
-            : ctx.Configuration.Enum.IgnoredTargetMembers.ToHashSet();
+            : ctx.Configuration.Enum.IgnoredTargetMembers.ToHashSet(FieldSymbolEqualityComparer.Default);
         var explicitMappings = ignoreExplicitAndIgnoredMappings
             ? new Dictionary<IFieldSymbol, IFieldSymbol>(SymbolEqualityComparer.Default)
             : BuildExplicitValueMappings(ctx);
-        var sourceMembers = ctx.Source.GetMembers().OfType<IFieldSymbol>().Where(x => !ignoredSourceMembers.Remove(x)).ToHashSet();
-        var targetMembers = ctx.Target.GetMembers().OfType<IFieldSymbol>().Where(x => !ignoredTargetMembers.Remove(x)).ToHashSet();
+        var sourceMembers = ctx.Source
+            .GetMembers()
+            .OfType<IFieldSymbol>()
+            .Where(x => !ignoredSourceMembers.Remove(x))
+            .ToHashSet(FieldSymbolEqualityComparer.Default);
+        var targetMembers = ctx.Target
+            .GetMembers()
+            .OfType<IFieldSymbol>()
+            .Where(x => !ignoredTargetMembers.Remove(x))
+            .ToHashSet(FieldSymbolEqualityComparer.Default);
 
         var targetMembersByProperty = propertyComparer
             .Select(pc => targetMembers.DistinctBy(propertySelector, pc).ToDictionary(propertySelector, x => x, pc))

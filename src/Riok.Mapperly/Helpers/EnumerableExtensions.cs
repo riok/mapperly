@@ -18,25 +18,6 @@ public static class EnumerableExtensions
 #nullable restore
     }
 
-    public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable, IEqualityComparer<T>? comparer = null) =>
-        new(enumerable, comparer);
-
-    public static IEnumerable<T> DistinctBy<T, TProp>(
-        this IEnumerable<T> enumerable,
-        Func<T, TProp> selector,
-        IEqualityComparer<TProp>? equalityComparer = null
-    )
-    {
-        var set = new HashSet<TProp>(equalityComparer);
-        foreach (var item in enumerable)
-        {
-            if (set.Add(selector(item)))
-            {
-                yield return item;
-            }
-        }
-    }
-
     public static IEnumerable<T> SkipLast<T>(this IEnumerable<T> enumerable)
     {
         using var enumerator = enumerable.GetEnumerator();

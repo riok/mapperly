@@ -215,4 +215,25 @@ public class ObjectVisibilityTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task PropertyInTheSameClassShouldIgnoreBackingField()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            public partial class A
+            {
+                public string Value { get; set; }
+
+                [Riok.Mapperly.Abstractions.Mapper(UseDeepCloning = true)]
+                internal partial class Mapper
+                {
+                    public partial A Clone(A source);
+                }
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

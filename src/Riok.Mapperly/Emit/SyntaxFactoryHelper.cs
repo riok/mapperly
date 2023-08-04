@@ -129,7 +129,7 @@ public static class SyntaxFactoryHelper
             {
                 ExpressionSyntax x => Interpolation(x),
                 string x => InterpolatedStringText(x),
-                _ => throw new InvalidOperationException(arg.GetType() + " cannot be converted into a string interpolation"),
+                _ => throw new InvalidOperationException(arg?.GetType() + " cannot be converted into a string interpolation"),
             };
             contents.Add(argSyntax);
             previousIndex = match.Index + match.Length;

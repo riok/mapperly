@@ -37,7 +37,7 @@ public sealed class PreserveReferenceHandler : IReferenceHandler
 
     private class ReferenceHolder
     {
-        private readonly Dictionary<object, object> _references = new(ReferenceEqualityComparer<object>.Instance);
+        private readonly Dictionary<object, object> _references = new(ReferenceEqualityComparer.Instance);
 
         public bool TryGetRef<TSource, TTarget>(TSource source, [NotNullWhen(true)] out TTarget? target)
             where TSource : notnull

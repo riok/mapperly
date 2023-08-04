@@ -10,27 +10,18 @@ public partial class Mapper
         var target = new global::B();
         if (source.Value != null)
         {
-            target.Value = MapToDArray(source.Value);
+            target.Value = MapToIReadOnlyCollection(source.Value);
         }
 
         return target;
     }
 
-    private global::D? MapToD(global::C? source)
+    private global::System.Collections.Generic.IReadOnlyCollection<string?> MapToIReadOnlyCollection(int[] source)
     {
-        if (source == null)
-            return default;
-        var target = new global::D();
-        target.Value = source.Value;
-        return target;
-    }
-
-    private global::D?[] MapToDArray(global::C[] source)
-    {
-        var target = new global::D?[source.Length];
+        var target = new string?[source.Length];
         for (var i = 0; i < source.Length; i++)
         {
-            target[i] = MapToD(source[i]);
+            target[i] = source[i].ToString();
         }
 
         return target;

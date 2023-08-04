@@ -37,9 +37,6 @@ Riok.Mapperly.Abstractions.MapperAttribute.UseDeepCloning.get -> bool
 Riok.Mapperly.Abstractions.MapperAttribute.UseDeepCloning.set -> void
 Riok.Mapperly.Abstractions.MapperConstructorAttribute
 Riok.Mapperly.Abstractions.MapperConstructorAttribute.MapperConstructorAttribute() -> void
-Riok.Mapperly.Abstractions.MapperIgnoreAttribute
-Riok.Mapperly.Abstractions.MapperIgnoreAttribute.MapperIgnoreAttribute(string! target) -> void
-Riok.Mapperly.Abstractions.MapperIgnoreAttribute.Target.get -> string!
 Riok.Mapperly.Abstractions.MapperIgnoreObsoleteMembersAttribute
 Riok.Mapperly.Abstractions.MapperIgnoreObsoleteMembersAttribute.IgnoreObsoleteStrategy.get -> Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy
 Riok.Mapperly.Abstractions.MapperIgnoreObsoleteMembersAttribute.MapperIgnoreObsoleteMembersAttribute(Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy ignoreObsoleteStrategy = (Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy)-1) -> void

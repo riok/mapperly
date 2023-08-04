@@ -17,7 +17,7 @@ public partial class MapperGenerator
     public const string AddMappersStep = "ImplementationSourceOutput";
     public const string ReportDiagnosticsStep = "Diagnostics";
 
-    public static readonly string MapperAttributeName = typeof(MapperAttribute).FullName;
+    public static readonly string MapperAttributeName = typeof(MapperAttribute).FullName!;
 
     private static MapperResults BuildDescriptors(
         Compilation compilation,
@@ -45,7 +45,7 @@ public partial class MapperGenerator
         {
             cancellationToken.ThrowIfCancellationRequested();
             var mapperModel = compilation.GetSemanticModel(mapperSyntax.SyntaxTree);
-            if (mapperModel.GetDeclaredSymbol(mapperSyntax) is not INamedTypeSymbol mapperSymbol)
+            if (mapperModel.GetDeclaredSymbol(mapperSyntax) is not { } mapperSymbol)
                 continue;
 
             var symbolAccessor = new SymbolAccessor(wellKnownTypes, compilation, mapperSymbol);

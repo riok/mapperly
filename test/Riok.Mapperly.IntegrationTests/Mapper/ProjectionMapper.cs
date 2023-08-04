@@ -12,10 +12,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public static partial IQueryable<TestObjectDtoProjectionBaseType> ProjectToDto(this IQueryable<TestObjectProjectionBaseType> q);
 
-        // disable obsolete warning, as the obsolete attribute should still be tested.
-#pragma warning disable CS0618
-        [MapperIgnore(nameof(TestObjectDtoProjection.IgnoredStringValue))]
-#pragma warning restore CS0618
+        [MapperIgnoreTarget(nameof(TestObjectDtoProjection.IgnoredStringValue))]
         [MapperIgnoreTarget(nameof(TestObjectDtoProjection.IgnoredIntValue))]
         [MapperIgnoreSource(nameof(TestObjectProjection.IgnoredStringValue))]
         [MapProperty(nameof(TestObjectProjection.RenamedStringValue), nameof(TestObjectDtoProjection.RenamedStringValue2))]
