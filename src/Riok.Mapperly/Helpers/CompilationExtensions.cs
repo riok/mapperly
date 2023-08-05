@@ -58,7 +58,9 @@ internal static class CompilationExtensions
 
         return type;
 #else
+#pragma warning disable RS0030
         return compilation.GetTypeByMetadataName(fullyQualifiedMetadataName);
+#pragma warning restore RS0030
 #endif
     }
 
