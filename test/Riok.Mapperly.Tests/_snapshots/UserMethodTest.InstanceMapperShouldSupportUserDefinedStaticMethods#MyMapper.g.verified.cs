@@ -5,7 +5,7 @@ public partial class MyMapper
 {
     public partial global::B Map(global::A s)
     {
-        var target = new global::B(StaticMapper(s.Value));
+        var target = new global::B(MapInt(s.Value));
         return target;
     }
 }

@@ -58,7 +58,10 @@ internal static class CompilationExtensions
 
         return type;
 #else
+        // RS0030 banned api: GetTypesByMetadataName is not supported for Roslyn < 4.4
+#pragma warning disable RS0030
         return compilation.GetTypeByMetadataName(fullyQualifiedMetadataName);
+#pragma warning restore RS0030
 #endif
     }
 
