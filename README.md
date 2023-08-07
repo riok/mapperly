@@ -47,6 +47,10 @@ dto.NumberOfSeats.Should().Be(10);
 
 [Read the docs](https://mapperly.riok.app/docs/getting-started/installation) for any further information.
 
+## Upgrading
+
+Find a list of breaking changes for each major version and upgrade guides [here](https://mapperly.riok.app/docs/category/upgrading/).
+
 ## How To Contribute
 
 We would love for you to contribute to Mapperly and help make it even better than it is today!
