@@ -13,7 +13,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Represents a mapping which is not a single expression but an entire method.
 /// </summary>
-public abstract class MethodMapping : TypeMapping
+public abstract class MethodMapping : NewInstanceMapping
 {
     protected const string DefaultReferenceHandlerParameterName = "refHandler";
     private const string DefaultSourceParameterName = "source";

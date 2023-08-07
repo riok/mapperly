@@ -8,21 +8,21 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Represents an enumerable mapping which works by using linq (select + collect).
 /// </summary>
-public class LinqDictionaryMapping : TypeMapping
+public class LinqDictionaryMapping : NewInstanceMapping
 {
     private const string KeyPropertyName = nameof(KeyValuePair<object, object>.Key);
     private const string ValuePropertyName = nameof(KeyValuePair<object, object>.Value);
 
     private readonly string _collectMethod;
-    private readonly ITypeMapping _keyMapping;
-    private readonly ITypeMapping _valueMapping;
+    private readonly INewInstanceMapping _keyMapping;
+    private readonly INewInstanceMapping _valueMapping;
 
     public LinqDictionaryMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         string collectMethod,
-        ITypeMapping keyMapping,
-        ITypeMapping valueMapping
+        INewInstanceMapping keyMapping,
+        INewInstanceMapping valueMapping
     )
         : base(sourceType, targetType)
     {

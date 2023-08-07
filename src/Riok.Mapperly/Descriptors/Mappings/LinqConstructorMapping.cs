@@ -8,17 +8,17 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Represents an enumerable mapping where the target type accepts IEnumerable as a single argument.
 /// </summary>
-public class LinqConstructorMapping : TypeMapping
+public class LinqConstructorMapping : NewInstanceMapping
 {
     private readonly INamedTypeSymbol _targetTypeToConstruct;
-    private readonly ITypeMapping _elementMapping;
+    private readonly INewInstanceMapping _elementMapping;
     private readonly string? _selectMethod;
 
     public LinqConstructorMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         INamedTypeSymbol targetTypeToConstruct,
-        ITypeMapping elementMapping,
+        INewInstanceMapping elementMapping,
         string? selectMethod
     )
         : base(sourceType, targetType)

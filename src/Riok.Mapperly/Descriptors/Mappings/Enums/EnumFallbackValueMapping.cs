@@ -9,14 +9,14 @@ namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 /// Enum fallback value which is used if no enum value matched.
 /// Either throws or returns the fallback value.
 /// </summary>
-public class EnumFallbackValueMapping : TypeMapping
+public class EnumFallbackValueMapping : NewInstanceMapping
 {
-    private readonly ITypeMapping? _fallbackMapping;
+    private readonly INewInstanceMapping? _fallbackMapping;
 
     public EnumFallbackValueMapping(
         ITypeSymbol source,
         ITypeSymbol target,
-        ITypeMapping? fallbackMapping = null,
+        INewInstanceMapping? fallbackMapping = null,
         IFieldSymbol? fallbackMember = null
     )
         : base(source, target)

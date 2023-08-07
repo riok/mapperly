@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
-using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
@@ -12,9 +11,6 @@ public readonly struct TypeMappingKey
     private readonly ITypeSymbol _target;
 
     public TypeMappingKey(ITypeMapping mapping, bool includeNullability = true)
-        : this(mapping.SourceType, mapping.TargetType, includeNullability) { }
-
-    public TypeMappingKey(IExistingTargetMapping mapping, bool includeNullability = true)
         : this(mapping.SourceType, mapping.TargetType, includeNullability) { }
 
     public TypeMappingKey(ITypeSymbol source, ITypeSymbol target, bool includeNullability = true)

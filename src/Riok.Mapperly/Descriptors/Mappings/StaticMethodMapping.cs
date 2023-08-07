@@ -7,7 +7,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Represents a mapping which works by invoking a static method with the source as only argument.
 /// </summary>
-public class StaticMethodMapping : TypeMapping
+public class StaticMethodMapping : NewInstanceMapping
 {
     private readonly IMethodSymbol _method;
 

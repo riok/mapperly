@@ -4,11 +4,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
-/// <inheritdoc cref="ITypeMapping"/>
+/// <inheritdoc cref="INewInstanceMapping"/>
 [DebuggerDisplay("{GetType().Name}({SourceType} => {TargetType})")]
-public abstract class TypeMapping : ITypeMapping
+public abstract class NewInstanceMapping : INewInstanceMapping
 {
-    protected TypeMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    protected NewInstanceMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
     {
         SourceType = sourceType;
         TargetType = targetType;
@@ -20,10 +20,10 @@ public abstract class TypeMapping : ITypeMapping
 
     public virtual MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.Default;
 
-    /// <inheritdoc cref="ITypeMapping.CallableByOtherMappings"/>
+    /// <inheritdoc cref="INewInstanceMapping.CallableByOtherMappings"/>
     public virtual bool CallableByOtherMappings => true;
 
-    /// <inheritdoc cref="ITypeMapping.IsSynthetic"/>
+    /// <inheritdoc cref="INewInstanceMapping.IsSynthetic"/>
     public virtual bool IsSynthetic => false;
 
     public abstract ExpressionSyntax Build(TypeMappingBuildContext ctx);

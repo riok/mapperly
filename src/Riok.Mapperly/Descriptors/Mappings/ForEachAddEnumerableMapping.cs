@@ -18,7 +18,7 @@ public class ForEachAddEnumerableMapping : ExistingTargetMappingMethodWrapper
     public ForEachAddEnumerableMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        ITypeMapping elementMapping,
+        INewInstanceMapping elementMapping,
         ObjectFactory? objectFactory,
         string insertMethodName,
         EnsureCapacityInfo? ensureCapacityBuilder

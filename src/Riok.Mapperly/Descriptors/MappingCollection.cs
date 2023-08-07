@@ -12,7 +12,7 @@ public class MappingCollection
     /// The first callable mapping of each type pair.
     /// Contains mappings to build and already built mappings
     /// </summary>
-    private readonly Dictionary<TypeMappingKey, ITypeMapping> _mappings = new();
+    private readonly Dictionary<TypeMappingKey, INewInstanceMapping> _mappings = new();
 
     /// <summary>
     /// A list of all method mappings (extra mappings and mappings)
@@ -39,7 +39,7 @@ public class MappingCollection
     /// <inheritdoc cref="_userMappings"/>
     public IReadOnlyCollection<IUserMapping> UserMappings => _userMappings;
 
-    public ITypeMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType)
+    public INewInstanceMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType)
     {
         _mappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var mapping);
         return mapping;
@@ -61,6 +61,21 @@ public class MappingCollection
             _userMappings.Add(userMapping);
         }
 
+        switch (mapping)
+        {
+            case INewInstanceMapping newInstanceMapping:
+                AddNewInstanceMapping(newInstanceMapping);
+                break;
+            case IExistingTargetMapping existingTargetMapping:
+                AddExistingTargetMapping(existingTargetMapping);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(mapping), mapping.GetType().FullName + " mappings are not supported");
+        }
+    }
+
+    public void AddNewInstanceMapping(INewInstanceMapping mapping)
+    {
         if (mapping is MethodMapping methodMapping)
         {
             _methodMappings.Add(methodMapping);
@@ -72,8 +87,13 @@ public class MappingCollection
         }
     }
 
-    public void AddExistingTargetMapping(IExistingTargetMapping mapping) =>
-        _existingTargetMappings.Add(new TypeMappingKey(mapping), mapping);
+    public void AddExistingTargetMapping(IExistingTargetMapping mapping)
+    {
+        if (mapping.CallableByOtherMappings && FindExistingInstanceMapping(mapping.SourceType, mapping.TargetType) is null)
+        {
+            _existingTargetMappings.Add(new TypeMappingKey(mapping), mapping);
+        }
+    }
 
     public IEnumerable<(IMapping, MappingBuilderContext)> DequeueMappingsToBuildBody() => _mappingsToBuildBody.DequeueAll();
 }

@@ -11,10 +11,15 @@ public class ArrayForMapping : MethodMapping
     private const string LoopCounterName = "i";
     private const string ArrayLengthProperty = nameof(Array.Length);
 
-    private readonly ITypeMapping _elementMapping;
+    private readonly INewInstanceMapping _elementMapping;
     private readonly ITypeSymbol _targetArrayElementType;
 
-    public ArrayForMapping(ITypeSymbol sourceType, ITypeSymbol targetType, ITypeMapping elementMapping, ITypeSymbol targetArrayElementType)
+    public ArrayForMapping(
+        ITypeSymbol sourceType,
+        ITypeSymbol targetType,
+        INewInstanceMapping elementMapping,
+        ITypeSymbol targetArrayElementType
+    )
         : base(sourceType, targetType)
     {
         _elementMapping = elementMapping;

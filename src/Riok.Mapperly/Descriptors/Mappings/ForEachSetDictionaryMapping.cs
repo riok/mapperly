@@ -22,8 +22,8 @@ public class ForEachSetDictionaryMapping : ExistingTargetMappingMethodWrapper
     public ForEachSetDictionaryMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        ITypeMapping keyMapping,
-        ITypeMapping valueMapping,
+        INewInstanceMapping keyMapping,
+        INewInstanceMapping valueMapping,
         bool sourceHasCount,
         ITypeSymbol? typeToInstantiate = null,
         ObjectFactory? objectFactory = null,

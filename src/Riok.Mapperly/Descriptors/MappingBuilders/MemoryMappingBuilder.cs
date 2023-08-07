@@ -12,7 +12,7 @@ public static class MemoryMappingBuilder
     private const string SpanMemberName = nameof(Memory<int>.Span);
     private const string ToArrayMethodName = nameof(Enumerable.ToArray);
 
-    public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         if (!ctx.IsConversionEnabled(MappingConversionType.Memory))
             return null;
@@ -104,7 +104,7 @@ public static class MemoryMappingBuilder
         return new SourceObjectMemberDelegateExistingTargetMapping(ctx.Source, ctx.Target, SpanMemberName, enumerableMapping);
     }
 
-    private static TypeMapping? BuildSpanToMemoryMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static NewInstanceMapping? BuildSpanToMemoryMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         if (elementMapping.IsSynthetic && !ctx.MapperConfiguration.UseDeepCloning)
             return new SourceObjectMethodMapping(ctx.Source, ctx.Target, ToArrayMethodName);
@@ -115,7 +115,7 @@ public static class MemoryMappingBuilder
             : new CastMapping(ctx.Source, ctx.Target, arrayMapping);
     }
 
-    private static TypeMapping? BuildMemoryToArrayMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static NewInstanceMapping? BuildMemoryToArrayMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         if (!elementMapping.IsSynthetic || ctx.MapperConfiguration.UseDeepCloning)
             return BuildSpanToArrayMethodMapping(ctx, elementMapping);
@@ -123,7 +123,7 @@ public static class MemoryMappingBuilder
         return new SourceObjectMethodMapping(ctx.Source, ctx.Target, ToArrayMethodName);
     }
 
-    private static TypeMapping? BuildMemoryToSpanMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static NewInstanceMapping? BuildMemoryToSpanMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         if (!elementMapping.IsSynthetic || ctx.MapperConfiguration.UseDeepCloning)
             return BuildMemoryToSpanMethod(ctx, elementMapping);
@@ -131,7 +131,7 @@ public static class MemoryMappingBuilder
         return new SourceObjectMemberMapping(ctx.Source, ctx.Target, SpanMemberName);
     }
 
-    private static TypeMapping BuildArrayToMemoryMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static NewInstanceMapping BuildArrayToMemoryMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         if (!elementMapping.IsSynthetic || ctx.MapperConfiguration.UseDeepCloning)
             return new ArrayForMapping(
@@ -144,7 +144,7 @@ public static class MemoryMappingBuilder
         return new CastMapping(ctx.Source, ctx.Target);
     }
 
-    private static TypeMapping? BuildMemoryToSpanMethod(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static NewInstanceMapping? BuildMemoryToSpanMethod(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         var sourceSpan = ctx.Types.Get(typeof(ReadOnlySpan<>)).Construct(elementMapping.SourceType);
         if (ctx.FindOrBuildMapping(sourceSpan, ctx.Target) is not { } spanMapping)
@@ -153,7 +153,7 @@ public static class MemoryMappingBuilder
         return new SourceObjectMemberMapping(ctx.Source, ctx.Target, SpanMemberName, spanMapping);
     }
 
-    private static TypeMapping? BuildMemoryToMemoryMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static NewInstanceMapping? BuildMemoryToMemoryMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         if (!elementMapping.IsSynthetic || ctx.MapperConfiguration.UseDeepCloning)
             return BuildSpanToArrayMethodMapping(ctx, elementMapping);
@@ -161,7 +161,7 @@ public static class MemoryMappingBuilder
         return new CastMapping(ctx.Source, ctx.Target);
     }
 
-    private static TypeMapping? BuildMemoryToEnumerableMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static NewInstanceMapping? BuildMemoryToEnumerableMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         var sourceSpan = ctx.Types.Get(typeof(ReadOnlySpan<>)).Construct(elementMapping.SourceType);
         if (ctx.FindOrBuildMapping(sourceSpan, ctx.Target) is not { } enumerableMapping)
@@ -170,7 +170,7 @@ public static class MemoryMappingBuilder
         return new SourceObjectMemberMapping(ctx.Source, ctx.Target, SpanMemberName, enumerableMapping);
     }
 
-    private static TypeMapping? BuildEnumerableToMemoryMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static NewInstanceMapping? BuildEnumerableToMemoryMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         var targetArray = ctx.Types.GetArrayType(elementMapping.TargetType);
         if (ctx.FindOrBuildMapping(ctx.Source, targetArray.NonNullable()) is not { } arrayMapping)
@@ -179,7 +179,7 @@ public static class MemoryMappingBuilder
         return new DelegateMapping(ctx.Source, ctx.Target, arrayMapping);
     }
 
-    private static TypeMapping? BuildSpanToArrayMethodMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static NewInstanceMapping? BuildSpanToArrayMethodMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         var sourceSpan = ctx.Types.Get(typeof(ReadOnlySpan<>)).Construct(elementMapping.SourceType);
         var targetArray = ctx.Types.GetArrayType(elementMapping.TargetType);

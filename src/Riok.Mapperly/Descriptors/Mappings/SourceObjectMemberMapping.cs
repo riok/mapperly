@@ -12,16 +12,16 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// target = Map(source.Span);
 /// </code>
 /// </summary>
-public class SourceObjectMemberMapping : TypeMapping
+public class SourceObjectMemberMapping : NewInstanceMapping
 {
     private readonly string _memberName;
-    private readonly ITypeMapping? _delegateMapping;
+    private readonly INewInstanceMapping? _delegateMapping;
 
     public SourceObjectMemberMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         string memberName,
-        ITypeMapping? delegateMapping = null
+        INewInstanceMapping? delegateMapping = null
     )
         : base(sourceType, targetType)
     {

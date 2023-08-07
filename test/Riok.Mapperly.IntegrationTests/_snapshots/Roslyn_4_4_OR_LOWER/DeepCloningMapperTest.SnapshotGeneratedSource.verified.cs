@@ -88,6 +88,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.ExistingSortedSet.Add(item2);
             }
 
+            target.ExistingList.EnsureCapacity(src.ExistingList.Count + target.ExistingList.Count);
+            foreach (var item3 in src.ExistingList)
+            {
+                target.ExistingList.Add(item3);
+            }
+
             target.ISet = global::System.Linq.Enumerable.ToHashSet(src.ISet);
             target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(src.IReadOnlySet);
             target.HashSet = global::System.Linq.Enumerable.ToHashSet(src.HashSet);

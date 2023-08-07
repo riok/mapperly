@@ -74,7 +74,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="sourceType">The source type.</param>
     /// <param name="targetType">The target type.</param>
     /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
-    public virtual ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType) =>
+    public virtual INewInstanceMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType) =>
         MappingBuilder.Find(sourceType.UpgradeNullable(), targetType.UpgradeNullable());
 
     /// <summary>
@@ -90,7 +90,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="targetType">The target type.</param>
     /// <param name="options">The mapping building options.</param>
     /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
-    public virtual ITypeMapping? FindOrBuildMapping(
+    public virtual INewInstanceMapping? FindOrBuildMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         MappingBuildingOptions options = MappingBuildingOptions.Default
@@ -108,7 +108,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="target">The target type.</param>
     /// <param name="options">The options.</param>
     /// <returns>The created mapping, or <c>null</c> if no mapping could be created.</returns>
-    public ITypeMapping? BuildMapping(ITypeSymbol source, ITypeSymbol target, MappingBuildingOptions options)
+    public INewInstanceMapping? BuildMapping(ITypeSymbol source, ITypeSymbol target, MappingBuildingOptions options)
     {
         var userSymbol = options.HasFlag(MappingBuildingOptions.KeepUserSymbol) ? UserSymbol : null;
         return BuildMapping(userSymbol, source, target, options);
@@ -193,7 +193,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         return new(this, userSymbol, sourceType, targetType, options.HasFlag(MappingBuildingOptions.ClearDerivedTypes));
     }
 
-    protected ITypeMapping? BuildMapping(
+    protected INewInstanceMapping? BuildMapping(
         IMethodSymbol? userSymbol,
         ITypeSymbol sourceType,
         ITypeSymbol targetType,

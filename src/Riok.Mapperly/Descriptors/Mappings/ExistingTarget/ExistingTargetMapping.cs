@@ -18,6 +18,10 @@ public abstract class ExistingTargetMapping : IExistingTargetMapping
 
     public ITypeSymbol TargetType { get; }
 
+    public virtual bool CallableByOtherMappings => true;
+
+    public virtual bool IsSynthetic => false;
+
     public MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.Default;
 
     public abstract IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target);

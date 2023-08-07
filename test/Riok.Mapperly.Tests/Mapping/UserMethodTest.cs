@@ -56,6 +56,18 @@ public record B(int Value);
     }
 
     [Fact]
+    public Task InstanceMapperShouldUseStaticExistingTargetMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A s);" + "static void StaticMapper(List<int> src, List<string> dst) { }",
+            "class A { public List<int> Value { get; set; } }",
+            "public class B { public List<string> Value { get; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public void WithMultipleUserImplementedMethodShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBody("partial int ToInt(string i);" + "int ToInt2(string i) => int.Parse(i);");
@@ -284,6 +296,48 @@ public record B(int Value);
 
             class A { public int Value { get; set; } public int Value2 { get; set; } public int Value3 { get; set; } public int Value4 { get; set; } }
             class B { public string Value { get; set; } public long Value2 { get; set; } public decimal Value3 { get; set; } public short Value4 { get; set; } }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ExistingTargetsWithClassBaseTypeShouldWork()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using System.Collections.Generic;
+            using Riok.Mapperly.Abstractions;
+
+            [Mapper]
+            public partial class BaseMapper : BaseMapper3
+            {
+                public void MyMapping(List<int> src, List<string> dst) { }
+
+                protected partial void MyIntToShortMapping(List<int> src, List<short> dst);
+            }
+
+            public interface BaseMapper2 : BaseMapper3
+            {
+                void MyMapping2(int src, long dst);
+            }
+
+            public interface BaseMapper3
+            {
+                void MyMapping3(C src, D dst) { }
+            }
+
+            [Mapper]
+            public partial class MyMapper : BaseMapper, BaseMapper2
+            {
+                public partial B Map(A source);
+            }
+
+            class A { public List<int> Value { get; set; } public int Value2 { get; set; } public C Value3 { get; set; } public List<int> Value4 { get; set; } }
+            class B { public List<string> Value { get; } public long Value2 { get; } public D Value3 { get; } public List<short> Value4 { get; } },
+            class C { public int Value { get; set; } },
+            class D { public string Value { get; set; } },
             """
         );
         return TestHelper.VerifyGenerator(source);

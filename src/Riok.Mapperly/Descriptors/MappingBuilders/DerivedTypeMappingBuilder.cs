@@ -8,7 +8,7 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public static class DerivedTypeMappingBuilder
 {
-    public static ITypeMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static INewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         var derivedTypeMappings = TryBuildContainedMappings(ctx);
         if (derivedTypeMappings == null)
@@ -19,7 +19,7 @@ public static class DerivedTypeMappingBuilder
             : new DerivedTypeSwitchMapping(ctx.Source, ctx.Target, derivedTypeMappings);
     }
 
-    public static IReadOnlyCollection<ITypeMapping>? TryBuildContainedMappings(
+    public static IReadOnlyCollection<INewInstanceMapping>? TryBuildContainedMappings(
         MappingBuilderContext ctx,
         bool duplicatedSourceTypesAllowed = false
     )
@@ -29,14 +29,14 @@ public static class DerivedTypeMappingBuilder
             : BuildContainedMappings(ctx, ctx.Configuration.DerivedTypes, duplicatedSourceTypesAllowed);
     }
 
-    private static IReadOnlyCollection<ITypeMapping> BuildContainedMappings(
+    private static IReadOnlyCollection<INewInstanceMapping> BuildContainedMappings(
         MappingBuilderContext ctx,
         IReadOnlyCollection<DerivedTypeMappingConfiguration> configs,
         bool duplicatedSourceTypesAllowed
     )
     {
         var derivedTypeMappingSourceTypes = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
-        var derivedTypeMappings = new List<ITypeMapping>(configs.Count);
+        var derivedTypeMappings = new List<INewInstanceMapping>(configs.Count);
         Func<ITypeSymbol, bool> isAssignableToSource = ctx.Source is ITypeParameterSymbol sourceTypeParameter
             ? t => ctx.SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(sourceTypeParameter, t, ctx.Source.NullableAnnotation)
             : t => ctx.SymbolAccessor.HasImplicitConversion(t, ctx.Source);

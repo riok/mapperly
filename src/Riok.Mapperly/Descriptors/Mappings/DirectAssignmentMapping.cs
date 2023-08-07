@@ -7,7 +7,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// Represents a direct assignment mapping.
 /// Source and target types need to be the same types.
 /// </summary>
-public class DirectAssignmentMapping : TypeMapping
+public class DirectAssignmentMapping : NewInstanceMapping
 {
     public DirectAssignmentMapping(ITypeSymbol type)
         : base(type, type) { }

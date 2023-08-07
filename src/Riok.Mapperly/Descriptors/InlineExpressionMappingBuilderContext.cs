@@ -61,8 +61,8 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     /// </summary>
     /// <param name="sourceType">The source type.</param>
     /// <param name="targetType">The target type.</param>
-    /// <returns>The <see cref="ITypeMapping"/> if a mapping was found or <c>null</c> if none was found.</returns>
-    public override ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    /// <returns>The <see cref="INewInstanceMapping"/> if a mapping was found or <c>null</c> if none was found.</returns>
+    public override INewInstanceMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
     {
         if (_inlineExpressionMappings.Find(sourceType, targetType) is { } mapping)
             return mapping;
@@ -92,7 +92,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     /// <param name="targetType">The target type.</param>
     /// <param name="options">The options, <see cref="MappingBuildingOptions.MarkAsReusable"/> is ignored.</param>
     /// <returns></returns>
-    public override ITypeMapping? FindOrBuildMapping(
+    public override INewInstanceMapping? FindOrBuildMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         MappingBuildingOptions options = MappingBuildingOptions.Default

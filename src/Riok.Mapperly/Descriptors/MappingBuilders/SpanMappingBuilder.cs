@@ -13,7 +13,7 @@ public static class SpanMappingBuilder
     private const string ToArrayMethodName = nameof(Enumerable.ToArray);
     private const string AddMethodName = nameof(ICollection<object>.Add);
 
-    public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         if (!ctx.IsConversionEnabled(MappingConversionType.Span))
             return null;
@@ -115,7 +115,7 @@ public static class SpanMappingBuilder
         }
     }
 
-    private static TypeMapping? BuildSpanToEnumerable(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static NewInstanceMapping? BuildSpanToEnumerable(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         var target = ctx.CollectionInfos!.Target;
 
@@ -156,7 +156,7 @@ public static class SpanMappingBuilder
         }
     }
 
-    private static TypeMapping BuildToArrayOrMap(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static NewInstanceMapping BuildToArrayOrMap(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         if (!elementMapping.IsSynthetic)
             return new ArrayForMapping(ctx.Source, ctx.Target, elementMapping, elementMapping.TargetType);
@@ -164,7 +164,7 @@ public static class SpanMappingBuilder
         return new SourceObjectMethodMapping(ctx.Source, ctx.Target, ToArrayMethodName);
     }
 
-    private static TypeMapping? BuildEnumerableToSpan(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static NewInstanceMapping? BuildEnumerableToSpan(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         var typedArray = ctx.Types.GetArrayType(elementMapping.TargetType);
         if (ctx.FindOrBuildMapping(ctx.Source, typedArray) is not { } arrayMapping)
@@ -173,7 +173,7 @@ public static class SpanMappingBuilder
         return new CastMapping(ctx.Source, ctx.Target, arrayMapping);
     }
 
-    private static TypeMapping? BuildSpanToList(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static NewInstanceMapping? BuildSpanToList(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         var typedList = ctx.Types.Get(typeof(List<>)).Construct(elementMapping.TargetType);
         if (ctx.FindOrBuildMapping(ctx.Source, typedList) is not { } listMapping)
@@ -182,7 +182,7 @@ public static class SpanMappingBuilder
         return new DelegateMapping(ctx.Source, ctx.Target, listMapping);
     }
 
-    private static TypeMapping? MapSpanArrayToEnumerableMethod(MappingBuilderContext ctx)
+    private static NewInstanceMapping? MapSpanArrayToEnumerableMethod(MappingBuilderContext ctx)
     {
         var enumeratedType = ctx.CollectionInfos!.Source.EnumeratedType;
         var typedArray = ctx.Types.GetArrayType(enumeratedType);

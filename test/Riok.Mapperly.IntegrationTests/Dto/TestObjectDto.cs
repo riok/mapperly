@@ -81,9 +81,11 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         public ISet<int> ExistingISet { get; } = new HashSet<int>();
 
-        public HashSet<int> ExistingHashSet { get; } = new HashSet<int>();
+        public HashSet<int> ExistingHashSet { get; } = new();
 
-        public SortedSet<int> ExistingSortedSet { get; } = new SortedSet<int>();
+        public SortedSet<int> ExistingSortedSet { get; } = new();
+
+        public List<int> ExistingList { get; } = new();
 
         public ISet<int> ISet { get; set; } = new HashSet<int>();
 

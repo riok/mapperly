@@ -10,17 +10,17 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Null aware delegate mapping. Abstracts handling null values of the delegated mapping.
 /// </summary>
-public class NullDelegateMapping : TypeMapping
+public class NullDelegateMapping : NewInstanceMapping
 {
     private const string NullableValueProperty = nameof(Nullable<int>.Value);
 
-    private readonly ITypeMapping _delegateMapping;
+    private readonly INewInstanceMapping _delegateMapping;
     private readonly NullFallbackValue _nullFallbackValue;
 
     public NullDelegateMapping(
         ITypeSymbol nullableSourceType,
         ITypeSymbol nullableTargetType,
-        ITypeMapping delegateMapping,
+        INewInstanceMapping delegateMapping,
         NullFallbackValue nullFallbackValue
     )
         : base(nullableSourceType, nullableTargetType)

@@ -25,7 +25,7 @@ public static class EnumerableMappingBuilder
     private const string CreateRangeStackMethodName = "global::System.Collections.Immutable.ImmutableStack.CreateRange";
     private const string ToImmutableSortedSetMethodName = "global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet";
 
-    public static TypeMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         if (!ctx.IsConversionEnabled(MappingConversionType.Enumerable))
             return null;
@@ -134,7 +134,11 @@ public static class EnumerableMappingBuilder
         }
     }
 
-    private static LinqEnumerableMapping BuildLinqMapping(MappingBuilderContext ctx, ITypeMapping elementMapping, string? collectMethod)
+    private static LinqEnumerableMapping BuildLinqMapping(
+        MappingBuilderContext ctx,
+        INewInstanceMapping elementMapping,
+        string? collectMethod
+    )
     {
         var selectMethod = elementMapping.IsSynthetic ? null : SelectMethodName;
         return new LinqEnumerableMapping(ctx.Source, ctx.Target, elementMapping, selectMethod, collectMethod);
@@ -161,14 +165,14 @@ public static class EnumerableMappingBuilder
     private static LinqConstructorMapping BuildLinqConstructorMapping(
         MappingBuilderContext ctx,
         INamedTypeSymbol targetTypeToConstruct,
-        ITypeMapping elementMapping
+        INewInstanceMapping elementMapping
     )
     {
         var selectMethod = elementMapping.IsSynthetic ? null : SelectMethodName;
         return new LinqConstructorMapping(ctx.Source, ctx.Target, targetTypeToConstruct, elementMapping, selectMethod);
     }
 
-    private static ExistingTargetMappingMethodWrapper? BuildCustomTypeMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static ExistingTargetMappingMethodWrapper? BuildCustomTypeMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         if (
             !ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory)
@@ -241,7 +245,7 @@ public static class EnumerableMappingBuilder
             : (false, null);
     }
 
-    private static LinqEnumerableMapping? TryBuildImmutableLinqMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
+    private static LinqEnumerableMapping? TryBuildImmutableLinqMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         var collectMethod = ResolveImmutableCollectMethod(ctx);
         if (collectMethod is null)
