@@ -8,9 +8,9 @@ using Microsoft.CodeAnalysis.MSBuild;
 
 namespace Riok.Mapperly.Benchmarks;
 
+[ArtifactsPath("artifacts")]
 [MemoryDiagnoser]
 [InProcess]
-[JsonExporterAttribute.Full]
 public class SourceGeneratorBenchmarks
 {
     private const string SampleProjectPath = "../../../samples/Riok.Mapperly.Sample/Riok.Mapperly.Sample.csproj";
