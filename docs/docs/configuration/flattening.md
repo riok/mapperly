@@ -14,9 +14,31 @@ by either using the source and target property path names as arrays or using a d
 [MapProperty(new[] { nameof(Car.Make), nameof(Car.Make.Id) }, new[] { nameof(CarDto.MakeId) })]
 // Or alternatively
 [MapProperty("Make.Id", "MakeId")]
+// Or
+[MapProperty($"{nameof(Make)}.{nameof(Make.Id)}", "MakeId")]
 partial CarDto Map(Car car);
 ```
 
 :::info
 Unflattening is not automatically configured by Mapperly and needs to be configured manually via `MapPropertyAttribute`.
+:::
+
+## Experimental full `nameof`
+
+Mapperly supports an experimental "fullnameof".
+It can be used to configure property paths using `nameof`.
+Opt-in is done by prefixing the path with `@`.
+
+```csharp
+[MapProperty(nameof(@Car.Make.Id), nameof(CarDto.MakeId))]
+partial CarDto Map(Car car);
+```
+
+`@nameof(Car.Make.Id)` will result in the property path `Make.Id`.
+The first part of the property path is stripped.
+Make sure these property paths start with the type of the property and not with a namespace or a property.
+
+:::warning
+This is an experimental API.
+Its API surface is not subject to semantic releases and may break in any release.
 :::

@@ -6,6 +6,50 @@ namespace Riok.Mapperly.Tests.Mapping;
 public class ObjectPropertyFlatteningTest
 {
     [Fact]
+    public void ManualFlattenedPropertyWithFullNameOfSource()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(nameof(@C.Value.Id), nameof(B.MyValueId))] partial B Map(A source);",
+            "class A { public C Value { get; set; } }",
+            "class B { public string MyValueId { get; set; } }",
+            "class C { public string Id { get; set; }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.MyValueId = source.Value.Id;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ManualFlattenedPropertyWithInterpolatedNameOfSource()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """[MapProperty($"{nameof(C.Value)}.{nameof(C.Value.Id)}", nameof(B.MyValueId))] partial B Map(A source);""",
+            "class A { public C Value { get; set; } }",
+            "class B { public string MyValueId { get; set; } }",
+            "class C { public string Id { get; set; }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.MyValueId = source.Value.Id;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void ManualFlattenedProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -262,6 +306,50 @@ public class ObjectPropertyFlatteningTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapProperty($\"MyValueId\", \"Value.Id\")] partial B Map(A source);",
             "class A { public string MyValueId { get; set; } }",
+            "class B { public C Value { get; set; } }",
+            "class C { public string Id { get; set; }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value.Id = source.MyValueId;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ManualUnflattenedPropertyWithFullNameOfTarget()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(nameof(C.MyValueId), nameof(@B.Value.Id))] partial B Map(A source);",
+            "class A { public string MyValueId { get; set; }  }",
+            "class B { public C Value { get; set; } }",
+            "class C { public string Id { get; set; }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value.Id = source.MyValueId;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ManualUnflattenedPropertyInterpolatedFullNameOfTarget()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """[MapProperty(nameof(C.MyValueId), $"{nameof(B.Value)}.{nameof(B.Value.Id)}")] partial B Map(A source);""",
+            "class A { public string MyValueId { get; set; }  }",
             "class B { public C Value { get; set; } }",
             "class C { public string Id { get; set; }"
         );
