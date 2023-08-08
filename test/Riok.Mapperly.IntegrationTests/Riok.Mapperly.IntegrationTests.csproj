@@ -31,7 +31,7 @@
 
   <!-- ef core tests should only run on net7 -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" />
   </ItemGroup>
 
   <!-- cannot use source generated polyfills since they require language version 11 -->
