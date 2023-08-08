@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
@@ -95,6 +96,7 @@ public static class ObjectMemberMappingBodyBuilder
         BuildMemberAssignmentMapping(ctx, sourceMemberPath, targetMemberPath);
     }
 
+    [SuppressMessage(" Meziantou.Analyzer", "MA0051:MethodIsTooLong")]
     public static bool ValidateMappingSpecification(
         IMembersBuilderContext<IMapping> ctx,
         MemberPath sourceMemberPath,
@@ -131,6 +133,11 @@ public static class ObjectMemberMappingBodyBuilder
             );
             return false;
         }
+
+        // cannot assign to intermediate value type, error CS1612
+        // invalid mapping a value type has a property set
+        if (!ValidateStructModification(ctx, sourceMemberPath, targetMemberPath))
+            return false;
 
         // a target member path part is init only
         var noInitOnlyPath = allowInitOnlyMember ? targetMemberPath.ObjectPath : targetMemberPath.Path;
@@ -174,6 +181,43 @@ public static class ObjectMemberMappingBodyBuilder
                 targetMemberPath.FullName
             );
             return false;
+        }
+
+        return true;
+    }
+
+    private static bool ValidateStructModification(
+        IMembersBuilderContext<IMapping> ctx,
+        MemberPath sourceMemberPath,
+        MemberPath targetMemberPath
+    )
+    {
+        if (targetMemberPath.Path.Count <= 1)
+            return true;
+
+        // iterate backwards, if a reference type property is found then path is valid
+        // if a value type property is found then invalid, a temporary struct is being modified
+        for (var i = targetMemberPath.Path.Count - 2; i >= 0; i--)
+        {
+            var member = targetMemberPath.Path[i];
+            if (member is PropertyMember { Type: { IsValueType: true, IsRefLikeType: false } })
+            {
+                ctx.BuilderContext.ReportDiagnostic(
+                    DiagnosticDescriptors.CannotMapToTemporarySourceMember,
+                    ctx.Mapping.SourceType,
+                    sourceMemberPath.FullName,
+                    sourceMemberPath.Member.Type,
+                    ctx.Mapping.TargetType,
+                    targetMemberPath.FullName,
+                    targetMemberPath.Member.Type,
+                    member.Name,
+                    member.Type
+                );
+                return false;
+            }
+
+            if (member is PropertyMember { Type.IsReferenceType: true })
+                break;
         }
 
         return true;
