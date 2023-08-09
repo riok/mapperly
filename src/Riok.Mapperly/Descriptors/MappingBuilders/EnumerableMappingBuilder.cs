@@ -40,8 +40,8 @@ public static class EnumerableMappingBuilder
         if (elementMapping == null)
             return null;
 
-        if (TryBuildCastMapping(ctx, elementMapping) is { } implicitMapping)
-            return implicitMapping;
+        if (TryBuildCastMapping(ctx, elementMapping) is { } castMapping)
+            return castMapping;
 
         if (TryBuildFastConversion(ctx, elementMapping) is { } fastLoopMapping)
             return fastLoopMapping;
@@ -149,7 +149,9 @@ public static class EnumerableMappingBuilder
             || !ctx.CollectionInfos!.Source.CountIsKnown
             || ctx.CollectionInfos.Target.CollectionType == CollectionType.None
         )
+        {
             return null;
+        }
 
         // if target is a list or type implemented by list
         if (ctx.CollectionInfos.Target.CollectionType is CollectionType.List or CollectionType.ICollection or CollectionType.IList)
@@ -185,15 +187,15 @@ public static class EnumerableMappingBuilder
             return null;
 
         // upgrade nullability of element type
-        var targetValue = ((INamedTypeSymbol)ctx.CollectionInfos!.Target.Type.OriginalDefinition).Construct(elementMapping.TargetType);
-        var targetCollection = ctx.Types.Get(typeof(List<>)).Construct(elementMapping.TargetType);
+        var targetType = ((INamedTypeSymbol)ctx.CollectionInfos!.Target.Type.OriginalDefinition).Construct(elementMapping.TargetType);
+        var targetTypeToInstantiate = ctx.Types.Get(typeof(List<>)).Construct(elementMapping.TargetType);
 
         return new ForEachAddEnumerableMapping(
             ctx.Source,
-            targetValue,
+            targetType,
             elementMapping,
             AddMethodName,
-            targetCollection,
+            targetTypeToInstantiate,
             ctx.CollectionInfos.Source.CountPropertyName
         );
     }
@@ -206,11 +208,11 @@ public static class EnumerableMappingBuilder
         if (!elementMapping.IsSynthetic)
         {
             // upgrade nullability of element type
-            var targetValue =
+            var targetType =
                 ctx.CollectionInfos!.Target.CollectionType == CollectionType.Array
                     ? ctx.Types.GetArrayType(elementMapping.TargetType)
                     : ((INamedTypeSymbol)ctx.Target).ConstructedFrom.Construct(elementMapping.TargetType);
-            return new ArrayForMapping(ctx.Source, targetValue, elementMapping, elementMapping.TargetType);
+            return new ArrayForMapping(ctx.Source, targetType, elementMapping, elementMapping.TargetType);
         }
 
         return ctx.MapperConfiguration.UseDeepCloning
@@ -225,14 +227,14 @@ public static class EnumerableMappingBuilder
             return null;
 
         // upgrade nullability of element type
-        var targetValue =
+        var targetType =
             ctx.CollectionInfos!.Target.CollectionType == CollectionType.Array
                 ? ctx.Types.GetArrayType(elementMapping.TargetType)
                 : ((INamedTypeSymbol)ctx.Target).ConstructedFrom.Construct(elementMapping.TargetType);
 
         return new ArrayForEachMapping(
             ctx.Source,
-            targetValue,
+            targetType,
             elementMapping,
             elementMapping.TargetType,
             ctx.CollectionInfos.Source.CountPropertyName!

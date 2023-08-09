@@ -15,43 +15,45 @@ public class UserMethodTest
     [Fact]
     public Task InstanceMapperShouldEmitDiagnosticForPartialStaticMethods()
     {
-        var source =
-            @"
-using System;
-using System.Collections.Generic;
-using Riok.Mapperly.Abstractions;
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using System.Collections.Generic;
+            using Riok.Mapperly.Abstractions;
 
-[Mapper]
-public partial class MyMapper
-{
-    public static object StaticToObject(string s);
+            [Mapper]
+            public partial class MyMapper
+            {
+                public static object StaticToObject(string s);
 
-    public partial object InstanceToObject(string s);
-}
-";
+                public partial object InstanceToObject(string s);
+            }
+            """
+        );
         return TestHelper.VerifyGenerator(source);
     }
 
     [Fact]
     public Task InstanceMapperShouldSupportUserDefinedStaticMethods()
     {
-        var source =
-            @"
-using System;
-using System.Collections.Generic;
-using Riok.Mapperly.Abstractions;
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using System.Collections.Generic;
+            using Riok.Mapperly.Abstractions;
 
-[Mapper]
-public partial class MyMapper
-{
-    public static int StaticMapper(int s) => s;
+            [Mapper]
+            public partial class MyMapper
+            {
+                public static int MapInt(int s) => s;
 
-    public partial B Map(A s);
-}
+                public partial B Map(A s);
+            }
 
-public record A(int Value);
-public record B(int Value);
-";
+            public record A(int Value);
+            public record B(int Value);
+            """
+        );
         return TestHelper.VerifyGenerator(source);
     }
 
@@ -59,7 +61,10 @@ public record B(int Value);
     public Task InstanceMapperShouldUseStaticExistingTargetMethod()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial B Map(A s);" + "static void StaticMapper(List<int> src, List<string> dst) { }",
+            """
+            partial B Map(A s);"
+            static void MapList(List<int> src, List<string> dst) { }
+            """,
             "class A { public List<int> Value { get; set; } }",
             "public class B { public List<string> Value { get; } }"
         );
