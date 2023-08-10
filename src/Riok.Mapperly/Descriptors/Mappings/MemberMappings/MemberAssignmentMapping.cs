@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Symbols;
 
@@ -23,6 +24,10 @@ public class MemberAssignmentMapping : IMemberAssignmentMapping
     public GetterMemberPath SourcePath => _mapping.SourcePath;
 
     public MemberPath TargetPath => _targetPath;
+
+    public ITypeSymbol SourceType => _mapping.SourceType;
+
+    public ITypeSymbol TargetType => _mapping.TargetType;
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess) =>
         ctx.SyntaxFactory.SingleStatement(BuildExpression(ctx, targetAccess));

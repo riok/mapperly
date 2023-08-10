@@ -1,6 +1,7 @@
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
@@ -72,6 +73,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
     public Dictionary<string, List<PropertyMappingConfiguration>> MemberConfigsByRootTargetName { get; }
 
+    public readonly HashSet<string> NotNullInitializedTargetMemberNames = new();
+
     public void AddDiagnostics()
     {
         AddUnmatchedIgnoredTargetMembersDiagnostics();
@@ -82,7 +85,19 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         AddMappedAndIgnoredTargetMembersDiagnostics();
     }
 
-    protected void SetSourceMemberMapped(MemberPath sourcePath) => _unmappedSourceMemberNames.Remove(sourcePath.Path.First().Name);
+    protected void SetMembersMapped(IMemberMapping mapping)
+    {
+        _unmappedSourceMemberNames.Remove(mapping.SourcePath.Path.First().Name);
+    }
+
+    protected void SetMembersMapped(IMemberAssignmentMapping assignmentMapping)
+    {
+        _unmappedSourceMemberNames.Remove(assignmentMapping.SourcePath.Path.First().Name);
+        if (!assignmentMapping.TargetType.IsNullable())
+        {
+            NotNullInitializedTargetMemberNames.Add(assignmentMapping.TargetPath.Path.First().Name);
+        }
+    }
 
     private HashSet<string> InitIgnoredUnmatchedProperties(IEnumerable<string> allProperties, IEnumerable<string> mappedProperties)
     {

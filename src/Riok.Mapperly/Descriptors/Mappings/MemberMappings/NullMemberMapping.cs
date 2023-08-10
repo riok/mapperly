@@ -36,6 +36,10 @@ public class NullMemberMapping : IMemberMapping
 
     public GetterMemberPath SourcePath { get; }
 
+    public ITypeSymbol SourceType => _delegateMapping.SourceType;
+
+    public ITypeSymbol TargetType => _delegateMapping.TargetType;
+
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         // the source type of the delegate mapping is nullable or the source path is not nullable

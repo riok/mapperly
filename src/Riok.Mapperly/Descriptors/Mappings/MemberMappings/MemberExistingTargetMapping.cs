@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Symbols;
@@ -22,6 +23,10 @@ public class MemberExistingTargetMapping : IMemberAssignmentMapping
     public GetterMemberPath SourcePath { get; }
 
     public MemberPath TargetPath => _targetPath;
+
+    public ITypeSymbol SourceType => _delegateMapping.SourceType;
+
+    public ITypeSymbol TargetType => _delegateMapping.TargetType;
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {

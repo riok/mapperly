@@ -16,7 +16,7 @@ public class NewValueTupleConstructorBuilderContext<T> : MembersMappingBuilderCo
     public void AddTupleConstructorParameterMapping(ValueTupleConstructorParameterMapping mapping)
     {
         MemberConfigsByRootTargetName.Remove(mapping.Parameter.Name);
-        SetSourceMemberMapped(mapping.DelegateMapping.SourcePath);
+        SetMembersMapped(mapping.DelegateMapping);
         Mapping.AddConstructorParameterMapping(mapping);
     }
 }

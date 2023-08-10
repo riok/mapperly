@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -18,6 +19,8 @@ public abstract class ObjectMemberMethodMapping : MethodMapping, IMemberAssignme
     {
         _mapping = new ObjectMemberExistingTargetMapping(sourceType, targetType);
     }
+
+    public IMemberAssignmentMapping? TryGetMemberMapping(MemberPath sourceMemberPath) => _mapping.TryGetMemberMapping(sourceMemberPath);
 
     public bool HasMemberMapping(IMemberAssignmentMapping mapping) => _mapping.HasMemberMapping(mapping);
 

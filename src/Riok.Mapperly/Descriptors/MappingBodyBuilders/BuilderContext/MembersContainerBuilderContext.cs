@@ -27,7 +27,7 @@ public class MembersContainerBuilderContext<T> : MembersMappingBuilderContext<T>
 
     private void AddMemberAssignmentMapping(IMemberAssignmentMappingContainer container, IMemberAssignmentMapping mapping)
     {
-        SetSourceMemberMapped(mapping.SourcePath);
+        SetMembersMapped(mapping);
         AddNullMemberInitializers(container, mapping.TargetPath);
         container.AddMemberMapping(mapping);
     }
@@ -40,6 +40,10 @@ public class MembersContainerBuilderContext<T> : MembersMappingBuilderContext<T>
             var type = nullablePath.Member.Type;
 
             if (!nullablePath.Member.CanSet)
+                continue;
+
+            // if member is initialised with a non null value then skip
+            if (NotNullInitializedTargetMemberNames.Contains(path.Path.First().Name))
                 continue;
 
             if (!BuilderContext.SymbolAccessor.HasAccessibleParameterlessConstructor(type))

@@ -15,14 +15,14 @@ public class NewInstanceBuilderContext<T> : MembersMappingBuilderContext<T>, INe
 
     public void AddInitMemberMapping(MemberAssignmentMapping mapping)
     {
-        SetSourceMemberMapped(mapping.SourcePath);
+        SetMembersMapped(mapping);
         Mapping.AddInitMemberMapping(mapping);
     }
 
     public void AddConstructorParameterMapping(ConstructorParameterMapping mapping)
     {
         MemberConfigsByRootTargetName.Remove(mapping.Parameter.Name);
-        SetSourceMemberMapped(mapping.DelegateMapping.SourcePath);
+        SetMembersMapped(mapping.DelegateMapping);
         Mapping.AddConstructorParameterMapping(mapping);
     }
 }

@@ -408,6 +408,81 @@ public class ObjectPropertyFlatteningTest
     }
 
     [Fact]
+    public void ManualUnflattenedPropertyNullablePathShouldNotNullInitialize()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty($\"MyValueId\", \"Value.Id\"), MapProperty($\"MyValueId2\", \"Value.Id2\"), MapProperty($\"Value\", \"Value\")] partial B Map(A source);",
+            "class A { public string MyValueId { get; set; } public string MyValueId2 { get; set; } public C Value { get; set; } }",
+            "class B { public C? Value { get; set; } }",
+            "class C { public string Id { get; set; } public string Id2 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = source.Value;
+                target.Value.Id = source.MyValueId;
+                target.Value.Id2 = source.MyValueId2;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ManualUnflattenedPropertyNullablePathShouldNullInitialize()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty($\"MyValueId\", \"Value.Id\"), MapProperty($\"MyValueId2\", \"Value.Id2\"), MapProperty($\"Value\", \"Value\")] partial B Map(A source);",
+            "class A { public string MyValueId { get; set; } public string MyValueId2 { get; set; } public C? Value { get; set; } }",
+            "class B { public C? Value { get; set; } }",
+            "class C { public string Id { get; set; } public string Id2 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value ??= new();
+                target.Value = source.Value;
+                target.Value.Id = source.MyValueId;
+                target.Value.Id2 = source.MyValueId2;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ManualUnflattenedPropertyDeepNullablePathShouldNotNullInitialize()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty($\"MyValueId\", \"My.Value.Id\"), MapProperty($\"MyValueId2\", \"My.Value.Id2\"), MapProperty($\"My\", \"My\"), MapProperty($\"Value\", \"My.Value\")] partial B Map(A source);",
+            "class A { public string MyValueId { get; set; } public string MyValueId2 { get; set; } public C My { get; set; }  public D Value { get; set; } }",
+            "class B { public C? My { get; set; } }",
+            "class C { public D? Value { get; set; } }",
+            "class D { public string Id { get; set; } public string Id2 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.My = source.My;
+                target.My.Value = source.Value;
+                target.My.Value.Id = source.MyValueId;
+                target.My.Value.Id2 = source.MyValueId2;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void ManualUnflattenedPropertyDeepNullablePath()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

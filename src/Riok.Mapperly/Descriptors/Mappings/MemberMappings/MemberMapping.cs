@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Symbols;
 
@@ -10,7 +11,6 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 public class MemberMapping : IMemberMapping
 {
     private readonly INewInstanceMapping _delegateMapping;
-    private readonly bool _nullConditionalAccess;
     private readonly bool _addValuePropertyOnNullable;
 
     public MemberMapping(
@@ -22,15 +22,21 @@ public class MemberMapping : IMemberMapping
     {
         _delegateMapping = delegateMapping;
         SourcePath = sourcePath;
-        _nullConditionalAccess = nullConditionalAccess;
+        NullConditionalAccess = nullConditionalAccess;
         _addValuePropertyOnNullable = addValuePropertyOnNullable;
     }
 
     public GetterMemberPath SourcePath { get; }
+    public bool NullConditionalAccess { get; }
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
+
+    public ITypeSymbol SourceType => _delegateMapping.SourceType;
+
+    public ITypeSymbol TargetType => _delegateMapping.TargetType;
+
     {
-        ctx = ctx.WithSource(SourcePath.BuildAccess(ctx.Source, _addValuePropertyOnNullable, _nullConditionalAccess));
+        ctx = ctx.WithSource(SourcePath.BuildAccess(ctx.Source, _addValuePropertyOnNullable, NullConditionalAccess));
         return _delegateMapping.Build(ctx);
     }
 }

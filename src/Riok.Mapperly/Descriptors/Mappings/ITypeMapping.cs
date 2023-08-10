@@ -15,4 +15,6 @@ public interface ITypeMapping : IMapping
     /// Gets a value indicating whether this mapping produces any code or can be omitted completely (eg. direct assignments or delegate mappings).
     /// </summary>
     bool IsSynthetic { get; }
+
+    MappingBodyBuildingPriority BodyBuildingPriority { get; }
 }

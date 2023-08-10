@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -41,6 +42,9 @@ public abstract class MemberAssignmentMappingContainer : IMemberAssignmentMappin
             _delegateMappings.Add(mapping);
         }
     }
+
+    public IMemberAssignmentMapping? TryGetMemberMapping(MemberPath sourceMemberPath) =>
+        _delegateMappings.FirstOrDefault(x => x.TargetPath == sourceMemberPath) ?? _parent?.TryGetMemberMapping(sourceMemberPath);
 
     public bool HasMemberMapping(IMemberAssignmentMapping mapping) =>
         _delegateMappings.Contains(mapping) || _parent?.HasMemberMapping(mapping) == true;

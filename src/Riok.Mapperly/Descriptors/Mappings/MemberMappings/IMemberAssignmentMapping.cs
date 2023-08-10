@@ -6,7 +6,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// <summary>
 /// Represents a member assignment mapping or a container of member assignment mappings.
 /// </summary>
-public interface IMemberAssignmentMapping
+public interface IMemberAssignmentMapping : IMapping
 {
     GetterMemberPath SourcePath { get; }
 

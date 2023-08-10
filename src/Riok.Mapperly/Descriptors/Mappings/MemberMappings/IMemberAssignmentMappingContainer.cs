@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -7,6 +8,8 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// </summary>
 public interface IMemberAssignmentMappingContainer
 {
+    IMemberAssignmentMapping? TryGetMemberMapping(MemberPath sourceMemberPath);
+
     bool HasMemberMapping(IMemberAssignmentMapping mapping);
 
     void AddMemberMapping(IMemberAssignmentMapping mapping);
