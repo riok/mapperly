@@ -5,8 +5,22 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  lint:
+  lint-dotnet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3.2.0
+      - run: dotnet tool restore
+      - run: dotnet csharpier --check .
+      # don't run dotnet format for whitespace formatting as this is done by csharpier
+      - run: dotnet format style --verify-no-changes
+      - run: dotnet format analyzers --verify-no-changes
+  superlinter:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -31,6 +45,6 @@ jobs:
           # exclusions:
           # LICENSE: 1:1 copy of the license text
           # sln files: Usually edited by the IDE
-          # AnalyzerReleases.Shipped.md and Analyzer.Unshipped.md: their structure is predefined by it's analyzer
+          # AnalyzerReleases.Shipped.md and Analyzer.Unshipped.md: their structure is predefined by its analyzer
           # _snapshots: Snapshots are generated and should not be linted
           FILTER_REGEX_EXCLUDE: 'LICENSE|.*.sln|src/Riok\.Mapperly/AnalyzerReleases\..*\.md|.*_snapshots.*'

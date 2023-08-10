@@ -5,9 +5,19 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'src/**'
+      - 'benchmarks/**'
+      - 'global.json'
+      - 'Directory.Build.props'
   pull_request:
     branches:
       - main
+    paths:
+      - 'src/**'
+      - 'benchmarks/**'
+      - 'global.json'
+      - 'Directory.Build.props'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
