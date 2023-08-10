@@ -72,7 +72,7 @@ public class DescriptorBuilder
                 userMapping.Method,
                 userMapping.SourceType,
                 userMapping.TargetType,
-                userMapping.Parameters
+                userMapping.AdditionalParameters
             );
 
             _mappings.Add(userMapping);

@@ -83,10 +83,12 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
     public void AddTypeMapping(ITypeMapping typeMapping)
     {
-        foreach (var parameter in typeMapping.Parameters)
-        {
-            _unmappedSourceParameters.Remove(parameter.Name);
-        }
+        //TODO: Delete
+
+        // foreach (var parameter in BuilderContext.Parameters)
+        // {
+        //     _unmappedSourceParameters.Remove(parameter.Name);
+        // }
     }
 
     private HashSet<string> InitIgnoredUnmatchedProperties(IEnumerable<string> allProperties, IEnumerable<string> mappedProperties)

@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -11,8 +10,6 @@ public interface IMapping
     ITypeSymbol SourceType { get; }
 
     ITypeSymbol TargetType { get; }
-
-    ImmutableEquatableArray<MethodParameter> Parameters { get; }
 
     MappingBodyBuildingPriority BodyBuildingPriority { get; }
 }

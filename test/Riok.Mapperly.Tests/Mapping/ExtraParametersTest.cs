@@ -144,27 +144,6 @@ public class ExtraParametersTest
     }
 
     [Fact]
-    public void MapShouldUseOtherMultiParamMapper()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial B Map(A source, int intValue); partial string MapWith(int src, int intValue)",
-            "class A { public int Value { get; set; } }",
-            "class B { public string Value { get; set; } }"
-        );
-
-        TestHelper
-            .GenerateMapper(source)
-            .Should()
-            .HaveMapMethodBody(
-                """
-                var target = new global::B();
-                target.Value = MapWith(source.Value, intValue);
-                return target;
-                """
-            );
-    }
-
-    [Fact]
     public void TwoExtraParameters()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

@@ -25,6 +25,8 @@ public class UserImplementedMethodMapping : TypeMapping, IUserMapping
 
     public IMethodSymbol Method { get; }
 
+    public ImmutableEquatableArray<MethodParameter> AdditionalParameters { get; } = ImmutableEquatableArray<MethodParameter>.Empty;
+
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         // if the user implemented method is on an interface,

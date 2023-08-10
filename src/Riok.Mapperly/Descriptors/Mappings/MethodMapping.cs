@@ -30,6 +30,7 @@ public abstract class MethodMapping : TypeMapping
         : base(sourceType, targetType)
     {
         SourceParameter = new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType);
+        AdditionalParameters = ImmutableEquatableArray<MethodParameter>.Empty;
         _returnType = targetType;
     }
 
@@ -38,14 +39,15 @@ public abstract class MethodMapping : TypeMapping
         MethodParameter sourceParameter,
         MethodParameter? referenceHandlerParameter,
         ITypeSymbol targetType,
-        ImmutableEquatableArray<MethodParameter> parameters
+        ImmutableEquatableArray<MethodParameter> additionalParameters
     )
-        : base(sourceParameter.Type, targetType, parameters)
+        : base(sourceParameter.Type, targetType)
     {
         SourceParameter = sourceParameter;
         IsExtensionMethod = method.IsExtensionMethod;
         IsPartial = method.IsPartialDefinition;
         ReferenceHandlerParameter = referenceHandlerParameter;
+        AdditionalParameters = additionalParameters;
         _accessibility = method.DeclaredAccessibility;
         _methodName = method.Name;
         _returnType = method.ReturnType.UpgradeNullable();
@@ -61,9 +63,11 @@ public abstract class MethodMapping : TypeMapping
 
     protected MethodParameter? ReferenceHandlerParameter { get; private set; }
 
+    public ImmutableEquatableArray<MethodParameter> AdditionalParameters { get; }
+
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        var parameters = Parameters
+        var parameters = AdditionalParameters
             .Zip(ctx.Parameters, (a, b) => (a, b))
             .Select(x => x.a.WithArgument(x.b))
             .Cast<MethodArgument?>()
@@ -83,7 +87,7 @@ public abstract class MethodMapping : TypeMapping
         var typeMappingBuildContext = new TypeMappingBuildContext(
             SourceParameter.Name,
             ReferenceHandlerParameter?.Name,
-            Parameters.Select(x => x.Name),
+            AdditionalParameters.Select(x => x.Name),
             ctx.NameBuilder.NewScope()
         );
 
@@ -115,7 +119,7 @@ public abstract class MethodMapping : TypeMapping
     protected virtual ParameterListSyntax BuildParameterList()
     {
         var initial = new[] { SourceParameter, ReferenceHandlerParameter };
-        var methodParameters = initial.Concat(Parameters.Cast<MethodParameter?>()).ToArray();
+        var methodParameters = initial.Concat(AdditionalParameters.Cast<MethodParameter?>()).ToArray();
         return ParameterList(IsExtensionMethod, methodParameters);
     }
 

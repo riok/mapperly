@@ -81,7 +81,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="targetType">The target type.</param>
     /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
     public virtual ITypeMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType) =>
-        MappingBuilder.Find(sourceType.UpgradeNullable(), targetType.UpgradeNullable(), Parameters);
+        MappingBuilder.Find(sourceType.UpgradeNullable(), targetType.UpgradeNullable());
 
     //TODO: updagrade nullable
 
@@ -106,7 +106,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     {
         sourceType = sourceType.UpgradeNullable();
         targetType = targetType.UpgradeNullable();
-        return MappingBuilder.Find(sourceType, targetType, Parameters) ?? BuildMapping(sourceType, targetType, options);
+        return MappingBuilder.Find(sourceType, targetType) ?? BuildMapping(sourceType, targetType, options);
     }
 
     /// <summary>
