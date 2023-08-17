@@ -1,4 +1,3 @@
-using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors;
@@ -177,25 +176,8 @@ internal class AttributeDataAccessor
             return null;
 
         var enumRoslynType = arg.Type ?? throw new InvalidOperationException("Type is null");
-        if (targetType == typeof(IFieldSymbol))
-            return enumRoslynType.GetFields().First(f => Equals(f.ConstantValue, arg.Value));
-
-        var enumReflectionType = GetReflectionType(enumRoslynType);
-        return enumReflectionType == null
-            ? throw new InvalidOperationException(
-                $"Could not resolve enum reflection type of {enumRoslynType.Name} or {targetType} is not supported"
-            )
-            : Enum.ToObject(enumReflectionType, arg.Value);
-    }
-
-    private static Type? GetReflectionType(ITypeSymbol type)
-    {
-        // other special types not yet supported since they are not used yet.
-        if (type.SpecialType == SpecialType.System_String)
-            return typeof(string);
-
-        var assemblyName = type.ContainingAssembly.Name;
-        var qualifiedTypeName = Assembly.CreateQualifiedName(assemblyName, type.ToDisplayString());
-        return Type.GetType(qualifiedTypeName);
+        return targetType == typeof(IFieldSymbol)
+            ? enumRoslynType.GetFields().First(f => Equals(f.ConstantValue, arg.Value))
+            : Enum.ToObject(targetType, arg.Value);
     }
 }

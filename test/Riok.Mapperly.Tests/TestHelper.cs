@@ -33,7 +33,7 @@ public static class TestHelper
 
         var result = Generate(source, options, additionalAssemblies).GetRunResult();
 
-        var methods = ExtractAllMethods(result.GeneratedTrees.Single().GetRoot())
+        var methods = ExtractAllMethods(result.GeneratedTrees.SingleOrDefault()?.GetRoot())
             .Select(x => new GeneratedMethod(x))
             .ToDictionary(x => x.Name);
 
@@ -117,8 +117,11 @@ public static class TestHelper
         return compilation;
     }
 
-    private static IEnumerable<MethodDeclarationSyntax> ExtractAllMethods(SyntaxNode root)
+    private static IEnumerable<MethodDeclarationSyntax> ExtractAllMethods(SyntaxNode? root)
     {
+        if (root == null)
+            yield break;
+
         foreach (var node in root.ChildNodes())
         {
             // a namespace can contain classes
