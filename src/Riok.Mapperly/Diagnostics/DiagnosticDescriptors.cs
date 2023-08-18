@@ -4,7 +4,7 @@ using Riok.Mapperly.Abstractions;
 namespace Riok.Mapperly.Diagnostics;
 
 // cannot use target-typed new: https://github.com/dotnet/roslyn-analyzers/issues/5828
-internal static class DiagnosticDescriptors
+public static class DiagnosticDescriptors
 {
     public static readonly DiagnosticDescriptor UnsupportedMappingMethodSignature = new DiagnosticDescriptor(
         "RMG001",

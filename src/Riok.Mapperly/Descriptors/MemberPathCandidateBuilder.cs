@@ -8,7 +8,7 @@ public static class MemberPathCandidateBuilder
     /// </summary>
     /// <param name="name">The name to build candidates from.</param>
     /// <returns>The joined member path groups.</returns>
-    internal static IEnumerable<IEnumerable<string>> BuildMemberPathCandidates(string name)
+    public static IEnumerable<IEnumerable<string>> BuildMemberPathCandidates(string name)
     {
         if (name.Length == 0)
             yield break;

@@ -3,7 +3,7 @@ using Riok.Mapperly.Descriptors.Mappings;
 
 namespace Riok.Mapperly.Helpers;
 
-internal class MethodNameBuilder : UniqueNameBuilder
+public class MethodNameBuilder : UniqueNameBuilder
 {
     private const string MethodNamePrefix = "MapTo";
     private const string ArrayTypeNameSuffix = "Array";
