@@ -12,7 +12,6 @@
     <PackageDescription>
       A .NET source generator for generating object mappings.
       No runtime reflection.
-      Inspired by MapStruct.
     </PackageDescription>
     <PackageTags>Mapper SourceGenerator</PackageTags>
     <PackageIcon>logo.png</PackageIcon>
