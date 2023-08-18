@@ -16,22 +16,22 @@ artifacts_dir="${script_dir}/../artifacts"
 
 echo "building Mapperly v${RELEASE_VERSION}"
 echo "cleaning artifacts dir"
-
 mkdir -p "${artifacts_dir}"
 rm -rf "${artifacts_dir:?}"/*
 
 artifacts_dir="$(realpath "$artifacts_dir")"
+source_generator_path="$(realpath "${script_dir}/../src/Riok.Mapperly")"
 
 for roslyn_version in "${roslyn_versions[@]}"; do
     echo "building for Roslyn ${roslyn_version}"
     dotnet pack \
-        "${script_dir}/../src/Riok.Mapperly" \
+        "$source_generator_path" \
+        --verbosity quiet \
         -c Release \
-        /p:TargetFrameworks="netstandard2.0" \
         /p:ROSLYN_VERSION="${roslyn_version}" \
         -o "${artifacts_dir}/roslyn-${roslyn_version}" \
         /p:Version="${RELEASE_VERSION}" \
-        /p:PackageReleaseNotes=\""${RELEASE_NOTES}"\" >/dev/null
+        /p:PackageReleaseNotes=\""${RELEASE_NOTES}"\"
 done
 
 echo "merging multi targets to a single nupkg"
