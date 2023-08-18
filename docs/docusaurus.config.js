@@ -11,7 +11,7 @@ async function createConfig() {
   return {
     title: 'Mapperly',
     tagline:
-      'A .NET source generator for generating object mappings. No runtime reflection. Inspired by MapStruct.',
+      'A .NET source generator for generating object mappings. No runtime reflection.',
     url: process.env.DOCUSAURUS_URL || 'https://mapperly.riok.app',
     baseUrl: process.env.DOCUSAURUS_BASE_URL || '/',
     trailingSlash: true,
