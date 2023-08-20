@@ -21,7 +21,7 @@ Because Mapperly creates the mapping code at build time, there is minimal overhe
 Even better, the generated code is perfectly readable, allowing you to verify the generated mapping code easily.
 
 Mapperly works by using .NET Source Generators.
-Since no reflection is used at runtime, the generated code is completely trimming save and AoT friendly.
+Since no reflection is used at runtime, the generated code is completely trimming safe and AoT friendly.
 
 Mapperly was originally inspired by [MapStruct](https://mapstruct.org/).
 
