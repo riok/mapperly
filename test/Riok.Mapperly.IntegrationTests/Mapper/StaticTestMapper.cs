@@ -95,10 +95,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         [MapEnum(EnumMappingStrategy.ByName)]
         [MapEnumValue(TestEnumDtoAdditionalValue.Value40, TestEnum.Value30)]
+        [MapEnumValue(TestEnumDtoAdditionalValue.Value50, TestEnum.Value30)]
         public static partial TestEnum MapToEnumByNameWithExplicit(TestEnumDtoAdditionalValue v);
 
         [MapEnum(EnumMappingStrategy.ByValue)]
         [MapEnumValue(TestEnumDtoAdditionalValue.Value40, TestEnum.Value30)]
+        [MapEnumValue(TestEnumDtoAdditionalValue.Value50, TestEnum.Value30)]
         public static partial TestEnum MapToEnumByValueWithExplicit(TestEnumDtoAdditionalValue v);
 
         [MapEnum(EnumMappingStrategy.ByName)]

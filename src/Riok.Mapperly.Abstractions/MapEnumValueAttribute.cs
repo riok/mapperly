@@ -3,7 +3,7 @@ namespace Riok.Mapperly.Abstractions;
 /// <summary>
 /// Customizes how enum values are mapped
 /// </summary>
-[AttributeUsage(AttributeTargets.Method)]
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public sealed class MapEnumValueAttribute : Attribute
 {
     /// <summary>
