@@ -536,6 +536,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value20 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20,
                 global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value30 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
                 global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value40 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
+                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value50 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
                 _ => throw new System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnumDtoAdditionalValue is not supported"),
             };
         }
@@ -545,6 +546,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             return v switch
             {
                 global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value40 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
+                global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value50 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
                 _ => (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)v,
             };
         }
