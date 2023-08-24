@@ -58,6 +58,8 @@ public class SimpleMappingBuilderContext
 
     public WellKnownTypes Types => _compilationContext.Types;
 
+    public bool Static => _descriptor.Static;
+
     public SymbolAccessor SymbolAccessor { get; }
 
     public AttributeDataAccessor AttributeAccessor { get; }

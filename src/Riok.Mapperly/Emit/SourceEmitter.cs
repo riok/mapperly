@@ -14,7 +14,7 @@ public static class SourceEmitter
     public static CompilationUnitSyntax Build(MapperDescriptor descriptor, CancellationToken cancellationToken)
     {
         var ctx = new SourceEmitterContext(
-            descriptor.Symbol.IsStatic,
+            descriptor.Static,
             descriptor.NameBuilder,
             new SyntaxFactoryHelper(descriptor.Symbol.ContainingAssembly.Name)
         );

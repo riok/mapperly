@@ -13,27 +13,6 @@ public class UserMethodTest
     }
 
     [Fact]
-    public Task InstanceMapperShouldEmitDiagnosticForPartialStaticMethods()
-    {
-        var source = TestSourceBuilder.CSharp(
-            """
-            using System;
-            using System.Collections.Generic;
-            using Riok.Mapperly.Abstractions;
-
-            [Mapper]
-            public partial class MyMapper
-            {
-                public static object StaticToObject(string s);
-
-                public partial object InstanceToObject(string s);
-            }
-            """
-        );
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
     public Task InstanceMapperShouldSupportUserDefinedStaticMethods()
     {
         var source = TestSourceBuilder.CSharp(
