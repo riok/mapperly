@@ -38,6 +38,10 @@ public class MembersContainerBuilderContext<T> : MembersMappingBuilderContext<T>
         {
             var nullablePath = new MemberPath(nullableTrailPath);
             var type = nullablePath.Member.Type;
+
+            if (!nullablePath.Member.CanSet)
+                continue;
+
             if (!BuilderContext.SymbolAccessor.HasAccessibleParameterlessConstructor(type))
             {
                 BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, type);
