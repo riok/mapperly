@@ -92,4 +92,10 @@ public record MapperConfiguration
     /// Defaults to <see cref="IgnoreObsoleteMembersStrategy.None"/>.
     /// </summary>
     public IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy { get; init; }
+
+    /// <summary>
+    /// Defines the strategy used when emitting warnings for unmapped members.
+    /// By default this is <see cref="RequiredMappingStrategy.Both"/>, emitting warnings for unmapped source and target members.
+    /// </summary>
+    public RequiredMappingStrategy? RequiredMappingStrategy { get; init; }
 }

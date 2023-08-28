@@ -26,6 +26,8 @@ namespace Riok.Mapperly.IntegrationTests.Models
         public int RequiredValue { get; init; }
 #endif
 
+        public int UnmappedValue => 10;
+
         public string StringValue { get; set; } = string.Empty;
 
         public string RenamedStringValue { get; set; } = string.Empty;

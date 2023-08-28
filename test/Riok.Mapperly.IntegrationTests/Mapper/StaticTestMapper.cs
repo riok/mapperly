@@ -30,6 +30,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapperIgnoreSource(nameof(TestObject.IgnoredIntValue))]
         [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredStringValue))]
         [MapperIgnoreObsoleteMembers]
+        [MapperRequiredMapping(RequiredMappingStrategy.Target)]
         public static partial TestObjectDto MapToDtoExt(this TestObject src);
 
         public static TestObjectDto MapToDto(TestObject src)

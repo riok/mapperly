@@ -21,6 +21,7 @@ public class MapperConfigurationBuilderTest
             EnabledConversions = MappingConversionType.Dictionary,
             UseReferenceHandling = false,
             IgnoreObsoleteMembersStrategy = IgnoreObsoleteMembersStrategy.Target,
+            RequiredMappingStrategy = RequiredMappingStrategy.Target,
         };
 
         var mapper = MapperConfigurationMerger.Merge(mapperConfiguration, defaultMapperConfiguration);
@@ -34,6 +35,7 @@ public class MapperConfigurationBuilderTest
         mapper.EnabledConversions.Should().Be(MappingConversionType.Constructor);
         mapper.UseReferenceHandling.Should().BeTrue();
         mapper.IgnoreObsoleteMembersStrategy.Should().Be(IgnoreObsoleteMembersStrategy.Source);
+        mapper.RequiredMappingStrategy.Should().Be(RequiredMappingStrategy.Source);
     }
 
     [Fact]
@@ -51,6 +53,7 @@ public class MapperConfigurationBuilderTest
         mapper.EnabledConversions.Should().Be(MappingConversionType.Constructor);
         mapper.UseReferenceHandling.Should().BeTrue();
         mapper.IgnoreObsoleteMembersStrategy.Should().Be(IgnoreObsoleteMembersStrategy.Source);
+        mapper.RequiredMappingStrategy.Should().Be(RequiredMappingStrategy.Source);
     }
 
     [Fact]
@@ -84,6 +87,7 @@ public class MapperConfigurationBuilderTest
             EnabledConversions = MappingConversionType.Constructor,
             UseReferenceHandling = true,
             IgnoreObsoleteMembersStrategy = IgnoreObsoleteMembersStrategy.Source,
+            RequiredMappingStrategy = RequiredMappingStrategy.Source,
         };
     }
 }

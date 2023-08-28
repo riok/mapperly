@@ -4,6 +4,7 @@
   IntValue: 10,
   IntInitOnlyValue: 3,
   RequiredValue: 4,
+  UnmappedValue: 10,
   StringValue: fooBar,
   RenamedStringValue: fooBar2,
   Flattening: {
@@ -27,6 +28,7 @@
     CtorValue: 5,
     CtorValue2: 100,
     RequiredValue: 4,
+    UnmappedValue: 10,
     StringValue: ,
     RenamedStringValue: ,
     Flattening: {},
@@ -45,6 +47,7 @@
     CtorValue2: 100,
     IntValue: 99,
     RequiredValue: 98,
+    UnmappedValue: 10,
     StringValue: ,
     RenamedStringValue: ,
     Flattening: {},
