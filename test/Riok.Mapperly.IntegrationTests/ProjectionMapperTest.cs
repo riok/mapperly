@@ -26,6 +26,7 @@ namespace Riok.Mapperly.IntegrationTests
 
 #if NET7_0_OR_GREATER
         [Fact]
+        [VersionedSnapshot(Versions.NET8_0)]
         public Task ProjectionShouldTranslateToQuery()
         {
             return RunWithDatabase(ctx =>
