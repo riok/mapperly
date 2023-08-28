@@ -5,7 +5,7 @@
       Title: Source member is not mapped to any target member,
       Severity: Info,
       WarningLevel: 1,
-      Location: : (8,0)-(12,1),
+      Location: : (7,0)-(11,1),
       Description: ,
       HelpLink: ,
       MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},

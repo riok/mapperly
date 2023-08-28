@@ -38,20 +38,22 @@ public static class TestSourceBuilder
     {
         options ??= TestSourceBuilderOptions.Default;
 
-        return $@"
-using System;
-using System.Collections.Generic;
-using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Abstractions.ReferenceHandling;
+        return CSharp(
+            $$"""
+            using System;
+            using System.Collections.Generic;
+            using Riok.Mapperly.Abstractions;
+            using Riok.Mapperly.Abstractions.ReferenceHandling;
 
-{(options.Namespace != null ? $"namespace {options.Namespace};" : string.Empty)}
+            {{(options.Namespace != null ? $"namespace {options.Namespace};" : string.Empty)}}
 
-{BuildAttribute(options)}
-public partial class Mapper
-{{
-    {body}
-}}
-";
+            {{BuildAttribute(options)}}
+            public partial class Mapper
+            {
+                {{body}}
+            }
+            """
+        );
     }
 
     public static string MapperWithBodyAndTypes(
