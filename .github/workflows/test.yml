@@ -13,6 +13,10 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_NOLOGO: true
+
 jobs:
   sample:
     runs-on: ubuntu-latest
@@ -38,8 +42,6 @@ jobs:
       - uses: actions/setup-dotnet@v3.2.0
       - run: dotnet tool restore
       - run: RELEASE_VERSION="0.0.1-dev.$GITHUB_RUN_ID" ./build/package.sh
-      - run: dotnet meziantou.validate-nuget-package ./artifacts/*.nupkg
-      - run: dotnet validate package local ./artifacts/*.nupkg
       - uses: actions/upload-artifact@v3
         with:
           name: mapperly-nupkg
@@ -49,6 +51,19 @@ jobs:
         with:
           name: verify-test-results
           path: '**/*.received.*'
+  validate-package:
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3.2.0
+      - run: dotnet tool restore
+      - uses: actions/download-artifact@v3
+        with:
+          name: mapperly-nupkg
+          path: artifacts
+      - run: dotnet meziantou.validate-nuget-package ./artifacts/*.nupkg
+      - run: dotnet validate package local ./artifacts/*.nupkg
   integration-test:
     needs: package
     runs-on: ubuntu-latest
