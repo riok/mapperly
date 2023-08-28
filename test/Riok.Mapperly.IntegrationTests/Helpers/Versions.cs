@@ -8,5 +8,6 @@ namespace Riok.Mapperly.IntegrationTests.Helpers
         NETFRAMEWORK4_8 = 1 << 0,
         NET6_0 = 1 << 1,
         NET7_0 = 1 << 2,
+        NET8_0 = 1 << 3,
     }
 }

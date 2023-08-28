@@ -29,9 +29,10 @@
     <PackageReference Include="Riok.Mapperly" Version="$(MapperlyNugetPackageVersion)" />
   </ItemGroup>
 
-  <!-- ef core tests should only run on net7 -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" />
+  <!-- ef core tests should only run on newer .NET versions -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" Condition="'$(TargetFramework)' == 'net7.0'" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0-preview.*" Condition="'$(TargetFramework)' == 'net8.0'" />
   </ItemGroup>
 
   <!-- cannot use source generated polyfills since they require language version 11 -->
