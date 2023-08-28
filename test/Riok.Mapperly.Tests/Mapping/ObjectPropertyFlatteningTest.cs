@@ -391,6 +391,28 @@ public class ObjectPropertyFlatteningTest
     }
 
     [Fact]
+    public void ManualUnflattenedPropertyReadOnlyNullablePath()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty($\"MyValueId\", \"Value.Id\")] partial B Map(A source);",
+            "class A { public string MyValueId { get; set; } }",
+            "class B { public C? Value { get; } }",
+            "class C { public string Id { get; set; } public string Id2 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value.Id = source.MyValueId;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void ManualUnflattenedPropertyDeepNullablePath()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
