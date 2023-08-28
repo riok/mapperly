@@ -3,9 +3,9 @@ using Riok.Mapperly.Abstractions.ReferenceHandling;
 namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
-/// Marks an abstract class or an interface as a mapper.
+/// Marks a partial class as a mapper.
 /// </summary>
-[AttributeUsage(AttributeTargets.Interface | AttributeTargets.Class)]
+[AttributeUsage(AttributeTargets.Class)]
 public sealed class MapperAttribute : Attribute
 {
     /// <summary>
