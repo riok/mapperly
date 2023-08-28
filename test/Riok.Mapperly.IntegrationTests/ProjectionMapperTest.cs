@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using Riok.Mapperly.IntegrationTests.Models;
 using VerifyXunit;
@@ -16,6 +17,7 @@ namespace Riok.Mapperly.IntegrationTests
     public class ProjectionMapperTest : BaseMapperTest
     {
         [Fact]
+        [VersionedSnapshot(Versions.NET6_0 | Versions.NET7_0)]
         public Task SnapshotGeneratedSource()
         {
             var path = GetGeneratedMapperFilePath(nameof(ProjectionMapper));
@@ -26,26 +28,40 @@ namespace Riok.Mapperly.IntegrationTests
         [Fact]
         public Task ProjectionShouldTranslateToQuery()
         {
-            return RunWithDatabase(async ctx =>
+            return RunWithDatabase(ctx =>
             {
                 var query = ctx.Objects.ProjectToDto();
-                await Verifier.Verify(query.ToQueryString(), "sql").UseTextForParameters("query");
+                return Verifier.Verify(query.ToQueryString(), "sql");
+            });
+        }
 
-                var objects = await query.ToListAsync();
-                await Verifier.Verify(objects).UseTextForParameters("result");
+        [Fact]
+        public Task ProjectionShouldTranslateToResult()
+        {
+            return RunWithDatabase(async ctx =>
+            {
+                var objects = await ctx.Objects.ProjectToDto().ToListAsync();
+                await Verifier.Verify(objects);
             });
         }
 
         [Fact]
         public Task DerivedTypesProjectionShouldTranslateToQuery()
         {
-            return RunWithDatabase(async ctx =>
+            return RunWithDatabase(ctx =>
             {
                 var query = ctx.BaseTypeObjects.OrderBy(x => x.BaseValue).ProjectToDto();
-                await Verifier.Verify(query.ToQueryString(), "sql").UseTextForParameters("query");
+                return Verifier.Verify(query.ToQueryString(), "sql");
+            });
+        }
 
-                var objects = await query.ToListAsync();
-                await Verifier.Verify(objects).UseTextForParameters("result");
+        [Fact]
+        public Task DerivedTypesProjectionShouldTranslateToResult()
+        {
+            return RunWithDatabase(async ctx =>
+            {
+                var objects = await ctx.BaseTypeObjects.OrderBy(x => x.BaseValue).ProjectToDto().ToListAsync();
+                await Verifier.Verify(objects);
             });
         }
 

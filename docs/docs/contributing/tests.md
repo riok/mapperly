@@ -36,7 +36,15 @@ These tests run locally by referencing the source generator as an analyzer.
 In the CI pipeline, the integration tests reference the built NuGet package and
 are run on several supported target frameworks (including .NET 7.0 but also .NET Framework).
 
-Snapshots of the generated code are stored per Roslyn version.
+If the content of the snapshot is different depending on the target framework used,
+`[VersionedSnapshot(...)]` can be applied on a test class or method.
+The version of each version,
+which produces a changed snapshot content should be passed to the `VersionedSnapshotAttribute`.
+Eg.
+if a snapshots content is different for .NET 6.0, .NET 7.0 and .NET Framework 4.8 but .NET 8.0 is the same as .NET 7.0,
+`[VersionedSnapshot(Versions.NET6_0 | Versions.NET7_0)]` can be applied.
+The resulting snapshot is then stored three times:
+in `default` for .NET Framework 4.8, in `NET6_0` for .NET 6.0 and in `NET7_0` for .NET 7.0 and later.
 You may need to manually update older versions.
 The received snapshots of the tests are saved in the GitHub Actions as artifacts
 and can be downloaded.

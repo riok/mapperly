@@ -118,7 +118,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.ExistingISet.Add(ParseableInt(item));
             }
 
-            target.ExistingHashSet.EnsureCapacity(src.ExistingHashSet.Count + target.ExistingHashSet.Count);
             foreach (var item1 in src.ExistingHashSet)
             {
                 target.ExistingHashSet.Add(ParseableInt(item1));
@@ -131,7 +130,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
             MapExistingList(src.ExistingList, target.ExistingList);
             target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(src.ISet, x => ParseableInt(x)));
-            target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(src.IReadOnlySet, x => ParseableInt(x)));
             target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(src.HashSet, x => ParseableInt(x)));
             target.SortedSet = new global::System.Collections.Generic.SortedSet<int>(global::System.Linq.Enumerable.Select(src.SortedSet, x => ParseableInt(x)));
             target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)src.EnumValue;
@@ -222,7 +220,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.ExistingISet.Add(ParseableInt(item));
             }
 
-            target.ExistingHashSet.EnsureCapacity(testObject.ExistingHashSet.Count + target.ExistingHashSet.Count);
             foreach (var item1 in testObject.ExistingHashSet)
             {
                 target.ExistingHashSet.Add(ParseableInt(item1));
@@ -235,7 +232,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
             MapExistingList(testObject.ExistingList, target.ExistingList);
             target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(testObject.ISet, x => ParseableInt(x)));
-            target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(testObject.IReadOnlySet, x => ParseableInt(x)));
             target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(testObject.HashSet, x => ParseableInt(x)));
             target.SortedSet = new global::System.Collections.Generic.SortedSet<int>(global::System.Linq.Enumerable.Select(testObject.SortedSet, x => ParseableInt(x)));
             target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)testObject.EnumValue;
@@ -308,7 +304,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.ExistingISet.Add(item.ToString());
             }
 
-            target.ExistingHashSet.EnsureCapacity(dto.ExistingHashSet.Count + target.ExistingHashSet.Count);
             foreach (var item1 in dto.ExistingHashSet)
             {
                 target.ExistingHashSet.Add(item1.ToString());
@@ -319,14 +314,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.ExistingSortedSet.Add(item2.ToString());
             }
 
-            target.ExistingList.EnsureCapacity(dto.ExistingList.Count + target.ExistingList.Count);
             foreach (var item3 in dto.ExistingList)
             {
                 target.ExistingList.Add(item3.ToString());
             }
 
             target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.ISet, x => x.ToString()));
-            target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.IReadOnlySet, x => x.ToString()));
             target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.HashSet, x => x.ToString()));
             target.SortedSet = new global::System.Collections.Generic.SortedSet<string>(global::System.Linq.Enumerable.Select(dto.SortedSet, x => x.ToString()));
             target.EnumValue = MapToEnumByValueCheckDefined(dto.EnumValue);
@@ -404,7 +397,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.ExistingISet.Add(ParseableInt(item));
             }
 
-            target.ExistingHashSet.EnsureCapacity(source.ExistingHashSet.Count + target.ExistingHashSet.Count);
             foreach (var item1 in source.ExistingHashSet)
             {
                 target.ExistingHashSet.Add(ParseableInt(item1));
@@ -417,7 +409,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
             MapExistingList(source.ExistingList, target.ExistingList);
             target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(source.ISet, x => ParseableInt(x)));
-            target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(source.IReadOnlySet, x => ParseableInt(x)));
             target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(source.HashSet, x => ParseableInt(x)));
             target.SortedSet = new global::System.Collections.Generic.SortedSet<int>(global::System.Linq.Enumerable.Select(source.SortedSet, x => ParseableInt(x)));
             target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)source.EnumValue;
@@ -653,7 +644,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue1) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue1,
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue2) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue2,
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue3) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue3,
-                _ => System.Enum.Parse<global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue>(source, false),
+                _ => (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)System.Enum.Parse(typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue), source, false),
             };
         }
 
@@ -707,7 +698,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 nameof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10) => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10,
                 nameof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20) => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20,
                 nameof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30) => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
-                _ => System.Enum.Parse<global::Riok.Mapperly.IntegrationTests.Models.TestEnum>(source, false),
+                _ => (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)System.Enum.Parse(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum), source, false),
             };
         }
 
