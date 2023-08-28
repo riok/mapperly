@@ -6,10 +6,18 @@ namespace Riok.Mapperly.Helpers;
 
 internal static class SymbolExtensions
 {
+    private static readonly SymbolDisplayFormat _fullyQualifiedNullableFormat =
+        SymbolDisplayFormat.FullyQualifiedFormat.AddMiscellaneousOptions(
+            SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier
+        );
+
     private static readonly ImmutableHashSet<string> _wellKnownImmutableTypes = ImmutableHashSet.Create(
         typeof(Uri).FullName!,
         typeof(Version).FullName!
     );
+
+    internal static string FullyQualifiedIdentifierName(this ITypeSymbol typeSymbol) =>
+        typeSymbol.ToDisplayString(_fullyQualifiedNullableFormat);
 
     internal static bool IsImmutable(this ISymbol symbol) =>
         symbol is INamedTypeSymbol namedSymbol

@@ -1,10 +1,10 @@
 ﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
-using Riok.Mapperly.Emit;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
@@ -16,8 +16,10 @@ public class UserImplementedExistingTargetMethodMapping : ExistingTargetMapping,
     private readonly MethodParameter _sourceParameter;
     private readonly MethodParameter _targetParameter;
     private readonly MethodParameter? _referenceHandlerParameter;
+    private readonly string? _receiver;
 
     public UserImplementedExistingTargetMethodMapping(
+        string? receiver,
         IMethodSymbol method,
         MethodParameter sourceParameter,
         MethodParameter targetParameter,
@@ -29,14 +31,10 @@ public class UserImplementedExistingTargetMethodMapping : ExistingTargetMapping,
         _sourceParameter = sourceParameter;
         _targetParameter = targetParameter;
         _referenceHandlerParameter = referenceHandlerParameter;
+        _receiver = receiver;
     }
 
     public IMethodSymbol Method { get; }
-
-    public ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
-        throw new InvalidOperationException(
-            $"{nameof(UserImplementedExistingTargetMethodMapping)} {ctx.Source}, {ctx.ReferenceHandler} does not support {nameof(Build)}"
-        );
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
@@ -44,9 +42,9 @@ public class UserImplementedExistingTargetMethodMapping : ExistingTargetMapping,
         // we explicitly cast to be able to use the default interface implementation or explicit implementations
         if (Method.ReceiverType?.TypeKind != TypeKind.Interface)
         {
-            yield return SyntaxFactory.ExpressionStatement(
-                SyntaxFactoryHelper.Invocation(
-                    Method.Name,
+            yield return ExpressionStatement(
+                Invocation(
+                    _receiver == null ? IdentifierName(Method.Name) : MemberAccess(_receiver, Method.Name),
                     _sourceParameter.WithArgument(ctx.Source),
                     _targetParameter.WithArgument(target),
                     _referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
@@ -55,13 +53,13 @@ public class UserImplementedExistingTargetMethodMapping : ExistingTargetMapping,
             yield break;
         }
 
-        var castedThis = SyntaxFactory.CastExpression(
-            SyntaxFactoryHelper.FullyQualifiedIdentifier(Method.ReceiverType!),
-            SyntaxFactory.ThisExpression()
+        var castedThis = CastExpression(
+            FullyQualifiedIdentifier(Method.ReceiverType!),
+            _receiver != null ? IdentifierName(_receiver) : ThisExpression()
         );
-        var method = SyntaxFactoryHelper.MemberAccess(SyntaxFactory.ParenthesizedExpression(castedThis), Method.Name);
-        yield return SyntaxFactory.ExpressionStatement(
-            SyntaxFactoryHelper.Invocation(
+        var method = MemberAccess(ParenthesizedExpression(castedThis), Method.Name);
+        yield return ExpressionStatement(
+            Invocation(
                 method,
                 _sourceParameter.WithArgument(ctx.Source),
                 _targetParameter.WithArgument(target),

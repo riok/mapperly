@@ -419,4 +419,13 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true
     );
+
+    public static readonly DiagnosticDescriptor ExternalMapperMemberCannotBeNullable = new DiagnosticDescriptor(
+        "RMG048",
+        "Used mapper members cannot be nullable",
+        "The used mapper member {0} cannot be nullable",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
 }

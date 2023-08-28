@@ -1,0 +1,88 @@
+---
+sidebar_position: 5
+description: Manually implement mappings
+---
+
+import Tabs from '@theme/Tabs';
+
+# User implemented mapping methods
+
+If Mapperly cannot generate a mapping, one can implement it manually simply by providing a method body in the mapper declaration:
+
+```csharp
+[Mapper]
+public partial class CarMapper
+{
+    public partial CarDto CarToCarDto(Car car);
+
+    private int TimeSpanToHours(TimeSpan t) => t.Hours;
+}
+```
+
+Whenever Mapperly needs a mapping from `TimeSpan` to `int` inside the `CarMapper` implementation, it will use the provided implementation.
+
+## Use external mappings
+
+Mapperly can also consider mappings implemented in other classes.
+In order for Mapperly to find the mappings, they must be made known with `UseMapper` / `UseStaticMapper`.
+
+<!-- do not indent this, it won't work, https://stackoverflow.com/a/67579641/3302887 -->
+
+<Tabs>
+<TabItem value="static" label="Static">
+
+For static mappings, `UseStaticMapper` can be used:
+
+```csharp
+[Mapper]
+// highlight-start
+[UseStaticMapper<BananaMapper>] // for c# language level ≥ 11
+[UseStaticMapper(typeof(BananaMapper))] // for c# language level < 11
+// highlight-end
+public static partial class BoxMapper
+{
+  public static partial BananaBox MapBananaBox(BananaBoxDto dto);
+}
+
+public static class BananaMapper
+{
+  public static Banana MapBanana(BananaDto dto)
+    => new Banana(dto.Weigth);
+}
+```
+
+</TabItem>
+<TabItem value="instance" label="Instance">
+
+To use the mappings of an object instance `UseMapper` can be used:
+
+```csharp
+[Mapper]
+public static partial class BoxMapper
+{
+    // highlight-start
+    [UseMapper]
+    private readonly BananaMapper _bananaMapper = new();
+    // highlight-end
+
+    public static partial BananaBox MapBananaBox(BananaBoxDto dto);
+}
+
+public static class BananaMapper
+{
+    public static Banana MapBanana(BananaDto dto)
+        => new Banana(dto.Weigth);
+}
+```
+
+:::info
+The initialization of fields and properties annotated with `UseMapper` needs to be done by the user.
+:::
+
+</TabItem>
+</Tabs>
+
+Whenever Mapperly needs a mapping from `BananaBox` to `BananaBoxDto` inside the `BoxMapper` implementation,
+it will use the provided implementation by the `BananaMapper`.
+
+Used mappers themselves can be Mapperly backed classes.

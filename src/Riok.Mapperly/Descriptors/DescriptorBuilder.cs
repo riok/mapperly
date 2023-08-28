@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
 using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Descriptors.ExternalMappings;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders;
 using Riok.Mapperly.Descriptors.MappingBuilders;
 using Riok.Mapperly.Descriptors.ObjectFactories;
@@ -33,11 +34,14 @@ public class DescriptorBuilder
         _mapperDescriptor = new MapperDescriptor(mapperSyntax, mapperSymbol, _methodNameBuilder);
         _symbolAccessor = symbolAccessor;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
+
+        var attributeAccessor = new AttributeDataAccessor(symbolAccessor);
         _builderContext = new SimpleMappingBuilderContext(
             compilation,
-            new MapperConfiguration(symbolAccessor, mapperSymbol),
+            new MapperConfiguration(attributeAccessor, mapperSymbol),
             wellKnownTypes,
             _symbolAccessor,
+            attributeAccessor,
             _mapperDescriptor,
             _diagnostics,
             new MappingBuilder(_mappings),
@@ -50,6 +54,7 @@ public class DescriptorBuilder
         ReserveMethodNames();
         ExtractObjectFactories();
         ExtractUserMappings();
+        ExtractExternalMappings();
         _mappingBodyBuilder.BuildMappingBodies();
         BuildMappingMethodNames();
         BuildReferenceHandlingParameters();
@@ -76,6 +81,14 @@ public class DescriptorBuilder
 
             _mappings.Add(userMapping);
             _mappings.EnqueueToBuildBody(userMapping, ctx);
+        }
+    }
+
+    private void ExtractExternalMappings()
+    {
+        foreach (var externalMapping in ExternalMappingsExtractor.ExtractExternalMappings(_builderContext, _mapperDescriptor.Symbol))
+        {
+            _mappings.Add(externalMapping);
         }
     }
 

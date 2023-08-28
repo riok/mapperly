@@ -48,7 +48,7 @@ public static class TestSourceBuilder
             {{(options.Namespace != null ? $"namespace {options.Namespace};" : string.Empty)}}
 
             {{BuildAttribute(options)}}
-            public partial class Mapper
+            public partial class {{options.MapperClassName}}
             {
                 {{body}}
             }

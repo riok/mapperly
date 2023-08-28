@@ -8,7 +8,7 @@ namespace Riok.Mapperly.Configuration;
 /// <summary>
 /// Creates <see cref="Attribute"/> instances by resolving attribute data from provided symbols.
 /// </summary>
-internal class AttributeDataAccessor
+public class AttributeDataAccessor
 {
     private const string NameOfOperatorName = "nameof";
     private const char FullNameOfPrefix = '@';
@@ -26,6 +26,9 @@ internal class AttributeDataAccessor
     public TData? AccessFirstOrDefault<TAttribute, TData>(ISymbol symbol)
         where TAttribute : Attribute
         where TData : notnull => Access<TAttribute, TData>(symbol).FirstOrDefault();
+
+    public bool HasAttribute<TAttribute>(ISymbol symbol)
+        where TAttribute : Attribute => _symbolAccessor.GetAttributes<TAttribute>(symbol).Any();
 
     public IEnumerable<TAttribute> Access<TAttribute>(ISymbol symbol)
         where TAttribute : Attribute => Access<TAttribute, TAttribute>(symbol);
@@ -60,13 +63,14 @@ internal class AttributeDataAccessor
             var attr = Create<TData>(typeArguments, attrData.ConstructorArguments, syntaxArguments);
 
             var syntaxIndex = attrData.ConstructorArguments.Length;
+            var propertiesByName = dataType.GetProperties().GroupBy(x => x.Name).ToDictionary(x => x.Key, x => x.First());
             foreach (var namedArgument in attrData.NamedArguments)
             {
-                var prop = dataType.GetProperty(namedArgument.Key);
-                if (prop == null)
+                if (!propertiesByName.TryGetValue(namedArgument.Key, out var prop))
                     throw new InvalidOperationException($"Could not get property {namedArgument.Key} of attribute {attrType.FullName}");
 
-                prop.SetValue(attr, BuildArgumentValue(namedArgument.Value, prop.PropertyType, syntaxArguments[syntaxIndex]));
+                var value = BuildArgumentValue(namedArgument.Value, prop.PropertyType, syntaxArguments[syntaxIndex]);
+                prop.SetValue(attr, value);
                 syntaxIndex++;
             }
 

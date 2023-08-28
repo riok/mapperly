@@ -20,10 +20,6 @@ public static class SyntaxFactoryHelper
     private const string NullReferenceExceptionClassName = "System.NullReferenceException";
 
     public static readonly IdentifierNameSyntax VarIdentifier = IdentifierName("var");
-    private static readonly SymbolDisplayFormat _fullyQualifiedNullableFormat =
-        SymbolDisplayFormat.FullyQualifiedFormat.AddMiscellaneousOptions(
-            SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier
-        );
     private static readonly IdentifierNameSyntax _nameofIdentifier = IdentifierName("nameof");
 
     private static readonly Regex FormattableStringPlaceholder = new Regex(
@@ -307,21 +303,21 @@ public static class SyntaxFactoryHelper
     public static string StaticMethodString(IMethodSymbol method)
     {
         var receiver = method.ReceiverType ?? throw new ArgumentException(nameof(method.ReceiverType) + " is null", nameof(method));
-        var qualifiedReceiverName = FullyQualifiedIdentifierName(receiver.NonNullable());
+        var qualifiedReceiverName = receiver.NonNullable().FullyQualifiedIdentifierName();
         return $"{qualifiedReceiverName}.{method.Name}";
     }
 
     public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ExpressionSyntax[] arguments)
     {
         var receiver = method.ReceiverType ?? throw new ArgumentException(nameof(method.ReceiverType) + " is null", nameof(method));
-        var qualifiedReceiverName = FullyQualifiedIdentifierName(receiver.NonNullable());
+        var qualifiedReceiverName = receiver.NonNullable().FullyQualifiedIdentifierName();
         return StaticInvocation(qualifiedReceiverName, method.Name, arguments);
     }
 
     public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ArgumentSyntax[] arguments)
     {
         var receiver = method.ReceiverType ?? throw new ArgumentException(nameof(method.ReceiverType) + " is null", nameof(method));
-        var qualifiedReceiverName = FullyQualifiedIdentifierName(receiver.NonNullable());
+        var qualifiedReceiverName = receiver.NonNullable().FullyQualifiedIdentifierName();
 
         var receiverTypeIdentifier = IdentifierName(qualifiedReceiverName);
         var methodAccess = MemberAccessExpression(
@@ -414,9 +410,7 @@ public static class SyntaxFactoryHelper
     public static IdentifierNameSyntax NonNullableIdentifier(ITypeSymbol t) => FullyQualifiedIdentifier(t.NonNullable());
 
     public static IdentifierNameSyntax FullyQualifiedIdentifier(ITypeSymbol typeSymbol) =>
-        IdentifierName(FullyQualifiedIdentifierName(typeSymbol));
-
-    public static string FullyQualifiedIdentifierName(ITypeSymbol typeSymbol) => typeSymbol.ToDisplayString(_fullyQualifiedNullableFormat);
+        IdentifierName(typeSymbol.FullyQualifiedIdentifierName());
 
     public static IReadOnlyCollection<StatementSyntax> SingleStatement(ExpressionSyntax expression) =>
         new[] { ExpressionStatement(expression) };
