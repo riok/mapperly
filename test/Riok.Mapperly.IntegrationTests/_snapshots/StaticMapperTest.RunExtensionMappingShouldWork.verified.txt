@@ -4,16 +4,11 @@
   IntValue: 10,
   IntInitOnlyValue: 3,
   RequiredValue: 4,
-  StringValue: fooBar+after-map,
-  RenamedStringValue2: fooBar2,
+  StringValue: fooBar,
+  RenamedStringValue2: ,
   FlatteningIdValue: 10,
   NullableFlatteningIdValue: 100,
-  Unflattening: {
-    IdValue: 20
-  },
-  NullableUnflattening: {
-    IdValue: 200
-  },
+  Unflattening: {},
   NestedNullableIntValue: 100,
   NestedNullable: {
     IntValue: 100
@@ -150,11 +145,6 @@
     3
   ],
   ISet: [
-    1,
-    2,
-    3
-  ],
-  IReadOnlySet: [
     1,
     2,
     3

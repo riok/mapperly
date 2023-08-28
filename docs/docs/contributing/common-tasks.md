@@ -36,13 +36,14 @@ To support a new roslyn version via multi targeting follow these steps (see also
 2. Create a new file `Riok.Mapperly.Roslyn$(Version).props` in `src/Riok.Mapperly` similar to the existing ones
    and define constants and include dependencies as needed.
 3. Update the default `ROSLYN_VERSION` in `src/Riok.Mapperly/Riok.Mapperly.csproj`.
-4. Update the `Microsoft.CodeAnalysis.CSharp` dependency version in `test/Riok.Mapperly.Tests/Riok.Mapperly.Tests.csproj`.
+4. Update the `Microsoft.CodeAnalysis.CSharp` dependency version.
 5. Adjust the .NET version matrix of the `integration-test` GitHub Actions job (defined in `.github/workflows/test.yml`)
    to include a dotnet version which is based on the added Roslyn version.
 6. Adjust the .NET version in the `global.json` file as needed.
-7. If generated code changes based on the new Roslyn version,
-   introduce a new `roslynVersionName` in `Riok.Mapperly.IntegrationTests.BaseMapperTest.GetRoslynVersion()` and generate the new snapshots.
-8. Adjust the documentation as needed.
+7. Add the new version in `Riok.Mapperly.IntegrationTests.Helpers.Versions` and `Riok.Mapperly.IntegrationTests.BaseMapperTest.GetCurrentVersion`.
+8. If generated code changes based on the new Roslyn version,
+   adjust the `VersionedSnapshotAttribute`s as needed.
+9. Adjust the documentation as needed.
 
 ## Mapping syntax
 

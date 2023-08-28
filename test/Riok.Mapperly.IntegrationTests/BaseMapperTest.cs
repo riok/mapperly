@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Riok.Mapperly.IntegrationTests.Dto;
+using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Models;
 using VerifyTests;
 using VerifyXunit;
@@ -30,7 +33,11 @@ namespace Riok.Mapperly.IntegrationTests
 
             Verifier.DerivePathInfo(
                 (file, _, type, method) =>
-                    new PathInfo(Path.Combine(Path.GetDirectoryName(file)!, "_snapshots", GetPlatformVersion()), type.Name, method.Name)
+                    new PathInfo(
+                        Path.Combine(Path.GetDirectoryName(file)!, "_snapshots"),
+                        type.Name,
+                        method.Name + GetSnapshotVersionSuffix(type, method)
+                    )
             );
         }
 
@@ -120,14 +127,50 @@ namespace Riok.Mapperly.IntegrationTests
             };
         }
 
-        private static string GetPlatformVersion()
+        /// <summary>
+        /// Gets the version of the snapshot.
+        /// If the test is not a <see cref="VersionedSnapshotAttribute"/>, empty string is returned.
+        /// Otherwise either the current version, or the latest version of the <see cref="VersionedSnapshotAttribute"/> prefixed with a _ is returned.
+        /// </summary>
+        /// <param name="type">The type of the test method.</param>
+        /// <param name="method">The test method.</param>
+        /// <returns>Either an empty string or the name of the version.</returns>
+        private static string GetSnapshotVersionSuffix(Type type, MethodInfo method)
         {
-#if NET48_OR_GREATER
-            return "NET_48";
+            var versionedSnapshot =
+                method.GetCustomAttribute<VersionedSnapshotAttribute>() ?? type.GetCustomAttribute<VersionedSnapshotAttribute>();
+            if (versionedSnapshot == null)
+                return string.Empty;
+
+            var currentVersion = GetCurrentVersion();
+            if (versionedSnapshot.VersionsWithChanges.HasFlag(currentVersion))
+                return "_" + currentVersion;
+
+            var supportedVersions = Enum.GetValues(typeof(Versions))
+                .Cast<Versions>()
+                .Where(x => x < currentVersion)
+                .OrderByDescending(x => x);
+            foreach (var supportedVersion in supportedVersions)
+            {
+                if (versionedSnapshot.VersionsWithChanges.HasFlag(supportedVersion))
+                    return "_" + supportedVersion;
+            }
+
+            return string.Empty;
+        }
+
+        private static Versions GetCurrentVersion()
+        {
+#if NET8_0_OR_GREATER
+            return Versions.NET8_0;
 #elif NET7_0_OR_GREATER
-            return "Roslyn_4_5";
+            return Versions.NET7_0;
+#elif NET6_0_OR_GREATER
+            return Versions.NET6_0;
+#elif NET48_OR_GREATER
+            return Versions.NETFRAMEWORK4_8;
 #else
-            return "Roslyn_4_4_OR_LOWER";
+            throw new InvalidOperationException("Target framework is not supported");
 #endif
         }
     }

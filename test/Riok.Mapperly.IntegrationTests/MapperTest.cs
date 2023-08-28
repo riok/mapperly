@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using VerifyXunit;
 using Xunit;
@@ -6,6 +7,7 @@ using Xunit;
 namespace Riok.Mapperly.IntegrationTests
 {
     [UsesVerify]
+    [VersionedSnapshot(Versions.NET6_0 | Versions.NET7_0)]
     public class MapperTest : BaseMapperTest
     {
         [Fact]
