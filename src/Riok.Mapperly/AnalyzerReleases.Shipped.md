@@ -106,3 +106,11 @@ RMG044  | Mapper   | Warning  | An ignored enum member can not be found on the s
 RMG045  | Mapper   | Warning  | An ignored enum member can not be found on the target enum
 RMG046  | Mapper   | Error    | The used C# language version is not supported by Mapperly, Mapperly requires at least C# 9.0
 RMG047  | Mapper   | Error    | Cannot map to member path due to modifying a temporary value, see CS1612
+
+## Release 3.2
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+RMG048 | Mapper | Error | Used mapper members cannot be nullable

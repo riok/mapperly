@@ -19,6 +19,7 @@ public class SimpleMappingBuilderContext
         MapperConfiguration configuration,
         WellKnownTypes types,
         SymbolAccessor symbolAccessor,
+        AttributeDataAccessor attributeAccessor,
         MapperDescriptor descriptor,
         List<Diagnostic> diagnostics,
         MappingBuilder mappingBuilder,
@@ -33,6 +34,7 @@ public class SimpleMappingBuilderContext
         _diagnostics = diagnostics;
         MappingBuilder = mappingBuilder;
         ExistingTargetMappingBuilder = existingTargetMappingBuilder;
+        AttributeAccessor = attributeAccessor;
     }
 
     protected SimpleMappingBuilderContext(SimpleMappingBuilderContext ctx)
@@ -41,6 +43,7 @@ public class SimpleMappingBuilderContext
             ctx._configuration,
             ctx.Types,
             ctx.SymbolAccessor,
+            ctx.AttributeAccessor,
             ctx._descriptor,
             ctx._diagnostics,
             ctx.MappingBuilder,
@@ -54,6 +57,8 @@ public class SimpleMappingBuilderContext
     public WellKnownTypes Types { get; }
 
     public SymbolAccessor SymbolAccessor { get; }
+
+    public AttributeDataAccessor AttributeAccessor { get; }
 
     protected MappingBuilder MappingBuilder { get; }
 

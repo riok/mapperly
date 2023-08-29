@@ -26,14 +26,17 @@ public static class TestHelper
     public static MapperGenerationResult GenerateMapper(
         string source,
         TestHelperOptions? options = null,
-        IReadOnlyCollection<TestAssembly>? additionalAssemblies = null
+        IReadOnlyCollection<TestAssembly>? additionalAssemblies = null,
+        string? GeneratedTreeFileName = $"{TestSourceBuilderOptions.DefaultMapperClassName}.g.cs"
     )
     {
         options ??= TestHelperOptions.NoDiagnostics;
 
         var result = Generate(source, options, additionalAssemblies).GetRunResult();
 
-        var methods = ExtractAllMethods(result.GeneratedTrees.SingleOrDefault()?.GetRoot())
+        var methods = ExtractAllMethods(
+                result.GeneratedTrees.SingleOrDefault(x => Path.GetFileName(x.FilePath) == GeneratedTreeFileName)?.GetRoot()
+            )
             .Select(x => new GeneratedMethod(x))
             .ToDictionary(x => x.Name);
 

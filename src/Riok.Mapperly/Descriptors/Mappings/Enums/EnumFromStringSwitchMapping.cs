@@ -60,7 +60,7 @@ public class EnumFromStringSwitchMapping : MethodMapping
             .WithDesignation(SingleVariableDesignation(Identifier(ignoreCaseSwitchDesignatedVariableName)));
 
         // source.Value1
-        var typeMemberAccess = MemberAccess(FullyQualifiedIdentifierName(field.ContainingType.NonNullable()), field.Name);
+        var typeMemberAccess = MemberAccess(field.ContainingType.NonNullable().FullyQualifiedIdentifierName(), field.Name);
 
         // when s.Equals(nameof(source.Value1), StringComparison.OrdinalIgnoreCase)
         var whenClause = WhenClause(

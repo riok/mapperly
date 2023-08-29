@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Configuration;
@@ -10,9 +9,9 @@ public class MapperConfiguration
     private readonly MappingConfiguration _defaultConfiguration;
     private readonly AttributeDataAccessor _dataAccessor;
 
-    public MapperConfiguration(SymbolAccessor symbolAccessor, ISymbol mapperSymbol)
+    public MapperConfiguration(AttributeDataAccessor dataAccessor, ISymbol mapperSymbol)
     {
-        _dataAccessor = new AttributeDataAccessor(symbolAccessor);
+        _dataAccessor = dataAccessor;
         Mapper = _dataAccessor.AccessSingle<MapperAttribute>(mapperSymbol);
         _defaultConfiguration = new MappingConfiguration(
             new EnumMappingConfiguration(

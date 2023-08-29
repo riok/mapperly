@@ -4,6 +4,7 @@ namespace Riok.Mapperly.Tests;
 
 public record TestSourceBuilderOptions(
     string? Namespace = null,
+    string MapperClassName = TestSourceBuilderOptions.DefaultMapperClassName,
     bool? UseDeepCloning = null,
     bool? UseReferenceHandling = null,
     bool? ThrowOnMappingNullMismatch = null,
@@ -16,6 +17,8 @@ public record TestSourceBuilderOptions(
     IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy = null
 )
 {
+    public const string DefaultMapperClassName = "Mapper";
+
     public static readonly TestSourceBuilderOptions Default = new();
     public static readonly TestSourceBuilderOptions WithDeepCloning = new(UseDeepCloning: true);
     public static readonly TestSourceBuilderOptions WithReferenceHandling = new(UseReferenceHandling: true);

@@ -24,4 +24,4 @@ Try to rebuild the solution or restart the IDE. This is a bug of the IDE.
 
 ## My advanced use case isn't supported by Mapperly or needs lots of configuration. What should I do?
 
-Write the mapping for that class manually. You can mix automatically generated mappings and [user implemented mappings](../configuration/user-implemented-methods.md) without problems.
+Write the mapping for that class manually. You can mix automatically generated mappings and [user implemented mappings](../configuration/user-implemented-methods.mdx) without problems.

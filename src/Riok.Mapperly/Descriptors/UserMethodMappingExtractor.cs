@@ -11,14 +11,14 @@ namespace Riok.Mapperly.Descriptors;
 
 public static class UserMethodMappingExtractor
 {
-    public static IEnumerable<IUserMapping> ExtractUserMappings(SimpleMappingBuilderContext ctx, ITypeSymbol mapperSymbol)
+    internal static IEnumerable<IUserMapping> ExtractUserMappings(SimpleMappingBuilderContext ctx, ITypeSymbol mapperSymbol)
     {
         // extract user implemented and user defined mappings from mapper
         foreach (var methodSymbol in ExtractMethods(mapperSymbol))
         {
             var mapping =
                 BuilderUserDefinedMapping(ctx, methodSymbol, mapperSymbol.IsStatic)
-                ?? BuildUserImplementedMapping(ctx, methodSymbol, false, mapperSymbol.IsStatic);
+                ?? BuildUserImplementedMapping(ctx, methodSymbol, null, false, mapperSymbol.IsStatic);
             if (mapping != null)
                 yield return mapping;
         }
@@ -28,40 +28,65 @@ public static class UserMethodMappingExtractor
             yield break;
 
         // extract user implemented mappings from base methods
-        foreach (var method in ExtractBaseMethods(ctx, mapperSymbol))
+        var methods = mapperSymbol.AllInterfaces.SelectMany(ctx.SymbolAccessor.GetAllMethods);
+        if (mapperSymbol.BaseType is { } mapperBaseSymbol)
         {
+            methods = methods.Concat(ctx.SymbolAccessor.GetAllMethods(mapperBaseSymbol));
+        }
+
+        foreach (var mapping in BuildUserImplementedMappings(ctx, methods, null, false))
+        {
+            yield return mapping;
+        }
+    }
+
+    internal static IEnumerable<IUserMapping> ExtractUserImplementedMappings(
+        SimpleMappingBuilderContext ctx,
+        ITypeSymbol type,
+        string? receiver,
+        bool isStatic
+    )
+    {
+        var methods = ctx.SymbolAccessor.GetAllMethods(type).Concat(type.AllInterfaces.SelectMany(ctx.SymbolAccessor.GetAllMethods));
+        return BuildUserImplementedMappings(ctx, methods, receiver, isStatic);
+    }
+
+    private static IEnumerable<IMethodSymbol> ExtractMethods(ITypeSymbol mapperSymbol) => mapperSymbol.GetMembers().OfType<IMethodSymbol>();
+
+    private static IEnumerable<IUserMapping> BuildUserImplementedMappings(
+        SimpleMappingBuilderContext ctx,
+        IEnumerable<IMethodSymbol> methods,
+        string? receiver,
+        bool isStatic
+    )
+    {
+        foreach (var method in methods)
+        {
+            if (!IsMappingMethodCandidate(ctx, method))
+                continue;
+
             // Partial method declarations are allowed for base classes,
             // but still treated as user implemented methods,
             // since the user should provide an implementation elsewhere.
             // This is the case if a partial mapper class is extended.
-            var mapping = BuildUserImplementedMapping(ctx, method, true, mapperSymbol.IsStatic);
+            var mapping = BuildUserImplementedMapping(ctx, method, receiver, true, isStatic);
             if (mapping != null)
                 yield return mapping;
         }
     }
 
-    private static IEnumerable<IMethodSymbol> ExtractMethods(ITypeSymbol mapperSymbol) => mapperSymbol.GetMembers().OfType<IMethodSymbol>();
-
-    private static IEnumerable<IMethodSymbol> ExtractBaseMethods(SimpleMappingBuilderContext ctx, ITypeSymbol mapperSymbol)
+    private static bool IsMappingMethodCandidate(SimpleMappingBuilderContext ctx, IMethodSymbol method)
     {
-        var baseMethods =
-            mapperSymbol.BaseType != null ? ctx.SymbolAccessor.GetAllMethods(mapperSymbol.BaseType!) : Enumerable.Empty<ISymbol>();
-        var intfMethods = mapperSymbol.AllInterfaces.SelectMany(ctx.SymbolAccessor.GetAllMethods);
-        return baseMethods
-            .Concat(intfMethods)
-            .OfType<IMethodSymbol>()
-            // ignore all non ordinary methods (eg. ctor, operators, etc.) and methods declared on the object type (eg. ToString)
-            .Where(
-                x =>
-                    x.MethodKind == MethodKind.Ordinary
-                    && ctx.SymbolAccessor.IsAccessible(x)
-                    && !SymbolEqualityComparer.Default.Equals(x.ReceiverType, ctx.Compilation.ObjectType)
-            );
+        // ignore all non ordinary methods (eg. ctor, operators, etc.) and methods declared on the object type (eg. ToString)
+        return method.MethodKind == MethodKind.Ordinary
+            && ctx.SymbolAccessor.IsAccessible(method)
+            && !SymbolEqualityComparer.Default.Equals(method.ReceiverType, ctx.Compilation.ObjectType);
     }
 
     private static IUserMapping? BuildUserImplementedMapping(
         SimpleMappingBuilderContext ctx,
         IMethodSymbol method,
+        string? receiver,
         bool allowPartial,
         bool isStatic
     )
@@ -75,12 +100,13 @@ public static class UserMethodMappingExtractor
 
         return method.ReturnsVoid
             ? new UserImplementedExistingTargetMethodMapping(
+                receiver,
                 method,
                 parameters.Source,
                 parameters.Target!.Value,
                 parameters.ReferenceHandler
             )
-            : new UserImplementedMethodMapping(method, parameters.Source, parameters.ReferenceHandler);
+            : new UserImplementedMethodMapping(receiver, method, parameters.Source, parameters.ReferenceHandler);
     }
 
     private static IUserMapping? BuilderUserDefinedMapping(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol, bool isStatic)
