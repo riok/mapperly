@@ -3,38 +3,66 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly;
 
 internal static class SyntaxProvider
 {
-    public static IncrementalValuesProvider<ClassDeclarationSyntax> GetClassDeclarations(IncrementalGeneratorInitializationContext context)
+    private static readonly SymbolDisplayFormat _fullyQualifiedFormatWithoutGlobal =
+        SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining);
+
+    public static IncrementalValuesProvider<MapperDeclaration> GetMapperDeclarations(IncrementalGeneratorInitializationContext context)
     {
         return context.SyntaxProvider
-            .CreateSyntaxProvider(static (s, _) => IsSyntaxTargetForGeneration(s), static (ctx, _) => GetSemanticTargetForGeneration(ctx))
+            .CreateSyntaxProvider(
+                static (s, _) => s is ClassDeclarationSyntax { AttributeLists.Count: > 0 },
+                static (ctx, ct) => GetMapperDeclaration(ctx, ct)
+            )
             .WhereNotNull();
     }
 
-    private static bool IsSyntaxTargetForGeneration(SyntaxNode node) => node is ClassDeclarationSyntax { AttributeLists.Count: > 0 };
-
-    private static ClassDeclarationSyntax? GetSemanticTargetForGeneration(GeneratorSyntaxContext ctx)
+    public static IncrementalValueProvider<IAssemblySymbol?> GetMapperDefaultDeclarations(IncrementalGeneratorInitializationContext context)
     {
-        var classDeclaration = (ClassDeclarationSyntax)ctx.Node;
-        foreach (var attributeListSyntax in classDeclaration.AttributeLists)
-        {
-            foreach (var attributeSyntax in attributeListSyntax.Attributes)
-            {
-                if (ctx.SemanticModel.GetSymbolInfo(attributeSyntax).Symbol is not IMethodSymbol attributeSymbol)
-                    continue;
+        return context.SyntaxProvider
+            .CreateSyntaxProvider(
+                static (s, _) => s is CompilationUnitSyntax { AttributeLists.Count: > 0 },
+                static (ctx, ct) => GetMapperDefaultDeclarations(ctx, ct)
+            )
+            .Collect()
+            .Select((x, _) => x.FirstOrDefault());
+    }
 
-                var attributeContainingTypeSymbol = attributeSymbol.ContainingType;
-                var fullName = attributeContainingTypeSymbol.ToDisplayString();
-                if (string.Equals(fullName, MapperGenerator.MapperAttributeName, StringComparison.Ordinal))
-                    return classDeclaration;
-            }
-        }
+    private static MapperDeclaration? GetMapperDeclaration(GeneratorSyntaxContext ctx, CancellationToken cancellationToken)
+    {
+        var declaration = (ClassDeclarationSyntax)ctx.Node;
+        if (ctx.SemanticModel.GetDeclaredSymbol(declaration, cancellationToken) is not INamedTypeSymbol symbol)
+            return null;
 
-        return null;
+        return HasAttribute(symbol, MapperGenerator.MapperAttributeName) ? new MapperDeclaration(symbol, declaration) : null;
+    }
+
+    private static IAssemblySymbol? GetMapperDefaultDeclarations(GeneratorSyntaxContext ctx, CancellationToken cancellationToken)
+    {
+        var declaration = (CompilationUnitSyntax)ctx.Node;
+        if (ctx.SemanticModel.GetDeclaredSymbol(declaration, cancellationToken) is not IAssemblySymbol symbol)
+            return null;
+
+        return HasAttribute(symbol, MapperGenerator.MapperDefaultsAttributeName) ? symbol : null;
+    }
+
+    private static bool HasAttribute(ISymbol symbol, string attributeName)
+    {
+        return symbol
+            .GetAttributes()
+            .Any(
+                x =>
+                    string.Equals(
+                        x.AttributeClass?.ToDisplayString(_fullyQualifiedFormatWithoutGlobal),
+                        attributeName,
+                        StringComparison.Ordinal
+                    )
+            );
     }
 }
 #endif

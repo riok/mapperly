@@ -6,26 +6,28 @@ namespace Riok.Mapperly.Configuration;
 /// Contains all the properties of <see cref="MapperAttribute"/> and <see cref="MapperDefaultsAttribute"/> but all of them are nullable.
 /// This is needed to evaluate which properties are set in the <see cref="MapperAttribute"/> and <see cref="MapperDefaultsAttribute"/>.
 /// <remarks>
-/// Newly added properties must also be added to <see cref="Riok.Mapperly.Helpers.MapperConfigurationBuilder"/>.
+/// Newly added properties must also be added to <see cref="Riok.Mapperly.Configuration.MapperConfigurationMerger"/>.
 /// </remarks>
 /// </summary>
-public class MapperConfiguration
+public record MapperConfiguration
 {
+    public static readonly MapperConfiguration Default = new();
+
     /// <summary>
     /// Strategy on how to match mapping property names.
     /// </summary>
-    public PropertyNameMappingStrategy? PropertyNameMappingStrategy { get; set; }
+    public PropertyNameMappingStrategy? PropertyNameMappingStrategy { get; init; }
 
     /// <summary>
     /// The default enum mapping strategy.
     /// Can be overwritten on specific enums via mapping method configurations.
     /// </summary>
-    public EnumMappingStrategy? EnumMappingStrategy { get; set; }
+    public EnumMappingStrategy? EnumMappingStrategy { get; init; }
 
     /// <summary>
     /// Whether the case should be ignored for enum mappings.
     /// </summary>
-    public bool? EnumMappingIgnoreCase { get; set; }
+    public bool? EnumMappingIgnoreCase { get; init; }
 
     /// <summary>
     /// Specifies the behaviour in the case when the mapper tries to return <c>null</c> in a mapping method with a non-nullable return type.
@@ -35,7 +37,7 @@ public class MapperConfiguration
     /// for value types <c>default</c>
     /// and for reference types <c>new()</c> if a parameterless constructor exists or else an <see cref="ArgumentNullException"/> is thrown.
     /// </summary>
-    public bool? ThrowOnMappingNullMismatch { get; set; }
+    public bool? ThrowOnMappingNullMismatch { get; init; }
 
     /// <summary>
     /// Specifies the behaviour in the case when the mapper tries to set a non-nullable property to a <c>null</c> value.
@@ -43,7 +45,7 @@ public class MapperConfiguration
     /// If set to <c>false</c> the property assignment is ignored.
     /// This is ignored for required init properties and <see cref="IQueryable{T}"/> projection mappings.
     /// </summary>
-    public bool? ThrowOnPropertyMappingNullMismatch { get; set; }
+    public bool? ThrowOnPropertyMappingNullMismatch { get; init; }
 
     /// <summary>
     /// Specifies whether <c>null</c> values are assigned to the target.
@@ -52,7 +54,7 @@ public class MapperConfiguration
     /// If <c>false</c>, <c>null</c> values are never assigned to the target property.
     /// This is ignored for required init properties and <see cref="IQueryable{T}"/> projection mappings.
     /// </summary>
-    public bool? AllowNullPropertyAssignment { get; set; }
+    public bool? AllowNullPropertyAssignment { get; init; }
 
     /// <summary>
     /// Whether to always deep copy objects.
@@ -60,7 +62,7 @@ public class MapperConfiguration
     /// when <c>false</c>, the same array is reused.
     /// when <c>true</c>, the array and each person is cloned.
     /// </summary>
-    public bool? UseDeepCloning { get; set; }
+    public bool? UseDeepCloning { get; init; }
 
     /// <summary>
     /// Enabled conversions which Mapperly automatically implements.
@@ -74,7 +76,7 @@ public class MapperConfiguration
     /// <c>EnabledConversions = MappingConversionType.All &amp; ~MappingConversionType.ToStringMethod</c>
     /// </example>
     /// </summary>
-    public MappingConversionType? EnabledConversions { get; set; }
+    public MappingConversionType? EnabledConversions { get; init; }
 
     /// <summary>
     /// Enables the reference handling feature.
@@ -82,11 +84,11 @@ public class MapperConfiguration
     /// When enabled, an <see cref="IReferenceHandler"/> instance is passed through the mapping methods
     /// to keep track of and reuse existing target object instances.
     /// </summary>
-    public bool? UseReferenceHandling { get; set; }
+    public bool? UseReferenceHandling { get; init; }
 
     /// <summary>
     /// The ignore obsolete attribute strategy. Determines how <see cref="ObsoleteAttribute"/> marked members are mapped.
     /// Defaults to <see cref="IgnoreObsoleteMembersStrategy.None"/>.
     /// </summary>
-    public IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy { get; set; }
+    public IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy { get; init; }
 }

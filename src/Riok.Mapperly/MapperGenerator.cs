@@ -1,134 +1,122 @@
-﻿using System.Collections.Immutable;
-using System.Text;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Text;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Emit;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Output;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly;
 
 [Generator]
 public class MapperGenerator : IIncrementalGenerator
 {
-    private const string GeneratedFileSuffix = ".g.cs";
-    public const string AddMappersStep = "ImplementationSourceOutput";
-    public const string ReportDiagnosticsStep = "Diagnostics";
-
     public static readonly string MapperAttributeName = typeof(MapperAttribute).FullName!;
     public static readonly string MapperDefaultsAttributeName = typeof(MapperDefaultsAttribute).FullName!;
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var mapperClassDeclarations = SyntaxProvider.GetClassDeclarations(context);
-
-        context.ReportDiagnostics(context.CompilationProvider.Select(static (compilation, _) => BuildCompilationDiagnostics(compilation)));
-
-        var compilationAndMappers = context.CompilationProvider.Combine(mapperClassDeclarations.Collect());
-        var mappersWithDiagnostics = compilationAndMappers.Select(
-            static (x, cancellationToken) => BuildDescriptors(x.Left, x.Right, cancellationToken)
-        );
-
-        // output the diagnostics
-        context.ReportDiagnostics(
-            mappersWithDiagnostics.Select(static (source, _) => source.Diagnostics).WithTrackingName(ReportDiagnosticsStep)
-        );
-
-        // split into mapper name pairs
-        var mappers = mappersWithDiagnostics.SelectMany(static (x, _) => x.Mappers);
-
-        context.RegisterImplementationSourceOutput(
-            mappers,
-            static (spc, source) =>
-            {
-                var mapperText = source.Body.NormalizeWhitespace().ToFullString();
-                spc.AddSource(source.FileName, SourceText.From(mapperText, Encoding.UTF8));
-            }
-        );
-    }
-
-    private static MapperResults BuildDescriptors(
-        Compilation compilation,
-        ImmutableArray<ClassDeclarationSyntax> mappers,
-        CancellationToken cancellationToken
-    )
-    {
-        if (mappers.IsDefaultOrEmpty)
-            return MapperResults.Empty;
-
 #if DEBUG_SOURCE_GENERATOR
         DebuggerUtil.AttachDebugger();
 #endif
-        var wellKnownTypes = new WellKnownTypes(compilation);
-        var mapperAttributeSymbol = wellKnownTypes.TryGet(MapperAttributeName);
-        if (mapperAttributeSymbol == null)
-            return MapperResults.Empty;
+        // report compilation diagnostics
+        var compilationDiagnostics = context.CompilationProvider.SelectMany(
+            static (compilation, _) => BuildCompilationDiagnostics(compilation)
+        );
+        context.ReportDiagnostics(compilationDiagnostics);
 
-        var uniqueNameBuilder = new UniqueNameBuilder();
+        // build the compilation context
+        var compilationContext = context.CompilationProvider
+            .Select(static (c, _) => new CompilationContext(c, new WellKnownTypes(c), new FileNameBuilder()))
+            .WithTrackingName(MapperGeneratorStepNames.BuildCompilationContext);
 
-        var diagnostics = new List<Diagnostic>();
-        var members = new List<MapperNode>();
-        var defaultConfiguration = ReadDefaultConfiguration(wellKnownTypes, compilation);
+        // build the assembly default configurations
+        var mapperDefaultsAssembly = SyntaxProvider.GetMapperDefaultDeclarations(context);
+        var mapperDefaults = compilationContext
+            .Combine(mapperDefaultsAssembly)
+            .Select(static (x, _) => BuildDefaults(x.Left, x.Right))
+            .WithTrackingName(MapperGeneratorStepNames.BuildMapperDefaults);
 
-        foreach (var mapperSyntax in mappers.Distinct())
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var mapperModel = compilation.GetSemanticModel(mapperSyntax.SyntaxTree);
-            if (mapperModel.GetDeclaredSymbol(mapperSyntax) is not { } mapperSymbol)
-                continue;
+        // extract the mapper declarations and build the descriptors
+        var mappersAndDiagnostics = SyntaxProvider
+            .GetMapperDeclarations(context)
+            .Combine(compilationContext)
+            .Combine(mapperDefaults)
+            .Select(static (x, ct) => BuildDescriptor(x.Left.Right, x.Left.Left, x.Right, ct))
+            .WhereNotNull();
 
-            var symbolAccessor = new SymbolAccessor(wellKnownTypes, compilation, mapperSymbol);
-            if (!symbolAccessor.HasAttribute<MapperAttribute>(mapperSymbol))
-                continue;
+        // output the diagnostics
+        var diagnostics = mappersAndDiagnostics
+            .Select(static (x, _) => x.Diagnostics)
+            .WithTrackingName(MapperGeneratorStepNames.ReportDiagnostics);
+        context.ReportDiagnostics(diagnostics);
 
-            var builder = new DescriptorBuilder(
-                compilation,
-                mapperSyntax,
-                mapperSymbol,
-                wellKnownTypes,
-                symbolAccessor,
-                defaultConfiguration
-            );
-            var (descriptor, descriptorDiagnostics) = builder.Build();
-
-            diagnostics.AddRange(descriptorDiagnostics);
-            members.Add(new MapperNode(SourceEmitter.Build(descriptor), uniqueNameBuilder.New(descriptor.Name) + GeneratedFileSuffix));
-        }
-
-        cancellationToken.ThrowIfCancellationRequested();
-        return new MapperResults(members.ToImmutableEquatableArray(), diagnostics.ToImmutableEquatableArray());
+        // output the mappers
+        var mappers = mappersAndDiagnostics.Select(static (x, _) => x.Mapper).WithTrackingName(MapperGeneratorStepNames.BuildMappers);
+        context.EmitMapperSource(mappers);
     }
 
-    private static ImmutableEquatableArray<Diagnostic> BuildCompilationDiagnostics(Compilation compilation)
+    private static MapperAndDiagnostics? BuildDescriptor(
+        CompilationContext compilationContext,
+        MapperDeclaration mapperDeclaration,
+        MapperConfiguration mapperDefaults,
+        CancellationToken cancellationToken
+    )
+    {
+        var mapperAttributeSymbol = compilationContext.Types.TryGet(MapperAttributeName);
+        if (mapperAttributeSymbol == null)
+            return null;
+
+        var symbolAccessor = new SymbolAccessor(compilationContext, mapperDeclaration.Symbol);
+        if (!symbolAccessor.HasAttribute<MapperAttribute>(mapperDeclaration.Symbol))
+            return null;
+
+        try
+        {
+            var builder = new DescriptorBuilder(compilationContext, mapperDeclaration, symbolAccessor, mapperDefaults);
+            var (descriptor, descriptorDiagnostics) = builder.Build(cancellationToken);
+            var mapper = new MapperNode(
+                compilationContext.FileNameBuilder.Build(descriptor),
+                SourceEmitter.Build(descriptor, cancellationToken)
+            );
+            return new MapperAndDiagnostics(mapper, descriptorDiagnostics.ToImmutableEquatableArray());
+        }
+        catch (OperationCanceledException)
+        {
+            return null;
+        }
+    }
+
+    private static MapperConfiguration BuildDefaults(CompilationContext compilationContext, IAssemblySymbol? assemblySymbol)
+    {
+        if (assemblySymbol == null)
+            return MapperConfiguration.Default;
+
+        var mapperDefaultsAttribute = compilationContext.Types.TryGet(MapperDefaultsAttributeName);
+        if (mapperDefaultsAttribute == null)
+            return MapperConfiguration.Default;
+
+        var assemblyMapperDefaultsAttribute = SymbolAccessor
+            .GetAttributesSkipCache(assemblySymbol, mapperDefaultsAttribute)
+            .FirstOrDefault();
+        return assemblyMapperDefaultsAttribute == null
+            ? MapperConfiguration.Default
+            : AttributeDataAccessor.Access<MapperDefaultsAttribute, MapperConfiguration>(assemblyMapperDefaultsAttribute);
+    }
+
+    private static IEnumerable<Diagnostic> BuildCompilationDiagnostics(Compilation compilation)
     {
         if (compilation is CSharpCompilation { LanguageVersion: < LanguageVersion.CSharp9 } cSharpCompilation)
         {
-            var diagnostic = Diagnostic.Create(
+            yield return Diagnostic.Create(
                 DiagnosticDescriptors.LanguageVersionNotSupported,
                 null,
                 cSharpCompilation.LanguageVersion.ToDisplayString(),
                 LanguageVersion.CSharp9.ToDisplayString()
             );
-            return ImmutableEquatableArray.Create(diagnostic);
         }
-
-        return ImmutableEquatableArray.Empty<Diagnostic>();
-    }
-
-    private static MapperConfiguration? ReadDefaultConfiguration(WellKnownTypes wellKnownTypes, Compilation compilation)
-    {
-        var mapperDefaultsAttributeSymbol = wellKnownTypes.TryGet(MapperDefaultsAttributeName);
-        var mapperDefaultsAttribute = compilation.Assembly
-            .GetAttributes()
-            .FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, mapperDefaultsAttributeSymbol));
-
-        return mapperDefaultsAttribute != null
-            ? AttributeDataAccessor.Access<MapperDefaultsAttribute, MapperConfiguration>(mapperDefaultsAttribute)
-            : null;
     }
 }

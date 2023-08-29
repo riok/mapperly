@@ -3,7 +3,7 @@
 
 using System.Collections;
 
-namespace Riok.Mapperly;
+namespace Riok.Mapperly.Helpers;
 
 /// <summary>
 /// Provides an immutable list implementation which implements sequence equality.

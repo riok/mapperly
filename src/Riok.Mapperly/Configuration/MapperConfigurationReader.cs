@@ -12,12 +12,12 @@ public class MapperConfigurationReader
     public MapperConfigurationReader(
         AttributeDataAccessor dataAccessor,
         ISymbol mapperSymbol,
-        MapperConfiguration? defaultMapperConfiguration
+        MapperConfiguration defaultMapperConfiguration
     )
     {
         _dataAccessor = dataAccessor;
         var mapperConfiguration = _dataAccessor.AccessSingle<MapperAttribute, MapperConfiguration>(mapperSymbol);
-        Mapper = MapperConfigurationBuilder.Merge(mapperConfiguration, defaultMapperConfiguration);
+        Mapper = MapperConfigurationMerger.Merge(mapperConfiguration, defaultMapperConfiguration);
 
         _defaultConfiguration = new MappingConfiguration(
             new EnumMappingConfiguration(
