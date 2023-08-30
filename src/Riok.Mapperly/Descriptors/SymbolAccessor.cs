@@ -9,8 +9,7 @@ namespace Riok.Mapperly.Descriptors;
 
 public class SymbolAccessor
 {
-    private readonly WellKnownTypes _types;
-    private readonly Compilation _compilation;
+    private readonly CompilationContext _compilationContext;
     private readonly INamedTypeSymbol _mapperSymbol;
     private readonly Dictionary<ISymbol, ImmutableArray<AttributeData>> _attributes = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<ISymbol>> _allMembers = new(SymbolEqualityComparer.Default);
@@ -21,21 +20,22 @@ public class SymbolAccessor
     private readonly Dictionary<ITypeSymbol, IReadOnlyDictionary<string, IMappableMember>> _allAccessibleMembersCaseSensitive =
         new(SymbolEqualityComparer.Default);
 
-    public SymbolAccessor(WellKnownTypes types, Compilation compilation, INamedTypeSymbol mapperSymbol)
+    public SymbolAccessor(CompilationContext compilationContext, INamedTypeSymbol mapperSymbol)
     {
-        _types = types;
-        _compilation = compilation;
+        _compilationContext = compilationContext;
         _mapperSymbol = mapperSymbol;
     }
+
+    private Compilation Compilation => _compilationContext.Compilation;
 
     public bool HasAccessibleParameterlessConstructor(ITypeSymbol symbol) =>
         symbol is INamedTypeSymbol { IsAbstract: false } namedTypeSymbol
         && namedTypeSymbol.InstanceConstructors.Any(c => c.Parameters.IsDefaultOrEmpty && IsAccessible(c));
 
-    public bool IsAccessible(ISymbol symbol) => _compilation.IsSymbolAccessibleWithin(symbol, _mapperSymbol);
+    public bool IsAccessible(ISymbol symbol) => Compilation.IsSymbolAccessibleWithin(symbol, _mapperSymbol);
 
     public bool HasImplicitConversion(ITypeSymbol source, ITypeSymbol destination) =>
-        _compilation.ClassifyConversion(source, destination).IsImplicit && (destination.IsNullable() || !source.IsNullable());
+        Compilation.ClassifyConversion(source, destination).IsImplicit && (destination.IsNullable() || !source.IsNullable());
 
     public bool DoesTypeSatisfyTypeParameterConstraints(
         ITypeParameterSymbol typeParameter,
@@ -57,7 +57,7 @@ public class SymbolAccessor
 
         foreach (var constraintType in typeParameter.ConstraintTypes)
         {
-            if (!_compilation.ClassifyConversion(type, constraintType.UpgradeNullable()).IsImplicit)
+            if (!Compilation.ClassifyConversion(type, constraintType.UpgradeNullable()).IsImplicit)
                 return false;
         }
 
@@ -73,8 +73,19 @@ public class SymbolAccessor
             yield break;
         }
 
-        var attributeSymbol = _types.Get<T>();
+        var attributeSymbol = _compilationContext.Types.Get<T>();
         foreach (var attr in attributes)
+        {
+            if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass?.ConstructedFrom ?? attr.AttributeClass, attributeSymbol))
+            {
+                yield return attr;
+            }
+        }
+    }
+
+    internal static IEnumerable<AttributeData> GetAttributesSkipCache(ISymbol symbol, INamedTypeSymbol attributeSymbol)
+    {
+        foreach (var attr in symbol.GetAttributes())
         {
             if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass?.ConstructedFrom ?? attr.AttributeClass, attributeSymbol))
             {

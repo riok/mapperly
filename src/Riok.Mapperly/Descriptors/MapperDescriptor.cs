@@ -3,19 +3,20 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
 
 public class MapperDescriptor
 {
+    private readonly MapperDeclaration _declaration;
     private readonly List<MethodMapping> _methodMappings = new();
 
-    public MapperDescriptor(ClassDeclarationSyntax syntax, INamedTypeSymbol symbol, UniqueNameBuilder nameBuilder)
+    public MapperDescriptor(MapperDeclaration declaration, UniqueNameBuilder nameBuilder)
     {
-        Syntax = syntax;
-        Symbol = symbol;
+        _declaration = declaration;
         NameBuilder = nameBuilder;
-        Name = BuildName(symbol);
+        Name = BuildName(declaration.Symbol);
 
         if (!Symbol.ContainingNamespace.IsGlobalNamespace)
         {
@@ -27,9 +28,9 @@ public class MapperDescriptor
 
     public string? Namespace { get; }
 
-    public ClassDeclarationSyntax Syntax { get; }
+    public ClassDeclarationSyntax Syntax => _declaration.Syntax;
 
-    public INamedTypeSymbol Symbol { get; }
+    public INamedTypeSymbol Symbol => _declaration.Symbol;
 
     public UniqueNameBuilder NameBuilder { get; }
 

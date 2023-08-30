@@ -1,6 +1,5 @@
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
-using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Tests.Helpers;
 
@@ -24,7 +23,7 @@ public class MapperConfigurationBuilderTest
             IgnoreObsoleteMembersStrategy = IgnoreObsoleteMembersStrategy.Target,
         };
 
-        var mapper = MapperConfigurationBuilder.Merge(mapperConfiguration, defaultMapperConfiguration);
+        var mapper = MapperConfigurationMerger.Merge(mapperConfiguration, defaultMapperConfiguration);
         mapper.PropertyNameMappingStrategy.Should().Be(PropertyNameMappingStrategy.CaseSensitive);
         mapper.EnumMappingStrategy.Should().Be(EnumMappingStrategy.ByName);
         mapper.EnumMappingIgnoreCase.Should().BeTrue();
@@ -41,7 +40,7 @@ public class MapperConfigurationBuilderTest
     public void ShouldMergeMapperConfigurationsWithEmptyDefaultMapperConfiguration()
     {
         var mapperConfiguration = NewMapperConfiguration();
-        var mapper = MapperConfigurationBuilder.Merge(mapperConfiguration, null);
+        var mapper = MapperConfigurationMerger.Merge(mapperConfiguration, new());
         mapper.PropertyNameMappingStrategy.Should().Be(PropertyNameMappingStrategy.CaseSensitive);
         mapper.EnumMappingStrategy.Should().Be(EnumMappingStrategy.ByName);
         mapper.EnumMappingIgnoreCase.Should().BeTrue();
@@ -65,7 +64,7 @@ public class MapperConfigurationBuilderTest
             EnumMappingIgnoreCase = true,
         };
 
-        var mapper = MapperConfigurationBuilder.Merge(mapperConfiguration, defaultMapperConfiguration);
+        var mapper = MapperConfigurationMerger.Merge(mapperConfiguration, defaultMapperConfiguration);
         mapper.PropertyNameMappingStrategy.Should().Be(PropertyNameMappingStrategy.CaseInsensitive);
         mapper.EnumMappingStrategy.Should().Be(EnumMappingStrategy.ByName);
         mapper.EnumMappingIgnoreCase.Should().BeTrue();

@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.ExternalMappings;
@@ -7,6 +6,7 @@ using Riok.Mapperly.Descriptors.MappingBodyBuilders;
 using Riok.Mapperly.Descriptors.MappingBuilders;
 using Riok.Mapperly.Descriptors.ObjectFactories;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -24,23 +24,20 @@ public class DescriptorBuilder
     private ObjectFactoryCollection _objectFactories = ObjectFactoryCollection.Empty;
 
     public DescriptorBuilder(
-        Compilation compilation,
-        ClassDeclarationSyntax mapperSyntax,
-        INamedTypeSymbol mapperSymbol,
-        WellKnownTypes wellKnownTypes,
+        CompilationContext compilationContext,
+        MapperDeclaration mapperDeclaration,
         SymbolAccessor symbolAccessor,
-        MapperConfiguration? defaultMapperConfiguration
+        MapperConfiguration defaultMapperConfiguration
     )
     {
-        _mapperDescriptor = new MapperDescriptor(mapperSyntax, mapperSymbol, _methodNameBuilder);
+        _mapperDescriptor = new MapperDescriptor(mapperDeclaration, _methodNameBuilder);
         _symbolAccessor = symbolAccessor;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
 
         var attributeAccessor = new AttributeDataAccessor(symbolAccessor);
         _builderContext = new SimpleMappingBuilderContext(
-            compilation,
-            new MapperConfigurationReader(attributeAccessor, mapperSymbol, defaultMapperConfiguration),
-            wellKnownTypes,
+            compilationContext,
+            new MapperConfigurationReader(attributeAccessor, mapperDeclaration.Symbol, defaultMapperConfiguration),
             _symbolAccessor,
             attributeAccessor,
             _mapperDescriptor,
@@ -50,13 +47,13 @@ public class DescriptorBuilder
         );
     }
 
-    public (MapperDescriptor descriptor, IReadOnlyCollection<Diagnostic> diagnostics) Build()
+    public (MapperDescriptor descriptor, IReadOnlyCollection<Diagnostic> diagnostics) Build(CancellationToken cancellationToken)
     {
         ReserveMethodNames();
         ExtractObjectFactories();
         ExtractUserMappings();
         ExtractExternalMappings();
-        _mappingBodyBuilder.BuildMappingBodies();
+        _mappingBodyBuilder.BuildMappingBodies(cancellationToken);
         BuildMappingMethodNames();
         BuildReferenceHandlingParameters();
         AddMappingsToDescriptor();

@@ -2,21 +2,34 @@
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly;
 
 internal static class SyntaxProvider
 {
-    public static IncrementalValuesProvider<ClassDeclarationSyntax> GetClassDeclarations(IncrementalGeneratorInitializationContext context)
+    public static IncrementalValuesProvider<MapperDeclaration> GetMapperDeclarations(IncrementalGeneratorInitializationContext context)
     {
         return context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 MapperGenerator.MapperAttributeName,
                 static (s, _) => s is ClassDeclarationSyntax,
-                static (ctx, _) => ctx.TargetNode as ClassDeclarationSyntax
+                static (ctx, _) => (ctx.TargetSymbol, TargetNode: (ClassDeclarationSyntax)ctx.TargetNode)
             )
-            .WhereNotNull();
+            .Where(x => x.TargetSymbol is INamedTypeSymbol)
+            .Select((x, _) => new MapperDeclaration((INamedTypeSymbol)x.TargetSymbol, x.TargetNode));
+    }
+
+    public static IncrementalValueProvider<IAssemblySymbol?> GetMapperDefaultDeclarations(IncrementalGeneratorInitializationContext context)
+    {
+        return context.SyntaxProvider
+            .ForAttributeWithMetadataName(
+                MapperGenerator.MapperDefaultsAttributeName,
+                static (s, _) => s is CompilationUnitSyntax,
+                static (ctx, _) => (IAssemblySymbol)ctx.TargetSymbol
+            )
+            .Collect()
+            .Select((x, _) => x.FirstOrDefault());
     }
 }
 #endif

@@ -16,10 +16,12 @@ public class MappingBodyBuilder
         _mappings = mappings;
     }
 
-    public void BuildMappingBodies()
+    public void BuildMappingBodies(CancellationToken cancellationToken)
     {
         foreach (var (typeMapping, ctx) in _mappings.DequeueMappingsToBuildBody())
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             switch (typeMapping)
             {
                 case NewInstanceObjectMemberMethodMapping mapping:

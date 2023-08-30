@@ -29,7 +29,7 @@ public class AttributeDataAccessor
         where TData : notnull => Access<TAttribute, TData>(symbol).FirstOrDefault();
 
     public bool HasAttribute<TAttribute>(ISymbol symbol)
-        where TAttribute : Attribute => _symbolAccessor.GetAttributes<TAttribute>(symbol).Any();
+        where TAttribute : Attribute => _symbolAccessor.HasAttribute<TAttribute>(symbol);
 
     public IEnumerable<TAttribute> Access<TAttribute>(ISymbol symbol)
         where TAttribute : Attribute => Access<TAttribute, TAttribute>(symbol);
@@ -56,7 +56,7 @@ public class AttributeDataAccessor
         }
     }
 
-    public static TData Access<TAttribute, TData>(AttributeData attrData)
+    internal static TData Access<TAttribute, TData>(AttributeData attrData)
         where TAttribute : Attribute
         where TData : notnull
     {
