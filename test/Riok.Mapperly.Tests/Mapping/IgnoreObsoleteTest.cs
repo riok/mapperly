@@ -337,7 +337,7 @@ public class IgnoreObsoleteTest
                 """
                 var target = new global::B()
                 {
-                    Ignored = source.Ignored
+                    Ignored = source.Ignored,
                 };
                 target.Value = source.Value;
                 return target;
@@ -373,7 +373,7 @@ public class IgnoreObsoleteTest
                 """
                 var target = new global::B()
                 {
-                    Ignored = source.Ignored
+                    Ignored = source.Ignored,
                 };
                 target.Value = source.Value;
                 return target;

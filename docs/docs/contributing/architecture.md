@@ -37,6 +37,10 @@ The `DescriptorBuilder` does this by following this process:
    one approach on how to map types (eg. an explicit cast is implemented by the `ExplicitCastMappingBuilder`).
    These mappings are queued in the queue of mappings which need the body to be built (currently body builders are only used for object to object (property-based) mappings).
 5. The `SourceEmitter` emits the code described by the `MapperDescriptor` and all its mappings.
+   The syntax objects are created by using `SyntaxFactory` and `SyntaxFactoryHelper`.
+   The `SyntaxFactoryHelper` tries to simplify creating formatted syntax trees.
+   If indentation is needed,
+   the `SyntaxFactoryHelper` instance of the `SourceEmitterContext`/`TypeMappingBuildContext` can be used.
 
 ## Roslyn multi targeting
 

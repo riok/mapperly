@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -31,11 +31,14 @@ public class QueryableProjectionMapping : MethodMapping
         var (lambdaCtx, lambdaSourceName) = ctx.WithNewScopedSource();
 
         var delegateMapping = _delegateMapping.Build(lambdaCtx);
-        var projectionLambda = SimpleLambdaExpression(Parameter(Identifier(lambdaSourceName))).WithExpressionBody(delegateMapping);
+        var projectionLambda = Lambda(lambdaSourceName, delegateMapping);
         var select = StaticInvocation(QueryableReceiverName, SelectMethodName, ctx.Source, projectionLambda);
+        var returnStatement = ctx.SyntaxFactory.Return(select);
         return new[]
         {
-            ReturnStatement(select).WithLeadingTrivia(TriviaList(Nullable(false))).WithTrailingTrivia(TriviaList(Nullable(true)))
+            returnStatement
+                .WithLeadingTrivia(returnStatement.GetLeadingTrivia().Insert(0, ElasticCarriageReturnLineFeed).Insert(1, Nullable(false)))
+                .WithTrailingTrivia(returnStatement.GetTrailingTrivia().Insert(0, ElasticCarriageReturnLineFeed).Insert(1, Nullable(true)))
         };
     }
 }

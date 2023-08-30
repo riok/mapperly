@@ -4,7 +4,7 @@ using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
@@ -42,7 +42,7 @@ public class UserImplementedExistingTargetMethodMapping : ExistingTargetMapping,
         // we explicitly cast to be able to use the default interface implementation or explicit implementations
         if (Method.ReceiverType?.TypeKind != TypeKind.Interface)
         {
-            yield return ExpressionStatement(
+            yield return ctx.SyntaxFactory.ExpressionStatement(
                 Invocation(
                     _receiver == null ? IdentifierName(Method.Name) : MemberAccess(_receiver, Method.Name),
                     _sourceParameter.WithArgument(ctx.Source),
@@ -58,7 +58,7 @@ public class UserImplementedExistingTargetMethodMapping : ExistingTargetMapping,
             _receiver != null ? IdentifierName(_receiver) : ThisExpression()
         );
         var method = MemberAccess(ParenthesizedExpression(castedThis), Method.Name);
-        yield return ExpressionStatement(
+        yield return ctx.SyntaxFactory.ExpressionStatement(
             Invocation(
                 method,
                 _sourceParameter.WithArgument(ctx.Source),

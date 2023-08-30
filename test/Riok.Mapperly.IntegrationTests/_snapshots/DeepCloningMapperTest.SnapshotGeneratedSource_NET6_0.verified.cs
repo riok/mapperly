@@ -14,47 +14,42 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial global::Riok.Mapperly.IntegrationTests.Models.TestObject Copy(global::Riok.Mapperly.IntegrationTests.Models.TestObject src)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObject(src.CtorValue, ctorValue2: src.CtorValue2)
-            {IntInitOnlyValue = src.IntInitOnlyValue, RequiredValue = src.RequiredValue};
+            {
+                IntInitOnlyValue = src.IntInitOnlyValue,
+                RequiredValue = src.RequiredValue,
+            };
             if (src.NullableFlattening != null)
             {
                 target.NullableFlattening = Copy(src.NullableFlattening);
             }
-
             if (src.NestedNullable != null)
             {
                 target.NestedNullable = MapToTestObjectNested(src.NestedNullable);
             }
-
             if (src.NestedNullableTargetNotNullable != null)
             {
                 target.NestedNullableTargetNotNullable = MapToTestObjectNested(src.NestedNullableTargetNotNullable);
             }
-
             if (src.TupleValue != null)
             {
                 target.TupleValue = MapToValueTuple(src.TupleValue.Value);
             }
-
             if (src.RecursiveObject != null)
             {
                 target.RecursiveObject = Copy(src.RecursiveObject);
             }
-
             if (src.SourceTargetSameObjectType != null)
             {
                 target.SourceTargetSameObjectType = Copy(src.SourceTargetSameObjectType);
             }
-
             if (src.NullableReadOnlyObjectCollection != null)
             {
                 target.NullableReadOnlyObjectCollection = MapToIReadOnlyCollection(src.NullableReadOnlyObjectCollection);
             }
-
             if (src.SubObject != null)
             {
                 target.SubObject = MapToInheritanceSubObject(src.SubObject);
             }
-
             target.IntValue = src.IntValue;
             target.StringValue = src.StringValue;
             target.RenamedStringValue = src.RenamedStringValue;
@@ -76,24 +71,20 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.ExistingISet.Add(item);
             }
-
             target.ExistingHashSet.EnsureCapacity(src.ExistingHashSet.Count + target.ExistingHashSet.Count);
             foreach (var item1 in src.ExistingHashSet)
             {
                 target.ExistingHashSet.Add(item1);
             }
-
             foreach (var item2 in src.ExistingSortedSet)
             {
                 target.ExistingSortedSet.Add(item2);
             }
-
             target.ExistingList.EnsureCapacity(src.ExistingList.Count + target.ExistingList.Count);
             foreach (var item3 in src.ExistingList)
             {
                 target.ExistingList.Add(item3);
             }
-
             target.ISet = global::System.Linq.Enumerable.ToHashSet(src.ISet);
             target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(src.IReadOnlySet);
             target.HashSet = global::System.Linq.Enumerable.ToHashSet(src.HashSet);
@@ -131,7 +122,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target[i] = MapToTestObjectNested(item);
                 i++;
             }
-
             return target;
         }
 

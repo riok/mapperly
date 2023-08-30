@@ -6,7 +6,18 @@ public partial class Mapper
     private partial global::System.Linq.IQueryable<global::B> Map(global::System.Linq.IQueryable<global::A> source)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(source, x => new global::B() { StringValue2 = x.StringValue, NestedValue = new global::D() { IntValue = (int)x.NestedValue.LongValue, NestedValue = new global::F() { ShortValue = x.NestedValue.NestedValue.ShortValue } } });
+        return System.Linq.Queryable.Select(source, x => new global::B()
+        {
+            StringValue2 = x.StringValue,
+            NestedValue = new global::D()
+            {
+                IntValue = (int)x.NestedValue.LongValue,
+                NestedValue = new global::F()
+                {
+                    ShortValue = x.NestedValue.NestedValue.ShortValue,
+                },
+            },
+        });
 #nullable enable
     }
 

@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 
@@ -32,9 +32,8 @@ public class EnumNameMapping : MethodMapping
         // switch for each name to the enum value
         // eg: Enum1.Value1 => Enum2.Value1,
         var arms = _enumMemberMappings.Select(x => BuildArm(x.Key, x.Value)).Append(_fallback.BuildDiscardArm(ctx));
-
-        var switchExpr = SwitchExpression(ctx.Source).WithArms(CommaSeparatedList(arms, true));
-        yield return ReturnStatement(switchExpr);
+        var switchExpr = ctx.SyntaxFactory.Switch(ctx.Source, arms);
+        yield return ctx.SyntaxFactory.Return(switchExpr);
     }
 
     private SwitchExpressionArmSyntax BuildArm(IFieldSymbol sourceMemberField, IFieldSymbol targetMemberField)
@@ -42,6 +41,6 @@ public class EnumNameMapping : MethodMapping
         var sourceMember = MemberAccess(FullyQualifiedIdentifier(SourceType), sourceMemberField.Name);
         var targetMember = MemberAccess(FullyQualifiedIdentifier(TargetType), targetMemberField.Name);
         var pattern = ConstantPattern(sourceMember);
-        return SwitchExpressionArm(pattern, targetMember);
+        return SwitchArm(pattern, targetMember);
     }
 }

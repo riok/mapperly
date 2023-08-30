@@ -22,7 +22,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    StringValue = source.StringValue
+                    StringValue = source.StringValue,
                 };
                 target.IntValue = source.IntValue;
                 return target;
@@ -48,7 +48,7 @@ public class ObjectPropertyInitPropertyTest
                 var target = new global::B()
                 {
                     StringValue = source.StringValue,
-                    IntValue = source.IntValue
+                    IntValue = source.IntValue,
                 };
                 return target;
                 """
@@ -72,7 +72,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    Value = source.Value ?? throw new System.ArgumentNullException(nameof(source.Value))
+                    Value = source.Value ?? throw new System.ArgumentNullException(nameof(source.Value)),
                 };
                 return target;
                 """
@@ -100,7 +100,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    Value = source.Value ?? ""
+                    Value = source.Value ?? "",
                 };
                 return target;
                 """
@@ -123,7 +123,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    StringValue = source.StringValue2
+                    StringValue = source.StringValue2,
                 };
                 return target;
                 """
@@ -147,7 +147,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    Parent = source.Parent != null ? Map(source.Parent) : default
+                    Parent = source.Parent != null ? Map(source.Parent) : default,
                 };
                 return target;
                 """
@@ -172,7 +172,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    NestedValue = source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested.Value))
+                    NestedValue = source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested.Value)),
                 };
                 return target;
                 """
@@ -197,7 +197,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    NestedValue = source.Nested.Value
+                    NestedValue = source.Nested.Value,
                 };
                 return target;
                 """
@@ -304,7 +304,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    StringValue = source.StringValue
+                    StringValue = source.StringValue,
                 };
                 target.IntValue = source.IntValue;
                 return target;
@@ -334,7 +334,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    StringValue = source.StringValue
+                    StringValue = source.StringValue,
                 };
                 target.IntValue = source.IntValue;
                 return target;
@@ -364,7 +364,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    StringValue = source.StringValue
+                    StringValue = source.StringValue,
                 };
                 target.IntValue = source.IntValue;
                 return target;

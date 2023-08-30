@@ -16,7 +16,6 @@ public partial class Mapper
         {
             target.Push(item);
         }
-
         return target;
     }
 }

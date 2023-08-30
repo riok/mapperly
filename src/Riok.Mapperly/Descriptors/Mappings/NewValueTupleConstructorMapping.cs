@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -25,9 +25,7 @@ public class NewValueTupleConstructorMapping : NewInstanceMapping, INewValueTupl
     {
         // new ValueTuple<T..>(ctorArgs)
         var ctorArgs = _constructorPropertyMappings.Select(x => x.BuildArgument(ctx, emitFieldName: false));
-        var genericName = GenericName(ValueTupleName);
         var typeArguments = TypeArgumentList(((INamedTypeSymbol)TargetType).TypeArguments.Select(NonNullableIdentifier));
-        var typedValue = genericName.WithTypeArgumentList(typeArguments);
-        return ObjectCreationExpression(typedValue).WithArgumentList(ArgumentList(ctorArgs));
+        return CreateGenericInstance(ValueTupleName, typeArguments, ctorArgs);
     }
 }

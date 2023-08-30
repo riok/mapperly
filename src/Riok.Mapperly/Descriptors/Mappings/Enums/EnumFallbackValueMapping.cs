@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 
@@ -27,7 +27,7 @@ public class EnumFallbackValueMapping : NewInstanceMapping
 
     public IFieldSymbol? FallbackMember { get; }
 
-    public SwitchExpressionArmSyntax BuildDiscardArm(TypeMappingBuildContext ctx) => SwitchExpressionArm(DiscardPattern(), Build(ctx));
+    public SwitchExpressionArmSyntax BuildDiscardArm(TypeMappingBuildContext ctx) => SwitchArm(DiscardPattern(), Build(ctx));
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {

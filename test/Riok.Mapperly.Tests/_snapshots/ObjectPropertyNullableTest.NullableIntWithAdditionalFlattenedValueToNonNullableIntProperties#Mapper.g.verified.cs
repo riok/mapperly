@@ -12,10 +12,8 @@ public partial class Mapper
             {
                 target.NestedValue2 = source.Nested.Value2.Value;
             }
-
             target.Nested = MapToD(source.Nested);
         }
-
         return target;
     }
 
@@ -26,7 +24,6 @@ public partial class Mapper
         {
             target.Value1 = source.Value1.Value;
         }
-
         return target;
     }
 }

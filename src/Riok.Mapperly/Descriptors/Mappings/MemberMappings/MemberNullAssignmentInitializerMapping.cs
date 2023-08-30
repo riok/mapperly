@@ -1,9 +1,8 @@
 using System.Diagnostics;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -23,12 +22,8 @@ public class MemberNullAssignmentInitializerMapping : MemberAssignmentMappingCon
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
         // source.Value ??= new();
-        var initializer = ExpressionStatement(
-            Assignment(
-                _pathToInitialize.BuildAccess(targetAccess),
-                ImplicitObjectCreationExpression(),
-                SyntaxKind.CoalesceAssignmentExpression
-            )
+        var initializer = ctx.SyntaxFactory.ExpressionStatement(
+            CoalesceAssignment(_pathToInitialize.BuildAccess(targetAccess), ImplicitObjectCreationExpression())
         );
         return base.Build(ctx, targetAccess).Prepend(initializer);
     }

@@ -4,7 +4,7 @@ using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
@@ -13,8 +13,6 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 /// </summary>
 public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMapping
 {
-    private const string NoMappingComment = "// Could not generate mapping";
-
     private const string ReferenceHandlerTypeName =
         "global::Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler";
 
@@ -50,7 +48,7 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
     {
         if (_delegateMapping == null)
         {
-            yield return ThrowStatement(ThrowNotImplementedException()).WithLeadingTrivia(TriviaList(Comment(NoMappingComment)));
+            yield return ThrowStatement(ctx.SyntaxFactory.ThrowMappingNotImplementedExceptionStatement());
             yield break;
         }
 
@@ -69,7 +67,7 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
             // var refHandler = new RefHandler();
             var referenceHandlerName = ctx.NameBuilder.New(DefaultReferenceHandlerParameterName);
             var createRefHandler = CreateInstance(ReferenceHandlerTypeName);
-            yield return DeclareLocalVariable(referenceHandlerName, createRefHandler);
+            yield return ctx.SyntaxFactory.DeclareLocalVariable(referenceHandlerName, createRefHandler);
             ctx = ctx.WithRefHandler(referenceHandlerName);
         }
 
@@ -91,6 +89,7 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
 
     private StatementSyntax BuildNullGuard(TypeMappingBuildContext ctx)
     {
-        return IfStatement(IfAnyNull((SourceType, ctx.Source), (TargetType, IdentifierName(TargetParameter.Name))), ReturnStatement());
+        var condition = IfAnyNull((SourceType, ctx.Source), (TargetType, IdentifierName(TargetParameter.Name)));
+        return ctx.SyntaxFactory.If(condition, ctx.SyntaxFactory.AddIndentation().Return());
     }
 }

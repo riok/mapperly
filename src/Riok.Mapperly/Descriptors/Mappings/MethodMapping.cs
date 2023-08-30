@@ -2,10 +2,11 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Emit;
+using Riok.Mapperly.Emit.Syntax;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 using Accessibility = Microsoft.CodeAnalysis.Accessibility;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
@@ -65,21 +66,21 @@ public abstract class MethodMapping : NewInstanceMapping
 
     public virtual MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
     {
-        var returnType = FullyQualifiedIdentifier(_returnType);
-
         var typeMappingBuildContext = new TypeMappingBuildContext(
             SourceParameter.Name,
             ReferenceHandlerParameter?.Name,
-            ctx.NameBuilder.NewScope()
+            ctx.NameBuilder.NewScope(),
+            ctx.SyntaxFactory.AddIndentation()
         );
 
         var parameters = BuildParameterList();
         ReserveParameterNames(typeMappingBuildContext.NameBuilder, parameters);
 
-        return MethodDeclaration(returnType, Identifier(MethodName))
+        var returnType = FullyQualifiedIdentifier(_returnType);
+        return MethodDeclaration(returnType.AddTrailingSpace(), Identifier(MethodName))
             .WithModifiers(TokenList(BuildModifiers(ctx.IsStatic)))
             .WithParameterList(parameters)
-            .WithBody(Block(BuildBody(typeMappingBuildContext)));
+            .WithBody(ctx.SyntaxFactory.Block(BuildBody(typeMappingBuildContext)));
     }
 
     public abstract IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx);
@@ -106,10 +107,10 @@ public abstract class MethodMapping : NewInstanceMapping
         yield return Accessibility(_accessibility);
 
         if (isStatic)
-            yield return Token(SyntaxKind.StaticKeyword);
+            yield return TrailingSpacedToken(SyntaxKind.StaticKeyword);
 
         if (IsPartial)
-            yield return Token(SyntaxKind.PartialKeyword);
+            yield return TrailingSpacedToken(SyntaxKind.PartialKeyword);
     }
 
     private void ReserveParameterNames(UniqueNameBuilder nameBuilder, ParameterListSyntax parameters)

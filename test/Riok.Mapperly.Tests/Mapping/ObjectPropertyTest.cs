@@ -187,7 +187,7 @@ public class ObjectPropertyTest
                 """
                 var target = new global::B()
                 {
-                    value = source.Value
+                    value = source.Value,
                 };
                 target.stringvalue = source.StringValue;
                 return target;

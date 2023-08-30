@@ -17,7 +17,7 @@ namespace Riok.Mapperly.IntegrationTests
     public class ProjectionMapperTest : BaseMapperTest
     {
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0 | Versions.NET7_0)]
+        [VersionedSnapshot(Versions.NET6_0)]
         public Task SnapshotGeneratedSource()
         {
             var path = GetGeneratedMapperFilePath(nameof(ProjectionMapper));

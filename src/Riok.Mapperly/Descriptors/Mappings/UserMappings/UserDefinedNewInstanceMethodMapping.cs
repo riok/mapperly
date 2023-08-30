@@ -2,8 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
@@ -12,7 +11,6 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 /// </summary>
 public class UserDefinedNewInstanceMethodMapping : MethodMapping, IDelegateUserMapping
 {
-    private const string NoMappingComment = "// Could not generate mapping";
     private const string ReferenceHandlerTypeName =
         "global::Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler";
 
@@ -40,7 +38,7 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IDelegateUserM
     {
         if (DelegateMapping == null)
         {
-            return new[] { ExpressionStatement(ThrowNotImplementedException()).WithLeadingTrivia(TriviaList(Comment(NoMappingComment))), };
+            return new[] { ctx.SyntaxFactory.ExpressionStatement(ctx.SyntaxFactory.ThrowMappingNotImplementedExceptionStatement()), };
         }
 
         // if reference handling is enabled and no reference handler parameter is declared
@@ -51,13 +49,13 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IDelegateUserM
             // new RefHandler();
             var createRefHandler = CreateInstance(ReferenceHandlerTypeName);
             ctx = ctx.WithRefHandler(createRefHandler);
-            return new[] { ReturnStatement(DelegateMapping.Build(ctx)) };
+            return new[] { ctx.SyntaxFactory.Return(DelegateMapping.Build(ctx)) };
         }
 
         if (DelegateMapping is MethodMapping delegateMethodMapping)
             return delegateMethodMapping.BuildBody(ctx);
 
-        return new[] { ReturnStatement(DelegateMapping.Build(ctx)) };
+        return new[] { ctx.SyntaxFactory.Return(DelegateMapping.Build(ctx)) };
     }
 
     /// <summary>

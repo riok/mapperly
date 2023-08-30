@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -67,7 +67,7 @@ public class NullDelegateMapping : NewInstanceMapping
             sourceValue = PostfixUnaryExpression(SyntaxKind.SuppressNullableWarningExpression, sourceValue);
         }
 
-        return ConditionalExpression(
+        return Conditional(
             IsNull(ctx.Source),
             NullSubstitute(TargetType.NonNullable(), ctx.Source, _nullFallbackValue),
             _delegateMapping.Build(ctx.WithSource(sourceValue))

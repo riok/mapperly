@@ -12,7 +12,6 @@ public partial class Mapper
         {
             target.Value = MapToD(source.Value);
         }
-
         return target;
     }
 

@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 
@@ -40,9 +40,10 @@ public class EnsureCapacityNonEnumerated : EnsureCapacityInfo
         var enumerableArgument = Argument(ctx.Source);
 
         var outVarArgument = Argument(DeclarationExpression(VarIdentifier, SingleVariableDesignation(countIdentifier)))
-            .WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword));
+            .WithRefOrOutKeyword(TrailingSpacedToken(SyntaxKind.OutKeyword));
 
         var getNonEnumeratedInvocation = StaticInvocation(_getNonEnumeratedMethod, enumerableArgument, outVarArgument);
-        return IfStatement(getNonEnumeratedInvocation, Block(EnsureCapacityStatement(target, countIdentifierName, targetCount)));
+        var ensureCapacity = EnsureCapacityStatement(ctx.SyntaxFactory.AddIndentation(), target, countIdentifierName, targetCount);
+        return ctx.SyntaxFactory.If(getNonEnumeratedInvocation, ensureCapacity);
     }
 }

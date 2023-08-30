@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -23,7 +24,7 @@ public class ConstructorParameterMapping
     {
         var argumentExpression = DelegateMapping.Build(ctx);
         var arg = Argument(argumentExpression);
-        return _selfOrPreviousIsUnmappedOptional ? arg.WithNameColon(NameColon(Parameter.Name)) : arg;
+        return _selfOrPreviousIsUnmappedOptional ? arg.WithNameColon(SpacedNameColon(Parameter.Name)) : arg;
     }
 
     protected bool Equals(ConstructorParameterMapping other) =>
