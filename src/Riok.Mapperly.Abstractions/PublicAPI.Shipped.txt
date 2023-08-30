@@ -35,6 +35,8 @@ Riok.Mapperly.Abstractions.MapperAttribute.ThrowOnPropertyMappingNullMismatch.ge
 Riok.Mapperly.Abstractions.MapperAttribute.ThrowOnPropertyMappingNullMismatch.set -> void
 Riok.Mapperly.Abstractions.MapperAttribute.UseDeepCloning.get -> bool
 Riok.Mapperly.Abstractions.MapperAttribute.UseDeepCloning.set -> void
+Riok.Mapperly.Abstractions.MapperDefaultsAttribute
+Riok.Mapperly.Abstractions.MapperDefaultsAttribute.MapperDefaultsAttribute() -> void
 Riok.Mapperly.Abstractions.MapperConstructorAttribute
 Riok.Mapperly.Abstractions.MapperConstructorAttribute.MapperConstructorAttribute() -> void
 Riok.Mapperly.Abstractions.MapperIgnoreObsoleteMembersAttribute

@@ -6,7 +6,7 @@ namespace Riok.Mapperly.Abstractions;
 /// Marks a partial class as a mapper.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
-public sealed class MapperAttribute : Attribute
+public class MapperAttribute : Attribute
 {
     /// <summary>
     /// Strategy on how to match mapping property names.

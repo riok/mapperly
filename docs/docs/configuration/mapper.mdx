@@ -185,3 +185,11 @@ dotnet_diagnostic.RMG020.severity = error # Unmapped source member
 ### Strict enum mappings
 
 To enforce strict enum mappings set `RMG037` and `RMG038` to error, see [strict enum mappings](./enum.mdx).
+
+## Default Mapper configuration
+
+The `MapperDefaultsAttribute` allows to set default configurations applied to all mappers on the assembly level.
+
+```csharp
+[assembly: MapperDefaults(EnumMappingIgnoreCase = true)]
+```

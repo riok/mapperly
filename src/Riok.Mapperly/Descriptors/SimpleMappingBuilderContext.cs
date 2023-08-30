@@ -12,11 +12,11 @@ public class SimpleMappingBuilderContext
 {
     private readonly MapperDescriptor _descriptor;
     private readonly List<Diagnostic> _diagnostics;
-    private readonly MapperConfiguration _configuration;
+    private readonly MapperConfigurationReader _configurationReader;
 
     public SimpleMappingBuilderContext(
         Compilation compilation,
-        MapperConfiguration configuration,
+        MapperConfigurationReader configurationReader,
         WellKnownTypes types,
         SymbolAccessor symbolAccessor,
         AttributeDataAccessor attributeAccessor,
@@ -29,7 +29,7 @@ public class SimpleMappingBuilderContext
         Compilation = compilation;
         Types = types;
         SymbolAccessor = symbolAccessor;
-        _configuration = configuration;
+        _configurationReader = configurationReader;
         _descriptor = descriptor;
         _diagnostics = diagnostics;
         MappingBuilder = mappingBuilder;
@@ -40,7 +40,7 @@ public class SimpleMappingBuilderContext
     protected SimpleMappingBuilderContext(SimpleMappingBuilderContext ctx)
         : this(
             ctx.Compilation,
-            ctx._configuration,
+            ctx._configurationReader,
             ctx.Types,
             ctx.SymbolAccessor,
             ctx.AttributeAccessor,
@@ -52,7 +52,7 @@ public class SimpleMappingBuilderContext
 
     public Compilation Compilation { get; }
 
-    public MapperAttribute MapperConfiguration => _configuration.Mapper;
+    public MapperAttribute MapperConfiguration => _configurationReader.Mapper;
 
     public WellKnownTypes Types { get; }
 
@@ -74,5 +74,5 @@ public class SimpleMappingBuilderContext
         _diagnostics.Add(Diagnostic.Create(descriptor, nodeLocation ?? _descriptor.Syntax.GetLocation(), messageArgs));
     }
 
-    protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef) => _configuration.BuildFor(configRef);
+    protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef) => _configurationReader.BuildFor(configRef);
 }

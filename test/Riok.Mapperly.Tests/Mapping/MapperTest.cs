@@ -125,4 +125,26 @@ public class MapperTest
             )
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public Task AssemblyAttributeShouldWork()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+
+            [assembly: MapperDefaultsAttribute(EnumMappingIgnoreCase = true)]
+            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
+            public partial class MyMapper
+            {
+                partial E2 Map(E1 source);
+            }
+
+            enum E1 { value1 }
+            enum E2 { Value1 }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }
