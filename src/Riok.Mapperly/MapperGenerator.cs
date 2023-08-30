@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Emit;
@@ -20,6 +21,7 @@ public class MapperGenerator : IIncrementalGenerator
     public const string ReportDiagnosticsStep = "Diagnostics";
 
     public static readonly string MapperAttributeName = typeof(MapperAttribute).FullName!;
+    public static readonly string MapperDefaultsAttributeName = typeof(MapperDefaultsAttribute).FullName!;
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -71,6 +73,7 @@ public class MapperGenerator : IIncrementalGenerator
 
         var diagnostics = new List<Diagnostic>();
         var members = new List<MapperNode>();
+        var defaultConfiguration = ReadDefaultConfiguration(wellKnownTypes, compilation);
 
         foreach (var mapperSyntax in mappers.Distinct())
         {
@@ -83,7 +86,14 @@ public class MapperGenerator : IIncrementalGenerator
             if (!symbolAccessor.HasAttribute<MapperAttribute>(mapperSymbol))
                 continue;
 
-            var builder = new DescriptorBuilder(compilation, mapperSyntax, mapperSymbol, wellKnownTypes, symbolAccessor);
+            var builder = new DescriptorBuilder(
+                compilation,
+                mapperSyntax,
+                mapperSymbol,
+                wellKnownTypes,
+                symbolAccessor,
+                defaultConfiguration
+            );
             var (descriptor, descriptorDiagnostics) = builder.Build();
 
             diagnostics.AddRange(descriptorDiagnostics);
@@ -108,5 +118,17 @@ public class MapperGenerator : IIncrementalGenerator
         }
 
         return ImmutableEquatableArray.Empty<Diagnostic>();
+    }
+
+    private static MapperConfiguration? ReadDefaultConfiguration(WellKnownTypes wellKnownTypes, Compilation compilation)
+    {
+        var mapperDefaultsAttributeSymbol = wellKnownTypes.TryGet(MapperDefaultsAttributeName);
+        var mapperDefaultsAttribute = compilation.Assembly
+            .GetAttributes()
+            .FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, mapperDefaultsAttributeSymbol));
+
+        return mapperDefaultsAttribute != null
+            ? AttributeDataAccessor.Access<MapperDefaultsAttribute, MapperConfiguration>(mapperDefaultsAttribute)
+            : null;
     }
 }

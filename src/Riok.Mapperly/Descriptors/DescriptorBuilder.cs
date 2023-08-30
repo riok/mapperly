@@ -28,7 +28,8 @@ public class DescriptorBuilder
         ClassDeclarationSyntax mapperSyntax,
         INamedTypeSymbol mapperSymbol,
         WellKnownTypes wellKnownTypes,
-        SymbolAccessor symbolAccessor
+        SymbolAccessor symbolAccessor,
+        MapperConfiguration? defaultMapperConfiguration
     )
     {
         _mapperDescriptor = new MapperDescriptor(mapperSyntax, mapperSymbol, _methodNameBuilder);
@@ -38,7 +39,7 @@ public class DescriptorBuilder
         var attributeAccessor = new AttributeDataAccessor(symbolAccessor);
         _builderContext = new SimpleMappingBuilderContext(
             compilation,
-            new MapperConfiguration(attributeAccessor, mapperSymbol),
+            new MapperConfigurationReader(attributeAccessor, mapperSymbol, defaultMapperConfiguration),
             wellKnownTypes,
             _symbolAccessor,
             attributeAccessor,

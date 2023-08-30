@@ -20,8 +20,9 @@ public class AttributeDataAccessor
         _symbolAccessor = symbolAccessor;
     }
 
-    public T AccessSingle<T>(ISymbol symbol)
-        where T : Attribute => Access<T, T>(symbol).Single();
+    public TData AccessSingle<TAttribute, TData>(ISymbol symbol)
+        where TAttribute : Attribute
+        where TData : notnull => Access<TAttribute, TData>(symbol).Single();
 
     public TData? AccessFirstOrDefault<TAttribute, TData>(ISymbol symbol)
         where TAttribute : Attribute
@@ -48,37 +49,43 @@ public class AttributeDataAccessor
         where TAttribute : Attribute
         where TData : notnull
     {
-        var attrType = typeof(TAttribute);
-        var dataType = typeof(TData);
-
         var attrDatas = _symbolAccessor.GetAttributes<TAttribute>(symbol);
-
         foreach (var attrData in attrDatas)
         {
-            var syntax = (AttributeSyntax?)attrData.ApplicationSyntaxReference?.GetSyntax();
-            var syntaxArguments =
-                (IReadOnlyList<AttributeArgumentSyntax>?)syntax?.ArgumentList?.Arguments
-                ?? new AttributeArgumentSyntax[attrData.ConstructorArguments.Length + attrData.NamedArguments.Length];
-            var typeArguments = (IReadOnlyCollection<ITypeSymbol>?)attrData.AttributeClass?.TypeArguments ?? Array.Empty<ITypeSymbol>();
-            var attr = Create<TData>(typeArguments, attrData.ConstructorArguments, syntaxArguments);
-
-            var syntaxIndex = attrData.ConstructorArguments.Length;
-            var propertiesByName = dataType.GetProperties().GroupBy(x => x.Name).ToDictionary(x => x.Key, x => x.First());
-            foreach (var namedArgument in attrData.NamedArguments)
-            {
-                if (!propertiesByName.TryGetValue(namedArgument.Key, out var prop))
-                    throw new InvalidOperationException($"Could not get property {namedArgument.Key} of attribute {attrType.FullName}");
-
-                var value = BuildArgumentValue(namedArgument.Value, prop.PropertyType, syntaxArguments[syntaxIndex]);
-                prop.SetValue(attr, value);
-                syntaxIndex++;
-            }
-
-            yield return attr;
+            yield return Access<TAttribute, TData>(attrData);
         }
     }
 
-    private TData Create<TData>(
+    public static TData Access<TAttribute, TData>(AttributeData attrData)
+        where TAttribute : Attribute
+        where TData : notnull
+    {
+        var attrType = typeof(TAttribute);
+        var dataType = typeof(TData);
+
+        var syntax = (AttributeSyntax?)attrData.ApplicationSyntaxReference?.GetSyntax();
+        var syntaxArguments =
+            (IReadOnlyList<AttributeArgumentSyntax>?)syntax?.ArgumentList?.Arguments
+            ?? new AttributeArgumentSyntax[attrData.ConstructorArguments.Length + attrData.NamedArguments.Length];
+        var typeArguments = (IReadOnlyCollection<ITypeSymbol>?)attrData.AttributeClass?.TypeArguments ?? Array.Empty<ITypeSymbol>();
+        var attr = Create<TData>(typeArguments, attrData.ConstructorArguments, syntaxArguments);
+
+        var syntaxIndex = attrData.ConstructorArguments.Length;
+        var propertiesByName = dataType.GetProperties().GroupBy(x => x.Name).ToDictionary(x => x.Key, x => x.First());
+        foreach (var namedArgument in attrData.NamedArguments)
+        {
+            if (!propertiesByName.TryGetValue(namedArgument.Key, out var prop))
+                throw new InvalidOperationException($"Could not get property {namedArgument.Key} of attribute {attrType.FullName}");
+
+            var value = BuildArgumentValue(namedArgument.Value, prop.PropertyType, syntaxArguments[syntaxIndex]);
+            prop.SetValue(attr, value);
+            syntaxIndex++;
+        }
+
+        return attr;
+    }
+
+    private static TData Create<TData>(
         IReadOnlyCollection<ITypeSymbol> typeArguments,
         IReadOnlyCollection<TypedConstant> constructorArguments,
         IReadOnlyList<AttributeArgumentSyntax> argumentSyntax
@@ -180,8 +187,14 @@ public class AttributeDataAccessor
             return null;
 
         var enumRoslynType = arg.Type ?? throw new InvalidOperationException("Type is null");
-        return targetType == typeof(IFieldSymbol)
-            ? enumRoslynType.GetFields().First(f => Equals(f.ConstantValue, arg.Value))
-            : Enum.ToObject(targetType, arg.Value);
+        if (targetType == typeof(IFieldSymbol))
+            return enumRoslynType.GetFields().First(f => Equals(f.ConstantValue, arg.Value));
+
+        if (targetType.IsConstructedGenericType && targetType.GetGenericTypeDefinition() == typeof(Nullable<>))
+        {
+            targetType = Nullable.GetUnderlyingType(targetType)!;
+        }
+
+        return Enum.ToObject(targetType, arg.Value);
     }
 }
