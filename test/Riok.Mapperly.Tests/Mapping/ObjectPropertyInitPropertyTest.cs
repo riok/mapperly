@@ -328,7 +328,7 @@ public class ObjectPropertyInitPropertyTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -339,7 +339,12 @@ public class ObjectPropertyInitPropertyTest
                 target.IntValue = source.IntValue;
                 return target;
                 """
-            );
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.IgnoredTargetMemberExplicitlyMapped,
+                "The target member StringValue on B is ignored, but is also mapped by the MapPropertyAttribute"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -358,7 +363,7 @@ public class ObjectPropertyInitPropertyTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -369,7 +374,12 @@ public class ObjectPropertyInitPropertyTest
                 target.IntValue = source.IntValue;
                 return target;
                 """
-            );
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.IgnoredTargetMemberExplicitlyMapped,
+                "The target member StringValue on B is ignored, but is also mapped by the MapPropertyAttribute"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]

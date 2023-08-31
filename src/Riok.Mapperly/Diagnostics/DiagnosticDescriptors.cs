@@ -428,4 +428,22 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true
     );
+
+    public static readonly DiagnosticDescriptor IgnoredSourceMemberExplicitlyMapped = new DiagnosticDescriptor(
+        "RMG049",
+        "Source member is ignored and also explicitly mapped",
+        "The source member {0} on {1} is ignored, but is also mapped by the " + nameof(MapPropertyAttribute),
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor IgnoredTargetMemberExplicitlyMapped = new DiagnosticDescriptor(
+        "RMG050",
+        "Target member is ignored and also explicitly mapped",
+        "The target member {0} on {1} is ignored, but is also mapped by the " + nameof(MapPropertyAttribute),
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        true
+    );
 }
