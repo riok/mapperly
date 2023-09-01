@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Emit.Syntax;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Templates;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
@@ -16,8 +17,6 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMap
 {
     private const string IsAssignableFromMethodName = nameof(Type.IsAssignableFrom);
     private const string GetTypeMethodName = nameof(GetType);
-    private const string ReferenceHandlerTypeName =
-        "global::Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler";
 
     private readonly List<RuntimeTargetTypeMapping> _mappings = new();
     private readonly bool _enableReferenceHandling;
@@ -61,7 +60,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMap
         {
             // var refHandler = new RefHandler();
             var referenceHandlerName = ctx.NameBuilder.New(DefaultReferenceHandlerParameterName);
-            var createRefHandler = CreateInstance(ReferenceHandlerTypeName);
+            var createRefHandler = ctx.SyntaxFactory.CreateInstance(TemplateReference.PreserveReferenceHandler);
             yield return ctx.SyntaxFactory.DeclareLocalVariable(referenceHandlerName, createRefHandler);
 
             ctx = ctx.WithRefHandler(referenceHandlerName);

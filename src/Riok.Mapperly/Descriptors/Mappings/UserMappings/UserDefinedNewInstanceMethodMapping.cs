@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
-using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
+using Riok.Mapperly.Templates;
 
 namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
@@ -11,9 +11,6 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 /// </summary>
 public class UserDefinedNewInstanceMethodMapping : MethodMapping, IDelegateUserMapping
 {
-    private const string ReferenceHandlerTypeName =
-        "global::Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler";
-
     private readonly bool _enableReferenceHandling;
 
     public UserDefinedNewInstanceMethodMapping(
@@ -47,7 +44,7 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IDelegateUserM
         if (_enableReferenceHandling && ReferenceHandlerParameter == null)
         {
             // new RefHandler();
-            var createRefHandler = CreateInstance(ReferenceHandlerTypeName);
+            var createRefHandler = ctx.SyntaxFactory.CreateInstance(TemplateReference.PreserveReferenceHandler);
             ctx = ctx.WithRefHandler(createRefHandler);
             return new[] { ctx.SyntaxFactory.Return(DelegateMapping.Build(ctx)) };
         }

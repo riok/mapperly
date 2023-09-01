@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+
+    <!--
+    AssemblyName is replaced by the source generator
+    with the name of the assembly of the target project.
+    This is done to reduce type name collisions when
+    InternalsVisibleTo is used in another project,
+    which needs the same generated templated type.
+    -->
+    <RootNamespace>Riok.Mapperly.Internal.AssemblyName</RootNamespace>
+
+    <!--
+    disable nullable and enable it for each file individually,
+    as the target application may not have nullables enabled
+    -->
+    <Nullable>disable</Nullable>
+
+    <!-- disable global usings as the target application may not have them enabled -->
+    <ImplicitUsings>disable</ImplicitUsings>
+
+    <!-- the minimal language version which is supported by Mapperly -->
+    <LangVersion>9</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+    do not use polyfills for the templates,
+    since we only copy the cs files in the directory and we do not know
+    whether the polyfills would be required in the target application.
+    -->
+    <PackageReference Remove="Meziantou.Polyfill" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Riok.Mapperly.Templates.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Riok.Mapperly.Abstractions\Riok.Mapperly.Abstractions.csproj"/>
+  </ItemGroup>
+</Project>

@@ -5,7 +5,7 @@ public partial class Mapper
 {
     private partial void Map(global::A source, global::B target)
     {
-        var refHandler = new global::Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler();
+        var refHandler = new global::Riok.Mapperly.Internal.Tests.PreserveReferenceHandler();
         target.Parent = MapToB(source.Parent, refHandler);
         target.Value = MapToD(source.Value, refHandler);
     }

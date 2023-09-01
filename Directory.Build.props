@@ -1,6 +1,9 @@
 <Project>
 
   <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>embedded</DebugType>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Version>0.0.1-dev</Version>

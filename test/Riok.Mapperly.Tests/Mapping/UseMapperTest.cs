@@ -90,7 +90,7 @@ public class UseMapperTest
             """
             [UseMapper]
             private readonly OtherMapper _otherMapper = new();
-            partial B Map(A source);
+            partial B Map(A source, [ReferenceHandler] IReferenceHandler refHandler);
             """,
             TestSourceBuilderOptions.WithReferenceHandling,
             "record A(AExternal Value);",
@@ -109,7 +109,7 @@ public class UseMapperTest
             """
             [UseMapper]
             private readonly OtherMapper _otherMapper = new();
-            partial B Map(A source);
+            partial B Map(A source, [ReferenceHandler] IReferenceHandler refHandler);
             """,
             TestSourceBuilderOptions.WithReferenceHandling,
             "record A(AExternal Value);",

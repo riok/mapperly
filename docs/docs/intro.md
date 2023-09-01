@@ -39,6 +39,7 @@ For example, Mapperly can report a warning when there is an added property in a 
 - Mapperly does not use reflection
 - Mapperly is trimming and AoT safe
 - Mapperly runs at build time
+- Mapperly does not have a runtime dependency
 - The generated mappings are amazingly fast with minimal memory overhead
 - The generated mapping code is readable and debuggable
 - No need to write and maintain boilerplate code by hand

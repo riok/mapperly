@@ -11,10 +11,6 @@ using Riok.Mapperly.IntegrationTests.Models;
 using VerifyTests;
 using VerifyXunit;
 
-#if !NET6_0_OR_GREATER
-using Riok.Mapperly.IntegrationTests.Helpers;
-#endif
-
 namespace Riok.Mapperly.IntegrationTests
 {
     public abstract class BaseMapperTest

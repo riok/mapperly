@@ -253,7 +253,7 @@ public class ReferenceHandlingTest
     public Task UserImplementedWithoutReferenceHandlerShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial B Map(A a);" + "string ToStringMod(string s) => s + \"-modified\";",
+            """partial B Map(A a); string ToStringMod(string s) => s + "-modified";""",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
@@ -268,7 +268,7 @@ public class ReferenceHandlingTest
     public Task UserImplementedWithReferenceHandlerShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial B Map(A a);" + "string ToStringMod(string s, [ReferenceHandler] IReferenceHandler _) => s + \"-modified\";",
+            """partial B Map(A a); string ToStringMod(string s, [ReferenceHandler] IReferenceHandler _) => s + "-modified";""",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",

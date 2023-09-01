@@ -10,13 +10,16 @@
 
     <!-- Not supported in .NET Framework -->
     <ImplicitUsings>disable</ImplicitUsings>
-  </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
     <!-- .NET Framework 4.8 defaults to lang version 7.3, but we want to test nullable features. These are available in 8.0.
           To also use init-only properties, we upgrade to lang version 9.0, which is works, but is not officially supported. -->
-    <LangVersion>9.0</LangVersion>
+    <LangVersion Condition="'$(TargetFramework)' == 'net48'">9.0</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Not supported in .NET Framework -->
+    <Using Remove="FluentAssertions"/>
+  </ItemGroup>
 
   <!-- For local development, simply reference the projects. -->
   <ItemGroup Condition="'$(MapperlyNugetPackageVersion)' == ''">
@@ -26,7 +29,7 @@
 
   <!-- In the CI pipeline, we always want to use a prebuilt nuget package version, since that nuget package will then be distributed -->
   <ItemGroup Condition="'$(MapperlyNugetPackageVersion)' != ''">
-    <PackageReference Include="Riok.Mapperly" Version="$(MapperlyNugetPackageVersion)" />
+    <PackageReference Include="Riok.Mapperly" Version="$(MapperlyNugetPackageVersion)" PrivateAssets="all" ExcludeAssets="runtime" />
   </ItemGroup>
 
   <!-- ef core tests should only run on newer .NET versions -->

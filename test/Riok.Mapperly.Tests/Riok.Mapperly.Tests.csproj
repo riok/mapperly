@@ -6,10 +6,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="FluentAssertions" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\src\Riok.Mapperly\Riok.Mapperly.csproj" />
     <ProjectReference Include="..\..\src\Riok.Mapperly.Abstractions\Riok.Mapperly.Abstractions.csproj" />
   </ItemGroup>

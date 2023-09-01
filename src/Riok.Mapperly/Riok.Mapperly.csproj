@@ -33,18 +33,25 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4">
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4" PrivateAssets="all" >
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Riok.Mapperly.Abstractions\Riok.Mapperly.Abstractions.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\Riok.Mapperly.Abstractions\Riok.Mapperly.Abstractions.csproj" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup Condition="!$(DefineConstants.Contains('DEBUG_SOURCE_GENERATOR'))">
     <Compile Remove="Helpers/DebuggerUtil.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\Riok.Mapperly.Templates\*.cs"
+                      CopyToOutputDirectory="Never"
+                      Visible="false"
+                      LogicalName="Templates/%(FileName)" />
   </ItemGroup>
 
   <!--

@@ -10,16 +10,24 @@ public readonly partial struct SyntaxFactoryHelper
 {
     public static readonly IdentifierNameSyntax VarIdentifier = IdentifierName("var").AddTrailingSpace();
 
-    private SyntaxFactoryHelper(int indentation)
+    private readonly string _assemblyName;
+
+    public SyntaxFactoryHelper(string assemblyName)
+    {
+        _assemblyName = assemblyName;
+    }
+
+    private SyntaxFactoryHelper(int indentation, string assemblyName)
     {
         Indentation = indentation;
+        _assemblyName = assemblyName;
     }
 
     public int Indentation { get; }
 
-    public SyntaxFactoryHelper AddIndentation() => new(Indentation + 1);
+    public SyntaxFactoryHelper AddIndentation() => new(Indentation + 1, _assemblyName);
 
-    public SyntaxFactoryHelper RemoveIndentation() => new(Indentation - 1);
+    public SyntaxFactoryHelper RemoveIndentation() => new(Indentation - 1, _assemblyName);
 
     public static SyntaxToken Accessibility(Accessibility accessibility)
     {

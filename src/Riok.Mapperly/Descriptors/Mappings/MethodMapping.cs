@@ -90,6 +90,8 @@ public abstract class MethodMapping : NewInstanceMapping
         _methodName ??= methodNameBuilder(this);
     }
 
+    public bool HasReferenceHandlingParameter() => ReferenceHandlerParameter.HasValue;
+
     internal virtual void EnableReferenceHandling(INamedTypeSymbol iReferenceHandlerType)
     {
         ReferenceHandlerParameter ??= new MethodParameter(

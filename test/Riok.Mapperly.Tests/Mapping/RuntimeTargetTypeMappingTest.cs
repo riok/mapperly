@@ -319,8 +319,8 @@ public class RuntimeTargetTypeMappingTest
             """
             partial object Map(object source, Type targetType, [ReferenceHandler] IReferenceHandler refHandler);
 
-            private partial B MapToB(A source);
-            private partial D MapToD(C source);
+            private partial B MapToB(A source, [ReferenceHandler] IReferenceHandler refHandler);
+            private partial D MapToD(C source, [ReferenceHandler] IReferenceHandler refHandler);
             """,
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A {}",

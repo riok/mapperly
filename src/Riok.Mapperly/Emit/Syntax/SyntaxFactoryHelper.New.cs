@@ -1,14 +1,16 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Templates;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Emit.Syntax;
 
 public partial struct SyntaxFactoryHelper
 {
-    public static ObjectCreationExpressionSyntax CreateInstance(string typeName)
+    public ObjectCreationExpressionSyntax CreateInstance(TemplateReference template)
     {
+        var typeName = TemplateReader.GetTypeName(template, _assemblyName);
         var type = IdentifierName(typeName);
         return CreateObject(type, SyntaxFactory.ArgumentList());
     }
