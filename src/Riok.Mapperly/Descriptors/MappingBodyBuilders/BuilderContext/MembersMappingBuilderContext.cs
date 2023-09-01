@@ -15,8 +15,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     where T : IMapping
 {
     private readonly HashSet<string> _unmappedSourceMemberNames;
-    private readonly IReadOnlyCollection<string> _mappedAndIgnoredTargetMemberNames;
-    private readonly IReadOnlyCollection<string> _mappedAndIgnoredSourceMemberNames;
+    private readonly HashSet<string> _mappedAndIgnoredTargetMemberNames;
+    private readonly HashSet<string> _mappedAndIgnoredSourceMemberNames;
     private readonly IReadOnlyCollection<string> _ignoredUnmatchedTargetMemberNames;
     private readonly IReadOnlyCollection<string> _ignoredUnmatchedSourceMemberNames;
 
@@ -46,14 +46,14 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
         MemberConfigsByRootTargetName = GetMemberConfigurations();
 
-        var mappedSourceMemberNames = MemberConfigsByRootTargetName.Values
-            .SelectMany(v => v.Select(s => s.Source.Path.First()))
-            .Distinct()
-            .ToList();
-
         // source and target properties may have been ignored and mapped explicitly
-        _mappedAndIgnoredSourceMemberNames = IgnoredSourceMemberNames.Intersect(mappedSourceMemberNames).ToList();
-        _mappedAndIgnoredTargetMemberNames = ignoredTargetMemberNames.Intersect(MemberConfigsByRootTargetName.Keys).ToList();
+        _mappedAndIgnoredSourceMemberNames = MemberConfigsByRootTargetName.Values
+            .SelectMany(v => v.Select(s => s.Source.Path.First()))
+            .ToHashSet();
+        _mappedAndIgnoredSourceMemberNames.IntersectWith(IgnoredSourceMemberNames);
+
+        _mappedAndIgnoredTargetMemberNames = new HashSet<string>(ignoredTargetMemberNames);
+        _mappedAndIgnoredTargetMemberNames.IntersectWith(MemberConfigsByRootTargetName.Keys);
 
         // remove explicitly mapped ignored targets from ignoredTargetMemberNames
         // then remove all ignored targets from TargetMembers, leaving unignored and explicitly mapped ignored members
