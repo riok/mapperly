@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -35,25 +35,28 @@ public class ArrayForMapping : MethodMapping
         var sourceLengthArrayRank = ArrayRankSpecifier(
             SingletonSeparatedList<ExpressionSyntax>(MemberAccess(ctx.Source, ArrayLengthProperty))
         );
-        var targetInitializationValue = ArrayCreationExpression(
+        var targetInitializationValue = CreateArray(
             ArrayType(FullyQualifiedIdentifier(_targetArrayElementType)).WithRankSpecifiers(SingletonList(sourceLengthArrayRank))
         );
-        yield return DeclareLocalVariable(targetVariableName, targetInitializationValue);
+        yield return ctx.SyntaxFactory.DeclareLocalVariable(targetVariableName, targetInitializationValue);
 
         // target[i] = Map(source[i]);
         var forLoopBuilderCtx = ctx.WithSource(ElementAccess(ctx.Source, IdentifierName(loopCounterVariableName)));
-        var mappedIndexedSourceValue = _elementMapping.Build(forLoopBuilderCtx);
+        var mappedIndexedSourceValue = _elementMapping.Build(forLoopBuilderCtx.AddIndentation());
         var assignment = Assignment(
             ElementAccess(IdentifierName(targetVariableName), IdentifierName(loopCounterVariableName)),
             mappedIndexedSourceValue
         );
-        var assignmentBlock = Block(SingletonList<StatementSyntax>(ExpressionStatement(assignment)));
 
         // for(var i = 0; i < source.Length; i++)
         //   target[i] = Map(source[i]);
-        yield return IncrementalForLoop(loopCounterVariableName, assignmentBlock, MemberAccess(ctx.Source, ArrayLengthProperty));
+        yield return ctx.SyntaxFactory.IncrementalForLoop(
+            loopCounterVariableName,
+            MemberAccess(ctx.Source, ArrayLengthProperty),
+            assignment
+        );
 
         // return target;
-        yield return ReturnVariable(targetVariableName);
+        yield return ctx.SyntaxFactory.ReturnVariable(targetVariableName);
     }
 }

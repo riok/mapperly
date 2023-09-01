@@ -3,7 +3,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.ObjectFactories;
 using Riok.Mapperly.Emit;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -35,18 +34,21 @@ public class NewInstanceObjectFactoryMemberMapping : ObjectMemberMethodMapping
         if (_enableReferenceHandling)
         {
             // TryGetReference
-            yield return ReferenceHandlingSyntaxFactoryHelper.TryGetReference(this, ctx);
+            yield return ReferenceHandlingSyntaxFactoryHelper.TryGetReference(ctx, this);
         }
 
         // var target = CreateMyObject<T>();
-        yield return DeclareLocalVariable(targetVariableName, _objectFactory.CreateType(SourceType, TargetType, ctx.Source));
+        yield return ctx.SyntaxFactory.DeclareLocalVariable(
+            targetVariableName,
+            _objectFactory.CreateType(SourceType, TargetType, ctx.Source)
+        );
 
         // set the reference as soon as it is created,
         // as property mappings could refer to the same instance.
         if (_enableReferenceHandling)
         {
             // SetReference
-            yield return ExpressionStatement(
+            yield return ctx.SyntaxFactory.ExpressionStatement(
                 ReferenceHandlingSyntaxFactoryHelper.SetReference(this, ctx, IdentifierName(targetVariableName))
             );
         }
@@ -58,6 +60,6 @@ public class NewInstanceObjectFactoryMemberMapping : ObjectMemberMethodMapping
         }
 
         // return target;
-        yield return ReturnVariable(targetVariableName);
+        yield return ctx.SyntaxFactory.ReturnVariable(targetVariableName);
     }
 }

@@ -16,7 +16,6 @@ public partial class Mapper
         {
             target.Add(item);
         }
-
         return target;
     }
 }

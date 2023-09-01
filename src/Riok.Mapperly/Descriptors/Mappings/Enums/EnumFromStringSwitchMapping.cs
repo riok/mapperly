@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 
@@ -41,9 +41,8 @@ public class EnumFromStringSwitchMapping : MethodMapping
         var arms = _ignoreCase ? BuildArmsIgnoreCase(ctx) : _enumMembers.Select(BuildArm);
         arms = arms.Append(_fallbackMapping.BuildDiscardArm(ctx));
 
-        var switchExpr = SwitchExpression(ctx.Source).WithArms(CommaSeparatedList(arms, true));
-
-        yield return ReturnStatement(switchExpr);
+        var switchExpr = ctx.SyntaxFactory.Switch(ctx.Source, arms);
+        yield return ctx.SyntaxFactory.Return(switchExpr);
     }
 
     private IEnumerable<SwitchExpressionArmSyntax> BuildArmsIgnoreCase(TypeMappingBuildContext ctx)
@@ -63,7 +62,7 @@ public class EnumFromStringSwitchMapping : MethodMapping
         var typeMemberAccess = MemberAccess(field.ContainingType.NonNullable().FullyQualifiedIdentifierName(), field.Name);
 
         // when s.Equals(nameof(source.Value1), StringComparison.OrdinalIgnoreCase)
-        var whenClause = WhenClause(
+        var whenClause = SwitchWhen(
             Invocation(
                 MemberAccess(ignoreCaseSwitchDesignatedVariableName, StringEqualsMethodName),
                 NameOf(typeMemberAccess),
@@ -72,7 +71,7 @@ public class EnumFromStringSwitchMapping : MethodMapping
         );
 
         // { } s when s.Equals(nameof(source.Value1), StringComparison.OrdinalIgnoreCase) => source.Value1;
-        return SwitchExpressionArm(pattern, typeMemberAccess).WithWhenClause(whenClause);
+        return SwitchArm(pattern, typeMemberAccess).WithWhenClause(whenClause);
     }
 
     private SwitchExpressionArmSyntax BuildArm(IFieldSymbol field)
@@ -80,6 +79,6 @@ public class EnumFromStringSwitchMapping : MethodMapping
         // nameof(source.Value1) => source.Value1;
         var typeMemberAccess = MemberAccess(FullyQualifiedIdentifier(field.ContainingType), field.Name);
         var pattern = ConstantPattern(NameOf(typeMemberAccess));
-        return SwitchExpressionArm(pattern, typeMemberAccess);
+        return SwitchArm(pattern, typeMemberAccess);
     }
 }

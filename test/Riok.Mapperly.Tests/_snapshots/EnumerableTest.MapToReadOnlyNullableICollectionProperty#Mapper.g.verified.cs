@@ -13,7 +13,6 @@ public partial class Mapper
                 target.Value.Add((long)item);
             }
         }
-
         return target;
     }
 }

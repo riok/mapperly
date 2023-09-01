@@ -12,7 +12,6 @@ public partial class Mapper
         {
             target.Value = MapToICollection(source.Value);
         }
-
         return target;
     }
 
@@ -23,7 +22,6 @@ public partial class Mapper
         {
             target.Add(item.ToString());
         }
-
         return target;
     }
 }

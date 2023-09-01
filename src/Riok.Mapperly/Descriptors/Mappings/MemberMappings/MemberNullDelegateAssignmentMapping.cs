@@ -1,8 +1,7 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Symbols;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -35,11 +34,13 @@ public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContai
         var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, true, true, true);
         var nameofSourceAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, true, false, true);
         var condition = IsNotNull(sourceNullConditionalAccess);
+        var conditionCtx = ctx.AddIndentation();
+        var trueClause = base.Build(conditionCtx, targetAccess);
         var elseClause = _throwInsteadOfConditionalNullMapping
-            ? ElseClause(Block(ExpressionStatement(ThrowArgumentNullException(nameofSourceAccess))))
+            ? new[] { conditionCtx.SyntaxFactory.ExpressionStatement(ThrowArgumentNullException(nameofSourceAccess)) }
             : null;
-
-        return new[] { IfStatement(condition, Block(base.Build(ctx, targetAccess)), elseClause), };
+        var ifExpression = ctx.SyntaxFactory.If(condition, trueClause, elseClause);
+        return new[] { ifExpression };
     }
 
     public override bool Equals(object? obj)

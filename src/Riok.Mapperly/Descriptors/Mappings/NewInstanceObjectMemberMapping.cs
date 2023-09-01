@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -31,8 +31,9 @@ public class NewInstanceObjectMemberMapping : NewInstanceMapping, INewInstanceOb
         // add initializer
         if (_initPropertyMappings.Count > 0)
         {
-            var initMappings = _initPropertyMappings.Select(x => x.BuildExpression(ctx, null)).ToArray();
-            objectCreationExpression = objectCreationExpression.WithInitializer(ObjectInitializer(initMappings));
+            var initPropertiesContext = ctx.AddIndentation();
+            var initMappings = _initPropertyMappings.Select(x => x.BuildExpression(initPropertiesContext, null)).ToArray();
+            objectCreationExpression = objectCreationExpression.WithInitializer(ctx.SyntaxFactory.ObjectInitializer(initMappings));
         }
 
         return objectCreationExpression;

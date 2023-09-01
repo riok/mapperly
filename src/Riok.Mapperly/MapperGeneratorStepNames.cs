@@ -2,9 +2,9 @@ namespace Riok.Mapperly;
 
 public static class MapperGeneratorStepNames
 {
-    public const string BuildCompilationContext = "bulidCompilationContext";
-    public const string BuildMapperDefaults = "buildMapperDefaults";
-    public const string ReportDiagnostics = "reportDiagnostics";
-    public const string BuildMappers = "buildMappers";
-    public const string ImplementationSourceOutput = "ImplementationSourceOutput";
+    public const string BuildCompilationContext = nameof(BuildCompilationContext);
+    public const string BuildMapperDefaults = nameof(BuildMapperDefaults);
+    public const string ReportDiagnostics = nameof(ReportDiagnostics);
+    public const string BuildMappers = nameof(BuildMappers);
+    public const string ImplementationSourceOutput = nameof(ImplementationSourceOutput);
 }

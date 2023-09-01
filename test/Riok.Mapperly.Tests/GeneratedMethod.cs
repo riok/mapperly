@@ -5,7 +5,7 @@ namespace Riok.Mapperly.Tests;
 
 public class GeneratedMethod
 {
-    private const string MethodIndention = "    ";
+    private const string MethodIndentation = "    ";
 
     public GeneratedMethod(MethodDeclarationSyntax declarationSyntax)
     {
@@ -21,7 +21,7 @@ public class GeneratedMethod
     public string Body { get; }
 
     /// <summary>
-    /// Builds the method body without the method body braces and without the method body level indention.
+    /// Builds the method body without the method body braces and without the method body level indentation.
     /// </summary>
     /// <param name="declarationSyntax">The syntax of the method.</param>
     /// <returns>The cleaned body.</returns>
@@ -38,6 +38,6 @@ public class GeneratedMethod
         var lines = body.Split(Environment.NewLine);
         return lines.Length == 0
             ? string.Empty
-            : string.Join(Environment.NewLine, lines.Select(l => l.StartsWith(MethodIndention) ? l[MethodIndention.Length..] : l));
+            : string.Join(Environment.NewLine, lines.Select(l => l.StartsWith(MethodIndentation) ? l[MethodIndentation.Length..] : l));
     }
 }

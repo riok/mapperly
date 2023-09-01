@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 
@@ -54,7 +54,7 @@ public class EnumCastMapping : CastMapping
             return casted;
 
         var valueDefinedCondition = BuildIsDefinedCondition(casted);
-        return ConditionalExpression(valueDefinedCondition, casted, _fallback.Build(ctx));
+        return Conditional(valueDefinedCondition, casted, _fallback.Build(ctx));
     }
 
     private ExpressionSyntax BuildIsDefinedCondition(ExpressionSyntax convertedSourceValue)
@@ -64,7 +64,7 @@ public class EnumCastMapping : CastMapping
         {
             // (TargetEnum)v is TargetEnum.A or TargetEnum.B or ...
             CheckDefinedMode.Value
-                => IsPatternExpression(convertedSourceValue, OrPattern(allEnumMembers)),
+                => IsPattern(convertedSourceValue, OrPattern(allEnumMembers)),
 
             // (TargetEnum)v == ((TargetEnum)v & (TargetEnum.A | TargetEnum.B | ...))
             CheckDefinedMode.Flags

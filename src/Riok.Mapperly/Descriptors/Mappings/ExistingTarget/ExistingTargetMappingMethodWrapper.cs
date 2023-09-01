@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 
@@ -23,14 +22,14 @@ public abstract class ExistingTargetMappingMethodWrapper : MethodMapping
     {
         var targetVariableName = ctx.NameBuilder.New(TargetVariableName);
 
-        yield return DeclareLocalVariable(targetVariableName, CreateTargetInstance(ctx));
+        yield return ctx.SyntaxFactory.DeclareLocalVariable(targetVariableName, CreateTargetInstance(ctx));
 
         foreach (var statement in _mapping.Build(ctx, IdentifierName(targetVariableName)))
         {
             yield return statement;
         }
 
-        yield return ReturnVariable(targetVariableName);
+        yield return ctx.SyntaxFactory.ReturnVariable(targetVariableName);
     }
 
     protected abstract ExpressionSyntax CreateTargetInstance(TypeMappingBuildContext ctx);

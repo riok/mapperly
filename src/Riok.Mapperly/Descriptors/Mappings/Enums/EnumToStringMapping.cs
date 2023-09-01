@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 
@@ -26,15 +26,13 @@ public class EnumToStringMapping : MethodMapping
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         // fallback switch arm: _ => source.ToString()
-        var fallbackArm = SwitchExpressionArm(DiscardPattern(), Invocation(MemberAccess(ctx.Source, ToStringMethodName)));
+        var fallbackArm = SwitchArm(DiscardPattern(), Invocation(MemberAccess(ctx.Source, ToStringMethodName)));
 
         // switch for each name to the enum value
         // eg: Enum1.Value1 => "Value1"
         var arms = _enumMembers.Select(BuildArm).Append(fallbackArm);
-
-        var switchExpr = SwitchExpression(ctx.Source).WithArms(CommaSeparatedList(arms, true));
-
-        yield return ReturnStatement(switchExpr);
+        var switchExpr = ctx.SyntaxFactory.Switch(ctx.Source, arms);
+        yield return ctx.SyntaxFactory.Return(switchExpr);
     }
 
     private SwitchExpressionArmSyntax BuildArm(IFieldSymbol field)
@@ -42,6 +40,6 @@ public class EnumToStringMapping : MethodMapping
         var typeMemberAccess = MemberAccess(FullyQualifiedIdentifier(field.ContainingType.NonNullable()), field.Name);
         var pattern = ConstantPattern(typeMemberAccess);
         var nameOf = NameOf(typeMemberAccess);
-        return SwitchExpressionArm(pattern, nameOf);
+        return SwitchArm(pattern, nameOf);
     }
 }

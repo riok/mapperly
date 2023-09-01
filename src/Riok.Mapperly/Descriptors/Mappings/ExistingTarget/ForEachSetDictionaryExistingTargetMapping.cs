@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 
@@ -63,6 +63,6 @@ public class ForEachSetDictionaryExistingTargetMapping : ExistingTargetMapping
 
         var assignment = Assignment(ElementAccess(target, convertedKeyExpression), convertedValueExpression);
 
-        yield return ForEachStatement(VarIdentifier, Identifier(loopItemVariableName), ctx.Source, Block(ExpressionStatement(assignment)));
+        yield return ctx.SyntaxFactory.ForEach(loopItemVariableName, ctx.Source, assignment);
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Emit;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -35,7 +35,7 @@ public class NewInstanceObjectMemberMethodMapping : ObjectMemberMethodMapping, I
         if (_enableReferenceHandling)
         {
             // TryGetReference
-            yield return ReferenceHandlingSyntaxFactoryHelper.TryGetReference(this, ctx);
+            yield return ReferenceHandlingSyntaxFactoryHelper.TryGetReference(ctx, this);
         }
 
         // new T(ctorArgs) { ... };
@@ -45,19 +45,20 @@ public class NewInstanceObjectMemberMethodMapping : ObjectMemberMethodMapping, I
         // add initializer
         if (_initPropertyMappings.Count > 0)
         {
-            var initMappings = _initPropertyMappings.Select(x => x.BuildExpression(ctx, null)).ToArray();
-            objectCreationExpression = objectCreationExpression.WithInitializer(ObjectInitializer(initMappings));
+            var initPropertiesContext = ctx.AddIndentation();
+            var initMappings = _initPropertyMappings.Select(x => x.BuildExpression(initPropertiesContext, null)).ToArray();
+            objectCreationExpression = objectCreationExpression.WithInitializer(ctx.SyntaxFactory.ObjectInitializer(initMappings));
         }
 
         // var target = new T() { ... };
-        yield return DeclareLocalVariable(targetVariableName, objectCreationExpression);
+        yield return ctx.SyntaxFactory.DeclareLocalVariable(targetVariableName, objectCreationExpression);
 
         // set the reference as soon as it is created,
         // as property mappings could refer to the same instance.
         if (_enableReferenceHandling)
         {
             // SetReference
-            yield return ExpressionStatement(
+            yield return ctx.SyntaxFactory.ExpressionStatement(
                 ReferenceHandlingSyntaxFactoryHelper.SetReference(this, ctx, IdentifierName(targetVariableName))
             );
         }
@@ -69,6 +70,6 @@ public class NewInstanceObjectMemberMethodMapping : ObjectMemberMethodMapping, I
         }
 
         // return target;
-        yield return ReturnVariable(targetVariableName);
+        yield return ctx.SyntaxFactory.ReturnVariable(targetVariableName);
     }
 }

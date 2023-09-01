@@ -1,8 +1,7 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using Riok.Mapperly.Emit.Syntax;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 
@@ -13,12 +12,13 @@ public abstract class EnsureCapacityInfo
     public abstract StatementSyntax Build(TypeMappingBuildContext ctx, ExpressionSyntax target);
 
     protected static ExpressionStatementSyntax EnsureCapacityStatement(
+        SyntaxFactoryHelper syntaxFactory,
         ExpressionSyntax target,
         ExpressionSyntax sourceCount,
         ExpressionSyntax targetCount
     )
     {
-        var sumMethod = BinaryExpression(SyntaxKind.AddExpression, sourceCount, targetCount);
-        return ExpressionStatement(Invocation(MemberAccess(target, EnsureCapacityName), sumMethod));
+        var sum = Add(sourceCount, targetCount);
+        return syntaxFactory.ExpressionStatement(Invocation(MemberAccess(target, EnsureCapacityName), sum));
     }
 }

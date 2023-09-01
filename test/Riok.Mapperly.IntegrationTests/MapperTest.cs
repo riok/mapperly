@@ -7,7 +7,7 @@ using Xunit;
 namespace Riok.Mapperly.IntegrationTests
 {
     [UsesVerify]
-    [VersionedSnapshot(Versions.NET6_0 | Versions.NET7_0)]
+    [VersionedSnapshot(Versions.NET6_0)]
     public class MapperTest : BaseMapperTest
     {
         [Fact]

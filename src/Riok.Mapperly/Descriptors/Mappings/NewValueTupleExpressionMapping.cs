@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -14,7 +14,6 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 public class NewValueTupleExpressionMapping : ObjectMemberMethodMapping, INewValueTupleMapping
 {
     private readonly int _argumentCount;
-    private const string NoMappingComment = "// Could not generate mapping";
     private const string TargetVariableName = "target";
     private readonly HashSet<ValueTupleConstructorParameterMapping> _constructorPropertyMappings = new();
 
@@ -31,7 +30,7 @@ public class NewValueTupleExpressionMapping : ObjectMemberMethodMapping, INewVal
         // generate error if constructor argument don't match
         if (_constructorPropertyMappings.Count != _argumentCount)
         {
-            return ThrowNotImplementedException().WithLeadingTrivia(TriviaList(Comment(NoMappingComment)));
+            return ctx.SyntaxFactory.ThrowMappingNotImplementedExceptionStatement();
         }
 
         return base.Build(ctx);
@@ -42,17 +41,17 @@ public class NewValueTupleExpressionMapping : ObjectMemberMethodMapping, INewVal
         // generate error if constructor argument don't match
         if (_constructorPropertyMappings.Count != _argumentCount)
         {
-            yield return ExpressionStatement(ThrowNotImplementedException()).WithLeadingTrivia(TriviaList(Comment(NoMappingComment)));
+            yield return ctx.SyntaxFactory.ExpressionStatement(ctx.SyntaxFactory.ThrowMappingNotImplementedExceptionStatement());
             yield break;
         }
 
         // (Name:.. ,..);
         var ctorArgs = _constructorPropertyMappings.Select(x => x.BuildArgument(ctx, emitFieldName: true));
-        var tupleCreationExpression = TupleExpression(SeparatedList(ctorArgs));
+        var tupleCreationExpression = TupleExpression(CommaSeparatedList(ctorArgs));
 
         // var target = (Name:.. ,..);
         var targetVariableName = ctx.NameBuilder.New(TargetVariableName);
-        yield return DeclareLocalVariable(targetVariableName, tupleCreationExpression);
+        yield return ctx.SyntaxFactory.DeclareLocalVariable(targetVariableName, tupleCreationExpression);
 
         // map properties
         // target.Name.Child = ...
@@ -62,6 +61,6 @@ public class NewValueTupleExpressionMapping : ObjectMemberMethodMapping, INewVal
         }
 
         // return target;
-        yield return ReturnVariable(targetVariableName);
+        yield return ctx.SyntaxFactory.ReturnVariable(targetVariableName);
     }
 }

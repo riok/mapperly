@@ -12,7 +12,6 @@ public partial class Mapper
         {
             target.Value = MapToDArray(source.Value);
         }
-
         return target;
     }
 
@@ -32,7 +31,6 @@ public partial class Mapper
         {
             target[i] = MapToD(source[i]);
         }
-
         return target;
     }
 }

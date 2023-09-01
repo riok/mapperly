@@ -26,7 +26,6 @@ public partial class Mapper
         {
             target[i] = MapToB(source[i], refHandler);
         }
-
         return target;
     }
 

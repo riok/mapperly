@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -29,7 +30,7 @@ public class ValueTupleConstructorParameterMapping
         // add field name if available
         return SymbolEqualityComparer.Default.Equals(Parameter.CorrespondingTupleField, Parameter)
             ? argument
-            : argument.WithNameColon(NameColon(IdentifierName(Parameter.Name)));
+            : argument.WithNameColon(SpacedNameColon(Parameter.Name));
     }
 
     protected bool Equals(ValueTupleConstructorParameterMapping other) =>

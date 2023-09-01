@@ -1,8 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 
@@ -34,20 +33,15 @@ public class ForEachAddEnumerableExistingTargetMapping : ExistingTargetMapping
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
-        var (loopItemCtx, loopItemVariableName) = ctx.WithNewSource(LoopItemVariableName);
-        var convertedSourceItemExpression = _elementMapping.Build(loopItemCtx);
-        var addMethod = MemberAccess(target, _insertMethodName);
-
         if (_ensureCapacityBuilder != null)
         {
             yield return _ensureCapacityBuilder.Build(ctx, target);
         }
 
-        yield return ForEachStatement(
-            VarIdentifier,
-            Identifier(loopItemVariableName),
-            ctx.Source,
-            Block(ExpressionStatement(Invocation(addMethod, convertedSourceItemExpression)))
-        );
+        var (loopItemCtx, loopItemVariableName) = ctx.WithNewSource(LoopItemVariableName);
+        var convertedSourceItemExpression = _elementMapping.Build(loopItemCtx);
+        var addMethod = MemberAccess(target, _insertMethodName);
+        var body = Invocation(addMethod, convertedSourceItemExpression);
+        yield return ctx.SyntaxFactory.ForEach(loopItemVariableName, ctx.Source, body);
     }
 }

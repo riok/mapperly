@@ -1,16 +1,11 @@
+using Riok.Mapperly.Emit.Syntax;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Emit;
 
-public class SourceEmitterContext
+public record SourceEmitterContext(bool IsStatic, UniqueNameBuilder NameBuilder, SyntaxFactoryHelper SyntaxFactory)
 {
-    public SourceEmitterContext(bool isStatic, UniqueNameBuilder nameBuilder)
-    {
-        IsStatic = isStatic;
-        NameBuilder = nameBuilder;
-    }
+    public SourceEmitterContext AddIndentation() => this with { SyntaxFactory = SyntaxFactory.AddIndentation() };
 
-    public bool IsStatic { get; }
-
-    public UniqueNameBuilder NameBuilder { get; }
+    public SourceEmitterContext RemoveIndentation() => this with { SyntaxFactory = SyntaxFactory.RemoveIndentation() };
 }

@@ -12,7 +12,6 @@ public partial class Mapper
         {
             target.Value = MapToIReadOnlyCollection(source.Value);
         }
-
         return target;
     }
 
@@ -23,7 +22,6 @@ public partial class Mapper
         {
             target[i] = source[i].ToString();
         }
-
         return target;
     }
 }

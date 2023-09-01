@@ -3,8 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -69,7 +68,7 @@ public class NullMemberMapping : IMemberMapping
             : SourcePath.BuildNonNullConditionWithoutConditionalAccess(ctx.Source)!;
         var sourceMemberAccess = SourcePath.BuildAccess(ctx.Source, true);
         ctx = ctx.WithSource(sourceMemberAccess);
-        return ConditionalExpression(
+        return Conditional(
             notNullCondition,
             _delegateMapping.Build(ctx),
             NullSubstitute(_delegateMapping.TargetType, sourceMemberAccess, _nullFallback)

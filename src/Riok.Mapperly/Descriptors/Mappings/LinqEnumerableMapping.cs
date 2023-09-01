@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -37,7 +36,7 @@ public class LinqEnumerableMapping : NewInstanceMapping
         {
             var (lambdaCtx, lambdaSourceName) = ctx.WithNewScopedSource();
             var sourceMapExpression = _elementMapping.Build(lambdaCtx);
-            var convertLambda = SimpleLambdaExpression(Parameter(Identifier(lambdaSourceName))).WithExpressionBody(sourceMapExpression);
+            var convertLambda = Lambda(lambdaSourceName, sourceMapExpression);
             mappedSource = Invocation(_selectMethod, ctx.Source, convertLambda);
         }
         else

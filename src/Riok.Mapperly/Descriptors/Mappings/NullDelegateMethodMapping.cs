@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -29,10 +29,10 @@ public class NullDelegateMethodMapping : MethodMapping
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         var body = _delegateMapping.BuildBody(ctx);
-        return AddPreNullHandling(ctx.Source, body);
+        return AddPreNullHandling(ctx, body);
     }
 
-    private IEnumerable<StatementSyntax> AddPreNullHandling(ExpressionSyntax source, IEnumerable<StatementSyntax> body)
+    private IEnumerable<StatementSyntax> AddPreNullHandling(TypeMappingBuildContext ctx, IEnumerable<StatementSyntax> body)
     {
         if (!SourceType.IsNullable() || _delegateMapping.SourceType.IsNullable())
             return body;
@@ -41,6 +41,8 @@ public class NullDelegateMethodMapping : MethodMapping
         // call mapping only if source is not null.
         // if (source == null)
         //   return <null-substitute>;
-        return body.Prepend(IfNullReturnOrThrow(source, NullSubstitute(TargetType.NonNullable(), source, _nullFallbackValue)));
+        var fallbackExpression = NullSubstitute(TargetType.NonNullable(), ctx.Source, _nullFallbackValue);
+        var ifExpression = ctx.SyntaxFactory.IfNullReturnOrThrow(ctx.Source, fallbackExpression);
+        return body.Prepend(ifExpression);
     }
 }

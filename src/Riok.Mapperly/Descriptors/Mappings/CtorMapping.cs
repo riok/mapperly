@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -13,8 +12,5 @@ public class CtorMapping : NewInstanceMapping
     public CtorMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
         : base(sourceType, targetType) { }
 
-    public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
-    {
-        return ObjectCreationExpression(FullyQualifiedIdentifier(TargetType)).WithArgumentList(ArgumentList(ctx.Source));
-    }
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) => CreateInstance(TargetType, ctx.Source);
 }

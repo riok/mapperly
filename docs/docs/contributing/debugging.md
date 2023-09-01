@@ -12,7 +12,7 @@ To debug the Mapperly in unit tests set a breakpoint
 in the code of Mappery which you want to debug and run the tests in debug mode.
 
 If your IDE supports the `DebugRoslynComponent` launch configuration command,
-you can just set your breakpoints and debug the preconfigured `integration-tests` profile which will debug Mapperly
+you can just set your breakpoints and debug the preconfigured `IntegrationTests` profile which will debug Mapperly
 in the context of the integration tests.
 JetBrains Rider and Visual Studio both support `DebugRoslynComponent`.
 Visual Studio requires the [Roslyn SDK](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/) to be installed.

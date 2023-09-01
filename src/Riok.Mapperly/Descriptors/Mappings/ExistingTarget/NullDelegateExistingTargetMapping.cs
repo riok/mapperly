@@ -1,8 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 
@@ -27,21 +26,21 @@ public class NullDelegateExistingTargetMapping : ExistingTargetMapping
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
-        var body = _delegateMapping.Build(ctx, target);
-
         // if the source or target type is nullable, add a null guard.
         if (!SourceType.IsNullable() && !TargetType.IsNullable())
-            return body;
+            return _delegateMapping.Build(ctx, target);
 
-        var enumerated = body.ToArray();
+        var body = _delegateMapping.Build(ctx.AddIndentation(), target).ToArray();
 
         // if body is empty don't generate an if statement
-        if (enumerated.Length == 0)
+        if (body.Length == 0)
         {
             return Enumerable.Empty<StatementSyntax>();
         }
 
         // if (source != null && target != null) { body }
-        return new[] { IfStatement(IfNoneNull((SourceType, ctx.Source), (TargetType, target)), Block(enumerated)), };
+        var condition = IfNoneNull((SourceType, ctx.Source), (TargetType, target));
+        var ifStatement = ctx.SyntaxFactory.If(condition, body);
+        return new[] { ifStatement };
     }
 }

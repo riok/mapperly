@@ -47,54 +47,48 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         private partial global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto MapToDtoInternal(global::Riok.Mapperly.IntegrationTests.Models.TestObject testObject)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto(DirectInt(testObject.CtorValue), ctorValue2: DirectInt(testObject.CtorValue2))
-            {IntInitOnlyValue = DirectInt(testObject.IntInitOnlyValue), RequiredValue = DirectInt(testObject.RequiredValue)};
+            {
+                IntInitOnlyValue = DirectInt(testObject.IntInitOnlyValue),
+                RequiredValue = DirectInt(testObject.RequiredValue),
+            };
             if (testObject.NullableFlattening != null)
             {
                 target.NullableFlatteningIdValue = CastIntNullable(testObject.NullableFlattening.IdValue);
             }
-
             if (testObject.NullableUnflatteningIdValue != null)
             {
                 target.NullableUnflattening ??= new();
                 target.NullableUnflattening.IdValue = DirectInt(testObject.NullableUnflatteningIdValue.Value);
             }
-
             if (testObject.NestedNullable != null)
             {
                 target.NestedNullableIntValue = DirectInt(testObject.NestedNullable.IntValue);
                 target.NestedNullable = MapToTestObjectNestedDto(testObject.NestedNullable);
             }
-
             if (testObject.NestedNullableTargetNotNullable != null)
             {
                 target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(testObject.NestedNullableTargetNotNullable);
             }
-
             if (testObject.StringNullableTargetNotNullable != null)
             {
                 target.StringNullableTargetNotNullable = testObject.StringNullableTargetNotNullable;
             }
-
             if (testObject.TupleValue != null)
             {
                 target.TupleValue = MapToValueTuple(testObject.TupleValue.Value);
             }
-
             if (testObject.RecursiveObject != null)
             {
                 target.RecursiveObject = MapToDto(testObject.RecursiveObject);
             }
-
             if (testObject.NullableReadOnlyObjectCollection != null)
             {
                 target.NullableReadOnlyObjectCollection = MapToTestObjectNestedDtoArray(testObject.NullableReadOnlyObjectCollection);
             }
-
             if (testObject.SubObject != null)
             {
                 target.SubObject = MapToInheritanceSubObjectDto(testObject.SubObject);
             }
-
             target.IntValue = DirectInt(testObject.IntValue);
             target.StringValue = testObject.StringValue;
             target.RenamedStringValue2 = testObject.RenamedStringValue;
@@ -117,24 +111,20 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.ExistingISet.Add(ParseableInt(item));
             }
-
             target.ExistingHashSet.EnsureCapacity(testObject.ExistingHashSet.Count + target.ExistingHashSet.Count);
             foreach (var item1 in testObject.ExistingHashSet)
             {
                 target.ExistingHashSet.Add(ParseableInt(item1));
             }
-
             foreach (var item2 in testObject.ExistingSortedSet)
             {
                 target.ExistingSortedSet.Add(ParseableInt(item2));
             }
-
             target.ExistingList.EnsureCapacity(testObject.ExistingList.Count + target.ExistingList.Count);
             foreach (var item3 in testObject.ExistingList)
             {
                 target.ExistingList.Add(ParseableInt(item3));
             }
-
             target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(testObject.ISet, x => ParseableInt(x)));
             target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(testObject.IReadOnlySet, x => ParseableInt(x)));
             target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(testObject.HashSet, x => ParseableInt(x)));
@@ -153,37 +143,34 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public partial global::Riok.Mapperly.IntegrationTests.Models.TestObject MapFromDto(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto dto)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObject(DirectInt(dto.CtorValue), ctorValue2: DirectInt(dto.CtorValue2))
-            {IntInitOnlyValue = DirectInt(dto.IntInitOnlyValue), RequiredValue = DirectInt(dto.RequiredValue)};
+            {
+                IntInitOnlyValue = DirectInt(dto.IntInitOnlyValue),
+                RequiredValue = DirectInt(dto.RequiredValue),
+            };
             if (dto.NullableUnflattening != null)
             {
                 target.NullableUnflatteningIdValue = CastIntNullable(dto.NullableUnflattening.IdValue);
             }
-
             if (dto.NestedNullable != null)
             {
                 target.NestedNullable = MapToTestObjectNested(dto.NestedNullable);
             }
-
             if (dto.TupleValue != null)
             {
                 target.TupleValue = MapToValueTuple1(dto.TupleValue.Value);
             }
-
             if (dto.RecursiveObject != null)
             {
                 target.RecursiveObject = MapFromDto(dto.RecursiveObject);
             }
-
             if (dto.NullableReadOnlyObjectCollection != null)
             {
                 target.NullableReadOnlyObjectCollection = MapToIReadOnlyCollection(dto.NullableReadOnlyObjectCollection);
             }
-
             if (dto.SubObject != null)
             {
                 target.SubObject = MapToInheritanceSubObject(dto.SubObject);
             }
-
             target.IntValue = DirectInt(dto.IntValue);
             target.StringValue = dto.StringValue;
             target.UnflatteningIdValue = DirectInt(dto.Unflattening.IdValue);
@@ -205,24 +192,20 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.ExistingISet.Add(item.ToString());
             }
-
             target.ExistingHashSet.EnsureCapacity(dto.ExistingHashSet.Count + target.ExistingHashSet.Count);
             foreach (var item1 in dto.ExistingHashSet)
             {
                 target.ExistingHashSet.Add(item1.ToString());
             }
-
             foreach (var item2 in dto.ExistingSortedSet)
             {
                 target.ExistingSortedSet.Add(item2.ToString());
             }
-
             target.ExistingList.EnsureCapacity(dto.ExistingList.Count + target.ExistingList.Count);
             foreach (var item3 in dto.ExistingList)
             {
                 target.ExistingList.Add(item3.ToString());
             }
-
             target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.ISet, x => x.ToString()));
             target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.IReadOnlySet, x => x.ToString()));
             target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.HashSet, x => x.ToString()));
@@ -242,43 +225,35 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.NullableFlatteningIdValue = CastIntNullable(source.NullableFlattening.IdValue);
             }
-
             if (source.NestedNullable != null)
             {
                 target.NestedNullableIntValue = DirectInt(source.NestedNullable.IntValue);
                 target.NestedNullable = MapToTestObjectNestedDto(source.NestedNullable);
             }
-
             if (source.NestedNullableTargetNotNullable != null)
             {
                 target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(source.NestedNullableTargetNotNullable);
             }
-
             if (source.StringNullableTargetNotNullable != null)
             {
                 target.StringNullableTargetNotNullable = source.StringNullableTargetNotNullable;
             }
-
             if (source.TupleValue != null)
             {
                 target.TupleValue = MapToValueTuple(source.TupleValue.Value);
             }
-
             if (source.RecursiveObject != null)
             {
                 target.RecursiveObject = MapToDto(source.RecursiveObject);
             }
-
             if (source.NullableReadOnlyObjectCollection != null)
             {
                 target.NullableReadOnlyObjectCollection = MapToTestObjectNestedDtoArray(source.NullableReadOnlyObjectCollection);
             }
-
             if (source.SubObject != null)
             {
                 target.SubObject = MapToInheritanceSubObjectDto(source.SubObject);
             }
-
             target.CtorValue = DirectInt(source.CtorValue);
             target.CtorValue2 = DirectInt(source.CtorValue2);
             target.IntValue = DirectInt(source.IntValue);
@@ -301,24 +276,20 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.ExistingISet.Add(ParseableInt(item));
             }
-
             target.ExistingHashSet.EnsureCapacity(source.ExistingHashSet.Count + target.ExistingHashSet.Count);
             foreach (var item1 in source.ExistingHashSet)
             {
                 target.ExistingHashSet.Add(ParseableInt(item1));
             }
-
             foreach (var item2 in source.ExistingSortedSet)
             {
                 target.ExistingSortedSet.Add(ParseableInt(item2));
             }
-
             target.ExistingList.EnsureCapacity(source.ExistingList.Count + target.ExistingList.Count);
             foreach (var item3 in source.ExistingList)
             {
                 target.ExistingList.Add(ParseableInt(item3));
             }
-
             target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(source.ISet, x => ParseableInt(x)));
             target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(source.IReadOnlySet, x => ParseableInt(x)));
             target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(source.HashSet, x => ParseableInt(x)));
@@ -371,7 +342,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target[i] = MapToTestObjectNestedDto(item);
                 i++;
             }
-
             return target;
         }
 
@@ -382,7 +352,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target[i] = ParseableInt(source[i]);
             }
-
             return target;
         }
 
@@ -393,7 +362,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target[i] = ParseableInt(source[i]);
             }
-
             return target;
         }
 
@@ -447,7 +415,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target[i] = MapToTestObjectNested(source[i]);
             }
-
             return target;
         }
 
@@ -458,7 +425,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target[i] = source[i].ToString();
             }
-
             return target;
         }
 

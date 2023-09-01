@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -43,17 +43,17 @@ public class ArrayForEachMapping : MethodMapping
         var sourceLengthArrayRank = ArrayRankSpecifier(
             SingletonSeparatedList<ExpressionSyntax>(MemberAccess(ctx.Source, _countPropertyName))
         );
-        var targetInitializationValue = ArrayCreationExpression(
+        var targetInitializationValue = CreateArray(
             ArrayType(FullyQualifiedIdentifier(_targetArrayElementType)).WithRankSpecifiers(SingletonList(sourceLengthArrayRank))
         );
-        yield return DeclareLocalVariable(targetVariableName, targetInitializationValue);
+        yield return ctx.SyntaxFactory.DeclareLocalVariable(targetVariableName, targetInitializationValue);
 
         // var i = 0;
-        yield return DeclareLocalVariable(loopCounterVariableName, IntLiteral(0));
+        yield return ctx.SyntaxFactory.DeclareLocalVariable(loopCounterVariableName, IntLiteral(0));
 
         // target[i] = Map(item);
         var (loopItemCtx, loopItemVariableName) = ctx.WithNewSource(LoopItemVariableName);
-        var convertedSourceItemExpression = _elementMapping.Build(loopItemCtx);
+        var convertedSourceItemExpression = _elementMapping.Build(loopItemCtx.AddIndentation());
 
         var assignment = Assignment(
             ElementAccess(IdentifierName(targetVariableName), IdentifierName(loopCounterVariableName)),
@@ -63,18 +63,14 @@ public class ArrayForEachMapping : MethodMapping
         // i++;
         var counterIncrement = PostfixUnaryExpression(SyntaxKind.PostIncrementExpression, IdentifierName(loopCounterVariableName));
 
-        // target[i] = Map(item);
-        // i++;
-        var assignmentBlock = Block(ExpressionStatement(assignment), ExpressionStatement(counterIncrement));
-
         // foreach(var item in source)
         //{
         //   target[i] = Map(item);
         //   i++;
         //}
-        yield return ForEachStatement(VarIdentifier, Identifier(loopItemVariableName), ctx.Source, assignmentBlock);
+        yield return ctx.SyntaxFactory.ForEach(loopItemVariableName, ctx.Source, assignment, counterIncrement);
 
         // return target;
-        yield return ReturnVariable(targetVariableName);
+        yield return ctx.SyntaxFactory.ReturnVariable(targetVariableName);
     }
 }

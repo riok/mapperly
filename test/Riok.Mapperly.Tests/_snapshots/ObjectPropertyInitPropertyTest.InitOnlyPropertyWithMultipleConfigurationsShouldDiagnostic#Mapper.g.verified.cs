@@ -7,7 +7,7 @@ public partial class Mapper
     {
         var target = new global::B()
         {
-            StringValue = source.StringValue2
+            StringValue = source.StringValue2,
         };
         return target;
     }

@@ -1,21 +1,33 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Emit.Syntax;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
-public class TypeMappingBuildContext
+public readonly record struct TypeMappingBuildContext
 {
     private const string DefaultSourceName = "x";
 
-    public TypeMappingBuildContext(string source, string? referenceHandler, UniqueNameBuilder nameBuilder)
-        : this(IdentifierName(source), referenceHandler == null ? null : IdentifierName(referenceHandler), nameBuilder) { }
+    public TypeMappingBuildContext(
+        string source,
+        string? referenceHandler,
+        UniqueNameBuilder nameBuilder,
+        SyntaxFactoryHelper syntaxFactory
+    )
+        : this(IdentifierName(source), referenceHandler == null ? null : IdentifierName(referenceHandler), nameBuilder, syntaxFactory) { }
 
-    private TypeMappingBuildContext(ExpressionSyntax source, ExpressionSyntax? referenceHandler, UniqueNameBuilder nameBuilder)
+    private TypeMappingBuildContext(
+        ExpressionSyntax source,
+        ExpressionSyntax? referenceHandler,
+        UniqueNameBuilder nameBuilder,
+        SyntaxFactoryHelper syntaxFactory
+    )
     {
         Source = source;
         ReferenceHandler = referenceHandler;
         NameBuilder = nameBuilder;
+        SyntaxFactory = syntaxFactory;
     }
 
     public UniqueNameBuilder NameBuilder { get; }
@@ -23,6 +35,10 @@ public class TypeMappingBuildContext
     public ExpressionSyntax Source { get; }
 
     public ExpressionSyntax? ReferenceHandler { get; }
+
+    public SyntaxFactoryHelper SyntaxFactory { get; }
+
+    public TypeMappingBuildContext AddIndentation() => new(Source, ReferenceHandler, NameBuilder, SyntaxFactory.AddIndentation());
 
     /// <summary>
     /// Creates a new scoped name builder,
@@ -43,7 +59,7 @@ public class TypeMappingBuildContext
     {
         var scopedNameBuilder = NameBuilder.NewScope();
         var scopedSourceName = scopedNameBuilder.New(DefaultSourceName);
-        var ctx = new TypeMappingBuildContext(sourceBuilder(scopedSourceName), ReferenceHandler, scopedNameBuilder);
+        var ctx = new TypeMappingBuildContext(sourceBuilder(scopedSourceName), ReferenceHandler, scopedNameBuilder, SyntaxFactory);
         return (ctx, scopedSourceName);
     }
 
@@ -53,9 +69,9 @@ public class TypeMappingBuildContext
         return (WithSource(IdentifierName(scopedSourceName)), scopedSourceName);
     }
 
-    public TypeMappingBuildContext WithSource(ExpressionSyntax source) => new(source, ReferenceHandler, NameBuilder);
+    public TypeMappingBuildContext WithSource(ExpressionSyntax source) => new(source, ReferenceHandler, NameBuilder, SyntaxFactory);
 
     public TypeMappingBuildContext WithRefHandler(string refHandler) => WithRefHandler(IdentifierName(refHandler));
 
-    public TypeMappingBuildContext WithRefHandler(ExpressionSyntax refHandler) => new(Source, refHandler, NameBuilder);
+    public TypeMappingBuildContext WithRefHandler(ExpressionSyntax refHandler) => new(Source, refHandler, NameBuilder, SyntaxFactory);
 }

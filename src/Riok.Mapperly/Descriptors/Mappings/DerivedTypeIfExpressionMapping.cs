@@ -1,8 +1,7 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -51,10 +50,7 @@ public class DerivedTypeIfExpressionMapping : NewInstanceMapping
         var castedSourceContext = ctx.WithSource(
             ParenthesizedExpression(CastExpression(FullyQualifiedIdentifier(mapping.SourceType), ctx.Source))
         );
-        return ConditionalExpression(
-            BinaryExpression(SyntaxKind.IsExpression, ctx.Source, FullyQualifiedIdentifier(mapping.SourceType)),
-            mapping.Build(castedSourceContext),
-            notMatched
-        );
+        var condition = Is(ctx.Source, FullyQualifiedIdentifier(mapping.SourceType));
+        return Conditional(condition, mapping.Build(castedSourceContext), notMatched);
     }
 }

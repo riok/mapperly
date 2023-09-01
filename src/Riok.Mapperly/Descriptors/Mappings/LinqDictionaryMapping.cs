@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -42,11 +41,11 @@ public class LinqDictionaryMapping : NewInstanceMapping
         // ie: source.ToImmutableDictionary(x => x.Key, x => (int)x.Value);
         var (keyLambdaCtx, keyLambdaParamName) = ctx.WithNewScopedSource(src => MemberAccess(src, KeyPropertyName));
         var keyMapExpression = _keyMapping.Build(keyLambdaCtx);
-        var keyExpression = SimpleLambdaExpression(Parameter(Identifier(keyLambdaParamName))).WithExpressionBody(keyMapExpression);
+        var keyExpression = Lambda(keyLambdaParamName, keyMapExpression);
 
         var (valueLambdaCtx, valueLambdaParamName) = ctx.WithNewScopedSource(src => MemberAccess(src, ValuePropertyName));
         var valueMapExpression = _valueMapping.Build(valueLambdaCtx);
-        var valueExpression = SimpleLambdaExpression(Parameter(Identifier(valueLambdaParamName))).WithExpressionBody(valueMapExpression);
+        var valueExpression = Lambda(valueLambdaParamName, valueMapExpression);
 
         return Invocation(_collectMethod, ctx.Source, keyExpression, valueExpression);
     }
