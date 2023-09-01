@@ -110,6 +110,11 @@ public static class CollectionInfoBuilder
 
     private static ITypeSymbol? GetEnumeratedType(WellKnownTypes types, ITypeSymbol type)
     {
+        // check if array
+        // this should be user over the IEnumerable check to prevent element null annotation erasure
+        if (type is IArrayTypeSymbol arrayType)
+            return arrayType.ElementType;
+
         if (type.ImplementsGeneric(types.Get(typeof(IEnumerable<>)), out var enumerableIntf))
             return enumerableIntf.TypeArguments[0];
 
