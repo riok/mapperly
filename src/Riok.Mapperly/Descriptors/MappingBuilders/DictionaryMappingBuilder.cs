@@ -11,7 +11,6 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public static class DictionaryMappingBuilder
 {
-    private const string CountPropertyName = nameof(IDictionary<object, object>.Count);
     private const string SetterIndexerPropertyName = "set_Item";
 
     private const string ToImmutableDictionaryMethodName = "global::System.Collections.Immutable.ImmutableDictionary.ToImmutableDictionary";
