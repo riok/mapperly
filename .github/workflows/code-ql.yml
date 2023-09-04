@@ -30,7 +30,7 @@ jobs:
           - csharp
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}

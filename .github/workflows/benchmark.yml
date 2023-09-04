@@ -39,7 +39,7 @@ jobs:
           - SourceGeneratorBenchmarks
     name: ${{ matrix.BENCHMARK_NAME }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v3.2.0
       - name: Run ${{ matrix.BENCHMARK_NAME }}
         working-directory: ${{ env.BENCHMARKS_PATH }}
