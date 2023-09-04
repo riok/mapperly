@@ -1,4 +1,4 @@
-﻿using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
@@ -245,7 +245,7 @@ public class IgnoreObsoleteTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -254,7 +254,16 @@ public class IgnoreObsoleteTest
                 target.Ignored = source.Ignored;
                 return target;
                 """
-            );
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.IgnoredSourceMemberExplicitlyMapped,
+                "The source member Ignored on A is ignored, but is also mapped by the MapPropertyAttribute"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.IgnoredTargetMemberExplicitlyMapped,
+                "The target member Ignored on B is ignored, but is also mapped by the MapPropertyAttribute"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -271,7 +280,7 @@ public class IgnoreObsoleteTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -280,7 +289,12 @@ public class IgnoreObsoleteTest
                 target.Ignored = source.Ignored;
                 return target;
                 """
-            );
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.IgnoredSourceMemberExplicitlyMapped,
+                "The source member Ignored on A is ignored, but is also mapped by the MapPropertyAttribute"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -297,7 +311,7 @@ public class IgnoreObsoleteTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -306,7 +320,12 @@ public class IgnoreObsoleteTest
                 target.Ignored = source.Ignored;
                 return target;
                 """
-            );
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.IgnoredTargetMemberExplicitlyMapped,
+                "The target member Ignored on B is ignored, but is also mapped by the MapPropertyAttribute"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -331,7 +350,7 @@ public class IgnoreObsoleteTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -342,7 +361,12 @@ public class IgnoreObsoleteTest
                 target.Value = source.Value;
                 return target;
                 """
-            );
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.IgnoredTargetMemberExplicitlyMapped,
+                "The target member Ignored on B is ignored, but is also mapped by the MapPropertyAttribute"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -367,7 +391,7 @@ public class IgnoreObsoleteTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -378,6 +402,11 @@ public class IgnoreObsoleteTest
                 target.Value = source.Value;
                 return target;
                 """
-            );
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.IgnoredTargetMemberExplicitlyMapped,
+                "The target member Ignored on B is ignored, but is also mapped by the MapPropertyAttribute"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 }

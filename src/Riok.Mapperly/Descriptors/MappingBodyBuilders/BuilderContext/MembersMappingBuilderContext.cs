@@ -15,6 +15,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     where T : IMapping
 {
     private readonly HashSet<string> _unmappedSourceMemberNames;
+    private readonly HashSet<string> _mappedAndIgnoredTargetMemberNames;
+    private readonly HashSet<string> _mappedAndIgnoredSourceMemberNames;
     private readonly IReadOnlyCollection<string> _ignoredUnmatchedTargetMemberNames;
     private readonly IReadOnlyCollection<string> _ignoredUnmatchedSourceMemberNames;
 
@@ -44,9 +46,19 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
         MemberConfigsByRootTargetName = GetMemberConfigurations();
 
+        // source and target properties may have been ignored and mapped explicitly
+        _mappedAndIgnoredSourceMemberNames = MemberConfigsByRootTargetName.Values
+            .SelectMany(v => v.Select(s => s.Source.Path.First()))
+            .ToHashSet();
+        _mappedAndIgnoredSourceMemberNames.IntersectWith(IgnoredSourceMemberNames);
+
+        _mappedAndIgnoredTargetMemberNames = new HashSet<string>(ignoredTargetMemberNames);
+        _mappedAndIgnoredTargetMemberNames.IntersectWith(MemberConfigsByRootTargetName.Keys);
+
         // remove explicitly mapped ignored targets from ignoredTargetMemberNames
         // then remove all ignored targets from TargetMembers, leaving unignored and explicitly mapped ignored members
-        ignoredTargetMemberNames.ExceptWith(MemberConfigsByRootTargetName.Keys);
+        ignoredTargetMemberNames.ExceptWith(_mappedAndIgnoredTargetMemberNames);
+
         TargetMembers.RemoveRange(ignoredTargetMemberNames);
     }
 
@@ -66,6 +78,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         AddUnmatchedIgnoredSourceMembersDiagnostics();
         AddUnmatchedTargetMembersDiagnostics();
         AddUnmatchedSourceMembersDiagnostics();
+        AddMappedAndIgnoredSourceMembersDiagnostics();
+        AddMappedAndIgnoredTargetMembersDiagnostics();
     }
 
     protected void SetSourceMemberMapped(MemberPath sourcePath) => _unmappedSourceMemberNames.Remove(sourcePath.Path.First().Name);
@@ -159,6 +173,30 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
                 sourceMemberName,
                 Mapping.SourceType,
                 Mapping.TargetType
+            );
+        }
+    }
+
+    private void AddMappedAndIgnoredTargetMembersDiagnostics()
+    {
+        foreach (var targetMemberName in _mappedAndIgnoredTargetMemberNames)
+        {
+            BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.IgnoredTargetMemberExplicitlyMapped,
+                targetMemberName,
+                Mapping.TargetType
+            );
+        }
+    }
+
+    private void AddMappedAndIgnoredSourceMembersDiagnostics()
+    {
+        foreach (var sourceMemberName in _mappedAndIgnoredSourceMemberNames)
+        {
+            BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.IgnoredSourceMemberExplicitlyMapped,
+                sourceMemberName,
+                Mapping.SourceType
             );
         }
     }

@@ -114,4 +114,5 @@ RMG047  | Mapper   | Error    | Cannot map to member path due to modifying a tem
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 RMG048  | Mapper   | Error    | Used mapper members cannot be nullable
-
+RMG049  | Mapper   | Warning  | Source member is ignored and also explicitly mapped
+RMG050  | Mapper   | Warning  | Target member is ignored and also explicitly mapped
