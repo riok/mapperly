@@ -110,6 +110,11 @@ public static class CollectionInfoBuilder
 
     private static ITypeSymbol? GetEnumeratedType(WellKnownTypes types, ITypeSymbol type)
     {
+        // if type is array return element type
+        // otherwise using the IEnumerable element type can erase the null annotation for external types
+        if (type.IsArrayType())
+            return ((IArrayTypeSymbol)type).ElementType;
+
         if (type.ImplementsGeneric(types.Get(typeof(IEnumerable<>)), out var enumerableIntf))
             return enumerableIntf.TypeArguments[0];
 
