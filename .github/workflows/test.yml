@@ -21,13 +21,13 @@ jobs:
   sample:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v3.2.0
       - run: dotnet run --project ./samples/Riok.Mapperly.Sample
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v3.2.0
       - run: dotnet build /p:TreatWarningsAsErrors=true
       - run: dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
@@ -37,7 +37,7 @@ jobs:
   package:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: sudo apt update && sudo apt -y install zipmerge # zipmerge is used to merge the multi target nupkg
       - uses: actions/setup-dotnet@v3.2.0
       - run: dotnet tool restore
@@ -55,7 +55,7 @@ jobs:
     needs: package
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v3.2.0
       - run: dotnet tool restore
       - uses: actions/download-artifact@v3
@@ -78,7 +78,7 @@ jobs:
           - '7.0'
           - '6.0'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       # install required dotnet dependencies
       # https://learn.microsoft.com/en-us/dotnet/core/install/linux-alpine#dependencies
       - run: apk add --no-cache bash icu-libs krb5-libs libgcc libintl libssl1.1 libstdc++ zlib
@@ -112,7 +112,7 @@ jobs:
     needs: package
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       # delete global.json since we want to use custom versions here
       - run: rm global.json
       - uses: actions/download-artifact@v3

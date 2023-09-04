@@ -35,7 +35,7 @@ jobs:
     needs: release-preview
     if: ${{ always() }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         # can't use the secrets.GITHUB_TOKEN since this doesn't trigger further workflows
         # https://github.community/t/push-from-action-does-not-trigger-subsequent-action/16854/9
         with:
