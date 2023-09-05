@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Moq;
+using NSubstitute;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
 
@@ -21,11 +21,11 @@ public class MethodNameBuilderTest
 
     private MethodMapping NewMethodMappingMock(string targetTypeName)
     {
-        var targetTypeMock = new Mock<ITypeSymbol>();
-        targetTypeMock.Setup(x => x.Name).Returns(targetTypeName);
-        targetTypeMock.Setup(x => x.NullableAnnotation).Returns(NullableAnnotation.NotAnnotated);
+        var targetTypeMock = Substitute.For<ITypeSymbol>();
+        targetTypeMock.Name.Returns(targetTypeName);
+        targetTypeMock.NullableAnnotation.Returns(NullableAnnotation.NotAnnotated);
 
-        return new MockedMethodMapping(targetTypeMock.Object);
+        return new MockedMethodMapping(targetTypeMock);
     }
 
     private class MockedMethodMapping : MethodMapping
