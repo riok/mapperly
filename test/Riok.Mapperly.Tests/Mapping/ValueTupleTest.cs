@@ -24,9 +24,9 @@ public class ValueTupleTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = (source.Item1, source.Item2);
-            return target;
-            """
+                var target = (source.Item1, source.Item2);
+                return target;
+                """
             );
     }
 
@@ -40,9 +40,9 @@ public class ValueTupleTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = ((long)source.Item1, int.Parse(source.Item2));
-            return target;
-            """
+                var target = ((long)source.Item1, int.Parse(source.Item2));
+                return target;
+                """
             );
     }
 
@@ -56,9 +56,9 @@ public class ValueTupleTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = (source.A, source.B);
-            return target;
-            """
+                var target = (source.A, source.B);
+                return target;
+                """
             );
     }
 
@@ -72,9 +72,9 @@ public class ValueTupleTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = (A: source.Item1, B: source.Item2);
-            return target;
-            """
+                var target = (A: source.Item1, B: source.Item2);
+                return target;
+                """
             );
     }
 
@@ -96,9 +96,9 @@ public class ValueTupleTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = (A: source.A, B: source.B);
-            return target;
-            """
+                var target = (A: source.A, B: source.B);
+                return target;
+                """
             );
     }
 
@@ -112,9 +112,9 @@ public class ValueTupleTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = (C: source.A, D: source.B);
-            return target;
-            """
+                var target = (C: source.A, D: source.B);
+                return target;
+                """
             );
     }
 
@@ -161,9 +161,9 @@ public class ValueTupleTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = (int.Parse(source.Item1), source.Item2.ToString());
-            return target;
-            """
+                var target = (int.Parse(source.Item1), source.Item2.ToString());
+                return target;
+                """
             );
     }
 
@@ -225,9 +225,9 @@ public class ValueTupleTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = (B: source.B, C: source.C.ToString());
-            return target;
-            """
+                var target = (B: source.B, C: source.C.ToString());
+                return target;
+                """
             );
     }
 
@@ -246,9 +246,9 @@ public class ValueTupleTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = (source.A, source.B);
-            return target;
-            """
+                var target = (source.A, source.B);
+                return target;
+                """
             );
     }
 
@@ -267,9 +267,9 @@ public class ValueTupleTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = (source.A, source.B);
-            return target;
-            """
+                var target = (source.A, source.B);
+                return target;
+                """
             );
     }
 
@@ -289,9 +289,9 @@ public class ValueTupleTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = (source.Item1, source.Item2);
-            return target;
-            """
+                var target = (source.Item1, source.Item2);
+                return target;
+                """
             );
     }
 
@@ -557,9 +557,9 @@ public class ValueTupleTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = (source.A, source.B);
-            return target;
-            """
+                var target = (source.A, source.B);
+                return target;
+                """
             );
     }
 
@@ -679,6 +679,89 @@ public class ValueTupleTest
                 """
                 // Could not generate mapping
                 throw new System.NotImplementedException();
+                """
+            );
+    }
+
+    [Fact]
+    public void AliasedTupleToAliasedTuple()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using System.Collections.Generic;
+            using Riok.Mapperly.Abstractions;
+            using A = (string X, int Y);
+            using B = (int X, string Y);
+
+            [Mapper]
+            public partial class Mapper
+            {
+                partial B Map(A source);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = (X: int.Parse(source.X), Y: source.Y.ToString());
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AliasedTupleToAliasedTupleSameValuesOtherAlias()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using System.Collections.Generic;
+            using Riok.Mapperly.Abstractions;
+            using A = (int X, int Y);
+            using B = (int X, int Y);
+
+            [Mapper]
+            public partial class Mapper
+            {
+                partial B Map(A source);
+            }
+            """
+        );
+
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source;");
+    }
+
+    [Fact]
+    public void AliasedTupleToRecord()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using System.Collections.Generic;
+            using Riok.Mapperly.Abstractions;
+            using A = (int X, int Y);
+
+            record B(string X, string Y);
+
+            [Mapper]
+            public partial class Mapper
+            {
+                partial B Map(A source);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B(source.X.ToString(), source.Y.ToString());
+                return target;
                 """
             );
     }
