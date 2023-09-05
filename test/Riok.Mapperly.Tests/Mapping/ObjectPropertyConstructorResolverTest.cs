@@ -485,6 +485,27 @@ public class ObjectPropertyConstructorResolverTest
     }
 
     [Fact]
+    public void CanResolveToClassPrimaryConstructor()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A(string? id, bool value) { public string? Id => id; public bool Value => value; }",
+            "class B(string? id, bool value) {}"
+        );
+
+        var result = TestHelper.GenerateMapper(source);
+        result
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B(source.Id, source.Value);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void RecordToRecordNullableToNullableEnum()
     {
         var source = TestSourceBuilder.CSharp(
