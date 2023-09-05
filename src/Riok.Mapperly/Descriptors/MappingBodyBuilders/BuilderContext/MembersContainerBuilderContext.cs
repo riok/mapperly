@@ -48,7 +48,18 @@ public class MembersContainerBuilderContext<T> : MembersMappingBuilderContext<T>
                 continue;
             }
 
-            container.AddMemberMappingContainer(new MemberNullAssignmentInitializerMapping(nullablePath));
+            var setterNullablePath = SetterMemberPath.Build(BuilderContext, nullablePath);
+
+            if (setterNullablePath.IsMethod)
+            {
+                var getterNullablePath = GetterMemberPath.Build(BuilderContext, nullablePath);
+                container.AddMemberMappingContainer(
+                    new MethodMemberNullAssignmentInitializerMapping(setterNullablePath, getterNullablePath)
+                );
+                continue;
+            }
+
+            container.AddMemberMappingContainer(new MemberNullAssignmentInitializerMapping(setterNullablePath));
         }
     }
 
@@ -75,7 +86,7 @@ public class MembersContainerBuilderContext<T> : MembersMappingBuilderContext<T>
         }
 
         mapping = new MemberNullDelegateAssignmentMapping(
-            nullConditionSourcePath,
+            GetterMemberPath.Build(BuilderContext, nullConditionSourcePath),
             parentMapping,
             BuilderContext.MapperConfiguration.ThrowOnPropertyMappingNullMismatch,
             needsNullSafeAccess

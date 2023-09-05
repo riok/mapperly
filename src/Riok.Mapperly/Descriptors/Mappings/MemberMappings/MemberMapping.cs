@@ -15,7 +15,7 @@ public class MemberMapping : IMemberMapping
 
     public MemberMapping(
         INewInstanceMapping delegateMapping,
-        MemberPath sourcePath,
+        GetterMemberPath sourcePath,
         bool nullConditionalAccess,
         bool addValuePropertyOnNullable
     )
@@ -26,7 +26,7 @@ public class MemberMapping : IMemberMapping
         _addValuePropertyOnNullable = addValuePropertyOnNullable;
     }
 
-    public MemberPath SourcePath { get; }
+    public GetterMemberPath SourcePath { get; }
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {

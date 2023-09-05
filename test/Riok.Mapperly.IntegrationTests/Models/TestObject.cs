@@ -10,6 +10,7 @@ namespace Riok.Mapperly.IntegrationTests.Models
         {
             CtorValue = ctorValue;
             CtorValue2 = ctorValue2;
+            PrivateValue = ctorValue + 11;
         }
 
         public int CtorValue { get; set; }
@@ -118,5 +119,9 @@ namespace Riok.Mapperly.IntegrationTests.Models
         public DateTime DateTimeValueTargetDateOnly { get; set; }
 
         public DateTime DateTimeValueTargetTimeOnly { get; set; }
+
+        public int ExposePrivateValue => PrivateValue;
+
+        private int PrivateValue { get; set; }
     }
 }

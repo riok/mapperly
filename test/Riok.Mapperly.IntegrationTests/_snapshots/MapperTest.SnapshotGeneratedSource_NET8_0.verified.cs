@@ -137,6 +137,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.EnumReverseStringValue = MapToTestEnumDtoByValue(testObject.EnumReverseStringValue);
             target.DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(testObject.DateTimeValueTargetDateOnly);
             target.DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(testObject.DateTimeValueTargetTimeOnly);
+            target.SetPrivateValue(DirectInt(testObject.GetPrivateValue()));
             return target;
         }
 
@@ -216,6 +217,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.EnumRawValue = (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumRawValue;
             target.EnumStringValue = MapToTestEnum(dto.EnumStringValue);
             target.EnumReverseStringValue = MapToString1(dto.EnumReverseStringValue);
+            target.SetPrivateValue1(DirectInt(dto.GetPrivateValue1()));
             return target;
         }
 
@@ -302,6 +304,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.EnumReverseStringValue = MapToTestEnumDtoByValue(source.EnumReverseStringValue);
             target.DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(source.DateTimeValueTargetDateOnly);
             target.DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(source.DateTimeValueTargetTimeOnly);
+            target.SetPrivateValue(DirectInt(source.GetPrivateValue()));
         }
 
         public partial global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName MapToEnumDtoByName(global::Riok.Mapperly.IntegrationTests.Models.TestEnum v)
@@ -463,5 +466,20 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.BaseIntValue = DirectInt(source.BaseIntValue);
             return target;
         }
+    }
+        
+    static file class UnsafeAccessor
+    {
+        [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_PrivateValue")]
+        public static extern int GetPrivateValue(this global::Riok.Mapperly.IntegrationTests.Models.TestObject source);
+
+        [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "set_PrivateValue")]
+        public static extern void SetPrivateValue(this global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto target, int value);
+
+        [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_PrivateValue")]
+        public static extern int GetPrivateValue1(this global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto source);
+
+        [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "set_PrivateValue")]
+        public static extern void SetPrivateValue1(this global::Riok.Mapperly.IntegrationTests.Models.TestObject target, int value);
     }
 }

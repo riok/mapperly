@@ -64,6 +64,14 @@ public readonly partial struct SyntaxFactoryHelper
         return SeparatedList<T>(joinedNodes);
     }
 
+    public static SeparatedSyntaxList<T> CommaSeparatedList<T>(params T[] nodes)
+        where T : SyntaxNode
+    {
+        var sep = TrailingSpacedToken(SyntaxKind.CommaToken);
+        var joinedNodes = Join(sep, false, nodes);
+        return SeparatedList<T>(joinedNodes);
+    }
+
     private SeparatedSyntaxList<T> CommaLineFeedSeparatedList<T>(IEnumerable<T> nodes)
         where T : SyntaxNode
     {

@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.ExternalMappings;
@@ -21,6 +22,8 @@ public class DescriptorBuilder
     private readonly MappingBodyBuilder _mappingBodyBuilder;
     private readonly SimpleMappingBuilderContext _builderContext;
     private readonly List<Diagnostic> _diagnostics = new();
+    private readonly UnsafeAccessorContext _unsafeAccessorContext;
+    private readonly MapperConfigurationReader _configurationReader;
 
     private ObjectFactoryCollection _objectFactories = ObjectFactoryCollection.Empty;
 
@@ -34,14 +37,18 @@ public class DescriptorBuilder
         _mapperDescriptor = new MapperDescriptor(mapperDeclaration, _methodNameBuilder);
         _symbolAccessor = symbolAccessor;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
+        _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
 
         var attributeAccessor = new AttributeDataAccessor(symbolAccessor);
+        _configurationReader = new MapperConfigurationReader(attributeAccessor, mapperDeclaration.Symbol, defaultMapperConfiguration);
+
         _builderContext = new SimpleMappingBuilderContext(
             compilationContext,
-            new MapperConfigurationReader(attributeAccessor, mapperDeclaration.Symbol, defaultMapperConfiguration),
+            _configurationReader,
             _symbolAccessor,
             attributeAccessor,
             _mapperDescriptor,
+            _unsafeAccessorContext,
             _diagnostics,
             new MappingBuilder(_mappings),
             new ExistingTargetMappingBuilder(_mappings)
@@ -50,6 +57,7 @@ public class DescriptorBuilder
 
     public (MapperDescriptor descriptor, IReadOnlyCollection<Diagnostic> diagnostics) Build(CancellationToken cancellationToken)
     {
+        ConfigureMemberVisibility();
         ReserveMethodNames();
         ExtractObjectFactories();
         ExtractUserMappings();
@@ -59,7 +67,31 @@ public class DescriptorBuilder
         TemplateResolver.AddRequiredTemplates(_builderContext.MapperConfiguration, _mappings, _mapperDescriptor);
         BuildReferenceHandlingParameters();
         AddMappingsToDescriptor();
+        AddAccessorsToDescriptor();
         return (_mapperDescriptor, _diagnostics);
+    }
+
+    /// <summary>
+    /// If <see cref="MemberVisibility.Accessible"/> is not set and the roslyn version does not have UnsafeAccessors
+    /// then emit a diagnostic and update the <see cref="MemberVisibility"/> for <see cref="SymbolAccessor"/>.
+    /// </summary>
+    private void ConfigureMemberVisibility()
+    {
+        var includedMembers = _configurationReader.Mapper.IncludedMembers;
+#if ROSLYN4_7_OR_GREATER
+        _symbolAccessor.SetMemberVisibility(includedMembers);
+#else
+        if (includedMembers.HasFlag(MemberVisibility.Accessible))
+            return;
+
+        _diagnostics.Add(
+            Diagnostic.Create(
+                Riok.Mapperly.Diagnostics.DiagnosticDescriptors.UnsafeAccessorNotAvailable,
+                _mapperDescriptor.Syntax.GetLocation()
+            )
+        );
+        _symbolAccessor.SetMemberVisibility(includedMembers | MemberVisibility.Accessible);
+#endif
     }
 
     private void ReserveMethodNames()
@@ -126,5 +158,11 @@ public class DescriptorBuilder
         {
             _mapperDescriptor.AddTypeMapping(mapping);
         }
+    }
+
+    private void AddAccessorsToDescriptor()
+    {
+        // add generated accessors to the mapper
+        _mapperDescriptor.AddUnsafeAccessors(_unsafeAccessorContext.UnsafeAccessors);
     }
 }

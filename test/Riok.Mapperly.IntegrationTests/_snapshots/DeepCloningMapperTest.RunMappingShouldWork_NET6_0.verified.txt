@@ -40,7 +40,8 @@
     ImmutableStackValue: [],
     EnumValue: Value10,
     EnumName: Value30,
-    EnumReverseStringValue: DtoValue3
+    EnumReverseStringValue: DtoValue3,
+    ExposePrivateValue: 16
   },
   SourceTargetSameObjectType: {
     CtorValue: 8,
@@ -57,7 +58,8 @@
     ImmutableArrayValue: null,
     ImmutableQueueValue: [],
     ImmutableStackValue: [],
-    EnumReverseStringValue: 
+    EnumReverseStringValue: ,
+    ExposePrivateValue: 19
   },
   NullableReadOnlyObjectCollection: [
     {
@@ -167,5 +169,6 @@
     BaseIntValue: 1
   },
   DateTimeValueTargetDateOnly: 2020-01-03 15:10:05 Utc,
-  DateTimeValueTargetTimeOnly: 2020-01-03 15:10:05 Utc
+  DateTimeValueTargetTimeOnly: 2020-01-03 15:10:05 Utc,
+  ExposePrivateValue: 18
 }

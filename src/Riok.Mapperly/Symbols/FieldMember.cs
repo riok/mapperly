@@ -1,5 +1,7 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Symbols;
 
@@ -19,6 +21,7 @@ public class FieldMember : IMappableMember
     public bool IsIndexer => false;
     public bool CanGet => !_fieldSymbol.IsReadOnly;
     public bool CanSet => true;
+    public bool CanSetDirectly => true;
     public bool IsInitOnly => false;
 
     public bool IsRequired
@@ -27,6 +30,11 @@ public class FieldMember : IMappableMember
 #else
         => false;
 #endif
+
+    public ExpressionSyntax BuildAccess(ExpressionSyntax source, bool nullConditional = false)
+    {
+        return nullConditional ? ConditionalAccess(source, Name) : MemberAccess(source, Name);
+    }
 
     public override bool Equals(object? obj) =>
         obj is FieldMember other && SymbolEqualityComparer.IncludeNullability.Equals(_fieldSymbol, other._fieldSymbol);

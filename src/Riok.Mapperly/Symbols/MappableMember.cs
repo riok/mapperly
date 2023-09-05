@@ -7,7 +7,7 @@ internal static class MappableMember
 {
     public static IMappableMember? Create(SymbolAccessor accessor, ISymbol symbol)
     {
-        if (!accessor.IsAccessible(symbol))
+        if (!accessor.IsAccessibleToMemberVisibility(symbol))
             return null;
 
         return symbol switch

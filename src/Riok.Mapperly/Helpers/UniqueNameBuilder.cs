@@ -35,6 +35,17 @@ public class UniqueNameBuilder
         return uniqueName;
     }
 
+    public string New(string name, IEnumerable<string> reservedNames)
+    {
+        var scope = NewScope();
+        scope.Reserve(reservedNames);
+        var uniqueName = scope.New(name);
+        _usedNames.Add(uniqueName);
+        return uniqueName;
+    }
+
+    private void Reserve(IEnumerable<string> names) => _usedNames.AddRange(names);
+
     private bool Contains(string name)
     {
         if (_usedNames.Contains(name))

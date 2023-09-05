@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 
@@ -20,6 +21,8 @@ public class SymbolAccessor
     private readonly Dictionary<ITypeSymbol, IReadOnlyDictionary<string, IMappableMember>> _allAccessibleMembersCaseSensitive =
         new(SymbolEqualityComparer.Default);
 
+    private MemberVisibility _memberVisibility = MemberVisibility.AllAccessible;
+
     public SymbolAccessor(CompilationContext compilationContext, INamedTypeSymbol mapperSymbol)
     {
         _compilationContext = compilationContext;
@@ -28,11 +31,32 @@ public class SymbolAccessor
 
     private Compilation Compilation => _compilationContext.Compilation;
 
+    internal void SetMemberVisibility(MemberVisibility visibility) => _memberVisibility = visibility;
+
     public bool HasAccessibleParameterlessConstructor(ITypeSymbol symbol) =>
         symbol is INamedTypeSymbol { IsAbstract: false } namedTypeSymbol
-        && namedTypeSymbol.InstanceConstructors.Any(c => c.Parameters.IsDefaultOrEmpty && IsAccessible(c));
+        && namedTypeSymbol.InstanceConstructors.Any(c => c.Parameters.IsDefaultOrEmpty && IsDirectlyAccessible(c));
 
-    public bool IsAccessible(ISymbol symbol) => Compilation.IsSymbolAccessibleWithin(symbol, _mapperSymbol);
+    public bool IsDirectlyAccessible(ISymbol symbol) => Compilation.IsSymbolAccessibleWithin(symbol, _mapperSymbol);
+
+    public bool IsAccessibleToMemberVisibility(ISymbol symbol)
+    {
+        if (_memberVisibility.HasFlag(MemberVisibility.Accessible) && !IsDirectlyAccessible(symbol))
+            return false;
+
+        return symbol.DeclaredAccessibility switch
+        {
+            Accessibility.Private => _memberVisibility.HasFlag(MemberVisibility.Private),
+            Accessibility.ProtectedAndInternal
+                => _memberVisibility.HasFlag(MemberVisibility.Protected) && _memberVisibility.HasFlag(MemberVisibility.Internal),
+            Accessibility.Protected => _memberVisibility.HasFlag(MemberVisibility.Protected),
+            Accessibility.Internal => _memberVisibility.HasFlag(MemberVisibility.Internal),
+            Accessibility.ProtectedOrInternal
+                => _memberVisibility.HasFlag(MemberVisibility.Protected) || _memberVisibility.HasFlag(MemberVisibility.Internal),
+            Accessibility.Public => _memberVisibility.HasFlag(MemberVisibility.Public),
+            _ => false,
+        };
+    }
 
     public bool HasImplicitConversion(ITypeSymbol source, ITypeSymbol destination) =>
         Compilation.ClassifyConversion(source, destination).IsImplicit && (destination.IsNullable() || !source.IsNullable());

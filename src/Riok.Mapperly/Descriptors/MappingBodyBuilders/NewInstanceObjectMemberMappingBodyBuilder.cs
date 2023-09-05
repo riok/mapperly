@@ -179,14 +179,17 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             nullFallback = ctx.BuilderContext.GetNullFallbackValue(targetMember.Type);
         }
 
+        var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourcePath);
+        var setterTargetPath = SetterMemberPath.Build(ctx.BuilderContext, targetPath);
+
         var memberMapping = new NullMemberMapping(
             delegateMapping,
-            sourcePath,
+            getterSourcePath,
             targetMember.Type,
             nullFallback,
             !ctx.BuilderContext.IsExpression
         );
-        var memberAssignmentMapping = new MemberAssignmentMapping(targetPath, memberMapping);
+        var memberAssignmentMapping = new MemberAssignmentMapping(setterTargetPath, memberMapping);
         ctx.AddInitMemberMapping(memberAssignmentMapping);
     }
 
@@ -203,7 +206,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         // then by descending parameter count
         // ctors annotated with [Obsolete] are considered last unless they have a MapperConstructor attribute set
         var ctorCandidates = namedTargetType.InstanceConstructors
-            .Where(ctor => ctx.BuilderContext.SymbolAccessor.IsAccessible(ctor))
+            .Where(ctor => ctx.BuilderContext.SymbolAccessor.IsDirectlyAccessible(ctor))
             .OrderByDescending(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
             .ThenBy(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
             .ThenByDescending(x => x.Parameters.Length == 0)
@@ -285,9 +288,11 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 return false;
             }
 
+            var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourcePath);
+
             var memberMapping = new NullMemberMapping(
                 delegateMapping,
-                sourcePath,
+                getterSourcePath,
                 paramType,
                 ctx.BuilderContext.GetNullFallbackValue(paramType),
                 !ctx.BuilderContext.IsExpression

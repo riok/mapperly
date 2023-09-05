@@ -15,7 +15,8 @@ public record TestSourceBuilderOptions(
     EnumMappingStrategy? EnumMappingStrategy = null,
     bool? EnumMappingIgnoreCase = null,
     IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy = null,
-    RequiredMappingStrategy? RequiredMappingStrategy = null
+    RequiredMappingStrategy? RequiredMappingStrategy = null,
+    MemberVisibility? IncludedMembers = null
 )
 {
     public const string DefaultMapperClassName = "Mapper";
@@ -29,6 +30,9 @@ public record TestSourceBuilderOptions(
 
     public static TestSourceBuilderOptions WithRequiredMappingStrategy(RequiredMappingStrategy requiredMappingStrategy) =>
         new(RequiredMappingStrategy: requiredMappingStrategy);
+
+    public static TestSourceBuilderOptions WithMemberVisibility(MemberVisibility memberVisibility) =>
+        new(IncludedMembers: memberVisibility);
 
     public static TestSourceBuilderOptions WithDisabledMappingConversion(params MappingConversionType[] conversionTypes)
     {

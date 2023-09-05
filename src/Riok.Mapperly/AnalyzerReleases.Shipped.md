@@ -125,3 +125,4 @@ Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 RMG051  | Mapper   | Warning  | Invalid ignore source member found, nested ignores are not supported
 RMG052  | Mapper   | Warning  | Invalid ignore target member found, nested ignores are not supported
+RMG053  | Mapper   | Error    | The flag MemberVisibility.Accessible cannot be disabled, this feature requires .NET 8.0 or greater

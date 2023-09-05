@@ -22,6 +22,7 @@ public class SimpleMappingBuilderContext
         SymbolAccessor symbolAccessor,
         AttributeDataAccessor attributeAccessor,
         MapperDescriptor descriptor,
+        UnsafeAccessorContext unsafeAccessorContext,
         List<Diagnostic> diagnostics,
         MappingBuilder mappingBuilder,
         ExistingTargetMappingBuilder existingTargetMappingBuilder
@@ -35,6 +36,7 @@ public class SimpleMappingBuilderContext
         MappingBuilder = mappingBuilder;
         ExistingTargetMappingBuilder = existingTargetMappingBuilder;
         AttributeAccessor = attributeAccessor;
+        UnsafeAccessorContext = unsafeAccessorContext;
     }
 
     protected SimpleMappingBuilderContext(SimpleMappingBuilderContext ctx)
@@ -44,6 +46,7 @@ public class SimpleMappingBuilderContext
             ctx.SymbolAccessor,
             ctx.AttributeAccessor,
             ctx._descriptor,
+            ctx.UnsafeAccessorContext,
             ctx._diagnostics,
             ctx.MappingBuilder,
             ctx.ExistingTargetMappingBuilder
@@ -58,6 +61,8 @@ public class SimpleMappingBuilderContext
     public SymbolAccessor SymbolAccessor { get; }
 
     public AttributeDataAccessor AttributeAccessor { get; }
+
+    public UnsafeAccessorContext UnsafeAccessorContext { get; }
 
     protected MappingBuilder MappingBuilder { get; }
 

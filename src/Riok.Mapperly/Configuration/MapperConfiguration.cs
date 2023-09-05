@@ -98,4 +98,9 @@ public record MapperConfiguration
     /// By default this is <see cref="RequiredMappingStrategy.Both"/>, emitting warnings for unmapped source and target members.
     /// </summary>
     public RequiredMappingStrategy? RequiredMappingStrategy { get; init; }
+
+    /// <summary>
+    /// Determines the access level of members that Mapperly will map.
+    /// </summary>
+    public MemberVisibility? IncludedMembers { get; init; }
 }

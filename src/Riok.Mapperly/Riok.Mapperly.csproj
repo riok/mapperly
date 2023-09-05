@@ -17,7 +17,7 @@
     <PackageIcon>logo.png</PackageIcon>
 
     <!-- default roslyn version -->
-    <ROSLYN_VERSION Condition="'$(ROSLYN_VERSION)' == ''">4.5</ROSLYN_VERSION>
+    <ROSLYN_VERSION Condition="'$(ROSLYN_VERSION)' == ''">4.7</ROSLYN_VERSION>
   </PropertyGroup>
 
   <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0 AND '$(CI)' == ''">

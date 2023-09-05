@@ -34,6 +34,24 @@ internal static class SyntaxIndentationExtensions
         }
     }
 
+    public static IEnumerable<TSyntax> SeparateByTrailingLineFeed<TSyntax>(this IEnumerable<TSyntax> syntax, int indentation)
+        where TSyntax : SyntaxNode
+    {
+        using var enumerator = syntax.GetEnumerator();
+        if (!enumerator.MoveNext())
+            yield break;
+
+        var current = enumerator.Current!;
+
+        while (enumerator.MoveNext())
+        {
+            yield return current.AddTrailingLineFeed(indentation);
+            current = enumerator.Current!;
+        }
+
+        yield return current;
+    }
+
     /// <summary>
     /// Adds a leading line feed to the first found trivia.
     /// If the first token is known by the caller, use <see cref="AddLeadingLineFeed"/> for the first token instead
