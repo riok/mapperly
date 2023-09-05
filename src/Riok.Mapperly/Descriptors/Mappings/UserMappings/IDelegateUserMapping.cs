@@ -9,10 +9,4 @@ public interface IDelegateUserMapping : IUserMapping
     /// Gets the delegate mapping or <c>null</c> if none is set (yet).
     /// </summary>
     INewInstanceMapping? DelegateMapping { get; }
-
-    /// <summary>
-    /// Sets the delegate mapping.
-    /// </summary>
-    /// <param name="mapping">The mapping.</param>
-    void SetDelegateMapping(INewInstanceMapping mapping);
 }

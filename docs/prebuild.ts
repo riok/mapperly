@@ -95,7 +95,7 @@ async function buildSamples(): Promise<void> {
   const projectFilesToCopy = ['CarMapper.cs', 'Car.cs', 'CarDto.cs'];
   const generatedMapperFile = join(
     sampleProject,
-    'obj/Debug/net7.0/generated/Riok.Mapperly/Riok.Mapperly.MapperGenerator/CarMapper.g.cs',
+    'obj/Debug/net8.0/generated/Riok.Mapperly/Riok.Mapperly.MapperGenerator/CarMapper.g.cs',
   );
 
   // Copy generated mapper to target dir

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <!-- setting the TargetFramework directly from the cli via -p:TargetFramework=netA.B does not work using a custom msbuild property seems to work -->
-    <MapperlyIntegrationTestsTargetFramework Condition="'$(MapperlyIntegrationTestsTargetFramework)' == ''">net7.0</MapperlyIntegrationTestsTargetFramework>
+    <MapperlyIntegrationTestsTargetFramework Condition="'$(MapperlyIntegrationTestsTargetFramework)' == ''">net8.0</MapperlyIntegrationTestsTargetFramework>
     <TargetFramework>$(MapperlyIntegrationTestsTargetFramework)</TargetFramework>
 
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
@@ -10,6 +10,8 @@
 
     <!-- Not supported in .NET Framework -->
     <ImplicitUsings>disable</ImplicitUsings>
+
+    <LangVersion>preview</LangVersion>
 
     <!-- .NET Framework 4.8 defaults to lang version 7.3, but we want to test nullable features. These are available in 8.0.
           To also use init-only properties, we upgrade to lang version 9.0, which is works, but is not officially supported. -->
@@ -34,8 +36,8 @@
 
   <!-- ef core tests should only run on newer .NET versions -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.10" Condition="'$(TargetFramework)' == 'net7.0'" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0-preview.*" Condition="'$(TargetFramework)' == 'net8.0'" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.11" Condition="'$(TargetFramework)' == 'net7.0'" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0-rc.1.23419.6" Condition="'$(TargetFramework)' == 'net8.0'" />
   </ItemGroup>
 
   <!-- cannot use source generated polyfills since they require language version 11 -->
