@@ -3,12 +3,27 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
+const mapperlyVersion = process.env.MAPPERLY_VERSION || '0.0.1-dev';
+const environment = process.env.ENVIRONMENT || 'local';
+
+/** @type {import('./src/custom-fields').CustomFields} */
+const customFields = {
+  mapperlyVersion,
+  environment: {
+    name: environment,
+    stable: environment === 'stable',
+    next: environment === 'next',
+    local: environment === 'local',
+  },
+};
+
 async function createConfig() {
   const rehypeFaq = (await import('./src/plugins/rehype/rehype-faq/index.js'))
     .default;
 
   /** @type {import('@docusaurus/types').Config} */
   return {
+    customFields,
     title: 'Mapperly',
     tagline:
       'A .NET source generator for generating object mappings. No runtime reflection.',
@@ -79,6 +94,10 @@ async function createConfig() {
               position: 'left',
               label: 'Contributing',
               sidebarId: 'contributing',
+            },
+            {
+              type: 'custom-versionsNavbarItem',
+              position: 'right',
             },
             {
               href: 'https://github.com/riok/mapperly',
@@ -180,10 +199,6 @@ async function createConfig() {
       ],
       '@easyops-cn/docusaurus-search-local',
     ],
-    customFields: {
-      mapperlyVersion: process.env.MAPPERLY_VERSION || '0.0.1-dev',
-      environment: process.env.ENVIRONMENT,
-    },
   };
 }
 

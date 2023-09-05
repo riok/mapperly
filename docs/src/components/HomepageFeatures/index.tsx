@@ -38,7 +38,7 @@ const FeatureList: FeatureItem[] = [
     description: (
       <>
         Mapperly works by using .NET Source Generators. Since no reflection is
-        used at runtime, the generated code is completely trimming save and AOT
+        used at runtime, the generated code is completely trimming safe and AOT
         friendly.
       </>
     ),
