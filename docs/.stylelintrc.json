@@ -1,5 +1,5 @@
 {
-  "extends": ["stylelint-config-standard", "stylelint-config-prettier"],
+  "extends": ["stylelint-config-standard"],
   "rules": {
     "selector-class-pattern": "^[a-zA-Z]+(_[a-zA-Z]+)*$"
   }
