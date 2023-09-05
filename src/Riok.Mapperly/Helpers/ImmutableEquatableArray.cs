@@ -11,8 +11,6 @@ namespace Riok.Mapperly.Helpers;
 public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableArray<T>>, IReadOnlyList<T>
     where T : IEquatable<T>
 {
-    public static ImmutableEquatableArray<T> Empty { get; } = new(Array.Empty<T>());
-
     private readonly T[] _values;
     public T this[int index] => _values[index];
     public int Count => _values.Length;
@@ -68,12 +66,6 @@ public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableAr
 
 public static class ImmutableEquatableArray
 {
-    public static ImmutableEquatableArray<T> Empty<T>()
-        where T : IEquatable<T> => ImmutableEquatableArray<T>.Empty;
-
     public static ImmutableEquatableArray<T> ToImmutableEquatableArray<T>(this IEnumerable<T> values)
         where T : IEquatable<T> => new(values);
-
-    public static ImmutableEquatableArray<T> Create<T>(params T[] values)
-        where T : IEquatable<T> => values is { Length: > 0 } ? new(values) : ImmutableEquatableArray<T>.Empty;
 }

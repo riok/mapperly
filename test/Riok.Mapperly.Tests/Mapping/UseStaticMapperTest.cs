@@ -121,7 +121,7 @@ public class UseStaticMapperTest
             [UseStaticMapper<OtherMapper>]
             public partial class Mapper
             {
-                partial B Map(A source);
+                partial B Map(A source, [ReferenceHandler] IReferenceHandler refHandler);
             }
             """
         );
@@ -147,7 +147,7 @@ public class UseStaticMapperTest
             [UseStaticMapper<OtherMapper>]
             public partial class Mapper
             {
-                partial B Map(A source);
+                partial B Map(A source, [ReferenceHandler] IReferenceHandler refHandler);
             }
             """
         );

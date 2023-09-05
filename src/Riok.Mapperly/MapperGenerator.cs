@@ -8,6 +8,7 @@ using Riok.Mapperly.Emit;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Output;
 using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Templates;
 
 namespace Riok.Mapperly;
 
@@ -22,6 +23,8 @@ public class MapperGenerator : IIncrementalGenerator
 #if DEBUG_SOURCE_GENERATOR
         DebuggerUtil.AttachDebugger();
 #endif
+        var assemblyName = context.CompilationProvider.Select((x, _) => x.Assembly.Name);
+
         // report compilation diagnostics
         var compilationDiagnostics = context.CompilationProvider.SelectMany(
             static (compilation, _) => BuildCompilationDiagnostics(compilation)
@@ -57,6 +60,17 @@ public class MapperGenerator : IIncrementalGenerator
         // output the mappers
         var mappers = mappersAndDiagnostics.Select(static (x, _) => x.Mapper).WithTrackingName(MapperGeneratorStepNames.BuildMappers);
         context.EmitMapperSource(mappers);
+
+        // output the templates
+        var templates = mappersAndDiagnostics
+            .SelectMany(static (x, _) => x.Templates)
+            .Collect()
+            .SelectMany(static (x, _) => x.DistinctBy(tm => tm))
+            .Combine(assemblyName)
+            .WithTrackingName(MapperGeneratorStepNames.BuildTemplates)
+            .Select(static (x, _) => TemplateReader.ReadContent(x.Left, x.Right))
+            .WithTrackingName(MapperGeneratorStepNames.BuildTemplatesContent);
+        context.EmitTemplates(templates);
     }
 
     private static MapperAndDiagnostics? BuildDescriptor(
@@ -82,7 +96,7 @@ public class MapperGenerator : IIncrementalGenerator
                 compilationContext.FileNameBuilder.Build(descriptor),
                 SourceEmitter.Build(descriptor, cancellationToken)
             );
-            return new MapperAndDiagnostics(mapper, descriptorDiagnostics.ToImmutableEquatableArray());
+            return new MapperAndDiagnostics(mapper, descriptorDiagnostics.ToImmutableEquatableArray(), descriptor.RequiredTemplates);
         }
         catch (OperationCanceledException)
         {

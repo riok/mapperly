@@ -5,7 +5,7 @@ public partial class Mapper
 {
     private partial TTarget Map<TSource, TTarget>(TSource source)
     {
-        var refHandler = new global::Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler();
+        var refHandler = new global::Riok.Mapperly.Internal.Tests.PreserveReferenceHandler();
         return source switch
         {
             global::A x when typeof(TTarget).IsAssignableFrom(typeof(global::B)) => (TTarget)(object)MapToB1(x, refHandler),
@@ -17,12 +17,12 @@ public partial class Mapper
 
     private partial global::B MapToB(global::A source)
     {
-        return MapToB1(source, new global::Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler());
+        return MapToB1(source, new global::Riok.Mapperly.Internal.Tests.PreserveReferenceHandler());
     }
 
     private partial global::D MapToD(global::C source)
     {
-        return MapToD1(source, new global::Riok.Mapperly.Abstractions.ReferenceHandling.Internal.PreserveReferenceHandler());
+        return MapToD1(source, new global::Riok.Mapperly.Internal.Tests.PreserveReferenceHandler());
     }
 
     private global::B MapToB1(global::A source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)

@@ -456,8 +456,8 @@ public class GenericTest
             """
                 partial TTarget Map<TSource, TTarget>(TSource source, [ReferenceHandler] IReferenceHandler refHandler);
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
+                partial B MapToB(A source, [ReferenceHandler] IReferenceHandler refHandler);
+                partial D MapToD(C source, [ReferenceHandler] IReferenceHandler refHandler);
                 """,
             TestSourceBuilderOptions.WithReferenceHandling,
             "record struct A(string Value);",

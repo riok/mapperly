@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static Riok.Mapperly.Tests.Generator.IncrementalGeneratorTestHelper;
 
 namespace Riok.Mapperly.Tests.Generator;
 
@@ -16,11 +17,11 @@ public class IncrementalGeneratorTest
         var compilation1 = TestHelper.BuildCompilation(syntaxTree);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
-        AssertRunReasons(driver1, RunReasons.New);
+        AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
 
         var compilation2 = compilation1.AddSyntaxTrees(TestSourceBuilder.SyntaxTree("struct MyValue {}"));
         var driver2 = driver1.RunGenerators(compilation2);
-        AssertRunReasons(driver2, RunReasons.Cached);
+        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.Cached);
     }
 
     [Fact]
@@ -54,8 +55,8 @@ public class IncrementalGeneratorTest
 
         var compilation2 = compilation1.AddSyntaxTrees(secondary);
         var driver2 = driver1.RunGenerators(compilation2);
-        AssertRunReasons(driver2, RunReasons.Cached, 0);
-        AssertRunReasons(driver2, RunReasons.New, 1);
+        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.Cached, 0);
+        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.New, 1);
     }
 
     [Fact]
@@ -74,31 +75,22 @@ public class IncrementalGeneratorTest
 
         var compilation2 = compilation1.ReplaceSyntaxTree(compilation1.SyntaxTrees.First(), newTree);
         var driver2 = driver1.RunGenerators(compilation2);
-        AssertRunReasons(driver2, RunReasons.Cached);
+        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.Cached);
     }
 
     [Fact]
     public void ModifyingMappedTypeDoesRegenerateOriginal()
     {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes("partial B Map(A source);", "record A(int Value);", "record B(int Value);");
+        var source = TestSourceBuilder.Mapping("A", "B", "record A(int Value);", "record B(int Value);");
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);
         var compilation1 = TestHelper.BuildCompilation(syntaxTree);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
-        AssertRunReasons(driver1, RunReasons.New);
+        AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
 
-        var recordDeclaration = syntaxTree
-            .GetCompilationUnitRoot()
-            .Members.OfType<RecordDeclarationSyntax>()
-            .Single(x => x.Identifier.Text == "A");
-        var updatedRecordDeclaration = ParseMemberDeclaration("record A(string Value)")!;
-
-        var newRoot = syntaxTree.GetCompilationUnitRoot().ReplaceNode(recordDeclaration, updatedRecordDeclaration);
-        var newTree = syntaxTree.WithRootAndOptions(newRoot, syntaxTree.Options);
-
-        var compilation2 = compilation1.ReplaceSyntaxTree(compilation1.SyntaxTrees.First(), newTree);
+        var compilation2 = ReplaceRecord(compilation1, "A", "record A(string Value)");
         var driver2 = driver1.RunGenerators(compilation2);
-        AssertRunReasons(driver2, RunReasons.ModifiedSource);
+        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.ModifiedSource);
     }
 
     [Fact]
@@ -113,7 +105,7 @@ public class IncrementalGeneratorTest
         var compilation1 = TestHelper.BuildCompilation(syntaxTree);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
-        AssertRunReasons(driver1, RunReasons.New);
+        AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
 
         var classDeclaration = syntaxTree
             .GetCompilationUnitRoot()
@@ -127,7 +119,7 @@ public class IncrementalGeneratorTest
 
         var compilation2 = compilation1.ReplaceSyntaxTree(compilation1.SyntaxTrees.First(), newTree);
         var driver2 = driver1.RunGenerators(compilation2);
-        AssertRunReasons(driver2, RunReasons.ModifiedSourceAndDiagnostics);
+        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.ModifiedSourceAndDiagnostics);
     }
 
     [Fact]
@@ -155,7 +147,7 @@ public class IncrementalGeneratorTest
 
         var compilation2 = compilation1.ReplaceSyntaxTree(compilation1.SyntaxTrees.First(), newTree);
         var driver2 = driver1.RunGenerators(compilation2);
-        AssertRunReasons(driver2, RunReasons.ModifiedDiagnostics);
+        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.ModifiedDiagnostics);
     }
 
     [Fact]
@@ -190,7 +182,7 @@ public class IncrementalGeneratorTest
         var compilation1 = TestHelper.BuildCompilation(syntaxTree1);
 
         var driver1 = TestHelper.GenerateTracked(compilation1);
-        AssertRunReasons(driver1, RunReasons.New);
+        AssertRunReasons(driver1, IncrementalGeneratorRunReasons.New);
 
         var compilationUnit1 = (CompilationUnitSyntax)syntaxTree1.GetRoot();
         var attribute = Attribute(
@@ -202,95 +194,7 @@ public class IncrementalGeneratorTest
         var syntaxTree2 = syntaxTree1.WithRootAndOptions(compilationUnit2, syntaxTree1.Options);
         var compilation2 = compilation1.ReplaceSyntaxTree(syntaxTree1, syntaxTree2);
         var driver2 = driver1.RunGenerators(compilation2);
-        AssertRunReasons(driver2, RunReasons.Modified, 0);
-        AssertRunReasons(driver2, RunReasons.ModifiedDefaults, 1);
-    }
-
-    private static void AssertRunReasons(GeneratorDriver driver, RunReasons reasons, int mapperIndex = 0)
-    {
-        var runResult = driver.GetRunResult().Results[0];
-        if (mapperIndex == 0)
-        {
-            // compilation and defaults are built access all mappers and not per mapper,
-            // only assert for the first mapper
-            AssertRunReason(runResult, MapperGeneratorStepNames.BuildCompilationContext, mapperIndex, reasons.CompilationStep);
-            AssertRunReason(runResult, MapperGeneratorStepNames.BuildMapperDefaults, mapperIndex, reasons.BuildMapperDefaultsStep);
-        }
-
-        AssertRunReason(runResult, MapperGeneratorStepNames.ReportDiagnostics, mapperIndex, reasons.ReportDiagnosticsStep);
-        AssertRunReason(runResult, MapperGeneratorStepNames.BuildMappers, mapperIndex, reasons.BuildMappersStep);
-        AssertRunReason(runResult, MapperGeneratorStepNames.ImplementationSourceOutput, mapperIndex, reasons.SourceOutputStep);
-    }
-
-    private static void AssertRunReason(
-        GeneratorRunResult runResult,
-        string stepName,
-        int outputIndex,
-        IncrementalStepRunReason expectedStepReason
-    )
-    {
-        var actualStepReason = runResult.TrackedSteps[stepName].SelectMany(x => x.Outputs).ElementAt(outputIndex).Reason;
-        actualStepReason.Should().Be(expectedStepReason, $"step {stepName} of mapper at index {outputIndex}");
-    }
-
-    private record RunReasons(
-        IncrementalStepRunReason CompilationStep,
-        IncrementalStepRunReason BuildMapperDefaultsStep,
-        IncrementalStepRunReason BuildMappersStep,
-        IncrementalStepRunReason ReportDiagnosticsStep,
-        IncrementalStepRunReason SourceOutputStep
-    )
-    {
-        public static readonly RunReasons New =
-            new(
-                IncrementalStepRunReason.New,
-                IncrementalStepRunReason.New,
-                IncrementalStepRunReason.New,
-                IncrementalStepRunReason.New,
-                IncrementalStepRunReason.New
-            );
-
-        public static readonly RunReasons Cached =
-            new(
-                // compilation step should always be modified as each time a new compilation is passed
-                IncrementalStepRunReason.Modified,
-                IncrementalStepRunReason.Unchanged,
-                IncrementalStepRunReason.Cached,
-                IncrementalStepRunReason.Cached,
-                IncrementalStepRunReason.Cached
-            );
-
-        public static readonly RunReasons Modified = Cached with
-        {
-            BuildMapperDefaultsStep = IncrementalStepRunReason.Modified,
-            ReportDiagnosticsStep = IncrementalStepRunReason.Modified,
-            BuildMappersStep = IncrementalStepRunReason.Modified,
-            // the input changed therefore new instead of modified
-            SourceOutputStep = IncrementalStepRunReason.New,
-        };
-
-        public static readonly RunReasons ModifiedDiagnostics = Cached with
-        {
-            BuildMappersStep = IncrementalStepRunReason.Unchanged,
-            ReportDiagnosticsStep = IncrementalStepRunReason.Modified,
-        };
-
-        public static readonly RunReasons ModifiedSource = Cached with
-        {
-            ReportDiagnosticsStep = IncrementalStepRunReason.Unchanged,
-            BuildMappersStep = IncrementalStepRunReason.Modified,
-            // the input changed therefore new instead of modified
-            SourceOutputStep = IncrementalStepRunReason.New,
-        };
-
-        public static readonly RunReasons ModifiedSourceAndDiagnostics = Cached with
-        {
-            ReportDiagnosticsStep = IncrementalStepRunReason.Modified,
-            BuildMappersStep = IncrementalStepRunReason.Modified,
-            // the input changed therefore new instead of modified
-            SourceOutputStep = IncrementalStepRunReason.New,
-        };
-
-        public static readonly RunReasons ModifiedDefaults = Cached with { BuildMapperDefaultsStep = IncrementalStepRunReason.Modified, };
+        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.Modified, 0);
+        AssertRunReasons(driver2, IncrementalGeneratorRunReasons.ModifiedDefaults, 1);
     }
 }

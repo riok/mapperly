@@ -50,3 +50,4 @@ To support a new roslyn version via multi targeting follow these steps (see also
 Mapperly Mappings use Roslyn syntax trees.
 [RoslynQuoter](https://roslynquoter.azurewebsites.net/) and [SharpLab](https://sharplab.io/)
 are fantastic tools to understand and work with Roslyn syntax trees.
+The `Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper` and `Microsoft.CodeAnalysis.CSharp.SyntaxFactory` classes help building these syntax trees.

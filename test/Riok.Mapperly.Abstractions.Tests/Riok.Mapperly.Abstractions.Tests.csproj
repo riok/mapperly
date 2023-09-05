@@ -4,8 +4,4 @@
     <ProjectReference Include="..\..\src\Riok.Mapperly.Abstractions\Riok.Mapperly.Abstractions.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Using Include="FluentAssertions"/>
-  </ItemGroup>
-
 </Project>
