@@ -151,7 +151,7 @@ public class EnumTest
     public Task EnumToOtherEnumByNameWithoutOverlap()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapEnum(EnumMappingStrategy.ByName)] partial E2 ToE1(E1 source);",
+            "[MapEnum(EnumMappingStrategy.ByName)] private partial E2 ToE1(E1 source);",
             "enum E1 {A, B, C}",
             "enum E2 {D, E, F}"
         );

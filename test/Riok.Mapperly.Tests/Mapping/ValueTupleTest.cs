@@ -496,7 +496,7 @@ public class ValueTupleTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
                 [MapProperty("Item2", "Item1.Value")]
-                partial (A, int) Map((B, string) source);
+                private partial (A, int) Map((B, string) source);
                 """,
             "class A { public int Value { get; set; } }",
             "class B { public int Value { get; set; } }"
@@ -511,7 +511,7 @@ public class ValueTupleTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
                 [MapProperty("Item2", "Item1.Item1")]
-                partial ((int, int), int) Map(((int, int), string) source);
+                private partial ((int, int), int) Map(((int, int), string) source);
                 """
         );
 
@@ -525,7 +525,7 @@ public class ValueTupleTest
             """
                 [MapProperty("Item1", "C")]
                 [MapProperty("B", "C.D")]
-                partial ((int, int D) C, int) Map(((int F, int G), string B) source);
+                private partial ((int, int D) C, int) Map(((int F, int G), string B) source);
                 """
         );
 
@@ -540,7 +540,7 @@ public class ValueTupleTest
                 [MapProperty("A", "F")]
                 [MapProperty("D", "E")]
                 [MapProperty("D", "F.H")]
-                partial (string E, (long G, int H) F) Map(((int B, int C) A, string D) source);
+                private partial (string E, (long G, int H) F) Map(((int B, int C) A, string D) source);
                 """
         );
 
@@ -638,8 +638,8 @@ public class ValueTupleTest
     {
         var source = TestSourceBuilder.MapperWithBody(
             """
-            partial (string A, string B) Map((int, int) src);
-            partial (string A, string B) Map((int B, int A) src);
+            private partial (string A, string B) Map((int, int) src);
+            private partial (string A, string B) Map((int B, int A) src);
             """
         );
 

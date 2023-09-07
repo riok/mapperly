@@ -137,7 +137,7 @@ public class MapperTest
             [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
             public partial class MyMapper
             {
-                partial E2 Map(E1 source);
+                private partial E2 Map(E1 source);
             }
 
             enum E1 { value1 }

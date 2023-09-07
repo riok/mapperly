@@ -7,7 +7,6 @@ using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
-using Accessibility = Microsoft.CodeAnalysis.Accessibility;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -22,8 +21,16 @@ public abstract class MethodMapping : NewInstanceMapping
     private const int SourceParameterIndex = 0;
     private const int ReferenceHandlerParameterIndex = 1;
 
-    private readonly Accessibility _accessibility = Accessibility.Private;
+    private static readonly IEnumerable<SyntaxToken> _privateSyntaxToken = new[] { TrailingSpacedToken(SyntaxKind.PrivateKeyword) };
+
+    private static readonly IEnumerable<SyntaxToken> _privateStaticSyntaxToken = new[]
+    {
+        TrailingSpacedToken(SyntaxKind.PrivateKeyword),
+        TrailingSpacedToken(SyntaxKind.StaticKeyword),
+    };
+
     private readonly ITypeSymbol _returnType;
+    private readonly IMethodSymbol? _partialMethodDefinition;
 
     private string? _methodName;
 
@@ -44,14 +51,11 @@ public abstract class MethodMapping : NewInstanceMapping
     {
         SourceParameter = sourceParameter;
         IsExtensionMethod = method.IsExtensionMethod;
-        IsPartial = method.IsPartialDefinition;
         ReferenceHandlerParameter = referenceHandlerParameter;
-        _accessibility = method.DeclaredAccessibility;
+        _partialMethodDefinition = method;
         _methodName = method.Name;
         _returnType = method.ReturnType.UpgradeNullable();
     }
-
-    private bool IsPartial { get; }
 
     protected bool IsExtensionMethod { get; }
 
@@ -106,13 +110,14 @@ public abstract class MethodMapping : NewInstanceMapping
 
     private IEnumerable<SyntaxToken> BuildModifiers(bool isStatic)
     {
-        yield return Accessibility(_accessibility);
+        // if a syntax is referenced it is the implementation part of partial method definition
+        // then copy all modifiers otherwise only set private and optionally static
+        if (_partialMethodDefinition?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is MethodDeclarationSyntax syntax)
+        {
+            return syntax.Modifiers.Select(x => TrailingSpacedToken(x.Kind()));
+        }
 
-        if (isStatic)
-            yield return TrailingSpacedToken(SyntaxKind.StaticKeyword);
-
-        if (IsPartial)
-            yield return TrailingSpacedToken(SyntaxKind.PartialKeyword);
+        return isStatic ? _privateStaticSyntaxToken : _privateSyntaxToken;
     }
 
     private void ReserveParameterNames(UniqueNameBuilder nameBuilder, ParameterListSyntax parameters)

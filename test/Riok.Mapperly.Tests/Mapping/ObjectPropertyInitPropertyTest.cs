@@ -254,7 +254,7 @@ public class ObjectPropertyInitPropertyTest
     public Task InitOnlyPropertyWithMultipleConfigurationsShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty($\"StringValue2\", \"StringValue\")] [MapProperty($\"StringValue3\", \"StringValue\")] partial B Map(A source);",
+            "[MapProperty($\"StringValue2\", \"StringValue\")] [MapProperty($\"StringValue3\", \"StringValue\")] private partial B Map(A source);",
             "class A { public string StringValue2 { get; init; } public string StringValue3 { get; init; } }",
             "class B { public string StringValue { get; init; } }"
         );
@@ -266,7 +266,7 @@ public class ObjectPropertyInitPropertyTest
     public Task InitOnlyPropertyWithPathConfigurationsShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty($\"NestedValue\", \"Nested.Value\")] partial B Map(A source);",
+            "[MapProperty($\"NestedValue\", \"Nested.Value\")] private partial B Map(A source);",
             "class A { public string NestedValue { get; init; } }",
             "class B { public C Nested { get; init; } }",
             "class C { public string Value { get; init; } }"
@@ -279,7 +279,7 @@ public class ObjectPropertyInitPropertyTest
     public Task InitOnlyPropertyWithConfigurationNotFoundSourcePropertyShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty($\"StringValue2\", \"StringValue\")] partial B Map(A source);",
+            "[MapProperty($\"StringValue2\", \"StringValue\")] private partial B Map(A source);",
             "class A { public string StringValue { get; init; } }",
             "class B { public string StringValue { get; init; } }"
         );
