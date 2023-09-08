@@ -63,5 +63,7 @@ namespace Riok.Mapperly.IntegrationTests.Dto
         public TimeOnly DateTimeValueTargetTimeOnly { get; set; }
 
         public TestObjectDtoManuallyMappedProjection? ManuallyMapped { get; set; }
+
+        public List<TestEnum> ManuallyMappedList { get; set; } = new();
     }
 }

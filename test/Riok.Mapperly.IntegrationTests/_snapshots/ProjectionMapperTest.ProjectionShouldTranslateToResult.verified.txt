@@ -1,6 +1,5 @@
 ﻿[
   {
-    IntValue: 1,
     RequiredValue: -1,
     StringValue: ,
     RenamedStringValue2: ,
@@ -9,8 +8,8 @@
     NestedNullableTargetNotNullable: {},
     StringNullableTargetNotNullable: ,
     SourceTargetSameObjectType: {
+      Id: 100,
       CtorValue: 2,
-      IntValue: 100,
       IntInitOnlyValue: 4,
       RequiredValue: 10,
       StringValue: fooBar3,
@@ -24,7 +23,7 @@
       UnflatteningIdValue: 7,
       StringNullableTargetNotNullable: fooBar,
       RecursiveObject: {
-        IntValue: 1,
+        Id: 1,
         RequiredValue: -1,
         StringValue: ,
         RenamedStringValue: ,
@@ -49,7 +48,17 @@
       IgnoredIntValue: 3,
       DateTimeValueTargetDateOnly: 2018-11-29 10:11:12,
       DateTimeValueTargetTimeOnly: 2018-11-29 10:11:12,
-      ManuallyMapped: fooBar
+      ManuallyMapped: fooBar5,
+      ManuallyMappedList: [
+        {
+          Id: 1,
+          Value: Value10
+        },
+        {
+          Id: 2,
+          Value: Value20
+        }
+      ]
     },
     EnumValue: DtoValue2,
     EnumName: 10,
@@ -62,7 +71,6 @@
   },
   {
     CtorValue: 2,
-    IntValue: 100,
     IntInitOnlyValue: 4,
     RequiredValue: 10,
     StringValue: fooBar3,
@@ -84,7 +92,11 @@
     DateTimeValueTargetTimeOnly: 10:11 AM,
     ManuallyMapped: {
       MagicIntValue: 100,
-      StringValue: fooBar
-    }
+      StringValue: fooBar5
+    },
+    ManuallyMappedList: [
+      Value10,
+      Value20
+    ]
   }
 ]

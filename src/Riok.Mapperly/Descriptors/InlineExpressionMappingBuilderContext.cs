@@ -67,8 +67,8 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         if (_inlineExpressionMappings.Find(sourceType, targetType) is { } mapping)
             return mapping;
 
-        // user implemented mappings are also taken into account
-        // this works as long as the user implemented methods
+        // User implemented mappings are also taken into account.
+        // This works as long as the user implemented methods
         // follow the expression tree limitations:
         // https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/expression-trees/#limitations
         if (_parentContext.FindMapping(sourceType, targetType) is UserImplementedMethodMapping userMapping)
@@ -100,7 +100,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     {
         sourceType = sourceType.UpgradeNullable();
         targetType = targetType.UpgradeNullable();
-        var mapping = _inlineExpressionMappings.Find(sourceType, targetType);
+        var mapping = FindMapping(sourceType, targetType);
         if (mapping != null)
             return mapping;
 

@@ -5,6 +5,8 @@ namespace Riok.Mapperly.IntegrationTests.Models
 {
     public class TestObjectProjection
     {
+        public int Id { get; set; }
+
         public int CtorValue { get; set; }
 
         public int IntValue { get; set; }
@@ -61,6 +63,8 @@ namespace Riok.Mapperly.IntegrationTests.Models
 
         public DateTime DateTimeValueTargetTimeOnly { get; set; }
 
-        public String ManuallyMapped { get; set; } = "fooBar";
+        public string ManuallyMapped { get; set; } = "fooBar";
+
+        public List<TestObjectProjectionEnumValue> ManuallyMappedList { get; set; } = new();
     }
 }

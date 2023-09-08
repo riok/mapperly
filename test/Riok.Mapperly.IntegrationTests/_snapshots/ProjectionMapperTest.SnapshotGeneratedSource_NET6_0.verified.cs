@@ -44,6 +44,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(x.DateTimeValueTargetDateOnly),
                 DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(x.DateTimeValueTargetTimeOnly),
                 ManuallyMapped = MapManual(x.ManuallyMapped),
+                ManuallyMappedList = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(x.ManuallyMappedList, x1 => MapManual(x1))),
             });
 #nullable enable
         }
@@ -107,6 +108,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(testObject.DateTimeValueTargetDateOnly);
             target.DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(testObject.DateTimeValueTargetTimeOnly);
             target.ManuallyMapped = MapManual(testObject.ManuallyMapped);
+            target.ManuallyMappedList = MapToList(testObject.ManuallyMappedList);
             return target;
         }
 
@@ -184,6 +186,16 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.InheritanceSubObjectDto();
             target.SubIntValue = source.SubIntValue;
             target.BaseIntValue = source.BaseIntValue;
+            return target;
+        }
+
+        private static global::System.Collections.Generic.List<global::Riok.Mapperly.IntegrationTests.Models.TestEnum> MapToList(global::System.Collections.Generic.List<global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionEnumValue> source)
+        {
+            var target = new global::System.Collections.Generic.List<global::Riok.Mapperly.IntegrationTests.Models.TestEnum>(source.Count);
+            foreach (var item in source)
+            {
+                target.Add(MapManual(item));
+            }
             return target;
         }
     }

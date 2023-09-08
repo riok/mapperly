@@ -24,6 +24,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             return new TestObjectDtoManuallyMappedProjection(100) { StringValue = str, };
         }
 
+        private static TestEnum MapManual(TestObjectProjectionEnumValue source) => source.Value;
+
         [MapDerivedType(typeof(TestObjectProjectionTypeA), typeof(TestObjectDtoProjectionTypeA))]
         [MapDerivedType(typeof(TestObjectProjectionTypeB), typeof(TestObjectDtoProjectionTypeB))]
         private static partial TestObjectDtoProjectionBaseType MapDerived(TestObjectProjectionBaseType source);
