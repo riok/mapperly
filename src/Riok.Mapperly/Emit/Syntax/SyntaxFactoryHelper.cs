@@ -29,18 +29,6 @@ public readonly partial struct SyntaxFactoryHelper
 
     public SyntaxFactoryHelper RemoveIndentation() => new(Indentation - 1, _assemblyName);
 
-    public static SyntaxToken Accessibility(Accessibility accessibility)
-    {
-        return accessibility switch
-        {
-            Microsoft.CodeAnalysis.Accessibility.Private => TrailingSpacedToken(SyntaxKind.PrivateKeyword),
-            Microsoft.CodeAnalysis.Accessibility.Protected => TrailingSpacedToken(SyntaxKind.ProtectedKeyword),
-            Microsoft.CodeAnalysis.Accessibility.Internal => TrailingSpacedToken(SyntaxKind.InternalKeyword),
-            Microsoft.CodeAnalysis.Accessibility.Public => TrailingSpacedToken(SyntaxKind.PublicKeyword),
-            _ => throw new ArgumentOutOfRangeException(nameof(accessibility), accessibility, null)
-        };
-    }
-
     public static AssignmentExpressionSyntax Assignment(ExpressionSyntax target, ExpressionSyntax source)
     {
         return AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, target, SpacedToken(SyntaxKind.EqualsToken), source);

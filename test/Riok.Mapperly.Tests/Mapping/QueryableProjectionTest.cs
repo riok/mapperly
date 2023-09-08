@@ -51,9 +51,9 @@ public class QueryableProjectionTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
-                [MapProperty("StringValue", "StringValue2")] partial B MapToB(A source);
-                [MapProperty("LongValue", "IntValue")] partial D MapToD(C source);
+                private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+                [MapProperty("StringValue", "StringValue2")] private partial B MapToB(A source);
+                [MapProperty("LongValue", "IntValue")] private partial D MapToD(C source);
                 """,
             "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",
             "class B { public string StringValue2 { get; set; } public D NestedValue { get; set; } }",
@@ -71,9 +71,9 @@ public class QueryableProjectionTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+                private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
 
-                D MapToD(C v) => new D { Value = v.Value + "-mapped" };
+                private D MapToD(C v) => new D { Value = v.Value + "-mapped" };
                 """,
             "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",
             "class B { public string StringValue { get; set; } public D NestedValue { get; set; } }",

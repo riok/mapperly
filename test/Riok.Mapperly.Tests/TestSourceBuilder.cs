@@ -31,7 +31,7 @@ public static class TestSourceBuilder
         [StringSyntax(StringSyntax.CSharp)] params string[] types
     )
     {
-        return MapperWithBodyAndTypes($"partial {toTypeName} {DefaultMapMethodName}({fromTypeName} source);", options, types);
+        return MapperWithBodyAndTypes($"private partial {toTypeName} {DefaultMapMethodName}({fromTypeName} source);", options, types);
     }
 
     public static string MapperWithBody([StringSyntax(StringSyntax.CSharp)] string body, TestSourceBuilderOptions? options = null)

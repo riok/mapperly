@@ -62,7 +62,7 @@ public class UserMethodTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            partial B Map(A s);"
+            private partial B Map(A s);"
             static void MapList(List<int> src, List<string> dst) { }
             """,
             "class A { public List<int> Value { get; set; } }",
@@ -117,7 +117,7 @@ public class UserMethodTest
     public Task WithExistingInstanceDisabledNullable()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial void Map(A source, B target)",
+            "private partial void Map(A source, B target)",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }"
         );
@@ -365,6 +365,44 @@ public class UserMethodTest
                 protected partial short IntToShort(int value);
 
                 protected abstract string IntToString(int value);
+            }
+
+            class A { public int Value { get; set; } public int Value2 { get; set; } }
+            class B { public string Value { get; set; } public short Value2 { get; set; } }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithMethodClassModifiersShouldCopyModifiersToMethod()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using System.Collections.Generic;
+            using Riok.Mapperly.Abstractions;
+
+            [Mapper]
+            public partial class BaseMapper
+            {
+                public virtual partial B AToB(A source);
+
+                public partial short IntToShort(int value);
+            }
+
+            [Mapper]
+            public partial class BaseMapper2 : BaseMapper
+            {
+                public override partial B AToB(A source);
+            }
+
+            [Mapper]
+            public partial class BaseMapper3 : BaseMapper
+            {
+                public sealed override partial B AToB(A source);
+
+                public new partial short IntToShort(int value);
             }
 
             class A { public int Value { get; set; } public int Value2 { get; set; } }

@@ -442,7 +442,7 @@ public class ObjectPropertyFlatteningTest
     public Task ManualUnflattenedPropertyNullablePathNoParameterlessCtorShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty($\"MyValueId\", \"Value.Id\")] partial B Map(A source);",
+            "[MapProperty($\"MyValueId\", \"Value.Id\")] private partial B Map(A source);",
             "class A { public string MyValueId { get; set; } }",
             "class B { public C? Value { get; set; } }",
             "class C { public C(string arg) {} public string Id { get; set; } }"
@@ -455,7 +455,7 @@ public class ObjectPropertyFlatteningTest
     public Task ManualUnflattenedPropertySourcePropertyNotFoundShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty($\"MyValueIdXXX\", \"Value.Id\")] partial B Map(A source);",
+            "[MapProperty($\"MyValueIdXXX\", \"Value.Id\")] private partial B Map(A source);",
             "class A { public string MyValueId { get; set; } }",
             "class B { public C? Value { get; set; } }",
             "class C { public C(string arg) {} public string Id { get; set; } }"
@@ -468,7 +468,7 @@ public class ObjectPropertyFlatteningTest
     public Task ManualUnflattenedPropertyTargetPropertyPathWriteOnlyShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty($\"MyValueId\", \"Value.Id\")] partial B Map(A source);",
+            "[MapProperty($\"MyValueId\", \"Value.Id\")] private partial B Map(A source);",
             "class A { public string MyValueId { get; set; } }",
             "class B { public C? Value { set; } }",
             "class C { public C(string arg) {} public string Id { get; set; } }"
@@ -481,7 +481,7 @@ public class ObjectPropertyFlatteningTest
     public Task ManualUnflattenedPropertyTargetPropertyNotFoundShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty($\"MyValueId\", \"Value.IdXXX\")] partial B Map(A source);",
+            "[MapProperty($\"MyValueId\", \"Value.IdXXX\")] private partial B Map(A source);",
             "class A { public string MyValueId { get; set; } }",
             "class B { public C? Value { get; set; } }",
             "class C { public C(string arg) {} public string Id { get; set; } }"

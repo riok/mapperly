@@ -199,7 +199,7 @@ public class ObjectPropertyTest
     public Task WithPropertyNameMappingStrategyCaseSensitive()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial B Map(A source);",
+            "private partial B Map(A source);",
             new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseSensitive },
             "class A { public string StringValue { get; set; } }",
             "class B { public string stringvalue { get; set; } }"
@@ -212,7 +212,7 @@ public class ObjectPropertyTest
     public Task WithManualMappedNotFoundTargetPropertyShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty(nameof(A.StringValue), nameof(B.StringValue9)] partial B Map(A source);",
+            "[MapProperty(nameof(A.StringValue), nameof(B.StringValue9)] private partial B Map(A source);",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue2 { get; set; } }"
         );
@@ -224,7 +224,7 @@ public class ObjectPropertyTest
     public Task WithManualMappedNotFoundSourcePropertyShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty(\"StringValue9\", nameof(B.StringValue2)] partial B Map(A source);",
+            "[MapProperty(\"StringValue9\", nameof(B.StringValue2)] private partial B Map(A source);",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue2 { get; set; } }"
         );
@@ -296,7 +296,7 @@ public class ObjectPropertyTest
     public Task WithManualNotFoundSourcePropertyShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty(\"not_found\", nameof(B.StringValue2))] partial B Map(A source);",
+            "[MapProperty(\"not_found\", nameof(B.StringValue2))] private partial B Map(A source);",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue2 { get; set; } }"
         );

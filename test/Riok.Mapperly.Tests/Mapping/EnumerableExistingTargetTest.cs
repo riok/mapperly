@@ -45,7 +45,7 @@ public class EnumerableExistingTargetTest
     public Task MapToExistingCollectionShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial void Map(List<A>? source, RepeatedField<B> target);",
+            "private partial void Map(List<A>? source, RepeatedField<B> target);",
             "class RepeatedField<T> : IList<T> { public void Add(T item) {} }",
             "class A { public string Value { get; set; } }",
             "class B { public string Value { get; set; } }"
@@ -69,7 +69,7 @@ public class EnumerableExistingTargetTest
     public Task MapToExistingStackShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial void Map(List<A>? source, Stack<B> target);",
+            "private partial void Map(List<A>? source, Stack<B> target);",
             "class A { public string Value { get; set; } }",
             "class B { public string Value { get; set; } }"
         );
@@ -81,7 +81,7 @@ public class EnumerableExistingTargetTest
     public Task MapToExistingQueueShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial void Map(List<A>? source, Queue<B> target);",
+            "private partial void Map(List<A>? source, Queue<B> target);",
             "class A { public string Value { get; set; } }",
             "class B { public string Value { get; set; } }"
         );

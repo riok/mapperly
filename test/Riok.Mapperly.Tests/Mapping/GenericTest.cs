@@ -8,10 +8,10 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial TTarget Map<TSource, TTarget>(TSource source);
+                private partial TTarget Map<TSource, TTarget>(TSource source);
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
+                private partial B MapToB(A source);
+                private partial D MapToD(C source);
                 """,
             "record struct A(string Value);",
             "record struct B(string Value);",
@@ -435,10 +435,10 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial TTarget Map<TSource, TTarget>(TSource source);
+                private partial TTarget Map<TSource, TTarget>(TSource source);
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
+                private partial B MapToB(A source);
+                private partial D MapToD(C source);
                 """,
             TestSourceBuilderOptions.WithReferenceHandling,
             "record struct A(string Value);",
@@ -454,10 +454,10 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial TTarget Map<TSource, TTarget>(TSource source, [ReferenceHandler] IReferenceHandler refHandler);
+                private partial TTarget Map<TSource, TTarget>(TSource source, [ReferenceHandler] IReferenceHandler refHandler);
 
-                partial B MapToB(A source, [ReferenceHandler] IReferenceHandler refHandler);
-                partial D MapToD(C source, [ReferenceHandler] IReferenceHandler refHandler);
+                private partial B MapToB(A source, [ReferenceHandler] IReferenceHandler refHandler);
+                private partial D MapToD(C source, [ReferenceHandler] IReferenceHandler refHandler);
                 """,
             TestSourceBuilderOptions.WithReferenceHandling,
             "record struct A(string Value);",

@@ -25,8 +25,8 @@ public class ReferenceHandlingTest
     public Task ManuallyMappedPropertiesShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty(\"Value\", \"MyValue\")] partial B MapToB(A source);"
-                + "[MapProperty(\"Value\", \"MyValue2\")] partial B MapToB1(A source);",
+            "[MapProperty(\"Value\", \"MyValue\")] private partial B MapToB(A source);"
+                + "[MapProperty(\"Value\", \"MyValue2\")] private partial B MapToB1(A source);",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D MyValue { get; set; } public D MyValue2 { get; set; } }",
@@ -73,7 +73,7 @@ public class ReferenceHandlingTest
     public Task ExistingInstanceShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial void Map(A source, B target);",
+            "private partial void Map(A source, B target);",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
@@ -88,7 +88,7 @@ public class ReferenceHandlingTest
     public Task ObjectFactoryShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[ObjectFactory] B CreateB() => new B();" + "partial B Map(A a);",
+            "[ObjectFactory] B CreateB() => new B();" + "private partial B Map(A a);",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
@@ -120,7 +120,7 @@ public class ReferenceHandlingTest
     public Task CustomHandlerShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial B Map(A source, [ReferenceHandler] IReferenceHandler refHandler);",
+            "private partial B Map(A source, [ReferenceHandler] IReferenceHandler refHandler);",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
@@ -193,7 +193,7 @@ public class ReferenceHandlingTest
     public Task CustomHandlerWithObjectFactoryShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[ObjectFactory] B CreateB() => new B();" + "partial B Map(A a, [ReferenceHandler] IReferenceHandler refHandler);",
+            "[ObjectFactory] B CreateB() => new B();" + "private partial B Map(A a, [ReferenceHandler] IReferenceHandler refHandler);",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
@@ -208,7 +208,7 @@ public class ReferenceHandlingTest
     public Task CustomHandlerWithExistingInstanceShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial void Map(A a, B b, [ReferenceHandler] IReferenceHandler refHandler);",
+            "private partial void Map(A a, B b, [ReferenceHandler] IReferenceHandler refHandler);",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
@@ -223,7 +223,7 @@ public class ReferenceHandlingTest
     public Task CustomHandlerAtIndex0ShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial B Map([ReferenceHandler] IReferenceHandler refHandler, A a);",
+            "private partial B Map([ReferenceHandler] IReferenceHandler refHandler, A a);",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
@@ -238,7 +238,7 @@ public class ReferenceHandlingTest
     public Task CustomHandlerAtIndex1WithExistingInstanceShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial void Map([ReferenceHandler] IReferenceHandler refHandler, A a, B b);",
+            "private partial void Map([ReferenceHandler] IReferenceHandler refHandler, A a, B b);",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
@@ -253,7 +253,7 @@ public class ReferenceHandlingTest
     public Task UserImplementedWithoutReferenceHandlerShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            """partial B Map(A a); string ToStringMod(string s) => s + "-modified";""",
+            """private partial B Map(A a); string ToStringMod(string s) => s + "-modified";""",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",
@@ -268,7 +268,7 @@ public class ReferenceHandlingTest
     public Task UserImplementedWithReferenceHandlerShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            """partial B Map(A a); string ToStringMod(string s, [ReferenceHandler] IReferenceHandler _) => s + "-modified";""",
+            """private partial B Map(A a); string ToStringMod(string s, [ReferenceHandler] IReferenceHandler _) => s + "-modified";""",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",

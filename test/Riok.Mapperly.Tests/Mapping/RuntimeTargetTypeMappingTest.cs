@@ -297,7 +297,7 @@ public class RuntimeTargetTypeMappingTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            partial object Map(object source, Type targetType);
+            private partial object Map(object source, Type targetType);
 
             private partial B MapToB(A source);
             private partial D MapToD(C source);
@@ -317,7 +317,7 @@ public class RuntimeTargetTypeMappingTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            partial object Map(object source, Type targetType, [ReferenceHandler] IReferenceHandler refHandler);
+            private partial object Map(object source, Type targetType, [ReferenceHandler] IReferenceHandler refHandler);
 
             private partial B MapToB(A source, [ReferenceHandler] IReferenceHandler refHandler);
             private partial D MapToD(C source, [ReferenceHandler] IReferenceHandler refHandler);
