@@ -67,6 +67,42 @@ public class QueryableProjectionTest
     }
 
     [Fact]
+    public Task RecordToRecordManualFlatteningInsideList()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+
+            private partial D Map(C source) => source.Value;
+            """,
+            "record A(Guid Id, List<C> Values);",
+            "record B(string Id, List<D> Values);",
+            "enum D(V1, V2, V3);",
+            "record C(D Value);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task RecordToRecordManualListMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+
+            private partial List<D> Map(List<C> source) => source.Select(x => x.Value).ToList();
+            """,
+            "record A(Guid Id, List<C> Values);",
+            "record B(string Id, List<D> Values);",
+            "enum D(V1, V2, V3);",
+            "record C(D Value);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ClassToClassWithUserImplemented()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

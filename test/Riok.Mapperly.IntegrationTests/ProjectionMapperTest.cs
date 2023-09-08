@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Riok.Mapperly.IntegrationTests.Helpers;
@@ -90,7 +91,7 @@ namespace Riok.Mapperly.IntegrationTests
                 EnumName = TestEnum.Value10,
                 EnumReverseStringValue = nameof(TestEnum.Value10),
                 EnumValue = TestEnum.Value20,
-                IntValue = 100,
+                Id = 100,
                 EnumRawValue = TestEnum.Value30,
                 EnumStringValue = TestEnum.Value10,
                 Flattening = new IdObject { IdValue = 10 },
@@ -113,6 +114,12 @@ namespace Riok.Mapperly.IntegrationTests
                     EnumReverseStringValue = nameof(TestEnum.Value10),
                     EnumValue = TestEnum.Value20,
                 },
+                ManuallyMapped = "fooBar5",
+                ManuallyMappedList = new List<TestObjectProjectionEnumValue>
+                {
+                    new TestObjectProjectionEnumValue { Value = TestEnum.Value10 },
+                    new TestObjectProjectionEnumValue { Value = TestEnum.Value20 },
+                },
             };
         }
 
@@ -126,9 +133,10 @@ namespace Riok.Mapperly.IntegrationTests
 
             protected override void OnModelCreating(ModelBuilder modelBuilder)
             {
-                modelBuilder.Entity<TestObjectProjection>().HasKey(p => p.IntValue);
+                modelBuilder.Entity<TestObjectProjection>().HasKey(p => p.Id);
                 modelBuilder.Entity<TestObjectProjection>().HasOne(p => p.RecursiveObject);
                 modelBuilder.Entity<TestObjectProjection>().HasOne(p => p.SubObject);
+                modelBuilder.Entity<TestObjectProjection>().HasMany(p => p.ManuallyMappedList);
 
                 modelBuilder.Entity<IdObject>().HasKey(p => p.IdValue);
                 modelBuilder.Entity<InheritanceSubObject>().HasKey(p => p.SubIntValue);
