@@ -62,6 +62,14 @@ public class DescriptorBuilder
         return (_mapperDescriptor, _diagnostics);
     }
 
+    private void ReserveMethodNames()
+    {
+        foreach (var methodSymbol in _symbolAccessor.GetAllMembers(_mapperDescriptor.Symbol))
+        {
+            _methodNameBuilder.Reserve(methodSymbol.Name);
+        }
+    }
+
     private void ExtractObjectFactories()
     {
         _objectFactories = ObjectFactoryBuilder.ExtractObjectFactories(_builderContext, _mapperDescriptor.Symbol);
@@ -89,14 +97,6 @@ public class DescriptorBuilder
         foreach (var externalMapping in ExternalMappingsExtractor.ExtractExternalMappings(_builderContext, _mapperDescriptor.Symbol))
         {
             _mappings.Add(externalMapping);
-        }
-    }
-
-    private void ReserveMethodNames()
-    {
-        foreach (var methodSymbol in _symbolAccessor.GetAllMembers(_mapperDescriptor.Symbol))
-        {
-            _methodNameBuilder.Reserve(methodSymbol.Name);
         }
     }
 

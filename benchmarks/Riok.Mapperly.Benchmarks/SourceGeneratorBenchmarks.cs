@@ -39,7 +39,7 @@ public class SourceGeneratorBenchmarks
     private async Task<(Compilation, CSharpGeneratorDriver)> SetupAsync(string projectPath)
     {
         _workspace = MSBuildWorkspace.Create();
-        _workspace.WorkspaceFailed += (sender, args) =>
+        _workspace.WorkspaceFailed += (_, args) =>
         {
             ConsoleLogger.Default.WriteLineError("-------------------------");
             ConsoleLogger.Default.WriteLineError(args.Diagnostic.ToString());

@@ -1,4 +1,5 @@
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Abstractions.ReferenceHandling;
 
 namespace Riok.Mapperly.Configuration;
 
