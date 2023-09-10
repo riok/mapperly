@@ -44,6 +44,8 @@ To support a new roslyn version via multi targeting follow these steps (see also
 8. If generated code changes based on the new Roslyn version,
    adjust the `VersionedSnapshotAttribute`s as needed.
 9. Adjust the documentation as needed.
+10. Add new preprocessor constants to `.csharpierrc.yaml`.
+11. Add new GitHub required checks as needed (needs to be done by a maintainer).
 
 ## Mapping syntax
 
