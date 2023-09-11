@@ -27,7 +27,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Meziantou.Xunit.ParallelTestFramework" Version="2.1.0"/>
-    <PackageReference Include="Verify.XUnit" Version="20.8.2" />
+    <PackageReference Include="Verify.XUnit" Version="21.1.1" />
     <PackageReference Include="NSubstitute" Version="5.0.0" />
     <PackageReference Include="NSubstitute.Analyzers.CSharp" Version="1.0.16">
       <PrivateAssets>all</PrivateAssets>
