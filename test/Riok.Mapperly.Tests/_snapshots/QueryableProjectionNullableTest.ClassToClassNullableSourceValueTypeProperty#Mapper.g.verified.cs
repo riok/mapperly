@@ -8,7 +8,7 @@ public partial class Mapper
 #nullable disable
         return System.Linq.Queryable.Select(source, x => new global::B()
         {
-            IntValue = x.IntValue ?? default,
+            IntValue = x.IntValue ?? default(int),
         });
 #nullable enable
     }

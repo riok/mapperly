@@ -5,7 +5,7 @@ public partial class Mapper
 {
     public partial global::B? Map(global::A? src)
     {
-        return src == null ? default : src switch
+        return src == null ? default(global::B?) : src switch
         {
             global::AImpl1 x => MapToBImpl1(x),
             global::AImpl2 x => MapToBImpl2(x),

@@ -6,7 +6,7 @@ public partial class Mapper
     private partial global::B? Map(global::A? source)
     {
         if (source == null)
-            return default;
+            return default(global::B?);
         var target = new global::B();
         return target;
     }

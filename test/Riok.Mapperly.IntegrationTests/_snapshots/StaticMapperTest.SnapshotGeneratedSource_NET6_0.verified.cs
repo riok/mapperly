@@ -11,7 +11,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public static partial int? DirectIntNullable(int? value)
         {
-            return value == null ? default : value.Value;
+            return value == null ? default(int?) : value.Value;
         }
 
         public static partial long ImplicitCastInt(int value)
@@ -444,7 +444,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestObject)) => MapFromDto(x),
                 global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => MapAllDtos(x),
                 object x when targetType.IsAssignableFrom(typeof(object)) => DerivedTypes(x),
-                null => default,
+                null => default(object?),
                 _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
             };
         }

@@ -15,12 +15,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 StringValue = x.StringValue,
                 RenamedStringValue2 = x.RenamedStringValue,
                 FlatteningIdValue = x.Flattening.IdValue,
-                NullableFlatteningIdValue = x.NullableFlattening != null ? x.NullableFlattening.IdValue : default,
-                NestedNullableIntValue = x.NestedNullable != null ? x.NestedNullable.IntValue : default,
+                NullableFlatteningIdValue = x.NullableFlattening != null ? x.NullableFlattening.IdValue : default(int?),
+                NestedNullableIntValue = x.NestedNullable != null ? x.NestedNullable.IntValue : default(int),
                 NestedNullable = x.NestedNullable != null ? new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto()
                 {
                     IntValue = x.NestedNullable.IntValue,
-                } : default,
+                } : default(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto?),
                 NestedNullableTargetNotNullable = x.NestedNullableTargetNotNullable != null ? new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto()
                 {
                     IntValue = x.NestedNullableTargetNotNullable.IntValue,
@@ -30,7 +30,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 NullableReadOnlyObjectCollection = x.NullableReadOnlyObjectCollection != null ? global::System.Linq.Enumerable.ToArray(global::System.Linq.Enumerable.Select(x.NullableReadOnlyObjectCollection, x1 => new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto()
                 {
                     IntValue = x1.IntValue,
-                })) : default,
+                })) : default(global::System.Collections.Generic.IReadOnlyCollection<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto>?),
                 EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)x.EnumValue,
                 EnumName = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)x.EnumName,
                 EnumRawValue = (byte)x.EnumRawValue,
@@ -40,7 +40,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 {
                     SubIntValue = x.SubObject.SubIntValue,
                     BaseIntValue = x.SubObject.BaseIntValue,
-                } : default,
+                } : default(global::Riok.Mapperly.IntegrationTests.Dto.InheritanceSubObjectDto?),
                 DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(x.DateTimeValueTargetDateOnly),
                 DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(x.DateTimeValueTargetTimeOnly),
                 ManuallyMapped = MapManual(x.ManuallyMapped),

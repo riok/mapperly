@@ -8,7 +8,7 @@ public partial class Mapper
 #nullable disable
         return System.Linq.Queryable.Select(source, x => new global::B()
         {
-            Parent = x.Parent != null ? new global::B() : default,
+            Parent = x.Parent != null ? new global::B() : default(global::B?),
         });
 #nullable enable
     }

@@ -8,7 +8,7 @@ public partial class Mapper
 #nullable disable
         return System.Linq.Queryable.Select(source, x => new global::B()
         {
-            NestedValue = x.Nested != null ? x.Nested.Value : default,
+            NestedValue = x.Nested != null ? x.Nested.Value : default(int),
         });
 #nullable enable
     }

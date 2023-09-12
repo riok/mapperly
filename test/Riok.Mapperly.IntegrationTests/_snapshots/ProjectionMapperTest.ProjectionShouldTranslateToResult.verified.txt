@@ -4,7 +4,6 @@
     StringValue: ,
     RenamedStringValue2: ,
     FlatteningIdValue: 1,
-    NullableFlatteningIdValue: 0,
     NestedNullableTargetNotNullable: {},
     StringNullableTargetNotNullable: ,
     SourceTargetSameObjectType: {

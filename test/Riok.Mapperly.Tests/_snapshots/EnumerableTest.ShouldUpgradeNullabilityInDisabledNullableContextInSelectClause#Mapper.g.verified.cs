@@ -6,7 +6,7 @@ public partial class Mapper
     private partial global::B? Map(global::A? source)
     {
         if (source == null)
-            return default;
+            return default(global::B?);
         var target = new global::B();
         if (source.Value != null)
         {
@@ -18,7 +18,7 @@ public partial class Mapper
     private global::D? MapToD(global::C? source)
     {
         if (source == null)
-            return default;
+            return default(global::D?);
         var target = new global::D();
         target.Value = source.Value;
         return target;

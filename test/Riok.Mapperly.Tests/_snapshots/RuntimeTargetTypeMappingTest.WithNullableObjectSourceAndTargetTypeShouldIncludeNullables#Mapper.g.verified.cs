@@ -11,7 +11,7 @@ public partial class Mapper
             string x when targetType.IsAssignableFrom(typeof(int)) => MapStringToInt(x),
             global::A x when targetType.IsAssignableFrom(typeof(global::B)) => MapToB(x),
             global::C x when targetType.IsAssignableFrom(typeof(global::D)) => MapToD(x),
-            null => default,
+            null => default(object?),
             _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
         };
     }
@@ -26,7 +26,7 @@ public partial class Mapper
     private partial global::D? MapToD(global::C? source)
     {
         if (source == null)
-            return default;
+            return default(global::D?);
         var target = new global::D();
         target.Value2 = source.Value2;
         return target;
@@ -34,7 +34,7 @@ public partial class Mapper
 
     private partial int? MapStringToInt(string? source)
     {
-        return source == null ? default : int.Parse(source);
+        return source == null ? default(int?) : int.Parse(source);
     }
 
     private partial int? MapIntToInt(int source)
