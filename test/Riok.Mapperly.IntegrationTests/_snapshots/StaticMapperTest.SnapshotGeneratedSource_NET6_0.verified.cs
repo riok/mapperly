@@ -11,7 +11,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public static partial int? DirectIntNullable(int? value)
         {
-            return value == null ? default : value.Value;
+            return value == null ? default(int?) : value.Value;
         }
 
         public static partial long ImplicitCastInt(int value)

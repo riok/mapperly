@@ -34,7 +34,7 @@ public partial class Mapper
 
     private partial int? MapStringToInt(string? source)
     {
-        return source == null ? default : int.Parse(source);
+        return source == null ? default(int?) : int.Parse(source);
     }
 
     private partial int? MapIntToInt(int source)
