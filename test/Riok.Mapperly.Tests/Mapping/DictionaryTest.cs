@@ -96,7 +96,7 @@ public class DictionaryTest
                 var target = new global::System.Collections.Generic.Dictionary<string, int>(source.Count);
                 foreach (var item in source)
                 {
-                    target[item.Key] = item.Value == null ? default : item.Value.Value;
+                    target[item.Key] = item.Value == null ? default(int) : item.Value.Value;
                 }
 
                 return target;

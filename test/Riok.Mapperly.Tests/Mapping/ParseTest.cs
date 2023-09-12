@@ -23,7 +23,7 @@ public class ParseTest
     public void ParseableBuiltNullableInClass()
     {
         var source = TestSourceBuilder.Mapping("string?", "int?");
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source == null ? default : int.Parse(source);");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source == null ? default(int? ) : int.Parse(source);");
     }
 
     [Fact]

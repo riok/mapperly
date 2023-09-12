@@ -305,7 +305,7 @@ public class UseMapperTest
             .HaveMapMethodBody(
                 """
                 if (source == null)
-                    return default;
+                    return default(global::B? );
                 var target = new global::B(_otherMapper.ToBExternal(source.Value));
                 return target;
                 """

@@ -517,7 +517,7 @@ public class ObjectPropertyNullableTest
             .HaveSingleMethodBody(
                 """
                 if (source == null)
-                    return default;
+                    return default(global::B? );
                 var target = new global::B();
                 target.StringValue = source.StringValue;
                 target.NestedValue = UserImplementedMap(source.NestedValue);
@@ -549,7 +549,7 @@ public class ObjectPropertyNullableTest
             .HaveSingleMethodBody(
                 """
                 if (y == null)
-                    return default;
+                    return default(global::NotNullableType? );
                 var target = new global::NotNullableType();
                 target.Test = Map(y.Test);
                 return target;
@@ -580,7 +580,7 @@ public class ObjectPropertyNullableTest
             .HaveSingleMethodBody(
                 """
                 if (y == null)
-                    return default;
+                    return default(global::NotNullableType? );
                 var target = new global::NotNullableType();
                 if (y.Test != null)
                 {
@@ -616,7 +616,7 @@ public class ObjectPropertyNullableTest
             .HaveSingleMethodBody(
                 """
                 if (y == null)
-                    return default;
+                    return default(global::NotNullableType? );
                 var target = new global::NotNullableType();
                 target.Test = MapNullable(y.Test);
                 target.Test2 = MapNonNullable(y.Test2);

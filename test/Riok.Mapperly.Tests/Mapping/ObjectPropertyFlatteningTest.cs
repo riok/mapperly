@@ -262,7 +262,7 @@ public class ObjectPropertyFlatteningTest
             .HaveSingleMethodBody(
                 """
                 if (source == null)
-                    return default;
+                    return default(global::B? );
                 var target = new global::B();
                 if (source.Value != null)
                 {
@@ -292,7 +292,7 @@ public class ObjectPropertyFlatteningTest
             .HaveSingleMethodBody(
                 """
                 if (source == null)
-                    return default;
+                    return default(global::B? );
                 var target = new global::B();
                 target.ValueName = source.Value?.Name;
                 return target;

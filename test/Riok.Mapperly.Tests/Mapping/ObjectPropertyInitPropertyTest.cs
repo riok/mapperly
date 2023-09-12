@@ -147,7 +147,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    Parent = source.Parent != null ? Map(source.Parent) : default,
+                    Parent = source.Parent != null ? Map(source.Parent) : default(global::B? ),
                 };
                 return target;
                 """

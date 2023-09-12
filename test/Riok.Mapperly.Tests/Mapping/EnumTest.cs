@@ -213,7 +213,10 @@ enum E2 {A = 100, B, C}
     {
         var source = TestSourceBuilder.Mapping("E1?", "E2?", "enum E1 {A, B, C}", "enum E2 {A, B, C}");
 
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source == null ? default : (global::E2)source.Value;");
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody("return source == null ? default(global::E2? ) : (global::E2)source.Value;");
     }
 
     [Fact]

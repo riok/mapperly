@@ -32,7 +32,7 @@ public class NullableTest
             .HaveSingleMethodBody(
                 """
                 if (source == null)
-                    return default;
+                    return default(global::B? );
                 var target = new global::B();
                 return target;
                 """
@@ -44,7 +44,7 @@ public class NullableTest
     {
         var source = TestSourceBuilder.Mapping("decimal?", "int?");
 
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody(@"return source == null ? default : (int)source.Value;");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody(@"return source == null ? default(int? ) : (int)source.Value;");
     }
 
     [Fact]
@@ -133,7 +133,10 @@ public class NullableTest
             }
         );
 
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source == null ? default : source.Value;");
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody("return source == null ? default(global::System.DateTime) : source.Value;");
     }
 
     [Fact]
