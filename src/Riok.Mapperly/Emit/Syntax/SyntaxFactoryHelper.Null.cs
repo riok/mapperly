@@ -35,7 +35,7 @@ public partial struct SyntaxFactoryHelper
         {
             NullFallbackValue.Default => DefaultExpression(FullyQualifiedIdentifier(t)),
             NullFallbackValue.EmptyString => StringLiteral(string.Empty),
-            NullFallbackValue.CreateInstance => CreateInstance(t),
+            NullFallbackValue.CreateInstance => CreateInstance(t.NonNullable()),
             _ when argument is ElementAccessExpressionSyntax memberAccess
                 => ThrowNullReferenceException(
                     InterpolatedString(
