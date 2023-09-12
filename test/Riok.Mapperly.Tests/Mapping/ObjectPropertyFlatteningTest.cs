@@ -138,7 +138,6 @@ public class ObjectPropertyFlatteningTest
                 {
                     target.ValueId = source.Value.Id;
                 }
-
                 return target;
                 """
             );
@@ -166,7 +165,6 @@ public class ObjectPropertyFlatteningTest
                     target.ValueId = source.Value.Id.ToString();
                     target.ValueName = source.Value.Name;
                 }
-
                 return target;
                 """
             );
@@ -192,7 +190,6 @@ public class ObjectPropertyFlatteningTest
                 {
                     target.IdValue = source.Id.Value.Value;
                 }
-
                 return target;
                 """
             );
@@ -218,7 +215,6 @@ public class ObjectPropertyFlatteningTest
                 {
                     target.PropInteger = source.Prop.Value.Integer.ToString();
                 }
-
                 return target;
                 """
             );
@@ -268,7 +264,6 @@ public class ObjectPropertyFlatteningTest
                 {
                     target.ValueId = source.Value.Id.ToString();
                 }
-
                 target.ValueName = source.Value?.Name;
                 return target;
                 """
@@ -521,10 +516,8 @@ public class ObjectPropertyFlatteningTest
                         target.Value2.Value2.Id2 = source.Value1.Value1.Id1;
                         target.Value2.Value2.Id20 = source.Value1.Value1.Id10;
                     }
-
                     target.Value2.Id200 = source.Value1.Id100;
                 }
-
                 return target;
                 """
             );

@@ -43,14 +43,13 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -63,14 +62,13 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -83,14 +81,13 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -103,14 +100,13 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -151,14 +147,13 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -171,14 +166,13 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -191,14 +185,13 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -211,14 +204,13 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -260,15 +252,14 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new global::System.Collections.Generic.List<int>();
-            target.EnsureCapacity(source.Length + target.Count);
-            foreach (var item in source)
-            {
-                target.Add(item);
-            }
-
-            return target;
-            """
+                var target = new global::System.Collections.Generic.List<int>();
+                target.EnsureCapacity(source.Length + target.Count);
+                foreach (var item in source)
+                {
+                    target.Add(item);
+                }
+                return target;
+                """
             );
     }
 
@@ -281,15 +272,14 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new global::System.Collections.Generic.Stack<int>();
-            target.EnsureCapacity(source.Length + target.Count);
-            foreach (var item in source)
-            {
-                target.Push(item);
-            }
-
-            return target;
-            """
+                var target = new global::System.Collections.Generic.Stack<int>();
+                target.EnsureCapacity(source.Length + target.Count);
+                foreach (var item in source)
+                {
+                    target.Push(item);
+                }
+                return target;
+                """
             );
     }
 
@@ -302,15 +292,14 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new global::System.Collections.Generic.Queue<int>();
-            target.EnsureCapacity(source.Length + target.Count);
-            foreach (var item in source)
-            {
-                target.Enqueue(item);
-            }
-
-            return target;
-            """
+                var target = new global::System.Collections.Generic.Queue<int>();
+                target.EnsureCapacity(source.Length + target.Count);
+                foreach (var item in source)
+                {
+                    target.Enqueue(item);
+                }
+                return target;
+                """
             );
     }
 
@@ -382,14 +371,13 @@ public class SpanTest
             .Should()
             .HaveMapMethodBody(
                 """
-            var target = new global::A[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = MapToA(source[i]);
-            }
-
-            return target;
-            """
+                var target = new global::A[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = MapToA(source[i]);
+                }
+                return target;
+                """
             );
     }
 
@@ -402,14 +390,13 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -422,14 +409,13 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -442,14 +428,13 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -462,14 +447,13 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -494,14 +478,13 @@ public class SpanTest
             .Should()
             .HaveMapMethodBody(
                 """
-            var target = new global::A[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = MapToA(source[i]);
-            }
-
-            return target;
-            """
+                var target = new global::A[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = MapToA(source[i]);
+                }
+                return target;
+                """
             );
     }
 
@@ -514,14 +497,13 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -546,14 +528,13 @@ public class SpanTest
             .Should()
             .HaveMapMethodBody(
                 """
-            var target = new global::A[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = MapToA(source[i]);
-            }
-
-            return target;
-            """
+                var target = new global::A[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = MapToA(source[i]);
+                }
+                return target;
+                """
             );
     }
 
@@ -566,14 +547,13 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -643,15 +623,14 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-            var target = new global::B();
-            target.Value.EnsureCapacity(source.Value.Length + target.Value.Count);
-            foreach (var item in source.Value)
-            {
-                target.Value.Add(item);
-            }
-
-            return target;
-            """
+                var target = new global::B();
+                target.Value.EnsureCapacity(source.Value.Length + target.Value.Count);
+                foreach (var item in source.Value)
+                {
+                    target.Value.Add(item);
+                }
+                return target;
+                """
             );
     }
 

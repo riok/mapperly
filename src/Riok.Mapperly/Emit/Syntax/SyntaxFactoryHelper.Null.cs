@@ -51,7 +51,7 @@ public partial struct SyntaxFactoryHelper
     {
         StatementSyntax ifExpression = returnOrThrowExpression switch
         {
-            ThrowExpressionSyntax throwSyntax => ThrowStatement(throwSyntax.Expression),
+            ThrowExpressionSyntax throwSyntax => AddIndentation().ThrowStatement(throwSyntax.Expression),
             _ => AddIndentation().Return(returnOrThrowExpression),
         };
 

@@ -43,8 +43,7 @@ public class NullableTest
     public void NullablePrimitiveToOtherNullablePrimitiveShouldWork()
     {
         var source = TestSourceBuilder.Mapping("decimal?", "int?");
-
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody(@"return source == null ? default(int? ) : (int)source.Value;");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source == null ? default(int?) : (int)source.Value;");
     }
 
     [Fact]
@@ -140,8 +139,7 @@ public class NullableTest
     public void NonNullableToNullableValueType()
     {
         var source = TestSourceBuilder.Mapping("DateTime", "DateTime?");
-
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::System.DateTime? )source;");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::System.DateTime?)source;");
     }
 
     [Fact]

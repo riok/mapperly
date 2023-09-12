@@ -299,14 +299,13 @@ public class MemoryTest
             .Should()
             .HaveMapMethodBody(
                 """
-            var target = new long[source.Length];
-            for (var i = 0; i < source.Length; i++)
-            {
-                target[i] = (long)source[i];
-            }
-
-            return target;
-            """
+                var target = new long[source.Length];
+                for (var i = 0; i < source.Length; i++)
+                {
+                    target[i] = (long)source[i];
+                }
+                return target;
+                """
             );
     }
 
@@ -343,15 +342,14 @@ public class MemoryTest
             .Should()
             .HaveMapMethodBody(
                 """
-            var target = new global::B();
-            target.Value.EnsureCapacity(source.Value.Span.Length + target.Value.Count);
-            foreach (var item in source.Value.Span)
-            {
-                target.Value.Add(item);
-            }
-
-            return target;
-            """
+                var target = new global::B();
+                target.Value.EnsureCapacity(source.Value.Span.Length + target.Value.Count);
+                foreach (var item in source.Value.Span)
+                {
+                    target.Value.Add(item);
+                }
+                return target;
+                """
             );
     }
 

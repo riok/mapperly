@@ -45,7 +45,6 @@ public class ObjectPropertyNullableTest
                 {
                     target.Value = source.Value.Value;
                 }
-
                 return target;
                 """
             );
@@ -75,7 +74,6 @@ public class ObjectPropertyNullableTest
                 {
                     target.Value = source.Value.Value;
                 }
-
                 return target;
                 """
             );
@@ -110,7 +108,6 @@ public class ObjectPropertyNullableTest
                 {
                     throw new System.ArgumentNullException(nameof(source.Value.Value));
                 }
-
                 return target;
                 """
             );
@@ -136,7 +133,6 @@ public class ObjectPropertyNullableTest
                 {
                     target.Value = source.Value;
                 }
-
                 return target;
                 """
             );
@@ -164,7 +160,6 @@ public class ObjectPropertyNullableTest
                 {
                     target.Value = MapToD(source.Value);
                 }
-
                 return target;
                 """
             );
@@ -216,7 +211,6 @@ public class ObjectPropertyNullableTest
                 {
                     target.Value = source.Value;
                 }
-
                 return target;
                 """
             );
@@ -251,7 +245,6 @@ public class ObjectPropertyNullableTest
                 {
                     throw new System.ArgumentNullException(nameof(source.Value));
                 }
-
                 return target;
                 """
             );
@@ -326,7 +319,6 @@ public class ObjectPropertyNullableTest
                 {
                     target.Value = MapToD(source.Value);
                 }
-
                 return target;
                 """
             );
@@ -358,7 +350,6 @@ public class ObjectPropertyNullableTest
                 {
                     target.Value = MapToD(source.Value);
                 }
-
                 return target;
                 """
             );
@@ -395,7 +386,6 @@ public class ObjectPropertyNullableTest
                 {
                     throw new System.ArgumentNullException(nameof(source.Value));
                 }
-
                 return target;
                 """
             );
@@ -423,7 +413,6 @@ public class ObjectPropertyNullableTest
                 {
                     target.Value = MapToD(source.Value);
                 }
-
                 return target;
                 """
             );
@@ -451,7 +440,6 @@ public class ObjectPropertyNullableTest
                 {
                     target.Value = MapToD(source.Value);
                 }
-
                 return target;
                 """
             );
@@ -487,7 +475,6 @@ public class ObjectPropertyNullableTest
                 {
                     throw new System.ArgumentNullException(nameof(source.Value));
                 }
-
                 return target;
                 """
             );
@@ -586,7 +573,6 @@ public class ObjectPropertyNullableTest
                 {
                     target.Test = Map(y.Test.Value);
                 }
-
                 return target;
                 """
             );

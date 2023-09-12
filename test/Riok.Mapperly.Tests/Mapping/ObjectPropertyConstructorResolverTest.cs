@@ -510,7 +510,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new global::TargetRecord(record.EnumValue != null ? MapToTargetEnum(record.EnumValue.Value) : default(global::TargetEnum? ));
+                var target = new global::TargetRecord(record.EnumValue != null ? MapToTargetEnum(record.EnumValue.Value) : default(global::TargetEnum?));
                 return target;
                 """
             );
@@ -542,7 +542,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new global::TargetRecord(record.StructValue != null ? MapToTargetStruct(record.StructValue.Value) : default(global::TargetStruct? ));
+                var target = new global::TargetRecord(record.StructValue != null ? MapToTargetStruct(record.StructValue.Value) : default(global::TargetStruct?));
                 return target;
                 """
             );

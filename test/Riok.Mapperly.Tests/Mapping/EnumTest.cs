@@ -216,14 +216,14 @@ enum E2 {A = 100, B, C}
         TestHelper
             .GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody("return source == null ? default(global::E2? ) : (global::E2)source.Value;");
+            .HaveSingleMethodBody("return source == null ? default(global::E2?) : (global::E2)source.Value;");
     }
 
     [Fact]
     public void EnumToOtherNullableEnumShouldCast()
     {
         var source = TestSourceBuilder.Mapping("E1", "E2?", "enum E1 {A, B, C}", "enum E2 {A, B, C}");
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E2? )(global::E2)source;");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E2?)(global::E2)source;");
     }
 
     [Fact]
@@ -260,9 +260,9 @@ enum E2 {A = 100, B, C}
                 """
                 return source switch
                 {
-                    { } s when s.Equals(nameof(global::E1.A), System.StringComparison.OrdinalIgnoreCase) => global::E1.A,
-                    { } s when s.Equals(nameof(global::E1.B), System.StringComparison.OrdinalIgnoreCase) => global::E1.B,
-                    { } s when s.Equals(nameof(global::E1.C), System.StringComparison.OrdinalIgnoreCase) => global::E1.C,
+                    {} s when s.Equals(nameof(global::E1.A), System.StringComparison.OrdinalIgnoreCase) => global::E1.A,
+                    {} s when s.Equals(nameof(global::E1.B), System.StringComparison.OrdinalIgnoreCase) => global::E1.B,
+                    {} s when s.Equals(nameof(global::E1.C), System.StringComparison.OrdinalIgnoreCase) => global::E1.C,
                     _ => System.Enum.Parse<global::E1>(source, true),
                 };
                 """
