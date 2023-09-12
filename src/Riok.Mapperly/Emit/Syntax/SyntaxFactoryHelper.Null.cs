@@ -36,7 +36,7 @@ public partial struct SyntaxFactoryHelper
             NullFallbackValue.Default when t.IsNullableValueType() => DefaultExpression(FullyQualifiedIdentifier(t)),
             NullFallbackValue.Default => DefaultLiteral(),
             NullFallbackValue.EmptyString => StringLiteral(string.Empty),
-            NullFallbackValue.CreateInstance => CreateInstance(t),
+            NullFallbackValue.CreateInstance => CreateInstance(t.NonNullable()),
             _ when argument is ElementAccessExpressionSyntax memberAccess
                 => ThrowNullReferenceException(
                     InterpolatedString(

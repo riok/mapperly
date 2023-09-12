@@ -41,7 +41,7 @@ public class NullDelegateMethodMapping : MethodMapping
         // call mapping only if source is not null.
         // if (source == null)
         //   return <null-substitute>;
-        var fallbackExpression = NullSubstitute(TargetType.NonNullable(), ctx.Source, _nullFallbackValue);
+        var fallbackExpression = NullSubstitute(TargetType, ctx.Source, _nullFallbackValue);
         var ifExpression = ctx.SyntaxFactory.IfNullReturnOrThrow(ctx.Source, fallbackExpression);
         return body.Prepend(ifExpression);
     }

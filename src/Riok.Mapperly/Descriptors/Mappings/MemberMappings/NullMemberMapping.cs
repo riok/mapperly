@@ -60,7 +60,7 @@ public class NullMemberMapping : IMemberMapping
             var mapping = _delegateMapping.Build(ctx.WithSource(nullConditionalSourceAccess));
             return _nullFallback == NullFallbackValue.Default && _targetType.IsNullable()
                 ? mapping
-                : Coalesce(mapping, NullSubstitute(_delegateMapping.TargetType, nameofSourceAccess, _nullFallback));
+                : Coalesce(mapping, NullSubstitute(_targetType, nameofSourceAccess, _nullFallback));
         }
 
         var notNullCondition = _useNullConditionalAccess
@@ -68,11 +68,7 @@ public class NullMemberMapping : IMemberMapping
             : SourcePath.BuildNonNullConditionWithoutConditionalAccess(ctx.Source)!;
         var sourceMemberAccess = SourcePath.BuildAccess(ctx.Source, true);
         ctx = ctx.WithSource(sourceMemberAccess);
-        return Conditional(
-            notNullCondition,
-            _delegateMapping.Build(ctx),
-            NullSubstitute(_delegateMapping.TargetType, sourceMemberAccess, _nullFallback)
-        );
+        return Conditional(notNullCondition, _delegateMapping.Build(ctx), NullSubstitute(_targetType, sourceMemberAccess, _nullFallback));
     }
 
     protected bool Equals(NullMemberMapping other) =>
