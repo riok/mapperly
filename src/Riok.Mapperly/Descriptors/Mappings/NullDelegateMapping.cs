@@ -69,7 +69,7 @@ public class NullDelegateMapping : NewInstanceMapping
 
         return Conditional(
             IsNull(ctx.Source),
-            NullSubstitute(TargetType.NonNullable(), ctx.Source, _nullFallbackValue),
+            NullSubstitute(TargetType, ctx.Source, _nullFallbackValue),
             _delegateMapping.Build(ctx.WithSource(sourceValue))
         );
     }

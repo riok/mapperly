@@ -44,7 +44,7 @@ public class NullableTest
     {
         var source = TestSourceBuilder.Mapping("decimal?", "int?");
 
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody(@"return source == null ? default : (int)source.Value;");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody(@"return source == null ? default(int? ) : (int)source.Value;");
     }
 
     [Fact]

@@ -15,7 +15,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 StringValue = x.StringValue,
                 RenamedStringValue2 = x.RenamedStringValue,
                 FlatteningIdValue = x.Flattening.IdValue,
-                NullableFlatteningIdValue = x.NullableFlattening != null ? x.NullableFlattening.IdValue : default,
+                NullableFlatteningIdValue = x.NullableFlattening != null ? x.NullableFlattening.IdValue : default(int?),
                 NestedNullableIntValue = x.NestedNullable != null ? x.NestedNullable.IntValue : default,
                 NestedNullable = x.NestedNullable != null ? new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto()
                 {

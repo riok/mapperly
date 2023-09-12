@@ -483,4 +483,68 @@ public class ObjectPropertyConstructorResolverTest
                 """
             );
     }
+
+    [Fact]
+    public void RecordToRecordNullableToNullableEnum()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+
+            enum SourceEnum { Value1, Value2 }
+            enum TargetEnum { Value1, Value2 }
+
+            record SourceRecord(SourceEnum? EnumValue);
+            record TargetRecord(TargetEnum? EnumValue);
+
+            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
+            static partial class Mapper
+            {
+                public static partial TargetRecord Map(this SourceRecord record);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::TargetRecord(record.EnumValue != null ? MapToTargetEnum(record.EnumValue.Value) : default(global::TargetEnum? ));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void RecordToRecordNullableToNullableStruct()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+
+            struct SourceStruct { public int Value { get; set; } }
+            struct TargetStruct { public int Value { get; set; } }
+
+            record SourceRecord(SourceStruct? StructValue);
+            record TargetRecord(TargetStruct? StructValue);
+
+            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
+            static partial class Mapper
+            {
+                public static partial TargetRecord Map(this SourceRecord record);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::TargetRecord(record.StructValue != null ? MapToTargetStruct(record.StructValue.Value) : default(global::TargetStruct? ));
+                return target;
+                """
+            );
+    }
 }

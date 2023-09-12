@@ -33,6 +33,7 @@ public partial struct SyntaxFactoryHelper
     {
         return nullFallbackValue switch
         {
+            NullFallbackValue.Default when t.IsNullableValueType() => DefaultExpression(FullyQualifiedIdentifier(t)),
             NullFallbackValue.Default => DefaultLiteral(),
             NullFallbackValue.EmptyString => StringLiteral(string.Empty),
             NullFallbackValue.CreateInstance => CreateInstance(t),
