@@ -37,7 +37,6 @@ public class EnumerableTest
                 {
                     target[i] = source[i] == null ? throw new System.NullReferenceException($"Sequence {nameof(source)}, contained a null value at index {i}.") : source[i].Value;
                 }
-
                 return target;
                 """
             );
@@ -52,12 +51,11 @@ public class EnumerableTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new int? [source.Length];
+                var target = new int?[source.Length];
                 for (var i = 0; i < source.Length; i++)
                 {
-                    target[i] = (int? )source[i];
+                    target[i] = (int?)source[i];
                 }
-
                 return target;
                 """
             );
@@ -84,7 +82,6 @@ public class EnumerableTest
                 {
                     target[i] = source[i] == null ? throw new System.NullReferenceException($"Sequence {nameof(source)}, contained a null value at index {i}.") : source[i]!;
                 }
-
                 return target;
                 """
             );
@@ -94,7 +91,7 @@ public class EnumerableTest
     public void ArrayCustomClassNonNullableToArrayCustomClassNullable()
     {
         var source = TestSourceBuilder.Mapping("B[]", "B?[]", "class B { public int Value {get; set; }}");
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::B? [])source;");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::B?[])source;");
     }
 
     [Fact]
@@ -108,7 +105,7 @@ public class EnumerableTest
     public void ArrayToArrayOfNullableString()
     {
         var source = TestSourceBuilder.Mapping("string[]", "string?[]");
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (string? [])source;");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (string?[])source;");
     }
 
     [Fact]
@@ -139,7 +136,6 @@ public class EnumerableTest
                 {
                     target[i] = (int)source[i];
                 }
-
                 return target;
                 """
             );
@@ -201,7 +197,6 @@ public class EnumerableTest
                 {
                     target.Add((long)item);
                 }
-
                 return target;
                 """
             );
@@ -223,7 +218,6 @@ public class EnumerableTest
                     target[i] = item.ToString();
                     i++;
                 }
-
                 return target;
                 """
             );
@@ -276,7 +270,6 @@ public class EnumerableTest
                     target[i] = (long)item;
                     i++;
                 }
-
                 return target;
                 """
             );
@@ -332,7 +325,6 @@ public class EnumerableTest
                 {
                     target.Add((int)item);
                 }
-
                 return target;
                 """
             );
@@ -378,7 +370,6 @@ public class EnumerableTest
                 {
                     target.Value.Add(item);
                 }
-
                 return target;
                 """
             );
@@ -403,12 +394,10 @@ public class EnumerableTest
                 {
                     target.Value.EnsureCapacity(sourceCount + target.Value.Count);
                 }
-
                 foreach (var item in source.Value)
                 {
                     target.Value.Push((long)item);
                 }
-
                 return target;
                 """
             );
@@ -433,12 +422,10 @@ public class EnumerableTest
                 {
                     target.Value.EnsureCapacity(sourceCount + target.Value.Count);
                 }
-
                 foreach (var item in source.Value)
                 {
                     target.Value.Enqueue((long)item);
                 }
-
                 return target;
                 """
             );
@@ -545,7 +532,6 @@ public class EnumerableTest
                 {
                     target.Add((int)item);
                 }
-
                 return target;
                 """
             );

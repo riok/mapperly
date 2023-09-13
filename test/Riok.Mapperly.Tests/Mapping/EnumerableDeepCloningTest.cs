@@ -43,7 +43,6 @@ public class EnumerableDeepCloningTest
                 {
                     target[i] = source[i] == null ? throw new System.NullReferenceException($"Sequence {nameof(source)}, contained a null value at index {i}.") : source[i].Value;
                 }
-
                 return target;
                 """
             );
@@ -58,12 +57,11 @@ public class EnumerableDeepCloningTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new int? [source.Length];
+                var target = new int?[source.Length];
                 for (var i = 0; i < source.Length; i++)
                 {
-                    target[i] = (int? )source[i];
+                    target[i] = (int?)source[i];
                 }
-
                 return target;
                 """
             );
@@ -88,7 +86,6 @@ public class EnumerableDeepCloningTest
                 {
                     target[i] = MapToB(source[i]);
                 }
-
                 return target;
                 """
             );
@@ -105,7 +102,7 @@ public class EnumerableDeepCloningTest
     public void ArrayToArrayOfNullableStringDeepCloning()
     {
         var source = TestSourceBuilder.Mapping("string[]", "string?[]", TestSourceBuilderOptions.WithDeepCloning);
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (string? [])source.Clone();");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (string?[])source.Clone();");
     }
 
     [Fact]
@@ -134,7 +131,6 @@ public class EnumerableDeepCloningTest
                 {
                     target[i] = MapToA(source[i]);
                 }
-
                 return target;
                 """
             );
@@ -168,7 +164,6 @@ public class EnumerableDeepCloningTest
                     target[i] = MapToA(item);
                     i++;
                 }
-
                 return target;
                 """
             );
@@ -199,7 +194,6 @@ public class EnumerableDeepCloningTest
                 {
                     target[i1] = MapToA(i[i1]);
                 }
-
                 return target;
                 """
             );
@@ -223,7 +217,6 @@ public class EnumerableDeepCloningTest
                 {
                     target1[i] = MapToA(target[i]);
                 }
-
                 return target1;
                 """
             );

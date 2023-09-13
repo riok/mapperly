@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Emit.Syntax;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
@@ -55,7 +56,7 @@ public class EnumFromStringSwitchMapping : MethodMapping
     {
         // { } s
         var pattern = RecursivePattern()
-            .WithPropertyPatternClause(PropertyPatternClause())
+            .WithPropertyPatternClause(PropertyPatternClause().AddTrailingSpace())
             .WithDesignation(SingleVariableDesignation(Identifier(ignoreCaseSwitchDesignatedVariableName)));
 
         // source.Value1

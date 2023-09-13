@@ -32,7 +32,6 @@ public class EnumerableExistingTargetTest
                 {
                     target.EnsureCapacity(sourceCount + target.Count);
                 }
-
                 foreach (var item in source)
                 {
                     target.Add(item);

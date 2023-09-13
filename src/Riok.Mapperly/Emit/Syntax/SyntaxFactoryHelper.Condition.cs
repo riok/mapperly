@@ -30,7 +30,7 @@ public partial struct SyntaxFactoryHelper
         ElseClauseSyntax? elseClause = null;
         if (elseStatements != null)
         {
-            elseClause = ElseClause(Block(elseStatements)).AddLeadingLineFeed(Indentation).AddTrailingLineFeed(Indentation);
+            elseClause = ElseClause(Block(elseStatements)).AddLeadingLineFeed(Indentation);
         }
 
         return IfStatement(

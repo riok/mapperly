@@ -48,7 +48,7 @@ public class ForEachSetDictionaryExistingTargetMapping : ExistingTargetMapping
             var castedVariable = ctx.NameBuilder.New(ExplicitCastVariableName);
             target = IdentifierName(castedVariable);
 
-            yield return LocalDeclarationStatement(DeclareVariable(castedVariable, cast));
+            yield return ctx.SyntaxFactory.DeclareLocalVariable(castedVariable, cast);
         }
 
         if (_ensureCapacity != null)

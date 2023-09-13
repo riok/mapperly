@@ -31,7 +31,6 @@ public class DictionaryTest
                 {
                     target[item.Key] = item.Value;
                 }
-
                 return target;
                 """
             );
@@ -51,7 +50,6 @@ public class DictionaryTest
                 {
                     target[item.Key] = (int)item.Value;
                 }
-
                 return target;
                 """
             );
@@ -71,7 +69,6 @@ public class DictionaryTest
                 {
                     target[item.Key] = item.Value == null ? throw new System.ArgumentNullException(nameof(item.Value)) : item.Value.Value;
                 }
-
                 return target;
                 """
             );
@@ -98,7 +95,6 @@ public class DictionaryTest
                 {
                     target[item.Key] = item.Value == null ? default : item.Value.Value;
                 }
-
                 return target;
                 """
             );
@@ -118,7 +114,6 @@ public class DictionaryTest
                 {
                     target[item.Key] = (int)item.Value;
                 }
-
                 return target;
                 """
             );
@@ -138,7 +133,6 @@ public class DictionaryTest
                 {
                     target[item.Key] = item.Value;
                 }
-
                 return target;
                 """
             );
@@ -158,7 +152,6 @@ public class DictionaryTest
                 {
                     target[item.Key] = item.Value;
                 }
-
                 return target;
                 """
             );
@@ -178,7 +171,6 @@ public class DictionaryTest
                 {
                     target[item.Key] = item.Value;
                 }
-
                 return target;
                 """
             );
@@ -199,7 +191,6 @@ public class DictionaryTest
                 {
                     target[item.Key] = item.Value;
                 }
-
                 return target;
                 """
             );
@@ -223,7 +214,6 @@ public class DictionaryTest
                 {
                     target[item.Key] = item.Value;
                 }
-
                 return target;
                 """
             );
@@ -285,7 +275,6 @@ public class DictionaryTest
                 {
                     target.EnsureCapacity(sourceCount + target.Count);
                 }
-
                 foreach (var item in source)
                 {
                     target[item.Key] = item.Value;
@@ -323,7 +312,6 @@ public class DictionaryTest
                 {
                     targetDict[item.Key] = item.Value;
                 }
-
                 return target;
                 """
             );
@@ -357,7 +345,6 @@ public class DictionaryTest
                 {
                     target[item.Key] = item.Value;
                 }
-
                 return target;
                 """
             );
@@ -394,7 +381,6 @@ public class DictionaryTest
                 {
                     targetDict[item.Key] = item.Value;
                 }
-
                 return target;
                 """
             );
@@ -428,7 +414,6 @@ public class DictionaryTest
                 {
                     targetDict[item.Key] = item.Value;
                 }
-
                 return target;
                 """
             );
@@ -461,7 +446,6 @@ public class DictionaryTest
                 {
                     target[item.Key] = item.Value;
                 }
-
                 return target;
                 """
             );

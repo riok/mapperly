@@ -574,7 +574,7 @@ public class ValueTupleTest
             .HaveSingleMethodBody(
                 """
                 #nullable disable
-                return System.Linq.Queryable.Select(source, x => new global::System.ValueTuple<int, string>(x.A, x.B));
+                        return System.Linq.Queryable.Select(source, x => new global::System.ValueTuple<int, string>(x.A, x.B));
                 #nullable enable
                 """
             );
@@ -594,7 +594,7 @@ public class ValueTupleTest
             .HaveSingleMethodBody(
                 """
                 #nullable disable
-                return System.Linq.Queryable.Select(source, x => new global::System.ValueTuple<int, string>(x.A, x.B));
+                        return System.Linq.Queryable.Select(source, x => new global::System.ValueTuple<int, string>(x.A, x.B));
                 #nullable enable
                 """
             );

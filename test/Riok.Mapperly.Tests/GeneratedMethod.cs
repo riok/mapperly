@@ -1,12 +1,9 @@
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Riok.Mapperly.Tests;
 
 public class GeneratedMethod
 {
-    private const string MethodIndentation = "    ";
-
     public GeneratedMethod(MethodDeclarationSyntax declarationSyntax)
     {
         Name = declarationSyntax.Identifier.ToString();
@@ -27,17 +24,19 @@ public class GeneratedMethod
     /// <returns>The cleaned body.</returns>
     private static string ExtractBody(MethodDeclarationSyntax declarationSyntax)
     {
-        var body =
-            declarationSyntax.Body
-                ?.NormalizeWhitespace()
-                .ToFullString()
-                .Trim(' ', '\r', '\n')
-                .Trim('{', '}')
-                .Trim(' ', '\r', '\n')
-                .ReplaceLineEndings() ?? string.Empty;
-        var lines = body.Split(Environment.NewLine);
-        return lines.Length == 0
-            ? string.Empty
-            : string.Join(Environment.NewLine, lines.Select(l => l.StartsWith(MethodIndentation) ? l[MethodIndentation.Length..] : l));
+        if (declarationSyntax.Body == null)
+            return string.Empty;
+
+        var body = declarationSyntax.Body
+            .ToFullString()
+            .Trim(' ', '\r', '\n')
+            .TrimStart('{')
+            .TrimEnd('}')
+            .Trim('\r', '\n')
+            .ReplaceLineEndings();
+        var lines = body.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+        var indentionCount = lines[0].TakeWhile(x => x == ' ').Count();
+        var indention = lines[0][..indentionCount];
+        return string.Join(Environment.NewLine, lines.Select(l => l.StartsWith(indention) ? l[indentionCount..] : l)).Trim(' ', '\r', '\n');
     }
 }
