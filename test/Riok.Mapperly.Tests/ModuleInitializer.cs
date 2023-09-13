@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using VerifyTests.DiffPlex;
 
 namespace Riok.Mapperly.Tests;
 
@@ -13,5 +14,6 @@ public static class ModuleInitializer
         DerivePathInfo((file, _, type, method) => new(Path.Join(Path.GetDirectoryName(file), "_snapshots"), type.Name, method.Name));
 
         VerifySourceGenerators.Initialize();
+        VerifyDiffPlex.Initialize(OutputType.Compact);
     }
 }
