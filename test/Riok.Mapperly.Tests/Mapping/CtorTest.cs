@@ -20,6 +20,13 @@ public class CtorTest
     }
 
     [Fact]
+    public void PrimaryCtorCustomClass()
+    {
+        var source = TestSourceBuilder.Mapping("string", "A", "class A(string x) {}");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return new global::A(source);");
+    }
+
+    [Fact]
     public void CtorMappingDisabledShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
