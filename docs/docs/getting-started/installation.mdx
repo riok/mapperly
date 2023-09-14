@@ -19,15 +19,13 @@ All you need to do, to install Mapperly is to add a NuGet reference pointing to 
 
 <Tabs>
 <TabItem value="csproj" label="PackageReference" default>
-    <CodeBlock language="xml">{`<PackageReference Include="Riok.Mapperly" Version="${useDocusaurusContext().siteConfig.customFields.mapperlyVersion}" PrivateAssets="all" ExcludeAssets="runtime" />`}</CodeBlock>
+    <CodeBlock language="xml">{`<PackageReference Include="Riok.Mapperly" Version="${useDocusaurusContext().siteConfig.customFields.mapperlyVersion}" />`}</CodeBlock>
 </TabItem>
 <TabItem value="dontet-cli" label=".NET CLI">
 
 ```bash
 dotnet add package Riok.Mapperly
 ```
-
-Make sure to set `PrivateAssets="all" ExcludeAssets="runtime"` on the added `PackageReference`.
 
 </TabItem>
 <TabItem value="pkg-manager" label="Package Manager">
@@ -36,15 +34,8 @@ Make sure to set `PrivateAssets="all" ExcludeAssets="runtime"` on the added `Pac
 Install-Package Riok.Mapperly
 ```
 
-Make sure to set `PrivateAssets="all" ExcludeAssets="runtime"` on the added `PackageReference`.
-
 </TabItem>
 </Tabs>
-
-:::info
-`PrivateAssets="all"` ensures that projects referencing this project do not also get a reference to "Riok.Mapperly".  
-`ExcludeAssets="runtime"` ensures that the Mapperly .dll files are not copied to the build output (they are not needed at runtime).
-:::
 
 <Conditional condition={!useDocusaurusContext().siteConfig.customFields.environment.stable}>
 
@@ -55,3 +46,17 @@ Checkout the latest stable version [here](https://mapperly.riok.app).
 :::
 
 </Conditional>
+
+:::info
+It is possible to remove Mapperly runtime references completely by setting `PrivateAssets="all"` and `ExcludeAssets="runtime"` on the `PackageReference`.  
+`PrivateAssets="all"` ensures that projects referencing this project do not also get a reference to `Riok.Mapperly`.  
+`ExcludeAssets="runtime"` ensures that the Mapperly .dll files are not copied to the build output.
+
+Removing the runtime dependency comes with the disadvantage that whenever the runtime tries
+to load a referenced attribute from `Riok.Mapperly.Abstractions` a `FileNotFoundException` is thrown.
+This is, for example, the case if `typeof(MyMapper).GetCustomAttributes()` is called.
+
+In Blazor Wasm applications `<BlazorWebAssemblyLazyLoad Include="Riok.Mapperly.Abstractions.dll" />` can be added to lazily load `Riok.Mapperly.Abstractions`
+and reduce the download size.
+`Riok.Mapperly.Abstractions` will probably never be needed anyway.
+:::
