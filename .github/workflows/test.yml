@@ -22,13 +22,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v3.2.0
+      - uses: actions/setup-dotnet@v3
       - run: dotnet run --project ./samples/Riok.Mapperly.Sample
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v3.2.0
+      - uses: actions/setup-dotnet@v3
       - run: dotnet build /p:TreatWarningsAsErrors=true
       - run: dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
       - uses: codecov/codecov-action@v3
@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt update && sudo apt -y install zipmerge # zipmerge is used to merge the multi target nupkg
-      - uses: actions/setup-dotnet@v3.2.0
+      - uses: actions/setup-dotnet@v3
       - run: dotnet tool restore
       - run: RELEASE_VERSION="0.0.1-dev.$GITHUB_RUN_ID" ./build/package.sh
       - uses: actions/upload-artifact@v3
@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v3.2.0
+      - uses: actions/setup-dotnet@v3
       - run: dotnet tool restore
       - uses: actions/download-artifact@v3
         with:
@@ -72,6 +72,7 @@ jobs:
     container:
       image: alpine:3.17
     strategy:
+      fail-fast: false
       matrix:
         dotnet:
           - '8.0'
@@ -84,7 +85,7 @@ jobs:
       - run: apk add --no-cache bash icu-libs krb5-libs libgcc libintl libssl1.1 libstdc++ zlib
       # delete global.json since we want to use custom versions here
       - run: rm global.json
-      - uses: actions/setup-dotnet@v3.2.0
+      - uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ matrix.dotnet }}
       - run: dotnet --list-sdks

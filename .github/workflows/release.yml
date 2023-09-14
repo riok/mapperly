@@ -18,6 +18,10 @@ on:
         description: 'The created version'
         value: ${{ jobs.release.outputs.version }}
 
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_NOLOGO: true
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -28,7 +32,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-dotnet@v3.2.0
+      - uses: actions/setup-dotnet@v3
       - uses: actions/setup-node@v3
         with:
           node-version: '18'

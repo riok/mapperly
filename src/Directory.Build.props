@@ -12,7 +12,7 @@
     (a lot of features get polyfilled by Meziantou.Polyfill)
     however we need to be careful with the available features!
     -->
-    <LangVersion>11</LangVersion>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
