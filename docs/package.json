@@ -33,7 +33,7 @@
   "devDependencies": {
     "@docusaurus/eslint-plugin": "2.4.1",
     "@docusaurus/module-type-aliases": "2.4.1",
-    "@tsconfig/docusaurus": "2.0.0",
+    "@tsconfig/docusaurus": "2.0.1",
     "@types/marked": "5.0.1",
     "@typescript-eslint/eslint-plugin": "6.6.0",
     "hast-util-to-html": "9.0.0",
