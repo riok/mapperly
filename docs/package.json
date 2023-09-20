@@ -37,7 +37,7 @@
     "@types/marked": "5.0.1",
     "@typescript-eslint/eslint-plugin": "6.7.2",
     "hast-util-to-html": "9.0.0",
-    "marked": "8.0.0",
+    "marked": "9.0.3",
     "prettier": "3.0.3",
     "stylelint": "15.10.3",
     "stylelint-config-standard": "34.0.0",
