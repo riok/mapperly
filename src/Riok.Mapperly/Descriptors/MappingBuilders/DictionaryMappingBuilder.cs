@@ -37,6 +37,9 @@ public static class DictionaryMappingBuilder
                 or CollectionType.IReadOnlyDictionary
         )
         {
+            if (TryGetFromEnumerable(ctx, keyMapping, valueMapping) is { } toDictionary)
+                return toDictionary;
+
             var targetDictionarySymbol = ctx.Types.Get(typeof(Dictionary<,>)).Construct(keyMapping.TargetType, valueMapping.TargetType);
             ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var dictionaryObjectFactory);
             return new ForEachSetDictionaryMapping(
@@ -133,6 +136,34 @@ public static class DictionaryMappingBuilder
             return null;
 
         return (keyMapping, valueMapping);
+    }
+
+    private static INewInstanceMapping? TryGetFromEnumerable(
+        MappingBuilderContext ctx,
+        INewInstanceMapping keyMapping,
+        INewInstanceMapping valueMapping
+    )
+    {
+        if (!keyMapping.IsSynthetic || !valueMapping.IsSynthetic || keyMapping.TargetType.IsNullable())
+            return null;
+
+        // use .NET Core 2+ Dictionary constructor if value and key mapping is synthetic
+        var enumerableType = ctx.Types.Get(typeof(IEnumerable<>));
+        var dictionaryType = ctx.Types.Get(typeof(Dictionary<,>));
+
+        var fromEnumerableCtor = dictionaryType.Constructors.FirstOrDefault(
+            x =>
+                x.Parameters.Length == 1
+                && SymbolEqualityComparer.Default.Equals(((INamedTypeSymbol)x.Parameters[0].Type).ConstructedFrom, enumerableType)
+        );
+
+        if (fromEnumerableCtor != null)
+        {
+            var constructedDictionary = dictionaryType.Construct(keyMapping.TargetType, valueMapping.TargetType);
+            return new CtorMapping(ctx.Source, constructedDictionary);
+        }
+
+        return null;
     }
 
     private static INamedTypeSymbol? GetExplicitIndexer(MappingBuilderContext ctx)

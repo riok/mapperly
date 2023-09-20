@@ -24,16 +24,7 @@ public class DictionaryTest
         TestHelper
             .GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::System.Collections.Generic.Dictionary<string, long>(source.Count);
-                foreach (var item in source)
-                {
-                    target[item.Key] = item.Value;
-                }
-                return target;
-                """
-            );
+            .HaveSingleMethodBody("return new global::System.Collections.Generic.Dictionary<string, long>(source);");
     }
 
     [Fact]
@@ -126,16 +117,7 @@ public class DictionaryTest
         TestHelper
             .GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::System.Collections.Generic.Dictionary<string, int>();
-                foreach (var item in source)
-                {
-                    target[item.Key] = item.Value;
-                }
-                return target;
-                """
-            );
+            .HaveSingleMethodBody("return new global::System.Collections.Generic.Dictionary<string, int>(source);");
     }
 
     [Fact]
@@ -145,16 +127,7 @@ public class DictionaryTest
         TestHelper
             .GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::System.Collections.Generic.Dictionary<string, int>(source.Count);
-                foreach (var item in source)
-                {
-                    target[item.Key] = item.Value;
-                }
-                return target;
-                """
-            );
+            .HaveSingleMethodBody("return new global::System.Collections.Generic.Dictionary<string, int>(source);");
     }
 
     [Fact]
@@ -164,16 +137,7 @@ public class DictionaryTest
         TestHelper
             .GenerateMapper(source)
             .Should()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::System.Collections.Generic.Dictionary<string, int>(source.Count);
-                foreach (var item in source)
-                {
-                    target[item.Key] = item.Value;
-                }
-                return target;
-                """
-            );
+            .HaveSingleMethodBody("return new global::System.Collections.Generic.Dictionary<string, int>(source);");
     }
 
     [Fact]
