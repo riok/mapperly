@@ -18,7 +18,7 @@
     "lint": "prettier --ignore-path .gitignore --check . && tsc && eslint --ignore-path .gitignore src && stylelint 'src/**/*.css'"
   },
   "dependencies": {
-    "@docusaurus/core": "2.4.1",
+    "@docusaurus/core": "2.4.3",
     "@docusaurus/plugin-ideal-image": "2.4.1",
     "@docusaurus/preset-classic": "2.4.1",
     "@easyops-cn/docusaurus-search-local": "0.36.0",
