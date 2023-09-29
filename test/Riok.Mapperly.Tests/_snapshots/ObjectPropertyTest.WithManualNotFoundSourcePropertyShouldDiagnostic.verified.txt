@@ -6,8 +6,6 @@
       Severity: Error,
       WarningLevel: 0,
       Location: : (10,4)-(10,87),
-      Description: ,
-      HelpLink: ,
       MessageFormat: Specified member {0} on source type {1} was not found,
       Message: Specified member not_found on source type A was not found,
       Category: Mapper
@@ -18,8 +16,6 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (10,4)-(10,87),
-      Description: ,
-      HelpLink: ,
       MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
       Message: The member StringValue on the mapping source type A is not mapped to any member on the mapping target type B,
       Category: Mapper

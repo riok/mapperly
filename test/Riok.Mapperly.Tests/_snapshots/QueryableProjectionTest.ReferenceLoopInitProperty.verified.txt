@@ -6,8 +6,6 @@
       Severity: Error,
       WarningLevel: 0,
       Location: : (7,0)-(11,1),
-      Description: ,
-      HelpLink: ,
       MessageFormat: Reference loop detected while mapping from {0}.{1} to the init only member {2}.{3}, consider ignoring this member,
       Message: Reference loop detected while mapping from A.Parent to the init only member B.Parent, consider ignoring this member,
       Category: Mapper
@@ -18,8 +16,6 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (7,0)-(11,1),
-      Description: ,
-      HelpLink: ,
       MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
       Message: The member Parent on the mapping source type A is not mapped to any member on the mapping target type B,
       Category: Mapper

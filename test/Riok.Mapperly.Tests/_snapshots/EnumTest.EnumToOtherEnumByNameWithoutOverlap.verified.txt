@@ -6,8 +6,6 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (10,4)-(10,77),
-      Description: ,
-      HelpLink: ,
       MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
       Message: Enum member A (0) on E1 not found on target enum E2,
       Category: Mapper
@@ -18,8 +16,6 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (10,4)-(10,77),
-      Description: ,
-      HelpLink: ,
       MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
       Message: Enum member B (1) on E1 not found on target enum E2,
       Category: Mapper
@@ -30,8 +26,6 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (10,4)-(10,77),
-      Description: ,
-      HelpLink: ,
       MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
       Message: Enum member C (2) on E1 not found on target enum E2,
       Category: Mapper
@@ -42,8 +36,6 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (10,4)-(10,77),
-      Description: ,
-      HelpLink: ,
       MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
       Message: Enum member D (0) on E2 not found on source enum E1,
       Category: Mapper
@@ -54,8 +46,6 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (10,4)-(10,77),
-      Description: ,
-      HelpLink: ,
       MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
       Message: Enum member E (1) on E2 not found on source enum E1,
       Category: Mapper
@@ -66,8 +56,6 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (10,4)-(10,77),
-      Description: ,
-      HelpLink: ,
       MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
       Message: Enum member F (2) on E2 not found on source enum E1,
       Category: Mapper
@@ -78,8 +66,6 @@
       Severity: Warning,
       WarningLevel: 1,
       Location: : (10,4)-(10,77),
-      Description: ,
-      HelpLink: ,
       MessageFormat: {0} and {1} don't have overlapping enum member names, mapping will therefore always result in an exception,
       Message: E1 and E2 don't have overlapping enum member names, mapping will therefore always result in an exception,
       Category: Mapper

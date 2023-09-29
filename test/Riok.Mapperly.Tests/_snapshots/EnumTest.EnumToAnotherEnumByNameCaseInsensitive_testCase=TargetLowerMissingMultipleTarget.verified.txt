@@ -6,8 +6,6 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (7,0)-(11,1),
-      Description: ,
-      HelpLink: ,
       MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
       Message: Enum member Value5 (0) on C not found on target enum D,
       Category: Mapper
@@ -18,8 +16,6 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (7,0)-(11,1),
-      Description: ,
-      HelpLink: ,
       MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
       Message: Enum member Value7 (2) on C not found on target enum D,
       Category: Mapper

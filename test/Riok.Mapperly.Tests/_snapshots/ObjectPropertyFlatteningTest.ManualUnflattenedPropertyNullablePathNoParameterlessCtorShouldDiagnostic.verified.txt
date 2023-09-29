@@ -6,8 +6,6 @@
       Severity: Error,
       WarningLevel: 0,
       Location: : (10,4)-(10,76),
-      Description: ,
-      HelpLink: ,
       MessageFormat: {0} has no accessible parameterless constructor,
       Message: C? has no accessible parameterless constructor,
       Category: Mapper
