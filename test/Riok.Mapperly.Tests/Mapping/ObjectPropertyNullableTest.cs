@@ -106,7 +106,7 @@ public class ObjectPropertyNullableTest
                 }
                 else
                 {
-                    throw new System.ArgumentNullException(nameof(source.Value.Value));
+                    throw new System.ArgumentNullException(nameof(source.Value));
                 }
                 return target;
                 """

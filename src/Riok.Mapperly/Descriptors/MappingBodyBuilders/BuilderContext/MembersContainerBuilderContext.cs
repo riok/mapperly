@@ -61,18 +61,24 @@ public class MembersContainerBuilderContext<T> : MembersMappingBuilderContext<T>
         IMemberAssignmentMappingContainer parentMapping = Mapping;
 
         // try to reuse parent path mappings and wrap inside them
+        // if the parentMapping is the first nullable path, no need to access the path in the condition in a null-safe way.
+        var needsNullSafeAccess = false;
         foreach (var nullablePath in nullConditionSourcePath.ObjectPathNullableSubPaths().Reverse())
         {
             if (_nullDelegateMappings.TryGetValue(new MemberPath(nullablePath), out var parentMappingHolder))
             {
                 parentMapping = parentMappingHolder;
+                break;
             }
+
+            needsNullSafeAccess = true;
         }
 
         mapping = new MemberNullDelegateAssignmentMapping(
             nullConditionSourcePath,
             parentMapping,
-            BuilderContext.MapperConfiguration.ThrowOnPropertyMappingNullMismatch
+            BuilderContext.MapperConfiguration.ThrowOnPropertyMappingNullMismatch,
+            needsNullSafeAccess
         );
         _nullDelegateMappings[nullConditionSourcePath] = mapping;
         parentMapping.AddMemberMappingContainer(mapping);
