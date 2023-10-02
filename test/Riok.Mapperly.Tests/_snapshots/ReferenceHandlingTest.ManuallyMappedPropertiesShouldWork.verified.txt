@@ -6,8 +6,6 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (10,4)-(10,73),
-      Description: ,
-      HelpLink: ,
       MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
       Message: The member MyValue2 on the mapping target type B was not found on the mapping source type A,
       Category: Mapper
@@ -18,8 +16,6 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (10,73)-(10,144),
-      Description: ,
-      HelpLink: ,
       MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
       Message: The member MyValue on the mapping target type B was not found on the mapping source type A,
       Category: Mapper

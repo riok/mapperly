@@ -6,8 +6,6 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (10,4)-(10,36),
-      Description: ,
-      HelpLink: ,
       MessageFormat: Cannot map from write only member {0}.{1} of type {2} to member {3}.{4} of type {5},
       Message: Cannot map from write only member A.StringValue2 of type string to member B.StringValue2 of type string,
       Category: Mapper
@@ -18,8 +16,6 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (10,4)-(10,36),
-      Description: ,
-      HelpLink: ,
       MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
       Message: The member StringValue2 on the mapping source type A is not mapped to any member on the mapping target type B,
       Category: Mapper
