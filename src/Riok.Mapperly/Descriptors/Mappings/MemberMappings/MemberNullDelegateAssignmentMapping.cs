@@ -13,14 +13,17 @@ public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContai
 {
     private readonly MemberPath _nullConditionalSourcePath;
     private readonly bool _throwInsteadOfConditionalNullMapping;
+    private readonly bool _needsNullSafeAccess;
 
     public MemberNullDelegateAssignmentMapping(
         MemberPath nullConditionalSourcePath,
         IMemberAssignmentMappingContainer parent,
-        bool throwInsteadOfConditionalNullMapping
+        bool throwInsteadOfConditionalNullMapping,
+        bool needsNullSafeAccess
     )
         : base(parent)
     {
+        _needsNullSafeAccess = needsNullSafeAccess;
         _nullConditionalSourcePath = nullConditionalSourcePath;
         _throwInsteadOfConditionalNullMapping = throwInsteadOfConditionalNullMapping;
     }
@@ -31,8 +34,8 @@ public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContai
         //   target.Value = Map(Source.Name);
         // else
         //   throw ...
-        var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, true, true, true);
-        var nameofSourceAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, true, false, true);
+        var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, false, _needsNullSafeAccess, true);
+        var nameofSourceAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, false, false, true);
         var condition = IsNotNull(sourceNullConditionalAccess);
         var conditionCtx = ctx.AddIndentation();
         var trueClause = base.Build(conditionCtx, targetAccess);

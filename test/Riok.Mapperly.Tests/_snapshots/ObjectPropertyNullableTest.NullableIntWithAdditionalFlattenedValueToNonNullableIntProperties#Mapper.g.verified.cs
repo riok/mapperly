@@ -8,7 +8,7 @@ public partial class Mapper
         var target = new global::B();
         if (source.Nested != null)
         {
-            if (source.Nested?.Value2 != null)
+            if (source.Nested.Value2 != null)
             {
                 target.NestedValue2 = source.Nested.Value2.Value;
             }
