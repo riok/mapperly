@@ -35,7 +35,7 @@
     "@docusaurus/module-type-aliases": "2.4.1",
     "@tsconfig/docusaurus": "2.0.1",
     "@types/marked": "5.0.1",
-    "@typescript-eslint/eslint-plugin": "6.7.3",
+    "@typescript-eslint/eslint-plugin": "6.7.4",
     "hast-util-to-html": "9.0.0",
     "marked": "8.0.0",
     "prettier": "3.0.3",
