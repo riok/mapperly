@@ -20,7 +20,8 @@ Restart the IDE to make it load the new version of Mapperly. This is a bug of th
 
 ## Everything is configured correctly and dotnet build works, but the IDE shows the error "[Mapper method] must have an implementation part because it has accessibility modifiers"
 
-Try to rebuild the solution or restart the IDE. This is a bug of the IDE.
+Make sure your project meets the [requirements](../intro.md#requirements).
+Try rebuilding the solution or restarting the IDE. This is a bug in the IDE.
 
 ## My advanced use case isn't supported by Mapperly or needs lots of configuration. What should I do?
 
