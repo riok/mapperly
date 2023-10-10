@@ -27,6 +27,32 @@ public class CtorTest
     }
 
     [Fact]
+    public void CtorClassNullableSource()
+    {
+        var source = TestSourceBuilder.Mapping("int?", "A", "class A { public A(int x) {} }");
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                "return source == null ? throw new System.ArgumentNullException(nameof(source)) : new global::A(source.Value);"
+            );
+    }
+
+    [Fact]
+    public void CtorClassNullableParameter()
+    {
+        var source = TestSourceBuilder.Mapping("int?", "A", "class A { public A(int? x) {} }");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return new global::A(source);");
+    }
+
+    [Fact]
+    public void CtorClassNonNullSourceNullableParameter()
+    {
+        var source = TestSourceBuilder.Mapping("int", "A", "class A { public A(int? x) {} }");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return new global::A(source);");
+    }
+
+    [Fact]
     public void CtorMappingDisabledShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
