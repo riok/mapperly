@@ -166,6 +166,9 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
     private void AddUnmatchedSourceMembersDiagnostics()
     {
+        if (!BuilderContext.Configuration.Properties.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Source))
+            return;
+
         foreach (var sourceMemberName in _unmappedSourceMemberNames)
         {
             BuilderContext.ReportDiagnostic(

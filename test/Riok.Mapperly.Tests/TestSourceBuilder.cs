@@ -90,6 +90,7 @@ public static class TestSourceBuilder
             Attribute(options.EnumMappingStrategy),
             Attribute(options.EnumMappingIgnoreCase),
             Attribute(options.IgnoreObsoleteMembersStrategy),
+            Attribute(options.RequiredMappingStrategy),
         }.WhereNotNull();
 
         return $"[Mapper({string.Join(", ", attrs)})]";

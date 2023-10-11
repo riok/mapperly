@@ -59,12 +59,25 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 )
             )
             {
-                ctx.BuilderContext.ReportDiagnostic(
-                    targetMember.IsRequired ? DiagnosticDescriptors.RequiredMemberNotMapped : DiagnosticDescriptors.SourceMemberNotFound,
-                    targetMember.Name,
-                    ctx.Mapping.TargetType,
-                    ctx.Mapping.SourceType
-                );
+                if (targetMember.IsRequired)
+                {
+                    ctx.BuilderContext.ReportDiagnostic(
+                        DiagnosticDescriptors.RequiredMemberNotMapped,
+                        targetMember.Name,
+                        ctx.Mapping.TargetType,
+                        ctx.Mapping.SourceType
+                    );
+                }
+                else if (ctx.BuilderContext.Configuration.Properties.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target))
+                {
+                    ctx.BuilderContext.ReportDiagnostic(
+                        DiagnosticDescriptors.SourceMemberNotFound,
+                        targetMember.Name,
+                        ctx.Mapping.TargetType,
+                        ctx.Mapping.SourceType
+                    );
+                }
+
                 continue;
             }
 
@@ -104,12 +117,16 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             !ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.SourceType, memberConfig.Source.Path, out var sourceMemberPath)
         )
         {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.SourceMemberNotFound,
-                targetMember.Name,
-                ctx.Mapping.TargetType,
-                ctx.Mapping.SourceType
-            );
+            if (ctx.BuilderContext.Configuration.Properties.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target))
+            {
+                ctx.BuilderContext.ReportDiagnostic(
+                    DiagnosticDescriptors.SourceMemberNotFound,
+                    targetMember.Name,
+                    ctx.Mapping.TargetType,
+                    ctx.Mapping.SourceType
+                );
+            }
+
             return;
         }
 

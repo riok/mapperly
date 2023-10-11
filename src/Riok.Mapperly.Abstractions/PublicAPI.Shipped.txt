@@ -109,3 +109,13 @@ Riok.Mapperly.Abstractions.UseStaticMapperAttribute
 Riok.Mapperly.Abstractions.UseStaticMapperAttribute.UseStaticMapperAttribute(System.Type! mapperType) -> void
 Riok.Mapperly.Abstractions.UseStaticMapperAttribute<T>
 Riok.Mapperly.Abstractions.UseStaticMapperAttribute<T>.UseStaticMapperAttribute() -> void
+Riok.Mapperly.Abstractions.MapperAttribute.RequiredMappingStrategy.get -> Riok.Mapperly.Abstractions.RequiredMappingStrategy
+Riok.Mapperly.Abstractions.MapperAttribute.RequiredMappingStrategy.set -> void
+Riok.Mapperly.Abstractions.MapperRequiredMappingAttribute
+Riok.Mapperly.Abstractions.MapperRequiredMappingAttribute.MapperRequiredMappingAttribute(Riok.Mapperly.Abstractions.RequiredMappingStrategy requiredMappingStrategy) -> void
+Riok.Mapperly.Abstractions.MapperRequiredMappingAttribute.RequiredMappingStrategy.get -> Riok.Mapperly.Abstractions.RequiredMappingStrategy
+Riok.Mapperly.Abstractions.RequiredMappingStrategy
+Riok.Mapperly.Abstractions.RequiredMappingStrategy.Both = -1 -> Riok.Mapperly.Abstractions.RequiredMappingStrategy
+Riok.Mapperly.Abstractions.RequiredMappingStrategy.None = 0 -> Riok.Mapperly.Abstractions.RequiredMappingStrategy
+Riok.Mapperly.Abstractions.RequiredMappingStrategy.Source = 1 -> Riok.Mapperly.Abstractions.RequiredMappingStrategy
+Riok.Mapperly.Abstractions.RequiredMappingStrategy.Target = 2 -> Riok.Mapperly.Abstractions.RequiredMappingStrategy

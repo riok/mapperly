@@ -46,6 +46,11 @@ public static class MapperConfigurationMerger
             ?? defaultMapperConfiguration.IgnoreObsoleteMembersStrategy
             ?? mapper.IgnoreObsoleteMembersStrategy;
 
+        mapper.RequiredMappingStrategy =
+            mapperConfiguration.RequiredMappingStrategy
+            ?? defaultMapperConfiguration.RequiredMappingStrategy
+            ?? mapper.RequiredMappingStrategy;
+
         return mapper;
     }
 }

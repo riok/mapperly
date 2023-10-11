@@ -54,7 +54,10 @@ public static class ObjectMemberMappingBodyBuilder
                 continue;
             }
 
-            if (targetMember.CanSet)
+            if (
+                targetMember.CanSet
+                && ctx.BuilderContext.Configuration.Properties.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target)
+            )
             {
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.SourceMemberNotFound,

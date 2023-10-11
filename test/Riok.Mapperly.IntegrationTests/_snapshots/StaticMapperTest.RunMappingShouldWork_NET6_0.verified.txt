@@ -54,6 +54,7 @@
     CtorValue2: 100,
     IntValue: 99,
     RequiredValue: 98,
+    UnmappedValue: 10,
     StringValue: ,
     RenamedStringValue: ,
     Flattening: {},
