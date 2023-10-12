@@ -4,7 +4,7 @@
 [![Nuget Preview](https://img.shields.io/nuget/vpre/Riok.Mapperly?style=flat-square&label=nuget%20preview)](https://www.nuget.org/packages/Riok.Mapperly/)
 [![License](https://img.shields.io/github/license/riok/mapperly?style=flat-square)](https://github.com/riok/mapperly/blob/main/LICENSE)
 [![Downloads](https://img.shields.io/nuget/dt/riok.mapperly?style=flat-square)](https://www.nuget.org/packages/Riok.Mapperly/)
-![GitHub Sponsors](https://img.shields.io/github/sponsors/riok)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/riok)](https://github.com/sponsors/riok)
 [![GitHub](https://img.shields.io/badge/-source-181717.svg?logo=GitHub)](https://github.com/riok/mapperly)
 
 
