@@ -446,4 +446,22 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         true
     );
+
+    public static readonly DiagnosticDescriptor NestedIgnoredSourceMember = new DiagnosticDescriptor(
+        "RMG051",
+        "Invalid ignore source member found, nested ignores are not supported",
+        "Invalid ignore source member {0} found for type {1}, nested ignores are not supported",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor NestedIgnoredTargetMember = new DiagnosticDescriptor(
+        "RMG052",
+        "Invalid ignore target member found, nested ignores are not supported",
+        "Invalid ignore target member {0} found for type {1}, nested ignores are not supported",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        true
+    );
 }
