@@ -1,4 +1,3 @@
-﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33424.131
@@ -21,13 +20,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{0FBD
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Riok.Mapperly.Sample", "samples\Riok.Mapperly.Sample\Riok.Mapperly.Sample.csproj", "{43A2E8E0-5A2C-45E9-84EF-CF934EC946FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riok.Mapperly.Benchmarks", "benchmarks\Riok.Mapperly.Benchmarks\Riok.Mapperly.Benchmarks.csproj", "{F2214C71-15A7-46EB-A3AA-D02EF4B705EF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Riok.Mapperly.Benchmarks", "benchmarks\Riok.Mapperly.Benchmarks\Riok.Mapperly.Benchmarks.csproj", "{F2214C71-15A7-46EB-A3AA-D02EF4B705EF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmarks", "benchmarks", "{961BAABA-0672-48E7-A5B3-30A676146BE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riok.Mapperly.Templates", "src\Riok.Mapperly.Templates\Riok.Mapperly.Templates.csproj", "{FF31D522-6A62-4466-90F7-6B297F82FCF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Riok.Mapperly.Templates", "src\Riok.Mapperly.Templates\Riok.Mapperly.Templates.csproj", "{FF31D522-6A62-4466-90F7-6B297F82FCF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riok.Mapperly.Templates.Tests", "test\Riok.Mapperly.Templates.Tests\Riok.Mapperly.Templates.Tests.csproj", "{1500A843-37E3-4DBA-8BAB-A40CF14678ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Riok.Mapperly.Templates.Tests", "test\Riok.Mapperly.Templates.Tests\Riok.Mapperly.Templates.Tests.csproj", "{1500A843-37E3-4DBA-8BAB-A40CF14678ED}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Riok.Mapperly.Sample.DependencyInjection", "samples\Riok.Mapperly.Sample.DependencyInjection\Riok.Mapperly.Sample.DependencyInjection.csproj", "{E6E792B4-261F-4ECE-9666-A91418ACE9E8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +72,10 @@ Global
 		{1500A843-37E3-4DBA-8BAB-A40CF14678ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1500A843-37E3-4DBA-8BAB-A40CF14678ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1500A843-37E3-4DBA-8BAB-A40CF14678ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6E792B4-261F-4ECE-9666-A91418ACE9E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6E792B4-261F-4ECE-9666-A91418ACE9E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6E792B4-261F-4ECE-9666-A91418ACE9E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6E792B4-261F-4ECE-9666-A91418ACE9E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -85,6 +90,7 @@ Global
 		{F2214C71-15A7-46EB-A3AA-D02EF4B705EF} = {961BAABA-0672-48E7-A5B3-30A676146BE3}
 		{FF31D522-6A62-4466-90F7-6B297F82FCF3} = {B65AF89A-4A3B-473C-83C8-5F0CB0EED30E}
 		{1500A843-37E3-4DBA-8BAB-A40CF14678ED} = {3598BE50-28D5-4BF4-BEA7-09E5FEA2910C}
+		{E6E792B4-261F-4ECE-9666-A91418ACE9E8} = {0FBD6C81-7E7A-4915-90D2-896F11C89FF0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BAAC5976-BEE6-440E-8DDC-90916A1001A1}
