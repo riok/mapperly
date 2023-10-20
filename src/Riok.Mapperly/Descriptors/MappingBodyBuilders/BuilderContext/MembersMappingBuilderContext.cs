@@ -140,6 +140,11 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     {
         foreach (var notFoundIgnoredMember in _ignoredUnmatchedTargetMemberNames)
         {
+            if (notFoundIgnoredMember.Contains(StringMemberPath.PropertyAccessSeparator, StringComparison.Ordinal))
+            {
+                BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NestedIgnoredTargetMember, notFoundIgnoredMember, Mapping.TargetType);
+                continue;
+            }
             BuilderContext.ReportDiagnostic(DiagnosticDescriptors.IgnoredTargetMemberNotFound, notFoundIgnoredMember, Mapping.TargetType);
         }
     }
@@ -148,6 +153,11 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     {
         foreach (var notFoundIgnoredMember in _ignoredUnmatchedSourceMemberNames)
         {
+            if (notFoundIgnoredMember.Contains(StringMemberPath.PropertyAccessSeparator, StringComparison.Ordinal))
+            {
+                BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NestedIgnoredSourceMember, notFoundIgnoredMember, Mapping.TargetType);
+                continue;
+            }
             BuilderContext.ReportDiagnostic(DiagnosticDescriptors.IgnoredSourceMemberNotFound, notFoundIgnoredMember, Mapping.SourceType);
         }
     }

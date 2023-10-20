@@ -116,3 +116,12 @@ Rule ID | Category | Severity | Notes
 RMG048  | Mapper   | Error    | Used mapper members cannot be nullable
 RMG049  | Mapper   | Warning  | Source member is ignored and also explicitly mapped
 RMG050  | Mapper   | Warning  | Target member is ignored and also explicitly mapped
+
+## Release 3.3
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+RMG051  | Mapper   | Warning  | Invalid ignore source member found, nested ignores are not supported
+RMG052  | Mapper   | Warning  | Invalid ignore target member found, nested ignores are not supported
