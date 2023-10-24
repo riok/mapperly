@@ -33,7 +33,7 @@ jobs:
         with:
           fetch-depth: 0
       - uses: actions/setup-dotnet@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: '18'
       - run: sudo apt update && sudo apt -y install zipmerge # zipmerge is used to merge the multi target nupkg
