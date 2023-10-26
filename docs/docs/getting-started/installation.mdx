@@ -47,7 +47,8 @@ Checkout the latest stable version [here](https://mapperly.riok.app).
 
 </Conditional>
 
-:::info
+### Removing runtime dependency
+
 It is possible to remove Mapperly runtime references completely by setting `PrivateAssets="all"` and `ExcludeAssets="runtime"` on the `PackageReference`.  
 `PrivateAssets="all"` ensures that projects referencing this project do not also get a reference to `Riok.Mapperly`.  
 `ExcludeAssets="runtime"` ensures that the Mapperly .dll files are not copied to the build output.
@@ -59,4 +60,3 @@ This is, for example, the case if `typeof(MyMapper).GetCustomAttributes()` is ca
 In Blazor Wasm applications `<BlazorWebAssemblyLazyLoad Include="Riok.Mapperly.Abstractions.dll" />` can be added to lazily load `Riok.Mapperly.Abstractions`
 and reduce the download size.
 `Riok.Mapperly.Abstractions` will probably never be needed anyway.
-:::
