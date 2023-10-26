@@ -4,14 +4,18 @@ using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.IntegrationTests.Dto;
 using Riok.Mapperly.IntegrationTests.Models;
 
-#if NET8_0
+#if NET8_0_OR_GREATER
 using AliasedTupleSource = (int X, int Y);
 using AliasedTupleTarget = (string X, string Y);
 #endif
 
 namespace Riok.Mapperly.IntegrationTests.Mapper
 {
+#if NET8_0_OR_GREATER
+    [Mapper(IncludedMembers = MemberVisibility.All)]
+#else
     [Mapper]
+#endif
     public partial class TestMapper
     {
         public partial int DirectInt(int value);
@@ -68,7 +72,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         private partial int PrivateDirectInt(int value);
 
-#if NET8_0
+#if NET8_0_OR_GREATER
         public partial AliasedTupleTarget MapAliasedTuple(AliasedTupleSource source);
 #endif
     }

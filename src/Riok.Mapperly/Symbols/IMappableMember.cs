@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Riok.Mapperly.Symbols;
 
@@ -20,9 +21,19 @@ public interface IMappableMember
 
     bool CanGet { get; }
 
+    /// <summary>
+    /// Whether the member can be modified using assignment or an unsafe accessor method.
+    /// </summary>
     bool CanSet { get; }
+
+    /// <summary>
+    /// Whether the member can be modified using simple assignment.
+    /// </summary>
+    bool CanSetDirectly { get; }
 
     bool IsInitOnly { get; }
 
     bool IsRequired { get; }
+
+    ExpressionSyntax BuildAccess(ExpressionSyntax source, bool nullConditional = false);
 }

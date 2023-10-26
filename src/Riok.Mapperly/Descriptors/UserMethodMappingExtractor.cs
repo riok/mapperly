@@ -79,7 +79,7 @@ public static class UserMethodMappingExtractor
     {
         // ignore all non ordinary methods (eg. ctor, operators, etc.) and methods declared on the object type (eg. ToString)
         return method.MethodKind == MethodKind.Ordinary
-            && ctx.SymbolAccessor.IsAccessible(method)
+            && ctx.SymbolAccessor.IsDirectlyAccessible(method)
             && !SymbolEqualityComparer.Default.Equals(method.ReceiverType, ctx.Compilation.ObjectType);
     }
 

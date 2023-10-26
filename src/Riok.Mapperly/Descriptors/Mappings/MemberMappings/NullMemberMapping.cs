@@ -21,7 +21,7 @@ public class NullMemberMapping : IMemberMapping
 
     public NullMemberMapping(
         INewInstanceMapping delegateMapping,
-        MemberPath sourcePath,
+        GetterMemberPath sourcePath,
         ITypeSymbol targetType,
         NullFallbackValue nullFallback,
         bool useNullConditionalAccess
@@ -34,7 +34,7 @@ public class NullMemberMapping : IMemberMapping
         _targetType = targetType;
     }
 
-    public MemberPath SourcePath { get; }
+    public GetterMemberPath SourcePath { get; }
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {

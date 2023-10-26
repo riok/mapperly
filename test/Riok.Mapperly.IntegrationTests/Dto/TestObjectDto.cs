@@ -11,6 +11,7 @@ namespace Riok.Mapperly.IntegrationTests.Dto
         {
             CtorValue = ctorValue;
             CtorValue2 = ctorValue2;
+            PrivateValue = ctorValue + 21;
         }
 
         public int CtorValue { get; set; }
@@ -121,5 +122,9 @@ namespace Riok.Mapperly.IntegrationTests.Dto
         public DateOnly DateTimeValueTargetDateOnly { get; set; }
 
         public TimeOnly DateTimeValueTargetTimeOnly { get; set; }
+
+        public int ExposePrivateValue => PrivateValue;
+
+        private int PrivateValue { get; set; }
     }
 }

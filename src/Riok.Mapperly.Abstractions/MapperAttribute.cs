@@ -92,4 +92,9 @@ public class MapperAttribute : Attribute
     /// By default this is <see cref="RequiredMappingStrategy.Both"/>, emitting warnings for unmapped source and target members.
     /// </summary>
     public RequiredMappingStrategy RequiredMappingStrategy { get; set; } = RequiredMappingStrategy.Both;
+
+    /// <summary>
+    /// Determines the access level of members that Mapperly will map.
+    /// </summary>
+    public MemberVisibility IncludedMembers { get; set; } = MemberVisibility.AllAccessible;
 }

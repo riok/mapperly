@@ -11,12 +11,12 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 [DebuggerDisplay("MemberNullDelegateAssignmentMapping({_nullConditionalSourcePath} != null)")]
 public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContainer
 {
-    private readonly MemberPath _nullConditionalSourcePath;
+    private readonly GetterMemberPath _nullConditionalSourcePath;
     private readonly bool _throwInsteadOfConditionalNullMapping;
     private readonly bool _needsNullSafeAccess;
 
     public MemberNullDelegateAssignmentMapping(
-        MemberPath nullConditionalSourcePath,
+        GetterMemberPath nullConditionalSourcePath,
         IMemberAssignmentMappingContainer parent,
         bool throwInsteadOfConditionalNullMapping,
         bool needsNullSafeAccess

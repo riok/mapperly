@@ -15,7 +15,7 @@ namespace Riok.Mapperly.Symbols;
 public class MemberPath
 {
     private const string MemberAccessSeparator = ".";
-    private const string NullableValueProperty = "Value";
+    protected const string NullableValueProperty = "Value";
 
     public MemberPath(IReadOnlyList<IMappableMember> path)
     {
@@ -72,41 +72,6 @@ public class MemberPath
     public bool IsAnyNullable() => Path.Any(p => p.IsNullable);
 
     public bool IsAnyObjectPathNullable() => ObjectPath.Any(p => p.IsNullable);
-
-    public ExpressionSyntax BuildAccess(
-        ExpressionSyntax? baseAccess,
-        bool addValuePropertyOnNullable = false,
-        bool nullConditional = false,
-        bool skipTrailingNonNullable = false
-    )
-    {
-        var path = skipTrailingNonNullable ? PathWithoutTrailingNonNullable() : Path;
-
-        if (baseAccess == null)
-        {
-            baseAccess = IdentifierName(path.First().Name);
-            path = path.Skip(1);
-        }
-
-        if (nullConditional)
-        {
-            return path.AggregateWithPrevious(
-                baseAccess,
-                (expr, prevProp, prop) => prevProp?.IsNullable == true ? ConditionalAccess(expr, prop.Name) : MemberAccess(expr, prop.Name)
-            );
-        }
-
-        if (addValuePropertyOnNullable)
-        {
-            return path.Aggregate(
-                baseAccess,
-                (a, b) =>
-                    b.Type.IsNullableValueType() ? MemberAccess(MemberAccess(a, b.Name), NullableValueProperty) : MemberAccess(a, b.Name)
-            );
-        }
-
-        return path.Aggregate(baseAccess, (a, b) => MemberAccess(a, b.Name));
-    }
 
     /// <summary>
     /// Builds a condition (the resulting expression evaluates to a boolean)

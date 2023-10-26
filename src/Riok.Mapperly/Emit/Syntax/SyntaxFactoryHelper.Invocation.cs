@@ -90,11 +90,14 @@ public partial struct SyntaxFactoryHelper
 
     private static ParameterSyntax Parameter(bool addThisKeyword, MethodParameter parameter)
     {
-        var param = SyntaxFactory
-            .Parameter(Identifier(parameter.Name))
-            .WithType(FullyQualifiedIdentifier(parameter.Type).AddTrailingSpace());
+        return Parameter(parameter.Type.FullyQualifiedIdentifierName(), parameter.Name, addThisKeyword);
+    }
 
-        if (addThisKeyword && parameter.Ordinal == 0)
+    public static ParameterSyntax Parameter(string type, string identifier, bool addThisKeyword = false)
+    {
+        var param = SyntaxFactory.Parameter(Identifier(identifier)).WithType(IdentifierName(type).AddTrailingSpace());
+
+        if (addThisKeyword)
         {
             param = param.WithModifiers(TokenList(TrailingSpacedToken(SyntaxKind.ThisKeyword)));
         }

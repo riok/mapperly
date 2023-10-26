@@ -21,7 +21,9 @@ public static class NewInstanceObjectPropertyMappingBuilder
                 ctx.MapperConfiguration.UseReferenceHandling
             );
 
-        if (ctx.Target is not INamedTypeSymbol namedTarget || namedTarget.Constructors.All(x => !ctx.SymbolAccessor.IsAccessible(x)))
+        if (
+            ctx.Target is not INamedTypeSymbol namedTarget || namedTarget.Constructors.All(x => !ctx.SymbolAccessor.IsDirectlyAccessible(x))
+        )
             return null;
 
         if (ctx.Source.IsEnum() || ctx.Target.IsEnum())

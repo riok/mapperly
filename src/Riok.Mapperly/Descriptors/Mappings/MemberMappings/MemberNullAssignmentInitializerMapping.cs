@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -12,9 +11,9 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 [DebuggerDisplay("MemberNullAssignmentInitializerMapping({_pathToInitialize} ??= new())")]
 public class MemberNullAssignmentInitializerMapping : MemberAssignmentMappingContainer
 {
-    private readonly MemberPath _pathToInitialize;
+    private readonly SetterMemberPath _pathToInitialize;
 
-    public MemberNullAssignmentInitializerMapping(MemberPath pathToInitialize)
+    public MemberNullAssignmentInitializerMapping(SetterMemberPath pathToInitialize)
     {
         _pathToInitialize = pathToInitialize;
     }
@@ -23,7 +22,7 @@ public class MemberNullAssignmentInitializerMapping : MemberAssignmentMappingCon
     {
         // source.Value ??= new();
         var initializer = ctx.SyntaxFactory.ExpressionStatement(
-            CoalesceAssignment(_pathToInitialize.BuildAccess(targetAccess), ImplicitObjectCreationExpression())
+            _pathToInitialize.BuildAssignment(targetAccess, ImplicitObjectCreationExpression(), true)
         );
         return base.Build(ctx, targetAccess).Prepend(initializer);
     }

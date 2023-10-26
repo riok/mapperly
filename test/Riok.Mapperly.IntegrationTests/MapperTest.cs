@@ -4,7 +4,7 @@ using Riok.Mapperly.IntegrationTests.Mapper;
 using VerifyXunit;
 using Xunit;
 
-#if NET8_0
+#if NET8_0_OR_GREATER
 using FluentAssertions;
 #endif
 
@@ -30,7 +30,7 @@ namespace Riok.Mapperly.IntegrationTests
             return Verifier.Verify(dto);
         }
 
-#if NET8_0
+#if NET8_0_OR_GREATER
         [Fact]
         public void RunMappingAliasedTuple()
         {

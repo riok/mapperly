@@ -1,6 +1,8 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Symbols;
 
@@ -21,9 +23,16 @@ internal class PropertyMember : IMappableMember
     public bool IsNullable => _propertySymbol.NullableAnnotation == NullableAnnotation.Annotated || Type.IsNullable();
     public bool IsIndexer => _propertySymbol.IsIndexer;
     public bool CanGet =>
-        !_propertySymbol.IsWriteOnly && (_propertySymbol.GetMethod == null || _symbolAccessor.IsAccessible(_propertySymbol.GetMethod));
+        !_propertySymbol.IsWriteOnly
+        && (_propertySymbol.GetMethod == null || _symbolAccessor.IsAccessibleToMemberVisibility(_propertySymbol.GetMethod));
     public bool CanSet =>
-        !_propertySymbol.IsReadOnly && (_propertySymbol.SetMethod == null || _symbolAccessor.IsAccessible(_propertySymbol.SetMethod));
+        !_propertySymbol.IsReadOnly
+        && (_propertySymbol.SetMethod == null || _symbolAccessor.IsAccessibleToMemberVisibility(_propertySymbol.SetMethod));
+
+    public bool CanSetDirectly =>
+        !_propertySymbol.IsReadOnly
+        && (_propertySymbol.SetMethod == null || _symbolAccessor.IsDirectlyAccessible(_propertySymbol.SetMethod));
+
     public bool IsInitOnly => _propertySymbol.SetMethod?.IsInitOnly == true;
 
     public bool IsRequired
@@ -32,6 +41,11 @@ internal class PropertyMember : IMappableMember
 #else
         => false;
 #endif
+
+    public ExpressionSyntax BuildAccess(ExpressionSyntax source, bool nullConditional = false)
+    {
+        return nullConditional ? ConditionalAccess(source, Name) : MemberAccess(source, Name);
+    }
 
     public override bool Equals(object? obj) =>
         obj is PropertyMember other && SymbolEqualityComparer.IncludeNullability.Equals(_propertySymbol, other._propertySymbol);

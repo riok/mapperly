@@ -111,9 +111,11 @@ public static class NewValueTupleMappingBodyBuilder
                 return false;
             }
 
+            var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourcePath);
+
             var memberMapping = new NullMemberMapping(
                 delegateMapping,
-                sourcePath,
+                getterSourcePath,
                 paramType,
                 ctx.BuilderContext.GetNullFallbackValue(paramType),
                 !ctx.BuilderContext.IsExpression

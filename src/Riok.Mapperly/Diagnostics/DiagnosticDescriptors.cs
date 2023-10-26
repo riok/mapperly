@@ -464,4 +464,13 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         true
     );
+
+    public static readonly DiagnosticDescriptor UnsafeAccessorNotAvailable = new DiagnosticDescriptor(
+        "RMG053",
+        $"The flag {nameof(MemberVisibility)}.{nameof(MemberVisibility.Accessible)} cannot be disabled, this feature requires .NET 8.0 or greater",
+        $"The flag {nameof(MemberVisibility)}.{nameof(MemberVisibility.Accessible)} cannot be disabled, this feature requires .NET 8.0 or greater",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
 }

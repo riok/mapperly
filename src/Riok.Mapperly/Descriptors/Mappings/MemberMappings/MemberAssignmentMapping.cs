@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Symbols;
-using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -13,27 +12,27 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 public class MemberAssignmentMapping : IMemberAssignmentMapping
 {
     private readonly IMemberMapping _mapping;
+    private readonly SetterMemberPath _targetPath;
 
-    public MemberAssignmentMapping(MemberPath targetPath, IMemberMapping mapping)
+    public MemberAssignmentMapping(SetterMemberPath targetPath, IMemberMapping mapping)
     {
-        TargetPath = targetPath;
+        _targetPath = targetPath;
         _mapping = mapping;
     }
 
-    public MemberPath SourcePath => _mapping.SourcePath;
+    public GetterMemberPath SourcePath => _mapping.SourcePath;
 
-    public MemberPath TargetPath { get; }
+    public MemberPath TargetPath => _targetPath;
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess) =>
         ctx.SyntaxFactory.SingleStatement(BuildExpression(ctx, targetAccess));
 
     public ExpressionSyntax BuildExpression(TypeMappingBuildContext ctx, ExpressionSyntax? targetAccess)
     {
-        var targetMemberAccess = TargetPath.BuildAccess(targetAccess);
         var mappedValue = _mapping.Build(ctx);
 
-        // target.Member = mappedValue;
-        return Assignment(targetMemberAccess, mappedValue);
+        // target.SetValue(source.Value); or target.Value = source.Value;
+        return _targetPath.BuildAssignment(targetAccess, mappedValue);
     }
 
     public override bool Equals(object? obj)

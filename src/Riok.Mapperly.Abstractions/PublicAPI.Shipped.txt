@@ -119,3 +119,13 @@ Riok.Mapperly.Abstractions.RequiredMappingStrategy.Both = -1 -> Riok.Mapperly.Ab
 Riok.Mapperly.Abstractions.RequiredMappingStrategy.None = 0 -> Riok.Mapperly.Abstractions.RequiredMappingStrategy
 Riok.Mapperly.Abstractions.RequiredMappingStrategy.Source = 1 -> Riok.Mapperly.Abstractions.RequiredMappingStrategy
 Riok.Mapperly.Abstractions.RequiredMappingStrategy.Target = 2 -> Riok.Mapperly.Abstractions.RequiredMappingStrategy
+Riok.Mapperly.Abstractions.MapperAttribute.IncludedMembers.get -> Riok.Mapperly.Abstractions.MemberVisibility
+Riok.Mapperly.Abstractions.MapperAttribute.IncludedMembers.set -> void
+Riok.Mapperly.Abstractions.MemberVisibility
+Riok.Mapperly.Abstractions.MemberVisibility.Accessible = 1 -> Riok.Mapperly.Abstractions.MemberVisibility
+Riok.Mapperly.Abstractions.MemberVisibility.All = Riok.Mapperly.Abstractions.MemberVisibility.Public | Riok.Mapperly.Abstractions.MemberVisibility.Internal | Riok.Mapperly.Abstractions.MemberVisibility.Protected | Riok.Mapperly.Abstractions.MemberVisibility.Private -> Riok.Mapperly.Abstractions.MemberVisibility
+Riok.Mapperly.Abstractions.MemberVisibility.AllAccessible = Riok.Mapperly.Abstractions.MemberVisibility.Accessible | Riok.Mapperly.Abstractions.MemberVisibility.All -> Riok.Mapperly.Abstractions.MemberVisibility
+Riok.Mapperly.Abstractions.MemberVisibility.Internal = 4 -> Riok.Mapperly.Abstractions.MemberVisibility
+Riok.Mapperly.Abstractions.MemberVisibility.Private = 16 -> Riok.Mapperly.Abstractions.MemberVisibility
+Riok.Mapperly.Abstractions.MemberVisibility.Protected = 8 -> Riok.Mapperly.Abstractions.MemberVisibility
+Riok.Mapperly.Abstractions.MemberVisibility.Public = 2 -> Riok.Mapperly.Abstractions.MemberVisibility

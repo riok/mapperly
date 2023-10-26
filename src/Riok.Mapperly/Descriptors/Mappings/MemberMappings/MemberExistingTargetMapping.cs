@@ -10,22 +10,23 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 public class MemberExistingTargetMapping : IMemberAssignmentMapping
 {
     private readonly IExistingTargetMapping _delegateMapping;
+    private readonly GetterMemberPath _targetPath;
 
-    public MemberExistingTargetMapping(IExistingTargetMapping delegateMapping, MemberPath sourcePath, MemberPath targetPath)
+    public MemberExistingTargetMapping(IExistingTargetMapping delegateMapping, GetterMemberPath sourcePath, GetterMemberPath targetPath)
     {
         _delegateMapping = delegateMapping;
         SourcePath = sourcePath;
-        TargetPath = targetPath;
+        _targetPath = targetPath;
     }
 
-    public MemberPath SourcePath { get; }
+    public GetterMemberPath SourcePath { get; }
 
-    public MemberPath TargetPath { get; }
+    public MemberPath TargetPath => _targetPath;
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
         var source = SourcePath.BuildAccess(ctx.Source);
-        var target = TargetPath.BuildAccess(targetAccess);
+        var target = _targetPath.BuildAccess(targetAccess);
         return _delegateMapping.Build(ctx.WithSource(source), target);
     }
 }
