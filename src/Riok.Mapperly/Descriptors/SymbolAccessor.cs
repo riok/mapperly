@@ -162,12 +162,18 @@ public class SymbolAccessor
         [NotNullWhen(true)] out MemberPath? memberPath
     )
     {
-        foreach (var pathCandidate in FindMemberPathCandidates(type, pathCandidates, ignoreCase))
+        var foundPath = new List<IMappableMember>();
+        foreach (var pathCandidate in pathCandidates)
         {
-            if (ignoredNames.Contains(pathCandidate.Path.First().Name))
+            // reuse List instead of allocating a new one
+            foundPath.Clear();
+            if (!TryFindPath(type, pathCandidate, ignoreCase, foundPath))
                 continue;
 
-            memberPath = pathCandidate;
+            if (ignoredNames.Contains(foundPath[0].Name))
+                continue;
+
+            memberPath = new(foundPath);
             return true;
         }
 
@@ -175,52 +181,33 @@ public class SymbolAccessor
         return false;
     }
 
-    internal bool TryFindMemberPath(ITypeSymbol type, IReadOnlyCollection<string> path, [NotNullWhen(true)] out MemberPath? memberPath) =>
-        TryFindMemberPath(type, path, false, out memberPath);
-
-    private IEnumerable<MemberPath> FindMemberPathCandidates(
-        ITypeSymbol type,
-        IEnumerable<IEnumerable<string>> pathCandidates,
-        bool ignoreCase
-    )
+    internal bool TryFindMemberPath(ITypeSymbol type, IReadOnlyCollection<string> path, [NotNullWhen(true)] out MemberPath? memberPath)
     {
-        foreach (var pathCandidate in pathCandidates)
+        var foundPath = new List<IMappableMember>();
+        if (TryFindPath(type, path, false, foundPath))
         {
-            if (TryFindMemberPath(type, pathCandidate.ToList(), ignoreCase, out var memberPath))
-                yield return memberPath;
-        }
-    }
-
-    private bool TryFindMemberPath(
-        ITypeSymbol type,
-        IReadOnlyCollection<string> path,
-        bool ignoreCase,
-        [NotNullWhen(true)] out MemberPath? memberPath
-    )
-    {
-        var foundPath = FindMemberPath(type, path, ignoreCase).ToList();
-        if (foundPath.Count != path.Count)
-        {
-            memberPath = null;
-            return false;
+            memberPath = new(foundPath);
+            return true;
         }
 
-        memberPath = new(foundPath);
-        return true;
+        memberPath = null;
+        return false;
     }
 
-    private IEnumerable<IMappableMember> FindMemberPath(ITypeSymbol type, IEnumerable<string> path, bool ignoreCase)
+    private bool TryFindPath(ITypeSymbol type, IEnumerable<string> path, bool ignoreCase, ICollection<IMappableMember> foundPath)
     {
         foreach (var name in path)
         {
             // get T if type is Nullable<T>, prevents Value being treated as a member
             var actualType = type.NonNullableValueType() ?? type;
             if (GetMappableMember(actualType, name, ignoreCase) is not { } member)
-                break;
+                return false;
 
             type = member.Type;
-            yield return member;
+            foundPath.Add(member);
         }
+
+        return true;
     }
 
     private IMappableMember? GetMappableMember(ITypeSymbol symbol, string name, bool ignoreCase)
