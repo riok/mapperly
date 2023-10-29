@@ -84,7 +84,7 @@ public class UseStaticMapperTest
             static class OtherMapper { public static BExternal ToBExternal(AExternal source) => new BExternal(); }
 
             [Mapper]
-            [UseStaticMapper<OtherMapper>]
+            [UseStaticMapper(typeof(OtherMapper))]
             public partial class Mapper
             {
                 partial B Map(A source);
