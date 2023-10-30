@@ -36,8 +36,7 @@ For static mappings, `UseStaticMapper` can be used:
 ```csharp
 [Mapper]
 // highlight-start
-[UseStaticMapper<BananaMapper>] // for c# language level ≥ 11
-[UseStaticMapper(typeof(BananaMapper))] // for c# language level < 11
+[UseStaticMapper(typeof(BananaMapper))]
 // highlight-end
 public static partial class BoxMapper
 {
