@@ -18,37 +18,37 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 IntInitOnlyValue = src.IntInitOnlyValue,
                 RequiredValue = src.RequiredValue,
             };
-            if (src.NullableFlattening != null)
+            if (src.NullableFlattening is { } srcNullableFlattening)
             {
-                target.NullableFlattening = Copy(src.NullableFlattening);
+                target.NullableFlattening = Copy(srcNullableFlattening);
             }
-            if (src.NestedNullable != null)
+            if (src.NestedNullable is { } srcNestedNullable)
             {
-                target.NestedNullable = MapToTestObjectNested(src.NestedNullable);
+                target.NestedNullable = MapToTestObjectNested(srcNestedNullable);
             }
-            if (src.NestedNullableTargetNotNullable != null)
+            if (src.NestedNullableTargetNotNullable is { } srcNestedNullableTargetNotNullable)
             {
-                target.NestedNullableTargetNotNullable = MapToTestObjectNested(src.NestedNullableTargetNotNullable);
+                target.NestedNullableTargetNotNullable = MapToTestObjectNested(srcNestedNullableTargetNotNullable);
             }
-            if (src.TupleValue != null)
+            if (src.TupleValue is { } srcTupleValue)
             {
-                target.TupleValue = MapToValueTuple(src.TupleValue.Value);
+                target.TupleValue = MapToValueTuple(srcTupleValue);
             }
-            if (src.RecursiveObject != null)
+            if (src.RecursiveObject is { } srcRecursiveObject)
             {
-                target.RecursiveObject = Copy(src.RecursiveObject);
+                target.RecursiveObject = Copy(srcRecursiveObject);
             }
-            if (src.SourceTargetSameObjectType != null)
+            if (src.SourceTargetSameObjectType is { } srcSourceTargetSameObjectType)
             {
-                target.SourceTargetSameObjectType = Copy(src.SourceTargetSameObjectType);
+                target.SourceTargetSameObjectType = Copy(srcSourceTargetSameObjectType);
             }
-            if (src.NullableReadOnlyObjectCollection != null)
+            if (src.NullableReadOnlyObjectCollection is { } srcNullableReadOnlyObjectCollection)
             {
-                target.NullableReadOnlyObjectCollection = MapToIReadOnlyCollection(src.NullableReadOnlyObjectCollection);
+                target.NullableReadOnlyObjectCollection = MapToIReadOnlyCollection(srcNullableReadOnlyObjectCollection);
             }
-            if (src.SubObject != null)
+            if (src.SubObject is { } srcSubObject)
             {
-                target.SubObject = MapToInheritanceSubObject(src.SubObject);
+                target.SubObject = MapToInheritanceSubObject(srcSubObject);
             }
             target.IntValue = src.IntValue;
             target.StringValue = src.StringValue;

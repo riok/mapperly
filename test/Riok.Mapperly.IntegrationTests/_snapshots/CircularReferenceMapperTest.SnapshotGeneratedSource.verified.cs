@@ -15,9 +15,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 return existingTargetReference;
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto();
             refHandler.SetReference<global::Riok.Mapperly.IntegrationTests.Models.CircularReferenceObject, global::Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto>(source, target);
-            if (source.Parent != null)
+            if (source.Parent is { } sourceParent)
             {
-                target.Parent = MapToCircularReferenceDto(source.Parent, refHandler);
+                target.Parent = MapToCircularReferenceDto(sourceParent, refHandler);
             }
             target.Value = source.Value;
             return target;

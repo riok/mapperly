@@ -73,26 +73,26 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 IntInitOnlyValue = testObject.IntInitOnlyValue,
                 RequiredValue = testObject.RequiredValue,
             };
-            if (testObject.NestedNullable != null)
+            if (testObject.NestedNullable is { } testObjectNestedNullable)
             {
-                target.NestedNullableIntValue = testObject.NestedNullable.IntValue;
-                target.NestedNullable = MapToTestObjectNestedDto(testObject.NestedNullable);
+                target.NestedNullableIntValue = testObjectNestedNullable.IntValue;
+                target.NestedNullable = MapToTestObjectNestedDto(testObjectNestedNullable);
             }
-            if (testObject.NestedNullableTargetNotNullable != null)
+            if (testObject.NestedNullableTargetNotNullable is { } testObjectNestedNullableTargetNotNullable)
             {
-                target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(testObject.NestedNullableTargetNotNullable);
+                target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(testObjectNestedNullableTargetNotNullable);
             }
-            if (testObject.StringNullableTargetNotNullable != null)
+            if (testObject.StringNullableTargetNotNullable is { } testObjectStringNullableTargetNotNullable)
             {
-                target.StringNullableTargetNotNullable = testObject.StringNullableTargetNotNullable;
+                target.StringNullableTargetNotNullable = testObjectStringNullableTargetNotNullable;
             }
-            if (testObject.NullableReadOnlyObjectCollection != null)
+            if (testObject.NullableReadOnlyObjectCollection is { } testObjectNullableReadOnlyObjectCollection)
             {
-                target.NullableReadOnlyObjectCollection = MapToIReadOnlyCollection(testObject.NullableReadOnlyObjectCollection);
+                target.NullableReadOnlyObjectCollection = MapToIReadOnlyCollection(testObjectNullableReadOnlyObjectCollection);
             }
-            if (testObject.SubObject != null)
+            if (testObject.SubObject is { } testObjectSubObject)
             {
-                target.SubObject = MapToInheritanceSubObjectDto(testObject.SubObject);
+                target.SubObject = MapToInheritanceSubObjectDto(testObjectSubObject);
             }
             target.IntValue = testObject.IntValue;
             target.StringValue = testObject.StringValue;
