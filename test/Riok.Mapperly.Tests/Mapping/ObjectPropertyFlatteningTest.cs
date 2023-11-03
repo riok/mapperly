@@ -134,9 +134,9 @@ public class ObjectPropertyFlatteningTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.ValueId = source.Value.Id;
+                    target.ValueId = sourceValue.Id;
                 }
                 return target;
                 """
@@ -160,10 +160,10 @@ public class ObjectPropertyFlatteningTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.ValueId = source.Value.Id.ToString();
-                    target.ValueName = source.Value.Name;
+                    target.ValueId = sourceValue.Id.ToString();
+                    target.ValueName = sourceValue.Name;
                 }
                 return target;
                 """
@@ -186,9 +186,9 @@ public class ObjectPropertyFlatteningTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                if (source.Id.Value != null)
+                if (source.Id.Value is { } sourceIdValue)
                 {
-                    target.IdValue = source.Id.Value.Value;
+                    target.IdValue = sourceIdValue;
                 }
                 return target;
                 """
@@ -211,9 +211,9 @@ public class ObjectPropertyFlatteningTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                if (source.Prop != null)
+                if (source.Prop is { } sourceProp)
                 {
-                    target.PropInteger = source.Prop.Value.Integer.ToString();
+                    target.PropInteger = sourceProp.Integer.ToString();
                 }
                 return target;
                 """
@@ -260,9 +260,9 @@ public class ObjectPropertyFlatteningTest
                 if (source == null)
                     return default;
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.ValueId = source.Value.Id.ToString();
+                    target.ValueId = sourceValue.Id.ToString();
                 }
                 target.ValueName = source.Value?.Name;
                 return target;
@@ -489,10 +489,12 @@ public class ObjectPropertyFlatteningTest
     public void ManualNestedPropertyNullablePath()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty(\"Value1.Value1.Id1\", \"Value2.Value2.Id2\")]"
-                + "[MapProperty(\"Value1.Value1.Id10\", \"Value2.Value2.Id20\")]"
-                + "[MapProperty(new[] { \"Value1\", \"Id100\" }, new[] { \"Value2\", \"Id200\" })]"
-                + "partial B Map(A source);",
+            """
+            [MapProperty("Value1.Value1.Id1", "Value2.Value2.Id2")]
+            [MapProperty("Value1.Value1.Id10", "Value2.Value2.Id20")]
+            [MapProperty(new[] { "Value1", "Id100" }, new[] { "Value2", "Id200" })]
+            partial B Map(A source);
+            """,
             "class A { public C? Value1 { get; set; } }",
             "class B { public E? Value2 { get; set; } }",
             "class C { public D? Value1 { get; set; } public string Id100 { get; set; } }",
@@ -507,16 +509,16 @@ public class ObjectPropertyFlatteningTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value1 != null)
+                if (source.Value1 is { } sourceValue1)
                 {
                     target.Value2 ??= new();
-                    if (source.Value1.Value1 != null)
+                    if (sourceValue1.Value1 is { } sourceValue1Value1)
                     {
                         target.Value2.Value2 ??= new();
-                        target.Value2.Value2.Id2 = source.Value1.Value1.Id1;
-                        target.Value2.Value2.Id20 = source.Value1.Value1.Id10;
+                        target.Value2.Value2.Id2 = sourceValue1Value1.Id1;
+                        target.Value2.Value2.Id20 = sourceValue1Value1.Id10;
                     }
-                    target.Value2.Id200 = source.Value1.Id100;
+                    target.Value2.Id200 = sourceValue1.Id100;
                 }
                 return target;
                 """

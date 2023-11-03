@@ -6,13 +6,13 @@ public partial class Mapper
     private partial global::B Map(global::A source)
     {
         var target = new global::B();
-        if (source.Nested != null)
+        if (source.Nested is { } sourceNested)
         {
-            if (source.Nested.Value2 != null)
+            if (sourceNested.Value2 is { } sourceNestedValue2)
             {
-                target.NestedValue2 = source.Nested.Value2.Value;
+                target.NestedValue2 = sourceNestedValue2;
             }
-            target.Nested = MapToD(source.Nested);
+            target.Nested = MapToD(sourceNested);
         }
         return target;
     }
@@ -20,9 +20,9 @@ public partial class Mapper
     private global::D MapToD(global::C source)
     {
         var target = new global::D();
-        if (source.Value1 != null)
+        if (source.Value1 is { } sourceValue1)
         {
-            target.Value1 = source.Value1.Value;
+            target.Value1 = sourceValue1;
         }
         return target;
     }

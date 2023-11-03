@@ -41,9 +41,9 @@ public class ObjectPropertyNullableTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.Value = source.Value.Value;
+                    target.Value = sourceValue;
                 }
                 return target;
                 """
@@ -70,9 +70,9 @@ public class ObjectPropertyNullableTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.Value = source.Value.Value;
+                    target.Value = sourceValue;
                 }
                 return target;
                 """
@@ -100,9 +100,9 @@ public class ObjectPropertyNullableTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.Value = source.Value.Value;
+                    target.Value = sourceValue;
                 }
                 else
                 {
@@ -129,9 +129,9 @@ public class ObjectPropertyNullableTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.Value = source.Value;
+                    target.Value = sourceValue;
                 }
                 return target;
                 """
@@ -156,9 +156,9 @@ public class ObjectPropertyNullableTest
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.Value = MapToD(source.Value);
+                    target.Value = MapToD(sourceValue);
                 }
                 return target;
                 """
@@ -207,9 +207,9 @@ public class ObjectPropertyNullableTest
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.Value = source.Value;
+                    target.Value = sourceValue;
                 }
                 return target;
                 """
@@ -237,9 +237,9 @@ public class ObjectPropertyNullableTest
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.Value = source.Value;
+                    target.Value = sourceValue;
                 }
                 else
                 {
@@ -315,9 +315,9 @@ public class ObjectPropertyNullableTest
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.Value = MapToD(source.Value);
+                    target.Value = MapToD(sourceValue);
                 }
                 return target;
                 """
@@ -346,9 +346,9 @@ public class ObjectPropertyNullableTest
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.Value = MapToD(source.Value);
+                    target.Value = MapToD(sourceValue);
                 }
                 return target;
                 """
@@ -378,9 +378,9 @@ public class ObjectPropertyNullableTest
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.Value = MapToD(source.Value);
+                    target.Value = MapToD(sourceValue);
                 }
                 else
                 {
@@ -409,9 +409,9 @@ public class ObjectPropertyNullableTest
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.Value = MapToD(source.Value);
+                    target.Value = MapToD(sourceValue);
                 }
                 return target;
                 """
@@ -436,9 +436,9 @@ public class ObjectPropertyNullableTest
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.Value = MapToD(source.Value);
+                    target.Value = MapToD(sourceValue);
                 }
                 return target;
                 """
@@ -467,9 +467,9 @@ public class ObjectPropertyNullableTest
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
-                if (source.Value != null)
+                if (source.Value is { } sourceValue)
                 {
-                    target.Value = MapToD(source.Value);
+                    target.Value = MapToD(sourceValue);
                 }
                 else
                 {
@@ -569,9 +569,9 @@ public class ObjectPropertyNullableTest
                 if (y == null)
                     return default;
                 var target = new global::NotNullableType();
-                if (y.Test != null)
+                if (y.Test is { } yTest)
                 {
-                    target.Test = Map(y.Test.Value);
+                    target.Test = Map(yTest);
                 }
                 return target;
                 """
