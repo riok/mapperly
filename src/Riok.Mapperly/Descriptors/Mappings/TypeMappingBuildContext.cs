@@ -1,6 +1,8 @@
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Emit.Syntax;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
@@ -30,15 +32,17 @@ public readonly record struct TypeMappingBuildContext
         SyntaxFactory = syntaxFactory;
     }
 
-    public UniqueNameBuilder NameBuilder { get; }
+    public UniqueNameBuilder NameBuilder { get; private init; }
 
-    public ExpressionSyntax Source { get; }
+    public ExpressionSyntax Source { get; private init; }
 
-    public ExpressionSyntax? ReferenceHandler { get; }
+    public IReadOnlyList<IMappableMember> TrimSourcePath { get; private init; } = ImmutableList<IMappableMember>.Empty;
 
-    public SyntaxFactoryHelper SyntaxFactory { get; }
+    public ExpressionSyntax? ReferenceHandler { get; private init; }
 
-    public TypeMappingBuildContext AddIndentation() => new(Source, ReferenceHandler, NameBuilder, SyntaxFactory.AddIndentation());
+    public SyntaxFactoryHelper SyntaxFactory { get; private init; }
+
+    public TypeMappingBuildContext AddIndentation() => this with { SyntaxFactory = SyntaxFactory.AddIndentation() };
 
     /// <summary>
     /// Creates a new scoped name builder,
@@ -59,7 +63,7 @@ public readonly record struct TypeMappingBuildContext
     {
         var scopedNameBuilder = NameBuilder.NewScope();
         var scopedSourceName = scopedNameBuilder.New(DefaultSourceName);
-        var ctx = new TypeMappingBuildContext(sourceBuilder(scopedSourceName), ReferenceHandler, scopedNameBuilder, SyntaxFactory);
+        var ctx = this with { Source = sourceBuilder(scopedSourceName), NameBuilder = scopedNameBuilder };
         return (ctx, scopedSourceName);
     }
 
@@ -69,9 +73,15 @@ public readonly record struct TypeMappingBuildContext
         return (WithSource(IdentifierName(scopedSourceName)), scopedSourceName);
     }
 
-    public TypeMappingBuildContext WithSource(ExpressionSyntax source) => new(source, ReferenceHandler, NameBuilder, SyntaxFactory);
+    public TypeMappingBuildContext WithSource(ExpressionSyntax source) => this with { Source = source };
 
     public TypeMappingBuildContext WithRefHandler(string refHandler) => WithRefHandler(IdentifierName(refHandler));
 
-    public TypeMappingBuildContext WithRefHandler(ExpressionSyntax refHandler) => new(Source, refHandler, NameBuilder, SyntaxFactory);
+    public TypeMappingBuildContext WithRefHandler(ExpressionSyntax refHandler) => this with { ReferenceHandler = refHandler };
+
+    public TypeMappingBuildContext WithTrimSourcePath(IReadOnlyList<IMappableMember> trimSourcePath) =>
+        this with
+        {
+            TrimSourcePath = trimSourcePath
+        };
 }
