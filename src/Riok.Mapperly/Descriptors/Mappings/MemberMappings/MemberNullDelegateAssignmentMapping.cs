@@ -44,7 +44,14 @@ public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContai
 
         var (conditionCtx, nullGuardedValue) = ctx.AddIndentation()
             .WithTrimSourcePath(nullConditionalSourcePath.Path)
-            .WithNewSource(sourceNullConditionalAccess.ToFullString().Replace(".", ""));
+            .WithNewSource(
+                sourceNullConditionalAccess
+                    .ToFullString()
+                    .Replace(".", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("?", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("(", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                    .Replace(")", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+            );
 
         var condition = IsNotNullWithPattern(sourceNullConditionalAccess, nullGuardedValue);
 
