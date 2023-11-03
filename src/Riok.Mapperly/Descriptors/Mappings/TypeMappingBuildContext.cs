@@ -82,6 +82,6 @@ public readonly record struct TypeMappingBuildContext
     public TypeMappingBuildContext WithTrimSourcePath(IReadOnlyList<IMappableMember> trimSourcePath) =>
         this with
         {
-            TrimSourcePath = trimSourcePath
+            TrimSourcePath = TrimSourcePath.Concat(trimSourcePath).ToArray()
         };
 }
