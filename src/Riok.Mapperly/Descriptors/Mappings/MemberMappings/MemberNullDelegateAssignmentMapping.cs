@@ -34,11 +34,16 @@ public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContai
         //   target.Value = Map(sourceValue);
         // else
         //   throw ...
-        var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, false, _needsNullSafeAccess, true);
-        var nameofSourceAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, false, false, true);
+        if (!GetterMemberPath.TryBuild(ctx, _nullConditionalSourcePath, out var nullConditionalSourcePath))
+        {
+            nullConditionalSourcePath = _nullConditionalSourcePath;
+        }
+
+        var sourceNullConditionalAccess = nullConditionalSourcePath.BuildAccess(ctx.Source, false, _needsNullSafeAccess, true);
+        var nameofSourceAccess = nullConditionalSourcePath.BuildAccess(ctx.Source, false, false, true);
 
         var (conditionCtx, nullGuardedValue) = ctx.AddIndentation()
-            .WithTrimSourcePath(_nullConditionalSourcePath.Path)
+            .WithTrimSourcePath(nullConditionalSourcePath.Path)
             .WithNewSource(sourceNullConditionalAccess.ToFullString().Replace(".", ""));
 
         var condition = IsNotNullWithPattern(sourceNullConditionalAccess, nullGuardedValue);
