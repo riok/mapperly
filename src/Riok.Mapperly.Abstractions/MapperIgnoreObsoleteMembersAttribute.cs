@@ -1,4 +1,4 @@
-﻿namespace Riok.Mapperly.Abstractions;
+namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
 /// Specifies options for obsolete ignoring strategy.

@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Emit;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings.UnsafeAccess;

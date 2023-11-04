@@ -1,4 +1,4 @@
-﻿using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.IntegrationTests.Models;
 
 namespace Riok.Mapperly.IntegrationTests.Mapper

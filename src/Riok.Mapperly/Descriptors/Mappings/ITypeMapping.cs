@@ -1,4 +1,4 @@
-﻿namespace Riok.Mapperly.Descriptors.Mappings;
+namespace Riok.Mapperly.Descriptors.Mappings;
 
 /// <summary>
 /// Represents a mapping from one type to another.
