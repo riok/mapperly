@@ -29,12 +29,11 @@ public class MemberMapping : IMemberMapping
     public GetterMemberPath SourcePath { get; }
     public bool NullConditionalAccess { get; }
 
-    public ExpressionSyntax Build(TypeMappingBuildContext ctx)
-
     public ITypeSymbol SourceType => _delegateMapping.SourceType;
 
     public ITypeSymbol TargetType => _delegateMapping.TargetType;
 
+    public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         ctx = ctx.WithSource(SourcePath.BuildAccess(ctx.Source, _addValuePropertyOnNullable, NullConditionalAccess));
         return _delegateMapping.Build(ctx);
