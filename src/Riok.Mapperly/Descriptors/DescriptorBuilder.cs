@@ -14,8 +14,11 @@ namespace Riok.Mapperly.Descriptors;
 
 public class DescriptorBuilder
 {
+    private const string UnsafeAccessorName = "System.Runtime.CompilerServices.UnsafeAccessorAttribute";
+
     private readonly MapperDescriptor _mapperDescriptor;
     private readonly SymbolAccessor _symbolAccessor;
+    private readonly WellKnownTypes _types;
 
     private readonly MappingCollection _mappings = new();
     private readonly MethodNameBuilder _methodNameBuilder = new();
@@ -36,6 +39,7 @@ public class DescriptorBuilder
     {
         _mapperDescriptor = new MapperDescriptor(mapperDeclaration, _methodNameBuilder);
         _symbolAccessor = symbolAccessor;
+        _types = compilationContext.Types;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
         _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
 
@@ -78,20 +82,20 @@ public class DescriptorBuilder
     private void ConfigureMemberVisibility()
     {
         var includedMembers = _configurationReader.Mapper.IncludedMembers;
-#if ROSLYN4_7_OR_GREATER
-        _symbolAccessor.SetMemberVisibility(includedMembers);
-#else
+
+        if (_types.TryGet(UnsafeAccessorName) != null)
+        {
+            _symbolAccessor.SetMemberVisibility(includedMembers);
+            return;
+        }
+
         if (includedMembers.HasFlag(MemberVisibility.Accessible))
             return;
 
         _diagnostics.Add(
-            Diagnostic.Create(
-                Riok.Mapperly.Diagnostics.DiagnosticDescriptors.UnsafeAccessorNotAvailable,
-                _mapperDescriptor.Syntax.GetLocation()
-            )
+            Diagnostic.Create(Diagnostics.DiagnosticDescriptors.UnsafeAccessorNotAvailable, _mapperDescriptor.Syntax.GetLocation())
         );
         _symbolAccessor.SetMemberVisibility(includedMembers | MemberVisibility.Accessible);
-#endif
     }
 
     private void ReserveMethodNames()
