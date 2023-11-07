@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Emit.Syntax;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;

@@ -1,4 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes;
 using Riok.Mapperly.IntegrationTests;
 using Riok.Mapperly.IntegrationTests.Dto;
 using Riok.Mapperly.IntegrationTests.Mapper;

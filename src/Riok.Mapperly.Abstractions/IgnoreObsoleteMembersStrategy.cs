@@ -1,4 +1,4 @@
-﻿namespace Riok.Mapperly.Abstractions;
+namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
 /// Defines the strategy to use when mapping members marked with <see cref="ObsoleteAttribute"/>.

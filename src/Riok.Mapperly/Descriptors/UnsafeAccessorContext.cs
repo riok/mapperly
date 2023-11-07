@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings.UnsafeAccess;
 using Riok.Mapperly.Helpers;

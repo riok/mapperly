@@ -1,4 +1,4 @@
-﻿namespace Riok.Mapperly.Abstractions;
+namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
 /// Defines the strategy used when emitting warnings for unmapped members.

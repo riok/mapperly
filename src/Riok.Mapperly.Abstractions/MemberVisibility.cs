@@ -1,4 +1,4 @@
-﻿namespace Riok.Mapperly.Abstractions;
+namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
 /// Determines what member accessibility Mapperly will attempt to map.

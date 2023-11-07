@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 
 namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 
