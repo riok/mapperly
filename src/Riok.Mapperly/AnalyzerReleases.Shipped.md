@@ -131,6 +131,7 @@ RMG055  | Mapper   | Error    | The source type does not implement ToString with
 RMG056  | Mapper   | Error    | Invalid format provider signature
 RMG057  | Mapper   | Error    | Format provider not found
 RMG058  | Mapper   | Error    | Multiple default format providers found, only one is allowed
+RMG059  | Mapper   | Error    | The value of MaxRecursionDepth cannot be less than zero
 
 ### Removed Rules
 Rule ID | Category | Severity | Notes

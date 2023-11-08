@@ -7,5 +7,6 @@ public record MembersMappingConfiguration(
     IReadOnlyCollection<string> IgnoredTargets,
     IReadOnlyCollection<MemberMappingConfiguration> ExplicitMappings,
     IgnoreObsoleteMembersStrategy IgnoreObsoleteMembersStrategy,
-    RequiredMappingStrategy RequiredMappingStrategy
+    RequiredMappingStrategy RequiredMappingStrategy,
+    int MaxRecursionDepth
 );

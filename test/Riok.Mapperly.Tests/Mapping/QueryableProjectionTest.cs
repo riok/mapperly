@@ -1,5 +1,3 @@
-using Riok.Mapperly.Diagnostics;
-
 namespace Riok.Mapperly.Tests.Mapping;
 
 public class QueryableProjectionTest
@@ -119,6 +117,21 @@ public class QueryableProjectionTest
     }
 
     [Fact]
+    public Task ClassToClassWithUserImplemented()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+
+            private D MapToD(C v) => new D { Value = v.Value + "-mapped" };
+            """,
+            "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public D NestedValue { get; set; } }",
+            "class C { public string Value { get; set; } }",
+            "class D { public string Value { get; set; } }"
+        );
+
+    [Fact]
     public Task ReferenceLoopInitProperty()
     {
         var source = TestSourceBuilder.Mapping(
@@ -155,21 +168,5 @@ public class QueryableProjectionTest
         );
 
         return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public void WithReferenceHandlingShouldDiagnostic()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "System.Linq.IQueryable<long>",
-            "System.Linq.IQueryable<int>",
-            TestSourceBuilderOptions.WithReferenceHandling
-        );
-
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingsDoNotSupportReferenceHandling)
-            .HaveAssertedAllDiagnostics();
     }
 }

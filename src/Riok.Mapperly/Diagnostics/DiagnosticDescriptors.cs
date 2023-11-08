@@ -667,6 +667,15 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static readonly DiagnosticDescriptor MaxRecursionDepthMustBeZeroOrMore = new DiagnosticDescriptor(
+        "RMG0569",
+        $"The value of MaxRecursionDepth cannot be less than zero",
+        $"The value of MaxRecursionDepth cannot be less than zero",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT

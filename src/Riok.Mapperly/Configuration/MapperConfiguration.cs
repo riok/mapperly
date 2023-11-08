@@ -115,4 +115,9 @@ public record MapperConfiguration
     /// Whether to consider non-partial methods in a mapper as user implemented mapping methods.
     /// </summary>
     public bool? AutoUserMappings { get; init; }
+
+    /// <summary>
+    /// Defines the maximum recursion depth that an IQueryable mapping will use.
+    /// </summary>
+    public int? MaxRecursionDepth { get; init; }
 }

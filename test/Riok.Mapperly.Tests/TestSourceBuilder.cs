@@ -97,6 +97,7 @@ public static class TestSourceBuilder
             Attribute(options.IncludedMembers),
             Attribute(options.PreferParameterlessConstructors),
             Attribute(options.AutoUserMappings),
+            Attribute(options.MaxRecursionDepth),
         }.WhereNotNull();
 
         return $"[Mapper({string.Join(", ", attrs)})]";
@@ -113,6 +114,9 @@ public static class TestSourceBuilder
 
     private static string? Attribute(bool? value, [CallerArgumentExpression("value")] string? expression = null) =>
         value.HasValue ? Attribute(value.Value ? "true" : "false", expression) : null;
+
+    private static string? Attribute(int? value, [CallerArgumentExpression("value")] string? expression = null) =>
+        value.HasValue ? Attribute(value.Value.ToString(), expression) : null;
 
     private static string? Attribute(string? value, [CallerArgumentExpression("value")] string? expression = null)
     {

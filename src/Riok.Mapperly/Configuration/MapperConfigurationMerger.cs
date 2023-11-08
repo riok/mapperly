@@ -62,6 +62,9 @@ public static class MapperConfigurationMerger
         mapper.AutoUserMappings =
             mapperConfiguration.AutoUserMappings ?? defaultMapperConfiguration.AutoUserMappings ?? mapper.AutoUserMappings;
 
+        mapper.MaxRecursionDepth =
+            mapperConfiguration.MaxRecursionDepth ?? defaultMapperConfiguration.MaxRecursionDepth ?? mapper.MaxRecursionDepth;
+
         return mapper;
     }
 }

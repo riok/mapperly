@@ -120,4 +120,9 @@ public class MapperAttribute : Attribute
     /// partial methods are discovered.
     /// </summary>
     public bool AutoUserMappings { get; set; } = true;
+
+    /// <summary>
+    /// Defines the maximum recursion depth that an IQueryable mapping will use.
+    /// </summary>
+    public int MaxRecursionDepth { get; set; } = 8;
 }
