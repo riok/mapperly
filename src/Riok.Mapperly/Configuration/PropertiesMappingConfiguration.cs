@@ -7,5 +7,6 @@ public record PropertiesMappingConfiguration(
     IReadOnlyCollection<string> IgnoredTargets,
     IReadOnlyCollection<PropertyMappingConfiguration> ExplicitMappings,
     IgnoreObsoleteMembersStrategy IgnoreObsoleteMembersStrategy,
-    RequiredMappingStrategy RequiredMappingStrategy
+    RequiredMappingStrategy RequiredMappingStrategy,
+    int MaxRecursionDepth
 );

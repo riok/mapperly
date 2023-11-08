@@ -509,4 +509,13 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true
     );
+
+    public static readonly DiagnosticDescriptor MaxRecursionDepthMustBeZeroOrMore = new DiagnosticDescriptor(
+        "RMG056",
+        $"The value of MaxRecursionDepth cannot be less than zero",
+        $"The value of MaxRecursionDepth cannot be less than zero",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
 }

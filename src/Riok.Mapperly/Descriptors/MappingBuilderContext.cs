@@ -17,6 +17,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 {
     private readonly FormatProviderCollection _formatProviders;
     private CollectionInfos? _collectionInfos;
+    internal readonly MappingRecursionDepthTracker _parentTypes;
 
     public MappingBuilderContext(
         SimpleMappingBuilderContext parentCtx,
@@ -30,6 +31,10 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     {
         ObjectFactories = objectFactories;
         _formatProviders = formatProviders;
+        _parentTypes = parentCtx is MappingBuilderContext inlineCtx
+            ? inlineCtx._parentTypes.AddOrIncrement(mappingKey)
+            : MappingRecursionDepthTracker.Create(mappingKey);
+
         UserSymbol = userSymbol;
         MappingKey = mappingKey;
         Configuration = ReadConfiguration(new MappingConfigurationReference(UserSymbol, mappingKey.Source, mappingKey.Target));

@@ -110,4 +110,9 @@ public record MapperConfiguration
     /// When <c>false</c>, accessible constructors are ordered in descending order by their parameter count.
     /// </summary>
     public bool? PreferParameterlessConstructors { get; init; }
+
+    /// <summary>
+    /// Defines the maximum recursion depth that an IQueryable mapping will use.
+    /// </summary>
+    public int? MaxRecursionDepth { get; init; }
 }

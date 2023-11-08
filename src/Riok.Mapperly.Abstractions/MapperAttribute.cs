@@ -106,4 +106,9 @@ public class MapperAttribute : Attribute
     /// When <c>false</c>, accessible constructors are ordered in descending order by their parameter count.
     /// </summary>
     public bool PreferParameterlessConstructors { get; set; } = true;
+
+    /// <summary>
+    /// Defines the maximum recursion depth that an IQueryable mapping will use.
+    /// </summary>
+    public int MaxRecursionDepth { get; set; } = 8;
 }

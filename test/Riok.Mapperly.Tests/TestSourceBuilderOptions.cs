@@ -18,7 +18,8 @@ public record TestSourceBuilderOptions(
     RequiredMappingStrategy? RequiredMappingStrategy = null,
     MemberVisibility? IncludedMembers = null,
     bool Static = false,
-    bool PreferParameterlessConstructors = true
+    bool PreferParameterlessConstructors = true,
+    int? MaxRecursionDepth = null
 )
 {
     public const string DefaultMapperClassName = "Mapper";
