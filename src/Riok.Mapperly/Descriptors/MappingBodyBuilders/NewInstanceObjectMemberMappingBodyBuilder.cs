@@ -208,7 +208,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         var ctorCandidates = namedTargetType.InstanceConstructors
             .Where(ctor => ctx.BuilderContext.SymbolAccessor.IsDirectlyAccessible(ctor))
             .OrderByDescending(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
-            .ThenBy(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
+            .ThenBy(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x))
             .ThenByDescending(x => x.Parameters.Length == 0)
             .ThenByDescending(x => x.Parameters.Length);
         foreach (var ctorCandidate in ctorCandidates)
