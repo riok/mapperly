@@ -215,7 +215,7 @@ public class ObjectPropertyConstructorResolverTest
             "A",
             "B",
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
-            "class B { [Obsolete] public B(string StringValue) { } public B(string stringValue, int intvalue) { } { public string StringValue { get; set; } public int IntValue { get; set; } "
+            "class B { [Obsolete] public B(string stringValue, int intValue) { } public B(string stringValue) { } { public string StringValue { get; set; } public int IntValue { get; set; } }"
         );
 
         TestHelper
@@ -223,7 +223,8 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new global::B(source.StringValue, source.IntValue);
+                var target = new global::B(source.StringValue);
+                target.IntValue = source.IntValue;
                 return target;
                 """
             );
