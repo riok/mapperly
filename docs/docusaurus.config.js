@@ -1,7 +1,5 @@
 // @ts-check
-
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const { themes } = require('prism-react-renderer');
 
 const mapperlyVersion = process.env.MAPPERLY_VERSION || '0.0.1-dev';
 const environment = process.env.ENVIRONMENT || 'local';
@@ -181,8 +179,8 @@ async function createConfig() {
           ],
         },
         prism: {
-          theme: lightCodeTheme,
-          darkTheme: darkCodeTheme,
+          theme: themes.github,
+          darkTheme: themes.dracula,
           additionalLanguages: ['csharp', 'powershell', 'editorconfig', 'bash'],
         },
       }),

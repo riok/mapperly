@@ -21,41 +21,39 @@ Available strategies:
 
 The `IgnoreCase` property allows to opt in for case insensitive mappings (defaults to `false`).
 
-<!-- do not indent this, it won't work, https://stackoverflow.com/a/67579641/3302887 -->
-
 <Tabs>
-<TabItem value="global" label="Global (mapper level)" default>
-
-Applied to all enums mapped inside this mapper.
-
-```csharp
-// highlight-start
-[Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName, EnumMappingIgnoreCase = true)]
-// highlight-end
-public partial class CarMapper
-{
-    ...
-}
-```
-
-</TabItem>
-<TabItem value="enum" label="Enum (mapping method level)">
-
-Applied to the specific enum mapped by this method.
-Attribute is only valid on mapping method with enums as parameters.
-
-```csharp
-[Mapper]
-public partial class CarMapper
-{
-    // highlight-start
-    [MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)]
-    // highlight-end
-    public partial CarMakeDto MapMake(CarMake make);
-}
-```
-
-</TabItem>
+  <TabItem value="global" label="Global (mapper level)" default>
+  
+  Applied to all enums mapped inside this mapper.
+  
+  ```csharp
+  // highlight-start
+  [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName, EnumMappingIgnoreCase = true)]
+  // highlight-end
+  public partial class CarMapper
+  {
+      ...
+  }
+  ```
+  
+  </TabItem>
+  <TabItem value="enum" label="Enum (mapping method level)">
+  
+  Applied to the specific enum mapped by this method.
+  Attribute is only valid on mapping method with enums as parameters.
+  
+  ```csharp
+  [Mapper]
+  public partial class CarMapper
+  {
+      // highlight-start
+      [MapEnum(EnumMappingStrategy.ByName, IgnoreCase = true)]
+      // highlight-end
+      public partial CarMakeDto MapMake(CarMake make);
+  }
+  ```
+  
+  </TabItem>
 </Tabs>
 
 ## Manually mapped enum values

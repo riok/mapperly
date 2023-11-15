@@ -12,53 +12,51 @@ Mapperly supports interfaces and base types as mapping sources and targets,
 but Mapperly needs to know which derived types exist.
 This can be configured with the `MapDerivedTypeAttribute`:
 
-<!-- do not indent this, it won't work, https://stackoverflow.com/a/67579641/3302887 -->
-
 <Tabs>
-<TabItem value="declaration" label="Declaration" default>
-
-```csharp
-[Mapper]
-public static partial class ModelMapper
-{
-    // highlight-start
-    [MapDerivedType<Banana, BananaDto>] // for c# language level ≥ 11
-    [MapDerivedType(typeof(Apple), typeof(AppleDto))] // for c# language level < 11
-    // highlight-end
-    public static partial FruitDto MapFruit(Fruit source);
-}
-
-abstract class Fruit {}
-class Banana : Fruit {}
-class Apple : Fruit {}
-
-abstract class FruitDto {}
-class BananaDto : FruitDto {}
-class AppleDto : FruitDto {}
-```
-
-</TabItem>
-<TabItem value="generated" label="Generated code" default>
-
-```csharp
-[Mapper]
-public static partial class ModelMapper
-{
-    public static partial FruitDto MapFruit(Fruit source)
-    {
-        return source switch
-        {
-            Banana x => MapToBananaDto(x),
-            Apple x => MapToAppleDto(x),
-            _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to FruitDto as there is no known derived type mapping", nameof(source)),
-        };
-    }
-
-    // ... implementations of MapToBananaDto and MapToAppleDto
-}
-```
-
-</TabItem>
+  <TabItem value="declaration" label="Declaration" default>
+  
+  ```csharp
+  [Mapper]
+  public static partial class ModelMapper
+  {
+      // highlight-start
+      [MapDerivedType<Banana, BananaDto>] // for c# language level ≥ 11
+      [MapDerivedType(typeof(Apple), typeof(AppleDto))] // for c# language level < 11
+      // highlight-end
+      public static partial FruitDto MapFruit(Fruit source);
+  }
+  
+  abstract class Fruit {}
+  class Banana : Fruit {}
+  class Apple : Fruit {}
+  
+  abstract class FruitDto {}
+  class BananaDto : FruitDto {}
+  class AppleDto : FruitDto {}
+  ```
+  
+  </TabItem>
+  <TabItem value="generated" label="Generated code" default>
+  
+  ```csharp
+  [Mapper]
+  public static partial class ModelMapper
+  {
+      public static partial FruitDto MapFruit(Fruit source)
+      {
+          return source switch
+          {
+              Banana x => MapToBananaDto(x),
+              Apple x => MapToAppleDto(x),
+              _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to FruitDto as there is no known derived type mapping", nameof(source)),
+          };
+      }
+  
+      // ... implementations of MapToBananaDto and MapToAppleDto
+  }
+  ```
+  
+  </TabItem>
 </Tabs>
 
 All source types provided to the `MapDerivedTypeAttribute`
