@@ -151,11 +151,13 @@ public static class DictionaryMappingBuilder
         var enumerableType = ctx.Types.Get(typeof(IEnumerable<>));
         var dictionaryType = ctx.Types.Get(typeof(Dictionary<,>));
 
-        var fromEnumerableCtor = dictionaryType.Constructors.FirstOrDefault(
-            x =>
-                x.Parameters.Length == 1
-                && SymbolEqualityComparer.Default.Equals(((INamedTypeSymbol)x.Parameters[0].Type).ConstructedFrom, enumerableType)
-        );
+        var fromEnumerableCtor = dictionaryType
+            .Constructors
+            .FirstOrDefault(
+                x =>
+                    x.Parameters.Length == 1
+                    && SymbolEqualityComparer.Default.Equals(((INamedTypeSymbol)x.Parameters[0].Type).ConstructedFrom, enumerableType)
+            );
 
         if (fromEnumerableCtor != null)
         {

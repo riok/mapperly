@@ -257,9 +257,9 @@ public static class EnumerableMappingBuilder
             return null;
 
         var typedEnumerable = ctx.Types.Get(typeof(IEnumerable<>)).Construct(typeSymbol);
-        var hasCtor = namedType.Constructors.Any(
-            m => m.Parameters.Length == 1 && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type, typedEnumerable)
-        );
+        var hasCtor = namedType
+            .Constructors
+            .Any(m => m.Parameters.Length == 1 && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type, typedEnumerable));
         if (hasCtor)
             return namedType;
 
@@ -294,7 +294,8 @@ public static class EnumerableMappingBuilder
         // and has an implicit .Add() method
         // the implicit check is an easy way to exclude for example immutable types.
         if (
-            ctx.CollectionInfos!.Target.CollectionType == CollectionType.Array || !ctx.CollectionInfos.Target.HasImplicitCollectionAddMethod
+            ctx.CollectionInfos!.Target.CollectionType == CollectionType.Array
+            || !ctx.CollectionInfos.Target.HasImplicitCollectionAddMethod
         )
             return null;
 

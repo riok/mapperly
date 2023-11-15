@@ -3,7 +3,6 @@ using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using VerifyXunit;
 using Xunit;
-
 #if NET8_0_OR_GREATER
 using FluentAssertions;
 #endif

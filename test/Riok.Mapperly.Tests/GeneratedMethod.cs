@@ -27,7 +27,8 @@ public class GeneratedMethod
         if (declarationSyntax.Body == null)
             return string.Empty;
 
-        var body = declarationSyntax.Body
+        var body = declarationSyntax
+            .Body
             .ToFullString()
             .Trim(' ', '\r', '\n')
             .TrimStart('{')

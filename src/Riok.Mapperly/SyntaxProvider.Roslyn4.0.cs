@@ -9,12 +9,14 @@ namespace Riok.Mapperly;
 
 internal static class SyntaxProvider
 {
-    private static readonly SymbolDisplayFormat _fullyQualifiedFormatWithoutGlobal =
-        SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining);
+    private static readonly SymbolDisplayFormat _fullyQualifiedFormatWithoutGlobal = SymbolDisplayFormat
+        .FullyQualifiedFormat
+        .WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining);
 
     public static IncrementalValuesProvider<MapperDeclaration> GetMapperDeclarations(IncrementalGeneratorInitializationContext context)
     {
-        return context.SyntaxProvider
+        return context
+            .SyntaxProvider
             .CreateSyntaxProvider(
                 static (s, _) => s is ClassDeclarationSyntax { AttributeLists.Count: > 0 },
                 static (ctx, ct) => GetMapperDeclaration(ctx, ct)
@@ -24,7 +26,8 @@ internal static class SyntaxProvider
 
     public static IncrementalValueProvider<IAssemblySymbol?> GetMapperDefaultDeclarations(IncrementalGeneratorInitializationContext context)
     {
-        return context.SyntaxProvider
+        return context
+            .SyntaxProvider
             .CreateSyntaxProvider(
                 static (s, _) => s is CompilationUnitSyntax { AttributeLists.Count: > 0 },
                 static (ctx, ct) => GetMapperDefaultDeclarations(ctx, ct)
