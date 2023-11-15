@@ -18,10 +18,10 @@
     "lint": "prettier --ignore-path .gitignore --check . && tsc && eslint --ignore-path .gitignore src && stylelint 'src/**/*.css'"
   },
   "dependencies": {
-    "@docusaurus/core": "2.4.3",
-    "@docusaurus/plugin-ideal-image": "2.4.3",
-    "@docusaurus/preset-classic": "2.4.3",
-    "@easyops-cn/docusaurus-search-local": "0.36.0",
+    "@docusaurus/core": "3.0.0",
+    "@docusaurus/plugin-ideal-image": "3.0.0",
+    "@docusaurus/preset-classic": "3.0.0",
+    "@easyops-cn/docusaurus-search-local": "0.37.4",
     "@mdx-js/react": "1.6.22",
     "clsx": "2.0.0",
     "docusaurus-plugin-sass": "0.2.5",
