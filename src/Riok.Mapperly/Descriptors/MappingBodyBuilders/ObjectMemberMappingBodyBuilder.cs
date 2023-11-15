@@ -41,13 +41,15 @@ public static class ObjectMemberMappingBodyBuilder
             }
 
             if (
-                ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
-                    ctx.Mapping.SourceType,
-                    MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
-                    ctx.IgnoredSourceMemberNames,
-                    ignoreCase,
-                    out var sourceMemberPath
-                )
+                ctx.BuilderContext
+                    .SymbolAccessor
+                    .TryFindMemberPath(
+                        ctx.Mapping.SourceType,
+                        MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
+                        ctx.IgnoredSourceMemberNames,
+                        ignoreCase,
+                        out var sourceMemberPath
+                    )
             )
             {
                 BuildMemberAssignmentMapping(ctx, sourceMemberPath, new MemberPath(new[] { targetMember }));

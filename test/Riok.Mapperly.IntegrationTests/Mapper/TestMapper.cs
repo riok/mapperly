@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.IntegrationTests.Dto;
 using Riok.Mapperly.IntegrationTests.Models;
-
 #if NET8_0_OR_GREATER
 using AliasedTupleSource = (int X, int Y);
 using AliasedTupleTarget = (string X, string Y);

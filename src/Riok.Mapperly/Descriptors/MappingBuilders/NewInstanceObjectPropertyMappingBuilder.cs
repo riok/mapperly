@@ -22,7 +22,8 @@ public static class NewInstanceObjectPropertyMappingBuilder
             );
 
         if (
-            ctx.Target is not INamedTypeSymbol namedTarget || namedTarget.Constructors.All(x => !ctx.SymbolAccessor.IsDirectlyAccessible(x))
+            ctx.Target is not INamedTypeSymbol namedTarget
+            || namedTarget.Constructors.All(x => !ctx.SymbolAccessor.IsDirectlyAccessible(x))
         )
             return null;
 

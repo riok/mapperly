@@ -87,7 +87,8 @@ public static class EnumMappingBuilder
             enumMemberMappings.TargetMembers,
             fallbackMapping
         );
-        var differentValueExplicitEnumMappings = enumMemberMappings.ExplicitMemberMappings
+        var differentValueExplicitEnumMappings = enumMemberMappings
+            .ExplicitMemberMappings
             .Where(x => x.Key.ConstantValue?.Equals(x.Value.ConstantValue) != true)
             .ToDictionary(x => x.Key, x => x.Value, (IEqualityComparer<IFieldSymbol>)SymbolEqualityComparer.Default);
 

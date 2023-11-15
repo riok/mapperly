@@ -16,11 +16,9 @@ public static class RuntimeTargetTypeMappingBodyBuilder
         var mappings = GetUserMappingCandidates(ctx)
             .Where(
                 x =>
-                    mapping.TypeParameters.DoesTypesSatisfyTypeParameterConstraints(
-                        ctx.SymbolAccessor,
-                        x.SourceType.NonNullable(),
-                        x.TargetType
-                    )
+                    mapping
+                        .TypeParameters
+                        .DoesTypesSatisfyTypeParameterConstraints(ctx.SymbolAccessor, x.SourceType.NonNullable(), x.TargetType)
             );
 
         BuildMappingBody(ctx, mapping, mappings);

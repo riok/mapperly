@@ -16,7 +16,8 @@ public static class CtorMappingBuilder
             return null;
 
         // resolve ctors which have the source as single argument
-        var ctorMethod = namedTarget.InstanceConstructors
+        var ctorMethod = namedTarget
+            .InstanceConstructors
             .Where(ctx.SymbolAccessor.IsDirectlyAccessible)
             .FirstOrDefault(
                 m =>

@@ -29,10 +29,16 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         _unmappedSourceMemberNames = GetSourceMemberNames();
         TargetMembers = GetTargetMembers();
 
-        IgnoredSourceMemberNames = builderContext.Configuration.Properties.IgnoredSources
+        IgnoredSourceMemberNames = builderContext
+            .Configuration
+            .Properties
+            .IgnoredSources
             .Concat(GetIgnoredObsoleteSourceMembers())
             .ToHashSet();
-        var ignoredTargetMemberNames = builderContext.Configuration.Properties.IgnoredTargets
+        var ignoredTargetMemberNames = builderContext
+            .Configuration
+            .Properties
+            .IgnoredTargets
             .Concat(GetIgnoredObsoleteTargetMembers())
             .ToHashSet();
 
@@ -47,7 +53,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         MemberConfigsByRootTargetName = GetMemberConfigurations();
 
         // source and target properties may have been ignored and mapped explicitly
-        _mappedAndIgnoredSourceMemberNames = MemberConfigsByRootTargetName.Values
+        _mappedAndIgnoredSourceMemberNames = MemberConfigsByRootTargetName
+            .Values
             .SelectMany(v => v.Select(s => s.Source.Path.First()))
             .ToHashSet();
         _mappedAndIgnoredSourceMemberNames.IntersectWith(IgnoredSourceMemberNames);
@@ -98,7 +105,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         if (!obsoleteStrategy.HasFlag(IgnoreObsoleteMembersStrategy.Target))
             return Enumerable.Empty<string>();
 
-        return BuilderContext.SymbolAccessor
+        return BuilderContext
+            .SymbolAccessor
             .GetAllAccessibleMappableMembers(Mapping.TargetType)
             .Where(x => BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x.MemberSymbol))
             .Select(x => x.Name);
@@ -111,7 +119,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         if (!obsoleteStrategy.HasFlag(IgnoreObsoleteMembersStrategy.Source))
             return Enumerable.Empty<string>();
 
-        return BuilderContext.SymbolAccessor
+        return BuilderContext
+            .SymbolAccessor
             .GetAllAccessibleMappableMembers(Mapping.SourceType)
             .Where(x => BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x.MemberSymbol))
             .Select(x => x.Name);
@@ -124,14 +133,18 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
     private Dictionary<string, IMappableMember> GetTargetMembers()
     {
-        return BuilderContext.SymbolAccessor
+        return BuilderContext
+            .SymbolAccessor
             .GetAllAccessibleMappableMembers(Mapping.TargetType)
             .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
     }
 
     private Dictionary<string, List<PropertyMappingConfiguration>> GetMemberConfigurations()
     {
-        return BuilderContext.Configuration.Properties.ExplicitMappings
+        return BuilderContext
+            .Configuration
+            .Properties
+            .ExplicitMappings
             .GroupBy(x => x.Target.Path.First())
             .ToDictionary(x => x.Key, x => x.ToList());
     }

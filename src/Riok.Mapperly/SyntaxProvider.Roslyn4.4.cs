@@ -10,7 +10,8 @@ internal static class SyntaxProvider
 {
     public static IncrementalValuesProvider<MapperDeclaration> GetMapperDeclarations(IncrementalGeneratorInitializationContext context)
     {
-        return context.SyntaxProvider
+        return context
+            .SyntaxProvider
             .ForAttributeWithMetadataName(
                 MapperGenerator.MapperAttributeName,
                 static (s, _) => s is ClassDeclarationSyntax,
@@ -22,7 +23,8 @@ internal static class SyntaxProvider
 
     public static IncrementalValueProvider<IAssemblySymbol?> GetMapperDefaultDeclarations(IncrementalGeneratorInitializationContext context)
     {
-        return context.SyntaxProvider
+        return context
+            .SyntaxProvider
             .ForAttributeWithMetadataName(
                 MapperGenerator.MapperDefaultsAttributeName,
                 static (s, _) => s is CompilationUnitSyntax,

@@ -50,13 +50,15 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             }
 
             if (
-                !ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
-                    ctx.Mapping.SourceType,
-                    MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
-                    ctx.IgnoredSourceMemberNames,
-                    ignoreCase,
-                    out var sourceMemberPath
-                )
+                !ctx.BuilderContext
+                    .SymbolAccessor
+                    .TryFindMemberPath(
+                        ctx.Mapping.SourceType,
+                        MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
+                        ctx.IgnoredSourceMemberNames,
+                        ignoreCase,
+                        out var sourceMemberPath
+                    )
             )
             {
                 if (targetMember.IsRequired)
@@ -205,7 +207,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         // parameterless ctor is prio 2
         // then by descending parameter count
         // ctors annotated with [Obsolete] are considered last unless they have a MapperConstructor attribute set
-        var ctorCandidates = namedTargetType.InstanceConstructors
+        var ctorCandidates = namedTargetType
+            .InstanceConstructors
             .Where(ctor => ctx.BuilderContext.SymbolAccessor.IsDirectlyAccessible(ctor))
             .OrderByDescending(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
             .ThenBy(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x))
@@ -315,13 +318,15 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
         if (!ctx.MemberConfigsByRootTargetName.TryGetValue(parameter.Name, out var memberConfigs))
         {
-            return ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
-                ctx.Mapping.SourceType,
-                MemberPathCandidateBuilder.BuildMemberPathCandidates(parameter.Name),
-                ctx.IgnoredSourceMemberNames,
-                true,
-                out sourcePath
-            );
+            return ctx.BuilderContext
+                .SymbolAccessor
+                .TryFindMemberPath(
+                    ctx.Mapping.SourceType,
+                    MemberPathCandidateBuilder.BuildMemberPathCandidates(parameter.Name),
+                    ctx.IgnoredSourceMemberNames,
+                    true,
+                    out sourcePath
+                );
         }
 
         if (memberConfigs.Count > 1)

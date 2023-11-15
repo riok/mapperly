@@ -26,13 +26,14 @@ public class MapperGenerator : IIncrementalGenerator
         var assemblyName = context.CompilationProvider.Select((x, _) => x.Assembly.Name);
 
         // report compilation diagnostics
-        var compilationDiagnostics = context.CompilationProvider.SelectMany(
-            static (compilation, _) => BuildCompilationDiagnostics(compilation)
-        );
+        var compilationDiagnostics = context
+            .CompilationProvider
+            .SelectMany(static (compilation, _) => BuildCompilationDiagnostics(compilation));
         context.ReportDiagnostics(compilationDiagnostics);
 
         // build the compilation context
-        var compilationContext = context.CompilationProvider
+        var compilationContext = context
+            .CompilationProvider
             .Select(static (c, _) => new CompilationContext(c, new WellKnownTypes(c), new FileNameBuilder()))
             .WithTrackingName(MapperGeneratorStepNames.BuildCompilationContext);
 

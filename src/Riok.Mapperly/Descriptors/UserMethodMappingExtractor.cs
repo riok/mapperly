@@ -195,9 +195,9 @@ public static class UserMethodMappingExtractor
 
         var targetType = parameters.Target?.Type ?? methodSymbol.ReturnType.UpgradeNullable();
         var targetTypeParameter = methodSymbol.TypeParameters.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x, targetType));
-        var sourceTypeParameter = methodSymbol.TypeParameters.FirstOrDefault(
-            x => SymbolEqualityComparer.Default.Equals(x, parameters.Source.Type)
-        );
+        var sourceTypeParameter = methodSymbol
+            .TypeParameters
+            .FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x, parameters.Source.Type));
 
         var expectedTypeParametersCount = 0;
         if (targetTypeParameter != null)
@@ -324,9 +324,9 @@ public static class UserMethodMappingExtractor
 
     private static MethodParameter? BuildReferenceHandlerParameter(SimpleMappingBuilderContext ctx, IMethodSymbol method)
     {
-        var refHandlerParameterSymbol = method.Parameters.FirstOrDefault(
-            p => ctx.SymbolAccessor.HasAttribute<ReferenceHandlerAttribute>(p)
-        );
+        var refHandlerParameterSymbol = method
+            .Parameters
+            .FirstOrDefault(p => ctx.SymbolAccessor.HasAttribute<ReferenceHandlerAttribute>(p));
         if (refHandlerParameterSymbol == null)
             return null;
 
