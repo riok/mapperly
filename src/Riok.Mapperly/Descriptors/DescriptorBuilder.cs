@@ -5,6 +5,7 @@ using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.ExternalMappings;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders;
 using Riok.Mapperly.Descriptors.MappingBuilders;
+using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Descriptors.ObjectFactories;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
@@ -28,8 +29,6 @@ public class DescriptorBuilder
     private readonly List<Diagnostic> _diagnostics = new();
     private readonly UnsafeAccessorContext _unsafeAccessorContext;
     private readonly MapperConfigurationReader _configurationReader;
-
-    private ObjectFactoryCollection _objectFactories = ObjectFactoryCollection.Empty;
 
     public DescriptorBuilder(
         CompilationContext compilationContext,
@@ -64,8 +63,10 @@ public class DescriptorBuilder
     {
         ConfigureMemberVisibility();
         ReserveMethodNames();
-        ExtractUserMappings();
-        ExtractObjectFactories();
+        var userMappings = ExtractUserMappings().ToList();
+        // ExtractObjectFactories needs to be called after ExtractUserMappings due to configuring mapperDescriptor.Static
+        var objectFactories = ExtractObjectFactories();
+        EnqueueToBuildBody(userMappings, objectFactories);
         ExtractExternalMappings();
         _mappingBodyBuilder.BuildMappingBodies(cancellationToken);
         BuildMappingMethodNames();
@@ -107,26 +108,13 @@ public class DescriptorBuilder
         }
     }
 
-    private void ExtractObjectFactories()
-    {
-        _objectFactories = ObjectFactoryBuilder.ExtractObjectFactories(_builderContext, _mapperDescriptor.Symbol);
-    }
-
-    private void ExtractUserMappings()
+    private IEnumerable<IUserMapping> ExtractUserMappings()
     {
         _mapperDescriptor.Static = _mapperDescriptor.Symbol.IsStatic;
         IMethodSymbol? firstNonStaticUserMapping = null;
 
         foreach (var userMapping in UserMethodMappingExtractor.ExtractUserMappings(_builderContext, _mapperDescriptor.Symbol))
         {
-            var ctx = new MappingBuilderContext(
-                _builderContext,
-                _objectFactories,
-                userMapping.Method,
-                userMapping.SourceType,
-                userMapping.TargetType
-            );
-
             // if a user defined mapping method is static, all of them need to be static to avoid confusion for mapping method resolution
             // however, user implemented mapping methods are allowed to be static in a non-static context.
             // Therefore we are only interested in partial method definitions here.
@@ -140,7 +128,8 @@ public class DescriptorBuilder
             }
 
             _mappings.Add(userMapping);
-            _mappings.EnqueueToBuildBody(userMapping, ctx);
+
+            yield return userMapping;
         }
 
         if (_mapperDescriptor.Static && firstNonStaticUserMapping is not null)
@@ -152,6 +141,27 @@ public class DescriptorBuilder
                     _mapperDescriptor.Symbol.ToDisplayString()
                 )
             );
+        }
+    }
+
+    private ObjectFactoryCollection ExtractObjectFactories()
+    {
+        return ObjectFactoryBuilder.ExtractObjectFactories(_builderContext, _mapperDescriptor.Symbol);
+    }
+
+    private void EnqueueToBuildBody(IReadOnlyCollection<IUserMapping> userMappings, ObjectFactoryCollection objectFactoryCollection)
+    {
+        foreach (var userMapping in userMappings)
+        {
+            var ctx = new MappingBuilderContext(
+                _builderContext,
+                objectFactoryCollection,
+                userMapping.Method,
+                userMapping.SourceType,
+                userMapping.TargetType
+            );
+
+            _mappings.EnqueueToBuildBody(userMapping, ctx);
         }
     }
 
