@@ -44,6 +44,11 @@ public sealed class MapPropertyAttribute : Attribute
     public IReadOnlyCollection<string> Target { get; }
 
     /// <summary>
+    /// Gets or sets the format of the <c>ToString</c> conversion.
+    /// </summary>
+    public string? StringFormat { get; set; }
+
+    /// <summary>
     /// Gets the full name of the target property path.
     /// </summary>
     public string TargetFullName => string.Join(PropertyAccessSeparatorStr, Target);

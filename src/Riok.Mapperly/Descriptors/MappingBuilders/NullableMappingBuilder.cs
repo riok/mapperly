@@ -8,28 +8,34 @@ public static class NullableMappingBuilder
 {
     public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
-        var sourceIsNullable = ctx.Source.TryGetNonNullable(out var sourceNonNullable);
-        var targetIsNullable = ctx.Target.TryGetNonNullable(out var targetNonNullable);
-        if (!sourceIsNullable && !targetIsNullable)
+        if (!TryBuildNonNullableMappingKey(ctx, out var mappingKey))
             return null;
 
-        var delegateMapping = ctx.BuildMapping(
-            sourceNonNullable ?? ctx.Source,
-            targetNonNullable ?? ctx.Target,
-            MappingBuildingOptions.KeepUserSymbol
-        );
+        var delegateMapping = ctx.BuildMapping(mappingKey, MappingBuildingOptions.KeepUserSymbol);
         return delegateMapping == null ? null : BuildNullDelegateMapping(ctx, delegateMapping);
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
     {
+        if (!TryBuildNonNullableMappingKey(ctx, out var mappingKey))
+            return null;
+
+        var delegateMapping = ctx.FindOrBuildExistingTargetMapping(mappingKey);
+        return delegateMapping == null ? null : new NullDelegateExistingTargetMapping(ctx.Source, ctx.Target, delegateMapping);
+    }
+
+    private static bool TryBuildNonNullableMappingKey(MappingBuilderContext ctx, out TypeMappingKey mappingKey)
+    {
         var sourceIsNullable = ctx.Source.TryGetNonNullable(out var sourceNonNullable);
         var targetIsNullable = ctx.Target.TryGetNonNullable(out var targetNonNullable);
         if (!sourceIsNullable && !targetIsNullable)
-            return null;
+        {
+            mappingKey = default;
+            return false;
+        }
 
-        var delegateMapping = ctx.FindOrBuildExistingTargetMapping(sourceNonNullable ?? ctx.Source, targetNonNullable ?? ctx.Target);
-        return delegateMapping == null ? null : new NullDelegateExistingTargetMapping(ctx.Source, ctx.Target, delegateMapping);
+        mappingKey = new TypeMappingKey(sourceNonNullable ?? ctx.Source, targetNonNullable ?? ctx.Target);
+        return true;
     }
 
     private static NewInstanceMapping BuildNullDelegateMapping(MappingBuilderContext ctx, INewInstanceMapping mapping)

@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
@@ -27,12 +26,14 @@ public class SourceObjectMethodMapping : NewInstanceMapping
         : base(sourceType, targetType)
     {
         _methodName = methodName;
-        this._delegateMapping = delegateMapping;
+        _delegateMapping = delegateMapping;
     }
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        var sourceExpression = InvocationExpression(MemberAccess(ctx.Source, _methodName));
+        var sourceExpression = Invocation(MemberAccess(ctx.Source, _methodName), BuildArguments(ctx).ToArray());
         return _delegateMapping == null ? sourceExpression : _delegateMapping.Build(ctx.WithSource(sourceExpression));
     }
+
+    protected virtual IEnumerable<ExpressionSyntax> BuildArguments(TypeMappingBuildContext ctx) => Enumerable.Empty<ExpressionSyntax>();
 }

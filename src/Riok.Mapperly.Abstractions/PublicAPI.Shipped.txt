@@ -55,6 +55,8 @@ Riok.Mapperly.Abstractions.MapPropertyAttribute.Source.get -> System.Collections
 Riok.Mapperly.Abstractions.MapPropertyAttribute.SourceFullName.get -> string!
 Riok.Mapperly.Abstractions.MapPropertyAttribute.Target.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
 Riok.Mapperly.Abstractions.MapPropertyAttribute.TargetFullName.get -> string!
+Riok.Mapperly.Abstractions.MapPropertyAttribute.StringFormat.get -> string?
+Riok.Mapperly.Abstractions.MapPropertyAttribute.StringFormat.set -> void
 Riok.Mapperly.Abstractions.ObjectFactoryAttribute
 Riok.Mapperly.Abstractions.ObjectFactoryAttribute.ObjectFactoryAttribute() -> void
 Riok.Mapperly.Abstractions.PropertyNameMappingStrategy

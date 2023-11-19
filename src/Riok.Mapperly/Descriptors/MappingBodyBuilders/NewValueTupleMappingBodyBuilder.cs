@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -67,7 +68,7 @@ public static class NewValueTupleMappingBodyBuilder
                 return false;
             }
 
-            if (!TryFindConstructorParameterSourcePath(ctx, targetMember, out var sourcePath))
+            if (!TryFindConstructorParameterSourcePath(ctx, targetMember, out var sourcePath, out var memberConfig))
             {
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.SourceMemberNotFound,
@@ -81,10 +82,8 @@ public static class NewValueTupleMappingBodyBuilder
 
             // nullability is handled inside the member expressionMapping
             var paramType = targetMember.Type.WithNullableAnnotation(targetMember.NullableAnnotation);
-            var delegateMapping =
-                ctx.BuilderContext.FindMapping(sourcePath.MemberType, paramType)
-                ?? ctx.BuilderContext.FindOrBuildMapping(sourcePath.Member.Type.NonNullable(), paramType.NonNullable());
-
+            var mappingKey = new TypeMappingKey(sourcePath.MemberType, paramType, memberConfig?.ToTypeMappingConfiguration());
+            var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(mappingKey);
             if (delegateMapping == null)
             {
                 ctx.BuilderContext.ReportDiagnostic(
@@ -132,10 +131,12 @@ public static class NewValueTupleMappingBodyBuilder
     private static bool TryFindConstructorParameterSourcePath(
         INewValueTupleBuilderContext<INewValueTupleMapping> ctx,
         IFieldSymbol field,
-        [NotNullWhen(true)] out MemberPath? sourcePath
+        [NotNullWhen(true)] out MemberPath? sourcePath,
+        out PropertyMappingConfiguration? memberConfig
     )
     {
         sourcePath = null;
+        memberConfig = null;
 
         if (!ctx.MemberConfigsByRootTargetName.TryGetValue(field.Name, out var memberConfigs))
             return TryBuildConstructorParameterSourcePath(ctx, field, out sourcePath);
@@ -156,7 +157,7 @@ public static class NewValueTupleMappingBodyBuilder
             );
         }
 
-        var memberConfig = initMemberPaths.First();
+        memberConfig = initMemberPaths.First();
         if (ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.SourceType, memberConfig.Source.Path, out sourcePath))
             return true;
 

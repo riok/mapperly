@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
@@ -24,8 +23,10 @@ public class ExistingTargetMappingBuilder
         _mappings = mappings;
     }
 
-    public IExistingTargetMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType) =>
-        _mappings.FindExistingInstanceMapping(sourceType, targetType);
+    public IExistingTargetMapping? Find(TypeMappingKey mappingKey)
+    {
+        return _mappings.FindExistingInstanceMapping(mappingKey);
+    }
 
     public IExistingTargetMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {
@@ -36,7 +37,7 @@ public class ExistingTargetMappingBuilder
 
             if (resultIsReusable)
             {
-                _mappings.AddExistingTargetMapping(mapping);
+                _mappings.AddExistingTargetMapping(mapping, ctx.MappingKey.Configuration);
             }
 
             _mappings.EnqueueToBuildBody(mapping, ctx);

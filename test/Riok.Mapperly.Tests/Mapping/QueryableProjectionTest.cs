@@ -67,6 +67,23 @@ public class QueryableProjectionTest
     }
 
     [Fact]
+    public Task QueryablePropertyWithStringFormat()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+
+            [MapProperty("Value", "Value", StringFormat = "C")]
+            private partial B MapPrivate(A source);",
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public string Value { get; init; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task RecordToRecordManualFlatteningInsideList()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

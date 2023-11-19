@@ -15,6 +15,6 @@ public partial struct SyntaxFactoryHelper
 
     public static LiteralExpressionSyntax IntLiteral(int i) => LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(i));
 
-    private static LiteralExpressionSyntax StringLiteral(string content) =>
+    public static LiteralExpressionSyntax StringLiteral(string content) =>
         LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(content));
 }

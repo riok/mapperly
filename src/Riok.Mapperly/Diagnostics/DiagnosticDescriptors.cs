@@ -473,4 +473,13 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true
     );
+
+    public static readonly DiagnosticDescriptor SourceDoesNotImplementIFormattable = new DiagnosticDescriptor(
+        "RMG055",
+        $"The source type does not implement {nameof(IFormattable)}, string format cannot be applied",
+        $"The source type {{0}} does not implement {nameof(IFormattable)}, string format cannot be applied",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
 }
