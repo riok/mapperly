@@ -66,7 +66,7 @@ public class DescriptorBuilder
         var userMappings = ExtractUserMappings().ToList();
         // ExtractObjectFactories needs to be called after ExtractUserMappings due to configuring mapperDescriptor.Static
         var objectFactories = ExtractObjectFactories();
-        EnqueueToBuildBody(userMappings, objectFactories);
+        EnqueueUserMappings(userMappings, objectFactories);
         ExtractExternalMappings();
         _mappingBodyBuilder.BuildMappingBodies(cancellationToken);
         BuildMappingMethodNames();
@@ -149,13 +149,13 @@ public class DescriptorBuilder
         return ObjectFactoryBuilder.ExtractObjectFactories(_builderContext, _mapperDescriptor.Symbol);
     }
 
-    private void EnqueueToBuildBody(IReadOnlyCollection<IUserMapping> userMappings, ObjectFactoryCollection objectFactoryCollection)
+    private void EnqueueUserMappings(IReadOnlyCollection<IUserMapping> userMappings, ObjectFactoryCollection objectFactories)
     {
         foreach (var userMapping in userMappings)
         {
             var ctx = new MappingBuilderContext(
                 _builderContext,
-                objectFactoryCollection,
+                objectFactories,
                 userMapping.Method,
                 userMapping.SourceType,
                 userMapping.TargetType
