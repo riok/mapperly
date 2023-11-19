@@ -92,12 +92,12 @@ public class MapperGenerator : IIncrementalGenerator
         try
         {
             var builder = new DescriptorBuilder(compilationContext, mapperDeclaration, symbolAccessor, mapperDefaults);
-            var (descriptor, descriptorDiagnostics) = builder.Build(cancellationToken);
+            var (descriptor, diagnostics) = builder.Build(cancellationToken);
             var mapper = new MapperNode(
                 compilationContext.FileNameBuilder.Build(descriptor),
                 SourceEmitter.Build(descriptor, cancellationToken)
             );
-            return new MapperAndDiagnostics(mapper, descriptorDiagnostics.ToImmutableEquatableArray(), descriptor.RequiredTemplates);
+            return new MapperAndDiagnostics(mapper, diagnostics.ToImmutableEquatableArray(), descriptor.RequiredTemplates);
         }
         catch (OperationCanceledException)
         {
