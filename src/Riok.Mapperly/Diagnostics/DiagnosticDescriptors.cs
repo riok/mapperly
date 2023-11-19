@@ -159,15 +159,6 @@ public static class DiagnosticDescriptors
         true
     );
 
-    public static readonly DiagnosticDescriptor PartialStaticMethodInInstanceMapper = new DiagnosticDescriptor(
-        "RMG018",
-        "Partial static mapping method in an instance mapper",
-        "{0} is a partial static mapping method in an instance mapper. Static mapping methods are only supported in static mappers.",
-        DiagnosticCategories.Mapper,
-        DiagnosticSeverity.Error,
-        true
-    );
-
     public static readonly DiagnosticDescriptor SourceMemberNotMapped = new DiagnosticDescriptor(
         "RMG020",
         "Source member is not mapped to any target member",
@@ -469,6 +460,15 @@ public static class DiagnosticDescriptors
         "RMG053",
         $"The flag {nameof(MemberVisibility)}.{nameof(MemberVisibility.Accessible)} cannot be disabled, this feature requires .NET 8.0 or greater",
         $"The flag {nameof(MemberVisibility)}.{nameof(MemberVisibility.Accessible)} cannot be disabled, this feature requires .NET 8.0 or greater",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor MixingStaticPartialWithInstanceMethod = new DiagnosticDescriptor(
+        "RMG054",
+        "Mapper class containing 'static partial' method must not have any instance methods",
+        "Mapper class {0} contains 'static partial' method. Use only instance method or only static methods.",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true

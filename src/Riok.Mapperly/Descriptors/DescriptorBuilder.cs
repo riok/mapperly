@@ -6,6 +6,7 @@ using Riok.Mapperly.Descriptors.ExternalMappings;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders;
 using Riok.Mapperly.Descriptors.MappingBuilders;
 using Riok.Mapperly.Descriptors.ObjectFactories;
+using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 using Riok.Mapperly.Templates;
@@ -27,8 +28,6 @@ public class DescriptorBuilder
     private readonly List<Diagnostic> _diagnostics = new();
     private readonly UnsafeAccessorContext _unsafeAccessorContext;
     private readonly MapperConfigurationReader _configurationReader;
-
-    private ObjectFactoryCollection _objectFactories = ObjectFactoryCollection.Empty;
 
     public DescriptorBuilder(
         CompilationContext compilationContext,
@@ -63,8 +62,10 @@ public class DescriptorBuilder
     {
         ConfigureMemberVisibility();
         ReserveMethodNames();
-        ExtractObjectFactories();
         ExtractUserMappings();
+        // ExtractObjectFactories needs to be called after ExtractUserMappings due to configuring mapperDescriptor.Static
+        var objectFactories = ExtractObjectFactories();
+        EnqueueUserMappings(objectFactories);
         ExtractExternalMappings();
         _mappingBodyBuilder.BuildMappingBodies(cancellationToken);
         BuildMappingMethodNames();
@@ -106,24 +107,57 @@ public class DescriptorBuilder
         }
     }
 
-    private void ExtractObjectFactories()
-    {
-        _objectFactories = ObjectFactoryBuilder.ExtractObjectFactories(_builderContext, _mapperDescriptor.Symbol);
-    }
-
     private void ExtractUserMappings()
     {
+        _mapperDescriptor.Static = _mapperDescriptor.Symbol.IsStatic;
+        IMethodSymbol? firstNonStaticUserMapping = null;
+
         foreach (var userMapping in UserMethodMappingExtractor.ExtractUserMappings(_builderContext, _mapperDescriptor.Symbol))
+        {
+            // if a user defined mapping method is static, all of them need to be static to avoid confusion for mapping method resolution
+            // however, user implemented mapping methods are allowed to be static in a non-static context.
+            // Therefore we are only interested in partial method definitions here.
+            if (userMapping.Method is { IsStatic: true, IsPartialDefinition: true })
+            {
+                _mapperDescriptor.Static = true;
+            }
+            else if (firstNonStaticUserMapping == null && !userMapping.Method.IsStatic)
+            {
+                firstNonStaticUserMapping = userMapping.Method;
+            }
+
+            _mappings.Add(userMapping);
+        }
+
+        if (_mapperDescriptor.Static && firstNonStaticUserMapping is not null)
+        {
+            _diagnostics.Add(
+                Diagnostic.Create(
+                    DiagnosticDescriptors.MixingStaticPartialWithInstanceMethod,
+                    firstNonStaticUserMapping.Locations.FirstOrDefault(),
+                    _mapperDescriptor.Symbol.ToDisplayString()
+                )
+            );
+        }
+    }
+
+    private ObjectFactoryCollection ExtractObjectFactories()
+    {
+        return ObjectFactoryBuilder.ExtractObjectFactories(_builderContext, _mapperDescriptor.Symbol);
+    }
+
+    private void EnqueueUserMappings(ObjectFactoryCollection objectFactories)
+    {
+        foreach (var userMapping in _mappings.UserMappings)
         {
             var ctx = new MappingBuilderContext(
                 _builderContext,
-                _objectFactories,
+                objectFactories,
                 userMapping.Method,
                 userMapping.SourceType,
                 userMapping.TargetType
             );
 
-            _mappings.Add(userMapping);
             _mappings.EnqueueToBuildBody(userMapping, ctx);
         }
     }

@@ -164,7 +164,11 @@ public class DictionaryTest
     public void DictionaryToCustomDictionaryWithObjectFactory()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[ObjectFactory] A CreateA() => new();" + "partial A Map(IDictionary<string, int> source);",
+            """
+            [ObjectFactory]
+            A CreateA() => new();
+            partial A Map(IDictionary<string, int> source);
+            """,
             "class A : Dictionary<string, int> {}"
         );
         TestHelper
@@ -354,7 +358,11 @@ public class DictionaryTest
     public void DictionaryToExplicitDictionaryWithObjectFactoryShouldCast()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[ObjectFactory] A CreateA() => new();" + "partial A Map(Dictionary<string, string> source);",
+            """
+            [ObjectFactory]
+            A CreateA() => new();
+            partial A Map(Dictionary<string, string> source);
+            """,
             """
             public class A : IDictionary<string, string>
             {
@@ -387,7 +395,11 @@ public class DictionaryTest
     public void DictionaryToImplicitDictionaryWithObjectFactoryShouldNotCast()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[ObjectFactory] A CreateA() => new();" + "partial A Map(Dictionary<string, string> source);",
+            """
+            [ObjectFactory]
+            A CreateA() => new();
+            partial A Map(Dictionary<string, string> source);
+            """,
             """
             public class A : IDictionary<string, string>
             {

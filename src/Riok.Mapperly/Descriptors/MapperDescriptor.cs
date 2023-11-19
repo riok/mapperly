@@ -16,6 +16,8 @@ public class MapperDescriptor
     private readonly List<IUnsafeAccessor> _unsafeAccessors = new();
     private readonly HashSet<TemplateReference> _requiredTemplates = new();
 
+    public bool Static { get; set; }
+
     public MapperDescriptor(MapperDeclaration declaration, UniqueNameBuilder nameBuilder)
     {
         _declaration = declaration;

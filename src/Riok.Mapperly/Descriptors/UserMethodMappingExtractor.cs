@@ -17,8 +17,8 @@ public static class UserMethodMappingExtractor
         foreach (var methodSymbol in ExtractMethods(mapperSymbol))
         {
             var mapping =
-                BuilderUserDefinedMapping(ctx, methodSymbol, mapperSymbol.IsStatic)
-                ?? BuildUserImplementedMapping(ctx, methodSymbol, null, false, mapperSymbol.IsStatic);
+                BuilderUserDefinedMapping(ctx, methodSymbol)
+                ?? BuildUserImplementedMapping(ctx, methodSymbol, receiver: null, allowPartial: false, mapperSymbol.IsStatic);
             if (mapping != null)
                 yield return mapping;
         }
@@ -109,17 +109,10 @@ public static class UserMethodMappingExtractor
             : new UserImplementedMethodMapping(receiver, method, parameters.Source, parameters.ReferenceHandler);
     }
 
-    private static IUserMapping? BuilderUserDefinedMapping(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol, bool isStatic)
+    private static IUserMapping? BuilderUserDefinedMapping(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol)
     {
         if (!methodSymbol.IsPartialDefinition)
             return null;
-
-        if (!isStatic && methodSymbol.IsStatic)
-        {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.PartialStaticMethodInInstanceMapper, methodSymbol, methodSymbol.Name);
-
-            return null;
-        }
 
         if (methodSymbol.IsAsync)
         {

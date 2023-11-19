@@ -30,9 +30,9 @@ The `DescriptorBuilder` is responsible to build a `MapperDescriptor` which holds
 The `DescriptorBuilder` does this by following this process:
 
 1. Extracting the configuration from the attributes
-2. Extracting user implemented object factories
-3. Extracting user implemented and user defined mapping methods.
+2. Extracting user implemented and user defined mapping methods.
    It instantiates a `User*Mapping` (eg. `UserDefinedNewInstanceMethodMapping`) for each discovered mapping method and adds it to the queue of mappings to work on.
+3. Extracting user implemented object factories
 4. Extracting external mappings
 5. For each mapping in the queue the `DescriptorBuilder` tries to build its implementation bodies.
    This is done by a so called `*MappingBodyBuilder`.

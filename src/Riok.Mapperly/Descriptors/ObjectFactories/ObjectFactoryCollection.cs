@@ -5,8 +5,6 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 
 public class ObjectFactoryCollection
 {
-    public static readonly ObjectFactoryCollection Empty = new(Array.Empty<ObjectFactory>());
-
     private readonly IReadOnlyCollection<ObjectFactory> _objectFactories;
     private readonly Dictionary<ITypeSymbol, ObjectFactory> _concreteObjectFactories = new(SymbolEqualityComparer.IncludeNullability);
 

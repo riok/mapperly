@@ -126,3 +126,9 @@ Rule ID | Category | Severity | Notes
 RMG051  | Mapper   | Warning  | Invalid ignore source member found, nested ignores are not supported
 RMG052  | Mapper   | Warning  | Invalid ignore target member found, nested ignores are not supported
 RMG053  | Mapper   | Error    | The flag MemberVisibility.Accessible cannot be disabled, this feature requires .NET 8.0 or greater
+RMG054  | Mapper   | Error    | Mapper class containing 'static partial' method must not have any instance methods 
+
+### Removed Rules
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+RMG018  | Mapper   | Disabled | Partial static mapping method in an instance mapper

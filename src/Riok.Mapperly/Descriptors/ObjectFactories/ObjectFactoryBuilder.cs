@@ -28,6 +28,7 @@ public static class ObjectFactoryBuilder
             || methodSymbol.IsPartialDefinition
             || methodSymbol.MethodKind != MethodKind.Ordinary
             || methodSymbol.ReturnsVoid
+            || (!methodSymbol.IsStatic && ctx.Static)
         )
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature, methodSymbol, methodSymbol.Name);
