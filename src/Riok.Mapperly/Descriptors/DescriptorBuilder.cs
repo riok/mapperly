@@ -5,7 +5,6 @@ using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.ExternalMappings;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders;
 using Riok.Mapperly.Descriptors.MappingBuilders;
-using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Descriptors.ObjectFactories;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
@@ -63,10 +62,10 @@ public class DescriptorBuilder
     {
         ConfigureMemberVisibility();
         ReserveMethodNames();
-        var userMappings = ExtractUserMappings().ToList();
+        ExtractUserMappings();
         // ExtractObjectFactories needs to be called after ExtractUserMappings due to configuring mapperDescriptor.Static
         var objectFactories = ExtractObjectFactories();
-        EnqueueUserMappings(userMappings, objectFactories);
+        EnqueueUserMappings(objectFactories);
         ExtractExternalMappings();
         _mappingBodyBuilder.BuildMappingBodies(cancellationToken);
         BuildMappingMethodNames();
@@ -108,7 +107,7 @@ public class DescriptorBuilder
         }
     }
 
-    private IEnumerable<IUserMapping> ExtractUserMappings()
+    private void ExtractUserMappings()
     {
         _mapperDescriptor.Static = _mapperDescriptor.Symbol.IsStatic;
         IMethodSymbol? firstNonStaticUserMapping = null;
@@ -128,8 +127,6 @@ public class DescriptorBuilder
             }
 
             _mappings.Add(userMapping);
-
-            yield return userMapping;
         }
 
         if (_mapperDescriptor.Static && firstNonStaticUserMapping is not null)
@@ -149,9 +146,9 @@ public class DescriptorBuilder
         return ObjectFactoryBuilder.ExtractObjectFactories(_builderContext, _mapperDescriptor.Symbol);
     }
 
-    private void EnqueueUserMappings(IReadOnlyCollection<IUserMapping> userMappings, ObjectFactoryCollection objectFactories)
+    private void EnqueueUserMappings(ObjectFactoryCollection objectFactories)
     {
-        foreach (var userMapping in userMappings)
+        foreach (var userMapping in _mappings.UserMappings)
         {
             var ctx = new MappingBuilderContext(
                 _builderContext,
