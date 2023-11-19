@@ -15,6 +15,9 @@ namespace Riok.Mapperly.IntegrationTests
 {
     public abstract class BaseMapperTest
     {
+        private static string SolutionDirectory = GetSolutionDirectory();
+        private static string ProjectDirectory = GetProjectDirectory();
+
         static BaseMapperTest()
         {
 #if !NET6_0_OR_GREATER
@@ -28,21 +31,24 @@ namespace Riok.Mapperly.IntegrationTests
             VerifierSettings.DontScrubDateTimes();
 
             Verifier.DerivePathInfo(
-                (file, _, type, method) =>
+                (_, _, type, method) =>
                     new PathInfo(
-                        Path.Combine(Path.GetDirectoryName(file)!, "_snapshots"),
+                        Path.Combine(ProjectDirectory, "_snapshots"),
                         type.Name,
                         method.Name + GetSnapshotVersionSuffix(type, method)
                     )
             );
         }
 
-        protected string GetGeneratedMapperFilePath(string name, [CallerFilePath] string filePath = "")
+        protected string GetGeneratedMapperFilePath(string name)
         {
             return Path.Combine(
-                Path.GetDirectoryName(filePath)!,
+                SolutionDirectory,
+                "artifacts",
                 "obj",
-                "GeneratedFiles",
+                "Riok.Mapperly.IntegrationTests",
+                "debug",
+                "generated",
                 "Riok.Mapperly",
                 "Riok.Mapperly.MapperGenerator",
                 name + ".g.cs"
@@ -168,6 +174,27 @@ namespace Riok.Mapperly.IntegrationTests
 #else
             throw new InvalidOperationException("Target framework is not supported");
 #endif
+        }
+
+        private static string GetProjectDirectory() => FindDirectoryOfFile(".csproj");
+
+        private static string GetSolutionDirectory() => FindDirectoryOfFile(".sln");
+
+        private static string FindDirectoryOfFile(string fileExtension, [CallerFilePath] string baseFilePath = "")
+        {
+            var dir =
+                Path.GetDirectoryName(baseFilePath) ?? throw new InvalidOperationException($"Could not get directory from {baseFilePath}");
+
+            while (Directory.GetFiles(dir, "*" + fileExtension, SearchOption.TopDirectoryOnly).Length == 0)
+            {
+                dir = Path.GetDirectoryName(dir);
+                if (dir == null)
+                {
+                    throw new InvalidOperationException($"Could not find directory from file {baseFilePath}");
+                }
+            }
+
+            return dir;
         }
     }
 }

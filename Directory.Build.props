@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
+    <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Version>0.0.1-dev</Version>
