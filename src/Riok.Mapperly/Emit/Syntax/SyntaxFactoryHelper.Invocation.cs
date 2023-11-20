@@ -84,7 +84,7 @@ public partial struct SyntaxFactoryHelper
             .WhereNotNull()
             .DistinctBy(x => x.Ordinal)
             .OrderBy(x => x.Ordinal)
-            .Select(p => Parameter(extensionMethod, p));
+            .Select((p, i) => Parameter(extensionMethod && i == 0, p));
         return SyntaxFactory.ParameterList(CommaSeparatedList(parameterSyntaxes));
     }
 
