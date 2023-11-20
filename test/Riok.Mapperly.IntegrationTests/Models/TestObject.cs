@@ -116,6 +116,8 @@ namespace Riok.Mapperly.IntegrationTests.Models
 
         public int IgnoredIntValue { get; set; }
 
+        public DateTime DateTimeValue { get; set; }
+
         public DateTime DateTimeValueTargetDateOnly { get; set; }
 
         public DateTime DateTimeValueTargetTimeOnly { get; set; }

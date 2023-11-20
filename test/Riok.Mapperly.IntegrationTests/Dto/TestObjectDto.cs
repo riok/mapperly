@@ -123,6 +123,10 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         public TimeOnly DateTimeValueTargetTimeOnly { get; set; }
 
+        public string FormattedIntValue { get; set; } = string.Empty;
+
+        public string FormattedDateValue { get; set; } = string.Empty;
+
         public int ExposePrivateValue => PrivateValue;
 
         private int PrivateValue { get; set; }

@@ -3,6 +3,7 @@ using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.ExternalMappings;
+using Riok.Mapperly.Descriptors.FormatProviders;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders;
 using Riok.Mapperly.Descriptors.MappingBuilders;
 using Riok.Mapperly.Descriptors.ObjectFactories;
@@ -67,7 +68,8 @@ public class DescriptorBuilder
 
         // ExtractObjectFactories needs to be called after ExtractUserMappings due to configuring mapperDescriptor.Static
         var objectFactories = ExtractObjectFactories();
-        EnqueueUserMappings(objectFactories);
+        var formatProviders = ExtractFormatProviders();
+        EnqueueUserMappings(objectFactories, formatProviders);
         ExtractExternalMappings();
         _mappingBodyBuilder.BuildMappingBodies(cancellationToken);
         BuildMappingMethodNames();
@@ -144,13 +146,14 @@ public class DescriptorBuilder
         return ObjectFactoryBuilder.ExtractObjectFactories(_builderContext, _mapperDescriptor.Symbol);
     }
 
-    private void EnqueueUserMappings(ObjectFactoryCollection objectFactories)
+    private void EnqueueUserMappings(ObjectFactoryCollection objectFactories, FormatProviderCollection formatProviders)
     {
         foreach (var userMapping in _mappings.UserMappings)
         {
             var ctx = new MappingBuilderContext(
                 _builderContext,
                 objectFactories,
+                formatProviders,
                 userMapping.Method,
                 new TypeMappingKey(userMapping.SourceType, userMapping.TargetType)
             );
@@ -165,6 +168,11 @@ public class DescriptorBuilder
         {
             _mappings.Add(externalMapping, TypeMappingConfiguration.Default);
         }
+    }
+
+    private FormatProviderCollection ExtractFormatProviders()
+    {
+        return FormatProviderBuilder.ExtractFormatProviders(_builderContext, _mapperDescriptor.Symbol);
     }
 
     private void BuildMappingMethodNames()

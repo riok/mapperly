@@ -95,6 +95,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.EnumRawValue = src.EnumRawValue;
             target.EnumStringValue = src.EnumStringValue;
             target.EnumReverseStringValue = src.EnumReverseStringValue;
+            target.DateTimeValue = src.DateTimeValue;
             target.DateTimeValueTargetDateOnly = src.DateTimeValueTargetDateOnly;
             target.DateTimeValueTargetTimeOnly = src.DateTimeValueTargetTimeOnly;
             return target;

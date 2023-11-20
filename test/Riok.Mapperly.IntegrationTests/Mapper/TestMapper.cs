@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.IntegrationTests.Dto;
 using Riok.Mapperly.IntegrationTests.Models;
@@ -17,6 +18,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 #endif
     public partial class TestMapper
     {
+        [FormatProvider(Default = true)]
+        private readonly CultureInfo _formatDeCh = CultureInfo.GetCultureInfo("de-CH");
+
+        [FormatProvider]
+        private readonly CultureInfo _formatEnUs = CultureInfo.GetCultureInfo("en-US");
+
         public partial int DirectInt(int value);
 
         public partial long ImplicitCastInt(int value);
@@ -43,6 +50,13 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredStringValue))]
         [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredIntValue))]
         [MapperIgnoreSource(nameof(TestObject.IgnoredIntValue))]
+        [MapProperty(nameof(TestObject.IntValue), nameof(TestObjectDto.FormattedIntValue), StringFormat = "C")]
+        [MapProperty(
+            nameof(TestObject.DateTimeValue),
+            nameof(TestObjectDto.FormattedDateValue),
+            StringFormat = "D",
+            FormatProvider = nameof(_formatEnUs)
+        )]
         [MapProperty(nameof(TestObject.RenamedStringValue), nameof(TestObjectDto.RenamedStringValue2))]
         [MapProperty(
             new[] { nameof(TestObject.UnflatteningIdValue) },

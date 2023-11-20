@@ -13,6 +13,9 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     private const string NameOfOperatorName = "nameof";
     private const char FullNameOfPrefix = '@';
 
+    public TAttribute AccessSingle<TAttribute>(ISymbol symbol)
+        where TAttribute : Attribute => AccessSingle<TAttribute, TAttribute>(symbol);
+
     public TData AccessSingle<TAttribute, TData>(ISymbol symbol)
         where TAttribute : Attribute
         where TData : notnull => Access<TAttribute, TData>(symbol).Single();

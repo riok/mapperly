@@ -15,8 +15,8 @@ namespace Riok.Mapperly.IntegrationTests
 {
     public abstract class BaseMapperTest
     {
-        private static string SolutionDirectory = GetSolutionDirectory();
-        private static string ProjectDirectory = GetProjectDirectory();
+        private static readonly string _solutionDirectory = GetSolutionDirectory();
+        private static readonly string _projectDirectory = GetProjectDirectory();
 
         static BaseMapperTest()
         {
@@ -33,7 +33,7 @@ namespace Riok.Mapperly.IntegrationTests
             Verifier.DerivePathInfo(
                 (_, _, type, method) =>
                     new PathInfo(
-                        Path.Combine(ProjectDirectory, "_snapshots"),
+                        Path.Combine(_projectDirectory, "_snapshots"),
                         type.Name,
                         method.Name + GetSnapshotVersionSuffix(type, method)
                     )
@@ -43,7 +43,7 @@ namespace Riok.Mapperly.IntegrationTests
         protected string GetGeneratedMapperFilePath(string name)
         {
             return Path.Combine(
-                SolutionDirectory,
+                _solutionDirectory,
                 "artifacts",
                 "obj",
                 "Riok.Mapperly.IntegrationTests",
@@ -70,6 +70,7 @@ namespace Riok.Mapperly.IntegrationTests
                 SubObject = new InheritanceSubObject { BaseIntValue = 1, SubIntValue = 2, },
                 EnumRawValue = TestEnum.Value20,
                 EnumStringValue = TestEnum.Value30,
+                DateTimeValue = new DateTime(2020, 1, 3, 15, 10, 5, DateTimeKind.Utc),
                 DateTimeValueTargetDateOnly = new DateTime(2020, 1, 3, 15, 10, 5, DateTimeKind.Utc),
                 DateTimeValueTargetTimeOnly = new DateTime(2020, 1, 3, 15, 10, 5, DateTimeKind.Utc),
                 IgnoredStringValue = "ignored",
