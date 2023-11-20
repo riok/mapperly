@@ -4,39 +4,38 @@ description: Use queryable projections to map queryable objects and optimize ORM
 ---
 
 import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # IQueryable projections
 
 Mapperly does support `IQueryable<T>` projections:
 
-<!-- do not indent this, it won't work, https://stackoverflow.com/a/67579641/3302887 -->
-
 <Tabs>
-<TabItem value="definition" label="Mapper definition">
-
-```csharp
-[Mapper]
-public static partial class CarMapper
-{
-    // highlight-start
-    public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q);
-    // highlight-end
-}
-```
-
-</TabItem>
-<TabItem value="usage" label="Usage">
-
-```csharp
-var dtos = await DbContext.Cars
-    .Where(...)
-    // highlight-start
-    .ProjectToDto()
-    // highlight-end
-    .ToListAsync();
-```
-
-</TabItem>
+  <TabItem value="definition" label="Mapper definition">
+  
+  ```csharp
+  [Mapper]
+  public static partial class CarMapper
+  {
+      // highlight-start
+      public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q);
+      // highlight-end
+  }
+  ```
+  
+  </TabItem>
+  <TabItem value="usage" label="Usage">
+  
+  ```csharp
+  var dtos = await DbContext.Cars
+      .Where(...)
+      // highlight-start
+      .ProjectToDto()
+      // highlight-end
+      .ToListAsync();
+  ```
+  
+  </TabItem>
 </Tabs>
 
 This is useful in combination with Entity Framework and other ORM solutions which expose `IQueryable<T>`.

@@ -210,7 +210,7 @@ indent_size = 2
 
 # markdown
 [*.{md,mdx}]
-indent_size = unset
+indent_size = 2
 trim_trailing_whitespace = false
 
 # Verify settings

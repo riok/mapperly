@@ -74,40 +74,40 @@ or by setting the `IgnoreObsoleteMembersStrategy` option of the `MapperAttribute
 | Target | Ignores target members with the `Obsolete` attribute            |
 
 <Tabs>
-<TabItem value="global" label="Global (mapper level)" default>
-
-Sets the `IgnoreObsoleteMembersStrategy` for all methods within the mapper,
-by default it is `None` allowing obsolete source and target members to be mapped.
-This can be overriden by individual mapping methods using `MapperIgnoreObsoleteMembersAttribute`.
-
-```csharp
-// highlight-start
-[Mapper(IgnoreObsoleteMembersStrategy = IgnoreObsoleteMembersStrategy.Both)]
-// highlight-end
-public partial class CarMapper
-{
-    ...
-}
-```
-
-</TabItem>
-<TabItem value="method" label="Local (mapping method level)">
-
-Method will use the provided ignore obsolete mapping strategy,
-otherwise the `MapperAttribute` property `IgnoreObsoleteMembersStrategy` will be used.
-
-```csharp
-[Mapper]
-public partial class CarMapper
-{
-    // highlight-start
-    [MapperIgnoreObsoleteMembers(IgnoreObsoleteMembersStrategy.Both)]
-    // highlight-end
-    public partial CarMakeDto MapMake(CarMake make);
-}
-```
-
-</TabItem>
+  <TabItem value="global" label="Global (mapper level)" default>
+  
+  Sets the `IgnoreObsoleteMembersStrategy` for all methods within the mapper,
+  by default it is `None` allowing obsolete source and target members to be mapped.
+  This can be overriden by individual mapping methods using `MapperIgnoreObsoleteMembersAttribute`.
+  
+  ```csharp
+  // highlight-start
+  [Mapper(IgnoreObsoleteMembersStrategy = IgnoreObsoleteMembersStrategy.Both)]
+  // highlight-end
+  public partial class CarMapper
+  {
+      ...
+  }
+  ```
+  
+  </TabItem>
+  <TabItem value="method" label="Local (mapping method level)">
+  
+  Method will use the provided ignore obsolete mapping strategy,
+  otherwise the `MapperAttribute` property `IgnoreObsoleteMembersStrategy` will be used.
+  
+  ```csharp
+  [Mapper]
+  public partial class CarMapper
+  {
+      // highlight-start
+      [MapperIgnoreObsoleteMembers(IgnoreObsoleteMembersStrategy.Both)]
+      // highlight-end
+      public partial CarMakeDto MapMake(CarMake make);
+  }
+  ```
+  
+  </TabItem>
 </Tabs>
 
 ### Property name mapping strategy
@@ -187,42 +187,40 @@ dotnet_diagnostic.RMG020.severity = error # Unmapped source member
 To enforce strict mappings on only either the source or the target,
 the `RequiredMappingStrategy` can be used.
 
-<!-- do not indent this, it won't work, https://stackoverflow.com/a/67579641/3302887 -->
-
 <Tabs>
-<TabItem value="global" label="Global (mapper level)" default>
-
-Sets the `RequiredMappingStrategy` for all methods within the mapper,
-by default it is `Both` requiring all members to be mapped.
-This can be overriden by individual mapping methods using `MapperRequiredMappingAttribute`.
-
-```csharp
-// highlight-start
-[Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Source)]
-// highlight-end
-public partial class CarMapper
-{
-  ...
-}
-```
-
-</TabItem>
-<TabItem value="enum" label="Enum (mapping method level)">
-
-Applied to the specific mapping method.
-
-```csharp
-[Mapper]
-public partial class CarMapper
-{
+  <TabItem value="global" label="Global (mapper level)" default>
+  
+  Sets the `RequiredMappingStrategy` for all methods within the mapper,
+  by default it is `Both` requiring all members to be mapped.
+  This can be overriden by individual mapping methods using `MapperRequiredMappingAttribute`.
+  
+  ```csharp
   // highlight-start
-  [MapperRequiredMapping(RequiredMappingStrategy.Source)]
+  [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Source)]
   // highlight-end
-  public partial CarDto MapMake(Car make);
-}
-```
-
-</TabItem>
+  public partial class CarMapper
+  {
+    ...
+  }
+  ```
+  
+  </TabItem>
+  <TabItem value="local" label="Local (mapping method level)">
+  
+  Applied to the specific mapping method.
+  
+  ```csharp
+  [Mapper]
+  public partial class CarMapper
+  {
+    // highlight-start
+    [MapperRequiredMapping(RequiredMappingStrategy.Source)]
+    // highlight-end
+    public partial CarDto MapMake(Car make);
+  }
+  ```
+  
+  </TabItem>
 </Tabs>
 
 ### Strict enum mappings
