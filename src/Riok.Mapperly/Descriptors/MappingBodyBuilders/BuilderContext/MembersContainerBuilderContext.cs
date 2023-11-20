@@ -8,13 +8,12 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// An <see cref="IMembersContainerBuilderContext{T}"/> implementation.
 /// </summary>
 /// <typeparam name="T">The type of mapping.</typeparam>
-public class MembersContainerBuilderContext<T> : MembersMappingBuilderContext<T>, IMembersContainerBuilderContext<T>
+public class MembersContainerBuilderContext<T>(MappingBuilderContext builderContext, T mapping)
+    : MembersMappingBuilderContext<T>(builderContext, mapping),
+        IMembersContainerBuilderContext<T>
     where T : IMemberAssignmentTypeMapping
 {
     private readonly Dictionary<MemberPath, MemberNullDelegateAssignmentMapping> _nullDelegateMappings = new();
-
-    public MembersContainerBuilderContext(MappingBuilderContext builderContext, T mapping)
-        : base(builderContext, mapping) { }
 
     public void AddMemberAssignmentMapping(IMemberAssignmentMapping memberMapping) => AddMemberAssignmentMapping(Mapping, memberMapping);
 

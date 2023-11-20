@@ -5,17 +5,10 @@ using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
 
-public class UnsafeAccessorContext
+public class UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor symbolAccessor)
 {
-    private readonly UniqueNameBuilder _nameBuilder;
-    private readonly SymbolAccessor _symbolAccessor;
+    private readonly UniqueNameBuilder _nameBuilder = nameBuilder.NewScope();
     private readonly Dictionary<UnsafeAccessorKey, IUnsafeAccessor> _unsafeAccessors = new();
-
-    public UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor symbolAccessor)
-    {
-        _nameBuilder = nameBuilder.NewScope();
-        _symbolAccessor = symbolAccessor;
-    }
 
     public IReadOnlyCollection<IUnsafeAccessor> UnsafeAccessors => _unsafeAccessors.Values;
 
@@ -50,7 +43,7 @@ public class UnsafeAccessorContext
 
     private string GetValidMethodName(ITypeSymbol symbol, string name)
     {
-        var memberNames = _symbolAccessor.GetAllMembers(symbol).Select(x => x.Name);
+        var memberNames = symbolAccessor.GetAllMembers(symbol).Select(x => x.Name);
         return _nameBuilder.New(name, memberNames);
     }
 
@@ -75,16 +68,10 @@ public class UnsafeAccessorContext
         GetField,
     }
 
-    private readonly struct UnsafeAccessorKey : IEquatable<UnsafeAccessorKey>
+    private readonly struct UnsafeAccessorKey(ISymbol member, UnsafeAccessorType type) : IEquatable<UnsafeAccessorKey>
     {
-        private readonly ISymbol _member;
-        private readonly UnsafeAccessorType _type;
-
-        public UnsafeAccessorKey(ISymbol member, UnsafeAccessorType type)
-        {
-            _member = member;
-            _type = type;
-        }
+        private readonly ISymbol _member = member;
+        private readonly UnsafeAccessorType _type = type;
 
         public bool Equals(UnsafeAccessorKey other) =>
             SymbolEqualityComparer.Default.Equals(_member, other._member) && _type == other._type;

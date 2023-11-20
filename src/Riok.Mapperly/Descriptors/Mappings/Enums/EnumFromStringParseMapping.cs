@@ -11,32 +11,23 @@ namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 /// Less efficient than <see cref="EnumFromStringSwitchMapping"/>
 /// but works in <see cref="System.Linq.Expressions.Expression{T}"/>.
 /// </summary>
-public class EnumFromStringParseMapping : NewInstanceMapping
+public class EnumFromStringParseMapping(ITypeSymbol sourceType, ITypeSymbol targetType, bool genericParseMethodSupported, bool ignoreCase)
+    : NewInstanceMapping(sourceType, targetType)
 {
     private const string EnumClassName = "System.Enum";
     private const string ParseMethodName = "Parse";
 
-    private readonly bool _genericParseMethodSupported;
-    private readonly bool _ignoreCase;
-
-    public EnumFromStringParseMapping(ITypeSymbol sourceType, ITypeSymbol targetType, bool genericParseMethodSupported, bool ignoreCase)
-        : base(sourceType, targetType)
-    {
-        _genericParseMethodSupported = genericParseMethodSupported;
-        _ignoreCase = ignoreCase;
-    }
-
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         // System.Enum.Parse<TargetType>(source, ignoreCase)
-        if (_genericParseMethodSupported)
+        if (genericParseMethodSupported)
         {
             return GenericInvocation(
                 EnumClassName,
                 ParseMethodName,
                 new[] { FullyQualifiedIdentifier(TargetType) },
                 ctx.Source,
-                BooleanLiteral(_ignoreCase)
+                BooleanLiteral(ignoreCase)
             );
         }
 
@@ -45,7 +36,7 @@ public class EnumFromStringParseMapping : NewInstanceMapping
             MemberAccess(EnumClassName, ParseMethodName),
             TypeOfExpression(FullyQualifiedIdentifier(TargetType)),
             ctx.Source,
-            BooleanLiteral(_ignoreCase)
+            BooleanLiteral(ignoreCase)
         );
         return CastExpression(FullyQualifiedIdentifier(TargetType), enumParseInvocation);
     }

@@ -6,17 +6,11 @@ namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 /// <summary>
 /// A default implementation of <see cref="IExistingTargetMapping"/>.
 /// </summary>
-public abstract class ExistingTargetMapping : IExistingTargetMapping
+public abstract class ExistingTargetMapping(ITypeSymbol sourceType, ITypeSymbol targetType) : IExistingTargetMapping
 {
-    protected ExistingTargetMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-    {
-        SourceType = sourceType;
-        TargetType = targetType;
-    }
+    public ITypeSymbol SourceType { get; } = sourceType;
 
-    public ITypeSymbol SourceType { get; }
-
-    public ITypeSymbol TargetType { get; }
+    public ITypeSymbol TargetType { get; } = targetType;
 
     public virtual bool CallableByOtherMappings => true;
 

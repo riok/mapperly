@@ -7,17 +7,12 @@ namespace Riok.Mapperly.Configuration;
 /// Represents the <see cref="MapEnumAttribute"/>
 /// with enum values as typed constants.
 /// </summary>
-public class EnumConfiguration
+public class EnumConfiguration(EnumMappingStrategy strategy)
 {
-    public EnumConfiguration(EnumMappingStrategy strategy)
-    {
-        Strategy = strategy;
-    }
-
     /// <summary>
     /// The strategy to be used to map enums.
     /// </summary>
-    public EnumMappingStrategy Strategy { get; }
+    public EnumMappingStrategy Strategy { get; } = strategy;
 
     /// <summary>
     /// Whether the case should be ignored during mappings.

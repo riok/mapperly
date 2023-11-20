@@ -10,22 +10,16 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// A member initializer which initializes null members to new objects.
 /// </summary>
 [DebuggerDisplay("MemberNullAssignmentInitializerMapping({_targetPathToInitialize} ??= new())")]
-public class MethodMemberNullAssignmentInitializerMapping : MemberAssignmentMappingContainer
+public class MethodMemberNullAssignmentInitializerMapping(SetterMemberPath targetPathToInitialize, GetterMemberPath sourcePathToInitialize)
+    : MemberAssignmentMappingContainer
 {
-    private readonly SetterMemberPath _targetPathToInitialize;
-    private readonly GetterMemberPath _sourcePathToInitialize;
-
-    public MethodMemberNullAssignmentInitializerMapping(SetterMemberPath targetPathToInitialize, GetterMemberPath sourcePathToInitialize)
-    {
-        _targetPathToInitialize = targetPathToInitialize;
-        _sourcePathToInitialize = sourcePathToInitialize;
-    }
+    private readonly SetterMemberPath _targetPathToInitialize = targetPathToInitialize;
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
         // target.Value ?? new()
         var initializer = SyntaxFactoryHelper.Coalesce(
-            _sourcePathToInitialize.BuildAccess(targetAccess),
+            sourcePathToInitialize.BuildAccess(targetAccess),
             SyntaxFactory.ImplicitObjectCreationExpression()
         );
 

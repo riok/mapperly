@@ -7,18 +7,11 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 /// <summary>
 /// Builds bodies mappings (the body of the mapping methods).
 /// </summary>
-public class MappingBodyBuilder
+public class MappingBodyBuilder(MappingCollection mappings)
 {
-    private readonly MappingCollection _mappings;
-
-    public MappingBodyBuilder(MappingCollection mappings)
-    {
-        _mappings = mappings;
-    }
-
     public void BuildMappingBodies(CancellationToken cancellationToken)
     {
-        foreach (var (typeMapping, ctx) in _mappings.DequeueMappingsToBuildBody())
+        foreach (var (typeMapping, ctx) in mappings.DequeueMappingsToBuildBody())
         {
             cancellationToken.ThrowIfCancellationRequested();
 

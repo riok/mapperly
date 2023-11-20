@@ -7,30 +7,18 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// Represents a simple <see cref="IMemberMapping"/> implementation without any null handling.
 /// (eg. <c>MapToD(source.A.B)</c> or <c>MapToD(source?.A?.B)</c>).
 /// </summary>
-public class MemberMapping : IMemberMapping
+public class MemberMapping(
+    INewInstanceMapping delegateMapping,
+    GetterMemberPath sourcePath,
+    bool nullConditionalAccess,
+    bool addValuePropertyOnNullable
+) : IMemberMapping
 {
-    private readonly INewInstanceMapping _delegateMapping;
-    private readonly bool _nullConditionalAccess;
-    private readonly bool _addValuePropertyOnNullable;
-
-    public MemberMapping(
-        INewInstanceMapping delegateMapping,
-        GetterMemberPath sourcePath,
-        bool nullConditionalAccess,
-        bool addValuePropertyOnNullable
-    )
-    {
-        _delegateMapping = delegateMapping;
-        SourcePath = sourcePath;
-        _nullConditionalAccess = nullConditionalAccess;
-        _addValuePropertyOnNullable = addValuePropertyOnNullable;
-    }
-
-    public GetterMemberPath SourcePath { get; }
+    public GetterMemberPath SourcePath { get; } = sourcePath;
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        ctx = ctx.WithSource(SourcePath.BuildAccess(ctx.Source, _addValuePropertyOnNullable, _nullConditionalAccess));
-        return _delegateMapping.Build(ctx);
+        ctx = ctx.WithSource(SourcePath.BuildAccess(ctx.Source, addValuePropertyOnNullable, nullConditionalAccess));
+        return delegateMapping.Build(ctx);
     }
 }

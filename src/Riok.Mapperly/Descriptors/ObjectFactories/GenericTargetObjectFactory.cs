@@ -9,11 +9,8 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 /// without any parameters but a single type parameter which is also the return type.
 /// Example signature: <c>T Create&lt;T&gt;();</c>
 /// </summary>
-public class GenericTargetObjectFactory : ObjectFactory
+public class GenericTargetObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol method) : ObjectFactory(symbolAccessor, method)
 {
-    public GenericTargetObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol method)
-        : base(symbolAccessor, method) { }
-
     public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
         SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(
             Method.TypeParameters[0],

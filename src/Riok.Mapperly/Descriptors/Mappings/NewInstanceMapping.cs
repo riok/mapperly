@@ -6,17 +6,11 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 
 /// <inheritdoc cref="INewInstanceMapping"/>
 [DebuggerDisplay("{GetType().Name}({SourceType} => {TargetType})")]
-public abstract class NewInstanceMapping : INewInstanceMapping
+public abstract class NewInstanceMapping(ITypeSymbol sourceType, ITypeSymbol targetType) : INewInstanceMapping
 {
-    protected NewInstanceMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-    {
-        SourceType = sourceType;
-        TargetType = targetType;
-    }
+    public ITypeSymbol SourceType { get; } = sourceType;
 
-    public ITypeSymbol SourceType { get; }
-
-    public ITypeSymbol TargetType { get; }
+    public ITypeSymbol TargetType { get; } = targetType;
 
     public virtual MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.Default;
 

@@ -7,17 +7,14 @@ namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 /// Represents a complex object mapping implemented in its own method.
 /// Maps each property from the source to the target.
 /// </summary>
-public class ObjectMemberExistingTargetMapping : MemberAssignmentMappingContainer, IExistingTargetMapping, IMemberAssignmentTypeMapping
+public class ObjectMemberExistingTargetMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    : MemberAssignmentMappingContainer,
+        IExistingTargetMapping,
+        IMemberAssignmentTypeMapping
 {
-    public ObjectMemberExistingTargetMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-    {
-        SourceType = sourceType;
-        TargetType = targetType;
-    }
+    public ITypeSymbol SourceType { get; } = sourceType;
 
-    public ITypeSymbol SourceType { get; }
-
-    public ITypeSymbol TargetType { get; }
+    public ITypeSymbol TargetType { get; } = targetType;
 
     public bool CallableByOtherMappings => true;
 

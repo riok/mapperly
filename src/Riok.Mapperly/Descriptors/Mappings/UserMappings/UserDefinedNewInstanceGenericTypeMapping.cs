@@ -13,22 +13,24 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 /// a generic target parameter or both.
 /// Similar to <see cref="UserDefinedNewInstanceRuntimeTargetTypeParameterMapping"/>.
 /// </summary>
-public class UserDefinedNewInstanceGenericTypeMapping : UserDefinedNewInstanceRuntimeTargetTypeMapping
-{
-    public UserDefinedNewInstanceGenericTypeMapping(
-        IMethodSymbol method,
-        GenericMappingTypeParameters typeParameters,
-        MappingMethodParameters parameters,
-        bool enableReferenceHandling,
-        NullFallbackValue nullArm,
-        ITypeSymbol objectType
+public class UserDefinedNewInstanceGenericTypeMapping(
+    IMethodSymbol method,
+    GenericMappingTypeParameters typeParameters,
+    MappingMethodParameters parameters,
+    bool enableReferenceHandling,
+    NullFallbackValue nullArm,
+    ITypeSymbol objectType
+)
+    : UserDefinedNewInstanceRuntimeTargetTypeMapping(
+        method,
+        parameters.Source,
+        parameters.ReferenceHandler,
+        enableReferenceHandling,
+        nullArm,
+        objectType
     )
-        : base(method, parameters.Source, parameters.ReferenceHandler, enableReferenceHandling, nullArm, objectType)
-    {
-        TypeParameters = typeParameters;
-    }
-
-    public GenericMappingTypeParameters TypeParameters { get; }
+{
+    public GenericMappingTypeParameters TypeParameters { get; } = typeParameters;
 
     public override MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx) =>
         base.BuildMethod(ctx).WithTypeParameterList(TypeParameterList(TypeParameters.SourceType, TypeParameters.TargetType));

@@ -7,12 +7,11 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// An implementation of <see cref="INewValueTupleBuilderContext{T}"/>.
 /// </summary>
 /// <typeparam name="T">The type of the mapping.</typeparam>
-public class NewValueTupleExpressionBuilderContext<T> : MembersContainerBuilderContext<T>, INewValueTupleBuilderContext<T>
+public class NewValueTupleExpressionBuilderContext<T>(MappingBuilderContext builderContext, T mapping)
+    : MembersContainerBuilderContext<T>(builderContext, mapping),
+        INewValueTupleBuilderContext<T>
     where T : INewValueTupleMapping, IMemberAssignmentTypeMapping
 {
-    public NewValueTupleExpressionBuilderContext(MappingBuilderContext builderContext, T mapping)
-        : base(builderContext, mapping) { }
-
     public void AddTupleConstructorParameterMapping(ValueTupleConstructorParameterMapping mapping)
     {
         if (MemberConfigsByRootTargetName.TryGetValue(mapping.Parameter.Name, out var value))

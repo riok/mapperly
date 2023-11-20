@@ -12,30 +12,21 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 /// <summary>
 /// Represents a mapping method declared but not implemented by the user which reuses an existing target object instance.
 /// </summary>
-public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMapping
+public class UserDefinedExistingTargetMethodMapping(
+    IMethodSymbol method,
+    MethodParameter sourceParameter,
+    MethodParameter targetParameter,
+    MethodParameter? referenceHandlerParameter,
+    bool enableReferenceHandling
+) : MethodMapping(method, sourceParameter, referenceHandlerParameter, targetParameter.Type), IUserMapping
 {
-    private readonly bool _enableReferenceHandling;
     private IExistingTargetMapping? _delegateMapping;
 
-    public UserDefinedExistingTargetMethodMapping(
-        IMethodSymbol method,
-        MethodParameter sourceParameter,
-        MethodParameter targetParameter,
-        MethodParameter? referenceHandlerParameter,
-        bool enableReferenceHandling
-    )
-        : base(method, sourceParameter, referenceHandlerParameter, targetParameter.Type)
-    {
-        _enableReferenceHandling = enableReferenceHandling;
-        Method = method;
-        TargetParameter = targetParameter;
-    }
-
-    public IMethodSymbol Method { get; }
+    public IMethodSymbol Method { get; } = method;
 
     public void SetDelegateMapping(IExistingTargetMapping delegateMapping) => _delegateMapping = delegateMapping;
 
-    private MethodParameter TargetParameter { get; }
+    private MethodParameter TargetParameter { get; } = targetParameter;
 
     public override bool CallableByOtherMappings => false;
 
@@ -60,7 +51,7 @@ public class UserDefinedExistingTargetMethodMapping : MethodMapping, IUserMappin
 
         // if reference handling is enabled and no reference handler parameter is declared
         // a new reference handler is instantiated and used.
-        if (_enableReferenceHandling && ReferenceHandlerParameter == null)
+        if (enableReferenceHandling && ReferenceHandlerParameter == null)
         {
             // var refHandler = new RefHandler();
             var referenceHandlerName = ctx.NameBuilder.New(DefaultReferenceHandlerParameterName);

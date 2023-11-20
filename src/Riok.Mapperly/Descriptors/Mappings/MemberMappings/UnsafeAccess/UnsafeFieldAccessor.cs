@@ -16,23 +16,15 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings.UnsafeAccess;
 /// public extern static int GetValue(this global::MyClass source);
 /// </code>
 /// </summary>
-public class UnsafeFieldAccessor : IUnsafeAccessor
+public class UnsafeFieldAccessor(IFieldSymbol value, string methodName) : IUnsafeAccessor
 {
     private const string DefaultTargetParameterName = "target";
 
-    private readonly string _targetType;
-    private readonly string _result;
-    private readonly string _memberName;
+    private readonly string _targetType = value.ContainingType.FullyQualifiedIdentifierName();
+    private readonly string _result = value.Type.FullyQualifiedIdentifierName();
+    private readonly string _memberName = value.Name;
 
-    public UnsafeFieldAccessor(IFieldSymbol value, string methodName)
-    {
-        MethodName = methodName;
-        _targetType = value.ContainingType.FullyQualifiedIdentifierName();
-        _result = value.Type.FullyQualifiedIdentifierName();
-        _memberName = value.Name;
-    }
-
-    public string MethodName { get; }
+    public string MethodName { get; } = methodName;
 
     public MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
     {

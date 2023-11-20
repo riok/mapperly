@@ -12,35 +12,23 @@ namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 /// Uses a switch expression for performance reasons (in comparison to <see cref="Enum.Parse(System.Type,string)"/>).
 /// Optimized version of <see cref="EnumFromStringParseMapping"/>.
 /// </summary>
-public class EnumFromStringSwitchMapping : MethodMapping
+public class EnumFromStringSwitchMapping(
+    ITypeSymbol sourceType,
+    ITypeSymbol targetType,
+    IEnumerable<IFieldSymbol> enumMembers,
+    bool ignoreCase,
+    EnumFallbackValueMapping fallbackMapping
+) : MethodMapping(sourceType, targetType)
 {
     private const string IgnoreCaseSwitchDesignatedVariableName = "s";
     private const string StringEqualsMethodName = nameof(string.Equals);
     private const string StringComparisonFullName = "System.StringComparison.OrdinalIgnoreCase";
 
-    private readonly IEnumerable<IFieldSymbol> _enumMembers;
-    private readonly bool _ignoreCase;
-    private readonly EnumFallbackValueMapping _fallbackMapping;
-
-    public EnumFromStringSwitchMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
-        IEnumerable<IFieldSymbol> enumMembers,
-        bool ignoreCase,
-        EnumFallbackValueMapping fallbackMapping
-    )
-        : base(sourceType, targetType)
-    {
-        _enumMembers = enumMembers;
-        _ignoreCase = ignoreCase;
-        _fallbackMapping = fallbackMapping;
-    }
-
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         // switch for each name to the enum value
-        var arms = _ignoreCase ? BuildArmsIgnoreCase(ctx) : _enumMembers.Select(BuildArm);
-        arms = arms.Append(_fallbackMapping.BuildDiscardArm(ctx));
+        var arms = ignoreCase ? BuildArmsIgnoreCase(ctx) : enumMembers.Select(BuildArm);
+        arms = arms.Append(fallbackMapping.BuildDiscardArm(ctx));
 
         var switchExpr = ctx.SyntaxFactory.Switch(ctx.Source, arms);
         yield return ctx.SyntaxFactory.Return(switchExpr);
@@ -49,7 +37,7 @@ public class EnumFromStringSwitchMapping : MethodMapping
     private IEnumerable<SwitchExpressionArmSyntax> BuildArmsIgnoreCase(TypeMappingBuildContext ctx)
     {
         var ignoreCaseSwitchDesignatedVariableName = ctx.NameBuilder.New(IgnoreCaseSwitchDesignatedVariableName);
-        return _enumMembers.Select(f => BuildArmIgnoreCase(ignoreCaseSwitchDesignatedVariableName, f));
+        return enumMembers.Select(f => BuildArmIgnoreCase(ignoreCaseSwitchDesignatedVariableName, f));
     }
 
     private SwitchExpressionArmSyntax BuildArmIgnoreCase(string ignoreCaseSwitchDesignatedVariableName, IFieldSymbol field)

@@ -8,17 +8,11 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 /// <summary>
 /// An object factory represents a method to instantiate objects of a certain type.
 /// </summary>
-public abstract class ObjectFactory
+public abstract class ObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol method)
 {
-    protected ObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol method)
-    {
-        Method = method;
-        SymbolAccessor = symbolAccessor;
-    }
+    protected SymbolAccessor SymbolAccessor { get; } = symbolAccessor;
 
-    protected SymbolAccessor SymbolAccessor { get; }
-
-    protected IMethodSymbol Method { get; }
+    protected IMethodSymbol Method { get; } = method;
 
     public ExpressionSyntax CreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
         HandleNull(BuildCreateType(sourceType, targetTypeToCreate, source), targetTypeToCreate);

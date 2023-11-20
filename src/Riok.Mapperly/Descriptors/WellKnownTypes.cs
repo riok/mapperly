@@ -3,15 +3,9 @@ using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
 
-public class WellKnownTypes
+public class WellKnownTypes(Compilation compilation)
 {
-    private readonly Compilation _compilation;
     private readonly Dictionary<string, INamedTypeSymbol?> _cachedTypes = new();
-
-    internal WellKnownTypes(Compilation compilation)
-    {
-        _compilation = compilation;
-    }
 
     // use string type name as they are not available in netstandard2.0
     public INamedTypeSymbol? DateOnly => TryGet("System.DateOnly");
@@ -19,7 +13,7 @@ public class WellKnownTypes
     public INamedTypeSymbol? TimeOnly => TryGet("System.TimeOnly");
 
     public ITypeSymbol GetArrayType(ITypeSymbol type) =>
-        _compilation.CreateArrayTypeSymbol(type, elementNullableAnnotation: type.NullableAnnotation).NonNullable();
+        compilation.CreateArrayTypeSymbol(type, elementNullableAnnotation: type.NullableAnnotation).NonNullable();
 
     public INamedTypeSymbol Get<T>() => Get(typeof(T));
 
@@ -40,7 +34,7 @@ public class WellKnownTypes
             return typeSymbol;
         }
 
-        typeSymbol = _compilation.GetBestTypeByMetadataName(typeFullName);
+        typeSymbol = compilation.GetBestTypeByMetadataName(typeFullName);
         _cachedTypes.Add(typeFullName, typeSymbol);
 
         return typeSymbol;

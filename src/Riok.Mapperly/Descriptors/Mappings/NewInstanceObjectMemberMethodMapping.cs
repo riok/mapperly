@@ -11,18 +11,13 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// An object mapping creating the target instance via a new() call,
 /// mapping properties via ctor, object initializer and by assigning.
 /// </summary>
-public class NewInstanceObjectMemberMethodMapping : ObjectMemberMethodMapping, INewInstanceObjectMemberMapping
+public class NewInstanceObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, bool enableReferenceHandling)
+    : ObjectMemberMethodMapping(sourceType, targetType),
+        INewInstanceObjectMemberMapping
 {
     private const string TargetVariableName = "target";
     private readonly HashSet<ConstructorParameterMapping> _constructorPropertyMappings = new();
     private readonly HashSet<MemberAssignmentMapping> _initPropertyMappings = new();
-    private readonly bool _enableReferenceHandling;
-
-    public NewInstanceObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, bool enableReferenceHandling)
-        : base(sourceType, targetType)
-    {
-        _enableReferenceHandling = enableReferenceHandling;
-    }
 
     public void AddConstructorParameterMapping(ConstructorParameterMapping mapping) => _constructorPropertyMappings.Add(mapping);
 
@@ -32,7 +27,7 @@ public class NewInstanceObjectMemberMethodMapping : ObjectMemberMethodMapping, I
     {
         var targetVariableName = ctx.NameBuilder.New(TargetVariableName);
 
-        if (_enableReferenceHandling)
+        if (enableReferenceHandling)
         {
             // TryGetReference
             yield return ReferenceHandlingSyntaxFactoryHelper.TryGetReference(ctx, this);
@@ -55,7 +50,7 @@ public class NewInstanceObjectMemberMethodMapping : ObjectMemberMethodMapping, I
 
         // set the reference as soon as it is created,
         // as property mappings could refer to the same instance.
-        if (_enableReferenceHandling)
+        if (enableReferenceHandling)
         {
             // SetReference
             yield return ctx.SyntaxFactory.ExpressionStatement(

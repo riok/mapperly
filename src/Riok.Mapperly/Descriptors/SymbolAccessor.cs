@@ -8,10 +8,8 @@ using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
 
-public class SymbolAccessor
+public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSymbol mapperSymbol)
 {
-    private readonly CompilationContext _compilationContext;
-    private readonly INamedTypeSymbol _mapperSymbol;
     private readonly Dictionary<ISymbol, ImmutableArray<AttributeData>> _attributes = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<ISymbol>> _allMembers = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<IMappableMember>> _allAccessibleMembers =
@@ -23,13 +21,7 @@ public class SymbolAccessor
 
     private MemberVisibility _memberVisibility = MemberVisibility.AllAccessible;
 
-    public SymbolAccessor(CompilationContext compilationContext, INamedTypeSymbol mapperSymbol)
-    {
-        _compilationContext = compilationContext;
-        _mapperSymbol = mapperSymbol;
-    }
-
-    private Compilation Compilation => _compilationContext.Compilation;
+    private Compilation Compilation => compilationContext.Compilation;
 
     internal void SetMemberVisibility(MemberVisibility visibility) => _memberVisibility = visibility;
 
@@ -37,7 +29,7 @@ public class SymbolAccessor
         symbol is INamedTypeSymbol { IsAbstract: false } namedTypeSymbol
         && namedTypeSymbol.InstanceConstructors.Any(c => c.Parameters.IsDefaultOrEmpty && IsDirectlyAccessible(c));
 
-    public bool IsDirectlyAccessible(ISymbol symbol) => Compilation.IsSymbolAccessibleWithin(symbol, _mapperSymbol);
+    public bool IsDirectlyAccessible(ISymbol symbol) => Compilation.IsSymbolAccessibleWithin(symbol, mapperSymbol);
 
     public bool IsAccessibleToMemberVisibility(ISymbol symbol)
     {
@@ -97,7 +89,7 @@ public class SymbolAccessor
             yield break;
         }
 
-        var attributeSymbol = _compilationContext.Types.Get<T>();
+        var attributeSymbol = compilationContext.Types.Get<T>();
         foreach (var attr in attributes)
         {
             if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass?.ConstructedFrom ?? attr.AttributeClass, attributeSymbol))

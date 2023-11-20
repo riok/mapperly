@@ -10,27 +10,19 @@ namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 /// Does not call the <see cref="ExistingTargetMapping"/> when
 /// the target or source is <c>null</c>.
 /// </summary>
-public class NullDelegateExistingTargetMapping : ExistingTargetMapping
+public class NullDelegateExistingTargetMapping(
+    ITypeSymbol nullableSourceType,
+    ITypeSymbol nullableTargetType,
+    IExistingTargetMapping delegateMapping
+) : ExistingTargetMapping(nullableSourceType, nullableTargetType)
 {
-    private readonly IExistingTargetMapping _delegateMapping;
-
-    public NullDelegateExistingTargetMapping(
-        ITypeSymbol nullableSourceType,
-        ITypeSymbol nullableTargetType,
-        IExistingTargetMapping delegateMapping
-    )
-        : base(nullableSourceType, nullableTargetType)
-    {
-        _delegateMapping = delegateMapping;
-    }
-
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
         // if the source or target type is nullable, add a null guard.
         if (!SourceType.IsNullable() && !TargetType.IsNullable())
-            return _delegateMapping.Build(ctx, target);
+            return delegateMapping.Build(ctx, target);
 
-        var body = _delegateMapping.Build(ctx.AddIndentation(), target).ToArray();
+        var body = delegateMapping.Build(ctx.AddIndentation(), target).ToArray();
 
         // if body is empty don't generate an if statement
         if (body.Length == 0)

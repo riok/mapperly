@@ -9,24 +9,16 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// A derived type mapping maps one base type or interface to another
 /// by implementing a if with instance checks over known types and performs the provided mapping for each type.
 /// </summary>
-public class DerivedTypeIfExpressionMapping : NewInstanceMapping
+public class DerivedTypeIfExpressionMapping(
+    ITypeSymbol sourceType,
+    ITypeSymbol targetType,
+    IReadOnlyCollection<INewInstanceMapping> typeMappings
+) : NewInstanceMapping(sourceType, targetType)
 {
-    private readonly IReadOnlyCollection<INewInstanceMapping> _typeMappings;
-
-    public DerivedTypeIfExpressionMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
-        IReadOnlyCollection<INewInstanceMapping> typeMappings
-    )
-        : base(sourceType, targetType)
-    {
-        _typeMappings = typeMappings;
-    }
-
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         // source is A x ? MapToA(x) : <other cases>
-        var typeExpressions = _typeMappings
+        var typeExpressions = typeMappings
             .Reverse()
             .Aggregate<INewInstanceMapping, ExpressionSyntax>(
                 DefaultLiteral(),

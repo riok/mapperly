@@ -9,20 +9,13 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// (eg. target.A = source.B)
 /// </summary>
 [DebuggerDisplay("MemberAssignmentMapping({SourcePath.FullName} => {TargetPath.FullName})")]
-public class MemberAssignmentMapping : IMemberAssignmentMapping
+public class MemberAssignmentMapping(SetterMemberPath targetPath, IMemberMapping mapping) : IMemberAssignmentMapping
 {
-    private readonly IMemberMapping _mapping;
-    private readonly SetterMemberPath _targetPath;
-
-    public MemberAssignmentMapping(SetterMemberPath targetPath, IMemberMapping mapping)
-    {
-        _targetPath = targetPath;
-        _mapping = mapping;
-    }
+    private readonly IMemberMapping _mapping = mapping;
 
     public GetterMemberPath SourcePath => _mapping.SourcePath;
 
-    public MemberPath TargetPath => _targetPath;
+    public MemberPath TargetPath => targetPath;
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess) =>
         ctx.SyntaxFactory.SingleStatement(BuildExpression(ctx, targetAccess));
@@ -32,7 +25,7 @@ public class MemberAssignmentMapping : IMemberAssignmentMapping
         var mappedValue = _mapping.Build(ctx);
 
         // target.SetValue(source.Value); or target.Value = source.Value;
-        return _targetPath.BuildAssignment(targetAccess, mappedValue);
+        return targetPath.BuildAssignment(targetAccess, mappedValue);
     }
 
     public override bool Equals(object? obj)

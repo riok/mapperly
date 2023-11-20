@@ -4,21 +4,14 @@ using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.ObjectFactories;
 
-public class GenericSourceTargetObjectFactory : ObjectFactory
+public class GenericSourceTargetObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol method, int sourceTypeParameterIndex)
+    : ObjectFactory(symbolAccessor, method)
 {
-    private readonly int _sourceTypeParameterIndex;
-    private readonly int _targetTypeParameterIndex;
-
-    public GenericSourceTargetObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol method, int sourceTypeParameterIndex)
-        : base(symbolAccessor, method)
-    {
-        _sourceTypeParameterIndex = sourceTypeParameterIndex;
-        _targetTypeParameterIndex = (sourceTypeParameterIndex + 1) % 2;
-    }
+    private readonly int _targetTypeParameterIndex = (sourceTypeParameterIndex + 1) % 2;
 
     public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
         SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(
-            Method.TypeParameters[_sourceTypeParameterIndex],
+            Method.TypeParameters[sourceTypeParameterIndex],
             sourceType,
             Method.Parameters[0].Type.NullableAnnotation
         )
@@ -31,7 +24,7 @@ public class GenericSourceTargetObjectFactory : ObjectFactory
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source)
     {
         var typeParams = new TypeSyntax[2];
-        typeParams[_sourceTypeParameterIndex] = NonNullableIdentifier(sourceType);
+        typeParams[sourceTypeParameterIndex] = NonNullableIdentifier(sourceType);
         typeParams[_targetTypeParameterIndex] = NonNullableIdentifier(targetTypeToCreate);
         return GenericInvocation(Method.Name, typeParams, source);
     }

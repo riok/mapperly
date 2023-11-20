@@ -11,24 +11,19 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// mapping properties via ctor, not by assigning.
 /// <seealso cref="NewInstanceObjectMemberMethodMapping"/>
 /// </summary>
-public class NewValueTupleExpressionMapping : ObjectMemberMethodMapping, INewValueTupleMapping
+public class NewValueTupleExpressionMapping(ITypeSymbol sourceType, ITypeSymbol targetType, int argumentCount)
+    : ObjectMemberMethodMapping(sourceType, targetType),
+        INewValueTupleMapping
 {
-    private readonly int _argumentCount;
     private const string TargetVariableName = "target";
     private readonly HashSet<ValueTupleConstructorParameterMapping> _constructorPropertyMappings = new();
-
-    public NewValueTupleExpressionMapping(ITypeSymbol sourceType, ITypeSymbol targetType, int argumentCount)
-        : base(sourceType, targetType)
-    {
-        _argumentCount = argumentCount;
-    }
 
     public void AddConstructorParameterMapping(ValueTupleConstructorParameterMapping mapping) => _constructorPropertyMappings.Add(mapping);
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         // generate error if constructor argument don't match
-        if (_constructorPropertyMappings.Count != _argumentCount)
+        if (_constructorPropertyMappings.Count != argumentCount)
         {
             return ctx.SyntaxFactory.ThrowMappingNotImplementedExceptionStatement();
         }
@@ -39,7 +34,7 @@ public class NewValueTupleExpressionMapping : ObjectMemberMethodMapping, INewVal
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         // generate error if constructor argument don't match
-        if (_constructorPropertyMappings.Count != _argumentCount)
+        if (_constructorPropertyMappings.Count != argumentCount)
         {
             yield return ctx.SyntaxFactory.ExpressionStatement(ctx.SyntaxFactory.ThrowMappingNotImplementedExceptionStatement());
             yield break;

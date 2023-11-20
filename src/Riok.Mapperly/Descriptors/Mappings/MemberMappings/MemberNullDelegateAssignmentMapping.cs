@@ -9,24 +9,15 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// a member mapping container, which performs a null check before the mappings.
 /// </summary>
 [DebuggerDisplay("MemberNullDelegateAssignmentMapping({_nullConditionalSourcePath} != null)")]
-public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContainer
+public class MemberNullDelegateAssignmentMapping(
+    GetterMemberPath nullConditionalSourcePath,
+    IMemberAssignmentMappingContainer parent,
+    bool throwInsteadOfConditionalNullMapping,
+    bool needsNullSafeAccess
+) : MemberAssignmentMappingContainer(parent)
 {
-    private readonly GetterMemberPath _nullConditionalSourcePath;
-    private readonly bool _throwInsteadOfConditionalNullMapping;
-    private readonly bool _needsNullSafeAccess;
-
-    public MemberNullDelegateAssignmentMapping(
-        GetterMemberPath nullConditionalSourcePath,
-        IMemberAssignmentMappingContainer parent,
-        bool throwInsteadOfConditionalNullMapping,
-        bool needsNullSafeAccess
-    )
-        : base(parent)
-    {
-        _needsNullSafeAccess = needsNullSafeAccess;
-        _nullConditionalSourcePath = nullConditionalSourcePath;
-        _throwInsteadOfConditionalNullMapping = throwInsteadOfConditionalNullMapping;
-    }
+    private readonly GetterMemberPath _nullConditionalSourcePath = nullConditionalSourcePath;
+    private readonly bool _throwInsteadOfConditionalNullMapping = throwInsteadOfConditionalNullMapping;
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
@@ -34,7 +25,7 @@ public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContai
         //   target.Value = Map(Source.Name);
         // else
         //   throw ...
-        var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, false, _needsNullSafeAccess, true);
+        var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, false, needsNullSafeAccess, true);
         var nameofSourceAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, false, false, true);
         var condition = IsNotNull(sourceNullConditionalAccess);
         var conditionCtx = ctx.AddIndentation();
