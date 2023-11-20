@@ -16,9 +16,9 @@ public partial class Mapper
     private partial global::B Map(global::A source)
     {
         var target = new global::B();
-        if (source.Nested?.Nested2 != null)
+        if (source.Nested?.Nested2 is { } sourceNestedNested2)
         {
-            target.NestedValue4 = source.Nested.Nested2.Value3;
+            target.NestedValue4 = sourceNestedNested2.Value3;
         }
         return target;
     }

@@ -8,9 +8,9 @@ public partial class Mapper
         if (source == null)
             return default;
         var target = new global::B();
-        if (source.Value != null)
+        if (source.Value is { } sourceValue)
         {
-            target.Value = MapToD(source.Value);
+            target.Value = MapToD(sourceValue);
         }
         return target;
     }

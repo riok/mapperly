@@ -56,38 +56,38 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 IntInitOnlyValue = DirectInt(src.IntInitOnlyValue),
                 RequiredValue = DirectInt(src.RequiredValue),
             };
-            if (src.NullableFlattening != null)
+            if (src.NullableFlattening is { } srcNullableFlattening)
             {
-                target.NullableFlatteningIdValue = CastIntNullable(src.NullableFlattening.IdValue);
+                target.NullableFlatteningIdValue = CastIntNullable(srcNullableFlattening.IdValue);
             }
-            if (src.NestedNullable != null)
+            if (src.NestedNullable is { } srcNestedNullable)
             {
-                target.NestedNullableIntValue = DirectInt(src.NestedNullable.IntValue);
-                target.NestedNullable = MapToTestObjectNestedDto(src.NestedNullable);
+                target.NestedNullableIntValue = DirectInt(srcNestedNullable.IntValue);
+                target.NestedNullable = MapToTestObjectNestedDto(srcNestedNullable);
             }
-            if (src.NestedNullableTargetNotNullable != null)
+            if (src.NestedNullableTargetNotNullable is { } srcNestedNullableTargetNotNullable)
             {
-                target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(src.NestedNullableTargetNotNullable);
+                target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(srcNestedNullableTargetNotNullable);
             }
-            if (src.StringNullableTargetNotNullable != null)
+            if (src.StringNullableTargetNotNullable is { } srcStringNullableTargetNotNullable)
             {
-                target.StringNullableTargetNotNullable = src.StringNullableTargetNotNullable;
+                target.StringNullableTargetNotNullable = srcStringNullableTargetNotNullable;
             }
-            if (src.TupleValue != null)
+            if (src.TupleValue is { } srcTupleValue)
             {
-                target.TupleValue = MapToValueTuple(src.TupleValue.Value);
+                target.TupleValue = MapToValueTuple(srcTupleValue);
             }
-            if (src.RecursiveObject != null)
+            if (src.RecursiveObject is { } srcRecursiveObject)
             {
-                target.RecursiveObject = MapToDtoExt(src.RecursiveObject);
+                target.RecursiveObject = MapToDtoExt(srcRecursiveObject);
             }
-            if (src.NullableReadOnlyObjectCollection != null)
+            if (src.NullableReadOnlyObjectCollection is { } srcNullableReadOnlyObjectCollection)
             {
-                target.NullableReadOnlyObjectCollection = MapToTestObjectNestedDtoArray(src.NullableReadOnlyObjectCollection);
+                target.NullableReadOnlyObjectCollection = MapToTestObjectNestedDtoArray(srcNullableReadOnlyObjectCollection);
             }
-            if (src.SubObject != null)
+            if (src.SubObject is { } srcSubObject)
             {
-                target.SubObject = MapToInheritanceSubObjectDto(src.SubObject);
+                target.SubObject = MapToInheritanceSubObjectDto(srcSubObject);
             }
             target.IntValue = DirectInt(src.IntValue);
             target.StringValue = src.StringValue;
@@ -141,43 +141,43 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 IntInitOnlyValue = DirectInt(testObject.IntInitOnlyValue),
                 RequiredValue = DirectInt(testObject.RequiredValue),
             };
-            if (testObject.NullableFlattening != null)
+            if (testObject.NullableFlattening is { } testObjectNullableFlattening)
             {
-                target.NullableFlatteningIdValue = CastIntNullable(testObject.NullableFlattening.IdValue);
+                target.NullableFlatteningIdValue = CastIntNullable(testObjectNullableFlattening.IdValue);
             }
-            if (testObject.NullableUnflatteningIdValue != null)
+            if (testObject.NullableUnflatteningIdValue is { } testObjectNullableUnflatteningIdValue)
             {
                 target.NullableUnflattening ??= new();
-                target.NullableUnflattening.IdValue = DirectInt(testObject.NullableUnflatteningIdValue.Value);
+                target.NullableUnflattening.IdValue = DirectInt(testObjectNullableUnflatteningIdValue);
             }
-            if (testObject.NestedNullable != null)
+            if (testObject.NestedNullable is { } testObjectNestedNullable)
             {
-                target.NestedNullableIntValue = DirectInt(testObject.NestedNullable.IntValue);
-                target.NestedNullable = MapToTestObjectNestedDto(testObject.NestedNullable);
+                target.NestedNullableIntValue = DirectInt(testObjectNestedNullable.IntValue);
+                target.NestedNullable = MapToTestObjectNestedDto(testObjectNestedNullable);
             }
-            if (testObject.NestedNullableTargetNotNullable != null)
+            if (testObject.NestedNullableTargetNotNullable is { } testObjectNestedNullableTargetNotNullable)
             {
-                target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(testObject.NestedNullableTargetNotNullable);
+                target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(testObjectNestedNullableTargetNotNullable);
             }
-            if (testObject.StringNullableTargetNotNullable != null)
+            if (testObject.StringNullableTargetNotNullable is { } testObjectStringNullableTargetNotNullable)
             {
-                target.StringNullableTargetNotNullable = testObject.StringNullableTargetNotNullable;
+                target.StringNullableTargetNotNullable = testObjectStringNullableTargetNotNullable;
             }
-            if (testObject.TupleValue != null)
+            if (testObject.TupleValue is { } testObjectTupleValue)
             {
-                target.TupleValue = MapToValueTuple(testObject.TupleValue.Value);
+                target.TupleValue = MapToValueTuple(testObjectTupleValue);
             }
-            if (testObject.RecursiveObject != null)
+            if (testObject.RecursiveObject is { } testObjectRecursiveObject)
             {
-                target.RecursiveObject = MapToDtoExt(testObject.RecursiveObject);
+                target.RecursiveObject = MapToDtoExt(testObjectRecursiveObject);
             }
-            if (testObject.NullableReadOnlyObjectCollection != null)
+            if (testObject.NullableReadOnlyObjectCollection is { } testObjectNullableReadOnlyObjectCollection)
             {
-                target.NullableReadOnlyObjectCollection = MapToTestObjectNestedDtoArray(testObject.NullableReadOnlyObjectCollection);
+                target.NullableReadOnlyObjectCollection = MapToTestObjectNestedDtoArray(testObjectNullableReadOnlyObjectCollection);
             }
-            if (testObject.SubObject != null)
+            if (testObject.SubObject is { } testObjectSubObject)
             {
-                target.SubObject = MapToInheritanceSubObjectDto(testObject.SubObject);
+                target.SubObject = MapToInheritanceSubObjectDto(testObjectSubObject);
             }
             target.IntValue = DirectInt(testObject.IntValue);
             target.StringValue = testObject.StringValue;
@@ -233,29 +233,29 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 IntInitOnlyValue = DirectInt(dto.IntInitOnlyValue),
                 RequiredValue = DirectInt(dto.RequiredValue),
             };
-            if (dto.NullableUnflattening != null)
+            if (dto.NullableUnflattening is { } dtoNullableUnflattening)
             {
-                target.NullableUnflatteningIdValue = CastIntNullable(dto.NullableUnflattening.IdValue);
+                target.NullableUnflatteningIdValue = CastIntNullable(dtoNullableUnflattening.IdValue);
             }
-            if (dto.NestedNullable != null)
+            if (dto.NestedNullable is { } dtoNestedNullable)
             {
-                target.NestedNullable = MapToTestObjectNested(dto.NestedNullable);
+                target.NestedNullable = MapToTestObjectNested(dtoNestedNullable);
             }
-            if (dto.TupleValue != null)
+            if (dto.TupleValue is { } dtoTupleValue)
             {
-                target.TupleValue = MapToValueTuple1(dto.TupleValue.Value);
+                target.TupleValue = MapToValueTuple1(dtoTupleValue);
             }
-            if (dto.RecursiveObject != null)
+            if (dto.RecursiveObject is { } dtoRecursiveObject)
             {
-                target.RecursiveObject = MapFromDto(dto.RecursiveObject);
+                target.RecursiveObject = MapFromDto(dtoRecursiveObject);
             }
-            if (dto.NullableReadOnlyObjectCollection != null)
+            if (dto.NullableReadOnlyObjectCollection is { } dtoNullableReadOnlyObjectCollection)
             {
-                target.NullableReadOnlyObjectCollection = MapToIReadOnlyCollection(dto.NullableReadOnlyObjectCollection);
+                target.NullableReadOnlyObjectCollection = MapToIReadOnlyCollection(dtoNullableReadOnlyObjectCollection);
             }
-            if (dto.SubObject != null)
+            if (dto.SubObject is { } dtoSubObject)
             {
-                target.SubObject = MapToInheritanceSubObject(dto.SubObject);
+                target.SubObject = MapToInheritanceSubObject(dtoSubObject);
             }
             target.IntValue = DirectInt(dto.IntValue);
             target.StringValue = dto.StringValue;
@@ -307,38 +307,38 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public static partial void UpdateDto(global::Riok.Mapperly.IntegrationTests.Models.TestObject source, global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto target)
         {
-            if (source.NullableFlattening != null)
+            if (source.NullableFlattening is { } sourceNullableFlattening)
             {
-                target.NullableFlatteningIdValue = CastIntNullable(source.NullableFlattening.IdValue);
+                target.NullableFlatteningIdValue = CastIntNullable(sourceNullableFlattening.IdValue);
             }
-            if (source.NestedNullable != null)
+            if (source.NestedNullable is { } sourceNestedNullable)
             {
-                target.NestedNullableIntValue = DirectInt(source.NestedNullable.IntValue);
-                target.NestedNullable = MapToTestObjectNestedDto(source.NestedNullable);
+                target.NestedNullableIntValue = DirectInt(sourceNestedNullable.IntValue);
+                target.NestedNullable = MapToTestObjectNestedDto(sourceNestedNullable);
             }
-            if (source.NestedNullableTargetNotNullable != null)
+            if (source.NestedNullableTargetNotNullable is { } sourceNestedNullableTargetNotNullable)
             {
-                target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(source.NestedNullableTargetNotNullable);
+                target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(sourceNestedNullableTargetNotNullable);
             }
-            if (source.StringNullableTargetNotNullable != null)
+            if (source.StringNullableTargetNotNullable is { } sourceStringNullableTargetNotNullable)
             {
-                target.StringNullableTargetNotNullable = source.StringNullableTargetNotNullable;
+                target.StringNullableTargetNotNullable = sourceStringNullableTargetNotNullable;
             }
-            if (source.TupleValue != null)
+            if (source.TupleValue is { } sourceTupleValue)
             {
-                target.TupleValue = MapToValueTuple(source.TupleValue.Value);
+                target.TupleValue = MapToValueTuple(sourceTupleValue);
             }
-            if (source.RecursiveObject != null)
+            if (source.RecursiveObject is { } sourceRecursiveObject)
             {
-                target.RecursiveObject = MapToDtoExt(source.RecursiveObject);
+                target.RecursiveObject = MapToDtoExt(sourceRecursiveObject);
             }
-            if (source.NullableReadOnlyObjectCollection != null)
+            if (source.NullableReadOnlyObjectCollection is { } sourceNullableReadOnlyObjectCollection)
             {
-                target.NullableReadOnlyObjectCollection = MapToTestObjectNestedDtoArray(source.NullableReadOnlyObjectCollection);
+                target.NullableReadOnlyObjectCollection = MapToTestObjectNestedDtoArray(sourceNullableReadOnlyObjectCollection);
             }
-            if (source.SubObject != null)
+            if (source.SubObject is { } sourceSubObject)
             {
-                target.SubObject = MapToInheritanceSubObjectDto(source.SubObject);
+                target.SubObject = MapToInheritanceSubObjectDto(sourceSubObject);
             }
             target.CtorValue = DirectInt(source.CtorValue);
             target.CtorValue2 = DirectInt(source.CtorValue2);

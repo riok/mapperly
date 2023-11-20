@@ -1,7 +1,9 @@
+﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors;
+using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Emit.Syntax;
 using Riok.Mapperly.Helpers;
 
@@ -16,6 +18,26 @@ public class GetterMemberPath : MemberPath
     {
         var memberPathArray = memberPath.Path.Select(item => BuildMappableMember(ctx, item)).ToArray();
         return new GetterMemberPath(memberPathArray);
+    }
+
+    public static bool TryBuild(
+        TypeMappingBuildContext ctx,
+        MemberPath memberPath,
+        [NotNullWhen(true)] out GetterMemberPath? getterMemberPath
+    )
+    {
+        if (
+            ctx.TrimSourcePath.Count > 0
+            && memberPath.Path.Count >= ctx.TrimSourcePath.Count
+            && memberPath.Path.Take(ctx.TrimSourcePath.Count).SequenceEqual(ctx.TrimSourcePath)
+        )
+        {
+            getterMemberPath = new GetterMemberPath(memberPath.Path.Skip(ctx.TrimSourcePath.Count).ToArray());
+            return true;
+        }
+
+        getterMemberPath = null;
+        return false;
     }
 
     public static IEnumerable<IMappableMember> Build(MappingBuilderContext ctx, IEnumerable<IMappableMember> path)

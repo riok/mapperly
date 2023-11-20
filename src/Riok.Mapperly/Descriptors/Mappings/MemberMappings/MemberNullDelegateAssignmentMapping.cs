@@ -30,14 +30,31 @@ public class MemberNullDelegateAssignmentMapping : MemberAssignmentMappingContai
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
-        // if (source.Value != null)
-        //   target.Value = Map(Source.Name);
+        // if (source.Value is {} sourceValue)
+        //   target.Value = Map(sourceValue);
         // else
         //   throw ...
-        var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, false, _needsNullSafeAccess, true);
-        var nameofSourceAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, false, false, true);
-        var condition = IsNotNull(sourceNullConditionalAccess);
-        var conditionCtx = ctx.AddIndentation();
+        if (!GetterMemberPath.TryBuild(ctx, _nullConditionalSourcePath, out var nullConditionalSourcePath))
+        {
+            nullConditionalSourcePath = _nullConditionalSourcePath;
+        }
+
+        var sourceNullConditionalAccess = nullConditionalSourcePath.BuildAccess(ctx.Source, false, _needsNullSafeAccess, true);
+        var nameofSourceAccess = nullConditionalSourcePath.BuildAccess(ctx.Source, false, false, true);
+
+        var (conditionCtx, nullGuardedValue) = ctx.AddIndentation()
+            .WithTrimSourcePath(nullConditionalSourcePath.Path)
+            .WithNewSource(
+                sourceNullConditionalAccess
+                    .ToFullString()
+                    .Replace(".", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("?", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                    .Replace("(", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+                    .Replace(")", string.Empty, StringComparison.InvariantCultureIgnoreCase)
+            );
+
+        var condition = IsNotNullWithPattern(sourceNullConditionalAccess, nullGuardedValue);
+
         var trueClause = base.Build(conditionCtx, targetAccess);
         var elseClause = _throwInsteadOfConditionalNullMapping
             ? new[] { conditionCtx.SyntaxFactory.ExpressionStatement(ThrowArgumentNullException(nameofSourceAccess)) }

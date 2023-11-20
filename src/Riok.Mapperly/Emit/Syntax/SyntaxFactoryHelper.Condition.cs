@@ -75,6 +75,13 @@ public partial struct SyntaxFactoryHelper
     public static BinaryExpressionSyntax IsNotNull(ExpressionSyntax expression) =>
         BinaryExpression(SyntaxKind.NotEqualsExpression, expression, NullLiteral());
 
+    public static ExpressionSyntax IsNotNullWithPattern(ExpressionSyntax expression, string nullGuardedValue) =>
+        IsPatternExpression(
+                expression.WithTrailingTrivia(TriviaList(Space)),
+                PropertyPatternClause().WithDesignation(SingleVariableDesignation(Identifier(nullGuardedValue)))
+            )
+            .WithIsKeyword(Token(TriviaList(), SyntaxKind.IsKeyword, TriviaList(Space)));
+
     public static BinaryExpressionSyntax Is(ExpressionSyntax left, ExpressionSyntax right) =>
         BinaryExpression(SyntaxKind.IsExpression, left, right);
 
@@ -97,4 +104,13 @@ public partial struct SyntaxFactoryHelper
 
     private static ExpressionSyntax BinaryExpression(SyntaxKind kind, IEnumerable<ExpressionSyntax?> values) =>
         values.WhereNotNull().Aggregate((left, right) => BinaryExpression(kind, left, right));
+
+    private static RecursivePatternSyntax PropertyPatternClause() =>
+        RecursivePattern()
+            .WithPropertyPatternClause(
+                SyntaxFactory
+                    .PropertyPatternClause()
+                    .WithOpenBraceToken(Token(TriviaList(), SyntaxKind.OpenBraceToken, TriviaList(Space)))
+                    .WithCloseBraceToken(Token(TriviaList(), SyntaxKind.CloseBraceToken, TriviaList(Space)))
+            );
 }

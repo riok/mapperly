@@ -30,7 +30,12 @@ public class MemberMapping : IMemberMapping
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        ctx = ctx.WithSource(SourcePath.BuildAccess(ctx.Source, _addValuePropertyOnNullable, _nullConditionalAccess));
+        if (!GetterMemberPath.TryBuild(ctx, SourcePath, out var sourcePath))
+        {
+            sourcePath = SourcePath;
+        }
+
+        ctx = ctx.WithSource(sourcePath.BuildAccess(ctx.Source, _addValuePropertyOnNullable, _nullConditionalAccess));
         return _delegateMapping.Build(ctx);
     }
 }
