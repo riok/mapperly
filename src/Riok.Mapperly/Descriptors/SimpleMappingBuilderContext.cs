@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBuilders;
+using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
@@ -12,7 +13,7 @@ namespace Riok.Mapperly.Descriptors;
 public class SimpleMappingBuilderContext
 {
     private readonly MapperDescriptor _descriptor;
-    private readonly List<Diagnostic> _diagnostics;
+    private readonly DiagnosticCollection _diagnostics;
     private readonly CompilationContext _compilationContext;
     private readonly MapperConfigurationReader _configurationReader;
 
@@ -23,7 +24,7 @@ public class SimpleMappingBuilderContext
         AttributeDataAccessor attributeAccessor,
         MapperDescriptor descriptor,
         UnsafeAccessorContext unsafeAccessorContext,
-        List<Diagnostic> diagnostics,
+        DiagnosticCollection diagnostics,
         MappingBuilder mappingBuilder,
         ExistingTargetMappingBuilder existingTargetMappingBuilder
     )
@@ -73,22 +74,8 @@ public class SimpleMappingBuilderContext
     public virtual bool IsConversionEnabled(MappingConversionType conversionType) =>
         MapperConfiguration.EnabledConversions.HasFlag(conversionType);
 
-    public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? location, params object[] messageArgs)
-    {
-        // cannot use the symbol since it would break the incremental generator
-        // due to being different for each compilation.
-        for (var i = 0; i < messageArgs.Length; i++)
-        {
-            if (messageArgs[i] is ISymbol symbol)
-            {
-                messageArgs[i] = symbol.ToDisplayString();
-            }
-        }
-
-        var syntaxNode = location?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
-        var nodeLocation = syntaxNode?.GetLocation();
-        _diagnostics.Add(Diagnostic.Create(descriptor, nodeLocation ?? _descriptor.Syntax.GetLocation(), messageArgs));
-    }
+    public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? location, params object[] messageArgs) =>
+        _diagnostics.ReportDiagnostic(descriptor, location, messageArgs);
 
     protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef) => _configurationReader.BuildFor(configRef);
 }

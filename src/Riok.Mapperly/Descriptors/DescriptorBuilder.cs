@@ -25,7 +25,7 @@ public class DescriptorBuilder
     private readonly MethodNameBuilder _methodNameBuilder = new();
     private readonly MappingBodyBuilder _mappingBodyBuilder;
     private readonly SimpleMappingBuilderContext _builderContext;
-    private readonly List<Diagnostic> _diagnostics = new();
+    private readonly DiagnosticCollection _diagnostics;
     private readonly UnsafeAccessorContext _unsafeAccessorContext;
     private readonly MapperConfigurationReader _configurationReader;
 
@@ -44,6 +44,7 @@ public class DescriptorBuilder
 
         var attributeAccessor = new AttributeDataAccessor(symbolAccessor);
         _configurationReader = new MapperConfigurationReader(attributeAccessor, mapperDeclaration.Symbol, defaultMapperConfiguration);
+        _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
 
         _builderContext = new SimpleMappingBuilderContext(
             compilationContext,
@@ -58,11 +59,12 @@ public class DescriptorBuilder
         );
     }
 
-    public (MapperDescriptor descriptor, IReadOnlyCollection<Diagnostic> diagnostics) Build(CancellationToken cancellationToken)
+    public (MapperDescriptor descriptor, DiagnosticCollection diagnostics) Build(CancellationToken cancellationToken)
     {
         ConfigureMemberVisibility();
         ReserveMethodNames();
         ExtractUserMappings();
+
         // ExtractObjectFactories needs to be called after ExtractUserMappings due to configuring mapperDescriptor.Static
         var objectFactories = ExtractObjectFactories();
         EnqueueUserMappings(objectFactories);
@@ -93,9 +95,7 @@ public class DescriptorBuilder
         if (includedMembers.HasFlag(MemberVisibility.Accessible))
             return;
 
-        _diagnostics.Add(
-            Diagnostic.Create(Diagnostics.DiagnosticDescriptors.UnsafeAccessorNotAvailable, _mapperDescriptor.Syntax.GetLocation())
-        );
+        _diagnostics.ReportDiagnostic(DiagnosticDescriptors.UnsafeAccessorNotAvailable);
         _symbolAccessor.SetMemberVisibility(includedMembers | MemberVisibility.Accessible);
     }
 
@@ -131,12 +131,10 @@ public class DescriptorBuilder
 
         if (_mapperDescriptor.Static && firstNonStaticUserMapping is not null)
         {
-            _diagnostics.Add(
-                Diagnostic.Create(
-                    DiagnosticDescriptors.MixingStaticPartialWithInstanceMethod,
-                    firstNonStaticUserMapping.Locations.FirstOrDefault(),
-                    _mapperDescriptor.Symbol.ToDisplayString()
-                )
+            _diagnostics.ReportDiagnostic(
+                DiagnosticDescriptors.MixingStaticPartialWithInstanceMethod,
+                firstNonStaticUserMapping,
+                _mapperDescriptor.Symbol.ToDisplayString()
             );
         }
     }
