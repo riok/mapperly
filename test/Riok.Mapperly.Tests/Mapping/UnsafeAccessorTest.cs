@@ -144,6 +144,44 @@ public class UnsafeAccessorTest
     }
 
     [Fact]
+    public void PropertyWithPrivateSetter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source); ",
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; private set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.SetValue(source.Value);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void PropertyWithProtectedSetterWhenDisabledShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All & ~MemberVisibility.Protected),
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; protected set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+    }
+
+    [Fact]
     public Task PrivateField()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
