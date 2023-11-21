@@ -10,13 +10,12 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// mapping properties via ctor, but not by assigning.
 /// <seealso cref="NewInstanceObjectMemberMethodMapping"/>
 /// </summary>
-public class NewValueTupleConstructorMapping : NewInstanceMapping, INewValueTupleMapping
+public class NewValueTupleConstructorMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    : NewInstanceMapping(sourceType, targetType),
+        INewValueTupleMapping
 {
     private const string ValueTupleName = "global::System.ValueTuple";
     private readonly HashSet<ValueTupleConstructorParameterMapping> _constructorPropertyMappings = new();
-
-    public NewValueTupleConstructorMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        : base(sourceType, targetType) { }
 
     public void AddConstructorParameterMapping(ValueTupleConstructorParameterMapping mapping) => _constructorPropertyMappings.Add(mapping);
 

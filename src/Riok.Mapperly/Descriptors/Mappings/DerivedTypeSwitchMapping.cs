@@ -10,17 +10,10 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// A derived type mapping maps one base type or interface to another
 /// by implementing a type switch over known types and performs the provided mapping for each type.
 /// </summary>
-public class DerivedTypeSwitchMapping : NewInstanceMapping
+public class DerivedTypeSwitchMapping(ITypeSymbol sourceType, ITypeSymbol targetType, IReadOnlyCollection<INewInstanceMapping> typeMappings)
+    : NewInstanceMapping(sourceType, targetType)
 {
     private const string GetTypeMethodName = nameof(GetType);
-
-    private readonly IReadOnlyCollection<INewInstanceMapping> _typeMappings;
-
-    public DerivedTypeSwitchMapping(ITypeSymbol sourceType, ITypeSymbol targetType, IReadOnlyCollection<INewInstanceMapping> typeMappings)
-        : base(sourceType, targetType)
-    {
-        _typeMappings = typeMappings;
-    }
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
@@ -36,9 +29,7 @@ public class DerivedTypeSwitchMapping : NewInstanceMapping
 
         // source switch { A x => MapToADto(x), B x => MapToBDto(x) }
         var (typeArmContext, typeArmVariableName) = ctx.WithNewSource();
-        var arms = _typeMappings
-            .Select(x => BuildSwitchArm(typeArmVariableName, x.SourceType, x.Build(typeArmContext)))
-            .Append(fallbackArm);
+        var arms = typeMappings.Select(x => BuildSwitchArm(typeArmVariableName, x.SourceType, x.Build(typeArmContext))).Append(fallbackArm);
         return ctx.SyntaxFactory.Switch(ctx.Source, arms);
     }
 

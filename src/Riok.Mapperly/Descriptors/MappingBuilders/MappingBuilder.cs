@@ -3,7 +3,7 @@ using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
-public class MappingBuilder
+public class MappingBuilder(MappingCollection mappings)
 {
     private delegate INewInstanceMapping? BuildMapping(MappingBuilderContext context);
 
@@ -31,17 +31,10 @@ public class MappingBuilder
         NewInstanceObjectPropertyMappingBuilder.TryBuildMapping,
     };
 
-    private readonly MappingCollection _mappings;
-
-    public MappingBuilder(MappingCollection mappings)
-    {
-        _mappings = mappings;
-    }
-
     /// <inheritdoc cref="MappingCollection.UserMappings"/>
-    public IReadOnlyCollection<IUserMapping> UserMappings => _mappings.UserMappings;
+    public IReadOnlyCollection<IUserMapping> UserMappings => mappings.UserMappings;
 
-    public INewInstanceMapping? Find(TypeMappingKey mapping) => _mappings.Find(mapping);
+    public INewInstanceMapping? Find(TypeMappingKey mapping) => mappings.Find(mapping);
 
     public INewInstanceMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {
@@ -52,10 +45,10 @@ public class MappingBuilder
 
             if (resultIsReusable)
             {
-                _mappings.AddNewInstanceMapping(mapping, ctx.MappingKey.Configuration);
+                mappings.AddNewInstanceMapping(mapping, ctx.MappingKey.Configuration);
             }
 
-            _mappings.EnqueueToBuildBody(mapping, ctx);
+            mappings.EnqueueToBuildBody(mapping, ctx);
             return mapping;
         }
 

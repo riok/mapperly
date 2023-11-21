@@ -9,15 +9,8 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// target = Map(source);
 /// </code>
 /// </summary>
-public class DelegateMapping : NewInstanceMapping
+public class DelegateMapping(ITypeSymbol sourceType, ITypeSymbol targetType, INewInstanceMapping delegateMapping)
+    : NewInstanceMapping(sourceType, targetType)
 {
-    private readonly INewInstanceMapping _delegateMapping;
-
-    public DelegateMapping(ITypeSymbol sourceType, ITypeSymbol targetType, INewInstanceMapping delegateMapping)
-        : base(sourceType, targetType)
-    {
-        _delegateMapping = delegateMapping;
-    }
-
-    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) => _delegateMapping.Build(ctx);
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) => delegateMapping.Build(ctx);
 }

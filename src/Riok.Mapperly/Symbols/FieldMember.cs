@@ -5,14 +5,9 @@ using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Symbols;
 
-public class FieldMember : IMappableMember
+public class FieldMember(IFieldSymbol fieldSymbol) : IMappableMember
 {
-    private readonly IFieldSymbol _fieldSymbol;
-
-    public FieldMember(IFieldSymbol fieldSymbol)
-    {
-        _fieldSymbol = fieldSymbol;
-    }
+    private readonly IFieldSymbol _fieldSymbol = fieldSymbol;
 
     public string Name => _fieldSymbol.Name;
     public ITypeSymbol Type => _fieldSymbol.Type;

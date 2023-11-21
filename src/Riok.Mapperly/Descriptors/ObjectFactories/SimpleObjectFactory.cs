@@ -8,11 +8,8 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 /// A <see cref="SimpleObjectFactory"/> is an <see cref="ObjectFactory"/> without any parameters and a named return type (not generic).
 /// Example signature: <c>TypeToCreate Create();</c>
 /// </summary>
-public class SimpleObjectFactory : ObjectFactory
+public class SimpleObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol method) : ObjectFactory(symbolAccessor, method)
 {
-    public SimpleObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol method)
-        : base(symbolAccessor, method) { }
-
     public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
         SymbolEqualityComparer.Default.Equals(Method.ReturnType, targetTypeToCreate);
 

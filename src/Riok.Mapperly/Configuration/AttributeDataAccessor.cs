@@ -8,17 +8,10 @@ namespace Riok.Mapperly.Configuration;
 /// <summary>
 /// Creates <see cref="Attribute"/> instances by resolving attribute data from provided symbols.
 /// </summary>
-public class AttributeDataAccessor
+public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 {
     private const string NameOfOperatorName = "nameof";
     private const char FullNameOfPrefix = '@';
-
-    private readonly SymbolAccessor _symbolAccessor;
-
-    public AttributeDataAccessor(SymbolAccessor symbolAccessor)
-    {
-        _symbolAccessor = symbolAccessor;
-    }
 
     public TData AccessSingle<TAttribute, TData>(ISymbol symbol)
         where TAttribute : Attribute
@@ -29,7 +22,7 @@ public class AttributeDataAccessor
         where TData : notnull => Access<TAttribute, TData>(symbol).FirstOrDefault();
 
     public bool HasAttribute<TAttribute>(ISymbol symbol)
-        where TAttribute : Attribute => _symbolAccessor.HasAttribute<TAttribute>(symbol);
+        where TAttribute : Attribute => symbolAccessor.HasAttribute<TAttribute>(symbol);
 
     public IEnumerable<TAttribute> Access<TAttribute>(ISymbol symbol)
         where TAttribute : Attribute => Access<TAttribute, TAttribute>(symbol);
@@ -49,7 +42,7 @@ public class AttributeDataAccessor
         where TAttribute : Attribute
         where TData : notnull
     {
-        var attrDatas = _symbolAccessor.GetAttributes<TAttribute>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<TAttribute>(symbol);
         foreach (var attrData in attrDatas)
         {
             yield return Access<TAttribute, TData>(attrData);

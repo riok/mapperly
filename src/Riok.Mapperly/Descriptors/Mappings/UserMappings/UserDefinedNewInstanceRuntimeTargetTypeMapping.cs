@@ -13,31 +13,19 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 /// A mapping which has a <see cref="Type"/> as a second parameter describing the target type of the mapping.
 /// Generates a switch expression based on the mapping types.
 /// </summary>
-public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMapping, IUserMapping
+public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
+    IMethodSymbol method,
+    MethodParameter sourceParameter,
+    MethodParameter? referenceHandlerParameter,
+    bool enableReferenceHandling,
+    NullFallbackValue nullArm,
+    ITypeSymbol objectType
+) : MethodMapping(method, sourceParameter, referenceHandlerParameter, method.ReturnType), IUserMapping
 {
     private const string IsAssignableFromMethodName = nameof(Type.IsAssignableFrom);
     private const string GetTypeMethodName = nameof(GetType);
 
     private readonly List<RuntimeTargetTypeMapping> _mappings = new();
-    private readonly bool _enableReferenceHandling;
-    private readonly NullFallbackValue _nullArm;
-    private readonly ITypeSymbol _objectType;
-
-    protected UserDefinedNewInstanceRuntimeTargetTypeMapping(
-        IMethodSymbol method,
-        MethodParameter sourceParameter,
-        MethodParameter? referenceHandlerParameter,
-        bool enableReferenceHandling,
-        NullFallbackValue nullArm,
-        ITypeSymbol objectType
-    )
-        : base(method, sourceParameter, referenceHandlerParameter, method.ReturnType)
-    {
-        Method = method;
-        _enableReferenceHandling = enableReferenceHandling;
-        _nullArm = nullArm;
-        _objectType = objectType;
-    }
 
     // requires the user mapping bodies
     // as the delegate mapping of user mappings is only set after bodies are built
@@ -46,7 +34,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMap
     // only the delegate mapping is callable by other mappings.
     public override MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.AfterUserMappings;
 
-    public IMethodSymbol Method { get; }
+    public IMethodSymbol Method { get; } = method;
 
     public override bool CallableByOtherMappings => false;
 
@@ -56,7 +44,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMap
     {
         // if reference handling is enabled and no reference handler parameter is declared
         // a new reference handler is instantiated and used.
-        if (_enableReferenceHandling && ReferenceHandlerParameter == null)
+        if (enableReferenceHandling && ReferenceHandlerParameter == null)
         {
             // var refHandler = new RefHandler();
             var referenceHandlerName = ctx.NameBuilder.New(DefaultReferenceHandlerParameterName);
@@ -83,7 +71,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMap
         var arms = _mappings.Select(x => BuildSwitchArm(typeArmContext, typeArmVariableName, x, targetType));
 
         // null => default / throw
-        arms = arms.Append(SwitchArm(ConstantPattern(NullLiteral()), NullSubstitute(TargetType, ctx.Source, _nullArm)));
+        arms = arms.Append(SwitchArm(ConstantPattern(NullLiteral()), NullSubstitute(TargetType, ctx.Source, nullArm)));
         arms = arms.Append(fallbackArm);
         var switchExpression = ctx.SyntaxFactory.Switch(ctx.Source, arms);
         yield return ctx.SyntaxFactory.Return(switchExpression);
@@ -131,7 +119,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping : MethodMap
         // (TTarget)(object)MapToTarget(source);
         return CastExpression(
             FullyQualifiedIdentifier(TargetType),
-            CastExpression(FullyQualifiedIdentifier(_objectType), mappingExpression)
+            CastExpression(FullyQualifiedIdentifier(objectType), mappingExpression)
         );
     }
 }

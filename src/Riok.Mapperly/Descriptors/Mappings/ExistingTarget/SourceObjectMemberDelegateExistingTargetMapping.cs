@@ -11,26 +11,16 @@ namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 /// Map(source.Span, target);
 /// </code>
 /// </summary>
-public class SourceObjectMemberDelegateExistingTargetMapping : ExistingTargetMapping
+public class SourceObjectMemberDelegateExistingTargetMapping(
+    ITypeSymbol sourceType,
+    ITypeSymbol targetType,
+    string memberName,
+    IExistingTargetMapping delegateMapping
+) : ExistingTargetMapping(sourceType, targetType)
 {
-    private readonly string _memberName;
-    private readonly IExistingTargetMapping _delegateMapping;
-
-    public SourceObjectMemberDelegateExistingTargetMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
-        string memberName,
-        IExistingTargetMapping delegateMapping
-    )
-        : base(sourceType, targetType)
-    {
-        _memberName = memberName;
-        _delegateMapping = delegateMapping;
-    }
-
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
-        var member = MemberAccess(ctx.Source, _memberName);
-        return _delegateMapping.Build(ctx.WithSource(member), target);
+        var member = MemberAccess(ctx.Source, memberName);
+        return delegateMapping.Build(ctx.WithSource(member), target);
     }
 }

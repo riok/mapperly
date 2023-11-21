@@ -18,21 +18,13 @@ namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 ///     target.EnsureCapacity(sourceCount + target.Count);
 /// </code>
 /// </remarks>
-public class EnsureCapacityNonEnumerated : EnsureCapacityInfo
+public class EnsureCapacityNonEnumerated(string targetAccessor, IMethodSymbol getNonEnumeratedMethod) : EnsureCapacityInfo
 {
     private const string SourceCountVariableName = "sourceCount";
-    private readonly string _targetAccessor;
-    private readonly IMethodSymbol _getNonEnumeratedMethod;
-
-    public EnsureCapacityNonEnumerated(string targetAccessor, IMethodSymbol getNonEnumeratedMethod)
-    {
-        _targetAccessor = targetAccessor;
-        _getNonEnumeratedMethod = getNonEnumeratedMethod;
-    }
 
     public override StatementSyntax Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
-        var targetCount = MemberAccess(target, _targetAccessor);
+        var targetCount = MemberAccess(target, targetAccessor);
 
         var countIdentifier = Identifier(ctx.NameBuilder.New(SourceCountVariableName));
         var countIdentifierName = IdentifierName(countIdentifier);
@@ -42,7 +34,7 @@ public class EnsureCapacityNonEnumerated : EnsureCapacityInfo
         var outVarArgument = Argument(DeclarationExpression(VarIdentifier, SingleVariableDesignation(countIdentifier)))
             .WithRefOrOutKeyword(TrailingSpacedToken(SyntaxKind.OutKeyword));
 
-        var getNonEnumeratedInvocation = StaticInvocation(_getNonEnumeratedMethod, enumerableArgument, outVarArgument);
+        var getNonEnumeratedInvocation = StaticInvocation(getNonEnumeratedMethod, enumerableArgument, outVarArgument);
         var ensureCapacity = EnsureCapacityStatement(ctx.SyntaxFactory.AddIndentation(), target, countIdentifierName, targetCount);
         return ctx.SyntaxFactory.If(getNonEnumeratedInvocation, ensureCapacity);
     }

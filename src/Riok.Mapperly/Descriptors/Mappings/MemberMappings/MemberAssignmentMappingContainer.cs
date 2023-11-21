@@ -5,16 +5,10 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// <summary>
 /// A default implementation for <see cref="IMemberAssignmentMappingContainer"/>.
 /// </summary>
-public abstract class MemberAssignmentMappingContainer : IMemberAssignmentMappingContainer
+public abstract class MemberAssignmentMappingContainer(IMemberAssignmentMappingContainer? parent = null) : IMemberAssignmentMappingContainer
 {
     private readonly HashSet<IMemberAssignmentMapping> _delegateMappings = new();
     private readonly HashSet<IMemberAssignmentMappingContainer> _childContainers = new();
-    private readonly IMemberAssignmentMappingContainer? _parent;
-
-    protected MemberAssignmentMappingContainer(IMemberAssignmentMappingContainer? parent = null)
-    {
-        _parent = parent;
-    }
 
     public virtual IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
@@ -32,7 +26,7 @@ public abstract class MemberAssignmentMappingContainer : IMemberAssignmentMappin
     }
 
     public bool HasMemberMappingContainer(IMemberAssignmentMappingContainer container) =>
-        _childContainers.Contains(container) || _parent?.HasMemberMappingContainer(container) == true;
+        _childContainers.Contains(container) || parent?.HasMemberMappingContainer(container) == true;
 
     public void AddMemberMapping(IMemberAssignmentMapping mapping)
     {
@@ -43,5 +37,5 @@ public abstract class MemberAssignmentMappingContainer : IMemberAssignmentMappin
     }
 
     public bool HasMemberMapping(IMemberAssignmentMapping mapping) =>
-        _delegateMappings.Contains(mapping) || _parent?.HasMemberMapping(mapping) == true;
+        _delegateMappings.Contains(mapping) || parent?.HasMemberMapping(mapping) == true;
 }

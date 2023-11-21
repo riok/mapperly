@@ -3,15 +3,9 @@ using Microsoft.CodeAnalysis;
 
 namespace Riok.Mapperly.Diagnostics;
 
-public class DiagnosticCollection : IReadOnlyCollection<Diagnostic>
+public class DiagnosticCollection(Location defaultLocation) : IReadOnlyCollection<Diagnostic>
 {
     private readonly List<Diagnostic> _diagnostics = new();
-    private readonly Location _defaultLocation;
-
-    internal DiagnosticCollection(Location defaultLocation)
-    {
-        _defaultLocation = defaultLocation;
-    }
 
     public IEnumerator<Diagnostic> GetEnumerator() => _diagnostics.GetEnumerator();
 
@@ -33,6 +27,6 @@ public class DiagnosticCollection : IReadOnlyCollection<Diagnostic>
 
         var syntaxNode = location?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
         var nodeLocation = syntaxNode?.GetLocation();
-        _diagnostics.Add(Diagnostic.Create(descriptor, nodeLocation ?? _defaultLocation, messageArgs));
+        _diagnostics.Add(Diagnostic.Create(descriptor, nodeLocation ?? defaultLocation, messageArgs));
     }
 }

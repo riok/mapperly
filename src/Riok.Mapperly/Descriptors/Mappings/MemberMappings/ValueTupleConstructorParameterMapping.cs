@@ -5,17 +5,11 @@ using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
-public class ValueTupleConstructorParameterMapping
+public class ValueTupleConstructorParameterMapping(IFieldSymbol parameter, NullMemberMapping delegateMapping)
 {
-    public ValueTupleConstructorParameterMapping(IFieldSymbol parameter, NullMemberMapping delegateMapping)
-    {
-        DelegateMapping = delegateMapping;
-        Parameter = parameter;
-    }
+    public IFieldSymbol Parameter { get; } = parameter;
 
-    public IFieldSymbol Parameter { get; }
-
-    public NullMemberMapping DelegateMapping { get; }
+    public NullMemberMapping DelegateMapping { get; } = delegateMapping;
 
     public ArgumentSyntax BuildArgument(TypeMappingBuildContext ctx, bool emitFieldName)
     {

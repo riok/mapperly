@@ -9,30 +9,21 @@ namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 /// Enum fallback value which is used if no enum value matched.
 /// Either throws or returns the fallback value.
 /// </summary>
-public class EnumFallbackValueMapping : NewInstanceMapping
+public class EnumFallbackValueMapping(
+    ITypeSymbol source,
+    ITypeSymbol target,
+    INewInstanceMapping? fallbackMapping = null,
+    IFieldSymbol? fallbackMember = null
+) : NewInstanceMapping(source, target)
 {
-    private readonly INewInstanceMapping? _fallbackMapping;
-
-    public EnumFallbackValueMapping(
-        ITypeSymbol source,
-        ITypeSymbol target,
-        INewInstanceMapping? fallbackMapping = null,
-        IFieldSymbol? fallbackMember = null
-    )
-        : base(source, target)
-    {
-        _fallbackMapping = fallbackMapping;
-        FallbackMember = fallbackMember;
-    }
-
-    public IFieldSymbol? FallbackMember { get; }
+    public IFieldSymbol? FallbackMember { get; } = fallbackMember;
 
     public SwitchExpressionArmSyntax BuildDiscardArm(TypeMappingBuildContext ctx) => SwitchArm(DiscardPattern(), Build(ctx));
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        if (_fallbackMapping != null)
-            return _fallbackMapping.Build(ctx);
+        if (fallbackMapping != null)
+            return fallbackMapping.Build(ctx);
 
         if (FallbackMember == null)
             return ThrowArgumentOutOfRangeException(ctx.Source, $"The value of enum {SourceType.Name} is not supported");

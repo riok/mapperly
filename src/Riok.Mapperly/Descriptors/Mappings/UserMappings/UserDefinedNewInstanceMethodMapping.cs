@@ -9,23 +9,14 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 /// <summary>
 /// Represents a mapping method declared but not implemented by the user which results in a new target object instance.
 /// </summary>
-public class UserDefinedNewInstanceMethodMapping : MethodMapping, IDelegateUserMapping
+public class UserDefinedNewInstanceMethodMapping(
+    IMethodSymbol method,
+    MethodParameter sourceParameter,
+    MethodParameter? referenceHandlerParameter,
+    bool enableReferenceHandling
+) : MethodMapping(method, sourceParameter, referenceHandlerParameter, method.ReturnType.UpgradeNullable()), IDelegateUserMapping
 {
-    private readonly bool _enableReferenceHandling;
-
-    public UserDefinedNewInstanceMethodMapping(
-        IMethodSymbol method,
-        MethodParameter sourceParameter,
-        MethodParameter? referenceHandlerParameter,
-        bool enableReferenceHandling
-    )
-        : base(method, sourceParameter, referenceHandlerParameter, method.ReturnType.UpgradeNullable())
-    {
-        _enableReferenceHandling = enableReferenceHandling;
-        Method = method;
-    }
-
-    public IMethodSymbol Method { get; }
+    public IMethodSymbol Method { get; } = method;
 
     public INewInstanceMapping? DelegateMapping { get; private set; }
 
@@ -41,7 +32,7 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IDelegateUserM
         // if reference handling is enabled and no reference handler parameter is declared
         // the generated mapping method is called with a new reference handler instance
         // otherwise the generated method is embedded
-        if (_enableReferenceHandling && ReferenceHandlerParameter == null)
+        if (enableReferenceHandling && ReferenceHandlerParameter == null)
         {
             // new RefHandler();
             var createRefHandler = ctx.SyntaxFactory.CreateInstance(TemplateReference.PreserveReferenceHandler);
@@ -59,7 +50,7 @@ public class UserDefinedNewInstanceMethodMapping : MethodMapping, IDelegateUserM
     /// A <see cref="UserDefinedNewInstanceMethodMapping"/> is callable by other mappings
     /// if either reference handling is not activated, or the user defined a reference handler parameter.
     /// </summary>
-    public override bool CallableByOtherMappings => !_enableReferenceHandling || ReferenceHandlerParameter != null;
+    public override bool CallableByOtherMappings => !enableReferenceHandling || ReferenceHandlerParameter != null;
 
     internal override void EnableReferenceHandling(INamedTypeSymbol iReferenceHandlerType)
     {

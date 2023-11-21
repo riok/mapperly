@@ -11,17 +11,10 @@ namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 /// Uses a switch expression for performance reasons (in comparison to <see cref="Enum.ToString()"/>).
 /// Only supports defined enum values and no flags.
 /// </summary>
-public class EnumToStringMapping : MethodMapping
+public class EnumToStringMapping(ITypeSymbol sourceType, ITypeSymbol targetType, IEnumerable<IFieldSymbol> enumMembers)
+    : MethodMapping(sourceType, targetType)
 {
     private const string ToStringMethodName = nameof(Enum.ToString);
-
-    private readonly IEnumerable<IFieldSymbol> _enumMembers;
-
-    public EnumToStringMapping(ITypeSymbol sourceType, ITypeSymbol targetType, IEnumerable<IFieldSymbol> enumMembers)
-        : base(sourceType, targetType)
-    {
-        _enumMembers = enumMembers;
-    }
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
@@ -30,7 +23,7 @@ public class EnumToStringMapping : MethodMapping
 
         // switch for each name to the enum value
         // eg: Enum1.Value1 => "Value1"
-        var arms = _enumMembers.Select(BuildArm).Append(fallbackArm);
+        var arms = enumMembers.Select(BuildArm).Append(fallbackArm);
         var switchExpr = ctx.SyntaxFactory.Switch(ctx.Source, arms);
         yield return ctx.SyntaxFactory.Return(switchExpr);
     }

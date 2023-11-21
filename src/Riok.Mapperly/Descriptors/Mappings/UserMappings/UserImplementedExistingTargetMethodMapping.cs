@@ -11,30 +11,15 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 /// <summary>
 /// Represents an existing target type mapper which is implemented by the user.
 /// </summary>
-public class UserImplementedExistingTargetMethodMapping : ExistingTargetMapping, IUserMapping
+public class UserImplementedExistingTargetMethodMapping(
+    string? receiver,
+    IMethodSymbol method,
+    MethodParameter sourceParameter,
+    MethodParameter targetParameter,
+    MethodParameter? referenceHandlerParameter
+) : ExistingTargetMapping(method.Parameters[0].Type.UpgradeNullable(), targetParameter.Type.UpgradeNullable()), IUserMapping
 {
-    private readonly MethodParameter _sourceParameter;
-    private readonly MethodParameter _targetParameter;
-    private readonly MethodParameter? _referenceHandlerParameter;
-    private readonly string? _receiver;
-
-    public UserImplementedExistingTargetMethodMapping(
-        string? receiver,
-        IMethodSymbol method,
-        MethodParameter sourceParameter,
-        MethodParameter targetParameter,
-        MethodParameter? referenceHandlerParameter
-    )
-        : base(method.Parameters[0].Type.UpgradeNullable(), targetParameter.Type.UpgradeNullable())
-    {
-        Method = method;
-        _sourceParameter = sourceParameter;
-        _targetParameter = targetParameter;
-        _referenceHandlerParameter = referenceHandlerParameter;
-        _receiver = receiver;
-    }
-
-    public IMethodSymbol Method { get; }
+    public IMethodSymbol Method { get; } = method;
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
@@ -44,10 +29,10 @@ public class UserImplementedExistingTargetMethodMapping : ExistingTargetMapping,
         {
             yield return ctx.SyntaxFactory.ExpressionStatement(
                 Invocation(
-                    _receiver == null ? IdentifierName(Method.Name) : MemberAccess(_receiver, Method.Name),
-                    _sourceParameter.WithArgument(ctx.Source),
-                    _targetParameter.WithArgument(target),
-                    _referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+                    receiver == null ? IdentifierName(Method.Name) : MemberAccess(receiver, Method.Name),
+                    sourceParameter.WithArgument(ctx.Source),
+                    targetParameter.WithArgument(target),
+                    referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
                 )
             );
             yield break;
@@ -55,15 +40,15 @@ public class UserImplementedExistingTargetMethodMapping : ExistingTargetMapping,
 
         var castedThis = CastExpression(
             FullyQualifiedIdentifier(Method.ReceiverType!),
-            _receiver != null ? IdentifierName(_receiver) : ThisExpression()
+            receiver != null ? IdentifierName(receiver) : ThisExpression()
         );
         var method = MemberAccess(ParenthesizedExpression(castedThis), Method.Name);
         yield return ctx.SyntaxFactory.ExpressionStatement(
             Invocation(
                 method,
-                _sourceParameter.WithArgument(ctx.Source),
-                _targetParameter.WithArgument(target),
-                _referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+                sourceParameter.WithArgument(ctx.Source),
+                targetParameter.WithArgument(target),
+                referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
             )
         );
     }

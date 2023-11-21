@@ -12,29 +12,18 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// (eg. <c>source?.A?.B ?? null-substitute</c> or <c>source?.A?.B != null ? MapToD(source.A.B) : null-substitute</c>)
 /// </summary>
 [DebuggerDisplay("NullMemberMapping({SourcePath}: {_delegateMapping})")]
-public class NullMemberMapping : IMemberMapping
+public class NullMemberMapping(
+    INewInstanceMapping delegateMapping,
+    GetterMemberPath sourcePath,
+    ITypeSymbol targetType,
+    NullFallbackValue nullFallback,
+    bool useNullConditionalAccess
+) : IMemberMapping
 {
-    private readonly INewInstanceMapping _delegateMapping;
-    private readonly ITypeSymbol _targetType;
-    private readonly NullFallbackValue _nullFallback;
-    private readonly bool _useNullConditionalAccess;
+    private readonly INewInstanceMapping _delegateMapping = delegateMapping;
+    private readonly NullFallbackValue _nullFallback = nullFallback;
 
-    public NullMemberMapping(
-        INewInstanceMapping delegateMapping,
-        GetterMemberPath sourcePath,
-        ITypeSymbol targetType,
-        NullFallbackValue nullFallback,
-        bool useNullConditionalAccess
-    )
-    {
-        SourcePath = sourcePath;
-        _delegateMapping = delegateMapping;
-        _nullFallback = nullFallback;
-        _useNullConditionalAccess = useNullConditionalAccess;
-        _targetType = targetType;
-    }
-
-    public GetterMemberPath SourcePath { get; }
+    public GetterMemberPath SourcePath { get; } = sourcePath;
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
@@ -53,22 +42,22 @@ public class NullMemberMapping : IMemberMapping
         // source.A?.B == null ? <null-substitute> : Map(source.A.B.Value)
         // use simplified coalesce expression for synthetic mappings:
         // source.A?.B ?? <null-substitute>
-        if (_delegateMapping.IsSynthetic && (_useNullConditionalAccess || !SourcePath.IsAnyObjectPathNullable()))
+        if (_delegateMapping.IsSynthetic && (useNullConditionalAccess || !SourcePath.IsAnyObjectPathNullable()))
         {
             var nullConditionalSourceAccess = SourcePath.BuildAccess(ctx.Source, nullConditional: true);
             var nameofSourceAccess = SourcePath.BuildAccess(ctx.Source, nullConditional: false);
             var mapping = _delegateMapping.Build(ctx.WithSource(nullConditionalSourceAccess));
-            return _nullFallback == NullFallbackValue.Default && _targetType.IsNullable()
+            return _nullFallback == NullFallbackValue.Default && targetType.IsNullable()
                 ? mapping
-                : Coalesce(mapping, NullSubstitute(_targetType, nameofSourceAccess, _nullFallback));
+                : Coalesce(mapping, NullSubstitute(targetType, nameofSourceAccess, _nullFallback));
         }
 
-        var notNullCondition = _useNullConditionalAccess
+        var notNullCondition = useNullConditionalAccess
             ? IsNotNull(SourcePath.BuildAccess(ctx.Source, nullConditional: true, skipTrailingNonNullable: true))
             : SourcePath.BuildNonNullConditionWithoutConditionalAccess(ctx.Source)!;
         var sourceMemberAccess = SourcePath.BuildAccess(ctx.Source, true);
         ctx = ctx.WithSource(sourceMemberAccess);
-        return Conditional(notNullCondition, _delegateMapping.Build(ctx), NullSubstitute(_targetType, sourceMemberAccess, _nullFallback));
+        return Conditional(notNullCondition, _delegateMapping.Build(ctx), NullSubstitute(targetType, sourceMemberAccess, _nullFallback));
     }
 
     protected bool Equals(NullMemberMapping other) =>

@@ -12,18 +12,12 @@ namespace Riok.Mapperly.Symbols;
 /// Eg. A.B.C
 /// </summary>
 [DebuggerDisplay("{FullName}")]
-public class MemberPath
+public class MemberPath(IReadOnlyList<IMappableMember> path)
 {
     private const string MemberAccessSeparator = ".";
     protected const string NullableValueProperty = "Value";
 
-    public MemberPath(IReadOnlyList<IMappableMember> path)
-    {
-        Path = path;
-        FullName = string.Join(MemberAccessSeparator, Path.Select(x => x.Name));
-    }
-
-    public IReadOnlyList<IMappableMember> Path { get; }
+    public IReadOnlyList<IMappableMember> Path { get; } = path;
 
     /// <summary>
     /// Gets the path without the very last element (the path of the object containing the <see cref="Member"/>).
@@ -43,7 +37,7 @@ public class MemberPath
     /// <summary>
     /// Gets the full name of the path (eg. A.B.C).
     /// </summary>
-    public string FullName { get; }
+    public string FullName { get; } = string.Join(MemberAccessSeparator, path.Select(x => x.Name));
 
     /// <summary>
     /// Builds a member path skipping trailing path items which are non nullable.

@@ -6,25 +6,25 @@ using Riok.Mapperly.Helpers;
 namespace Riok.Mapperly.Descriptors;
 
 [DebuggerDisplay("{Source.Name} => {Target.Name}")]
-public readonly struct TypeMappingKey
+public readonly struct TypeMappingKey(
+    ITypeSymbol source,
+    ITypeSymbol target,
+    TypeMappingConfiguration? config = null,
+    bool includeNullability = true
+)
 {
     private static readonly IEqualityComparer<ISymbol?> _comparer = SymbolEqualityComparer.IncludeNullability;
 
     public TypeMappingKey(ITypeMapping mapping, TypeMappingConfiguration? config = null, bool includeNullability = true)
         : this(mapping.SourceType, mapping.TargetType, config, includeNullability) { }
 
-    public TypeMappingKey(ITypeSymbol source, ITypeSymbol target, TypeMappingConfiguration? config = null, bool includeNullability = true)
-    {
-        Configuration = config ?? TypeMappingConfiguration.Default;
-        Source = includeNullability ? source.UpgradeNullable() : source.NonNullable();
-        Target = includeNullability ? target.UpgradeNullable() : target.NonNullable();
-    }
+    public ITypeSymbol Source { get; } =
+        includeNullability ? NullableSymbolExtensions.UpgradeNullable(source) : NullableSymbolExtensions.NonNullable(source);
 
-    public ITypeSymbol Source { get; }
+    public ITypeSymbol Target { get; } =
+        includeNullability ? NullableSymbolExtensions.UpgradeNullable(target) : NullableSymbolExtensions.NonNullable(target);
 
-    public ITypeSymbol Target { get; }
-
-    public TypeMappingConfiguration Configuration { get; }
+    public TypeMappingConfiguration Configuration { get; } = config ?? TypeMappingConfiguration.Default;
 
     public TypeMappingKey NonNullableSource() => new(Source.NonNullable(), Target, Configuration);
 

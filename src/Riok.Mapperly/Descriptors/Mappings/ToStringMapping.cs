@@ -11,22 +11,15 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// target = source.ToString();
 /// </code>
 /// </summary>
-public class ToStringMapping : SourceObjectMethodMapping
+public class ToStringMapping(ITypeSymbol sourceType, ITypeSymbol targetType, string? stringFormat = null)
+    : SourceObjectMethodMapping(sourceType, targetType, nameof(ToString))
 {
-    private readonly string? _stringFormat;
-
-    public ToStringMapping(ITypeSymbol sourceType, ITypeSymbol targetType, string? stringFormat = null)
-        : base(sourceType, targetType, nameof(ToString))
-    {
-        _stringFormat = stringFormat;
-    }
-
     protected override IEnumerable<ExpressionSyntax> BuildArguments(TypeMappingBuildContext ctx)
     {
-        if (_stringFormat == null)
+        if (stringFormat == null)
             yield break;
 
-        yield return StringLiteral(_stringFormat);
+        yield return StringLiteral(stringFormat);
         yield return NullLiteral();
     }
 }

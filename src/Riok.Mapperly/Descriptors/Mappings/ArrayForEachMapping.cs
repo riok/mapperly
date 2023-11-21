@@ -10,29 +10,17 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// Represents an enumerable to array mapping which works by initialising an array, looping through the source,
 /// mapping each element and adding it to the target array.
 /// </summary>
-public class ArrayForEachMapping : MethodMapping
+public class ArrayForEachMapping(
+    ITypeSymbol sourceType,
+    ITypeSymbol targetType,
+    INewInstanceMapping elementMapping,
+    ITypeSymbol targetArrayElementType,
+    string countPropertyName
+) : MethodMapping(sourceType, targetType)
 {
     private const string TargetVariableName = "target";
     private const string LoopItemVariableName = "item";
     private const string LoopCounterName = "i";
-
-    private readonly INewInstanceMapping _elementMapping;
-    private readonly ITypeSymbol _targetArrayElementType;
-    private readonly string _countPropertyName;
-
-    public ArrayForEachMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
-        INewInstanceMapping elementMapping,
-        ITypeSymbol targetArrayElementType,
-        string countPropertyName
-    )
-        : base(sourceType, targetType)
-    {
-        _elementMapping = elementMapping;
-        _targetArrayElementType = targetArrayElementType;
-        _countPropertyName = countPropertyName;
-    }
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
@@ -41,10 +29,10 @@ public class ArrayForEachMapping : MethodMapping
 
         // var target = new T[source.Count];
         var sourceLengthArrayRank = ArrayRankSpecifier(
-            SingletonSeparatedList<ExpressionSyntax>(MemberAccess(ctx.Source, _countPropertyName))
+            SingletonSeparatedList<ExpressionSyntax>(MemberAccess(ctx.Source, countPropertyName))
         );
         var targetInitializationValue = CreateArray(
-            ArrayType(FullyQualifiedIdentifier(_targetArrayElementType)).WithRankSpecifiers(SingletonList(sourceLengthArrayRank))
+            ArrayType(FullyQualifiedIdentifier(targetArrayElementType)).WithRankSpecifiers(SingletonList(sourceLengthArrayRank))
         );
         yield return ctx.SyntaxFactory.DeclareLocalVariable(targetVariableName, targetInitializationValue);
 
@@ -53,7 +41,7 @@ public class ArrayForEachMapping : MethodMapping
 
         // target[i] = Map(item);
         var (loopItemCtx, loopItemVariableName) = ctx.WithNewSource(LoopItemVariableName);
-        var convertedSourceItemExpression = _elementMapping.Build(loopItemCtx.AddIndentation());
+        var convertedSourceItemExpression = elementMapping.Build(loopItemCtx.AddIndentation());
 
         var assignment = Assignment(
             ElementAccess(IdentifierName(targetVariableName), IdentifierName(loopCounterVariableName)),

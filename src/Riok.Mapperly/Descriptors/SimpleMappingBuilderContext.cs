@@ -10,35 +10,22 @@ namespace Riok.Mapperly.Descriptors;
 /// <summary>
 /// A simple mapping context which does not allow to access and build other mappings.
 /// </summary>
-public class SimpleMappingBuilderContext
+public class SimpleMappingBuilderContext(
+    CompilationContext compilationContext,
+    MapperConfigurationReader configurationReader,
+    SymbolAccessor symbolAccessor,
+    AttributeDataAccessor attributeAccessor,
+    MapperDescriptor descriptor,
+    UnsafeAccessorContext unsafeAccessorContext,
+    DiagnosticCollection diagnostics,
+    MappingBuilder mappingBuilder,
+    ExistingTargetMappingBuilder existingTargetMappingBuilder
+)
 {
-    private readonly MapperDescriptor _descriptor;
-    private readonly DiagnosticCollection _diagnostics;
-    private readonly CompilationContext _compilationContext;
-    private readonly MapperConfigurationReader _configurationReader;
-
-    public SimpleMappingBuilderContext(
-        CompilationContext compilationContext,
-        MapperConfigurationReader configurationReader,
-        SymbolAccessor symbolAccessor,
-        AttributeDataAccessor attributeAccessor,
-        MapperDescriptor descriptor,
-        UnsafeAccessorContext unsafeAccessorContext,
-        DiagnosticCollection diagnostics,
-        MappingBuilder mappingBuilder,
-        ExistingTargetMappingBuilder existingTargetMappingBuilder
-    )
-    {
-        SymbolAccessor = symbolAccessor;
-        _compilationContext = compilationContext;
-        _configurationReader = configurationReader;
-        _descriptor = descriptor;
-        _diagnostics = diagnostics;
-        MappingBuilder = mappingBuilder;
-        ExistingTargetMappingBuilder = existingTargetMappingBuilder;
-        AttributeAccessor = attributeAccessor;
-        UnsafeAccessorContext = unsafeAccessorContext;
-    }
+    private readonly MapperDescriptor _descriptor = descriptor;
+    private readonly DiagnosticCollection _diagnostics = diagnostics;
+    private readonly CompilationContext _compilationContext = compilationContext;
+    private readonly MapperConfigurationReader _configurationReader = configurationReader;
 
     protected SimpleMappingBuilderContext(SimpleMappingBuilderContext ctx)
         : this(
@@ -61,15 +48,15 @@ public class SimpleMappingBuilderContext
 
     public bool Static => _descriptor.Static;
 
-    public SymbolAccessor SymbolAccessor { get; }
+    public SymbolAccessor SymbolAccessor { get; } = symbolAccessor;
 
-    public AttributeDataAccessor AttributeAccessor { get; }
+    public AttributeDataAccessor AttributeAccessor { get; } = attributeAccessor;
 
-    public UnsafeAccessorContext UnsafeAccessorContext { get; }
+    public UnsafeAccessorContext UnsafeAccessorContext { get; } = unsafeAccessorContext;
 
-    protected MappingBuilder MappingBuilder { get; }
+    protected MappingBuilder MappingBuilder { get; } = mappingBuilder;
 
-    protected ExistingTargetMappingBuilder ExistingTargetMappingBuilder { get; }
+    protected ExistingTargetMappingBuilder ExistingTargetMappingBuilder { get; } = existingTargetMappingBuilder;
 
     public virtual bool IsConversionEnabled(MappingConversionType conversionType) =>
         MapperConfiguration.EnabledConversions.HasFlag(conversionType);

@@ -6,17 +6,10 @@ namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 /// <summary>
 /// Wraps an <see cref="IExistingTargetMapping"/> as <see cref="MethodMapping"/>.
 /// </summary>
-public abstract class ExistingTargetMappingMethodWrapper : MethodMapping
+public abstract class ExistingTargetMappingMethodWrapper(IExistingTargetMapping mapping)
+    : MethodMapping(mapping.SourceType, mapping.TargetType)
 {
     private const string TargetVariableName = "target";
-
-    private readonly IExistingTargetMapping _mapping;
-
-    protected ExistingTargetMappingMethodWrapper(IExistingTargetMapping mapping)
-        : base(mapping.SourceType, mapping.TargetType)
-    {
-        _mapping = mapping;
-    }
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
@@ -24,7 +17,7 @@ public abstract class ExistingTargetMappingMethodWrapper : MethodMapping
 
         yield return ctx.SyntaxFactory.DeclareLocalVariable(targetVariableName, CreateTargetInstance(ctx));
 
-        foreach (var statement in _mapping.Build(ctx, IdentifierName(targetVariableName)))
+        foreach (var statement in mapping.Build(ctx, IdentifierName(targetVariableName)))
         {
             yield return statement;
         }

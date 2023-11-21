@@ -2,7 +2,7 @@ using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
-public class ExistingTargetMappingBuilder
+public class ExistingTargetMappingBuilder(MappingCollection mappings)
 {
     private delegate IExistingTargetMapping? BuildExistingTargetMapping(MappingBuilderContext context);
 
@@ -16,16 +16,9 @@ public class ExistingTargetMappingBuilder
         NewInstanceObjectPropertyMappingBuilder.TryBuildExistingTargetMapping,
     };
 
-    private readonly MappingCollection _mappings;
-
-    public ExistingTargetMappingBuilder(MappingCollection mappings)
-    {
-        _mappings = mappings;
-    }
-
     public IExistingTargetMapping? Find(TypeMappingKey mappingKey)
     {
-        return _mappings.FindExistingInstanceMapping(mappingKey);
+        return mappings.FindExistingInstanceMapping(mappingKey);
     }
 
     public IExistingTargetMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
@@ -37,10 +30,10 @@ public class ExistingTargetMappingBuilder
 
             if (resultIsReusable)
             {
-                _mappings.AddExistingTargetMapping(mapping, ctx.MappingKey.Configuration);
+                mappings.AddExistingTargetMapping(mapping, ctx.MappingKey.Configuration);
             }
 
-            _mappings.EnqueueToBuildBody(mapping, ctx);
+            mappings.EnqueueToBuildBody(mapping, ctx);
             return mapping;
         }
 

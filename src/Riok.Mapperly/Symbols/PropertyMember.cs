@@ -6,16 +6,9 @@ using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Symbols;
 
-internal class PropertyMember : IMappableMember
+internal class PropertyMember(IPropertySymbol propertySymbol, SymbolAccessor symbolAccessor) : IMappableMember
 {
-    private readonly IPropertySymbol _propertySymbol;
-    private readonly SymbolAccessor _symbolAccessor;
-
-    internal PropertyMember(IPropertySymbol propertySymbol, SymbolAccessor symbolAccessor)
-    {
-        _propertySymbol = propertySymbol;
-        _symbolAccessor = symbolAccessor;
-    }
+    private readonly IPropertySymbol _propertySymbol = propertySymbol;
 
     public string Name => _propertySymbol.Name;
     public ITypeSymbol Type => _propertySymbol.Type;
@@ -24,14 +17,14 @@ internal class PropertyMember : IMappableMember
     public bool IsIndexer => _propertySymbol.IsIndexer;
     public bool CanGet =>
         !_propertySymbol.IsWriteOnly
-        && (_propertySymbol.GetMethod == null || _symbolAccessor.IsAccessibleToMemberVisibility(_propertySymbol.GetMethod));
+        && (_propertySymbol.GetMethod == null || symbolAccessor.IsAccessibleToMemberVisibility(_propertySymbol.GetMethod));
     public bool CanSet =>
         !_propertySymbol.IsReadOnly
-        && (_propertySymbol.SetMethod == null || _symbolAccessor.IsAccessibleToMemberVisibility(_propertySymbol.SetMethod));
+        && (_propertySymbol.SetMethod == null || symbolAccessor.IsAccessibleToMemberVisibility(_propertySymbol.SetMethod));
 
     public bool CanSetDirectly =>
         !_propertySymbol.IsReadOnly
-        && (_propertySymbol.SetMethod == null || _symbolAccessor.IsDirectlyAccessible(_propertySymbol.SetMethod));
+        && (_propertySymbol.SetMethod == null || symbolAccessor.IsDirectlyAccessible(_propertySymbol.SetMethod));
 
     public bool IsInitOnly => _propertySymbol.SetMethod?.IsInitOnly == true;
 

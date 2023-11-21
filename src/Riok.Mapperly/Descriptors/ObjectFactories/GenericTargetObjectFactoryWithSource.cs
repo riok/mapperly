@@ -9,11 +9,9 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 /// with a single parameter (which is the source object and is a named type) and a single type parameter which is also the return type.
 /// Example signature: <c>T Create&lt;T&gt;(SourceType source);</c>
 /// </summary>
-public class GenericTargetObjectFactoryWithSource : GenericTargetObjectFactory
+public class GenericTargetObjectFactoryWithSource(SymbolAccessor symbolAccessor, IMethodSymbol method)
+    : GenericTargetObjectFactory(symbolAccessor, method)
 {
-    public GenericTargetObjectFactoryWithSource(SymbolAccessor symbolAccessor, IMethodSymbol method)
-        : base(symbolAccessor, method) { }
-
     public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
         base.CanCreateType(sourceType, targetTypeToCreate) && SymbolEqualityComparer.Default.Equals(Method.Parameters[0].Type, sourceType);
 

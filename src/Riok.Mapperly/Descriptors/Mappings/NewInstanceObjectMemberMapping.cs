@@ -10,13 +10,12 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// mapping properties via ctor, object initializer but not by assigning.
 /// <seealso cref="NewInstanceObjectMemberMethodMapping"/>
 /// </summary>
-public class NewInstanceObjectMemberMapping : NewInstanceMapping, INewInstanceObjectMemberMapping
+public class NewInstanceObjectMemberMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    : NewInstanceMapping(sourceType, targetType),
+        INewInstanceObjectMemberMapping
 {
     private readonly HashSet<ConstructorParameterMapping> _constructorPropertyMappings = new();
     private readonly HashSet<MemberAssignmentMapping> _initPropertyMappings = new();
-
-    public NewInstanceObjectMemberMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        : base(sourceType, targetType) { }
 
     public void AddConstructorParameterMapping(ConstructorParameterMapping mapping) => _constructorPropertyMappings.Add(mapping);
 

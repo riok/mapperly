@@ -7,43 +7,31 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Represents an enumerable mapping where the target type accepts IEnumerable as a single argument.
 /// </summary>
-public class LinqConstructorMapping : NewInstanceMapping
+public class LinqConstructorMapping(
+    ITypeSymbol sourceType,
+    ITypeSymbol targetType,
+    INamedTypeSymbol targetTypeToConstruct,
+    INewInstanceMapping elementMapping,
+    string? selectMethod
+) : NewInstanceMapping(sourceType, targetType)
 {
-    private readonly INamedTypeSymbol _targetTypeToConstruct;
-    private readonly INewInstanceMapping _elementMapping;
-    private readonly string? _selectMethod;
-
-    public LinqConstructorMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
-        INamedTypeSymbol targetTypeToConstruct,
-        INewInstanceMapping elementMapping,
-        string? selectMethod
-    )
-        : base(sourceType, targetType)
-    {
-        _targetTypeToConstruct = targetTypeToConstruct;
-        _elementMapping = elementMapping;
-        _selectMethod = selectMethod;
-    }
-
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         ExpressionSyntax mappedSource;
 
         // Select / Map if needed
-        if (_selectMethod != null)
+        if (selectMethod != null)
         {
             var (lambdaCtx, lambdaSourceName) = ctx.WithNewScopedSource();
-            var sourceMapExpression = _elementMapping.Build(lambdaCtx);
+            var sourceMapExpression = elementMapping.Build(lambdaCtx);
             var convertLambda = Lambda(lambdaSourceName, sourceMapExpression);
-            mappedSource = Invocation(_selectMethod, ctx.Source, convertLambda);
+            mappedSource = Invocation(selectMethod, ctx.Source, convertLambda);
         }
         else
         {
-            mappedSource = _elementMapping.Build(ctx);
+            mappedSource = elementMapping.Build(ctx);
         }
 
-        return CreateInstance(_targetTypeToConstruct, mappedSource);
+        return CreateInstance(targetTypeToConstruct, mappedSource);
     }
 }
