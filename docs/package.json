@@ -34,7 +34,7 @@
     "@docusaurus/eslint-plugin": "3.0.0",
     "@docusaurus/module-type-aliases": "3.0.0",
     "@docusaurus/tsconfig": "3.0.0",
-    "@types/react": "18.2.37",
+    "@types/react": "18.2.38",
     "@typescript-eslint/eslint-plugin": "6.11.0",
     "hast-util-to-html": "9.0.0",
     "marked": "10.0.0",
