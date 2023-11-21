@@ -52,11 +52,11 @@ public class DescriptorBuilder
             _configurationReader,
             _symbolAccessor,
             attributeAccessor,
-            _mapperDescriptor,
             _unsafeAccessorContext,
             _diagnostics,
             new MappingBuilder(_mappings),
-            new ExistingTargetMappingBuilder(_mappings)
+            new ExistingTargetMappingBuilder(_mappings),
+            mapperDeclaration.Syntax.GetLocation()
         );
     }
 
@@ -135,7 +135,7 @@ public class DescriptorBuilder
         {
             _diagnostics.ReportDiagnostic(
                 DiagnosticDescriptors.MixingStaticPartialWithInstanceMethod,
-                firstNonStaticUserMapping,
+                firstNonStaticUserMapping.GetSyntaxLocation(),
                 _mapperDescriptor.Symbol.ToDisplayString()
             );
         }
@@ -143,7 +143,7 @@ public class DescriptorBuilder
 
     private ObjectFactoryCollection ExtractObjectFactories()
     {
-        return ObjectFactoryBuilder.ExtractObjectFactories(_builderContext, _mapperDescriptor.Symbol);
+        return ObjectFactoryBuilder.ExtractObjectFactories(_builderContext, _mapperDescriptor.Symbol, _mapperDescriptor.Static);
     }
 
     private void EnqueueUserMappings(ObjectFactoryCollection objectFactories, FormatProviderCollection formatProviders)
@@ -172,7 +172,7 @@ public class DescriptorBuilder
 
     private FormatProviderCollection ExtractFormatProviders()
     {
-        return FormatProviderBuilder.ExtractFormatProviders(_builderContext, _mapperDescriptor.Symbol);
+        return FormatProviderBuilder.ExtractFormatProviders(_builderContext, _mapperDescriptor.Symbol, _mapperDescriptor.Static);
     }
 
     private void BuildMappingMethodNames()

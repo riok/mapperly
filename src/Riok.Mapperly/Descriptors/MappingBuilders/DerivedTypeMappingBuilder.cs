@@ -70,7 +70,8 @@ public static class DerivedTypeMappingBuilder
             var mapping = ctx.FindOrBuildMapping(
                 sourceType,
                 targetType,
-                MappingBuildingOptions.KeepUserSymbol | MappingBuildingOptions.MarkAsReusable | MappingBuildingOptions.ClearDerivedTypes
+                MappingBuildingOptions.KeepUserSymbol | MappingBuildingOptions.MarkAsReusable | MappingBuildingOptions.ClearDerivedTypes,
+                config.Location
             );
             if (mapping == null)
             {

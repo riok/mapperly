@@ -15,6 +15,7 @@ namespace Riok.Mapperly.Descriptors;
 [DebuggerDisplay("{GetType().Name}({Source.Name} => {Target.Name})")]
 public class MappingBuilderContext : SimpleMappingBuilderContext
 {
+    private readonly FormatProviderCollection _formatProviders;
     private CollectionInfos? _collectionInfos;
 
     public MappingBuilderContext(
@@ -22,19 +23,26 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         ObjectFactoryCollection objectFactories,
         FormatProviderCollection formatProviders,
         IMethodSymbol? userSymbol,
-        TypeMappingKey mappingKey
+        TypeMappingKey mappingKey,
+        Location? diagnosticLocation = null
     )
-        : base(parentCtx)
+        : base(parentCtx, diagnosticLocation ?? userSymbol?.GetSyntaxLocation())
     {
         ObjectFactories = objectFactories;
-        FormatProviders = formatProviders;
+        _formatProviders = formatProviders;
         UserSymbol = userSymbol;
         MappingKey = mappingKey;
         Configuration = ReadConfiguration(new MappingConfigurationReference(UserSymbol, mappingKey.Source, mappingKey.Target));
     }
 
-    protected MappingBuilderContext(MappingBuilderContext ctx, IMethodSymbol? userSymbol, TypeMappingKey mappingKey, bool clearDerivedTypes)
-        : this(ctx, ctx.ObjectFactories, ctx.FormatProviders, userSymbol, mappingKey)
+    protected MappingBuilderContext(
+        MappingBuilderContext ctx,
+        IMethodSymbol? userSymbol,
+        Location? diagnosticLocation,
+        TypeMappingKey mappingKey,
+        bool clearDerivedTypes
+    )
+        : this(ctx, ctx.ObjectFactories, ctx._formatProviders, userSymbol, mappingKey, diagnosticLocation)
     {
         if (clearDerivedTypes)
         {
@@ -60,7 +68,6 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     public virtual bool IsExpression => false;
 
     public ObjectFactoryCollection ObjectFactories { get; }
-    public FormatProviderCollection FormatProviders { get; }
 
     /// <inheritdoc cref="MappingBuilders.MappingBuilder.UserMappings"/>
     public IReadOnlyCollection<IUserMapping> UserMappings => MappingBuilder.UserMappings;
@@ -85,14 +92,16 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="sourceType">The source type.</param>
     /// <param name="targetType">The target type.</param>
     /// <param name="options">The mapping building options.</param>
+    /// <param name="diagnosticLocation">The updated to location where to report diagnostics if a new mapping is being built.</param>
     /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
     public INewInstanceMapping? FindOrBuildMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
-        MappingBuildingOptions options = MappingBuildingOptions.Default
+        MappingBuildingOptions options = MappingBuildingOptions.Default,
+        Location? diagnosticLocation = null
     )
     {
-        return FindOrBuildMapping(new TypeMappingKey(sourceType, targetType), options);
+        return FindOrBuildMapping(new TypeMappingKey(sourceType, targetType), options, diagnosticLocation);
     }
 
     /// <summary>
@@ -106,17 +115,19 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// </summary>
     /// <param name="mappingKey">The mapping key.</param>
     /// <param name="options">The mapping building options.</param>
+    /// <param name="diagnosticLocation">The updated to location where to report diagnostics if a new mapping is being built.</param>
     /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
     public virtual INewInstanceMapping? FindOrBuildMapping(
         TypeMappingKey mappingKey,
-        MappingBuildingOptions options = MappingBuildingOptions.Default
+        MappingBuildingOptions options = MappingBuildingOptions.Default,
+        Location? diagnosticLocation = null
     )
     {
-        return MappingBuilder.Find(mappingKey) ?? BuildMapping(mappingKey, options);
+        return MappingBuilder.Find(mappingKey) ?? BuildMapping(mappingKey, options, diagnosticLocation);
     }
 
     /// <summary>
-    /// Finds or builds a mapping (<seealso cref="FindOrBuildMapping(Riok.Mapperly.Descriptors.TypeMappingKey,Riok.Mapperly.Descriptors.MappingBuildingOptions)"/>).
+    /// Finds or builds a mapping (<seealso cref="FindOrBuildMapping(Riok.Mapperly.Descriptors.TypeMappingKey,Riok.Mapperly.Descriptors.MappingBuildingOptions,Location)"/>).
     /// Before a new mapping is built existing mappings are tried to be found by the following priorities:
     /// 1. exact match
     /// 2. ignoring the nullability of the source (needs to be handled by the caller of this method)
@@ -126,16 +137,18 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// </summary>
     /// <param name="key">The mapping key.</param>
     /// <param name="options">The options to build a new mapping if no existing mapping is found.</param>
+    /// <param name="diagnosticLocation">The updated to location where to report diagnostics if a new mapping is being built.</param>
     /// <returns>The found or built mapping, or <c>null</c> if none could be found and none could be built.</returns>
     public INewInstanceMapping? FindOrBuildLooseNullableMapping(
         TypeMappingKey key,
-        MappingBuildingOptions options = MappingBuildingOptions.Default
+        MappingBuildingOptions options = MappingBuildingOptions.Default,
+        Location? diagnosticLocation = null
     )
     {
         return FindMapping(key)
             ?? FindMapping(key.NonNullableSource())
             ?? FindMapping(key.NonNullableTarget())
-            ?? FindOrBuildMapping(key.NonNullable(), options);
+            ?? FindOrBuildMapping(key.NonNullable(), options, diagnosticLocation);
     }
 
     /// <summary>
@@ -143,11 +156,16 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// </summary>
     /// <param name="mappingKey">The mapping key.</param>
     /// <param name="options">The options.</param>
+    /// <param name="diagnosticLocation">The updated to location where to report diagnostics if a new mapping is being built.</param>
     /// <returns>The created mapping, or <c>null</c> if no mapping could be created.</returns>
-    public INewInstanceMapping? BuildMapping(TypeMappingKey mappingKey, MappingBuildingOptions options = MappingBuildingOptions.Default)
+    public INewInstanceMapping? BuildMapping(
+        TypeMappingKey mappingKey,
+        MappingBuildingOptions options = MappingBuildingOptions.Default,
+        Location? diagnosticLocation = null
+    )
     {
         var userSymbol = options.HasFlag(MappingBuildingOptions.KeepUserSymbol) ? UserSymbol : null;
-        return BuildMapping(userSymbol, mappingKey, options);
+        return BuildMapping(userSymbol, mappingKey, options, diagnosticLocation);
     }
 
     /// <summary>
@@ -211,14 +229,14 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     }
 
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, params object[] messageArgs) =>
-        base.ReportDiagnostic(descriptor, UserSymbol, messageArgs);
+        base.ReportDiagnostic(descriptor, null, messageArgs);
 
     public NullFallbackValue GetNullFallbackValue(ITypeSymbol? targetType = null) =>
         GetNullFallbackValue(targetType ?? Target, MapperConfiguration.ThrowOnMappingNullMismatch);
 
     public FormatProvider? GetFormatProvider(string? formatProviderName)
     {
-        var formatProvider = FormatProviders.Get(formatProviderName);
+        var formatProvider = _formatProviders.Get(formatProviderName);
         if (formatProviderName != null && formatProvider == null)
         {
             ReportDiagnostic(DiagnosticDescriptors.FormatProviderNotFound, formatProviderName);
@@ -251,15 +269,21 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     protected virtual MappingBuilderContext ContextForMapping(
         IMethodSymbol? userSymbol,
         TypeMappingKey mappingKey,
-        MappingBuildingOptions options
+        MappingBuildingOptions options,
+        Location? diagnosticLocation = null
     )
     {
-        return new(this, userSymbol, mappingKey, options.HasFlag(MappingBuildingOptions.ClearDerivedTypes));
+        return new(this, userSymbol, diagnosticLocation, mappingKey, options.HasFlag(MappingBuildingOptions.ClearDerivedTypes));
     }
 
-    protected INewInstanceMapping? BuildMapping(IMethodSymbol? userSymbol, TypeMappingKey key, MappingBuildingOptions options)
+    protected INewInstanceMapping? BuildMapping(
+        IMethodSymbol? userSymbol,
+        TypeMappingKey mappingKey,
+        MappingBuildingOptions options,
+        Location? diagnosticLocation
+    )
     {
-        var ctx = ContextForMapping(userSymbol, key, options);
+        var ctx = ContextForMapping(userSymbol, mappingKey, options, diagnosticLocation);
         return MappingBuilder.Build(ctx, options.HasFlag(MappingBuildingOptions.MarkAsReusable));
     }
 }

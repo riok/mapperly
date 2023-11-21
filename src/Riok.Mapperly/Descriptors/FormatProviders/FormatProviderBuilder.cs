@@ -8,12 +8,12 @@ namespace Riok.Mapperly.Descriptors.FormatProviders;
 
 public static class FormatProviderBuilder
 {
-    public static FormatProviderCollection ExtractFormatProviders(SimpleMappingBuilderContext ctx, ITypeSymbol mapperSymbol)
+    public static FormatProviderCollection ExtractFormatProviders(SimpleMappingBuilderContext ctx, ITypeSymbol mapperSymbol, bool isStatic)
     {
         var formatProviders = mapperSymbol
             .GetMembers()
             .Where(x => ctx.SymbolAccessor.HasAttribute<FormatProviderAttribute>(x))
-            .Select(x => BuildFormatProvider(ctx, x))
+            .Select(x => BuildFormatProvider(ctx, x, isStatic))
             .WhereNotNull()
             .ToList();
 
@@ -27,13 +27,13 @@ public static class FormatProviderBuilder
         return new FormatProviderCollection(formatProvidersByName, defaultFormatProviderCandidates.FirstOrDefault());
     }
 
-    private static FormatProvider? BuildFormatProvider(SimpleMappingBuilderContext ctx, ISymbol symbol)
+    private static FormatProvider? BuildFormatProvider(SimpleMappingBuilderContext ctx, ISymbol symbol, bool isStatic)
     {
         var memberSymbol = MappableMember.Create(ctx.SymbolAccessor, symbol);
         if (memberSymbol == null)
             return null;
 
-        if (!memberSymbol.CanGet || symbol.IsStatic != ctx.Static || !memberSymbol.Type.Implements(ctx.Types.Get<IFormatProvider>()))
+        if (!memberSymbol.CanGet || symbol.IsStatic != isStatic || !memberSymbol.Type.Implements(ctx.Types.Get<IFormatProvider>()))
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidFormatProviderSignature, symbol, symbol.Name);
             return null;

@@ -13,7 +13,7 @@ public class DiagnosticCollection(Location defaultLocation) : IReadOnlyCollectio
 
     public int Count => _diagnostics.Count;
 
-    internal void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? location = null, params object[] messageArgs)
+    internal void ReportDiagnostic(DiagnosticDescriptor descriptor, Location? location = null, params object[] messageArgs)
     {
         // cannot use the symbol since it would break the incremental generator
         // due to being different for each compilation.
@@ -25,8 +25,6 @@ public class DiagnosticCollection(Location defaultLocation) : IReadOnlyCollectio
             }
         }
 
-        var syntaxNode = location?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax();
-        var nodeLocation = syntaxNode?.GetLocation();
-        _diagnostics.Add(Diagnostic.Create(descriptor, nodeLocation ?? defaultLocation, messageArgs));
+        _diagnostics.Add(Diagnostic.Create(descriptor, location ?? defaultLocation, messageArgs));
     }
 }

@@ -7,20 +7,20 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 
 public static class ObjectFactoryBuilder
 {
-    public static ObjectFactoryCollection ExtractObjectFactories(SimpleMappingBuilderContext ctx, ITypeSymbol mapperSymbol)
+    public static ObjectFactoryCollection ExtractObjectFactories(SimpleMappingBuilderContext ctx, ITypeSymbol mapperSymbol, bool isStatic)
     {
         var objectFactories = mapperSymbol
             .GetMembers()
             .OfType<IMethodSymbol>()
             .Where(m => ctx.SymbolAccessor.HasAttribute<ObjectFactoryAttribute>(m))
-            .Select(x => BuildObjectFactory(ctx, x))
+            .Select(x => BuildObjectFactory(ctx, x, isStatic))
             .WhereNotNull()
             .ToList();
 
         return new ObjectFactoryCollection(objectFactories);
     }
 
-    private static ObjectFactory? BuildObjectFactory(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol)
+    private static ObjectFactory? BuildObjectFactory(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol, bool isStatic)
     {
         if (
             methodSymbol.IsAsync
@@ -28,7 +28,7 @@ public static class ObjectFactoryBuilder
             || methodSymbol.IsPartialDefinition
             || methodSymbol.MethodKind != MethodKind.Ordinary
             || methodSymbol.ReturnsVoid
-            || (!methodSymbol.IsStatic && ctx.Static)
+            || (!methodSymbol.IsStatic && isStatic)
         )
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature, methodSymbol, methodSymbol.Name);
