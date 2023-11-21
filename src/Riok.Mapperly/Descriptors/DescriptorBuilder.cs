@@ -126,7 +126,7 @@ public class DescriptorBuilder
                 firstNonStaticUserMapping = userMapping.Method;
             }
 
-            _mappings.Add(userMapping);
+            _mappings.Add(userMapping, TypeMappingConfiguration.Default);
         }
 
         if (_mapperDescriptor.Static && firstNonStaticUserMapping is not null)
@@ -152,8 +152,7 @@ public class DescriptorBuilder
                 _builderContext,
                 objectFactories,
                 userMapping.Method,
-                userMapping.SourceType,
-                userMapping.TargetType
+                new TypeMappingKey(userMapping.SourceType, userMapping.TargetType)
             );
 
             _mappings.EnqueueToBuildBody(userMapping, ctx);
@@ -164,7 +163,7 @@ public class DescriptorBuilder
     {
         foreach (var externalMapping in ExternalMappingsExtractor.ExtractExternalMappings(_builderContext, _mapperDescriptor.Symbol))
         {
-            _mappings.Add(externalMapping);
+            _mappings.Add(externalMapping, TypeMappingConfiguration.Default);
         }
     }
 

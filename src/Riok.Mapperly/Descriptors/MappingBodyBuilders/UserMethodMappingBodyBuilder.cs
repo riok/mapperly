@@ -1,6 +1,5 @@
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
-using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
@@ -13,11 +12,9 @@ public static class UserMethodMappingBodyBuilder
     {
         // UserDefinedExistingTargetMethodMapping handles null already
         var delegateMapping = ctx.BuildExistingTargetMapping(
-            mapping.SourceType.NonNullable(),
-            mapping.TargetType.NonNullable(),
+            new TypeMappingKey(mapping).NonNullable(),
             MappingBuildingOptions.KeepUserSymbol
         );
-
         if (delegateMapping != null)
         {
             mapping.SetDelegateMapping(delegateMapping);
@@ -39,8 +36,7 @@ public static class UserMethodMappingBodyBuilder
             options |= MappingBuildingOptions.MarkAsReusable;
         }
 
-        var delegateMapping = ctx.BuildMapping(mapping.SourceType, mapping.TargetType, options);
-
+        var delegateMapping = ctx.BuildMapping(new TypeMappingKey(mapping), options);
         if (delegateMapping != null)
         {
             mapping.SetDelegateMapping(delegateMapping);

@@ -569,4 +569,26 @@ public class ObjectPropertyConstructorResolverTest
                 """
             );
     }
+
+    [Fact]
+    public void ClassConstructorParameterWithStringFormat()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("Value", "value", StringFormat = "C")]
+            partial B Map(A source);",
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public B(string value) {} }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B(source.Value.ToString("C", null));
+                return target;
+                """
+            );
+    }
 }

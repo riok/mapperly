@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
@@ -42,8 +41,7 @@ public class MappingBuilder
     /// <inheritdoc cref="MappingCollection.UserMappings"/>
     public IReadOnlyCollection<IUserMapping> UserMappings => _mappings.UserMappings;
 
-    /// <inheritdoc cref="MappingBuilderContext.FindMapping"/>
-    public INewInstanceMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType) => _mappings.Find(sourceType, targetType);
+    public INewInstanceMapping? Find(TypeMappingKey mapping) => _mappings.Find(mapping);
 
     public INewInstanceMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {
@@ -54,7 +52,7 @@ public class MappingBuilder
 
             if (resultIsReusable)
             {
-                _mappings.AddNewInstanceMapping(mapping);
+                _mappings.AddNewInstanceMapping(mapping, ctx.MappingKey.Configuration);
             }
 
             _mappings.EnqueueToBuildBody(mapping, ctx);

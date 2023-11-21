@@ -394,4 +394,29 @@ public class ObjectPropertyInitPropertyTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void ClassInitOnlyPropertyWithStringFormat()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("Value", "Value", StringFormat = "C")]
+            partial B Map(A source);",
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public string Value { get; init; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    Value = source.Value.ToString("C", null),
+                };
+                return target;
+                """
+            );
+    }
 }

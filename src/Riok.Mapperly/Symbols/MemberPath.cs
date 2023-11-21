@@ -33,7 +33,7 @@ public class MemberPath
     /// <summary>
     /// Gets the last part of the path or throws if there is none.
     /// </summary>
-    public IMappableMember Member => Path.Last();
+    public IMappableMember Member => Path[^1];
 
     /// <summary>
     /// Gets the type of the <see cref="Member"/>. If any part of the path is nullable, this type will be nullable too.

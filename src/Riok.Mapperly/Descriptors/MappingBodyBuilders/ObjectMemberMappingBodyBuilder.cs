@@ -98,7 +98,7 @@ public static class ObjectMemberMappingBodyBuilder
             return;
         }
 
-        BuildMemberAssignmentMapping(ctx, sourceMemberPath, targetMemberPath);
+        BuildMemberAssignmentMapping(ctx, sourceMemberPath, targetMemberPath, config);
     }
 
     [SuppressMessage(" Meziantou.Analyzer", "MA0051:MethodIsTooLong")]
@@ -266,7 +266,8 @@ public static class ObjectMemberMappingBodyBuilder
     private static void BuildMemberAssignmentMapping(
         IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
         MemberPath sourceMemberPath,
-        MemberPath targetMemberPath
+        MemberPath targetMemberPath,
+        PropertyMappingConfiguration? memberConfig = null
     )
     {
         if (TryAddExistingTargetMapping(ctx, sourceMemberPath, targetMemberPath))
@@ -276,12 +277,12 @@ public static class ObjectMemberMappingBodyBuilder
             return;
 
         // nullability is handled inside the member mapping
-        var delegateMapping =
-            ctx.BuilderContext.FindMapping(sourceMemberPath.Member.Type, targetMemberPath.Member.Type)
-            ?? ctx.BuilderContext.FindOrBuildMapping(
-                sourceMemberPath.Member.Type.NonNullable(),
-                targetMemberPath.Member.Type.NonNullable()
-            );
+        var typeMapping = new TypeMappingKey(
+            sourceMemberPath.MemberType,
+            targetMemberPath.MemberType,
+            memberConfig?.ToTypeMappingConfiguration()
+        );
+        var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(typeMapping);
 
         // couldn't build the mapping
         if (delegateMapping == null)
@@ -344,10 +345,8 @@ public static class ObjectMemberMappingBodyBuilder
             return false;
         }
 
-        var existingTargetMapping = ctx.BuilderContext.FindOrBuildExistingTargetMapping(
-            sourceMemberPath.Member.Type,
-            targetMemberPath.Member.Type
-        );
+        var mappingKey = new TypeMappingKey(sourceMemberPath.MemberType, targetMemberPath.MemberType);
+        var existingTargetMapping = ctx.BuilderContext.FindOrBuildExistingTargetMapping(mappingKey);
         if (existingTargetMapping == null)
             return false;
 

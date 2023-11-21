@@ -55,6 +55,12 @@ internal static class SymbolExtensions
         return namedType.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault(m => m.IsStatic && m.IsGenericMethod);
     }
 
+    internal static bool Implements(this ITypeSymbol t, INamedTypeSymbol interfaceSymbol)
+    {
+        return SymbolEqualityComparer.Default.Equals(t, interfaceSymbol)
+            || t.AllInterfaces.Any(x => SymbolEqualityComparer.Default.Equals(x, interfaceSymbol));
+    }
+
     internal static bool ImplementsGeneric(
         this ITypeSymbol t,
         INamedTypeSymbol genericInterfaceSymbol,

@@ -72,7 +72,7 @@ public class MapperConfigurationReader
             .Select(x => x.Target)
             .WhereNotNull()
             .ToList();
-        var explicitMappings = _dataAccessor.Access<MapPropertyAttribute, PropertyMappingConfiguration>(method).ToList();
+        var propertyConfigurations = _dataAccessor.Access<MapPropertyAttribute, PropertyMappingConfiguration>(method).ToList();
         var ignoreObsolete = _dataAccessor.Access<MapperIgnoreObsoleteMembersAttribute>(method).FirstOrDefault() is not { } methodIgnore
             ? _defaultConfiguration.Properties.IgnoreObsoleteMembersStrategy
             : methodIgnore.IgnoreObsoleteStrategy;
@@ -83,7 +83,7 @@ public class MapperConfigurationReader
         return new PropertiesMappingConfiguration(
             ignoredSourceProperties,
             ignoredTargetProperties,
-            explicitMappings,
+            propertyConfigurations,
             ignoreObsolete,
             requiredMapping
         );

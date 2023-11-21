@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
@@ -9,7 +8,7 @@ namespace Riok.Mapperly.Descriptors;
 public class MappingCollection
 {
     /// <summary>
-    /// The first callable mapping of each type pair.
+    /// The first callable mapping of each type pair + config.
     /// Contains mappings to build and already built mappings
     /// </summary>
     private readonly Dictionary<TypeMappingKey, INewInstanceMapping> _mappings = new();
@@ -39,22 +38,22 @@ public class MappingCollection
     /// <inheritdoc cref="_userMappings"/>
     public IReadOnlyCollection<IUserMapping> UserMappings => _userMappings;
 
-    public INewInstanceMapping? Find(ITypeSymbol sourceType, ITypeSymbol targetType)
+    public INewInstanceMapping? Find(TypeMappingKey mappingKey)
     {
-        _mappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var mapping);
+        _mappings.TryGetValue(mappingKey, out var mapping);
         return mapping;
     }
 
-    public IExistingTargetMapping? FindExistingInstanceMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    public IExistingTargetMapping? FindExistingInstanceMapping(TypeMappingKey mappingKey)
     {
-        _existingTargetMappings.TryGetValue(new TypeMappingKey(sourceType, targetType), out var mapping);
+        _existingTargetMappings.TryGetValue(mappingKey, out var mapping);
         return mapping;
     }
 
     public void EnqueueToBuildBody(IMapping mapping, MappingBuilderContext ctx) =>
         _mappingsToBuildBody.Enqueue((mapping, ctx), mapping.BodyBuildingPriority);
 
-    public void Add(ITypeMapping mapping)
+    public void Add(ITypeMapping mapping, TypeMappingConfiguration config)
     {
         if (mapping is IUserMapping userMapping)
         {
@@ -64,34 +63,36 @@ public class MappingCollection
         switch (mapping)
         {
             case INewInstanceMapping newInstanceMapping:
-                AddNewInstanceMapping(newInstanceMapping);
+                AddNewInstanceMapping(newInstanceMapping, config);
                 break;
             case IExistingTargetMapping existingTargetMapping:
-                AddExistingTargetMapping(existingTargetMapping);
+                AddExistingTargetMapping(existingTargetMapping, config);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(mapping), mapping.GetType().FullName + " mappings are not supported");
         }
     }
 
-    public void AddNewInstanceMapping(INewInstanceMapping mapping)
+    public void AddNewInstanceMapping(INewInstanceMapping mapping, TypeMappingConfiguration config)
     {
         if (mapping is MethodMapping methodMapping)
         {
             _methodMappings.Add(methodMapping);
         }
 
-        if (mapping.CallableByOtherMappings && Find(mapping.SourceType, mapping.TargetType) is null)
+        var mappingKey = new TypeMappingKey(mapping, config);
+        if (mapping.CallableByOtherMappings && Find(mappingKey) is null)
         {
-            _mappings.Add(new TypeMappingKey(mapping), mapping);
+            _mappings.Add(mappingKey, mapping);
         }
     }
 
-    public void AddExistingTargetMapping(IExistingTargetMapping mapping)
+    public void AddExistingTargetMapping(IExistingTargetMapping mapping, TypeMappingConfiguration config)
     {
-        if (mapping.CallableByOtherMappings && FindExistingInstanceMapping(mapping.SourceType, mapping.TargetType) is null)
+        var mappingKey = new TypeMappingKey(mapping, config);
+        if (mapping.CallableByOtherMappings && FindExistingInstanceMapping(mappingKey) is null)
         {
-            _existingTargetMappings.Add(new TypeMappingKey(mapping), mapping);
+            _existingTargetMappings.Add(mappingKey, mapping);
         }
     }
 

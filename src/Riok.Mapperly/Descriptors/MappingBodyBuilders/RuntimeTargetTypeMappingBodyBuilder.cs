@@ -78,7 +78,7 @@ public static class RuntimeTargetTypeMappingBodyBuilder
             .OrderByDescending(x => x.SourceType.GetInheritanceLevel())
             .ThenByDescending(x => x.TargetType.GetInheritanceLevel())
             .ThenBy(x => x.TargetType.IsNullable())
-            .GroupBy(x => new TypeMappingKey(x, false))
+            .GroupBy(x => new TypeMappingKey(x, includeNullability: false))
             .Select(x => x.First())
             .Select(x => new RuntimeTargetTypeMapping(x, ctx.Compilation.HasImplicitConversion(x.TargetType, ctx.Target)));
         mapping.AddMappings(runtimeTargetTypeMappings);

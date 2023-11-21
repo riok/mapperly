@@ -132,22 +132,22 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             return;
         }
 
-        BuildInitMemberMapping(ctx, targetMember, sourceMemberPath);
+        BuildInitMemberMapping(ctx, targetMember, sourceMemberPath, memberConfig);
     }
 
     private static void BuildInitMemberMapping(
         INewInstanceBuilderContext<IMapping> ctx,
         IMappableMember targetMember,
-        MemberPath sourcePath
+        MemberPath sourcePath,
+        PropertyMappingConfiguration? memberConfig = null
     )
     {
         var targetPath = new MemberPath(new[] { targetMember });
         if (!ObjectMemberMappingBodyBuilder.ValidateMappingSpecification(ctx, sourcePath, targetPath, true))
             return;
 
-        var delegateMapping =
-            ctx.BuilderContext.FindMapping(sourcePath.MemberType, targetMember.Type)
-            ?? ctx.BuilderContext.FindOrBuildMapping(sourcePath.MemberType.NonNullable(), targetMember.Type.NonNullable());
+        var mappingKey = new TypeMappingKey(sourcePath.MemberType, targetMember.Type, memberConfig?.ToTypeMappingConfiguration());
+        var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(mappingKey);
 
         if (delegateMapping == null)
         {
@@ -254,7 +254,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         var skippedOptionalParam = false;
         foreach (var parameter in ctor.Parameters)
         {
-            if (!TryFindConstructorParameterSourcePath(ctx, parameter, out var sourcePath))
+            if (!TryFindConstructorParameterSourcePath(ctx, parameter, out var sourcePath, out var memberConfig))
             {
                 // expressions do not allow skipping of optional parameters
                 if (!parameter.IsOptional || ctx.BuilderContext.IsExpression)
@@ -266,9 +266,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
             // nullability is handled inside the member mapping
             var paramType = parameter.Type.WithNullableAnnotation(parameter.NullableAnnotation);
-            var delegateMapping =
-                ctx.BuilderContext.FindMapping(sourcePath.MemberType, paramType)
-                ?? ctx.BuilderContext.FindOrBuildMapping(sourcePath.Member.Type.NonNullable(), paramType.NonNullable());
+            var typeMapping = new TypeMappingKey(sourcePath.MemberType, paramType, memberConfig?.ToTypeMappingConfiguration());
+            var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(typeMapping);
 
             if (delegateMapping == null)
             {
@@ -311,10 +310,12 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
     private static bool TryFindConstructorParameterSourcePath(
         INewInstanceBuilderContext<IMapping> ctx,
         IParameterSymbol parameter,
-        [NotNullWhen(true)] out MemberPath? sourcePath
+        [NotNullWhen(true)] out MemberPath? sourcePath,
+        out PropertyMappingConfiguration? memberConfig
     )
     {
         sourcePath = null;
+        memberConfig = null;
 
         if (!ctx.MemberConfigsByRootTargetName.TryGetValue(parameter.Name, out var memberConfigs))
         {
@@ -338,7 +339,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             );
         }
 
-        var memberConfig = memberConfigs.First();
+        memberConfig = memberConfigs.First();
         if (memberConfig.Target.Path.Count > 1)
         {
             ctx.BuilderContext.ReportDiagnostic(

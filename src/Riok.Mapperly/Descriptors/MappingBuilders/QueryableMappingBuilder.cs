@@ -20,9 +20,10 @@ public static class QueryableMappingBuilder
 
         var sourceType = sourceQueryable.TypeArguments[0];
         var targetType = targetQueryable.TypeArguments[0];
+        var mappingKey = new TypeMappingKey(sourceType, targetType);
 
-        var inlineCtx = new InlineExpressionMappingBuilderContext(ctx, sourceType, targetType);
-        var mapping = inlineCtx.BuildMapping(sourceType, targetType, MappingBuildingOptions.KeepUserSymbol);
+        var inlineCtx = new InlineExpressionMappingBuilderContext(ctx, mappingKey);
+        var mapping = inlineCtx.BuildMapping(mappingKey, MappingBuildingOptions.KeepUserSymbol);
         if (mapping == null)
             return null;
 

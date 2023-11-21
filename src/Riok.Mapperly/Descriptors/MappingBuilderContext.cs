@@ -20,26 +20,18 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         SimpleMappingBuilderContext parentCtx,
         ObjectFactoryCollection objectFactories,
         IMethodSymbol? userSymbol,
-        ITypeSymbol source,
-        ITypeSymbol target
+        TypeMappingKey mappingKey
     )
         : base(parentCtx)
     {
         ObjectFactories = objectFactories;
-        Source = source;
-        Target = target;
         UserSymbol = userSymbol;
-        Configuration = ReadConfiguration(new MappingConfigurationReference(UserSymbol, source, target));
+        MappingKey = mappingKey;
+        Configuration = ReadConfiguration(new MappingConfigurationReference(UserSymbol, mappingKey.Source, mappingKey.Target));
     }
 
-    protected MappingBuilderContext(
-        MappingBuilderContext ctx,
-        IMethodSymbol? userSymbol,
-        ITypeSymbol source,
-        ITypeSymbol target,
-        bool clearDerivedTypes
-    )
-        : this(ctx, ctx.ObjectFactories, userSymbol, source, target)
+    protected MappingBuilderContext(MappingBuilderContext ctx, IMethodSymbol? userSymbol, TypeMappingKey mappingKey, bool clearDerivedTypes)
+        : this(ctx, ctx.ObjectFactories, userSymbol, mappingKey)
     {
         if (clearDerivedTypes)
         {
@@ -49,9 +41,11 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public MappingConfiguration Configuration { get; }
 
-    public ITypeSymbol Source { get; }
+    public TypeMappingKey MappingKey { get; }
 
-    public ITypeSymbol Target { get; }
+    public ITypeSymbol Source => MappingKey.Source;
+
+    public ITypeSymbol Target => MappingKey.Target;
 
     public CollectionInfos? CollectionInfos => _collectionInfos ??= CollectionInfoBuilder.Build(Types, SymbolAccessor, Source, Target);
 
@@ -68,14 +62,12 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     public IReadOnlyCollection<IUserMapping> UserMappings => MappingBuilder.UserMappings;
 
     /// <summary>
-    /// Tries to find an existing mapping for the provided types.
+    /// Tries to find an existing mapping for the provided key.
     /// If none is found, <c>null</c> is returned.
     /// </summary>
-    /// <param name="sourceType">The source type.</param>
-    /// <param name="targetType">The target type.</param>
+    /// <param name="mappingKey">The mapping key.</param>
     /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
-    public virtual INewInstanceMapping? FindMapping(ITypeSymbol sourceType, ITypeSymbol targetType) =>
-        MappingBuilder.Find(sourceType.UpgradeNullable(), targetType.UpgradeNullable());
+    public virtual INewInstanceMapping? FindMapping(TypeMappingKey mappingKey) => MappingBuilder.Find(mappingKey);
 
     /// <summary>
     /// Tries to find an existing mapping for the provided types.
@@ -83,35 +75,75 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// If no mapping is possible for the provided types,
     /// <c>null</c> is returned.
     /// If a new mapping is created, it is added to the mapping descriptor
-    /// and returned in further <see cref="FindOrBuildMapping"/> calls.
-    /// No configuration / user symbol is passed.
+    /// and returned in further calls to this method.
+    /// No user symbol is passed.
     /// </summary>
     /// <param name="sourceType">The source type.</param>
     /// <param name="targetType">The target type.</param>
     /// <param name="options">The mapping building options.</param>
     /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
-    public virtual INewInstanceMapping? FindOrBuildMapping(
+    public INewInstanceMapping? FindOrBuildMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         MappingBuildingOptions options = MappingBuildingOptions.Default
     )
     {
-        sourceType = sourceType.UpgradeNullable();
-        targetType = targetType.UpgradeNullable();
-        return MappingBuilder.Find(sourceType, targetType) ?? BuildMapping(sourceType, targetType, options);
+        return FindOrBuildMapping(new TypeMappingKey(sourceType, targetType), options);
     }
 
     /// <summary>
-    /// Builds a new mapping for the provided types with the given options.
+    /// Tries to find an existing mapping for the provided mapping key.
+    /// If none is found, a new one is created.
+    /// If no mapping is possible for the provided types,
+    /// <c>null</c> is returned.
+    /// If a new mapping is created, it is added to the mapping descriptor
+    /// and returned in further calls to this method.
+    /// No user symbol is passed.
     /// </summary>
-    /// <param name="source">The source type.</param>
-    /// <param name="target">The target type.</param>
+    /// <param name="mappingKey">The mapping key.</param>
+    /// <param name="options">The mapping building options.</param>
+    /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
+    public virtual INewInstanceMapping? FindOrBuildMapping(
+        TypeMappingKey mappingKey,
+        MappingBuildingOptions options = MappingBuildingOptions.Default
+    )
+    {
+        return MappingBuilder.Find(mappingKey) ?? BuildMapping(mappingKey, options);
+    }
+
+    /// <summary>
+    /// Finds or builds a mapping (<seealso cref="FindOrBuildMapping(Riok.Mapperly.Descriptors.TypeMappingKey,Riok.Mapperly.Descriptors.MappingBuildingOptions)"/>).
+    /// Before a new mapping is built existing mappings are tried to be found by the following priorities:
+    /// 1. exact match
+    /// 2. ignoring the nullability of the source (needs to be handled by the caller of this method)
+    /// 3. ignoring the nullability of the target (needs to be handled by the caller of this method)
+    /// 4. ignoring the nullability of the source and the target (needs to be handled by the caller of this method)
+    /// If no mapping can be found a new mapping is built with the source and the target as non-nullables.
+    /// </summary>
+    /// <param name="key">The mapping key.</param>
+    /// <param name="options">The options to build a new mapping if no existing mapping is found.</param>
+    /// <returns>The found or built mapping, or <c>null</c> if none could be found and none could be built.</returns>
+    public INewInstanceMapping? FindOrBuildLooseNullableMapping(
+        TypeMappingKey key,
+        MappingBuildingOptions options = MappingBuildingOptions.Default
+    )
+    {
+        return FindMapping(key)
+            ?? FindMapping(key.NonNullableSource())
+            ?? FindMapping(key.NonNullableTarget())
+            ?? FindOrBuildMapping(key.NonNullable(), options);
+    }
+
+    /// <summary>
+    /// Builds a new mapping for the provided types and config with the given options.
+    /// </summary>
+    /// <param name="mappingKey">The mapping key.</param>
     /// <param name="options">The options.</param>
     /// <returns>The created mapping, or <c>null</c> if no mapping could be created.</returns>
-    public INewInstanceMapping? BuildMapping(ITypeSymbol source, ITypeSymbol target, MappingBuildingOptions options)
+    public INewInstanceMapping? BuildMapping(TypeMappingKey mappingKey, MappingBuildingOptions options = MappingBuildingOptions.Default)
     {
         var userSymbol = options.HasFlag(MappingBuildingOptions.KeepUserSymbol) ? UserSymbol : null;
-        return BuildMapping(userSymbol, source, target, options);
+        return BuildMapping(userSymbol, mappingKey, options);
     }
 
     /// <summary>
@@ -120,39 +152,57 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// If no mapping is possible for the provided types,
     /// <c>null</c> is returned.
     /// If a new mapping is created, it is added to the mapping descriptor
-    /// and returned in further <see cref="FindOrBuildMapping"/> calls.
+    /// and returned in further calls to this method.
     /// No configuration / user symbol is passed.
     /// </summary>
-    /// <param name="sourceType">The source type.</param>
-    /// <param name="targetType">The target type.</param>
+    /// <param name="source">The source type.</param>
+    /// <param name="target">The target type.</param>
+    /// <param name="options">The options.</param>
+    /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
+    public IExistingTargetMapping? FindOrBuildExistingTargetMapping(
+        ITypeSymbol source,
+        ITypeSymbol target,
+        MappingBuildingOptions options = MappingBuildingOptions.Default
+    ) => FindOrBuildExistingTargetMapping(new TypeMappingKey(source, target), options);
+
+    /// <summary>
+    /// Tries to find an existing mapping which can work with an existing target object instance for the provided types.
+    /// If none is found, a new one is created.
+    /// If no mapping is possible for the provided types,
+    /// <c>null</c> is returned.
+    /// If a new mapping is created, it is added to the mapping descriptor
+    /// and returned in further calls to this method.
+    /// No configuration / user symbol is passed.
+    /// </summary>
+    /// <param name="mappingKey">The mapping key.</param>
     /// <param name="options">The options.</param>
     /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
     public virtual IExistingTargetMapping? FindOrBuildExistingTargetMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
+        TypeMappingKey mappingKey,
         MappingBuildingOptions options = MappingBuildingOptions.Default
-    ) => ExistingTargetMappingBuilder.Find(sourceType, targetType) ?? BuildExistingTargetMapping(sourceType, targetType, options);
+    )
+    {
+        return ExistingTargetMappingBuilder.Find(mappingKey) ?? BuildExistingTargetMapping(mappingKey, options);
+    }
 
     /// <summary>
     /// Tries to build an existing target instance mapping.
     /// If no mapping is possible for the provided types,
     /// <c>null</c> is returned.
     /// If a new mapping is created, it is added to the mapping descriptor
-    /// and returned in further <see cref="FindOrBuildMapping"/> calls.
+    /// and returned in further calls to this method.
     /// No configuration / user symbol is passed.
     /// </summary>
-    /// <param name="sourceType">The source type.</param>
-    /// <param name="targetType">The target type.</param>
+    /// <param name="mappingKey">The mapping key.</param>
     /// <param name="options">The options.</param>
     /// <returns>The created mapping, or <c>null</c> if no mapping could be created.</returns>
     public virtual IExistingTargetMapping? BuildExistingTargetMapping(
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
+        TypeMappingKey mappingKey,
         MappingBuildingOptions options = MappingBuildingOptions.Default
     )
     {
         var userSymbol = options.HasFlag(MappingBuildingOptions.KeepUserSymbol) ? UserSymbol : null;
-        var ctx = ContextForMapping(userSymbol, sourceType, targetType, options);
+        var ctx = ContextForMapping(userSymbol, mappingKey, options);
         return ExistingTargetMappingBuilder.Build(ctx, options.HasFlag(MappingBuildingOptions.MarkAsReusable));
     }
 
@@ -185,22 +235,16 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     protected virtual MappingBuilderContext ContextForMapping(
         IMethodSymbol? userSymbol,
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
+        TypeMappingKey mappingKey,
         MappingBuildingOptions options
     )
     {
-        return new(this, userSymbol, sourceType, targetType, options.HasFlag(MappingBuildingOptions.ClearDerivedTypes));
+        return new(this, userSymbol, mappingKey, options.HasFlag(MappingBuildingOptions.ClearDerivedTypes));
     }
 
-    protected INewInstanceMapping? BuildMapping(
-        IMethodSymbol? userSymbol,
-        ITypeSymbol sourceType,
-        ITypeSymbol targetType,
-        MappingBuildingOptions options
-    )
+    protected INewInstanceMapping? BuildMapping(IMethodSymbol? userSymbol, TypeMappingKey key, MappingBuildingOptions options)
     {
-        var ctx = ContextForMapping(userSymbol, sourceType.UpgradeNullable(), targetType.UpgradeNullable(), options);
+        var ctx = ContextForMapping(userSymbol, key, options);
         return MappingBuilder.Build(ctx, options.HasFlag(MappingBuildingOptions.MarkAsReusable));
     }
 }
