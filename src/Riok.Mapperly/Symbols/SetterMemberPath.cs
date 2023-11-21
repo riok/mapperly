@@ -34,10 +34,8 @@ public class SetterMemberPath : MemberPath
 
     private static (IMappableMember, bool) BuildMemberSetter(MappingBuilderContext ctx, IMappableMember member)
     {
-        if (ctx.SymbolAccessor.IsDirectlyAccessible(member.MemberSymbol))
-        {
+        if (ctx.SymbolAccessor.IsDirectlyAccessible(member.MemberSymbol) && member.CanSetDirectly)
             return (member, false);
-        }
 
         if (member.MemberSymbol.Kind == SymbolKind.Field)
         {
