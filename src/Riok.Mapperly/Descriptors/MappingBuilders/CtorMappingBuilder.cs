@@ -22,7 +22,7 @@ public static class CtorMappingBuilder
             .FirstOrDefault(
                 m =>
                     m.Parameters.Length == 1
-                    && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type, ctx.Source)
+                    && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type.NonNullable(), ctx.Source.NonNullable())
                     && ctx.Source.HasSameOrStricterNullability(m.Parameters[0].Type)
             );
 
