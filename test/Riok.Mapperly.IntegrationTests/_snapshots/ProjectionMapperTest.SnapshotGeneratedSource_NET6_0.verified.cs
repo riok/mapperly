@@ -78,6 +78,10 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.NestedNullableIntValue = testObject.NestedNullable.IntValue;
                 target.NestedNullable = MapToTestObjectNestedDto(testObject.NestedNullable);
             }
+            else
+            {
+                target.NestedNullable = null;
+            }
             if (testObject.NestedNullableTargetNotNullable != null)
             {
                 target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(testObject.NestedNullableTargetNotNullable);
@@ -90,9 +94,17 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.NullableReadOnlyObjectCollection = MapToIReadOnlyCollection(testObject.NullableReadOnlyObjectCollection);
             }
+            else
+            {
+                target.NullableReadOnlyObjectCollection = null;
+            }
             if (testObject.SubObject != null)
             {
                 target.SubObject = MapToInheritanceSubObjectDto(testObject.SubObject);
+            }
+            else
+            {
+                target.SubObject = null;
             }
             target.IntValue = testObject.IntValue;
             target.StringValue = testObject.StringValue;
