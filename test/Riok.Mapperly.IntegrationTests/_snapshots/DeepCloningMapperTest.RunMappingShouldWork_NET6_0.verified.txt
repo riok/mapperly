@@ -168,6 +168,7 @@
     SubIntValue: 2,
     BaseIntValue: 1
   },
+  DateTimeValue: 2020-01-03 15:10:05 Utc,
   DateTimeValueTargetDateOnly: 2020-01-03 15:10:05 Utc,
   DateTimeValueTargetTimeOnly: 2020-01-03 15:10:05 Utc,
   ExposePrivateValue: 18

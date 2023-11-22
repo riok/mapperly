@@ -16,12 +16,14 @@ public record TestSourceBuilderOptions(
     bool? EnumMappingIgnoreCase = null,
     IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy = null,
     RequiredMappingStrategy? RequiredMappingStrategy = null,
-    MemberVisibility? IncludedMembers = null
+    MemberVisibility? IncludedMembers = null,
+    bool Static = false
 )
 {
     public const string DefaultMapperClassName = "Mapper";
 
     public static readonly TestSourceBuilderOptions Default = new();
+    public static readonly TestSourceBuilderOptions AsStatic = new(Static: true);
     public static readonly TestSourceBuilderOptions WithDeepCloning = new(UseDeepCloning: true);
     public static readonly TestSourceBuilderOptions WithReferenceHandling = new(UseReferenceHandling: true);
 

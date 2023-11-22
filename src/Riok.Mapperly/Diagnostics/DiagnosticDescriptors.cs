@@ -476,8 +476,35 @@ public static class DiagnosticDescriptors
 
     public static readonly DiagnosticDescriptor SourceDoesNotImplementIFormattable = new DiagnosticDescriptor(
         "RMG055",
-        $"The source type does not implement {nameof(IFormattable)}, string format cannot be applied",
-        $"The source type {{0}} does not implement {nameof(IFormattable)}, string format cannot be applied",
+        $"The source type does not implement {nameof(IFormattable)}, string format and format provider cannot be applied",
+        $"The source type {{0}} does not implement {nameof(IFormattable)}, string format and format provider cannot be applied",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor InvalidFormatProviderSignature = new DiagnosticDescriptor(
+        "RMG056",
+        "Invalid format provider signature",
+        "The format provider {0} has an invalid signature",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor FormatProviderNotFound = new DiagnosticDescriptor(
+        "RMG057",
+        "Format provider not found",
+        $"The format provider {{0}} could not be found, make sure it is annotated with {nameof(FormatProviderAttribute)}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor MultipleDefaultFormatProviders = new DiagnosticDescriptor(
+        "RMG058",
+        "Multiple default format providers found, only one is allowed",
+        "Multiple default format providers found, only one is allowed",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true

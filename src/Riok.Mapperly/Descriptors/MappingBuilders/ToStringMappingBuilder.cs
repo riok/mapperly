@@ -16,7 +16,8 @@ public static class ToStringMappingBuilder
         if (ctx.Target.SpecialType != SpecialType.System_String)
             return null;
 
-        if (ctx.MappingKey.Configuration.StringFormat == null)
+        var formatProvider = ctx.GetFormatProvider(ctx.MappingKey.Configuration.FormatProviderName);
+        if (ctx.MappingKey.Configuration.StringFormat == null && formatProvider == null)
             return new ToStringMapping(ctx.Source, ctx.Target);
 
         if (!ctx.Source.Implements(ctx.Types.Get<IFormattable>()))
@@ -25,6 +26,6 @@ public static class ToStringMappingBuilder
             return new ToStringMapping(ctx.Source, ctx.Target);
         }
 
-        return new ToStringMapping(ctx.Source, ctx.Target, ctx.MappingKey.Configuration.StringFormat);
+        return new ToStringMapping(ctx.Source, ctx.Target, ctx.MappingKey.Configuration.StringFormat, formatProvider?.Name);
     }
 }

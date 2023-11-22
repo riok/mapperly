@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Enumerables;
+using Riok.Mapperly.Descriptors.FormatProviders;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
@@ -19,19 +20,21 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     public MappingBuilderContext(
         SimpleMappingBuilderContext parentCtx,
         ObjectFactoryCollection objectFactories,
+        FormatProviderCollection formatProviders,
         IMethodSymbol? userSymbol,
         TypeMappingKey mappingKey
     )
         : base(parentCtx)
     {
         ObjectFactories = objectFactories;
+        FormatProviders = formatProviders;
         UserSymbol = userSymbol;
         MappingKey = mappingKey;
         Configuration = ReadConfiguration(new MappingConfigurationReference(UserSymbol, mappingKey.Source, mappingKey.Target));
     }
 
     protected MappingBuilderContext(MappingBuilderContext ctx, IMethodSymbol? userSymbol, TypeMappingKey mappingKey, bool clearDerivedTypes)
-        : this(ctx, ctx.ObjectFactories, userSymbol, mappingKey)
+        : this(ctx, ctx.ObjectFactories, ctx.FormatProviders, userSymbol, mappingKey)
     {
         if (clearDerivedTypes)
         {
@@ -57,6 +60,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     public virtual bool IsExpression => false;
 
     public ObjectFactoryCollection ObjectFactories { get; }
+    public FormatProviderCollection FormatProviders { get; }
 
     /// <inheritdoc cref="MappingBuilders.MappingBuilder.UserMappings"/>
     public IReadOnlyCollection<IUserMapping> UserMappings => MappingBuilder.UserMappings;
@@ -211,6 +215,17 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public NullFallbackValue GetNullFallbackValue(ITypeSymbol? targetType = null) =>
         GetNullFallbackValue(targetType ?? Target, MapperConfiguration.ThrowOnMappingNullMismatch);
+
+    public FormatProvider? GetFormatProvider(string? formatProviderName)
+    {
+        var formatProvider = FormatProviders.Get(formatProviderName);
+        if (formatProviderName != null && formatProvider == null)
+        {
+            ReportDiagnostic(DiagnosticDescriptors.FormatProviderNotFound, formatProviderName);
+        }
+
+        return formatProvider;
+    }
 
     protected virtual NullFallbackValue GetNullFallbackValue(ITypeSymbol targetType, bool throwOnMappingNullMismatch)
     {

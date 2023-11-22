@@ -48,6 +48,8 @@
     EnumName: Value30,
     EnumStringValue: 0,
     EnumReverseStringValue: DtoValue3,
+    FormattedIntValue: ,
+    FormattedDateValue: ,
     ExposePrivateValue: 26
   },
   SourceTargetSameObjectType: {
@@ -184,5 +186,7 @@
   },
   DateTimeValueTargetDateOnly: 2020-01-03,
   DateTimeValueTargetTimeOnly: 3:10 PM,
+  FormattedIntValue: ,
+  FormattedDateValue: ,
   ExposePrivateValue: 28
 }

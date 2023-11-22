@@ -131,3 +131,9 @@ Riok.Mapperly.Abstractions.MemberVisibility.Internal = 4 -> Riok.Mapperly.Abstra
 Riok.Mapperly.Abstractions.MemberVisibility.Private = 16 -> Riok.Mapperly.Abstractions.MemberVisibility
 Riok.Mapperly.Abstractions.MemberVisibility.Protected = 8 -> Riok.Mapperly.Abstractions.MemberVisibility
 Riok.Mapperly.Abstractions.MemberVisibility.Public = 2 -> Riok.Mapperly.Abstractions.MemberVisibility
+Riok.Mapperly.Abstractions.FormatProviderAttribute
+Riok.Mapperly.Abstractions.FormatProviderAttribute.Default.get -> bool
+Riok.Mapperly.Abstractions.FormatProviderAttribute.Default.set -> void
+Riok.Mapperly.Abstractions.FormatProviderAttribute.FormatProviderAttribute() -> void
+Riok.Mapperly.Abstractions.MapPropertyAttribute.FormatProvider.get -> string?
+Riok.Mapperly.Abstractions.MapPropertyAttribute.FormatProvider.set -> void
