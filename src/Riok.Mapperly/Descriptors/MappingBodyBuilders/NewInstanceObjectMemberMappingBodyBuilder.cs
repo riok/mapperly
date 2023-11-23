@@ -147,7 +147,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             return;
 
         var mappingKey = new TypeMappingKey(sourcePath.MemberType, targetMember.Type, memberConfig?.ToTypeMappingConfiguration());
-        var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(mappingKey);
+        var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(mappingKey, diagnosticLocation: memberConfig?.Location);
 
         if (delegateMapping == null)
         {
@@ -267,7 +267,10 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             // nullability is handled inside the member mapping
             var paramType = parameter.Type.WithNullableAnnotation(parameter.NullableAnnotation);
             var typeMapping = new TypeMappingKey(sourcePath.MemberType, paramType, memberConfig?.ToTypeMappingConfiguration());
-            var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(typeMapping);
+            var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(
+                typeMapping,
+                diagnosticLocation: memberConfig?.Location
+            );
 
             if (delegateMapping == null)
             {

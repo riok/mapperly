@@ -2,6 +2,7 @@ using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
 
+[UsesVerify]
 public class ToStringFormattedTest
 {
     [Fact]
@@ -78,7 +79,7 @@ public class ToStringFormattedTest
     }
 
     [Fact]
-    public void ClassToStringWithoutIFormattableShouldDiagnostic()
+    public Task ClassToStringWithoutIFormattableShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -89,21 +90,7 @@ public class ToStringFormattedTest
             "class B { public string Value { get; set; } }",
             "class C {}"
         );
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(
-                DiagnosticDescriptors.SourceDoesNotImplementIFormattable,
-                "The source type C does not implement IFormattable, string format and format provider cannot be applied"
-            )
-            .HaveAssertedAllDiagnostics()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::B();
-                target.Value = source.Value.ToString();
-                return target;
-                """
-            );
+        return TestHelper.VerifyGenerator(source);
     }
 
     [Fact]

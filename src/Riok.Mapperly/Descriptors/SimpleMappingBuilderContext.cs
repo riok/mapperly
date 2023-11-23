@@ -3,6 +3,7 @@ using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBuilders;
 using Riok.Mapperly.Diagnostics;
+using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
@@ -15,29 +16,29 @@ public class SimpleMappingBuilderContext(
     MapperConfigurationReader configurationReader,
     SymbolAccessor symbolAccessor,
     AttributeDataAccessor attributeAccessor,
-    MapperDescriptor descriptor,
     UnsafeAccessorContext unsafeAccessorContext,
     DiagnosticCollection diagnostics,
     MappingBuilder mappingBuilder,
-    ExistingTargetMappingBuilder existingTargetMappingBuilder
+    ExistingTargetMappingBuilder existingTargetMappingBuilder,
+    Location diagnosticLocation
 )
 {
-    private readonly MapperDescriptor _descriptor = descriptor;
     private readonly DiagnosticCollection _diagnostics = diagnostics;
     private readonly CompilationContext _compilationContext = compilationContext;
     private readonly MapperConfigurationReader _configurationReader = configurationReader;
+    private readonly Location _diagnosticLocation = diagnosticLocation;
 
-    protected SimpleMappingBuilderContext(SimpleMappingBuilderContext ctx)
+    protected SimpleMappingBuilderContext(SimpleMappingBuilderContext ctx, Location? diagnosticLocation)
         : this(
             ctx._compilationContext,
             ctx._configurationReader,
             ctx.SymbolAccessor,
             ctx.AttributeAccessor,
-            ctx._descriptor,
             ctx.UnsafeAccessorContext,
             ctx._diagnostics,
             ctx.MappingBuilder,
-            ctx.ExistingTargetMappingBuilder
+            ctx.ExistingTargetMappingBuilder,
+            diagnosticLocation ?? ctx._diagnosticLocation
         ) { }
 
     public Compilation Compilation => _compilationContext.Compilation;
@@ -45,8 +46,6 @@ public class SimpleMappingBuilderContext(
     public MapperAttribute MapperConfiguration => _configurationReader.Mapper;
 
     public WellKnownTypes Types => _compilationContext.Types;
-
-    public bool Static => _descriptor.Static;
 
     public SymbolAccessor SymbolAccessor { get; } = symbolAccessor;
 
@@ -61,8 +60,8 @@ public class SimpleMappingBuilderContext(
     public virtual bool IsConversionEnabled(MappingConversionType conversionType) =>
         MapperConfiguration.EnabledConversions.HasFlag(conversionType);
 
-    public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? location, params object[] messageArgs) =>
-        _diagnostics.ReportDiagnostic(descriptor, location, messageArgs);
+    public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? symbolLocation, params object[] messageArgs) =>
+        _diagnostics.ReportDiagnostic(descriptor, symbolLocation?.GetSyntaxLocation() ?? _diagnosticLocation, messageArgs);
 
     protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef) => _configurationReader.BuildFor(configRef);
 }

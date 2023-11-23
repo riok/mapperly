@@ -10,4 +10,4 @@ namespace Riok.Mapperly.Configuration;
 /// </summary>
 /// <param name="SourceType">The source type of the derived type mapping.</param>
 /// <param name="TargetType">The target type of the derived type mapping.</param>
-public record DerivedTypeMappingConfiguration(ITypeSymbol SourceType, ITypeSymbol TargetType);
+public record DerivedTypeMappingConfiguration(ITypeSymbol SourceType, ITypeSymbol TargetType) : HasSyntaxReference;

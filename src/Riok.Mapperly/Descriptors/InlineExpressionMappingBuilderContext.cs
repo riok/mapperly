@@ -16,10 +16,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     private readonly MappingBuilderContext _parentContext;
 
     public InlineExpressionMappingBuilderContext(MappingBuilderContext ctx, TypeMappingKey mappingKey)
-        : this(ctx, (ctx.FindMapping(mappingKey) as IUserMapping)?.Method, mappingKey) { }
-
-    private InlineExpressionMappingBuilderContext(MappingBuilderContext ctx, IMethodSymbol? userSymbol, TypeMappingKey mappingKey)
-        : base(ctx, userSymbol, mappingKey, false)
+        : base(ctx, (ctx.FindMapping(mappingKey) as IUserMapping)?.Method, null, mappingKey, false)
     {
         _parentContext = ctx;
         _inlineExpressionMappings = new MappingCollection();
@@ -28,10 +25,11 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     private InlineExpressionMappingBuilderContext(
         InlineExpressionMappingBuilderContext ctx,
         IMethodSymbol? userSymbol,
+        Location? diagnosticLocation,
         TypeMappingKey mappingKey,
         bool clearDerivedTypes
     )
-        : base(ctx, userSymbol, mappingKey, clearDerivedTypes)
+        : base(ctx, userSymbol, diagnosticLocation, mappingKey, clearDerivedTypes)
     {
         _parentContext = ctx;
         _inlineExpressionMappings = ctx._inlineExpressionMappings;
@@ -82,10 +80,12 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     /// </summary>
     /// <param name="mappingKey">The mapping key.</param>
     /// <param name="options">The options, <see cref="MappingBuildingOptions.MarkAsReusable"/> is ignored.</param>
-    /// <returns></returns>
+    /// <param name="diagnosticLocation">The updated to location where to report diagnostics if a new mapping is being built.</param>
+    /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
     public override INewInstanceMapping? FindOrBuildMapping(
         TypeMappingKey mappingKey,
-        MappingBuildingOptions options = MappingBuildingOptions.Default
+        MappingBuildingOptions options = MappingBuildingOptions.Default,
+        Location? diagnosticLocation = null
     )
     {
         var mapping = FindMapping(mappingKey);
@@ -99,7 +99,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         // unset MarkAsReusable and KeepUserSymbol as they have special handling for inline mappings
         options &= ~(MappingBuildingOptions.MarkAsReusable | MappingBuildingOptions.KeepUserSymbol);
 
-        mapping = BuildMapping(userSymbol, mappingKey, options);
+        mapping = BuildMapping(userSymbol, mappingKey, options, diagnosticLocation);
         if (mapping != null)
         {
             _inlineExpressionMappings.Add(mapping, mappingKey.Configuration);
@@ -136,12 +136,14 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     protected override MappingBuilderContext ContextForMapping(
         IMethodSymbol? userSymbol,
         TypeMappingKey mappingKey,
-        MappingBuildingOptions options
+        MappingBuildingOptions options,
+        Location? diagnosticLocation = null
     )
     {
         return new InlineExpressionMappingBuilderContext(
             this,
             userSymbol,
+            diagnosticLocation,
             mappingKey,
             options.HasFlag(MappingBuildingOptions.ClearDerivedTypes)
         );

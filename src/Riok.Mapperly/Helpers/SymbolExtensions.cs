@@ -15,6 +15,9 @@ internal static class SymbolExtensions
         typeof(Version).FullName!
     );
 
+    internal static Location? GetSyntaxLocation(this ISymbol symbol) =>
+        symbol.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax().GetLocation();
+
     internal static string FullyQualifiedIdentifierName(this ITypeSymbol typeSymbol) =>
         typeSymbol.ToDisplayString(_fullyQualifiedNullableFormat);
 

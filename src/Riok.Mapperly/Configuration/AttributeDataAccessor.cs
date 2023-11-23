@@ -78,6 +78,11 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             syntaxIndex++;
         }
 
+        if (attr is HasSyntaxReference symbolRefHolder)
+        {
+            symbolRefHolder.SyntaxReference = attrData.ApplicationSyntaxReference?.GetSyntax();
+        }
+
         return attr;
     }
 

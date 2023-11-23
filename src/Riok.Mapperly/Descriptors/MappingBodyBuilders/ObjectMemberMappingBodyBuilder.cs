@@ -282,7 +282,7 @@ public static class ObjectMemberMappingBodyBuilder
             targetMemberPath.MemberType,
             memberConfig?.ToTypeMappingConfiguration()
         );
-        var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(typeMapping);
+        var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(typeMapping, diagnosticLocation: memberConfig?.Location);
 
         // couldn't build the mapping
         if (delegateMapping == null)

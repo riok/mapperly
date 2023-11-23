@@ -2,7 +2,7 @@ using Riok.Mapperly.Descriptors;
 
 namespace Riok.Mapperly.Configuration;
 
-public record PropertyMappingConfiguration(StringMemberPath Source, StringMemberPath Target)
+public record PropertyMappingConfiguration(StringMemberPath Source, StringMemberPath Target) : HasSyntaxReference
 {
     public string? StringFormat { get; set; }
 
