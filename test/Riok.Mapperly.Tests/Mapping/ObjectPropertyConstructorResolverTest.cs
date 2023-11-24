@@ -509,22 +509,13 @@ public class ObjectPropertyConstructorResolverTest
     [Fact]
     public void RecordToRecordNullableToNullableEnum()
     {
-        var source = TestSourceBuilder.CSharp(
-            """
-            using Riok.Mapperly.Abstractions;
-
-            enum SourceEnum { Value1, Value2 }
-            enum TargetEnum { Value1, Value2 }
-
-            record SourceRecord(SourceEnum? EnumValue);
-            record TargetRecord(TargetEnum? EnumValue);
-
-            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
-            static partial class Mapper
-            {
-                public static partial TargetRecord Map(this SourceRecord record);
-            }
-            """
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "record A(C? EnumValue);",
+            "record B(D? EnumValue);",
+            "enum C { Value1, Value2 }",
+            "enum D { Value1, Value2 }"
         );
 
         TestHelper
@@ -532,7 +523,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new global::TargetRecord(record.EnumValue != null ? MapToTargetEnum(record.EnumValue.Value) : default(global::TargetEnum?));
+                var target = new global::B(source.EnumValue != null ? (global::D)source.EnumValue.Value : default(global::D?));
                 return target;
                 """
             );
@@ -541,22 +532,13 @@ public class ObjectPropertyConstructorResolverTest
     [Fact]
     public void RecordToRecordNullableToNullableStruct()
     {
-        var source = TestSourceBuilder.CSharp(
-            """
-            using Riok.Mapperly.Abstractions;
-
-            struct SourceStruct { public int Value { get; set; } }
-            struct TargetStruct { public int Value { get; set; } }
-
-            record SourceRecord(SourceStruct? StructValue);
-            record TargetRecord(TargetStruct? StructValue);
-
-            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
-            static partial class Mapper
-            {
-                public static partial TargetRecord Map(this SourceRecord record);
-            }
-            """
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "record A(C? StructValue);",
+            "record B(D? StructValue);",
+            "struct C { public int Value { get; set; } }",
+            "struct D { public int Value { get; set; } }"
         );
 
         TestHelper
@@ -564,7 +546,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new global::TargetRecord(record.StructValue != null ? MapToTargetStruct(record.StructValue.Value) : default(global::TargetStruct?));
+                var target = new global::B(source.StructValue != null ? MapToD(source.StructValue.Value) : default(global::D?));
                 return target;
                 """
             );
