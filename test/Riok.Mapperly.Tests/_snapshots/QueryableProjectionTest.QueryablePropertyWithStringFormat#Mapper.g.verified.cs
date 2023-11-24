@@ -8,7 +8,7 @@ public partial class Mapper
 #nullable disable
         return System.Linq.Queryable.Select(source, x => new global::B()
         {
-            Value = x.Value.ToString("C", null),
+            Value = x.Value.ToString("C"),
         });
 #nullable enable
     }
@@ -17,7 +17,7 @@ public partial class Mapper
     {
         var target = new global::B()
         {
-            Value = source.Value.ToString("C", null),
+            Value = source.Value.ToString("C"),
         };
         return target;
     }

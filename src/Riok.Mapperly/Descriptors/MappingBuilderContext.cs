@@ -234,15 +234,15 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     public NullFallbackValue GetNullFallbackValue(ITypeSymbol? targetType = null) =>
         GetNullFallbackValue(targetType ?? Target, MapperConfiguration.ThrowOnMappingNullMismatch);
 
-    public FormatProvider? GetFormatProvider(string? formatProviderName)
+    public (FormatProvider? formatProvider, bool isDefault) GetFormatProvider(string? formatProviderName)
     {
-        var formatProvider = _formatProviders.Get(formatProviderName);
+        var (formatProvider, isDefault) = _formatProviders.Get(formatProviderName);
         if (formatProviderName != null && formatProvider == null)
         {
             ReportDiagnostic(DiagnosticDescriptors.FormatProviderNotFound, formatProviderName);
         }
 
-        return formatProvider;
+        return (formatProvider, isDefault);
     }
 
     protected virtual NullFallbackValue GetNullFallbackValue(ITypeSymbol targetType, bool throwOnMappingNullMismatch)

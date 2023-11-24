@@ -24,8 +24,8 @@ public class ToStringFormattedTest
                 """
                 var target = new global::B();
                 target.Value = source.Value.ToString();
-                target.Value1 = source.Value1.ToString("dd.MM.yyyy", null);
-                target.Value2 = source.Value2.ToString("yyyy-MM-dd", null);
+                target.Value1 = source.Value1.ToString("dd.MM.yyyy");
+                target.Value2 = source.Value2.ToString("yyyy-MM-dd");
                 return target;
                 """
             );
@@ -48,14 +48,41 @@ public class ToStringFormattedTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new global::B(source.Value.ToString(), source.Value1.ToString("dd.MM.yyyy", null), source.Value2.ToString("yyyy-MM-dd", null));
+                var target = new global::B(source.Value.ToString(), source.Value1.ToString("dd.MM.yyyy"), source.Value2.ToString("yyyy-MM-dd"));
                 return target;
                 """
             );
     }
 
     [Fact]
-    public void ClassToStringWithIFormattable()
+    public void WithBothParamsButOnlyFormatProviderSet()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [FormatProvider]
+            private readonly IFormatProvider _formatter = CultureInfo.GetCultureInfo("de-CH");
+
+            [MapProperty("Value", "Value", FormatProvider = nameof(_formatter)]
+            partial B Map(A source);",
+            """,
+            "class A { public C Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string ToString(string? format, IFormatProvider? formatProvider) => format; }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = source.Value.ToString(null, _formatter);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void WithBothParamsButOnlyFormatSet()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -64,7 +91,7 @@ public class ToStringFormattedTest
             """,
             "class A { public C Value { get; set; } }",
             "class B { public string Value { get; set; } }",
-            "class C : IFormattable { public string ToString(string? format, IFormatProvider? formatProvider) => format; }"
+            "class C { public string ToString(string? format, IFormatProvider? formatProvider) => format; }"
         );
         TestHelper
             .GenerateMapper(source)
@@ -79,54 +106,7 @@ public class ToStringFormattedTest
     }
 
     [Fact]
-    public Task ClassToStringWithoutIFormattableShouldDiagnostic()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            """
-            [MapProperty("Value", "Value", StringFormat = "C")]
-            partial B Map(A source);",
-            """,
-            "class A { public C Value { get; set; } }",
-            "class B { public string Value { get; set; } }",
-            "class C {}"
-        );
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public void ClassToStringWithFormatProviderWithoutIFormattableShouldDiagnostic()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            """
-            [FormatProvider]
-            private readonly IFormatProvider _formatter = CultureInfo.GetCultureInfo("de-CH");
-
-            [MapProperty("Value", "Value", FormatProvider = "_formatter")]
-            partial B Map(A source);",
-            """,
-            "class A { public C Value { get; set; } }",
-            "class B { public string Value { get; set; } }",
-            "class C {}"
-        );
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(
-                DiagnosticDescriptors.SourceDoesNotImplementIFormattable,
-                "The source type C does not implement IFormattable, string format and format provider cannot be applied"
-            )
-            .HaveAssertedAllDiagnostics()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::B();
-                target.Value = source.Value.ToString();
-                return target;
-                """
-            );
-    }
-
-    [Fact]
-    public void ClassWithDefaultFormatProvider()
+    public void DefaultFormatProvider()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -144,14 +124,64 @@ public class ToStringFormattedTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                target.Value = source.Value.ToString(null, _formatter);
+                target.Value = source.Value.ToString(_formatter);
                 return target;
                 """
             );
     }
 
     [Fact]
-    public void ClassWithDefaultFormatProviderAndStringFormat()
+    public void DefaultFormatProviderButNoFormatProviderOverload()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [FormatProvider(Default = true)]
+            private readonly IFormatProvider _formatter = CultureInfo.GetCultureInfo("de-CH");
+            partial B Map(A source);
+            """,
+            "class A { public C Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string ToString(string? format) => format; }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = source.Value.ToString();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ExplicitFormatProviderButNoFormatProviderOverloadShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [FormatProvider)]
+            private readonly IFormatProvider _formatter = CultureInfo.GetCultureInfo("de-CH");
+
+            [MapProperty("Value", "Value", FormatProvider = nameof(_formatter)]
+            partial B Map(A source);",
+            """,
+            "class A { public C Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string ToString(string? format) => format; }"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceDoesNotImplementToStringWithFormatParameters,
+                "The source type C does not implement ToString with the provided formatting parameters, string format and format provider cannot be applied"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void DefaultFormatProviderAndStringFormat()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -177,7 +207,34 @@ public class ToStringFormattedTest
     }
 
     [Fact]
-    public void ClassWithDefaultAndExplicitFormatProviderAndStringFormat()
+    public void DefaultFormatProviderAndStringFormatButNoFormatProviderOverload()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [FormatProvider(Default = true)]
+            private readonly IFormatProvider _formatter = CultureInfo.GetCultureInfo("de-CH");
+
+            [MapProperty("Value", "Value", StringFormat = "C")]
+            partial B Map(A source);
+            """,
+            "class A { public C Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string ToString(string? format) => format; }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = source.Value.ToString("C");
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void DefaultAndExplicitFormatProviderAndStringFormat()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -206,7 +263,7 @@ public class ToStringFormattedTest
     }
 
     [Fact]
-    public void ClassWithExplicitFormatProvider()
+    public void ExplicitFormatProvider()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -233,7 +290,7 @@ public class ToStringFormattedTest
     }
 
     [Fact]
-    public void ClassWithDefaultFormatProviderDisabledNullable()
+    public void DefaultFormatProviderDisabledNullable()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -253,7 +310,7 @@ public class ToStringFormattedTest
                 if (source == null)
                     return default;
                 var target = new global::B();
-                target.Value = source.Value.ToString(null, _formatter);
+                target.Value = source.Value.ToString(_formatter);
                 return target;
                 """
             );
@@ -304,7 +361,7 @@ public class ToStringFormattedTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                target.Value = source.Value.ToString(null, _formatter);
+                target.Value = source.Value.ToString(_formatter);
                 return target;
                 """
             );
@@ -328,7 +385,7 @@ public class ToStringFormattedTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                target.Value = source.Value.ToString(null, _formatter);
+                target.Value = source.Value.ToString(_formatter);
                 return target;
                 """
             );
@@ -375,7 +432,7 @@ public class ToStringFormattedTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                target.Value = source.Value.ToString("dd.MM.yyyy", null);
+                target.Value = source.Value.ToString("dd.MM.yyyy");
                 return target;
                 """
             );
@@ -430,6 +487,4 @@ public class ToStringFormattedTest
             )
             .HaveAssertedAllDiagnostics();
     }
-
-    // TODO test diagnostics
 }

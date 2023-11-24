@@ -413,7 +413,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    Value = source.Value.ToString("C", null),
+                    Value = source.Value.ToString("C"),
                 };
                 return target;
                 """

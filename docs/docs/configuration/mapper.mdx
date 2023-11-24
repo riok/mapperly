@@ -229,7 +229,7 @@ To enforce strict enum mappings set `RMG037` and `RMG038` to error, see [strict 
 
 ### String format
 
-The string format passed to `ToString` calls when converting to a string (using `IFormattable`) can be customized
+The string format passed to `ToString` calls when converting to a string can be customized
 by using the `StringFormat` property of the `MapPropertyAttribute`.
 
 ```csharp
@@ -245,13 +245,14 @@ public partial class CarMapper
 
 ### String format provider & culture
 
-To customize the format provider / culture to be used by Mapperly when calling `ToString` (using `IFormattable`)
+To customize the format provider / culture to be used by Mapperly when calling `ToString`
 format providers can be used.
 A format provider can be provided to Mapperly by simply annotating a field or property within the Mapper with the `FormatProviderAttribute`.
 The field/property need to return a type implementing `System.IFormatProvider`.
 Format providers can be referenced by the name of the property / field in `MapPropertyAttribute.FormatProvider`.
 A format provider can be marked as default (set the default property of the `FormatProviderAttribute` to true).
-A default format provider is used for all `ToString` conversions when the source implements `System.IFormattable`.
+A default format provider is used for all `ToString` conversions
+when the source implements has a `ToString` overload accepting a `System.IFormatProvider`.
 In a mapper only one format provider can be marked as default.
 
 ```csharp

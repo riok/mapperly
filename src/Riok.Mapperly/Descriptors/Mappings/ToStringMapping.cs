@@ -11,16 +11,29 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <code>
 /// target = source.ToString();
 /// </code>
+/// <param name="simpleInvocation">
+/// When true, <c>null</c> parameters are not emitted,
+/// when false, <c>null</c> parameters are emitted as <c>null</c> literals..</param>
 /// </summary>
-public class ToStringMapping(ITypeSymbol sourceType, ITypeSymbol targetType, string? stringFormat = null, string? formatProviderName = null)
-    : SourceObjectMethodMapping(sourceType, targetType, nameof(ToString))
+public class ToStringMapping(
+    ITypeSymbol sourceType,
+    ITypeSymbol targetType,
+    string? stringFormat = null,
+    string? formatProviderName = null,
+    bool simpleInvocation = true
+) : SourceObjectMethodMapping(sourceType, targetType, nameof(ToString))
 {
-    protected override IEnumerable<ExpressionSyntax> BuildArguments(TypeMappingBuildContext ctx)
+    protected override IEnumerable<ExpressionSyntax?> BuildArguments(TypeMappingBuildContext ctx)
     {
-        if (stringFormat == null && formatProviderName == null)
-            yield break;
-
-        yield return stringFormat == null ? NullLiteral() : StringLiteral(stringFormat);
-        yield return formatProviderName == null ? NullLiteral() : IdentifierName(formatProviderName);
+        yield return stringFormat != null
+            ? StringLiteral(stringFormat)
+            : simpleInvocation
+                ? null
+                : NullLiteral();
+        yield return formatProviderName != null
+            ? IdentifierName(formatProviderName)
+            : simpleInvocation
+                ? null
+                : NullLiteral();
     }
 }
