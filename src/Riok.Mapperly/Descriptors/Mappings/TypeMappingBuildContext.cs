@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Emit.Syntax;
 using Riok.Mapperly.Helpers;
@@ -10,21 +11,26 @@ public readonly record struct TypeMappingBuildContext
     private const string DefaultSourceName = "x";
 
     public TypeMappingBuildContext(
-        string source,
+        string? source,
         string? referenceHandler,
         UniqueNameBuilder nameBuilder,
         SyntaxFactoryHelper syntaxFactory
     )
-        : this(IdentifierName(source), referenceHandler == null ? null : IdentifierName(referenceHandler), nameBuilder, syntaxFactory) { }
+        : this(
+            source == null ? null : IdentifierName(source),
+            referenceHandler == null ? null : IdentifierName(referenceHandler),
+            nameBuilder,
+            syntaxFactory
+        ) { }
 
     private TypeMappingBuildContext(
-        ExpressionSyntax source,
+        ExpressionSyntax? source,
         ExpressionSyntax? referenceHandler,
         UniqueNameBuilder nameBuilder,
         SyntaxFactoryHelper syntaxFactory
     )
     {
-        Source = source;
+        Source = source ?? LiteralExpression(SyntaxKind.NullLiteralExpression);
         ReferenceHandler = referenceHandler;
         NameBuilder = nameBuilder;
         SyntaxFactory = syntaxFactory;

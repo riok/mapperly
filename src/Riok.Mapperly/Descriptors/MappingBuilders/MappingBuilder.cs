@@ -13,6 +13,7 @@ public class MappingBuilder(MappingCollection mappings)
         DerivedTypeMappingBuilder.TryBuildMapping,
         SpecialTypeMappingBuilder.TryBuildMapping,
         DirectAssignmentMappingBuilder.TryBuildMapping,
+        ExpressionMappingBuilder.TryBuildMapping,
         QueryableMappingBuilder.TryBuildMapping,
         DictionaryMappingBuilder.TryBuildMapping,
         SpanMappingBuilder.TryBuildMapping,

@@ -41,6 +41,13 @@ public abstract class MethodMapping : NewInstanceMapping
         _returnType = targetType;
     }
 
+    protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, MethodParameter? sourceParameter)
+        : base(sourceType, targetType)
+    {
+        SourceParameter = sourceParameter;
+        _returnType = targetType;
+    }
+
     protected MethodMapping(
         IMethodSymbol method,
         MethodParameter sourceParameter,
@@ -49,7 +56,7 @@ public abstract class MethodMapping : NewInstanceMapping
     )
         : base(sourceParameter.Type, targetType)
     {
-        SourceParameter = sourceParameter;
+        SourceParameter = sourceParameter.Ordinal >= 0 ? sourceParameter : null;
         IsExtensionMethod = method.IsExtensionMethod;
         ReferenceHandlerParameter = referenceHandlerParameter;
         _partialMethodDefinition = method;
@@ -61,17 +68,17 @@ public abstract class MethodMapping : NewInstanceMapping
 
     private string MethodName => _methodName ?? throw new InvalidOperationException();
 
-    protected MethodParameter SourceParameter { get; }
+    protected MethodParameter? SourceParameter { get; }
 
     protected MethodParameter? ReferenceHandlerParameter { get; private set; }
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
-        Invocation(MethodName, SourceParameter.WithArgument(ctx.Source), ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
+        Invocation(MethodName, SourceParameter?.WithArgument(ctx.Source), ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
 
     public virtual MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
     {
         var typeMappingBuildContext = new TypeMappingBuildContext(
-            SourceParameter.Name,
+            SourceParameter?.Name,
             ReferenceHandlerParameter?.Name,
             ctx.NameBuilder.NewScope(),
             ctx.SyntaxFactory.AddIndentation()

@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
 using Riok.Mapperly.Descriptors.Mappings;
@@ -270,6 +271,17 @@ public static class UserMethodMappingExtractor
         [NotNullWhen(true)] out MappingMethodParameters? parameters
     )
     {
+        if (
+            method.Parameters.Length == 0
+            && method.ReturnType.ImplementsGeneric(ctx.Types.Get(typeof(Expression<>)), out var targetExpr)
+            && targetExpr.TypeArguments[0].ImplementsGeneric(ctx.Types.Get(typeof(Func<,>)), out var targetFunc)
+        )
+        {
+            var noSource = new MethodParameter(-1, "sourceHack", ctx.Types.Get(typeof(void)));
+            parameters = new MappingMethodParameters(noSource, null, null);
+            return true;
+        }
+
         var expectedParameterCount = 1;
 
         // reference handler parameter is always annotated
