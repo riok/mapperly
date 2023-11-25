@@ -80,4 +80,6 @@ public readonly record struct TypeMappingBuildContext
     public TypeMappingBuildContext WithRefHandler(string refHandler) => WithRefHandler(IdentifierName(refHandler));
 
     public TypeMappingBuildContext WithRefHandler(ExpressionSyntax refHandler) => new(Source, refHandler, NameBuilder, SyntaxFactory);
+
+    public TypeMappingBuildContext WithNoSource() => new(null, ReferenceHandler, NameBuilder, SyntaxFactory);
 }

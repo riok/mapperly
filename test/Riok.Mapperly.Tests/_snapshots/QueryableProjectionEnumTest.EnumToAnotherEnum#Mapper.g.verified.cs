@@ -5,11 +5,16 @@ public partial class Mapper
 {
     private partial global::System.Linq.IQueryable<global::B> Map(global::System.Linq.IQueryable<global::A> source)
     {
+        return System.Linq.Queryable.Select(source, MapToExpression());
+    }
+
+    private global::System.Linq.Expressions.Expression<global::System.Func<global::A, global::B>> MapToExpression()
+    {
 #nullable disable
-        return System.Linq.Queryable.Select(source, x => new global::B()
+        return x => new global::B()
         {
             Value = (global::D)x.Value,
-        });
+        };
 #nullable enable
     }
 }

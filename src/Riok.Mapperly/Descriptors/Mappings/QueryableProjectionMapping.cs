@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
@@ -17,21 +16,10 @@ public class QueryableProjectionMapping(ITypeSymbol sourceType, ITypeSymbol targ
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
-        // disable nullable reference types for expressions, as for ORMs nullables usually don't apply
-        // #nullable disable
-        // return System.Linq.Enumerable.Select(source, x => ...);
-        // #nullable enable
-        var (lambdaCtx, lambdaSourceName) = ctx.WithNewScopedSource();
-
-        var delegateMappingSyntax = delegateMapping.Build(lambdaCtx);
-        var projectionLambda = Lambda(lambdaSourceName, delegateMappingSyntax);
-        var select = StaticInvocation(QueryableReceiverName, SelectMethodName, ctx.Source, projectionLambda);
+        var innerCtx = ctx.WithNoSource();
+        var delegateMappingSyntax = delegateMapping.Build(innerCtx);
+        var select = StaticInvocation(QueryableReceiverName, SelectMethodName, ctx.Source, delegateMappingSyntax);
         var returnStatement = ctx.SyntaxFactory.Return(select);
-        return new[]
-        {
-            returnStatement
-                .WithLeadingTrivia(returnStatement.GetLeadingTrivia().Insert(0, ElasticCarriageReturnLineFeed).Insert(1, Nullable(false)))
-                .WithTrailingTrivia(returnStatement.GetTrailingTrivia().Insert(0, ElasticCarriageReturnLineFeed).Insert(1, Nullable(true)))
-        };
+        return new[] { returnStatement };
     }
 }

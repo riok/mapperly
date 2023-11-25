@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Diagnostics;
@@ -20,10 +21,13 @@ public static class QueryableMappingBuilder
 
         var sourceType = sourceQueryable.TypeArguments[0];
         var targetType = targetQueryable.TypeArguments[0];
-        var mappingKey = new TypeMappingKey(sourceType, targetType);
 
-        var inlineCtx = new InlineExpressionMappingBuilderContext(ctx, mappingKey);
-        var mapping = inlineCtx.BuildMapping(mappingKey, MappingBuildingOptions.KeepUserSymbol);
+        var funcType = ctx.Types
+            .Get(typeof(Expression<>))
+            .Construct(ctx.Types.Get(typeof(Func<,>)).Construct(sourceType, targetType))
+            .NonNullable();
+
+        var mapping = ctx.FindOrBuildMapping(ctx.Types.Get(typeof(void)), funcType);
         if (mapping == null)
             return null;
 

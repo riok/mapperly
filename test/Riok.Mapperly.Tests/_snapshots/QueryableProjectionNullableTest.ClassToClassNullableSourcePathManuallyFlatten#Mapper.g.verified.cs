@@ -5,12 +5,7 @@ public partial class Mapper
 {
     public partial global::System.Linq.IQueryable<global::B> Map(global::System.Linq.IQueryable<global::A> q)
     {
-#nullable disable
-        return System.Linq.Queryable.Select(q, x => new global::B()
-        {
-            NestedValue4 = x.Nested != null && x.Nested.Nested2 != null ? x.Nested.Nested2.Value3 : default,
-        });
-#nullable enable
+        return System.Linq.Queryable.Select(q, MapToExpression());
     }
 
     private partial global::B Map(global::A source)
@@ -21,5 +16,15 @@ public partial class Mapper
             target.NestedValue4 = source.Nested.Nested2.Value3;
         }
         return target;
+    }
+
+    private global::System.Linq.Expressions.Expression<global::System.Func<global::A, global::B>> MapToExpression()
+    {
+#nullable disable
+        return x => new global::B()
+        {
+            NestedValue4 = x.Nested != null && x.Nested.Nested2 != null ? x.Nested.Nested2.Value3 : default,
+        };
+#nullable enable
     }
 }
