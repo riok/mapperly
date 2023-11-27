@@ -79,4 +79,33 @@ public class CtorTest
                 """
             );
     }
+
+    [Fact]
+    public void MapPropertyCtorMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.BId), nameof(B.Id))]
+            private partial B Map(A source);
+            """,
+            "class A { public long BId { get; } }",
+            """
+            class B
+            {
+                public long Id { get; }
+
+                public B(long id) { Id = id; }
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B(source.BId);
+                return target;
+                """
+            );
+    }
 }

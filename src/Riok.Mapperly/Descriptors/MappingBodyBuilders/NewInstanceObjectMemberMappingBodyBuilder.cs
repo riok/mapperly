@@ -320,7 +320,10 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         sourcePath = null;
         memberConfig = null;
 
-        if (!ctx.MemberConfigsByRootTargetName.TryGetValue(parameter.Name, out var memberConfigs))
+        if (
+            !ctx.RootTargetNameCasingMapping.TryGetValue(parameter.Name, out var parameterName)
+            || !ctx.MemberConfigsByRootTargetName.TryGetValue(parameterName, out var memberConfigs)
+        )
         {
             return ctx.BuilderContext
                 .SymbolAccessor
