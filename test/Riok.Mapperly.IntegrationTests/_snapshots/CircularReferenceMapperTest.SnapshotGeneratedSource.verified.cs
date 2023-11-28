@@ -19,6 +19,10 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.Parent = MapToCircularReferenceDto(source.Parent, refHandler);
             }
+            else
+            {
+                target.Parent = null;
+            }
             target.Value = source.Value;
             return target;
         }

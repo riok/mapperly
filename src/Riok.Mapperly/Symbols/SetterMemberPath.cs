@@ -55,7 +55,7 @@ public class SetterMemberPath : MemberPath
         return (new MethodAccessorMember(member, unsafeGetAccessor.MethodName, methodRequiresParameter: true), true);
     }
 
-    public ExpressionSyntax BuildAssignment(ExpressionSyntax? baseAccess, ExpressionSyntax sourceValue, bool coalesceAssignment = false)
+    public ExpressionSyntax BuildAssignment(ExpressionSyntax? baseAccess, ExpressionSyntax valueToAssign, bool coalesceAssignment = false)
     {
         IEnumerable<IMappableMember> path = Path;
 
@@ -73,16 +73,16 @@ public class SetterMemberPath : MemberPath
             Debug.Assert(!IsMethod);
 
             // target.Value ??= mappedValue;
-            return CoalesceAssignment(memberPath, sourceValue);
+            return CoalesceAssignment(memberPath, valueToAssign);
         }
 
         if (IsMethod)
         {
             // target.SetValue(source.Value);
-            return Invocation(memberPath, sourceValue);
+            return Invocation(memberPath, valueToAssign);
         }
 
         // target.Value = source.Value;
-        return Assignment(memberPath, sourceValue);
+        return Assignment(memberPath, valueToAssign);
     }
 }

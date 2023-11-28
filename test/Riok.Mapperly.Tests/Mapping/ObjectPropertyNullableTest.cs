@@ -319,6 +319,10 @@ public class ObjectPropertyNullableTest
                 {
                     target.Value = MapToD(source.Value);
                 }
+                else
+                {
+                    target.Value = null;
+                }
                 return target;
                 """
             );
@@ -439,6 +443,39 @@ public class ObjectPropertyNullableTest
                 if (source.Value != null)
                 {
                     target.Value = MapToD(source.Value);
+                }
+                else
+                {
+                    target.Value = null;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableValueTypeToOtherNullableValueType()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public float? Value { get; set; } }",
+            "class B { public decimal? Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.Value != null)
+                {
+                    target.Value = new decimal(source.Value.Value);
+                }
+                else
+                {
+                    target.Value = null;
                 }
                 return target;
                 """

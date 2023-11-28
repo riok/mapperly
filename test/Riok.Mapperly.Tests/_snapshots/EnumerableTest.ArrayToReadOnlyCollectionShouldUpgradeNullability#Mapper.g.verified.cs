@@ -12,6 +12,10 @@ public partial class Mapper
         {
             target.Value = MapToIReadOnlyCollection(source.Value);
         }
+        else
+        {
+            target.Value = null;
+        }
         return target;
     }
 

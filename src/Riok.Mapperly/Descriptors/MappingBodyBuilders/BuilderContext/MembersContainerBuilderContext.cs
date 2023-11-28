@@ -1,5 +1,6 @@
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
+using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
@@ -22,6 +23,13 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         var nullConditionSourcePath = new MemberPath(memberMapping.SourcePath.PathWithoutTrailingNonNullable().ToList());
         var container = GetOrCreateNullDelegateMappingForPath(nullConditionSourcePath);
         AddMemberAssignmentMapping(container, memberMapping);
+
+        // set target member to null if null assignments are allowed
+        // and the source is null
+        if (BuilderContext.MapperConfiguration.AllowNullPropertyAssignment && memberMapping.TargetPath.Member.Type.IsNullable())
+        {
+            container.AddNullMemberAssignment(SetterMemberPath.Build(BuilderContext, memberMapping.TargetPath));
+        }
     }
 
     private void AddMemberAssignmentMapping(IMemberAssignmentMappingContainer container, IMemberAssignmentMapping mapping)

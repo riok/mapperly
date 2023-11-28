@@ -264,6 +264,10 @@ public class ObjectPropertyFlatteningTest
                 {
                     target.ValueId = source.Value.Id.ToString();
                 }
+                else
+                {
+                    target.ValueId = null;
+                }
                 target.ValueName = source.Value?.Name;
                 return target;
                 """
