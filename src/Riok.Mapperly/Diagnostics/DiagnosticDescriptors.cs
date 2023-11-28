@@ -474,10 +474,10 @@ public static class DiagnosticDescriptors
         true
     );
 
-    public static readonly DiagnosticDescriptor SourceDoesNotImplementIFormattable = new DiagnosticDescriptor(
+    public static readonly DiagnosticDescriptor SourceDoesNotImplementToStringWithFormatParameters = new DiagnosticDescriptor(
         "RMG055",
-        $"The source type does not implement {nameof(IFormattable)}, string format and format provider cannot be applied",
-        $"The source type {{0}} does not implement {nameof(IFormattable)}, string format and format provider cannot be applied",
+        $"The source type does not implement {nameof(ToString)} with the provided formatting parameters, string format and format provider cannot be applied",
+        $"The source type {{0}} does not implement {nameof(ToString)} with the provided formatting parameters, string format and format provider cannot be applied",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true

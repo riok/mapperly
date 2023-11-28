@@ -568,7 +568,7 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new global::B(source.Value.ToString("C", null));
+                var target = new global::B(source.Value.ToString("C"));
                 return target;
                 """
             );

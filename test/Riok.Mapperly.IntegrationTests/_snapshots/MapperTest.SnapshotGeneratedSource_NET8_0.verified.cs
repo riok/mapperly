@@ -229,38 +229,38 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.StringNullableTargetNotNullable = dto.StringNullableTargetNotNullable;
             target.SourceTargetSameObjectType = dto.SourceTargetSameObjectType;
             target.MemoryValue = MapToStringArray(dto.MemoryValue.Span);
-            target.StackValue = new global::System.Collections.Generic.Stack<string>(global::System.Linq.Enumerable.Select(dto.StackValue, x => x.ToString(null, _formatDeCh)));
-            target.QueueValue = new global::System.Collections.Generic.Queue<string>(global::System.Linq.Enumerable.Select(dto.QueueValue, x => x.ToString(null, _formatDeCh)));
-            target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(global::System.Linq.Enumerable.Select(dto.ImmutableArrayValue, x => x.ToString(null, _formatDeCh)));
-            target.ImmutableListValue = global::System.Collections.Immutable.ImmutableList.ToImmutableList(global::System.Linq.Enumerable.Select(dto.ImmutableListValue, x => x.ToString(null, _formatDeCh)));
-            target.ImmutableHashSetValue = global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(global::System.Linq.Enumerable.Select(dto.ImmutableHashSetValue, x => x.ToString(null, _formatDeCh)));
-            target.ImmutableQueueValue = global::System.Collections.Immutable.ImmutableQueue.CreateRange(global::System.Linq.Enumerable.Select(dto.ImmutableQueueValue, x => x.ToString(null, _formatDeCh)));
-            target.ImmutableStackValue = global::System.Collections.Immutable.ImmutableStack.CreateRange(global::System.Linq.Enumerable.Select(dto.ImmutableStackValue, x => x.ToString(null, _formatDeCh)));
-            target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(global::System.Linq.Enumerable.Select(dto.ImmutableSortedSetValue, x => x.ToString(null, _formatDeCh)));
-            target.ImmutableDictionaryValue = global::System.Collections.Immutable.ImmutableDictionary.ToImmutableDictionary(dto.ImmutableDictionaryValue, x => x.Key.ToString(null, _formatDeCh), x => x.Value.ToString(null, _formatDeCh));
-            target.ImmutableSortedDictionaryValue = global::System.Collections.Immutable.ImmutableSortedDictionary.ToImmutableSortedDictionary(dto.ImmutableSortedDictionaryValue, x => x.Key.ToString(null, _formatDeCh), x => x.Value.ToString(null, _formatDeCh));
+            target.StackValue = new global::System.Collections.Generic.Stack<string>(global::System.Linq.Enumerable.Select(dto.StackValue, x => x.ToString(_formatDeCh)));
+            target.QueueValue = new global::System.Collections.Generic.Queue<string>(global::System.Linq.Enumerable.Select(dto.QueueValue, x => x.ToString(_formatDeCh)));
+            target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(global::System.Linq.Enumerable.Select(dto.ImmutableArrayValue, x => x.ToString(_formatDeCh)));
+            target.ImmutableListValue = global::System.Collections.Immutable.ImmutableList.ToImmutableList(global::System.Linq.Enumerable.Select(dto.ImmutableListValue, x => x.ToString(_formatDeCh)));
+            target.ImmutableHashSetValue = global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(global::System.Linq.Enumerable.Select(dto.ImmutableHashSetValue, x => x.ToString(_formatDeCh)));
+            target.ImmutableQueueValue = global::System.Collections.Immutable.ImmutableQueue.CreateRange(global::System.Linq.Enumerable.Select(dto.ImmutableQueueValue, x => x.ToString(_formatDeCh)));
+            target.ImmutableStackValue = global::System.Collections.Immutable.ImmutableStack.CreateRange(global::System.Linq.Enumerable.Select(dto.ImmutableStackValue, x => x.ToString(_formatDeCh)));
+            target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(global::System.Linq.Enumerable.Select(dto.ImmutableSortedSetValue, x => x.ToString(_formatDeCh)));
+            target.ImmutableDictionaryValue = global::System.Collections.Immutable.ImmutableDictionary.ToImmutableDictionary(dto.ImmutableDictionaryValue, x => x.Key.ToString(_formatDeCh), x => x.Value.ToString(_formatDeCh));
+            target.ImmutableSortedDictionaryValue = global::System.Collections.Immutable.ImmutableSortedDictionary.ToImmutableSortedDictionary(dto.ImmutableSortedDictionaryValue, x => x.Key.ToString(_formatDeCh), x => x.Value.ToString(_formatDeCh));
             foreach (var item in dto.ExistingISet)
             {
-                target.ExistingISet.Add(item.ToString(null, _formatDeCh));
+                target.ExistingISet.Add(item.ToString(_formatDeCh));
             }
             target.ExistingHashSet.EnsureCapacity(dto.ExistingHashSet.Count + target.ExistingHashSet.Count);
             foreach (var item1 in dto.ExistingHashSet)
             {
-                target.ExistingHashSet.Add(item1.ToString(null, _formatDeCh));
+                target.ExistingHashSet.Add(item1.ToString(_formatDeCh));
             }
             foreach (var item2 in dto.ExistingSortedSet)
             {
-                target.ExistingSortedSet.Add(item2.ToString(null, _formatDeCh));
+                target.ExistingSortedSet.Add(item2.ToString(_formatDeCh));
             }
             target.ExistingList.EnsureCapacity(dto.ExistingList.Count + target.ExistingList.Count);
             foreach (var item3 in dto.ExistingList)
             {
-                target.ExistingList.Add(item3.ToString(null, _formatDeCh));
+                target.ExistingList.Add(item3.ToString(_formatDeCh));
             }
-            target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.ISet, x => x.ToString(null, _formatDeCh)));
-            target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.IReadOnlySet, x => x.ToString(null, _formatDeCh)));
-            target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.HashSet, x => x.ToString(null, _formatDeCh)));
-            target.SortedSet = new global::System.Collections.Generic.SortedSet<string>(global::System.Linq.Enumerable.Select(dto.SortedSet, x => x.ToString(null, _formatDeCh)));
+            target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.ISet, x => x.ToString(_formatDeCh)));
+            target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.IReadOnlySet, x => x.ToString(_formatDeCh)));
+            target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.HashSet, x => x.ToString(_formatDeCh)));
+            target.SortedSet = new global::System.Collections.Generic.SortedSet<string>(global::System.Linq.Enumerable.Select(dto.SortedSet, x => x.ToString(_formatDeCh)));
             target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumValue;
             target.FlagsEnumValue = (global::Riok.Mapperly.IntegrationTests.Models.TestFlagsEnum)dto.FlagsEnumValue;
             target.EnumName = (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)dto.EnumName;
@@ -399,7 +399,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public partial (string X, string Y) MapAliasedTuple((int X, int Y) source)
         {
-            var target = (X: source.X.ToString(null, _formatDeCh), Y: source.Y.ToString(null, _formatDeCh));
+            var target = (X: source.X.ToString(_formatDeCh), Y: source.Y.ToString(_formatDeCh));
             return target;
         }
 
@@ -487,7 +487,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         private (string A, string) MapToValueTuple1((int A, int) source)
         {
-            var target = (A: source.A.ToString(null, _formatDeCh), source.Item2.ToString(null, _formatDeCh));
+            var target = (A: source.A.ToString(_formatDeCh), source.Item2.ToString(_formatDeCh));
             return target;
         }
 
@@ -506,7 +506,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             var target = new string[source.Length];
             for (var i = 0; i < source.Length; i++)
             {
-                target[i] = source[i].ToString(null, _formatDeCh);
+                target[i] = source[i].ToString(_formatDeCh);
             }
             return target;
         }

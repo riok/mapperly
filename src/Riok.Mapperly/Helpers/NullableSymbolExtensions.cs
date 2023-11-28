@@ -110,5 +110,6 @@ public static class NullableSymbolExtensions
         return typeParameter.HasReferenceTypeConstraint && typeParameter.ReferenceTypeConstraintNullableAnnotation.IsNullable();
     }
 
-    private static bool IsNullable(this NullableAnnotation nullable) => nullable is NullableAnnotation.Annotated or NullableAnnotation.None;
+    internal static bool IsNullable(this NullableAnnotation nullable) =>
+        nullable is NullableAnnotation.Annotated or NullableAnnotation.None;
 }

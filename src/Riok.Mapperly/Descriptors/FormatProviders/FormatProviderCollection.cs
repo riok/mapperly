@@ -5,8 +5,8 @@ public class FormatProviderCollection(
     FormatProvider? defaultFormatProvider
 )
 {
-    public FormatProvider? Get(string? reference)
+    public (FormatProvider? formatProvider, bool isDefault) Get(string? reference)
     {
-        return reference == null ? defaultFormatProvider : formatProvidersByName.GetValueOrDefault(reference);
+        return reference == null ? (defaultFormatProvider, true) : (formatProvidersByName.GetValueOrDefault(reference), false);
     }
 }

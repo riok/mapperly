@@ -127,7 +127,7 @@ RMG051  | Mapper   | Warning  | Invalid ignore source member found, nested ignor
 RMG052  | Mapper   | Warning  | Invalid ignore target member found, nested ignores are not supported
 RMG053  | Mapper   | Error    | The flag MemberVisibility.Accessible cannot be disabled, this feature requires .NET 8.0 or greater
 RMG054  | Mapper   | Error    | Mapper class containing 'static partial' method must not have any instance methods 
-RMG055  | Mapper   | Error    | The source type does not implement IFormattable, string format and format provider cannot be applied
+RMG055  | Mapper   | Error    | The source type does not implement ToString with the provided formatting parameters, string format and format provider cannot be applied
 RMG056  | Mapper   | Error    | Invalid format provider signature
 RMG057  | Mapper   | Error    | Format provider not found
 RMG058  | Mapper   | Error    | Multiple default format providers found, only one is allowed
