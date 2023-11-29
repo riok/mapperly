@@ -45,8 +45,10 @@ public readonly record struct TypeMappingBuildContext
     /// builds the name of the source in this new scope
     /// and creates a new context with the new source.
     /// </summary>
+    /// <param name="sourceName">The name for the new scoped source.</param>
     /// <returns>The new context and the scoped name of the source.</returns>
-    public (TypeMappingBuildContext Context, string SourceName) WithNewScopedSource() => WithNewScopedSource(IdentifierName);
+    public (TypeMappingBuildContext Context, string SourceName) WithNewScopedSource(string sourceName = DefaultSourceName) =>
+        WithNewScopedSource(IdentifierName, sourceName);
 
     /// <summary>
     /// Creates a new scoped name builder,
@@ -54,11 +56,15 @@ public readonly record struct TypeMappingBuildContext
     /// and creates a new context with the new source.
     /// </summary>
     /// <param name="sourceBuilder">A function to build the source access for the new context.</param>
+    /// <param name="sourceName">The name for the new scoped source.</param>
     /// <returns>The new context and the scoped name of the source.</returns>
-    public (TypeMappingBuildContext Context, string SourceName) WithNewScopedSource(Func<string, ExpressionSyntax> sourceBuilder)
+    public (TypeMappingBuildContext Context, string SourceName) WithNewScopedSource(
+        Func<string, ExpressionSyntax> sourceBuilder,
+        string sourceName = DefaultSourceName
+    )
     {
         var scopedNameBuilder = NameBuilder.NewScope();
-        var scopedSourceName = scopedNameBuilder.New(DefaultSourceName);
+        var scopedSourceName = scopedNameBuilder.New(sourceName);
         var ctx = new TypeMappingBuildContext(sourceBuilder(scopedSourceName), ReferenceHandler, scopedNameBuilder, SyntaxFactory);
         return (ctx, scopedSourceName);
     }

@@ -569,6 +569,23 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             };
         }
 
+        public static partial void MapToDerivedExisting(global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectBase source, global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectBase target)
+        {
+            switch (source, target)
+            {
+                case (global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectTypeA source1, global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectTypeA target1):
+                    target1.ValueA = DirectInt(source1.ValueA);
+                    target1.Value = DirectInt(source1.Value);
+                    break;
+                case (global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectTypeB source1, global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectTypeB target1):
+                    target1.ValueB = DirectInt(source1.ValueB);
+                    target1.Value = DirectInt(source1.Value);
+                    break;
+                default:
+                    throw new System.ArgumentException($"Cannot map {source.GetType()} to {target.GetType()} as there is no known derived type mapping", nameof(source));
+            }
+        }
+
         public static partial global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName MapToEnumDtoByName(global::Riok.Mapperly.IntegrationTests.Models.TestEnum v)
         {
             return v switch
