@@ -9,6 +9,7 @@ using Riok.Mapperly.IntegrationTests.Dto;
 using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Models;
 using VerifyTests;
+using VerifyTests.DiffPlex;
 using VerifyXunit;
 
 namespace Riok.Mapperly.IntegrationTests
@@ -29,6 +30,7 @@ namespace Riok.Mapperly.IntegrationTests
 #endif
 
             VerifierSettings.DontScrubDateTimes();
+            VerifyDiffPlex.Initialize(OutputType.Compact);
 
             Verifier.DerivePathInfo(
                 (_, _, type, method) =>
@@ -42,17 +44,30 @@ namespace Riok.Mapperly.IntegrationTests
 
         protected string GetGeneratedMapperFilePath(string name)
         {
+#if NET8_0_OR_GREATER || NET48_OR_GREATER
+            // artifacts output
             return Path.Combine(
                 _solutionDirectory,
                 "artifacts",
                 "obj",
                 "Riok.Mapperly.IntegrationTests",
-                "debug",
                 "generated",
                 "Riok.Mapperly",
                 "Riok.Mapperly.MapperGenerator",
                 name + ".g.cs"
             );
+#else
+            return Path.Combine(
+                _solutionDirectory,
+                "test",
+                "Riok.Mapperly.IntegrationTests",
+                "obj",
+                "generated",
+                "Riok.Mapperly",
+                "Riok.Mapperly.MapperGenerator",
+                name + ".g.cs"
+            );
+#endif
         }
 
         public static TestObject NewTestObj()

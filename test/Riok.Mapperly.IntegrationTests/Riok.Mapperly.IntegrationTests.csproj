@@ -6,6 +6,7 @@
     <TargetFramework>$(MapperlyIntegrationTestsTargetFramework)</TargetFramework>
 
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)/generated</CompilerGeneratedFilesOutputPath>
 
     <!-- Not supported in .NET Framework -->
     <ImplicitUsings>disable</ImplicitUsings>
@@ -28,7 +29,7 @@
 
   <!-- In the CI pipeline, we always want to use a prebuilt nuget package version, since that nuget package will then be distributed -->
   <ItemGroup Condition="'$(MapperlyNugetPackageVersion)' != ''">
-    <PackageReference Include="Riok.Mapperly" Version="$(MapperlyNugetPackageVersion)" PrivateAssets="all" ExcludeAssets="runtime" />
+    <PackageReference Include="Riok.Mapperly" Version="$(MapperlyNugetPackageVersion)" PrivateAssets="all" />
   </ItemGroup>
 
   <!-- ef core tests should only run on newer .NET versions -->

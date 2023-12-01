@@ -4,11 +4,16 @@
   IntValue: 10,
   IntInitOnlyValue: 3,
   RequiredValue: 4,
-  StringValue: fooBar,
-  RenamedStringValue2: ,
+  StringValue: fooBar+after-map,
+  RenamedStringValue2: fooBar2,
   FlatteningIdValue: 10,
   NullableFlatteningIdValue: 100,
-  Unflattening: {},
+  Unflattening: {
+    IdValue: 20
+  },
+  NullableUnflattening: {
+    IdValue: 200
+  },
   NestedNullableIntValue: 100,
   NestedNullable: {
     IntValue: 100
@@ -23,7 +28,7 @@
     CtorValue: 5,
     CtorValue2: 100,
     RequiredValue: 4,
-    StringValue: ,
+    StringValue: +after-map,
     RenamedStringValue2: ,
     Unflattening: {},
     NestedNullableTargetNotNullable: {},
@@ -43,9 +48,9 @@
     EnumName: Value30,
     EnumStringValue: 0,
     EnumReverseStringValue: DtoValue3,
-    FormattedIntValue: ,
-    FormattedDateValue: ,
-    ExposePrivateValue: 26
+    FormattedIntValue: CHF 0.00,
+    FormattedDateValue: Monday, January 1, 0001,
+    ExposePrivateValue: 16
   },
   SourceTargetSameObjectType: {
     CtorValue: 8,
@@ -154,6 +159,11 @@
     2,
     3
   ],
+  IReadOnlySet: [
+    1,
+    2,
+    3
+  ],
   HashSet: [
     1,
     2,
@@ -176,7 +186,7 @@
   },
   DateTimeValueTargetDateOnly: 2020-01-03,
   DateTimeValueTargetTimeOnly: 3:10 PM,
-  FormattedIntValue: ,
-  FormattedDateValue: ,
-  ExposePrivateValue: 28
+  FormattedIntValue: CHF 10.00,
+  FormattedDateValue: Friday, January 3, 2020,
+  ExposePrivateValue: 18
 }
