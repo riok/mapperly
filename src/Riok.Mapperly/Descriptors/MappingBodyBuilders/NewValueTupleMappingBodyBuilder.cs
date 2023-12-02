@@ -24,7 +24,7 @@ public static class NewValueTupleMappingBodyBuilder
     {
         var mappingCtx = new NewValueTupleExpressionBuilderContext<NewValueTupleExpressionMapping>(ctx, expressionMapping);
         BuildTupleConstructorMapping(mappingCtx);
-        ObjectMemberMappingBodyBuilder.BuildMappingBody(mappingCtx);
+        ObjectMemberMappingBodyBuilder.BuildMappingBody(mappingCtx, false);
         mappingCtx.AddDiagnostics();
     }
 

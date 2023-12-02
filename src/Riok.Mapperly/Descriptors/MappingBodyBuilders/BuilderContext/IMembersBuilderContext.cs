@@ -19,6 +19,8 @@ public interface IMembersBuilderContext<out T>
 
     IReadOnlyCollection<string> IgnoredSourceMemberNames { get; }
 
+    HashSet<string> IgnoredTargetMemberNames { get; }
+
     Dictionary<string, IMappableMember> TargetMembers { get; }
 
     Dictionary<string, List<PropertyMappingConfiguration>> MemberConfigsByRootTargetName { get; }

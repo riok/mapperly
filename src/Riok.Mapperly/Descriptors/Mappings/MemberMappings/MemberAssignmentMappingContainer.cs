@@ -13,7 +13,7 @@ public abstract class MemberAssignmentMappingContainer(IMemberAssignmentMappingC
     public virtual IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
         var childContainerStatements = _childContainers.SelectMany(x => x.Build(ctx, targetAccess));
-        var mappings = _delegateMappings.SelectMany(m => m.Build(ctx, targetAccess));
+        var mappings = _delegateMappings.OrderBy(x => x.TargetPath.Path.Count).SelectMany(m => m.Build(ctx, targetAccess));
         return childContainerStatements.Concat(mappings);
     }
 
