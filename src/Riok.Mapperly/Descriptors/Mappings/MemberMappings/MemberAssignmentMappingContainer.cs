@@ -12,9 +12,10 @@ public abstract class MemberAssignmentMappingContainer(IMemberAssignmentMappingC
 
     public virtual IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
+        var roots = _delegateMappings.Where(x => x.TargetPath.Path.Count == 1).SelectMany(m => m.Build(ctx, targetAccess));
         var childContainerStatements = _childContainers.SelectMany(x => x.Build(ctx, targetAccess));
-        var mappings = _delegateMappings.OrderBy(x => x.TargetPath.Path.Count).SelectMany(m => m.Build(ctx, targetAccess));
-        return childContainerStatements.Concat(mappings);
+        var mappings = _delegateMappings.Where(x => x.TargetPath.Path.Count > 1).SelectMany(m => m.Build(ctx, targetAccess));
+        return roots.Concat(childContainerStatements.Concat(mappings));
     }
 
     public void AddMemberMappingContainer(IMemberAssignmentMappingContainer container)
