@@ -196,6 +196,10 @@ end_of_line = crlf
 [*.json]
 indent_size = 2
 
+# dependabot does not insert a final newline
+[dotnet-tools.json]
+insert_final_newline = false
+
 # javascript
 [*.js]
 indent_size = 2
