@@ -131,6 +131,30 @@ public class ObjectPropertyInitPropertyTest
     }
 
     [Fact]
+    public void MapInitChildProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty($\"StringValue\", \"Child.Nested\")] partial B Map(A source);",
+            "class A { public string StringValue { get; init; } }",
+            "class B { public C Child { get; init; } }",
+            "class C { public string Nested { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    StringValue = source.StringValue2,
+                };
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void InitOnlyReferenceLoop()
     {
         var source = TestSourceBuilder.Mapping(
