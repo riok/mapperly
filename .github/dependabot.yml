@@ -17,3 +17,7 @@ updates:
     directory: "/docs"
     schedule:
       interval: "daily"
+    groups:
+      docusaurus:
+        patterns:
+          - '@docusaurus*'
