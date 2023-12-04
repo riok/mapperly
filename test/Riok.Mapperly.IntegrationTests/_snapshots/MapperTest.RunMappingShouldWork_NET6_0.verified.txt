@@ -50,7 +50,7 @@
     EnumReverseStringValue: DtoValue3,
     FormattedIntValue: CHF 0.00,
     FormattedDateValue: Monday, January 1, 0001,
-    ExposePrivateValue: 16
+    ExposePrivateValue: 26
   },
   SourceTargetSameObjectType: {
     CtorValue: 8,
@@ -188,5 +188,5 @@
   DateTimeValueTargetTimeOnly: 3:10 PM,
   FormattedIntValue: CHF 10.00,
   FormattedDateValue: Friday, January 3, 2020,
-  ExposePrivateValue: 18
+  ExposePrivateValue: 28
 }

@@ -19,10 +19,18 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
     public partial class TestMapper
     {
         [FormatProvider(Default = true)]
-        private readonly CultureInfo _formatDeCh = CultureInfo.GetCultureInfo("de-CH");
+        private readonly CultureInfo _formatDeCh = (CultureInfo)CultureInfo.GetCultureInfo("de-CH").Clone();
 
         [FormatProvider]
-        private readonly CultureInfo _formatEnUs = CultureInfo.GetCultureInfo("en-US");
+        private readonly CultureInfo _formatEnUs = (CultureInfo)CultureInfo.GetCultureInfo("en-US").Clone();
+
+        public TestMapper()
+        {
+            // these seem to vary depending on the OS
+            // set them to a fixed value.
+            _formatDeCh.NumberFormat.CurrencyPositivePattern = 2;
+            _formatEnUs.NumberFormat.CurrencyPositivePattern = 2;
+        }
 
         public partial int DirectInt(int value);
 
