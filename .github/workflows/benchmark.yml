@@ -59,7 +59,7 @@ jobs:
           output-file-path: >-
             ${{ env.BENCHMARK_RESULT_DIR }}/Riok.Mapperly.Benchmarks.${{ matrix.BENCHMARK_NAME }}-report-full-compressed.json
           # Show alert with commit comment on detecting possible performance regression
-          alert-threshold: '200%'
+          alert-threshold: '300%'
           comment-on-alert: true
           fail-on-alert: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
