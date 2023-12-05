@@ -12,9 +12,9 @@ using AliasedTupleTarget = (string X, string Y);
 namespace Riok.Mapperly.IntegrationTests.Mapper
 {
 #if NET8_0_OR_GREATER
-    [Mapper(IncludedMembers = MemberVisibility.All)]
+    [Mapper(IncludedMembers = MemberVisibility.All, EnumMappingStrategy = EnumMappingStrategy.ByValue)]
 #else
-    [Mapper]
+    [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByValue)]
 #endif
     public partial class TestMapper
     {

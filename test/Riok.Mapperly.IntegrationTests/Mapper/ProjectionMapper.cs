@@ -5,7 +5,7 @@ using Riok.Mapperly.IntegrationTests.Models;
 
 namespace Riok.Mapperly.IntegrationTests.Mapper
 {
-    [Mapper]
+    [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByValue)]
     public static partial class ProjectionMapper
     {
         public static partial IQueryable<TestObjectDtoProjection> ProjectToDto(this IQueryable<TestObjectProjection> q);

@@ -30,7 +30,7 @@ internal static class SyntaxProvider
             .SyntaxProvider
             .CreateSyntaxProvider(
                 static (s, _) => s is CompilationUnitSyntax { AttributeLists.Count: > 0 },
-                static (ctx, ct) => GetMapperDefaultDeclarations(ctx, ct)
+                static (ctx, ct) => GetMapperDefaultDeclarations(ctx)
             )
             .Collect()
             .Select((x, _) => x.FirstOrDefault());
@@ -45,12 +45,9 @@ internal static class SyntaxProvider
         return HasAttribute(symbol, MapperGenerator.MapperAttributeName) ? new MapperDeclaration(symbol, declaration) : null;
     }
 
-    private static IAssemblySymbol? GetMapperDefaultDeclarations(GeneratorSyntaxContext ctx, CancellationToken cancellationToken)
+    private static IAssemblySymbol? GetMapperDefaultDeclarations(GeneratorSyntaxContext ctx)
     {
-        var declaration = (CompilationUnitSyntax)ctx.Node;
-        if (ctx.SemanticModel.GetDeclaredSymbol(declaration, cancellationToken) is not IAssemblySymbol symbol)
-            return null;
-
+        var symbol = ctx.SemanticModel.Compilation.Assembly;
         return HasAttribute(symbol, MapperGenerator.MapperDefaultsAttributeName) ? symbol : null;
     }
 
