@@ -7,11 +7,17 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// An implementation of <see cref="INewInstanceBuilderContext{T}"/>.
 /// </summary>
 /// <typeparam name="T">The type of the mapping.</typeparam>
-public class NewInstanceBuilderContext<T>(MappingBuilderContext builderContext, T mapping)
-    : MembersMappingBuilderContext<T>(builderContext, mapping),
-        INewInstanceBuilderContext<T>
+public class NewInstanceBuilderContext<T> : MembersMappingBuilderContext<T>, INewInstanceBuilderContext<T>
     where T : INewInstanceObjectMemberMapping
 {
+    public IReadOnlyDictionary<string, string> RootTargetNameCasingMapping { get; }
+
+    public NewInstanceBuilderContext(MappingBuilderContext builderContext, T mapping)
+        : base(builderContext, mapping)
+    {
+        RootTargetNameCasingMapping = MemberConfigsByRootTargetName.ToDictionary(x => x.Key, x => x.Key, StringComparer.OrdinalIgnoreCase);
+    }
+
     public void AddInitMemberMapping(MemberAssignmentMapping mapping)
     {
         SetSourceMemberMapped(mapping.SourcePath);
@@ -20,7 +26,8 @@ public class NewInstanceBuilderContext<T>(MappingBuilderContext builderContext, 
 
     public void AddConstructorParameterMapping(ConstructorParameterMapping mapping)
     {
-        MemberConfigsByRootTargetName.Remove(mapping.Parameter.Name);
+        var paramName = RootTargetNameCasingMapping.GetValueOrDefault(mapping.Parameter.Name, defaultValue: mapping.Parameter.Name);
+        MemberConfigsByRootTargetName.Remove(paramName);
         SetSourceMemberMapped(mapping.DelegateMapping.SourcePath);
         Mapping.AddConstructorParameterMapping(mapping);
     }

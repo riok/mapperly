@@ -13,4 +13,11 @@ public interface INewInstanceBuilderContext<out T> : IMembersBuilderContext<T>
     void AddConstructorParameterMapping(ConstructorParameterMapping mapping);
 
     void AddInitMemberMapping(MemberAssignmentMapping mapping);
+
+    /// <summary>
+    /// Maps case insensitive target root member names to their real case sensitive names.
+    /// For example id => Id. The real name can then be used as key for <see cref="IMembersBuilderContext{T}.MemberConfigsByRootTargetName"/>.
+    /// This allows resolving case insensitive configuration member names (eg. when mapping to constructor parameters).
+    /// </summary>
+    IReadOnlyDictionary<string, string> RootTargetNameCasingMapping { get; }
 }
