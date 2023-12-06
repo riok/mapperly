@@ -6,7 +6,7 @@ using Riok.Mapperly.IntegrationTests.Models;
 
 namespace Riok.Mapperly.IntegrationTests.Mapper
 {
-    [Mapper]
+    [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByValue)]
     public static partial class StaticTestMapper
     {
         public static partial int DirectInt(int value);
