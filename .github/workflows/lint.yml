@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v3
+      - uses: actions/setup-dotnet@v4
       - run: dotnet tool restore
       - run: dotnet csharpier --check .
       # don't run dotnet format for whitespace formatting as this is done by csharpier
