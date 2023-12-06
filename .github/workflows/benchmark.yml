@@ -40,7 +40,7 @@ jobs:
     name: ${{ matrix.BENCHMARK_NAME }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v3
+      - uses: actions/setup-dotnet@v4
       - name: Run ${{ matrix.BENCHMARK_NAME }}
         working-directory: ${{ env.BENCHMARKS_PATH }}
         run: dotnet run --exporters json --configuration Release --filter '*${{ matrix.BENCHMARK_NAME }}*'
