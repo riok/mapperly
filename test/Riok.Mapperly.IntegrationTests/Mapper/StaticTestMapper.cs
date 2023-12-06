@@ -91,6 +91,15 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public static partial TTarget MapGeneric<TSource, TTarget>(TSource source);
 
+#if NET7_0_OR_GREATER
+        [MapDerivedType<ExistingObjectTypeA, ExistingObjectTypeA>]
+        [MapDerivedType<ExistingObjectTypeB, ExistingObjectTypeB>]
+#else
+        [MapDerivedType(typeof(ExistingObjectTypeA), typeof(ExistingObjectTypeA))]
+        [MapDerivedType(typeof(ExistingObjectTypeB), typeof(ExistingObjectTypeB))]
+#endif
+        public static partial void MapToDerivedExisting(ExistingObjectBase source, ExistingObjectBase target);
+
         [MapEnum(EnumMappingStrategy.ByName)]
         public static partial TestEnumDtoByName MapToEnumDtoByName(TestEnum v);
 

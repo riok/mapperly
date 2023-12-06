@@ -23,4 +23,28 @@ public partial struct SyntaxFactoryHelper
     }
 
     public static WhenClauseSyntax SwitchWhen(ExpressionSyntax condition) => WhenClause(SpacedToken(SyntaxKind.WhenKeyword), condition);
+
+    public SwitchStatementSyntax SwitchStatement(
+        ExpressionSyntax governingExpression,
+        IEnumerable<SwitchSectionSyntax> sections,
+        SwitchSectionSyntax defaultSection
+    )
+    {
+        return SyntaxFactory.SwitchStatement(
+            default,
+            TrailingSpacedToken(SyntaxKind.SwitchKeyword),
+            Token(SyntaxKind.None),
+            governingExpression,
+            Token(SyntaxKind.None),
+            LeadingLineFeedToken(SyntaxKind.OpenBraceToken),
+            List(sections.Append(defaultSection)),
+            LeadingLineFeedToken(SyntaxKind.CloseBraceToken)
+        );
+    }
+
+    public static SwitchSectionSyntax SwitchSection(SwitchLabelSyntax labelSyntax, IEnumerable<StatementSyntax> statements) =>
+        SyntaxFactory.SwitchSection().WithLabels(SingletonList(labelSyntax)).WithStatements(List(statements));
+
+    public static CasePatternSwitchLabelSyntax CasePatternSwitchLabel(PatternSyntax pattern) =>
+        SyntaxFactory.CasePatternSwitchLabel(TrailingSpacedToken(SyntaxKind.CaseKeyword), pattern, null, Token(SyntaxKind.ColonToken));
 }

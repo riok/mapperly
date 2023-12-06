@@ -8,8 +8,8 @@ description: Map derived types and interfaces
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Mapperly supports interfaces and base types as mapping sources and targets,
-but Mapperly needs to know which derived types exist.
+Mapperly supports interfaces and base types as mapping sources and targets, for both new instance and [exiting target](./existing-target.md) mapings.
+To do this, Mapperly needs to know which derived types exist.
 This can be configured with the `MapDerivedTypeAttribute`:
 
 <Tabs>
