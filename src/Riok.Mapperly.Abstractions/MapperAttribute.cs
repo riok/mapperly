@@ -86,4 +86,9 @@ public class MapperAttribute : Attribute
     /// Defaults to <see cref="IgnoreObsoleteMembersStrategy.None"/>.
     /// </summary>
     public IgnoreObsoleteMembersStrategy IgnoreObsoleteMembersStrategy { get; set; } = IgnoreObsoleteMembersStrategy.None;
+
+    /// <summary>
+    /// Whether to map only primitive types.
+    /// </summary>
+    public bool MapOnlyPrimitives { get; set; }
 }

@@ -92,4 +92,9 @@ public record MapperConfiguration
     /// Defaults to <see cref="IgnoreObsoleteMembersStrategy.None"/>.
     /// </summary>
     public IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy { get; init; }
+
+    /// <summary>
+    /// Whether to map only primitive types.
+    /// </summary>
+    public bool? MapOnlyPrimitives { get; init; }
 }
