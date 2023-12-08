@@ -41,6 +41,9 @@ public static class MapperConfigurationMerger
         mapper.UseReferenceHandling =
             mapperConfiguration.UseReferenceHandling ?? defaultMapperConfiguration.UseReferenceHandling ?? mapper.UseReferenceHandling;
 
+        mapper.MapOnlyPrimitives =
+            mapperConfiguration.MapOnlyPrimitives ?? defaultMapperConfiguration.MapOnlyPrimitives ?? mapper.MapOnlyPrimitives;
+
         mapper.IgnoreObsoleteMembersStrategy =
             mapperConfiguration.IgnoreObsoleteMembersStrategy
             ?? defaultMapperConfiguration.IgnoreObsoleteMembersStrategy

@@ -82,6 +82,7 @@ public static class TestSourceBuilder
         {
             Attribute(options.UseDeepCloning),
             Attribute(options.UseReferenceHandling),
+            Attribute(options.MapOnlyPrimitives),
             Attribute(options.ThrowOnMappingNullMismatch),
             Attribute(options.ThrowOnPropertyMappingNullMismatch),
             Attribute(options.AllowNullPropertyAssignment),

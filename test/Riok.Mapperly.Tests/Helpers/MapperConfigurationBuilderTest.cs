@@ -20,6 +20,7 @@ public class MapperConfigurationBuilderTest
             UseDeepCloning = false,
             EnabledConversions = MappingConversionType.Dictionary,
             UseReferenceHandling = false,
+            MapOnlyPrimitives = false,
             IgnoreObsoleteMembersStrategy = IgnoreObsoleteMembersStrategy.Target,
         };
 
@@ -83,6 +84,7 @@ public class MapperConfigurationBuilderTest
             UseDeepCloning = true,
             EnabledConversions = MappingConversionType.Constructor,
             UseReferenceHandling = true,
+            MapOnlyPrimitives = true,
             IgnoreObsoleteMembersStrategy = IgnoreObsoleteMembersStrategy.Source,
         };
     }
