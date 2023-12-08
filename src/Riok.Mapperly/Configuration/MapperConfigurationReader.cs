@@ -32,7 +32,8 @@ public class MapperConfigurationReader
                 Array.Empty<string>(),
                 Array.Empty<string>(),
                 Array.Empty<PropertyMappingConfiguration>(),
-                Mapper.IgnoreObsoleteMembersStrategy
+                Mapper.IgnoreObsoleteMembersStrategy,
+                Mapper.MapOnlyPrimitives
             ),
             Array.Empty<DerivedTypeMappingConfiguration>()
         );
@@ -76,7 +77,9 @@ public class MapperConfigurationReader
             ? _defaultConfiguration.Properties.IgnoreObsoleteMembersStrategy
             : methodIgnore.IgnoreObsoleteStrategy;
 
-        return new PropertiesMappingConfiguration(ignoredSourceProperties, ignoredTargetProperties, explicitMappings, ignoreObsolete);
+        var mapOnlyPrimitives = methodIgnore.IgnoreObsoleteStrategy;
+
+        return new PropertiesMappingConfiguration(ignoredSourceProperties, ignoredTargetProperties, explicitMappings, ignoreObsolete, mapOnlyPrimitives);
     }
 
     private EnumMappingConfiguration BuildEnumConfig(MappingConfigurationReference configRef)

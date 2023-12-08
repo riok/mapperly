@@ -34,6 +34,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
             .ToHashSet();
         var ignoredTargetMemberNames = builderContext.Configuration.Properties.IgnoredTargets
             .Concat(GetIgnoredObsoleteTargetMembers())
+            .Concat(GetComplexTypes())
             .ToHashSet();
 
         _ignoredUnmatchedSourceMemberNames = InitIgnoredUnmatchedProperties(IgnoredSourceMemberNames, _unmappedSourceMemberNames);
@@ -96,6 +97,19 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         var obsoleteStrategy = BuilderContext.Configuration.Properties.IgnoreObsoleteMembersStrategy;
 
         if (!obsoleteStrategy.HasFlag(IgnoreObsoleteMembersStrategy.Target))
+            return Enumerable.Empty<string>();
+
+        return BuilderContext.SymbolAccessor
+            .GetAllAccessibleMappableMembers(Mapping.TargetType)
+            .Where(x => BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x.MemberSymbol))
+            .Select(x => x.Name);
+    }
+
+    private IEnumerable<string> GetComplexTypes()
+    {
+        var mapOnlyPrimitives = BuilderContext.Configuration.Properties.MapOnlyPrimitives;
+
+        if (!mapOnlyPrimitives)
             return Enumerable.Empty<string>();
 
         return BuilderContext.SymbolAccessor
