@@ -34,9 +34,9 @@ public class UnsafeSetPropertyAccessor(IPropertySymbol value, string methodName)
         var valueName = nameBuilder.New(DefaultValueParameterName);
 
         var target = Parameter(_targetType, targetName, true);
-        var value = Parameter(_valueType, valueName);
+        var targetValue = Parameter(_valueType, valueName);
 
-        var parameters = ParameterList(CommaSeparatedList(target, value));
+        var parameters = ParameterList(CommaSeparatedList(target, targetValue));
         var attributeList = ctx.SyntaxFactory.UnsafeAccessorAttributeList(UnsafeAccessorType.Method, $"set_{_memberName}");
 
         return PublicStaticExternMethod(
