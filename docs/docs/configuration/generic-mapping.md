@@ -7,7 +7,10 @@ description: Create a generic mapping method
 
 Mapperly supports generic user defined mapping methods.
 Mapperly implements this mapping method
-using all mappings the user defined in the mapper.
+using all mappings the user defined in the mapper that:
+
+- satisfy generic constraints,
+- and can be substituted instead of generic mapper
 
 ```csharp
 [Mapper]
@@ -17,12 +20,17 @@ public static partial class ModelMapper
     public static partial TTarget Map<TTarget>(object source);
     // highlight-end
 
+    // highlight-start
+    public static partial TTarget MapFruit<TTarget>(Fruit source);
+    // highlight-end
+
     private static partial BananaDto MapBanana(Banana source);
     private static partial AppleDto MapApple(Apple source);
 }
 
-class Banana {}
-class Apple {}
+class Fruit {}
+class Banana : Fruit {}
+class Apple : Fruit {}
 
 class BananaDto {}
 class AppleDto {}

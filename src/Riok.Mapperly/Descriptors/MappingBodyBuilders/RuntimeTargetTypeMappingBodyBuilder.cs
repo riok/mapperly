@@ -16,7 +16,8 @@ public static class RuntimeTargetTypeMappingBodyBuilder
         var mappings = GetUserMappingCandidates(ctx)
             .Where(
                 x =>
-                    mapping
+                    mapping.DoesTypesSatisfySubstitutionPrinciples(ctx.SymbolAccessor, x.SourceType.NonNullable(), x.TargetType)
+                    && mapping
                         .TypeParameters
                         .DoesTypesSatisfyTypeParameterConstraints(ctx.SymbolAccessor, x.SourceType.NonNullable(), x.TargetType)
             );
