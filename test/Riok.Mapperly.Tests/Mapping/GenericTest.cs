@@ -304,6 +304,41 @@ public class GenericTest
     }
 
     [Fact]
+    public void WithGenericSourceSpecificTarget()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial BaseDto Map<TSource>(TSource source);
+
+            partial C MapToC(A source);
+            partial D MapToD(B source);
+            partial MyEnum MapToMyEnum(DtoEnum source);
+            """,
+            "record A(string BaseValue);",
+            "record B(string BaseValue);",
+            "abstract record BaseDto(string BaseValue);",
+            "record C(string BaseValue) : BaseDto(BaseValue);",
+            "record D(string BaseValue) : BaseDto(BaseValue);",
+            "enum DtoEnum;",
+            "enum MyEnum;"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                return source switch
+                {
+                    global::A x => MapToC(x),
+                    global::B x => MapToD(x),
+                    null => throw new System.ArgumentNullException(nameof(source)),
+                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(global::BaseDto)} as there is no known type mapping", nameof(source)),
+                };
+                """
+            );
+    }
+
+    [Fact]
     public void WithGenericTarget()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
