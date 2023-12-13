@@ -42,10 +42,10 @@ public class UserImplementedExistingTargetMethodMapping(
             FullyQualifiedIdentifier(Method.ReceiverType!),
             receiver != null ? IdentifierName(receiver) : ThisExpression()
         );
-        var method = MemberAccess(ParenthesizedExpression(castedThis), Method.Name);
+        var methodExpr = MemberAccess(ParenthesizedExpression(castedThis), Method.Name);
         yield return ctx.SyntaxFactory.ExpressionStatement(
             Invocation(
-                method,
+                methodExpr,
                 sourceParameter.WithArgument(ctx.Source),
                 targetParameter.WithArgument(target),
                 referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)

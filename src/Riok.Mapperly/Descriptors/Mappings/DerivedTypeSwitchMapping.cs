@@ -18,11 +18,13 @@ public class DerivedTypeSwitchMapping(ITypeSymbol sourceType, ITypeSymbol target
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         // _ => throw new ArgumentException(msg, nameof(ctx.Source)),
-        var sourceType = Invocation(MemberAccess(ctx.Source, GetTypeMethodName));
+        var sourceTypeExpr = Invocation(MemberAccess(ctx.Source, GetTypeMethodName));
         var fallbackArm = SwitchArm(
             DiscardPattern(),
             ThrowArgumentExpression(
-                InterpolatedString($"Cannot map {sourceType} to {TargetType.ToDisplayString()} as there is no known derived type mapping"),
+                InterpolatedString(
+                    $"Cannot map {sourceTypeExpr} to {TargetType.ToDisplayString()} as there is no known derived type mapping"
+                ),
                 ctx.Source
             )
         );

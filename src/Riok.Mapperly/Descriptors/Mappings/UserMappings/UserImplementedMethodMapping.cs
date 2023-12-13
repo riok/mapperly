@@ -34,7 +34,11 @@ public class UserImplementedMethodMapping(
             FullyQualifiedIdentifier(Method.ReceiverType!),
             receiver == null ? ThisExpression() : IdentifierName(receiver)
         );
-        var method = MemberAccess(ParenthesizedExpression(castedReceiver), Method.Name);
-        return Invocation(method, sourceParameter.WithArgument(ctx.Source), referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
+        var methodExpr = MemberAccess(ParenthesizedExpression(castedReceiver), Method.Name);
+        return Invocation(
+            methodExpr,
+            sourceParameter.WithArgument(ctx.Source),
+            referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+        );
     }
 }

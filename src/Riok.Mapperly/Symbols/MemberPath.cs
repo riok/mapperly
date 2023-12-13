@@ -75,16 +75,16 @@ public class MemberPath(IReadOnlyList<IMappableMember> path)
     /// <returns><c>null</c> if no part of the path is nullable or the condition which needs to be true, that the path cannot be <c>null</c>.</returns>
     public ExpressionSyntax? BuildNonNullConditionWithoutConditionalAccess(ExpressionSyntax? baseAccess)
     {
-        var path = PathWithoutTrailingNonNullable();
+        var nullablePath = PathWithoutTrailingNonNullable();
         ExpressionSyntax? condition = null;
         var access = baseAccess;
         if (access == null)
         {
-            access = IdentifierName(path.First().Name);
-            path = path.Skip(1);
+            access = IdentifierName(nullablePath.First().Name);
+            nullablePath = nullablePath.Skip(1);
         }
 
-        foreach (var pathPart in path)
+        foreach (var pathPart in nullablePath)
         {
             access = MemberAccess(access, pathPart.Name);
 
