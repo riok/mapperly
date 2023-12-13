@@ -7,7 +7,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageProjectUrl>https://mapperly.riok.app</PackageProjectUrl>
-    <PackageId>GreatUtilities.MapperWithPrimitiveOnly</PackageId>
+    <PackageId>Riok.Mapperly</PackageId>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageDescription>
       A .NET source generator for generating object mappings.
@@ -18,7 +18,6 @@
 
     <!-- default roslyn version -->
     <ROSLYN_VERSION Condition="'$(ROSLYN_VERSION)' == ''">4.5</ROSLYN_VERSION>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0 AND '$(CI)' == ''">
@@ -34,7 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4" PrivateAssets="all">
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4" PrivateAssets="all" >
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>analyzers</IncludeAssets>
     </PackageReference>
@@ -49,7 +48,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="..\Riok.Mapperly.Templates\*.cs" CopyToOutputDirectory="Never" Visible="false" LogicalName="Templates/%(FileName)" />
+    <EmbeddedResource Include="..\Riok.Mapperly.Templates\*.cs"
+                      CopyToOutputDirectory="Never"
+                      Visible="false"
+                      LogicalName="Templates/%(FileName)" />
   </ItemGroup>
 
   <!--
