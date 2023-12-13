@@ -1,6 +1,8 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Descriptors;
 
 namespace Riok.Mapperly.Helpers;
 
@@ -138,4 +140,71 @@ internal static class SymbolExtensions
 
     internal static bool HasImplicitGenericImplementation(this ITypeSymbol symbol, INamedTypeSymbol inter, string methodName) =>
         symbol.ImplementsGeneric(inter, methodName, out _, out var isExplicit) && !isExplicit;
+
+    // Method to check if a given ITypeSymbol is a primitive type or an enumerable of primitives
+    internal static bool IsPrimitiveOrEnumerableOfPrimitives(this ITypeSymbol typeSymbol)
+    {
+        if (typeSymbol == null)
+        {
+            return false;
+        }
+
+        if (IsPrimitiveType(typeSymbol))
+        {
+            return true;
+        }
+
+        if (typeSymbol is IArrayTypeSymbol arrayTypeSymbol && IsPrimitiveType(arrayTypeSymbol.ElementType))
+        {
+            return true;
+        }
+
+        if (
+            typeSymbol is INamedTypeSymbol namedTypeSymbol
+            && namedTypeSymbol.IsGenericType
+            && typeSymbol.AllInterfaces.Any(s => s.OriginalDefinition.SpecialType == SpecialType.System_Collections_Generic_IEnumerable_T)
+            && namedTypeSymbol.TypeArguments.All(s => IsPrimitiveType(s))
+        )
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    // Method to check if a given ITypeSymbol is a primitive type
+    private static bool IsPrimitiveType(ITypeSymbol? typeSymbol)
+    {
+        return typeSymbol != null
+            && (
+                typeSymbol.TypeKind == TypeKind.Enum
+                || typeSymbol.GetTypedConstantKind()
+                || string.Equals(typeSymbol.ContainingNamespace?.Name, "System", StringComparison.OrdinalIgnoreCase)
+            );
+    }
+
+    private static bool GetTypedConstantKind(this ITypeSymbol type)
+    {
+        switch (type.SpecialType)
+        {
+            case SpecialType.System_Boolean:
+            case SpecialType.System_SByte:
+            case SpecialType.System_Int16:
+            case SpecialType.System_Int32:
+            case SpecialType.System_Int64:
+            case SpecialType.System_Byte:
+            case SpecialType.System_UInt16:
+            case SpecialType.System_UInt32:
+            case SpecialType.System_UInt64:
+            case SpecialType.System_Single:
+            case SpecialType.System_Double:
+            case SpecialType.System_Char:
+            case SpecialType.System_String:
+            case SpecialType.System_DateTime:
+            case SpecialType.System_ValueType:
+                return true;
+            default:
+                return false;
+        }
+    }
 }
