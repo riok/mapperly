@@ -49,7 +49,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
             if (!nullablePath.Member.CanSet)
                 continue;
 
-            if (!BuilderContext.SymbolAccessor.HasAccessibleParameterlessConstructor(type))
+            if (!BuilderContext.SymbolAccessor.HasDirectlyAccessibleParameterlessConstructor(type))
             {
                 BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, type);
                 continue;

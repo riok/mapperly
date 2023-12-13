@@ -25,13 +25,13 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     internal void SetMemberVisibility(MemberVisibility visibility) => _memberVisibility = visibility;
 
-    public bool HasAccessibleParameterlessConstructor(ITypeSymbol symbol) =>
+    public bool HasDirectlyAccessibleParameterlessConstructor(ITypeSymbol symbol) =>
         symbol is INamedTypeSymbol { IsAbstract: false } namedTypeSymbol
         && namedTypeSymbol.InstanceConstructors.Any(c => c.Parameters.IsDefaultOrEmpty && IsDirectlyAccessible(c));
 
     public bool IsDirectlyAccessible(ISymbol symbol) => Compilation.IsSymbolAccessibleWithin(symbol, mapperSymbol);
 
-    public bool IsAccessibleToMemberVisibility(ISymbol symbol)
+    public bool IsAccessible(ISymbol symbol)
     {
         if (_memberVisibility.HasFlag(MemberVisibility.Accessible) && !IsDirectlyAccessible(symbol))
             return false;
@@ -59,7 +59,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         NullableAnnotation typeParameterUsageNullableAnnotation
     )
     {
-        if (typeParameter.HasConstructorConstraint && !HasAccessibleParameterlessConstructor(type))
+        if (typeParameter.HasConstructorConstraint && !HasDirectlyAccessibleParameterlessConstructor(type))
             return false;
 
         if (!typeParameter.IsNullable(typeParameterUsageNullableAnnotation) && type.IsNullable())
