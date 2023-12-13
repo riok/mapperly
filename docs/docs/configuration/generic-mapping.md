@@ -17,10 +17,6 @@ using all mappings the user defined in the mapper that:
 public static partial class ModelMapper
 {
     // highlight-start
-    public static partial TTarget Map<TTarget>(object source);
-    // highlight-end
-
-    // highlight-start
     public static partial TTarget MapFruit<TTarget>(Fruit source);
     // highlight-end
 
