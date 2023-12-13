@@ -28,7 +28,7 @@ public class MappingBuilder(MappingCollection mappings)
         DateTimeToTimeOnlyMappingBuilder.TryBuildMapping,
         ExplicitCastMappingBuilder.TryBuildMapping,
         ToStringMappingBuilder.TryBuildMapping,
-        NewInstanceObjectPropertyMappingBuilder.TryBuildMapping,
+        NewInstanceObjectMemberMappingBuilder.TryBuildMapping,
     };
 
     /// <inheritdoc cref="MappingCollection.UserMappings"/>

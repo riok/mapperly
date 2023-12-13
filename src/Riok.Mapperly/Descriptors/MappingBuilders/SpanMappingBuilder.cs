@@ -129,7 +129,7 @@ public static class SpanMappingBuilder
 
         if (
             !ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory)
-            && !ctx.SymbolAccessor.HasAccessibleParameterlessConstructor(ctx.Target)
+            && !ctx.SymbolAccessor.HasDirectlyAccessibleParameterlessConstructor(ctx.Target)
         )
         {
             return MapSpanArrayToEnumerableMethod(ctx);

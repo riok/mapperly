@@ -35,7 +35,7 @@ public abstract class ObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol
         if (!Method.ReturnType.UpgradeNullable().IsNullable())
             return expression;
 
-        ExpressionSyntax nullFallback = SymbolAccessor.HasAccessibleParameterlessConstructor(typeToCreate)
+        ExpressionSyntax nullFallback = SymbolAccessor.HasDirectlyAccessibleParameterlessConstructor(typeToCreate)
             ? CreateInstance(typeToCreate)
             : ThrowNullReferenceException($"The object factory {Method.Name} returned null");
 

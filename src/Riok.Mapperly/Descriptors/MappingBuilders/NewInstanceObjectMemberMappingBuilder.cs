@@ -6,7 +6,7 @@ using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
-public static class NewInstanceObjectPropertyMappingBuilder
+public static class NewInstanceObjectMemberMappingBuilder
 {
     public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
