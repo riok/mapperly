@@ -115,7 +115,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
         return BuilderContext.SymbolAccessor
             .GetAllAccessibleMappableMembers(Mapping.TargetType)
-            .Where(x => x.Type.IsComplexType(BuilderContext.Types))
+            .Where(x => !x.Type.IsPrimitiveOrEnumerableOfPrimitives())
             .Select(x => x.Name);
     }
 
@@ -214,46 +214,5 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
                 Mapping.SourceType
             );
         }
-    }
-}
-
-public static class TypeExtensions
-{
-    public static bool IsComplexType(this ITypeSymbol type, WellKnownTypes knowTypes)
-    {
-        return type.TypeKind switch
-        {
-            // check if it's an IEnumerable of primitives
-            TypeKind.Class
-                => type.Name != "string"
-                    && (
-                        (
-                            type is INamedTypeSymbol namedType
-                            && namedType.AllInterfaces.Any(s => string.Equals(s.Name, "IEnumerable", StringComparison.OrdinalIgnoreCase))
-                            && namedType.TypeArguments.Count() > 0
-                            && namedType.TypeArguments[0].IsComplexType(knowTypes)
-                        )
-                        || !(
-                            type is INamedTypeSymbol namedType2
-                            && namedType2.AllInterfaces.Any(s => string.Equals(s.Name, "IEnumerable", StringComparison.OrdinalIgnoreCase))
-                        )
-                    ),
-            TypeKind.Struct => false,
-            TypeKind.Enum => false,
-            TypeKind.Delegate => true,
-            TypeKind.Interface => true,
-            // check if it's an array of primitives
-            TypeKind.Array
-                => type is IArrayTypeSymbol arrayType && arrayType.ElementType.IsComplexType(knowTypes)
-                    || type is not IArrayTypeSymbol arrayType2,
-            TypeKind.Dynamic => true,
-            TypeKind.Error => true,
-            TypeKind.Pointer => true,
-            TypeKind.Submission => false,
-            TypeKind.Module => true,
-            TypeKind.TypeParameter => false,
-            TypeKind.Unknown => false,
-            _ => false
-        };
     }
 }
