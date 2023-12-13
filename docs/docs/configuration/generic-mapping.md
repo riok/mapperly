@@ -7,10 +7,7 @@ description: Create a generic mapping method
 
 Mapperly supports generic user defined mapping methods.
 Mapperly implements this mapping method
-using all mappings the user defined in the mapper that:
-
-- satisfy generic constraints,
-- and can be substituted instead of generic mapper
+using all mappings the user defined in the mapper that satisfy the source and target type constraints.
 
 ```csharp
 [Mapper]
