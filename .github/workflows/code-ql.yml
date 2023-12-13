@@ -31,9 +31,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: github/codeql-action/init@v2
+      - uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
       - uses: actions/setup-dotnet@v4
       - run: dotnet build
-      - uses: github/codeql-action/analyze@v2
+      - uses: github/codeql-action/analyze@v3
