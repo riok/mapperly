@@ -32,10 +32,6 @@ public class UserDefinedNewInstanceGenericTypeMapping(
 {
     public GenericMappingTypeParameters TypeParameters { get; } = typeParameters;
 
-    public bool DoesTypesSatisfySubstitutionPrinciples(SymbolAccessor symbolAccessor, ITypeSymbol sourceType, ITypeSymbol targetType) =>
-        (SourceType.TypeKind == TypeKind.TypeParameter || symbolAccessor.HasImplicitConversion(sourceType, SourceType))
-        && (TargetType.TypeKind == TypeKind.TypeParameter || symbolAccessor.HasImplicitConversion(targetType, TargetType));
-
     public override MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx) =>
         base.BuildMethod(ctx).WithTypeParameterList(TypeParameterList(TypeParameters.SourceType, TypeParameters.TargetType));
 
