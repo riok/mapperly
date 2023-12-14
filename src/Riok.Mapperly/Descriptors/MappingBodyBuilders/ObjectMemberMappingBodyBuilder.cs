@@ -21,7 +21,7 @@ public static class ObjectMemberMappingBodyBuilder
         BuildMappingBody(mappingCtx);
     }
 
-    public static void BuildMappingBody(IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx)
+    public static void BuildMappingBody(IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx, bool inferRootProperties = true)
     {
         var ignoreCase = ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
 
@@ -37,7 +37,14 @@ public static class ObjectMemberMappingBodyBuilder
                     BuildMemberAssignmentMapping(ctx, config);
                 }
 
-                continue;
+                // if root property is explicitly mapped or inferRootProperties is disabled then continue.
+                // otherwise attempt to match the root
+                if (!inferRootProperties || memberConfigs.Exists(static x => x.Target.Path.Count == 1))
+                    continue;
+
+                // skip check if target is ignored
+                if (ctx.IgnoredTargetMemberNames.Contains(targetMember.Name))
+                    continue;
             }
 
             if (

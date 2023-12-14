@@ -35,7 +35,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
             .IgnoredSources
             .Concat(GetIgnoredObsoleteSourceMembers())
             .ToHashSet();
-        var ignoredTargetMemberNames = builderContext
+        IgnoredTargetMemberNames = builderContext
             .Configuration
             .Properties
             .IgnoredTargets
@@ -59,14 +59,14 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
             .ToHashSet();
         _mappedAndIgnoredSourceMemberNames.IntersectWith(IgnoredSourceMemberNames);
 
-        _mappedAndIgnoredTargetMemberNames = new HashSet<string>(ignoredTargetMemberNames);
+        _mappedAndIgnoredTargetMemberNames = new HashSet<string>(IgnoredTargetMemberNames);
         _mappedAndIgnoredTargetMemberNames.IntersectWith(MemberConfigsByRootTargetName.Keys);
 
         // remove explicitly mapped ignored targets from ignoredTargetMemberNames
         // then remove all ignored targets from TargetMembers, leaving unignored and explicitly mapped ignored members
-        ignoredTargetMemberNames.ExceptWith(_mappedAndIgnoredTargetMemberNames);
+        IgnoredTargetMemberNames.ExceptWith(_mappedAndIgnoredTargetMemberNames);
 
-        TargetMembers.RemoveRange(ignoredTargetMemberNames);
+        TargetMembers.RemoveRange(IgnoredTargetMemberNames);
     }
 
     public MappingBuilderContext BuilderContext { get; }
@@ -74,6 +74,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     public T Mapping { get; }
 
     public IReadOnlyCollection<string> IgnoredSourceMemberNames { get; }
+
+    public HashSet<string> IgnoredTargetMemberNames { get; }
 
     public Dictionary<string, IMappableMember> TargetMembers { get; }
 

@@ -304,7 +304,7 @@ public class ObjectPropertyFlatteningTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapProperty($\"MyValueId\", \"Value.Id\")] partial B Map(A source);",
-            "class A { public string MyValueId { get; set; } }",
+            "class A { public string MyValueId { get; set; } public C Value { get; set; } }",
             "class B { public C Value { get; set; } }",
             "class C { public string Id { get; set; }"
         );
