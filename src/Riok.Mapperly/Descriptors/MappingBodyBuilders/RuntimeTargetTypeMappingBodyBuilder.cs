@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.MappingBuilders;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
@@ -16,13 +17,23 @@ public static class RuntimeTargetTypeMappingBodyBuilder
         var mappings = GetUserMappingCandidates(ctx)
             .Where(
                 x =>
-                    mapping
+                    DoesTypesSatisfySubstitutionPrinciples(mapping, ctx.SymbolAccessor, x.SourceType.NonNullable(), x.TargetType)
+                    && mapping
                         .TypeParameters
                         .DoesTypesSatisfyTypeParameterConstraints(ctx.SymbolAccessor, x.SourceType.NonNullable(), x.TargetType)
             );
 
         BuildMappingBody(ctx, mapping, mappings);
     }
+
+    private static bool DoesTypesSatisfySubstitutionPrinciples(
+        IMapping mapping,
+        SymbolAccessor symbolAccessor,
+        ITypeSymbol sourceType,
+        ITypeSymbol targetType
+    ) =>
+        (mapping.SourceType.TypeKind == TypeKind.TypeParameter || symbolAccessor.HasImplicitConversion(sourceType, mapping.SourceType))
+        && (mapping.TargetType.TypeKind == TypeKind.TypeParameter || symbolAccessor.HasImplicitConversion(targetType, mapping.TargetType));
 
     public static void BuildMappingBody(MappingBuilderContext ctx, UserDefinedNewInstanceRuntimeTargetTypeMapping mapping)
     {
