@@ -18,9 +18,11 @@ public static class RuntimeTargetTypeMappingBodyBuilder
             .Where(
                 x =>
                     DoesTypesSatisfySubstitutionPrinciples(mapping, ctx.SymbolAccessor, x.SourceType.NonNullable(), x.TargetType)
-                    && mapping
-                        .TypeParameters
-                        .DoesTypesSatisfyTypeParameterConstraints(ctx.SymbolAccessor, x.SourceType.NonNullable(), x.TargetType)
+                    && mapping.TypeParameters.DoesTypesSatisfyTypeParameterConstraints(
+                        ctx.SymbolAccessor,
+                        x.SourceType.NonNullable(),
+                        x.TargetType
+                    )
             );
 
         BuildMappingBody(ctx, mapping, mappings);

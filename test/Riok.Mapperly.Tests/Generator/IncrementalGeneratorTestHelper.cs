@@ -16,8 +16,7 @@ internal static class IncrementalGeneratorTestHelper
         var syntaxTree = compilation.SyntaxTrees.Single();
         var recordDeclaration = syntaxTree
             .GetCompilationUnitRoot()
-            .Members
-            .OfType<RecordDeclarationSyntax>()
+            .Members.OfType<RecordDeclarationSyntax>()
             .Single(x => x.Identifier.Text == recordName);
         var updatedRecordDeclaration = SyntaxFactory.ParseMemberDeclaration(newRecord)!;
 

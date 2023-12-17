@@ -109,8 +109,7 @@ public class IncrementalGeneratorTest
 
         var classDeclaration = syntaxTree
             .GetCompilationUnitRoot()
-            .Members
-            .OfType<ClassDeclarationSyntax>()
+            .Members.OfType<ClassDeclarationSyntax>()
             .Single(x => x.Identifier.Text == TestSourceBuilderOptions.DefaultMapperClassName);
         var member = ParseMemberDeclaration("internal partial int BarToBaz(int value);")!;
         var updatedClass = classDeclaration.AddMembers(member);
@@ -138,8 +137,7 @@ public class IncrementalGeneratorTest
 
         var classDeclaration = syntaxTree
             .GetCompilationUnitRoot()
-            .Members
-            .OfType<ClassDeclarationSyntax>()
+            .Members.OfType<ClassDeclarationSyntax>()
             .Single(x => x.Identifier.Text == TestSourceBuilderOptions.DefaultMapperClassName);
         var member = ParseMemberDeclaration("[MapperIgnoreSource(\"not_found_updated\")] partial B Map(A source);")!;
         var updatedClass = classDeclaration.WithMembers(new SyntaxList<MemberDeclarationSyntax>(member));

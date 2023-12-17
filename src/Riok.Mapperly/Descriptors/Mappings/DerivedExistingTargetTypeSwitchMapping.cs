@@ -27,8 +27,7 @@ public class DerivedExistingTargetTypeSwitchMapping(
         var caseSections = existingTargetTypeMappings.Select(x => BuildSwitchSection(ctx, x));
         var defaultSection = BuildDefaultSwitchSection(ctx, target);
 
-        yield return ctx.SyntaxFactory
-            .SwitchStatement(sourceExpression, caseSections, defaultSection)
+        yield return ctx.SyntaxFactory.SwitchStatement(sourceExpression, caseSections, defaultSection)
             .AddLeadingLineFeed(ctx.SyntaxFactory.Indentation);
     }
 

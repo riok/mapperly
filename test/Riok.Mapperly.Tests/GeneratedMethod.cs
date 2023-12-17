@@ -28,8 +28,7 @@ public class GeneratedMethod
             return string.Empty;
 
         var body = declarationSyntax
-            .Body
-            .ToFullString()
+            .Body.ToFullString()
             .Trim(' ', '\r', '\n')
             .TrimStart('{')
             .TrimEnd('}')
