@@ -42,12 +42,12 @@ jobs:
       - uses: actions/setup-dotnet@v4
       - run: dotnet tool restore
       - run: RELEASE_VERSION="0.0.1-dev.$GITHUB_RUN_ID" ./build/package.sh
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: mapperly-nupkg
           path: artifacts/*.nupkg
       - if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: verify-test-results
           path: '**/*.received.*'
@@ -105,7 +105,7 @@ jobs:
       - run: dotnet test --no-build -f net${{ matrix.dotnet }}
         working-directory: ./test/Riok.Mapperly.IntegrationTests
       - if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: verify-test-results
           path: '**/*.received.*'
@@ -132,7 +132,7 @@ jobs:
       - run: dotnet test --no-build -f net48
         working-directory: ./test/Riok.Mapperly.IntegrationTests
       - if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: verify-test-results
           path: '**/*.received.*'

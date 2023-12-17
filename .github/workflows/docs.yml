@@ -60,7 +60,7 @@ jobs:
         env:
           MAPPERLY_VERSION: ${{ inputs.version }}
           ENVIRONMENT: ${{ inputs.environment }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: mapperly-docs
           path: 'docs/build'
