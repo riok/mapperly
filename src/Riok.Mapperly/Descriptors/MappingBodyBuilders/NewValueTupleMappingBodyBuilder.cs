@@ -182,15 +182,13 @@ public static class NewValueTupleMappingBodyBuilder
         var ignoreCase = ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
 
         if (
-            ctx.BuilderContext
-                .SymbolAccessor
-                .TryFindMemberPath(
-                    ctx.Mapping.SourceType,
-                    MemberPathCandidateBuilder.BuildMemberPathCandidates(field.Name),
-                    ctx.IgnoredSourceMemberNames,
-                    ignoreCase,
-                    out sourcePath
-                )
+            ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
+                ctx.Mapping.SourceType,
+                MemberPathCandidateBuilder.BuildMemberPathCandidates(field.Name),
+                ctx.IgnoredSourceMemberNames,
+                ignoreCase,
+                out sourcePath
+            )
         )
         {
             return true;
@@ -201,14 +199,12 @@ public static class NewValueTupleMappingBodyBuilder
         if (!ctx.Mapping.SourceType.IsTupleType || ctx.Mapping.SourceType is not INamedTypeSymbol namedType)
             return false;
 
-        var mappableField = namedType
-            .TupleElements
-            .FirstOrDefault(
-                x =>
-                    x.CorrespondingTupleField != default
-                    && !ctx.IgnoredSourceMemberNames.Contains(x.Name)
-                    && string.Equals(field.CorrespondingTupleField!.Name, x.CorrespondingTupleField!.Name)
-            );
+        var mappableField = namedType.TupleElements.FirstOrDefault(
+            x =>
+                x.CorrespondingTupleField != default
+                && !ctx.IgnoredSourceMemberNames.Contains(x.Name)
+                && string.Equals(field.CorrespondingTupleField!.Name, x.CorrespondingTupleField!.Name)
+        );
 
         if (mappableField == default)
             return false;

@@ -34,14 +34,12 @@ public static class TestHelper
         var result = Generate(source, options, additionalAssemblies).GetRunResult();
 
         var syntaxRoot = result
-            .GeneratedTrees
-            .SingleOrDefault(x => Path.GetFileName(x.FilePath) == options.GeneratedTreeFileName)
+            .GeneratedTrees.SingleOrDefault(x => Path.GetFileName(x.FilePath) == options.GeneratedTreeFileName)
             ?.GetRoot();
         var methods = ExtractAllMethods(syntaxRoot).Select(x => new GeneratedMethod(x)).ToDictionary(x => x.Name);
 
         var groupedDiagnostics = result
-            .Diagnostics
-            .GroupBy(x => x.Descriptor.Id)
+            .Diagnostics.GroupBy(x => x.Descriptor.Id)
             .ToDictionary(x => x.Key, x => (IReadOnlyCollection<Diagnostic>)x.ToList());
         var mapperResult = new MapperGenerationResult(result.Diagnostics, groupedDiagnostics, methods);
         if (options.AllowedDiagnostics != null)
@@ -104,8 +102,7 @@ public static class TestHelper
         var compilation = CSharpCompilation.Create(name, syntaxTrees, options: compilationOptions);
 
         var references = AppDomain
-            .CurrentDomain
-            .GetAssemblies()
+            .CurrentDomain.GetAssemblies()
             .Where(x => !x.IsDynamic && !string.IsNullOrWhiteSpace(x.Location))
             .Select(x => MetadataReference.CreateFromFile(x.Location));
         compilation = compilation.AddReferences(references);

@@ -88,8 +88,7 @@ public static class EnumMappingBuilder
             fallbackMapping
         );
         var differentValueExplicitEnumMappings = enumMemberMappings
-            .ExplicitMemberMappings
-            .Where(x => x.Key.ConstantValue?.Equals(x.Value.ConstantValue) != true)
+            .ExplicitMemberMappings.Where(x => x.Key.ConstantValue?.Equals(x.Value.ConstantValue) != true)
             .ToDictionary(x => x.Key, x => x.Value, (IEqualityComparer<IFieldSymbol>)SymbolEqualityComparer.Default);
 
         if (differentValueExplicitEnumMappings.Count == 0)
@@ -135,13 +134,11 @@ public static class EnumMappingBuilder
         var explicitMappings = ignoreExplicitAndIgnoredMappings
             ? new Dictionary<IFieldSymbol, IFieldSymbol>(SymbolEqualityComparer.Default)
             : BuildExplicitValueMappings(ctx);
-        var sourceMembers = ctx.Source
-            .GetMembers()
+        var sourceMembers = ctx.Source.GetMembers()
             .OfType<IFieldSymbol>()
             .Where(x => !ignoredSourceMembers.Remove(x))
             .ToHashSet(FieldSymbolEqualityComparer.Default);
-        var targetMembers = ctx.Target
-            .GetMembers()
+        var targetMembers = ctx.Target.GetMembers()
             .OfType<IFieldSymbol>()
             .Where(x => !ignoredTargetMembers.Remove(x))
             .ToHashSet(FieldSymbolEqualityComparer.Default);

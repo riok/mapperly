@@ -15,8 +15,7 @@ public static class EnsureCapacityBuilder
         if (ctx.CollectionInfos == null)
             return null;
 
-        var capacityMethod = ctx.SymbolAccessor
-            .GetAllMethods(ctx.Target, EnsureCapacityName)
+        var capacityMethod = ctx.SymbolAccessor.GetAllMethods(ctx.Target, EnsureCapacityName)
             .FirstOrDefault(x => x.Parameters.Length == 1 && x.Parameters[0].Type.SpecialType == SpecialType.System_Int32 && !x.IsStatic);
 
         // if EnsureCapacity is not available then return null
@@ -31,8 +30,7 @@ public static class EnsureCapacityBuilder
         if (ctx.CollectionInfos.Source.CountIsKnown)
             return new EnsureCapacityMember(ctx.CollectionInfos.Target.CountPropertyName, ctx.CollectionInfos.Source.CountPropertyName);
 
-        var nonEnumeratedCountMethod = ctx.Types
-            .Get(typeof(Enumerable))
+        var nonEnumeratedCountMethod = ctx.Types.Get(typeof(Enumerable))
             .GetMembers(TryGetNonEnumeratedCountMethodName)
             .OfType<IMethodSymbol>()
             .FirstOrDefault(

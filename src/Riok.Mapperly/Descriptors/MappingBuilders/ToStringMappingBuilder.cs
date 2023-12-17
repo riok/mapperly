@@ -67,8 +67,7 @@ public static class ToStringMappingBuilder
 
     private static IMethodSymbol? FindToStringMethod(MappingBuilderContext ctx, bool stringFormatParam, bool formatProviderParam)
     {
-        return ctx.SymbolAccessor
-            .GetAllMethods(ctx.Source, nameof(ToString))
+        return ctx.SymbolAccessor.GetAllMethods(ctx.Source, nameof(ToString))
             .FirstOrDefault(m => IsToStringMethod(ctx, m, stringFormatParam, formatProviderParam));
     }
 
