@@ -551,6 +551,14 @@ public class EnumerableTest
     }
 
     [Fact]
+    public Task ShouldUpgradeNullabilityOfGenericInDisabledNullableContext()
+    {
+        var source = TestSourceBuilder.Mapping("IList<A>", "IList<B>", "record A(int V);", "record B(int V);");
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
+
+    [Fact]
     public Task ArrayToCollectionShouldUpgradeNullability()
     {
         var source = TestSourceBuilder.Mapping(
