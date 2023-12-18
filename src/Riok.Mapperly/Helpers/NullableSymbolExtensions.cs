@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 
@@ -38,7 +39,7 @@ public static class NullableSymbolExtensions
             return false;
         }
 
-        upgradedSymbol = symbol.WithNullableAnnotation(NullableAnnotation.Annotated);
+        upgradedSymbol = symbol.WithDeepNullableAnnotation(NullableAnnotation.Annotated);
         return true;
     }
 
@@ -112,4 +113,24 @@ public static class NullableSymbolExtensions
 
     internal static bool IsNullable(this NullableAnnotation nullable) =>
         nullable is NullableAnnotation.Annotated or NullableAnnotation.None;
+
+    /// <summary>
+    /// Returns a new type symbol with the provided nullable annotation.
+    /// Also sets the nullable annotation on all type arguments of the <see cref="symbol"/>.
+    /// </summary>
+    /// <param name="symbol">The symbol to work on.</param>
+    /// <param name="annotation">The <see cref="NullableAnnotation"/> to set.</param>
+    /// <returns>The new symbol with the given nullable annotation.</returns>
+    private static ITypeSymbol WithDeepNullableAnnotation(this ITypeSymbol symbol, NullableAnnotation annotation)
+    {
+        if (symbol is INamedTypeSymbol { TypeArguments.Length: > 0 } namedSymbol)
+        {
+            symbol = namedSymbol.ConstructedFrom.Construct(
+                namedSymbol.TypeArguments,
+                Enumerable.Repeat(annotation, namedSymbol.TypeArguments.Length).ToImmutableArray()
+            );
+        }
+
+        return symbol.WithNullableAnnotation(annotation);
+    }
 }
