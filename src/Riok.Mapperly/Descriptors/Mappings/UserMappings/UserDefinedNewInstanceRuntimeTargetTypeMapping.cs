@@ -17,10 +17,11 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
     IMethodSymbol method,
     MethodParameter sourceParameter,
     MethodParameter? referenceHandlerParameter,
+    ITypeSymbol targetType,
     bool enableReferenceHandling,
     NullFallbackValue nullArm,
     ITypeSymbol objectType
-) : MethodMapping(method, sourceParameter, referenceHandlerParameter, method.ReturnType), IUserMapping
+) : MethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), IUserMapping
 {
     private const string IsAssignableFromMethodName = nameof(Type.IsAssignableFrom);
     private const string GetTypeMethodName = nameof(GetType);
@@ -54,21 +55,21 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
             ctx = ctx.WithRefHandler(referenceHandlerName);
         }
 
-        var targetType = BuildTargetType();
+        var targetTypeExpr = BuildTargetType();
 
         // _ => throw new ArgumentException(msg, nameof(ctx.Source)),
         var sourceType = Invocation(MemberAccess(ctx.Source, GetTypeMethodName));
         var fallbackArm = SwitchArm(
             DiscardPattern(),
             ThrowArgumentExpression(
-                InterpolatedString($"Cannot map {sourceType} to {targetType} as there is no known type mapping"),
+                InterpolatedString($"Cannot map {sourceType} to {targetTypeExpr} as there is no known type mapping"),
                 ctx.Source
             )
         );
 
         // source switch { A x when targetType.IsAssignableFrom(typeof(ADto)) => MapToADto(x), B x when targetType.IsAssignableFrom(typeof(BDto)) => MapToBDto(x) }
         var (typeArmContext, typeArmVariableName) = ctx.WithNewScopedSource();
-        var arms = _mappings.Select(x => BuildSwitchArm(typeArmContext, typeArmVariableName, x, targetType));
+        var arms = _mappings.Select(x => BuildSwitchArm(typeArmContext, typeArmVariableName, x, targetTypeExpr));
 
         // null => default / throw
         arms = arms.Append(SwitchArm(ConstantPattern(NullLiteral()), NullSubstitute(TargetType, ctx.Source, nullArm)));

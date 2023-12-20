@@ -159,7 +159,9 @@ public static class DictionaryMappingBuilder
 
         if (fromEnumerableCtor != null)
         {
-            var constructedDictionary = dictionaryType.Construct(keyMapping.TargetType, valueMapping.TargetType);
+            var constructedDictionary = dictionaryType
+                .Construct(keyMapping.TargetType, valueMapping.TargetType)
+                .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
             return new CtorMapping(ctx.Source, constructedDictionary);
         }
 

@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Emit;
+using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
@@ -17,6 +18,7 @@ public class UserDefinedNewInstanceGenericTypeMapping(
     IMethodSymbol method,
     GenericMappingTypeParameters typeParameters,
     MappingMethodParameters parameters,
+    ITypeSymbol targetType,
     bool enableReferenceHandling,
     NullFallbackValue nullArm,
     ITypeSymbol objectType
@@ -25,6 +27,7 @@ public class UserDefinedNewInstanceGenericTypeMapping(
         method,
         parameters.Source,
         parameters.ReferenceHandler,
+        targetType,
         enableReferenceHandling,
         nullArm,
         objectType
@@ -39,7 +42,7 @@ public class UserDefinedNewInstanceGenericTypeMapping(
     {
         // typeof(TTarget) or typeof(<ReturnType>)
         var targetTypeName = TypeParameters.TargetType ?? TargetType;
-        return TypeOfExpression(FullyQualifiedIdentifier(targetTypeName));
+        return TypeOfExpression(FullyQualifiedIdentifier(targetTypeName.NonNullable()));
     }
 
     protected override ExpressionSyntax? BuildSwitchArmWhenClause(ExpressionSyntax targetType, RuntimeTargetTypeMapping mapping)

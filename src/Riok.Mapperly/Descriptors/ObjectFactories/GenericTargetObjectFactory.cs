@@ -12,11 +12,7 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 public class GenericTargetObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol method) : ObjectFactory(symbolAccessor, method)
 {
     public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
-        SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(
-            Method.TypeParameters[0],
-            targetTypeToCreate,
-            Method.ReturnType.NullableAnnotation
-        );
+        SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(Method.TypeParameters[0], targetTypeToCreate);
 
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
         GenericInvocation(Method.Name, new[] { NonNullableIdentifier(targetTypeToCreate) });

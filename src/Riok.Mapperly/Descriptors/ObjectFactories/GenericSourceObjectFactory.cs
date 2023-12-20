@@ -13,11 +13,7 @@ public class GenericSourceObjectFactory(SymbolAccessor symbolAccessor, IMethodSy
 {
     public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
         SymbolEqualityComparer.Default.Equals(Method.ReturnType, targetTypeToCreate)
-        && SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(
-            Method.TypeParameters[0],
-            sourceType,
-            Method.Parameters[0].Type.NullableAnnotation
-        );
+        && SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(Method.TypeParameters[0], sourceType);
 
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
         GenericInvocation(Method.Name, new[] { NonNullableIdentifier(sourceType) }, source);

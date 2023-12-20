@@ -186,13 +186,13 @@ public static class EnumerableMappingBuilder
         if (elementMapping.IsSynthetic)
             return null;
 
-        // upgrade nullability of element type
-        var targetType = ((INamedTypeSymbol)ctx.CollectionInfos!.Target.Type.OriginalDefinition).Construct(elementMapping.TargetType);
-        var targetTypeToInstantiate = ctx.Types.Get(typeof(List<>)).Construct(elementMapping.TargetType);
+        var targetTypeToInstantiate = ctx.Types.Get(typeof(List<>))
+            .Construct(elementMapping.TargetType)
+            .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
 
         return new ForEachAddEnumerableMapping(
             ctx.Source,
-            targetType,
+            ctx.CollectionInfos!.Target.Type,
             elementMapping,
             AddMethodName,
             targetTypeToInstantiate,
@@ -207,12 +207,7 @@ public static class EnumerableMappingBuilder
         // use a for loop mapping otherwise.
         if (!elementMapping.IsSynthetic)
         {
-            // upgrade nullability of element type
-            var targetType =
-                ctx.CollectionInfos!.Target.CollectionType == CollectionType.Array
-                    ? ctx.Types.GetArrayType(elementMapping.TargetType)
-                    : ((INamedTypeSymbol)ctx.Target).ConstructedFrom.Construct(elementMapping.TargetType);
-            return new ArrayForMapping(ctx.Source, targetType, elementMapping, elementMapping.TargetType);
+            return new ArrayForMapping(ctx.Source, ctx.Target, elementMapping, elementMapping.TargetType);
         }
 
         return ctx.MapperConfiguration.UseDeepCloning
@@ -226,18 +221,12 @@ public static class EnumerableMappingBuilder
         if (elementMapping.IsSynthetic)
             return null;
 
-        // upgrade nullability of element type
-        var targetType =
-            ctx.CollectionInfos!.Target.CollectionType == CollectionType.Array
-                ? ctx.Types.GetArrayType(elementMapping.TargetType)
-                : ((INamedTypeSymbol)ctx.Target).ConstructedFrom.Construct(elementMapping.TargetType);
-
         return new ArrayForEachMapping(
             ctx.Source,
-            targetType,
+            ctx.Target,
             elementMapping,
             elementMapping.TargetType,
-            ctx.CollectionInfos.Source.CountPropertyName!
+            ctx.CollectionInfos!.Source.CountPropertyName!
         );
     }
 

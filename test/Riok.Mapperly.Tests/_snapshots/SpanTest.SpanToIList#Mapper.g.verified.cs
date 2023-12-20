@@ -8,7 +8,7 @@ public partial class Mapper
         return MapToList(source);
     }
 
-    private global::System.Collections.Generic.List<int>? MapToList(global::System.Span<int> source)
+    private global::System.Collections.Generic.List<int> MapToList(global::System.Span<int> source)
     {
         var target = new global::System.Collections.Generic.List<int>();
         target.EnsureCapacity(source.Length + target.Count);

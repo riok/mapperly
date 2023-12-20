@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Enumerables;
 using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
@@ -175,7 +176,9 @@ public static class SpanMappingBuilder
 
     private static NewInstanceMapping? BuildSpanToList(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
-        var typedList = ctx.Types.Get(typeof(List<>)).Construct(elementMapping.TargetType);
+        var typedList = ctx.Types.Get(typeof(List<>))
+            .Construct(elementMapping.TargetType)
+            .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
         if (ctx.FindOrBuildMapping(ctx.Source, typedList) is not { } listMapping)
             return null;
 
