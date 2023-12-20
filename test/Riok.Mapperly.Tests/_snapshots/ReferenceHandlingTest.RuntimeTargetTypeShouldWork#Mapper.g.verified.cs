@@ -5,7 +5,7 @@ public partial class Mapper
 {
     public partial object Map(object source, global::System.Type destinationType)
     {
-        var refHandler = new global::Riok.Mapperly.Internal.Tests.PreserveReferenceHandler();
+        var refHandler = new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler();
         return source switch
         {
             global::A x when destinationType.IsAssignableFrom(typeof(global::B)) => MapToB(x, refHandler),

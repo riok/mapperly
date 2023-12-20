@@ -4,4 +4,8 @@
     <ProjectReference Include="..\..\src\Riok.Mapperly.Abstractions\Riok.Mapperly.Abstractions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="NetArchTest.Rules" Version="1.3.2" />
+  </ItemGroup>
+
 </Project>

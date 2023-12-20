@@ -17,7 +17,7 @@ All you need to do, to install Mapperly is to add a NuGet reference pointing to 
 
 <Tabs>
   <TabItem value="csproj" label="PackageReference" default>
-      <CodeBlock language="xml">{`<PackageReference Include="Riok.Mapperly" Version="${useDocusaurusContext().siteConfig.customFields.mapperlyVersion}" />`}</CodeBlock>
+      <CodeBlock language="xml">{`<PackageReference Include="Riok.Mapperly" Version="${useDocusaurusContext().siteConfig.customFields.mapperlyVersion}" ExcludeAssets="runtime" PrivateAssets="all" />`}</CodeBlock>
   </TabItem>
 <TabItem value="dontet-cli" label=".NET CLI">
 
@@ -25,12 +25,24 @@ All you need to do, to install Mapperly is to add a NuGet reference pointing to 
 dotnet add package Riok.Mapperly
 ```
 
+:::info
+To remove the runtime dependency of Mapperly add
+`ExcludeAssets="runtime"` and `PrivateAssets="all"`
+to the resulting `PackageReference`.
+:::
+
 </TabItem>
 <TabItem value="pkg-manager" label="Package Manager">
 
 ```powershell
 Install-Package Riok.Mapperly
 ```
+
+:::info
+To remove the runtime dependency of Mapperly add
+`ExcludeAssets="runtime"` and `PrivateAssets="all"`
+to the resulting `PackageReference`.
+:::
 
 </TabItem>
 </Tabs>
@@ -45,16 +57,20 @@ Checkout the latest stable version [here](https://mapperly.riok.app).
 
 </Conditional>
 
-### Removing runtime dependency
+### Preserving the attributes at runtime
 
-It is possible to remove Mapperly runtime references completely by setting `PrivateAssets="all"` and `ExcludeAssets="runtime"` on the `PackageReference`.  
-`PrivateAssets="all"` ensures that projects referencing this project do not also get a reference to `Riok.Mapperly`.  
-`ExcludeAssets="runtime"` ensures that the Mapperly .dll files are not copied to the build output.
+Mapperly removes the attribute references at compile time by default (they have the `ConditionalAttribute`).
+If you want
+to preserve the attribute references at runtime
+you can set the MSBuild variable `MapperlyAbstractionsScopeRuntime` to `runtime`.
 
-Removing the runtime dependency comes with the disadvantage that whenever the runtime tries
-to load a referenced attribute from `Riok.Mapperly.Abstractions` a `FileNotFoundException` is thrown.
-This is, for example, the case if `typeof(MyMapper).GetCustomAttributes()` is called.
+```xml
+<PropertyGroup>
+  <MapperlyAbstractionsScopeRuntime>runtime</MapperlyAbstractionsScopeRuntime>
+</PropertyGroup>
+```
 
-In Blazor Wasm applications `<BlazorWebAssemblyLazyLoad Include="Riok.Mapperly.Abstractions.dll" />` can be added to lazily load `Riok.Mapperly.Abstractions`
-and reduce the download size.
-`Riok.Mapperly.Abstractions` will probably never be needed anyway.
+:::info
+When preserving the attribute usages, the Mapperly package reference needs to include the runtime assets.  
+Make sure `ExcludeAssets` on the `PackageReference` does not include `runtime`.
+:::

@@ -5,7 +5,7 @@ public partial class Mapper
 {
     private partial global::B Map(global::A source)
     {
-        return MapToB(source, new global::Riok.Mapperly.Internal.Tests.PreserveReferenceHandler());
+        return MapToB(source, new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler());
     }
 
     private global::B MapToB(global::A source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)

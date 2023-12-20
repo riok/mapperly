@@ -21,6 +21,12 @@ public partial class CarMapper
 This enables the usage of a default reference handler
 which reuses the same target object instance if encountered the same source object instance.
 
+:::info
+When using reference handling, the Mapperly package reference needs to include the runtime assets
+(the runtime assets are needed for the reference handler implementation).  
+Make sure `ExcludeAssets` on the `PackageReference` does not include `runtime` when using reference handling.
+:::
+
 ## Custom reference handler
 
 To use a custom `IReferenceHandler` implementation,

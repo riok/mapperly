@@ -5,12 +5,12 @@ public partial class Mapper
 {
     private partial global::B MapToB(global::A source)
     {
-        return MapToB2(source, new global::Riok.Mapperly.Internal.Tests.PreserveReferenceHandler());
+        return MapToB2(source, new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler());
     }
 
     private partial global::B MapToB1(global::A source)
     {
-        return MapToB3(source, new global::Riok.Mapperly.Internal.Tests.PreserveReferenceHandler());
+        return MapToB3(source, new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler());
     }
 
     private global::B MapToB2(global::A source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)

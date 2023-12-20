@@ -1,9 +1,12 @@
+using System.Diagnostics;
+
 namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
 /// Customizes how enum values are mapped
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+[Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
 public sealed class MapEnumValueAttribute : Attribute
 {
     /// <summary>

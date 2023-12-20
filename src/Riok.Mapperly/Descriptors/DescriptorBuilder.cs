@@ -10,7 +10,6 @@ using Riok.Mapperly.Descriptors.ObjectFactories;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
-using Riok.Mapperly.Templates;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -73,7 +72,6 @@ public class DescriptorBuilder
         ExtractExternalMappings();
         _mappingBodyBuilder.BuildMappingBodies(cancellationToken);
         BuildMappingMethodNames();
-        TemplateResolver.AddRequiredTemplates(_builderContext.MapperConfiguration, _mappings, _mapperDescriptor);
         BuildReferenceHandlingParameters();
         AddMappingsToDescriptor();
         AddAccessorsToDescriptor();

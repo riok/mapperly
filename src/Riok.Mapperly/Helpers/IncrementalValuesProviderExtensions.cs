@@ -2,7 +2,6 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using Riok.Mapperly.Output;
-using Riok.Mapperly.Templates;
 
 namespace Riok.Mapperly.Helpers;
 
@@ -68,17 +67,6 @@ internal static class IncrementalValuesProviderExtensions
                 var mapperText = mapper.Body.ToFullString();
                 spc.AddSource(mapper.FileName, SourceText.From(mapperText, Encoding.UTF8));
             }
-        );
-    }
-
-    public static void EmitTemplates(
-        this IncrementalGeneratorInitializationContext context,
-        IncrementalValuesProvider<TemplateContent> templates
-    )
-    {
-        context.RegisterImplementationSourceOutput(
-            templates,
-            static (spc, template) => spc.AddSource(template.FileName, SourceText.From(template.Content, Encoding.UTF8))
         );
     }
 

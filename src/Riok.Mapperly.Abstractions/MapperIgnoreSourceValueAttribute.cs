@@ -1,9 +1,12 @@
+using System.Diagnostics;
+
 namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
 /// Ignores a source enum value from the mapping.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+[Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
 public sealed class MapperIgnoreSourceValueAttribute : Attribute
 {
     /// <summary>

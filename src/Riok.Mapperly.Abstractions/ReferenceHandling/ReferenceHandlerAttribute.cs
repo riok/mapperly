@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Riok.Mapperly.Abstractions.ReferenceHandling;
 
 /// <summary>
@@ -5,4 +7,5 @@ namespace Riok.Mapperly.Abstractions.ReferenceHandling;
 /// The type of the parameter needs to be <see cref="IReferenceHandler"/>.
 /// </summary>
 [AttributeUsage(AttributeTargets.Parameter)]
-public sealed class ReferenceHandlerAttribute : Attribute { }
+[Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
+public sealed class ReferenceHandlerAttribute : Attribute;

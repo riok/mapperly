@@ -1,7 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Riok.Mapperly.Templates\Riok.Mapperly.Templates.csproj" />
-  </ItemGroup>
-
-</Project>

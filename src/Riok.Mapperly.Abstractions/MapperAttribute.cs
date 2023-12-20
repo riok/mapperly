@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
 
 namespace Riok.Mapperly.Abstractions;
@@ -6,6 +7,7 @@ namespace Riok.Mapperly.Abstractions;
 /// Marks a partial class as a mapper.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
+[Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
 public class MapperAttribute : Attribute
 {
     /// <summary>
