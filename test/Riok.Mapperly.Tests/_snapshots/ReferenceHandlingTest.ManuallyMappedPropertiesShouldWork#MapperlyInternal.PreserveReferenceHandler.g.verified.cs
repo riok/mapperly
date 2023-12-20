@@ -6,7 +6,7 @@ using Riok.Mapperly.Abstractions.ReferenceHandling;
 
 #nullable enable
 
-namespace Riok.Mapperly.Internal.Tests
+namespace Riok.Mapperly.Internal
 {
     /// <summary>
     /// A <see cref="IReferenceHandler"/> implementation

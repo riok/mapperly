@@ -5,13 +5,12 @@ namespace Riok.Mapperly.Templates;
 internal static class TemplateReader
 {
     private const string ResourceNamePrefix = "Templates/";
-    private const string AssemblyNamePlaceholder = "AssemblyName";
     private const string TypeNamePrefix = "global::Riok.Mapperly.Internal.";
 
-    public static TemplateContent ReadContent(TemplateReference reference, string assemblyName)
+    public static TemplateContent ReadContent(TemplateReference reference)
     {
         var fileName = FileNameBuilder.BuildForTemplate(reference);
-        var content = Read(reference).Replace(AssemblyNamePlaceholder, assemblyName, StringComparison.Ordinal);
+        var content = Read(reference);
         return new TemplateContent(fileName, content);
     }
 
@@ -22,9 +21,8 @@ internal static class TemplateReader
     /// which also uses Mapperly.
     /// </summary>
     /// <param name="reference">The name of the template.</param>
-    /// <param name="assemblyName">The name of the assembly.</param>
     /// <returns>The resulting type name of the template.</returns>
-    public static string GetTypeName(TemplateReference reference, string assemblyName) => $"{TypeNamePrefix}{assemblyName}.{reference}";
+    public static string GetTypeName(TemplateReference reference) => TypeNamePrefix + reference;
 
     private static string Read(TemplateReference reference)
     {

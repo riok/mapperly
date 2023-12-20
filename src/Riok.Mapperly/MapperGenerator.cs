@@ -23,8 +23,6 @@ public class MapperGenerator : IIncrementalGenerator
 #if DEBUG_SOURCE_GENERATOR
         DebuggerUtil.AttachDebugger();
 #endif
-        var assemblyName = context.CompilationProvider.Select((x, _) => x.Assembly.Name);
-
         // report compilation diagnostics
         var compilationDiagnostics = context.CompilationProvider.SelectMany(
             static (compilation, _) => BuildCompilationDiagnostics(compilation)
@@ -66,9 +64,8 @@ public class MapperGenerator : IIncrementalGenerator
             .SelectMany(static (x, _) => x.Templates)
             .Collect()
             .SelectMany(static (x, _) => x.DistinctBy(tm => tm))
-            .Combine(assemblyName)
             .WithTrackingName(MapperGeneratorStepNames.BuildTemplates)
-            .Select(static (x, _) => TemplateReader.ReadContent(x.Left, x.Right))
+            .Select(static (x, _) => TemplateReader.ReadContent(x))
             .WithTrackingName(MapperGeneratorStepNames.BuildTemplatesContent);
         context.EmitTemplates(templates);
     }

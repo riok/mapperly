@@ -5,7 +5,7 @@ using Riok.Mapperly.Abstractions.ReferenceHandling;
 
 #nullable enable
 
-namespace Riok.Mapperly.Internal.AssemblyName
+namespace Riok.Mapperly.Internal
 {
     /// <summary>
     /// A <see cref="IReferenceHandler"/> implementation

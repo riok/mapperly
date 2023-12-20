@@ -1,5 +1,5 @@
 using Riok.Mapperly.Abstractions.ReferenceHandling;
-using Riok.Mapperly.Internal.AssemblyName;
+using Riok.Mapperly.Internal;
 
 namespace Riok.Mapperly.Templates.Tests;
 

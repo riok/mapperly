@@ -10,7 +10,7 @@ public partial struct SyntaxFactoryHelper
 {
     public ObjectCreationExpressionSyntax CreateInstance(TemplateReference template)
     {
-        var typeName = TemplateReader.GetTypeName(template, _assemblyName);
+        var typeName = TemplateReader.GetTypeName(template);
         var type = IdentifierName(typeName);
         return CreateObject(type, SyntaxFactory.ArgumentList());
     }

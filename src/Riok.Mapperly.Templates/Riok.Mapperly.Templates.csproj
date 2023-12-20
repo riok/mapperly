@@ -2,15 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-
-    <!--
-    AssemblyName is replaced by the source generator
-    with the name of the assembly of the target project.
-    This is done to reduce type name collisions when
-    InternalsVisibleTo is used in another project,
-    which needs the same generated templated type.
-    -->
-    <RootNamespace>Riok.Mapperly.Internal.AssemblyName</RootNamespace>
+    <RootNamespace>Riok.Mapperly.Internal</RootNamespace>
 
     <!--
     disable nullable and enable it for each file individually,
@@ -35,12 +27,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-      <_Parameter1>Riok.Mapperly.Templates.Tests</_Parameter1>
-    </AssemblyAttribute>
+    <ProjectReference Include="..\Riok.Mapperly.Abstractions\Riok.Mapperly.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Riok.Mapperly.Abstractions\Riok.Mapperly.Abstractions.csproj"/>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Riok.Mapperly.Templates.Tests</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 </Project>

@@ -73,7 +73,7 @@ public class DescriptorBuilder
         ExtractExternalMappings();
         _mappingBodyBuilder.BuildMappingBodies(cancellationToken);
         BuildMappingMethodNames();
-        TemplateResolver.AddRequiredTemplates(_builderContext.MapperConfiguration, _mappings, _mapperDescriptor);
+        TemplateResolver.AddRequiredTemplates(_builderContext, _mappings, _mapperDescriptor);
         BuildReferenceHandlingParameters();
         AddMappingsToDescriptor();
         AddAccessorsToDescriptor();
