@@ -5,9 +5,14 @@
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(MapperlyNugetPackageVersion)' == ''">
     <ProjectReference Include="..\..\src\Riok.Mapperly\Riok.Mapperly.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\src\Riok.Mapperly.Abstractions\Riok.Mapperly.Abstractions.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
+  </ItemGroup>
+
+  <!-- In the CI pipeline, we always want to use test the prebuilt nuget package version, since that nuget package will then be distributed -->
+  <ItemGroup Condition="'$(MapperlyNugetPackageVersion)' != ''">
+    <PackageReference Include="Riok.Mapperly" Version="$(MapperlyNugetPackageVersion)" ExcludeAssets="runtime" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>

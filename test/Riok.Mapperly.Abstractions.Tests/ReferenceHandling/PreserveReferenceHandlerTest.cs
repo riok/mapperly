@@ -1,7 +1,6 @@
 using Riok.Mapperly.Abstractions.ReferenceHandling;
-using Riok.Mapperly.Internal.AssemblyName;
 
-namespace Riok.Mapperly.Templates.Tests;
+namespace Riok.Mapperly.Abstractions.Tests.ReferenceHandling;
 
 public class PreserveReferenceHandlerTest
 {

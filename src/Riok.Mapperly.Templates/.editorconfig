@@ -1,3 +1,0 @@
-# keep namespaces block scoped, because .NET Framework language version does not support this
-[*.cs]
-csharp_style_namespace_declarations = block_scoped:warning

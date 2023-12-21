@@ -1,9 +1,12 @@
+using System.Diagnostics;
+
 namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
 /// Considers all static mapping methods provided by the type.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+[Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
 public sealed class UseStaticMapperAttribute : Attribute
 {
     /// <summary>
@@ -18,4 +21,5 @@ public sealed class UseStaticMapperAttribute : Attribute
 /// </summary>
 /// <typeparam name="T">The type of which mapping methods will be included.</typeparam>
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-public sealed class UseStaticMapperAttribute<T> : Attribute { }
+[Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
+public sealed class UseStaticMapperAttribute<T> : Attribute;

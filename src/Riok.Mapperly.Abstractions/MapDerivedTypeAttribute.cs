@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
@@ -8,6 +10,7 @@ namespace Riok.Mapperly.Abstractions;
 /// Each target type needs to extend or implement the return type of the mapping method.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+[Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
 public sealed class MapDerivedTypeAttribute : Attribute
 {
     /// <summary>
@@ -40,4 +43,5 @@ public sealed class MapDerivedTypeAttribute : Attribute
 /// Each target type needs to extend or implement the return type of the mapping method.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public sealed class MapDerivedTypeAttribute<TSource, TTarget> : Attribute { }
+[Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
+public sealed class MapDerivedTypeAttribute<TSource, TTarget> : Attribute;

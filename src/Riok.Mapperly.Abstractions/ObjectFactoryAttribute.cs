@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
@@ -8,4 +10,5 @@ namespace Riok.Mapperly.Abstractions;
 /// If the object factory has a parameter, the source object is provided as an argument.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
-public sealed class ObjectFactoryAttribute : Attribute { }
+[Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
+public sealed class ObjectFactoryAttribute : Attribute;

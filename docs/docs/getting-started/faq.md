@@ -26,3 +26,9 @@ Try rebuilding the solution or restarting the IDE. This is a bug in the IDE.
 ## My advanced use case isn't supported by Mapperly or needs lots of configuration. What should I do?
 
 Write the mapping for that class manually. You can mix automatically generated mappings and [user implemented mappings](../configuration/user-implemented-methods.mdx) without problems.
+
+## My code throws `FileNotFoundException` with `Riok.Mapperly.Abstractions`. What should I do?
+
+Are you using [reference handling](../configuration/reference-handling.md)
+or have you enabled the [preservation of Mapperly attributes at runtime](installation.mdx#preserving-the-attributes-at-runtime)?
+Make sure `ExcludeAssets` on the `PackageReference` does not include `runtime` as these features require runtime assets.

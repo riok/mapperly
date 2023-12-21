@@ -137,3 +137,7 @@ Riok.Mapperly.Abstractions.FormatProviderAttribute.Default.set -> void
 Riok.Mapperly.Abstractions.FormatProviderAttribute.FormatProviderAttribute() -> void
 Riok.Mapperly.Abstractions.MapPropertyAttribute.FormatProvider.get -> string?
 Riok.Mapperly.Abstractions.MapPropertyAttribute.FormatProvider.set -> void
+Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler
+Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler.PreserveReferenceHandler() -> void
+Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler.SetReference<TSource, TTarget>(TSource source, TTarget target) -> void
+Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler.TryGetReference<TSource, TTarget>(TSource source, out TTarget? target) -> bool

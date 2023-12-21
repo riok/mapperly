@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
@@ -5,6 +7,7 @@ namespace Riok.Mapperly.Abstractions;
 /// A format provider needs to be of a type which implements <see cref="IFormatProvider"/> and needs to have a getter.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+[Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
 public sealed class FormatProviderAttribute : Attribute
 {
     /// <summary>
