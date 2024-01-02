@@ -101,7 +101,7 @@ public static class CollectionInfoBuilder
             type,
             typeInfo,
             implementedTypes,
-            enumeratedType,
+            symbolAccessor.UpgradeNullable(enumeratedType),
             FindCountProperty(symbolAccessor, type, typeInfo),
             HasValidAddMethod(wellKnownTypes, type, typeInfo, implementedTypes),
             collectionTypeInfo?.Immutable == true
@@ -112,8 +112,8 @@ public static class CollectionInfoBuilder
     {
         // if type is array return element type
         // otherwise using the IEnumerable element type can erase the null annotation for external types
-        if (type.IsArrayType())
-            return ((IArrayTypeSymbol)type).ElementType;
+        if (type.IsArrayType(out var arraySymbol))
+            return arraySymbol.ElementType;
 
         if (type.ImplementsGeneric(types.Get(typeof(IEnumerable<>)), out var enumerableIntf))
             return enumerableIntf.TypeArguments[0];
@@ -133,6 +133,7 @@ public static class CollectionInfoBuilder
         {
             return namedType.TypeArguments[0];
         }
+
         // Memory<> or ReadOnlyMemory<> etc, get the type symbol
         if (
             SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, types.Get(typeof(Memory<>)))

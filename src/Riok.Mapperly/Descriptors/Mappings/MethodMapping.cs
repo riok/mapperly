@@ -54,7 +54,7 @@ public abstract class MethodMapping : NewInstanceMapping
         ReferenceHandlerParameter = referenceHandlerParameter;
         _partialMethodDefinition = method;
         _methodName = method.Name;
-        _returnType = method.ReturnType.UpgradeNullable();
+        _returnType = method.ReturnsVoid ? method.ReturnType : targetType;
     }
 
     protected bool IsExtensionMethod { get; }

@@ -10,7 +10,7 @@ public partial class Mapper
         var target = new global::B();
         if (source.Value != null)
         {
-            target.Value = MapToDArray(source.Value);
+            target.Value = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(source.Value, x => MapToD(x)));
         }
         else
         {
@@ -25,16 +25,6 @@ public partial class Mapper
             return default;
         var target = new global::D();
         target.Value = source.Value;
-        return target;
-    }
-
-    private global::D?[] MapToDArray(global::C?[] source)
-    {
-        var target = new global::D?[source.Length];
-        for (var i = 0; i < source.Length; i++)
-        {
-            target[i] = MapToD(source[i]);
-        }
         return target;
     }
 }

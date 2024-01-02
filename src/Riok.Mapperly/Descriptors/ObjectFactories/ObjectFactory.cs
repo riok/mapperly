@@ -32,7 +32,7 @@ public abstract class ObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol
     /// <returns></returns>
     private ExpressionSyntax HandleNull(ExpressionSyntax expression, ITypeSymbol typeToCreate)
     {
-        if (!Method.ReturnType.UpgradeNullable().IsNullable())
+        if (!Method.ReturnType.IsNullable())
             return expression;
 
         ExpressionSyntax nullFallback = SymbolAccessor.HasDirectlyAccessibleParameterlessConstructor(typeToCreate)

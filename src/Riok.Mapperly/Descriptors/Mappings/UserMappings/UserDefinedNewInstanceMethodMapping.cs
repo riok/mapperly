@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
-using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
@@ -13,8 +12,9 @@ public class UserDefinedNewInstanceMethodMapping(
     IMethodSymbol method,
     MethodParameter sourceParameter,
     MethodParameter? referenceHandlerParameter,
+    ITypeSymbol targetType,
     bool enableReferenceHandling
-) : MethodMapping(method, sourceParameter, referenceHandlerParameter, method.ReturnType.UpgradeNullable()), IDelegateUserMapping
+) : MethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), IDelegateUserMapping
 {
     public IMethodSymbol Method { get; } = method;
 

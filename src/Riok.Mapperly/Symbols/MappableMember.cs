@@ -13,7 +13,7 @@ internal static class MappableMember
         return symbol switch
         {
             IPropertySymbol property => new PropertyMember(property, accessor),
-            IFieldSymbol field => new FieldMember(field),
+            IFieldSymbol field => new FieldMember(field, accessor),
             _ => null,
         };
     }

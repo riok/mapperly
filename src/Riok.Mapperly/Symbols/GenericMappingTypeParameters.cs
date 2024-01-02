@@ -7,44 +7,19 @@ namespace Riok.Mapperly.Symbols;
 /// <summary>
 /// Method
 /// </summary>
-public readonly struct GenericMappingTypeParameters
+public readonly struct GenericMappingTypeParameters(ITypeParameterSymbol? sourceType, ITypeParameterSymbol? targetType)
 {
-    private readonly NullableAnnotation _sourceNullableAnnotation;
-    private readonly NullableAnnotation _targetNullableAnnotation;
+    public ITypeParameterSymbol? SourceType { get; } = sourceType;
 
-    public GenericMappingTypeParameters(
-        ITypeParameterSymbol? sourceType,
-        NullableAnnotation sourceNullableAnnotation,
-        ITypeParameterSymbol? targetType,
-        NullableAnnotation targetNullableAnnotation
-    )
-    {
-        SourceType = sourceType;
-        _sourceNullableAnnotation = sourceNullableAnnotation;
-        TargetType = targetType;
-        _targetNullableAnnotation = targetNullableAnnotation;
+    public bool? SourceNullable { get; } = sourceType?.IsNullable();
 
-        SourceNullable = sourceType?.IsNullable(_sourceNullableAnnotation);
-        TargetNullable = targetType?.IsNullable(_targetNullableAnnotation);
-    }
+    public ITypeParameterSymbol? TargetType { get; } = targetType;
 
-    public ITypeParameterSymbol? SourceType { get; }
-
-    public bool? SourceNullable { get; }
-
-    public ITypeParameterSymbol? TargetType { get; }
-
-    public bool? TargetNullable { get; }
+    public bool? TargetNullable { get; } = targetType?.IsNullable();
 
     public bool DoesTypesSatisfyTypeParameterConstraints(SymbolAccessor symbolAccessor, ITypeSymbol sourceType, ITypeSymbol targetType)
     {
-        return (
-                SourceType == null
-                || symbolAccessor.DoesTypeSatisfyTypeParameterConstraints(SourceType, sourceType, _sourceNullableAnnotation)
-            )
-            && (
-                TargetType == null
-                || symbolAccessor.DoesTypeSatisfyTypeParameterConstraints(TargetType, targetType, _targetNullableAnnotation)
-            );
+        return (SourceType == null || symbolAccessor.DoesTypeSatisfyTypeParameterConstraints(SourceType, sourceType))
+            && (TargetType == null || symbolAccessor.DoesTypeSatisfyTypeParameterConstraints(TargetType, targetType));
     }
 }

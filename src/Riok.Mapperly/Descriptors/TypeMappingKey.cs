@@ -18,11 +18,9 @@ public readonly struct TypeMappingKey(
     public TypeMappingKey(ITypeMapping mapping, TypeMappingConfiguration? config = null, bool includeNullability = true)
         : this(mapping.SourceType, mapping.TargetType, config, includeNullability) { }
 
-    public ITypeSymbol Source { get; } =
-        includeNullability ? NullableSymbolExtensions.UpgradeNullable(source) : NullableSymbolExtensions.NonNullable(source);
+    public ITypeSymbol Source { get; } = includeNullability ? source : source.NonNullable();
 
-    public ITypeSymbol Target { get; } =
-        includeNullability ? NullableSymbolExtensions.UpgradeNullable(target) : NullableSymbolExtensions.NonNullable(target);
+    public ITypeSymbol Target { get; } = includeNullability ? target : target.NonNullable();
 
     public TypeMappingConfiguration Configuration { get; } = config ?? TypeMappingConfiguration.Default;
 

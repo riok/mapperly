@@ -1,16 +1,27 @@
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 
 /// <summary>
 /// A default implementation of <see cref="IExistingTargetMapping"/>.
 /// </summary>
-public abstract class ExistingTargetMapping(ITypeSymbol sourceType, ITypeSymbol targetType) : IExistingTargetMapping
+public abstract class ExistingTargetMapping : IExistingTargetMapping
 {
-    public ITypeSymbol SourceType { get; } = sourceType;
+    protected ExistingTargetMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    {
+        Debug.Assert(sourceType.IsNullableUpgraded());
+        Debug.Assert(targetType.IsNullableUpgraded());
 
-    public ITypeSymbol TargetType { get; } = targetType;
+        SourceType = sourceType;
+        TargetType = targetType;
+    }
+
+    public ITypeSymbol SourceType { get; }
+
+    public ITypeSymbol TargetType { get; }
 
     public virtual bool CallableByOtherMappings => true;
 

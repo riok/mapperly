@@ -664,6 +664,36 @@ public class ObjectPropertyNullableTest
     }
 
     [Fact]
+    public Task ShouldUpgradeNullabilityInDisabledNullableContextInGenericProperty()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<C> Value { get; set;} }",
+            "class B { public IReadOnlyCollection<D> Value { get; set; } }",
+            "class C { public string Value { get; set; } }",
+            "class D { public string Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
+
+    [Fact]
+    public Task ShouldUpgradeNullabilityInDisabledNullableContextInArrayProperty()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public C[] Value { get; set;} }",
+            "class B { public D[] Value { get; set; } }",
+            "class C { public string Value { get; set; } }",
+            "class D { public string Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
+
+    [Fact]
     public Task NullableIntWithAdditionalFlattenedValueToNonNullableIntProperties()
     {
         var source = TestSourceBuilder.Mapping(
@@ -676,5 +706,28 @@ public class ObjectPropertyNullableTest
         );
 
         return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void NullableDirectiveEnabledTargetWithSameNullableRefTypeAsPropertyAndInEnumerable()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string Value { get; set; } public string[] Descriptions { get; set; } }",
+            "#nullable disable\n class B { public string Value { get; set; } public string[] Descriptions { get; set; } }\n#nullable enable"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Value = source.Value;
+                target.Descriptions = (string?[])source.Descriptions;
+                return target;
+                """
+            );
     }
 }

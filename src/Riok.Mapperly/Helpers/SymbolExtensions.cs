@@ -44,6 +44,12 @@ internal static class SymbolExtensions
 
     internal static bool IsArrayType(this ITypeSymbol symbol) => symbol is IArrayTypeSymbol;
 
+    internal static bool IsArrayType(this ITypeSymbol symbol, [NotNullWhen(true)] out IArrayTypeSymbol? arrayTypeSymbol)
+    {
+        arrayTypeSymbol = symbol as IArrayTypeSymbol;
+        return arrayTypeSymbol != null;
+    }
+
     internal static bool IsEnum(this ITypeSymbol t) => TryGetEnumUnderlyingType(t, out _);
 
     internal static bool TryGetEnumUnderlyingType(this ITypeSymbol t, [NotNullWhen(true)] out INamedTypeSymbol? enumType)

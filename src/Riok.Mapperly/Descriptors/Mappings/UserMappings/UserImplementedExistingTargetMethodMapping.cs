@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
-using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
@@ -17,7 +16,7 @@ public class UserImplementedExistingTargetMethodMapping(
     MethodParameter sourceParameter,
     MethodParameter targetParameter,
     MethodParameter? referenceHandlerParameter
-) : ExistingTargetMapping(method.Parameters[0].Type.UpgradeNullable(), targetParameter.Type.UpgradeNullable()), IUserMapping
+) : ExistingTargetMapping(method.Parameters[0].Type, targetParameter.Type), IUserMapping
 {
     public IMethodSymbol Method { get; } = method;
 

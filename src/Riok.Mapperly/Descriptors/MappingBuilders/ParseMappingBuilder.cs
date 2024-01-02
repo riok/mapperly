@@ -41,7 +41,7 @@ public static class ParseMappingBuilder
             return null;
 
         // otherwise try to find parse method ignoring the nullability
-        parseMethod = parseMethodCandidates.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x.ReturnType, nonNullableTarget));
+        parseMethod = parseMethodCandidates.Find(x => SymbolEqualityComparer.Default.Equals(x.ReturnType, nonNullableTarget));
         return parseMethod == null ? null : new StaticMethodMapping(parseMethod);
     }
 }

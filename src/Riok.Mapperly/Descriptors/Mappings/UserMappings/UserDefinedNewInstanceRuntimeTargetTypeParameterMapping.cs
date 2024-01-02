@@ -14,6 +14,7 @@ public class UserDefinedNewInstanceRuntimeTargetTypeParameterMapping(
     IMethodSymbol method,
     RuntimeTargetTypeMappingMethodParameters parameters,
     bool enableReferenceHandling,
+    ITypeSymbol targetType,
     NullFallbackValue nullArm,
     ITypeSymbol objectType
 )
@@ -21,6 +22,7 @@ public class UserDefinedNewInstanceRuntimeTargetTypeParameterMapping(
         method,
         parameters.Source,
         parameters.ReferenceHandler,
+        targetType,
         enableReferenceHandling,
         nullArm,
         objectType

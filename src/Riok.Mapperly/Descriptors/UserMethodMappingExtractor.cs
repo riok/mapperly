@@ -98,15 +98,24 @@ public static class UserMethodMappingExtractor
             return null;
         }
 
-        return method.ReturnsVoid
-            ? new UserImplementedExistingTargetMethodMapping(
+        if (method.ReturnsVoid)
+        {
+            return new UserImplementedExistingTargetMethodMapping(
                 receiver,
                 method,
                 parameters.Source,
                 parameters.Target!.Value,
                 parameters.ReferenceHandler
-            )
-            : new UserImplementedMethodMapping(receiver, method, parameters.Source, parameters.ReferenceHandler);
+            );
+        }
+
+        return new UserImplementedMethodMapping(
+            receiver,
+            method,
+            parameters.Source,
+            ctx.SymbolAccessor.UpgradeNullable(method.ReturnType),
+            parameters.ReferenceHandler
+        );
     }
 
     private static IUserMapping? BuilderUserDefinedMapping(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol)
@@ -126,8 +135,9 @@ public static class UserMethodMappingExtractor
                 methodSymbol,
                 runtimeTargetTypeParams,
                 ctx.MapperConfiguration.UseReferenceHandling,
+                ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
                 GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams, null),
-                ctx.Compilation.ObjectType
+                ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
             );
         }
 
@@ -143,9 +153,10 @@ public static class UserMethodMappingExtractor
                 methodSymbol,
                 typeParameters.Value,
                 parameters,
+                ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
                 ctx.MapperConfiguration.UseReferenceHandling,
                 GetTypeSwitchNullArm(methodSymbol, parameters, typeParameters),
-                ctx.Compilation.ObjectType
+                ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
             );
         }
 
@@ -170,6 +181,7 @@ public static class UserMethodMappingExtractor
             methodSymbol,
             parameters.Source,
             parameters.ReferenceHandler,
+            ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
             ctx.MapperConfiguration.UseReferenceHandling
         );
     }
@@ -186,7 +198,7 @@ public static class UserMethodMappingExtractor
             return false;
         }
 
-        var targetType = parameters.Target?.Type ?? methodSymbol.ReturnType.UpgradeNullable();
+        var targetType = parameters.Target?.Type ?? methodSymbol.ReturnType;
         var targetTypeParameter = methodSymbol.TypeParameters.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x, targetType));
         var sourceTypeParameter = methodSymbol.TypeParameters.FirstOrDefault(
             x => SymbolEqualityComparer.Default.Equals(x, parameters.Source.Type)
@@ -209,12 +221,7 @@ public static class UserMethodMappingExtractor
             return false;
         }
 
-        typeParameters = new GenericMappingTypeParameters(
-            sourceTypeParameter,
-            parameters.Source.Type.NullableAnnotation,
-            targetTypeParameter,
-            targetType.NullableAnnotation
-        );
+        typeParameters = new GenericMappingTypeParameters(sourceTypeParameter, targetTypeParameter);
         return true;
     }
 
@@ -235,24 +242,31 @@ public static class UserMethodMappingExtractor
         }
 
         // source parameter is the first parameter (except if the reference handler is the first parameter)
-        var sourceParameter = MethodParameter.Wrap(method.Parameters.FirstOrDefault(p => p.Ordinal != refHandlerParameterOrdinal));
-        expectedParametersCount++;
-        if (sourceParameter == null)
+        var sourceParameterSymbol = method.Parameters.FirstOrDefault(p => p.Ordinal != refHandlerParameterOrdinal);
+        if (sourceParameterSymbol == null)
         {
             parameters = null;
             return false;
         }
 
-        // target type parameter is the second parameter (except if the reference handler is the first or the second parameter)
-        var targetTypeParameter = MethodParameter.Wrap(
-            method.Parameters.FirstOrDefault(p => p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != refHandlerParameterOrdinal)
-        );
+        var sourceParameter = ctx.SymbolAccessor.WrapMethodParameter(sourceParameterSymbol);
         expectedParametersCount++;
-        if (targetTypeParameter == null || !SymbolEqualityComparer.Default.Equals(targetTypeParameter.Value.Type, ctx.Types.Get<Type>()))
+
+        // target type parameter is the second parameter (except if the reference handler is the first or the second parameter)
+        var targetTypeParameterSymbol = method.Parameters.FirstOrDefault(
+            p => p.Ordinal != sourceParameter.Ordinal && p.Ordinal != refHandlerParameterOrdinal
+        );
+        if (
+            targetTypeParameterSymbol == null
+            || !SymbolEqualityComparer.Default.Equals(targetTypeParameterSymbol.Type, ctx.Types.Get<Type>())
+        )
         {
             parameters = null;
             return false;
         }
+
+        var targetTypeParameter = ctx.SymbolAccessor.WrapMethodParameter(targetTypeParameterSymbol);
+        expectedParametersCount++;
 
         if (method.Parameters.Length != expectedParametersCount)
         {
@@ -260,7 +274,7 @@ public static class UserMethodMappingExtractor
             return false;
         }
 
-        parameters = new RuntimeTargetTypeMappingMethodParameters(sourceParameter.Value, targetTypeParameter.Value, refHandlerParameter);
+        parameters = new RuntimeTargetTypeMappingMethodParameters(sourceParameter, targetTypeParameter, refHandlerParameter);
         return true;
     }
 
@@ -281,18 +295,20 @@ public static class UserMethodMappingExtractor
         }
 
         // source parameter is the first parameter (except if the reference handler is the first parameter)
-        var sourceParameter = MethodParameter.Wrap(method.Parameters.FirstOrDefault(p => p.Ordinal != refHandlerParameterOrdinal));
-        if (sourceParameter == null)
+        var sourceParameterSymbol = method.Parameters.FirstOrDefault(p => p.Ordinal != refHandlerParameterOrdinal);
+        if (sourceParameterSymbol == null)
         {
             parameters = null;
             return false;
         }
 
+        var sourceParameter = ctx.SymbolAccessor.WrapMethodParameter(sourceParameterSymbol);
+
         // target parameter is the second parameter (except if the reference handler is the first or the second parameter)
         // if the method returns void, a target parameter is required
         // if the method doesnt return void, a target parameter is not allowed
-        var targetParameter = MethodParameter.Wrap(
-            method.Parameters.FirstOrDefault(p => p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != refHandlerParameterOrdinal)
+        var targetParameter = ctx.SymbolAccessor.WrapOptionalMethodParameter(
+            method.Parameters.FirstOrDefault(p => p.Ordinal != sourceParameter.Ordinal && p.Ordinal != refHandlerParameterOrdinal)
         );
         if (method.ReturnsVoid == !targetParameter.HasValue)
         {
@@ -311,7 +327,7 @@ public static class UserMethodMappingExtractor
             return false;
         }
 
-        parameters = new MappingMethodParameters(sourceParameter.Value, targetParameter, refHandlerParameter);
+        parameters = new MappingMethodParameters(sourceParameter, targetParameter, refHandlerParameter);
         return true;
     }
 
@@ -323,7 +339,7 @@ public static class UserMethodMappingExtractor
         if (refHandlerParameterSymbol == null)
             return null;
 
-        var refHandlerParameter = new MethodParameter(refHandlerParameterSymbol);
+        var refHandlerParameter = ctx.SymbolAccessor.WrapMethodParameter(refHandlerParameterSymbol);
         if (!SymbolEqualityComparer.Default.Equals(ctx.Types.Get<IReferenceHandler>(), refHandlerParameter.Type))
         {
             ctx.ReportDiagnostic(

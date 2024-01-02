@@ -10,16 +10,8 @@ public class GenericSourceTargetObjectFactory(SymbolAccessor symbolAccessor, IMe
     private readonly int _targetTypeParameterIndex = (sourceTypeParameterIndex + 1) % 2;
 
     public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
-        SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(
-            Method.TypeParameters[sourceTypeParameterIndex],
-            sourceType,
-            Method.Parameters[0].Type.NullableAnnotation
-        )
-        && SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(
-            Method.TypeParameters[_targetTypeParameterIndex],
-            targetTypeToCreate,
-            Method.ReturnType.NullableAnnotation
-        );
+        SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(Method.TypeParameters[sourceTypeParameterIndex], sourceType)
+        && SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(Method.TypeParameters[_targetTypeParameterIndex], targetTypeToCreate);
 
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source)
     {
