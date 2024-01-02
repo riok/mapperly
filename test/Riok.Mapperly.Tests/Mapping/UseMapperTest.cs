@@ -306,7 +306,7 @@ public class UseMapperTest
                 """
                 if (source == null)
                     return default;
-                var target = new global::B(_otherMapper.ToBExternal(source.Value));
+                var target = new global::B(source.Value != null ? MapToBExternal(source.Value) : default);
                 return target;
                 """
             );

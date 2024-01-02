@@ -390,4 +390,43 @@ public class UserMethodTest
         );
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void WithNullableGenericAndNullableDisabledTargetShouldWork()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using System.Collections.Generic;
+            using Riok.Mapperly.Abstractions;
+
+            [Mapper]
+            public partial class Mapper
+            {
+                public partial B Map(A source);
+
+                private ICollection<string?> MapValue(IEnumerable<C> source)
+                    => source.Select(x => x.Name).ToList();
+            }
+
+            #nullable disable
+            public class B { public ICollection<string> Value { get; set; } }
+            #nullable restore
+
+            public class A { public IEnumerable<C> Value { get; } }
+            public record C(string Name);
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Value = MapValue(source.Value);
+                return target;
+                """
+            );
+    }
 }

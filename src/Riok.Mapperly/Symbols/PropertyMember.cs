@@ -11,9 +11,10 @@ internal class PropertyMember(IPropertySymbol propertySymbol, SymbolAccessor sym
     private readonly IPropertySymbol _propertySymbol = propertySymbol;
 
     public string Name => _propertySymbol.Name;
-    public ITypeSymbol Type => _propertySymbol.Type;
+    public ITypeSymbol Type { get; } = symbolAccessor.UpgradeNullable(propertySymbol.Type);
+
     public ISymbol MemberSymbol => _propertySymbol;
-    public bool IsNullable => _propertySymbol.NullableAnnotation == NullableAnnotation.Annotated || Type.IsNullable();
+    public bool IsNullable => Type.IsNullable();
     public bool IsIndexer => _propertySymbol.IsIndexer;
     public bool CanGet =>
         !_propertySymbol.IsWriteOnly && (_propertySymbol.GetMethod == null || symbolAccessor.IsAccessible(_propertySymbol.GetMethod));

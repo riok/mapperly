@@ -207,25 +207,16 @@ public class NullableTest
     }
 
     [Fact]
-    public void NullableDirectiveEnabledTargetWithSameNullableRefTypeAsPropertyAndInEnumerable()
+    public Task ShouldUpgradeArrayElementNullabilityInDisabledNullableContext()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "B",
-            "class A { public string Value { get; set; } public string[] Descriptions { get; set; } }",
-            "#nullable disable\n class B { public string Value { get; set; } public string[] Descriptions { get; set; } }\n#nullable enable"
-        );
+        var source = TestSourceBuilder.Mapping("A[]", "B[]", "class A {}", "class B {}");
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
 
-        TestHelper
-            .GenerateMapper(source)
-            .Should()
-            .HaveMapMethodBody(
-                """
-                var target = new global::B();
-                target.Value = source.Value;
-                target.Descriptions = (string[])source.Descriptions;
-                return target;
-                """
-            );
+    [Fact]
+    public Task ShouldUpgradeGenericNullabilityInDisabledNullableContext()
+    {
+        var source = TestSourceBuilder.Mapping("IEnumerable<A>", "IReadOnlyCollection<B>", "class A {}", "class B {}");
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
     }
 }

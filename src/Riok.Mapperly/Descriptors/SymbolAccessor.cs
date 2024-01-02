@@ -53,16 +53,12 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     public bool HasImplicitConversion(ITypeSymbol source, ITypeSymbol destination) =>
         Compilation.ClassifyConversion(source, destination).IsImplicit && (destination.IsNullable() || !source.IsNullable());
 
-    public bool DoesTypeSatisfyTypeParameterConstraints(
-        ITypeParameterSymbol typeParameter,
-        ITypeSymbol type,
-        NullableAnnotation typeParameterUsageNullableAnnotation
-    )
+    public bool DoesTypeSatisfyTypeParameterConstraints(ITypeParameterSymbol typeParameter, ITypeSymbol type)
     {
         if (typeParameter.HasConstructorConstraint && !HasDirectlyAccessibleParameterlessConstructor(type))
             return false;
 
-        if (!typeParameter.IsNullable(typeParameterUsageNullableAnnotation) && type.IsNullable())
+        if (!typeParameter.IsNullable() && type.IsNullable())
             return false;
 
         if (typeParameter.HasValueTypeConstraint && !type.IsValueType)
@@ -73,8 +69,72 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
         foreach (var constraintType in typeParameter.ConstraintTypes)
         {
-            if (!Compilation.ClassifyConversion(type, constraintType.UpgradeNullable()).IsImplicit)
+            if (!Compilation.ClassifyConversion(type, UpgradeNullable(constraintType)).IsImplicit)
                 return false;
+        }
+
+        return true;
+    }
+
+    public MethodParameter? WrapOptionalMethodParameter(IParameterSymbol? symbol)
+    {
+        return symbol == null ? null : WrapMethodParameter(symbol);
+    }
+
+    public MethodParameter WrapMethodParameter(IParameterSymbol symbol) => new(symbol, UpgradeNullable(symbol.Type));
+
+    /// <summary>
+    /// Upgrade the nullability of a symbol from <see cref="NullableAnnotation.None"/> to <see cref="NullableAnnotation.Annotated"/>.
+    /// Does not upgrade the nullability of type parameters or array element types.
+    /// </summary>
+    /// <param name="symbol">The symbol to upgrade.</param>
+    /// <returns>The upgraded symbol</returns>
+    internal ITypeSymbol UpgradeNullable(ITypeSymbol symbol)
+    {
+        TryUpgradeNullable(symbol, out var upgradedSymbol);
+        return upgradedSymbol ?? symbol;
+    }
+
+    /// <summary>
+    /// Tries to upgrade the nullability of a symbol from <see cref="NullableAnnotation.None"/> to <see cref="NullableAnnotation.Annotated"/>.
+    /// Value types are not upgraded.
+    /// </summary>
+    /// <param name="symbol">The symbol.</param>
+    /// <param name="upgradedSymbol">The upgraded symbol, if an upgrade has taken place, <c>null</c> otherwise.</param>
+    /// <returns>Whether an upgrade has taken place.</returns>
+    internal bool TryUpgradeNullable(ITypeSymbol symbol, [NotNullWhen(true)] out ITypeSymbol? upgradedSymbol)
+    {
+        if (symbol.NullableAnnotation != NullableAnnotation.None || symbol.IsValueType)
+        {
+            upgradedSymbol = default;
+            return false;
+        }
+
+        switch (symbol)
+        {
+            case INamedTypeSymbol { TypeArguments.Length: > 0 } namedSymbol:
+                var upgradedTypeArguments = namedSymbol.TypeArguments.Select(UpgradeNullable).ToImmutableArray();
+                upgradedSymbol = namedSymbol
+                    .ConstructedFrom.Construct(
+                        upgradedTypeArguments,
+                        upgradedTypeArguments.Select(ta => ta.NullableAnnotation).ToImmutableArray()
+                    )
+                    .WithNullableAnnotation(NullableAnnotation.Annotated);
+                break;
+
+            case IArrayTypeSymbol { ElementType.IsValueType: false, ElementNullableAnnotation: NullableAnnotation.None } arrayTypeSymbol:
+                upgradedSymbol = compilationContext
+                    .Compilation.CreateArrayTypeSymbol(
+                        UpgradeNullable(arrayTypeSymbol.ElementType),
+                        arrayTypeSymbol.Rank,
+                        NullableAnnotation.Annotated
+                    )
+                    .WithNullableAnnotation(NullableAnnotation.Annotated);
+                break;
+
+            default:
+                upgradedSymbol = symbol.WithNullableAnnotation(NullableAnnotation.Annotated);
+                break;
         }
 
         return true;

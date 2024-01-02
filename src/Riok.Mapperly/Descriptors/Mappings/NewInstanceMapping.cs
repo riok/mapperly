@@ -1,16 +1,26 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
 /// <inheritdoc cref="INewInstanceMapping"/>
 [DebuggerDisplay("{GetType().Name}({SourceType} => {TargetType})")]
-public abstract class NewInstanceMapping(ITypeSymbol sourceType, ITypeSymbol targetType) : INewInstanceMapping
+public abstract class NewInstanceMapping : INewInstanceMapping
 {
-    public ITypeSymbol SourceType { get; } = sourceType;
+    protected NewInstanceMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    {
+        Debug.Assert(sourceType.IsNullableUpgraded());
+        Debug.Assert(targetType.IsNullableUpgraded());
 
-    public ITypeSymbol TargetType { get; } = targetType;
+        SourceType = sourceType;
+        TargetType = targetType;
+    }
+
+    public ITypeSymbol SourceType { get; }
+
+    public ITypeSymbol TargetType { get; }
 
     public virtual MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.Default;
 

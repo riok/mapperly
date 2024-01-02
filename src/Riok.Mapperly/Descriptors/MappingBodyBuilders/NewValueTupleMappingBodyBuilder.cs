@@ -209,7 +209,7 @@ public static class NewValueTupleMappingBodyBuilder
         if (mappableField == default)
             return false;
 
-        sourcePath = new MemberPath(new[] { new FieldMember(mappableField) });
+        sourcePath = new MemberPath(new[] { new FieldMember(mappableField, ctx.BuilderContext.SymbolAccessor) });
         return true;
     }
 }

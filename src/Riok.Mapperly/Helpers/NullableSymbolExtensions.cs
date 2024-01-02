@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 
@@ -8,39 +7,7 @@ public static class NullableSymbolExtensions
 {
     internal static bool HasSameOrStricterNullability(this ITypeSymbol symbol, ITypeSymbol other)
     {
-        return symbol.NullableAnnotation == NullableAnnotation.NotAnnotated
-            || symbol.UpgradeNullable().NullableAnnotation == other.UpgradeNullable().NullableAnnotation;
-    }
-
-    /// <summary>
-    /// Upgrade the nullability of a symbol from <see cref="NullableAnnotation.None"/> to <see cref="NullableAnnotation.Annotated"/>.
-    /// Does not upgrade the nullability of type parameters or array element types.
-    /// </summary>
-    /// <param name="symbol">The symbol to upgrade.</param>
-    /// <returns>The upgraded symbol</returns>
-    internal static ITypeSymbol UpgradeNullable(this ITypeSymbol symbol)
-    {
-        TryUpgradeNullable(symbol, out var upgradedSymbol);
-        return upgradedSymbol ?? symbol;
-    }
-
-    /// <summary>
-    /// Tries to upgrade the nullability of a symbol from <see cref="NullableAnnotation.None"/> to <see cref="NullableAnnotation.Annotated"/>.
-    /// Does not upgrade the nullability of type parameters or array element types.
-    /// </summary>
-    /// <param name="symbol">The symbol.</param>
-    /// <param name="upgradedSymbol">The upgraded symbol, if an upgrade has taken place, <c>null</c> otherwise.</param>
-    /// <returns>Whether an upgrade has taken place.</returns>
-    internal static bool TryUpgradeNullable(this ITypeSymbol symbol, [NotNullWhen(true)] out ITypeSymbol? upgradedSymbol)
-    {
-        if (symbol.NullableAnnotation != NullableAnnotation.None)
-        {
-            upgradedSymbol = default;
-            return false;
-        }
-
-        upgradedSymbol = symbol.WithDeepNullableAnnotation(NullableAnnotation.Annotated);
-        return true;
+        return symbol.NullableAnnotation == NullableAnnotation.NotAnnotated || symbol.NullableAnnotation == other.NullableAnnotation;
     }
 
     internal static bool TryGetNonNullable(this ITypeSymbol symbol, [NotNullWhen(true)] out ITypeSymbol? nonNullable)
@@ -79,8 +46,9 @@ public static class NullableSymbolExtensions
         return nonNullable;
     }
 
-    internal static bool IsNullable(this ITypeSymbol symbol) =>
-        symbol.NullableAnnotation.IsNullable() || symbol.NonNullableValueType() is not null;
+    internal static bool IsNullable(this ITypeSymbol symbol) => symbol.IsNullableReferenceType() || symbol.IsNullableValueType();
+
+    internal static bool IsNullableReferenceType(this ITypeSymbol symbol) => symbol.NullableAnnotation.IsNullable();
 
     internal static bool IsNullableValueType(this ITypeSymbol symbol) => symbol.NonNullableValueType() != null;
 
@@ -95,11 +63,10 @@ public static class NullableSymbolExtensions
     /// Whether or not the <see cref="ITypeParameterSymbol"/> is nullable.
     /// </summary>
     /// <param name="typeParameter">The type parameter.</param>
-    /// <param name="typeParameterUsageNullableAnnotation">Whether or not the usage of the type parameter is nullable (eg. is suffixed with ?).</param>
     /// <returns>A boolean indicating whether <c>null</c> can be used to satisfy the type parameter constraints.</returns>
-    internal static bool IsNullable(this ITypeParameterSymbol typeParameter, NullableAnnotation typeParameterUsageNullableAnnotation)
+    internal static bool IsNullable(this ITypeParameterSymbol typeParameter)
     {
-        if (typeParameterUsageNullableAnnotation == NullableAnnotation.Annotated)
+        if (typeParameter.NullableAnnotation == NullableAnnotation.Annotated)
             return true;
 
         if (typeParameter.HasNotNullConstraint || typeParameter.HasValueTypeConstraint || typeParameter.HasUnmanagedTypeConstraint)
@@ -111,26 +78,22 @@ public static class NullableSymbolExtensions
         return typeParameter.HasReferenceTypeConstraint && typeParameter.ReferenceTypeConstraintNullableAnnotation.IsNullable();
     }
 
+    internal static bool IsNullableUpgraded(this ITypeSymbol symbol)
+    {
+        if (symbol.NullableAnnotation == NullableAnnotation.None)
+            return false;
+
+        return symbol switch
+        {
+            INamedTypeSymbol namedTypeSymbol when namedTypeSymbol.TypeArguments.Any(x => !x.IsNullableUpgraded()) => false,
+            IArrayTypeSymbol arrayTypeSymbol when !arrayTypeSymbol.ElementType.IsNullableUpgraded() => false,
+            _ => true
+        };
+    }
+
     internal static bool IsNullable(this NullableAnnotation nullable) =>
         nullable is NullableAnnotation.Annotated or NullableAnnotation.None;
 
-    /// <summary>
-    /// Returns a new type symbol with the provided nullable annotation.
-    /// Also sets the nullable annotation on all type arguments of the <see cref="symbol"/>.
-    /// </summary>
-    /// <param name="symbol">The symbol to work on.</param>
-    /// <param name="annotation">The <see cref="NullableAnnotation"/> to set.</param>
-    /// <returns>The new symbol with the given nullable annotation.</returns>
-    private static ITypeSymbol WithDeepNullableAnnotation(this ITypeSymbol symbol, NullableAnnotation annotation)
-    {
-        if (symbol is INamedTypeSymbol { TypeArguments.Length: > 0 } namedSymbol)
-        {
-            symbol = namedSymbol.ConstructedFrom.Construct(
-                namedSymbol.TypeArguments,
-                Enumerable.Repeat(annotation, namedSymbol.TypeArguments.Length).ToImmutableArray()
-            );
-        }
-
-        return symbol.WithNullableAnnotation(annotation);
-    }
+    internal static NullableAnnotation Upgrade(this NullableAnnotation nullable) =>
+        nullable.IsNullable() ? NullableAnnotation.Annotated : NullableAnnotation.NotAnnotated;
 }
