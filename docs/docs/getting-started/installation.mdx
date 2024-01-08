@@ -62,11 +62,11 @@ Checkout the latest stable version [here](https://mapperly.riok.app).
 Mapperly removes the attribute references at compile time by default (they have the `ConditionalAttribute`).
 If you want
 to preserve the attribute references at runtime
-you can set the MSBuild variable `MapperlyAbstractionsScopeRuntime` to `runtime`.
+you can set the MSBuild variable `MapperlyAbstractionsScope` to `runtime`.
 
 ```xml
 <PropertyGroup>
-  <MapperlyAbstractionsScopeRuntime>runtime</MapperlyAbstractionsScopeRuntime>
+  <MapperlyAbstractionsScope>runtime</MapperlyAbstractionsScope>
 </PropertyGroup>
 ```
 
