@@ -1,5 +1,5 @@
 <Project>
   <PropertyGroup>
-    <DefineConstants Condition="'$(MapperlyAbstractionsScopeRuntime)' == 'runtime'">$(DefineConstants);MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME</DefineConstants>
+    <DefineConstants Condition="'$(MapperlyAbstractionsScope)' == 'runtime'">$(DefineConstants);MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME</DefineConstants>
   </PropertyGroup>
 </Project>
