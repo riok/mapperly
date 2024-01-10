@@ -262,8 +262,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             }
 
             // nullability is handled inside the member mapping
-            var paramType = parameter.Type.WithNullableAnnotation(parameter.NullableAnnotation);
-            var typeMapping = new TypeMappingKey(sourcePath.MemberType, paramType, memberConfig?.ToTypeMappingConfiguration());
+            var parameterType = ctx.BuilderContext.SymbolAccessor.UpgradeNullable(parameter.Type);
+            var typeMapping = new TypeMappingKey(sourcePath.MemberType, parameterType, memberConfig?.ToTypeMappingConfiguration());
             var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(
                 typeMapping,
                 diagnosticLocation: memberConfig?.Location
@@ -295,8 +295,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             var memberMapping = new NullMemberMapping(
                 delegateMapping,
                 getterSourcePath,
-                paramType,
-                ctx.BuilderContext.GetNullFallbackValue(paramType),
+                parameterType,
+                ctx.BuilderContext.GetNullFallbackValue(parameterType),
                 !ctx.BuilderContext.IsExpression
             );
             var ctorMapping = new ConstructorParameterMapping(parameter, memberMapping, skippedOptionalParam);

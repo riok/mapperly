@@ -81,8 +81,8 @@ public static class NewValueTupleMappingBodyBuilder
             }
 
             // nullability is handled inside the member expressionMapping
-            var paramType = targetMember.Type.WithNullableAnnotation(targetMember.NullableAnnotation);
-            var mappingKey = new TypeMappingKey(sourcePath.MemberType, paramType, memberConfig?.ToTypeMappingConfiguration());
+            var targetMemberType = ctx.BuilderContext.SymbolAccessor.UpgradeNullable(targetMember.Type);
+            var mappingKey = new TypeMappingKey(sourcePath.MemberType, targetMemberType, memberConfig?.ToTypeMappingConfiguration());
             var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(
                 mappingKey,
                 diagnosticLocation: memberConfig?.Location
@@ -118,8 +118,8 @@ public static class NewValueTupleMappingBodyBuilder
             var memberMapping = new NullMemberMapping(
                 delegateMapping,
                 getterSourcePath,
-                paramType,
-                ctx.BuilderContext.GetNullFallbackValue(paramType),
+                targetMemberType,
+                ctx.BuilderContext.GetNullFallbackValue(targetMemberType),
                 !ctx.BuilderContext.IsExpression
             );
 
