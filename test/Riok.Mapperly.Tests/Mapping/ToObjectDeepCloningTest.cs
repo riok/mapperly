@@ -2,7 +2,7 @@ using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
 
-public class SpecialTypeDeepCloningTest
+public class ToObjectDeepCloningTest
 {
     [Fact]
     public void ClassToObjectDeepCloning()

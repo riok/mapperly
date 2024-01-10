@@ -1,6 +1,6 @@
 namespace Riok.Mapperly.Tests.Mapping;
 
-public class SpecialTypeTest
+public class ToObjectTypeTest
 {
     [Fact]
     public void ClassToObject()
