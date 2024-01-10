@@ -22,13 +22,24 @@ internal static class SymbolExtensions
     internal static string FullyQualifiedIdentifierName(this ITypeSymbol typeSymbol) =>
         typeSymbol.ToDisplayString(_fullyQualifiedNullableFormat);
 
-    internal static bool IsImmutable(this ISymbol symbol) =>
-        symbol is INamedTypeSymbol namedSymbol
-        && (
-            namedSymbol.IsUnmanagedType
+    internal static bool IsImmutable(this ISymbol symbol)
+    {
+        if (symbol is not INamedTypeSymbol namedSymbol)
+            return false;
+
+        return namedSymbol.IsUnmanagedType
             || namedSymbol.SpecialType == SpecialType.System_String
-            || _wellKnownImmutableTypes.Contains(namedSymbol.ToDisplayString())
-        );
+            || IsDelegate(symbol)
+            || _wellKnownImmutableTypes.Contains(namedSymbol.ToDisplayString());
+    }
+
+    internal static bool IsDelegate(this ISymbol symbol)
+    {
+        if (symbol is not INamedTypeSymbol namedSymbol)
+            return false;
+
+        return namedSymbol.DelegateInvokeMethod != null;
+    }
 
     internal static int GetInheritanceLevel(this ITypeSymbol symbol)
     {

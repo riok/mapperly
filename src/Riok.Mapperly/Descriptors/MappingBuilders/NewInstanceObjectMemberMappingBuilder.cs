@@ -13,6 +13,9 @@ public static class NewInstanceObjectMemberMappingBuilder
         if (ctx.Target.SpecialType != SpecialType.None || ctx.Source.SpecialType != SpecialType.None)
             return null;
 
+        if (ctx.Source.IsDelegate() || ctx.Target.IsDelegate())
+            return null;
+
         if (ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory))
             return new NewInstanceObjectFactoryMemberMapping(
                 ctx.Source,
