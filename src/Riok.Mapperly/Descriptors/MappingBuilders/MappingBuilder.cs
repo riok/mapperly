@@ -11,7 +11,7 @@ public class MappingBuilder(MappingCollection mappings)
     {
         NullableMappingBuilder.TryBuildMapping,
         DerivedTypeMappingBuilder.TryBuildMapping,
-        SpecialTypeMappingBuilder.TryBuildMapping,
+        ToObjectMappingBuilder.TryBuildMapping,
         DirectAssignmentMappingBuilder.TryBuildMapping,
         QueryableMappingBuilder.TryBuildMapping,
         DictionaryMappingBuilder.TryBuildMapping,
