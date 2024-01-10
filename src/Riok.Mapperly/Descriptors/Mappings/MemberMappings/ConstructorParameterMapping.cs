@@ -13,6 +13,10 @@ public class ConstructorParameterMapping(
 {
     private readonly bool _selfOrPreviousIsUnmappedOptional = selfOrPreviousIsUnmappedOptional;
 
+    /// <summary>
+    /// The parameter of the constructor.
+    /// Note: the nullability of it may not be "upgraded".
+    /// </summary>
     public IParameterSymbol Parameter { get; } = parameter;
 
     public NullMemberMapping DelegateMapping { get; } = delegateMapping;

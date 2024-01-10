@@ -7,6 +7,10 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 public class ValueTupleConstructorParameterMapping(IFieldSymbol parameter, NullMemberMapping delegateMapping)
 {
+    /// <summary>
+    /// The parameter the value tuple.
+    /// Note: the nullability of it may not be "upgraded".
+    /// </summary>
     public IFieldSymbol Parameter { get; } = parameter;
 
     public NullMemberMapping DelegateMapping { get; } = delegateMapping;
