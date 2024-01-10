@@ -5,7 +5,7 @@ using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
 
-[DebuggerDisplay("{Source.Name} => {Target.Name}")]
+[DebuggerDisplay("{Source} => {Target}")]
 public readonly struct TypeMappingKey(
     ITypeSymbol source,
     ITypeSymbol target,
