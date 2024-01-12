@@ -253,6 +253,28 @@ public class ObjectPropertyConstructorResolverTest
     }
 
     [Fact]
+    public void ClassToClassMultipleCtorsWithDescParametersConstructorPriorityShouldPreferMultipleCtors()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.WithDescParametersConstructorPriority,
+            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
+            "class B { public B(string stringValue, int intvalue) { } public B( int intvalue) { } public B() { } { public string StringValue { get; set; } public int IntValue { get; set; } "
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B(source.StringValue, source.IntValue);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void RecordToRecord()
     {
         var source = TestSourceBuilder.Mapping(
