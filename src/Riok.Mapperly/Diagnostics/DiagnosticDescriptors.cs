@@ -527,4 +527,22 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Info,
         true
     );
+
+    public static readonly DiagnosticDescriptor ReferencedMappingNotFound = new DiagnosticDescriptor(
+        "RMG061",
+        "The referenced mapping was not found",
+        "The referenced mapping named {0} was not found",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor ReferencedMappingAmbiguous = new DiagnosticDescriptor(
+        "RMG062",
+        "The referenced mapping name is ambiguous",
+        "The referenced mapping name {0} is ambiguous, use a unique name",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
 }

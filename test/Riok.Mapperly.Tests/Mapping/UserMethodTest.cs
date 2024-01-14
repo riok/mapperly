@@ -456,7 +456,7 @@ public class UserMethodTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             public static int NotAMappingMethod(int s) => s;
-            [UserMapping]
+            [UserMapping(Default = true)]
             public static int AMappingMethod(int s) => s;
             public partial B Map(A s);
             """,
@@ -706,7 +706,7 @@ public class UserMethodTest
     public void UnrelatedUserImplementedShouldNotReportDiagnostic()
     {
         // duplicated user mapping for int => int but
-        // but should not be used
+        // but not used (also no MapPropertyAttribute.Use reference)
         // therefore no RMG060 should be reported
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """

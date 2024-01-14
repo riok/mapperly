@@ -8,5 +8,7 @@ public record PropertyMappingConfiguration(StringMemberPath Source, StringMember
 
     public string? FormatProvider { get; set; }
 
-    public TypeMappingConfiguration ToTypeMappingConfiguration() => new(StringFormat, FormatProvider);
+    public string? Use { get; set; }
+
+    public TypeMappingConfiguration ToTypeMappingConfiguration() => new(StringFormat, FormatProvider, Use);
 }

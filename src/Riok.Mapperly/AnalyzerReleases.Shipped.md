@@ -145,3 +145,5 @@ Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 RMG059  | Mapper   | Error    | Multiple default user mappings found, only one is allowed
 RMG060  | Mapper   | Info     | Multiple user mappings discovered without specifying an explicit default
+RMG061  | Mapper   | Error    | The referenced mapping was not found
+RMG062  | Mapper   | Error    | The referenced mapping name is ambiguous

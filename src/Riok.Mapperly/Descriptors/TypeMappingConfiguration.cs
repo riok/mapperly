@@ -6,7 +6,8 @@ namespace Riok.Mapperly.Descriptors;
 /// </summary>
 /// <param name="StringFormat">The format to apply to <see cref="IFormattable"/>.</param>
 /// <param name="FormatProviderName">The name of the format provider to apply to <see cref="IFormattable"/>.</param>
-public record TypeMappingConfiguration(string? StringFormat = null, string? FormatProviderName = null)
+/// <param name="UseNamedMapping">The name of the mapping to use to convert the source type to the target type.</param>
+public record TypeMappingConfiguration(string? StringFormat = null, string? FormatProviderName = null, string? UseNamedMapping = null)
 {
     public static readonly TypeMappingConfiguration Default = new();
 }

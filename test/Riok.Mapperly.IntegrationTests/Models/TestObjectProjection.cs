@@ -65,6 +65,8 @@ namespace Riok.Mapperly.IntegrationTests.Models
 
         public string ManuallyMapped { get; set; } = "fooBar";
 
+        public int ManuallyMappedModified { get; set; }
+
         public List<TestObjectProjectionEnumValue> ManuallyMappedList { get; set; } = new();
     }
 }

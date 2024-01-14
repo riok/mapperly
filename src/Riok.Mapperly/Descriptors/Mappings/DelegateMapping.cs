@@ -5,6 +5,9 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 
 /// <summary>
 /// Represents a mapping generated from invoking <see cref="INewInstanceMapping.Build"/> on a source value.
+/// This can be used to adjust the types of the mapping
+/// (eg. use the same mapping to map from an interface as for an implementation for an interface,
+/// List => ICollection)
 /// <code>
 /// target = Map(source);
 /// </code>

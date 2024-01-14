@@ -9,6 +9,7 @@ public class MappingBuilder(MappingCollection mappings)
 
     private static readonly IReadOnlyCollection<BuildMapping> _builders = new BuildMapping[]
     {
+        UseNamedMappingBuilder.TryBuildMapping,
         NullableMappingBuilder.TryBuildMapping,
         DerivedTypeMappingBuilder.TryBuildMapping,
         ToObjectMappingBuilder.TryBuildMapping,
@@ -35,6 +36,9 @@ public class MappingBuilder(MappingCollection mappings)
     public IReadOnlyCollection<IUserMapping> UserMappings => mappings.UserMappings;
 
     public INewInstanceMapping? Find(TypeMappingKey mapping) => mappings.FindNewInstanceMapping(mapping);
+
+    public INewInstanceMapping? FindNamed(string name, out bool ambiguousName) =>
+        mappings.FindNamedNewInstanceMapping(name, out ambiguousName);
 
     public INewInstanceMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {

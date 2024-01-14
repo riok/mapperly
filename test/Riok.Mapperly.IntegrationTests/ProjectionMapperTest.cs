@@ -120,6 +120,7 @@ namespace Riok.Mapperly.IntegrationTests
                     new TestObjectProjectionEnumValue { Value = TestEnum.Value10 },
                     new TestObjectProjectionEnumValue { Value = TestEnum.Value20 },
                 },
+                ManuallyMappedModified = 1,
             };
         }
 

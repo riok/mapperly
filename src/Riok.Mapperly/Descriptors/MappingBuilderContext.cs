@@ -75,6 +75,23 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     public IReadOnlyCollection<IUserMapping> UserMappings => MappingBuilder.UserMappings;
 
     /// <summary>
+    /// Tries to find an existing mapping with the provided name.
+    /// If none is found, <c>null</c> is returned.
+    /// </summary>
+    /// <param name="mappingName">The name of the mapping.</param>
+    /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
+    public INewInstanceMapping? FindNamedMapping(string mappingName)
+    {
+        var mapping = MappingBuilder.FindNamed(mappingName, out var ambiguousName);
+        if (ambiguousName)
+        {
+            ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingAmbiguous, mappingName);
+        }
+
+        return mapping;
+    }
+
+    /// <summary>
     /// Tries to find an existing mapping for the provided key.
     /// If none is found, <c>null</c> is returned.
     /// </summary>

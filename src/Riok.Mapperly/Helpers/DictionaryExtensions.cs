@@ -20,4 +20,13 @@ public static class DictionaryExtensions
             dict.Remove(key);
         }
     }
+
+    public static bool TryAdd<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue value)
+    {
+        if (dict.ContainsKey(key))
+            return false;
+
+        dict.Add(key, value);
+        return true;
+    }
 }
