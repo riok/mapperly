@@ -28,7 +28,7 @@ public record TestSourceBuilderOptions(
     public static readonly TestSourceBuilderOptions WithDeepCloning = new(UseDeepCloning: true);
     public static readonly TestSourceBuilderOptions WithReferenceHandling = new(UseReferenceHandling: true);
 
-    public static readonly TestSourceBuilderOptions WithDescParametersConstructorPriority = new(PreferParameterlessConstructors: false);
+    public static readonly TestSourceBuilderOptions PreferParameterizedConstructors = new(PreferParameterlessConstructors: false);
 
     public static TestSourceBuilderOptions WithIgnoreObsolete(IgnoreObsoleteMembersStrategy ignoreObsoleteStrategy) =>
         new(IgnoreObsoleteMembersStrategy: ignoreObsoleteStrategy);

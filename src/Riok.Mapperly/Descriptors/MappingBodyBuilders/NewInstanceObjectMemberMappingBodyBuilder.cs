@@ -19,7 +19,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
     public static void BuildMappingBody(MappingBuilderContext ctx, NewInstanceObjectMemberMapping mapping)
     {
         var mappingCtx = new NewInstanceBuilderContext<NewInstanceObjectMemberMapping>(ctx, mapping);
-        BuildConstructorMapping(mappingCtx, ctx.MapperConfiguration.PreferParameterlessConstructors);
+        BuildConstructorMapping(mappingCtx);
         BuildInitOnlyMemberMappings(mappingCtx, true);
         mappingCtx.AddDiagnostics();
     }
@@ -27,7 +27,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
     public static void BuildMappingBody(MappingBuilderContext ctx, NewInstanceObjectMemberMethodMapping mapping)
     {
         var mappingCtx = new NewInstanceContainerBuilderContext<NewInstanceObjectMemberMethodMapping>(ctx, mapping);
-        BuildConstructorMapping(mappingCtx, ctx.MapperConfiguration.PreferParameterlessConstructors);
+        BuildConstructorMapping(mappingCtx);
         BuildInitOnlyMemberMappings(mappingCtx);
         ObjectMemberMappingBodyBuilder.BuildMappingBody(mappingCtx);
     }
@@ -193,7 +193,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         ctx.AddInitMemberMapping(memberAssignmentMapping);
     }
 
-    private static void BuildConstructorMapping(INewInstanceBuilderContext<IMapping> ctx, bool preferParameterlessConstructors)
+    private static void BuildConstructorMapping(INewInstanceBuilderContext<IMapping> ctx)
     {
         if (ctx.Mapping.TargetType is not INamedTypeSymbol namedTargetType)
         {
@@ -210,7 +210,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             .OrderByDescending(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
             .ThenBy(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x));
 
-        if (preferParameterlessConstructors)
+        if (ctx.BuilderContext.MapperConfiguration.PreferParameterlessConstructors)
         {
             ctorCandidates = ctorCandidates.ThenByDescending(x => x.Parameters.Length == 0).ThenByDescending(x => x.Parameters.Length);
         }

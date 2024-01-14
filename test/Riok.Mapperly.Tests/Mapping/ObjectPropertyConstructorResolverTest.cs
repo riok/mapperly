@@ -253,12 +253,12 @@ public class ObjectPropertyConstructorResolverTest
     }
 
     [Fact]
-    public void ClassToClassMultipleCtorsWithDescParametersConstructorPriorityShouldPreferMultipleCtors()
+    public void ClassToClassMultipleCtorsPreferParameterizedConstructorsOptionShouldPreferMultipleCtors()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
             "B",
-            TestSourceBuilderOptions.WithDescParametersConstructorPriority,
+            TestSourceBuilderOptions.PreferParameterizedConstructors,
             "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
             "class B { public B(string stringValue, int intvalue) { } public B( int intvalue) { } public B() { } { public string StringValue { get; set; } public int IntValue { get; set; } "
         );

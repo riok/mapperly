@@ -106,8 +106,8 @@ public record MapperConfiguration
 
     /// <summary>
     /// Controls the priority of constructors used in mapping.
-    ///  When enabled, a parameterless constructor is prioritized over constructors with parameters.
-    ///  When disabled, accessible constructors are ordered in descending order by their parameter count.
+    /// When <c>true</c>, a parameterless constructor is prioritized over constructors with parameters.
+    /// When <c>false</c>, accessible constructors are ordered in descending order by their parameter count.
     /// </summary>
     public bool? PreferParameterlessConstructors { get; init; }
 }

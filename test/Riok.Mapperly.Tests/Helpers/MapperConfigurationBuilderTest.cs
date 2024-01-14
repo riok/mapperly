@@ -92,7 +92,7 @@ public class MapperConfigurationBuilderTest
             UseReferenceHandling = true,
             IgnoreObsoleteMembersStrategy = IgnoreObsoleteMembersStrategy.Source,
             RequiredMappingStrategy = RequiredMappingStrategy.Source,
-            PreferParameterlessConstructors = false,
+            PreferParameterlessConstructors = true,
         };
     }
 }
