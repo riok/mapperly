@@ -1,3 +1,1 @@
 #nullable enable
-Riok.Mapperly.Abstractions.MapperAttribute.PreferParameterlessConstructors.get -> bool
-Riok.Mapperly.Abstractions.MapperAttribute.PreferParameterlessConstructors.set -> void
