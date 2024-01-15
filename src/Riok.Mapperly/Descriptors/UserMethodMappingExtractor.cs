@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
@@ -91,12 +92,22 @@ public static class UserMethodMappingExtractor
         bool isStatic
     )
     {
+        var userMappingConfig = GetUserMappingConfig(ctx, method, out var hasAttribute);
         var valid = !method.IsGenericMethod && (allowPartial || !method.IsPartialDefinition) && (!isStatic || method.IsStatic);
 
         if (!valid || !BuildParameters(ctx, method, out var parameters))
         {
+            if (hasAttribute)
+            {
+                var name = receiver == null ? method.Name : receiver + method.Name;
+                ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, method, name);
+            }
+
             return null;
         }
+
+        if (userMappingConfig.Ignore)
+            return null;
 
         if (method.ReturnsVoid)
         {
@@ -373,5 +384,12 @@ public static class UserMethodMappingExtractor
     {
         var targetCanBeNull = typeParameters?.TargetNullable ?? parameters.Target?.Type.IsNullable() ?? method.ReturnType.IsNullable();
         return targetCanBeNull ? NullFallbackValue.Default : NullFallbackValue.ThrowArgumentNullException;
+    }
+
+    private static UserMappingAttribute GetUserMappingConfig(SimpleMappingBuilderContext ctx, IMethodSymbol method, out bool hasAttribute)
+    {
+        var userMappingAttr = ctx.AttributeAccessor.AccessFirstOrDefault<UserMappingAttribute>(method);
+        hasAttribute = userMappingAttr != null;
+        return userMappingAttr ?? new UserMappingAttribute { Ignore = !ctx.MapperConfiguration.AutoUserMappings };
     }
 }
