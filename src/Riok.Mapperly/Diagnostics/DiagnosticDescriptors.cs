@@ -468,7 +468,7 @@ public static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor MixingStaticPartialWithInstanceMethod = new DiagnosticDescriptor(
         "RMG054",
         "Mapper class containing 'static partial' method must not have any instance methods",
-        "Mapper class {0} contains 'static partial' method. Use only instance method or only static methods.",
+        "Mapper class {0} contains 'static partial' methods. Use either only instance methods or only static methods.",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true
@@ -507,6 +507,24 @@ public static class DiagnosticDescriptors
         "Multiple default format providers found, only one is allowed",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor MultipleDefaultUserMappings = new DiagnosticDescriptor(
+        "RMG059",
+        "Multiple default user mappings found, only one is allowed",
+        "Multiple default user mappings for the mapping from {0} to {1} found, only one is allowed",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor MultipleUserMappingsWithoutDefault = new DiagnosticDescriptor(
+        "RMG060",
+        "Multiple user mappings discovered without specifying an explicit default",
+        "Multiple user mappings discovered for the mapping from {0} to {1} without specifying an explicit default",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Info,
         true
     );
 }

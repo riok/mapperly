@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 
 namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
@@ -8,4 +9,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 public interface IUserMapping : ITypeMapping
 {
     IMethodSymbol Method { get; }
+
+    /// <inheritdoc cref="UserMappingAttribute.Default"/>
+    bool? Default { get; }
 }

@@ -14,7 +14,7 @@ public static class SpanMappingBuilder
     private const string ToArrayMethodName = nameof(Enumerable.ToArray);
     private const string AddMethodName = nameof(ICollection<object>.Add);
 
-    public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static INewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         if (!ctx.IsConversionEnabled(MappingConversionType.Span))
             return null;
@@ -116,7 +116,7 @@ public static class SpanMappingBuilder
         }
     }
 
-    private static NewInstanceMapping? BuildSpanToEnumerable(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    private static INewInstanceMapping? BuildSpanToEnumerable(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         var target = ctx.CollectionInfos!.Target;
 
@@ -157,7 +157,7 @@ public static class SpanMappingBuilder
         }
     }
 
-    private static NewInstanceMapping BuildToArrayOrMap(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    private static INewInstanceMapping BuildToArrayOrMap(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         if (!elementMapping.IsSynthetic)
             return new ArrayForMapping(ctx.Source, ctx.Target, elementMapping, elementMapping.TargetType);

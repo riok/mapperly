@@ -10,13 +10,16 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 /// </summary>
 public class UserDefinedNewInstanceMethodMapping(
     IMethodSymbol method,
+    bool? isDefault,
     MethodParameter sourceParameter,
     MethodParameter? referenceHandlerParameter,
     ITypeSymbol targetType,
     bool enableReferenceHandling
-) : MethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), IDelegateUserMapping
+) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), IDelegateUserMapping
 {
     public IMethodSymbol Method { get; } = method;
+
+    public bool? Default { get; } = isDefault;
 
     public INewInstanceMapping? DelegateMapping { get; private set; }
 

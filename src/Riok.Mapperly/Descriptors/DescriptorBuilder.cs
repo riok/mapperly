@@ -6,6 +6,7 @@ using Riok.Mapperly.Descriptors.ExternalMappings;
 using Riok.Mapperly.Descriptors.FormatProviders;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders;
 using Riok.Mapperly.Descriptors.MappingBuilders;
+using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Descriptors.ObjectFactories;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
@@ -71,6 +72,7 @@ public class DescriptorBuilder
         EnqueueUserMappings(objectFactories, formatProviders);
         ExtractExternalMappings();
         _mappingBodyBuilder.BuildMappingBodies(cancellationToken);
+        AddUserMappingDiagnostics();
         BuildMappingMethodNames();
         BuildReferenceHandlingParameters();
         AddMappingsToDescriptor();
@@ -126,14 +128,14 @@ public class DescriptorBuilder
                 firstNonStaticUserMapping = userMapping.Method;
             }
 
-            _mappings.Add(userMapping, TypeMappingConfiguration.Default);
+            AddUserMapping(userMapping, false);
         }
 
         if (_mapperDescriptor.Static && firstNonStaticUserMapping is not null)
         {
             _diagnostics.ReportDiagnostic(
                 DiagnosticDescriptors.MixingStaticPartialWithInstanceMethod,
-                firstNonStaticUserMapping.GetSyntaxLocation(),
+                firstNonStaticUserMapping,
                 _mapperDescriptor.Symbol.ToDisplayString()
             );
         }
@@ -164,7 +166,7 @@ public class DescriptorBuilder
     {
         foreach (var externalMapping in ExternalMappingsExtractor.ExtractExternalMappings(_builderContext, _mapperDescriptor.Symbol))
         {
-            _mappings.Add(externalMapping, TypeMappingConfiguration.Default);
+            AddUserMapping(externalMapping, true);
         }
     }
 
@@ -205,5 +207,32 @@ public class DescriptorBuilder
     {
         // add generated accessors to the mapper
         _mapperDescriptor.AddUnsafeAccessors(_unsafeAccessorContext.UnsafeAccessors);
+    }
+
+    private void AddUserMapping(IUserMapping mapping, bool ignoreDuplicates)
+    {
+        var result = _mappings.AddUserMapping(mapping, ignoreDuplicates);
+        if (result == MappingCollectionAddResult.NotAddedDuplicatedDefault)
+        {
+            _diagnostics.ReportDiagnostic(
+                DiagnosticDescriptors.MultipleDefaultUserMappings,
+                mapping.Method,
+                mapping.SourceType.ToDisplayString(),
+                mapping.TargetType.ToDisplayString()
+            );
+        }
+    }
+
+    private void AddUserMappingDiagnostics()
+    {
+        foreach (var mapping in _mappings.UsedDuplicatedNonDefaultUserMappings)
+        {
+            _diagnostics.ReportDiagnostic(
+                DiagnosticDescriptors.MultipleUserMappingsWithoutDefault,
+                mapping.Method,
+                mapping.SourceType.ToDisplayString(),
+                mapping.TargetType.ToDisplayString()
+            );
+        }
     }
 }

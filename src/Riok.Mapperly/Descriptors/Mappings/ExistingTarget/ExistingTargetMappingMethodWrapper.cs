@@ -4,10 +4,10 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 
 /// <summary>
-/// Wraps an <see cref="IExistingTargetMapping"/> as <see cref="MethodMapping"/>.
+/// Wraps an <see cref="IExistingTargetMapping"/> as <see cref="NewInstanceMethodMapping"/>.
 /// </summary>
 public abstract class ExistingTargetMappingMethodWrapper(IExistingTargetMapping mapping)
-    : MethodMapping(mapping.SourceType, mapping.TargetType)
+    : NewInstanceMethodMapping(mapping.SourceType, mapping.TargetType)
 {
     private const string TargetVariableName = "target";
 

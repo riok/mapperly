@@ -34,7 +34,7 @@ public class MappingBuilder(MappingCollection mappings)
     /// <inheritdoc cref="MappingCollection.UserMappings"/>
     public IReadOnlyCollection<IUserMapping> UserMappings => mappings.UserMappings;
 
-    public INewInstanceMapping? Find(TypeMappingKey mapping) => mappings.Find(mapping);
+    public INewInstanceMapping? Find(TypeMappingKey mapping) => mappings.FindNewInstanceMapping(mapping);
 
     public INewInstanceMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {

@@ -13,7 +13,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Represents a mapping which is not a single expression but an entire method.
 /// </summary>
-public abstract class MethodMapping : NewInstanceMapping
+public abstract class MethodMapping : ITypeMapping
 {
     protected const string DefaultReferenceHandlerParameterName = "refHandler";
     private const string DefaultSourceParameterName = "source";
@@ -35,8 +35,8 @@ public abstract class MethodMapping : NewInstanceMapping
     private string? _methodName;
 
     protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        : base(sourceType, targetType)
     {
+        TargetType = targetType;
         SourceParameter = new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType);
         _returnType = targetType;
     }
@@ -47,8 +47,8 @@ public abstract class MethodMapping : NewInstanceMapping
         MethodParameter? referenceHandlerParameter,
         ITypeSymbol targetType
     )
-        : base(sourceParameter.Type, targetType)
     {
+        TargetType = targetType;
         SourceParameter = sourceParameter;
         IsExtensionMethod = method.IsExtensionMethod;
         ReferenceHandlerParameter = referenceHandlerParameter;
@@ -65,7 +65,17 @@ public abstract class MethodMapping : NewInstanceMapping
 
     protected MethodParameter? ReferenceHandlerParameter { get; private set; }
 
-    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
+    public ITypeSymbol SourceType => SourceParameter.Type;
+
+    public ITypeSymbol TargetType { get; }
+
+    public virtual bool CallableByOtherMappings => true;
+
+    public bool IsSynthetic => false;
+
+    public virtual MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.Default;
+
+    public virtual ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
         Invocation(MethodName, SourceParameter.WithArgument(ctx.Source), ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
 
     public virtual MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)

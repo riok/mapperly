@@ -9,7 +9,7 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public static class StringToEnumMappingBuilder
 {
-    public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static INewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         if (!ctx.IsConversionEnabled(MappingConversionType.StringToEnum))
             return null;

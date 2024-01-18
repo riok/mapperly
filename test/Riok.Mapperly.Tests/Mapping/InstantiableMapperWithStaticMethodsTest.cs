@@ -186,21 +186,13 @@ public class InstantiableMapperWithStaticMethodsTest
     [Fact]
     public void MixedStaticMethodWithPartialInstanceMethod()
     {
-        var source = TestSourceBuilder.CSharp(
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            using Riok.Mapperly.Abstractions;
-
-            record A(int Value);
-            record B(int Value);
-
-            [Mapper]
-            public partial class Mapper
-            {
-                static partial B Map(A source);
-
-                partial B Map2(A source);
-            }
-            """
+            static partial B Map(A source);
+            partial string Map2(int source);
+            """,
+            "record A(int Value);",
+            "record B(int Value);"
         );
 
         TestHelper
@@ -241,27 +233,22 @@ public class InstantiableMapperWithStaticMethodsTest
     [Fact]
     public void MixedStaticMethodWithInstanceMethod()
     {
-        var source = TestSourceBuilder.CSharp(
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            using Riok.Mapperly.Abstractions;
-
-            record A(int Value);
-            record B(int Value);
-
-            [Mapper]
-            public partial class Mapper
-            {
-                static partial B Map(A source);
-
-                private B Map2(A source);
-            }
-            """
+            static partial B Map(A source);
+            private string Map2(int source);
+            """,
+            "record A(int Value);",
+            "record B(int Value);"
         );
 
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.MixingStaticPartialWithInstanceMethod)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.MixingStaticPartialWithInstanceMethod,
+                "Mapper class Mapper contains 'static partial' methods. Use either only instance methods or only static methods."
+            )
             .HaveAssertedAllDiagnostics();
     }
 }

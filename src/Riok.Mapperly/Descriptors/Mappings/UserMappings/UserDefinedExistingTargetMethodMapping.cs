@@ -18,17 +18,23 @@ public class UserDefinedExistingTargetMethodMapping(
     MethodParameter targetParameter,
     MethodParameter? referenceHandlerParameter,
     bool enableReferenceHandling
-) : MethodMapping(method, sourceParameter, referenceHandlerParameter, targetParameter.Type), IUserMapping
+) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetParameter.Type), IUserMapping
 {
     private IExistingTargetMapping? _delegateMapping;
 
     public IMethodSymbol Method { get; } = method;
 
-    public void SetDelegateMapping(IExistingTargetMapping delegateMapping) => _delegateMapping = delegateMapping;
+    /// <summary>
+    /// Always false, since <see cref="CallableByOtherMappings"/> is false
+    /// this can never be the default.
+    /// </summary>
+    public bool? Default => false;
 
     private MethodParameter TargetParameter { get; } = targetParameter;
 
     public override bool CallableByOtherMappings => false;
+
+    public void SetDelegateMapping(IExistingTargetMapping delegateMapping) => _delegateMapping = delegateMapping;
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
         throw new InvalidOperationException($"{nameof(UserDefinedExistingTargetMethodMapping)} does not support {nameof(Build)}");

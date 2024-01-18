@@ -13,12 +13,15 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 public class UserImplementedExistingTargetMethodMapping(
     string? receiver,
     IMethodSymbol method,
+    bool? isDefault,
     MethodParameter sourceParameter,
     MethodParameter targetParameter,
     MethodParameter? referenceHandlerParameter
 ) : ExistingTargetMapping(method.Parameters[0].Type, targetParameter.Type), IUserMapping
 {
     public IMethodSymbol Method { get; } = method;
+
+    public bool? Default { get; } = isDefault;
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {

@@ -10,7 +10,7 @@ public class ArrayForMapping(
     ITypeSymbol targetType,
     INewInstanceMapping elementMapping,
     ITypeSymbol targetArrayElementType
-) : MethodMapping(sourceType, targetType)
+) : NewInstanceMethodMapping(sourceType, targetType)
 {
     private const string TargetVariableName = "target";
     private const string LoopCounterName = "i";

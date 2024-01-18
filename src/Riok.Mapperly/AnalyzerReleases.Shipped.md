@@ -136,3 +136,12 @@ RMG058  | Mapper   | Error    | Multiple default format providers found, only on
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 RMG018  | Mapper   | Disabled | Partial static mapping method in an instance mapper
+
+## Release 3.4
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+RMG059  | Mapper   | Error    | Multiple default user mappings found, only one is allowed
+RMG060  | Mapper   | Info     | Multiple user mappings discovered without specifying an explicit default

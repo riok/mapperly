@@ -15,7 +15,7 @@ public class EnumNameMapping(
     ITypeSymbol target,
     IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> enumMemberMappings,
     EnumFallbackValueMapping fallback
-) : MethodMapping(source, target)
+) : NewInstanceMethodMapping(source, target)
 {
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
