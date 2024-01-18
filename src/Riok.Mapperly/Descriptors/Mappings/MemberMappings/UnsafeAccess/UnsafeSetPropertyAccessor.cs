@@ -40,6 +40,7 @@ public class UnsafeSetPropertyAccessor(IPropertySymbol value, string methodName)
         var attributeList = ctx.SyntaxFactory.UnsafeAccessorAttributeList(UnsafeAccessorType.Method, $"set_{_memberName}");
 
         return PublicStaticExternMethod(
+            ctx,
             PredefinedType(Token(SyntaxKind.VoidKeyword)).AddTrailingSpace(),
             MethodName,
             parameters,

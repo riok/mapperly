@@ -3,6 +3,7 @@
 #nullable enable
 public partial class Mapper
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial void Map(global::System.Collections.Generic.List<global::A>? source, global::System.Collections.Generic.Stack<global::B> target)
     {
         if (source == null)
@@ -14,6 +15,7 @@ public partial class Mapper
         }
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private global::B MapToB(global::A source)
     {
         var target = new global::B();

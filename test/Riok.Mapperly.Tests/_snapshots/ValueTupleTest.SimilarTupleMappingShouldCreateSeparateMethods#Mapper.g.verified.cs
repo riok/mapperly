@@ -3,12 +3,14 @@
 #nullable enable
 public partial class Mapper
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial (string A, string B) Map((int, int) src)
     {
         var target = (A: src.Item1.ToString(), B: src.Item2.ToString());
         return target;
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial (string A, string B) Map((int B, int A) src)
     {
         var target = (A: src.A.ToString(), B: src.B.ToString());

@@ -3,6 +3,7 @@
 #nullable enable
 public partial class Mapper
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial ((int, int D) C, int) Map(((int F, int G), string B) source)
     {
         var target = (C: MapToValueTuple(source.Item1), int.Parse(source.B));
@@ -10,6 +11,7 @@ public partial class Mapper
         return target;
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private (int, int D) MapToValueTuple((int F, int G) source)
     {
         var target = (source.F, D: source.G);

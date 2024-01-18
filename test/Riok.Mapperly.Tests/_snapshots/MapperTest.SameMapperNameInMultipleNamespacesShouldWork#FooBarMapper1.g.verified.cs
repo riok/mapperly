@@ -5,6 +5,7 @@ namespace Test.B
 {
     internal partial class FooBarMapper
     {
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         internal partial string FooToBar(string value)
         {
             return value;

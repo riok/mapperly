@@ -34,6 +34,6 @@ public class UnsafeGetPropertyAccessor(IPropertySymbol result, string methodName
 
         var parameters = ParameterList(CommaSeparatedList(source));
         var attributeList = ctx.SyntaxFactory.UnsafeAccessorAttributeList(UnsafeAccessorType.Method, $"get_{_memberName}");
-        return PublicStaticExternMethod(IdentifierName(_result).AddTrailingSpace(), MethodName, parameters, attributeList);
+        return PublicStaticExternMethod(ctx, IdentifierName(_result).AddTrailingSpace(), MethodName, parameters, attributeList);
     }
 }

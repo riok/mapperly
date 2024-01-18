@@ -3,6 +3,7 @@
 #nullable enable
 public partial class MyMapper
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::E2 Map(global::E1 source)
     {
         return source switch

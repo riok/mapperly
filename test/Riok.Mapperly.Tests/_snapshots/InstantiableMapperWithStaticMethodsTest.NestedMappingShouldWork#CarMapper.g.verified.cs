@@ -3,12 +3,14 @@
 #nullable enable
 public partial class CarMapper
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     static partial global::C MapToC(global::A value)
     {
         var target = new global::C(MapToD(value.Value1));
         return target;
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private static global::D MapToD(global::B source)
     {
         var target = new global::D(source.Value2);

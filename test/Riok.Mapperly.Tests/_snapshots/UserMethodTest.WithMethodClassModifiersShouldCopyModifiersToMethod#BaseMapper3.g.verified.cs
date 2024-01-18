@@ -3,6 +3,7 @@
 #nullable enable
 public partial class BaseMapper3
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public sealed override partial global::B AToB(global::A source)
     {
         var target = new global::B();
@@ -11,6 +12,7 @@ public partial class BaseMapper3
         return target;
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public new partial short IntToShort(int value)
     {
         return (short)value;

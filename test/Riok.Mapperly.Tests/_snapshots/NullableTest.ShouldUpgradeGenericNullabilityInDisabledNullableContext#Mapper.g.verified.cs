@@ -3,11 +3,13 @@
 #nullable enable
 public partial class Mapper
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::System.Collections.Generic.IReadOnlyCollection<global::B?>? Map(global::System.Collections.Generic.IEnumerable<global::A?>? source)
     {
         return source == null ? default : global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(source, x => MapToB(x)));
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private global::B? MapToB(global::A? source)
     {
         if (source == null)

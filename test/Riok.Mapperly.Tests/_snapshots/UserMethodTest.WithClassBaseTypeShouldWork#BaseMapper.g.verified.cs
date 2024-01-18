@@ -3,6 +3,7 @@
 #nullable enable
 public partial class BaseMapper
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     protected partial short MyIntToShortMapping(int value)
     {
         return (short)value;

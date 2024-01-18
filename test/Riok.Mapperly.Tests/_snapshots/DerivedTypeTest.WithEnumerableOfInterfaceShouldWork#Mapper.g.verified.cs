@@ -3,11 +3,13 @@
 #nullable enable
 public partial class Mapper
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::System.Collections.Generic.IEnumerable<global::B> Map(global::System.Collections.Generic.IEnumerable<global::A> source)
     {
         return global::System.Linq.Enumerable.Select(source, x => Map(x));
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::B Map(global::A src)
     {
         return src switch
@@ -18,6 +20,7 @@ public partial class Mapper
         };
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private global::BImpl1 MapToBImpl1(global::AImpl1 source)
     {
         var target = new global::BImpl1();
@@ -26,6 +29,7 @@ public partial class Mapper
         return target;
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private global::BImpl2 MapToBImpl2(global::AImpl2 source)
     {
         var target = new global::BImpl2();

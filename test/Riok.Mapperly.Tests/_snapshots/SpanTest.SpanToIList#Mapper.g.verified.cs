@@ -3,11 +3,13 @@
 #nullable enable
 public partial class Mapper
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::System.Collections.Generic.IList<int> Map(global::System.Span<int> source)
     {
         return MapToList(source);
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private global::System.Collections.Generic.List<int> MapToList(global::System.Span<int> source)
     {
         var target = new global::System.Collections.Generic.List<int>();
