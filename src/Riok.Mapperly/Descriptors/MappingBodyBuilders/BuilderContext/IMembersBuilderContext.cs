@@ -21,7 +21,7 @@ public interface IMembersBuilderContext<out T>
 
     Dictionary<string, IMappableMember> TargetMembers { get; }
 
-    Dictionary<string, List<PropertyMappingConfiguration>> MemberConfigsByRootTargetName { get; }
+    Dictionary<string, List<MemberMappingConfiguration>> MemberConfigsByRootTargetName { get; }
 
     void AddDiagnostics();
 

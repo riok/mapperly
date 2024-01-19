@@ -23,7 +23,7 @@ public static class ObjectMemberMappingBodyBuilder
 
     public static void BuildMappingBody(IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx)
     {
-        var ignoreCase = ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
+        var ignoreCase = ctx.BuilderContext.Configuration.Mapper.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
 
         foreach (var targetMember in ctx.TargetMembers.Values)
         {
@@ -56,7 +56,7 @@ public static class ObjectMemberMappingBodyBuilder
 
             if (
                 targetMember.CanSet
-                && ctx.BuilderContext.Configuration.Properties.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target)
+                && ctx.BuilderContext.Configuration.Members.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target)
             )
             {
                 ctx.BuilderContext.ReportDiagnostic(
@@ -73,7 +73,7 @@ public static class ObjectMemberMappingBodyBuilder
 
     private static void BuildMemberAssignmentMapping(
         IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
-        PropertyMappingConfiguration config
+        MemberMappingConfiguration config
     )
     {
         if (!ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.TargetType, config.Target.Path, out var targetMemberPath))
@@ -265,7 +265,7 @@ public static class ObjectMemberMappingBodyBuilder
         IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
         MemberPath sourceMemberPath,
         MemberPath targetMemberPath,
-        PropertyMappingConfiguration? memberConfig = null
+        MemberMappingConfiguration? memberConfig = null
     )
     {
         if (TryAddExistingTargetMapping(ctx, sourceMemberPath, targetMemberPath))
@@ -294,7 +294,7 @@ public static class ObjectMemberMappingBodyBuilder
         // or the mapping is synthetic and the target accepts nulls
         // access the source in a null save matter (via ?.) but no other special handling required.
         if (
-            ctx.BuilderContext.MapperConfiguration.AllowNullPropertyAssignment
+            ctx.BuilderContext.Configuration.Mapper.AllowNullPropertyAssignment
             && (delegateMapping.SourceType.IsNullable() || delegateMapping.IsSynthetic && targetMemberPath.Member.IsNullable)
         )
         {
@@ -314,7 +314,7 @@ public static class ObjectMemberMappingBodyBuilder
         IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
         MemberPath sourceMemberPath,
         MemberPath targetMemberPath,
-        PropertyMappingConfiguration? memberConfig
+        MemberMappingConfiguration? memberConfig
     )
     {
         // nullability is handled inside the member mapping

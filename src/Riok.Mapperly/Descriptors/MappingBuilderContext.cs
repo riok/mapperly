@@ -50,8 +50,6 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         }
     }
 
-    public MappingConfiguration Configuration { get; }
-
     public TypeMappingKey MappingKey { get; }
 
     public ITypeSymbol Source => MappingKey.Source;
@@ -287,7 +285,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         base.ReportDiagnostic(descriptor, null, messageArgs);
 
     public NullFallbackValue GetNullFallbackValue(ITypeSymbol? targetType = null) =>
-        GetNullFallbackValue(targetType ?? Target, MapperConfiguration.ThrowOnMappingNullMismatch);
+        GetNullFallbackValue(targetType ?? Target, Configuration.Mapper.ThrowOnMappingNullMismatch);
 
     public (FormatProvider? formatProvider, bool isDefault) GetFormatProvider(string? formatProviderName)
     {

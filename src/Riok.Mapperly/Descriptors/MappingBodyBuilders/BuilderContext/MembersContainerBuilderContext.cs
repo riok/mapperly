@@ -26,7 +26,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
 
         // set target member to null if null assignments are allowed
         // and the source is null
-        if (BuilderContext.MapperConfiguration.AllowNullPropertyAssignment && memberMapping.TargetPath.Member.Type.IsNullable())
+        if (BuilderContext.Configuration.Mapper.AllowNullPropertyAssignment && memberMapping.TargetPath.Member.Type.IsNullable())
         {
             container.AddNullMemberAssignment(SetterMemberPath.Build(BuilderContext, memberMapping.TargetPath));
         }
@@ -95,7 +95,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         mapping = new MemberNullDelegateAssignmentMapping(
             GetterMemberPath.Build(BuilderContext, nullConditionSourcePath),
             parentMapping,
-            BuilderContext.MapperConfiguration.ThrowOnPropertyMappingNullMismatch,
+            BuilderContext.Configuration.Mapper.ThrowOnPropertyMappingNullMismatch,
             needsNullSafeAccess
         );
         _nullDelegateMappings[nullConditionSourcePath] = mapping;

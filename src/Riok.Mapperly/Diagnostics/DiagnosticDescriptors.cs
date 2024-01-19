@@ -545,4 +545,31 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Error,
         true
     );
+
+    public static readonly DiagnosticDescriptor EnumConfigurationOnNonEnumMapping = new DiagnosticDescriptor(
+        "RMG063",
+        "Cannot configure an enum mapping on a non-enum mapping",
+        "Cannot configure an enum mapping on a non-enum mapping",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor MemberConfigurationOnNonMemberMapping = new DiagnosticDescriptor(
+        "RMG064",
+        "Cannot configure an object mapping on a non-object mapping",
+        "Cannot configure an object mapping on a non-object mapping",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor MemberConfigurationOnQueryableProjectionMapping = new DiagnosticDescriptor(
+        "RMG065",
+        "Cannot configure an object mapping on a queryable projection mapping, apply the configurations to an object mapping method instead",
+        "Cannot configure an object mapping on a queryable projection mapping, apply the configurations to an object mapping method instead",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        true
+    );
 }

@@ -13,7 +13,7 @@ public static class ExplicitCastMappingBuilder
         if (!ctx.IsConversionEnabled(MappingConversionType.ExplicitCast))
             return null;
 
-        if (ctx.MapperConfiguration.UseDeepCloning && !ctx.Source.IsImmutable() && !ctx.Target.IsImmutable())
+        if (ctx.Configuration.Mapper.UseDeepCloning && !ctx.Source.IsImmutable() && !ctx.Target.IsImmutable())
             return null;
 
         // ClassifyConversion does not check if tuple field member names are the same

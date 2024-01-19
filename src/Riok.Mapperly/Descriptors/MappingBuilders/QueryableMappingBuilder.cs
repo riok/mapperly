@@ -27,7 +27,7 @@ public static class QueryableMappingBuilder
         if (mapping == null)
             return null;
 
-        if (ctx.MapperConfiguration.UseReferenceHandling)
+        if (ctx.Configuration.Mapper.UseReferenceHandling)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingsDoNotSupportReferenceHandling);
         }

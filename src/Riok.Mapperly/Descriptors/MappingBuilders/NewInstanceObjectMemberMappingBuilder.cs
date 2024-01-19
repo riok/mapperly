@@ -21,7 +21,7 @@ public static class NewInstanceObjectMemberMappingBuilder
                 ctx.Source,
                 ctx.Target.NonNullable(),
                 objectFactory,
-                ctx.MapperConfiguration.UseReferenceHandling
+                ctx.Configuration.Mapper.UseReferenceHandling
             );
 
         if (
@@ -52,7 +52,7 @@ public static class NewInstanceObjectMemberMappingBuilder
         // and can only map to properties via object initializers.
         return ctx.IsExpression
             ? new NewInstanceObjectMemberMapping(ctx.Source, ctx.Target.NonNullable())
-            : new NewInstanceObjectMemberMethodMapping(ctx.Source, ctx.Target.NonNullable(), ctx.MapperConfiguration.UseReferenceHandling);
+            : new NewInstanceObjectMemberMethodMapping(ctx.Source, ctx.Target.NonNullable(), ctx.Configuration.Mapper.UseReferenceHandling);
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)

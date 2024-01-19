@@ -2,10 +2,10 @@ using Riok.Mapperly.Abstractions;
 
 namespace Riok.Mapperly.Configuration;
 
-public record PropertiesMappingConfiguration(
+public record MembersMappingConfiguration(
     IReadOnlyCollection<string> IgnoredSources,
     IReadOnlyCollection<string> IgnoredTargets,
-    IReadOnlyCollection<PropertyMappingConfiguration> ExplicitMappings,
+    IReadOnlyCollection<MemberMappingConfiguration> ExplicitMappings,
     IgnoreObsoleteMembersStrategy IgnoreObsoleteMembersStrategy,
     RequiredMappingStrategy RequiredMappingStrategy
 );

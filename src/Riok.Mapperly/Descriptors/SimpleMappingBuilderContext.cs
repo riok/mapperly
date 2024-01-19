@@ -43,7 +43,7 @@ public class SimpleMappingBuilderContext(
 
     public Compilation Compilation => _compilationContext.Compilation;
 
-    public MapperAttribute MapperConfiguration => _configurationReader.Mapper;
+    public MappingConfiguration Configuration { get; protected init; } = configurationReader.MapperConfiguration;
 
     public WellKnownTypes Types => _compilationContext.Types;
 
@@ -58,10 +58,11 @@ public class SimpleMappingBuilderContext(
     protected ExistingTargetMappingBuilder ExistingTargetMappingBuilder { get; } = existingTargetMappingBuilder;
 
     public virtual bool IsConversionEnabled(MappingConversionType conversionType) =>
-        MapperConfiguration.EnabledConversions.HasFlag(conversionType);
+        Configuration.Mapper.EnabledConversions.HasFlag(conversionType);
 
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? symbolLocation, params object[] messageArgs) =>
         _diagnostics.ReportDiagnostic(descriptor, symbolLocation?.GetSyntaxLocation() ?? _diagnosticLocation, messageArgs);
 
-    protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef) => _configurationReader.BuildFor(configRef);
+    protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef) =>
+        _configurationReader.BuildFor(configRef, _diagnostics);
 }
