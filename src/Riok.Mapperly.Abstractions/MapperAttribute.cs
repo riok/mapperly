@@ -99,4 +99,11 @@ public class MapperAttribute : Attribute
     /// Determines the access level of members that Mapperly will map.
     /// </summary>
     public MemberVisibility IncludedMembers { get; set; } = MemberVisibility.AllAccessible;
+
+    /// <summary>
+    /// Controls the priority of constructors used in mapping.
+    /// When <c>true</c>, a parameterless constructor is prioritized over constructors with parameters.
+    /// When <c>false</c>, accessible constructors are ordered in descending order by their parameter count.
+    /// </summary>
+    public bool PreferParameterlessConstructors { get; set; } = true;
 }

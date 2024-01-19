@@ -17,7 +17,8 @@ public record TestSourceBuilderOptions(
     IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy = null,
     RequiredMappingStrategy? RequiredMappingStrategy = null,
     MemberVisibility? IncludedMembers = null,
-    bool Static = false
+    bool Static = false,
+    bool PreferParameterlessConstructors = true
 )
 {
     public const string DefaultMapperClassName = "Mapper";
@@ -26,6 +27,8 @@ public record TestSourceBuilderOptions(
     public static readonly TestSourceBuilderOptions AsStatic = new(Static: true);
     public static readonly TestSourceBuilderOptions WithDeepCloning = new(UseDeepCloning: true);
     public static readonly TestSourceBuilderOptions WithReferenceHandling = new(UseReferenceHandling: true);
+
+    public static readonly TestSourceBuilderOptions PreferParameterizedConstructors = new(PreferParameterlessConstructors: false);
 
     public static TestSourceBuilderOptions WithIgnoreObsolete(IgnoreObsoleteMembersStrategy ignoreObsoleteStrategy) =>
         new(IgnoreObsoleteMembersStrategy: ignoreObsoleteStrategy);

@@ -22,6 +22,7 @@ public class MapperConfigurationBuilderTest
             UseReferenceHandling = false,
             IgnoreObsoleteMembersStrategy = IgnoreObsoleteMembersStrategy.Target,
             RequiredMappingStrategy = RequiredMappingStrategy.Target,
+            PreferParameterlessConstructors = false,
         };
 
         var mapper = MapperConfigurationMerger.Merge(mapperConfiguration, defaultMapperConfiguration);
@@ -36,6 +37,7 @@ public class MapperConfigurationBuilderTest
         mapper.UseReferenceHandling.Should().BeTrue();
         mapper.IgnoreObsoleteMembersStrategy.Should().Be(IgnoreObsoleteMembersStrategy.Source);
         mapper.RequiredMappingStrategy.Should().Be(RequiredMappingStrategy.Source);
+        mapper.PreferParameterlessConstructors.Should().BeTrue();
     }
 
     [Fact]
@@ -54,6 +56,8 @@ public class MapperConfigurationBuilderTest
         mapper.UseReferenceHandling.Should().BeTrue();
         mapper.IgnoreObsoleteMembersStrategy.Should().Be(IgnoreObsoleteMembersStrategy.Source);
         mapper.RequiredMappingStrategy.Should().Be(RequiredMappingStrategy.Source);
+        mapper.UseReferenceHandling.Should().BeTrue();
+        mapper.PreferParameterlessConstructors.Should().BeTrue();
     }
 
     [Fact]
@@ -88,6 +92,7 @@ public class MapperConfigurationBuilderTest
             UseReferenceHandling = true,
             IgnoreObsoleteMembersStrategy = IgnoreObsoleteMembersStrategy.Source,
             RequiredMappingStrategy = RequiredMappingStrategy.Source,
+            PreferParameterlessConstructors = true,
         };
     }
 }

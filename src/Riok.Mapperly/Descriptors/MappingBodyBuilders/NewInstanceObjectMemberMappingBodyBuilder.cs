@@ -202,15 +202,23 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         }
 
         // attributed ctor is prio 1
-        // parameterless ctor is prio 2
-        // then by descending parameter count
+        // if preferParameterlessConstructors is true (default) :parameterless ctor is prio 2 then by descending parameter count
+        // the reverse if preferParameterlessConstructors is false , descending parameter count is prio2 then parameterless ctor
         // ctors annotated with [Obsolete] are considered last unless they have a MapperConstructor attribute set
         var ctorCandidates = namedTargetType
             .InstanceConstructors.Where(ctor => ctx.BuilderContext.SymbolAccessor.IsDirectlyAccessible(ctor))
             .OrderByDescending(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
-            .ThenBy(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x))
-            .ThenByDescending(x => x.Parameters.Length == 0)
-            .ThenByDescending(x => x.Parameters.Length);
+            .ThenBy(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x));
+
+        if (ctx.BuilderContext.MapperConfiguration.PreferParameterlessConstructors)
+        {
+            ctorCandidates = ctorCandidates.ThenByDescending(x => x.Parameters.Length == 0).ThenByDescending(x => x.Parameters.Length);
+        }
+        else
+        {
+            ctorCandidates = ctorCandidates.ThenByDescending(x => x.Parameters.Length).ThenByDescending(x => x.Parameters.Length == 0);
+        }
+
         foreach (var ctorCandidate in ctorCandidates)
         {
             if (!TryBuildConstructorMapping(ctx, ctorCandidate, out var mappedTargetMemberNames, out var constructorParameterMappings))
