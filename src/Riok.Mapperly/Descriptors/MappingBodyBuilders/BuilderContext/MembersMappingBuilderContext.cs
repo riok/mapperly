@@ -124,9 +124,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
     private Dictionary<string, IMappableMember> GetTargetMembers()
     {
-        return BuilderContext
-            .SymbolAccessor.GetAllAccessibleMappableMembers(Mapping.TargetType)
-            .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
+        return BuilderContext.SymbolAccessor.GetAllAccessibleMappableMembers(Mapping.TargetType).ToDictionary(x => x.Name);
     }
 
     private Dictionary<string, List<PropertyMappingConfiguration>> GetMemberConfigurations()

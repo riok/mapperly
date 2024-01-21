@@ -428,6 +428,19 @@ public class ObjectPropertyTest
     }
 
     [Fact]
+    public Task PropertiesWithCaseInsensitiveEqualNamesShouldNotFail()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public int Value { get; set; } }",
+            "class B { public int value { get; set; } public int Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public void ShouldIgnoreStaticConstructorAndDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(

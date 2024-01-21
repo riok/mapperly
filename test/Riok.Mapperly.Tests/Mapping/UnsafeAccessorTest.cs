@@ -33,6 +33,19 @@ public class UnsafeAccessorTest
     }
 
     [Fact]
+    public Task PrivatePropertyWithBackingField()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "class A { private int Value { get; set; } }",
+            "class B { private int value; private int Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task PrivateNestedProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

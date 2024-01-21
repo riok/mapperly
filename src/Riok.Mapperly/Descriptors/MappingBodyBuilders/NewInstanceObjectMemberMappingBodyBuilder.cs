@@ -235,7 +235,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 continue;
             }
 
-            ctx.TargetMembers.RemoveRange(mappedTargetMemberNames);
+            ctx.TargetMembers.RemoveRange(ctx.TargetMembers.Keys.Intersect(mappedTargetMemberNames, StringComparer.OrdinalIgnoreCase));
             foreach (var constructorParameterMapping in constructorParameterMappings)
             {
                 ctx.AddConstructorParameterMapping(constructorParameterMapping);
