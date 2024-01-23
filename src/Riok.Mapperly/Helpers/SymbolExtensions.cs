@@ -122,8 +122,8 @@ internal static class SymbolExtensions
             return true;
         }
 
-        typedInterface = t.AllInterfaces.FirstOrDefault(
-            x => x.IsGenericType && SymbolEqualityComparer.Default.Equals(x.OriginalDefinition, genericInterfaceSymbol)
+        typedInterface = t.AllInterfaces.FirstOrDefault(x =>
+            x.IsGenericType && SymbolEqualityComparer.Default.Equals(x.OriginalDefinition, genericInterfaceSymbol)
         );
 
         if (typedInterface == null)

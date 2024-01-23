@@ -222,10 +222,8 @@ public static class EnumMappingBuilder
             );
         }
 
-        var missingTargetMembers = targetMembers.Where(
-            field =>
-                !mappedTargetMembers.Contains(field)
-                && ctx.Configuration.Enum.FallbackValue?.ConstantValue?.Equals(field.ConstantValue) != true
+        var missingTargetMembers = targetMembers.Where(field =>
+            !mappedTargetMembers.Contains(field) && ctx.Configuration.Enum.FallbackValue?.ConstantValue?.Equals(field.ConstantValue) != true
         );
         foreach (var member in missingTargetMembers)
         {

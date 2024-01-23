@@ -317,10 +317,10 @@ public class ObjectPropertyInitPropertyTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                [MapProperty("StringValue", "StringValue")]
-                [MapperIgnoreTarget("StringValue")]
-                partial B Map(A source);
-                """,
+            [MapProperty("StringValue", "StringValue")]
+            [MapperIgnoreTarget("StringValue")]
+            partial B Map(A source);
+            """,
             "A",
             "B",
             "class A { public string StringValue { get; init; } public int IntValue { get; set; } }",
@@ -352,10 +352,10 @@ public class ObjectPropertyInitPropertyTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                [MapProperty("StringValue", "StringValue")]
-                [MapperIgnoreTarget("StringValue")]
-                partial B Map(A source);
-                """,
+            [MapProperty("StringValue", "StringValue")]
+            [MapperIgnoreTarget("StringValue")]
+            partial B Map(A source);
+            """,
             "A",
             "B",
             "class A { public string StringValue { get; init; } public int IntValue { get; set; } }",

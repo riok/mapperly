@@ -52,13 +52,12 @@ internal static class SyntaxProvider
     {
         return symbol
             .GetAttributes()
-            .Any(
-                x =>
-                    string.Equals(
-                        x.AttributeClass?.ToDisplayString(_fullyQualifiedFormatWithoutGlobal),
-                        attributeName,
-                        StringComparison.Ordinal
-                    )
+            .Any(x =>
+                string.Equals(
+                    x.AttributeClass?.ToDisplayString(_fullyQualifiedFormatWithoutGlobal),
+                    attributeName,
+                    StringComparison.Ordinal
+                )
             );
     }
 }

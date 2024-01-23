@@ -13,14 +13,13 @@ internal static class ExternalMappingsExtractor
     {
         var staticExternalMappers = ctx.AttributeAccessor.Access<UseStaticMapperAttribute, UseStaticMapperConfiguration>(mapperSymbol)
             .Concat(ctx.AttributeAccessor.Access<UseStaticMapperAttribute<object>, UseStaticMapperConfiguration>(mapperSymbol))
-            .SelectMany(
-                x =>
-                    UserMethodMappingExtractor.ExtractUserImplementedMappings(
-                        ctx,
-                        x.MapperType,
-                        x.MapperType.FullyQualifiedIdentifierName(),
-                        true
-                    )
+            .SelectMany(x =>
+                UserMethodMappingExtractor.ExtractUserImplementedMappings(
+                    ctx,
+                    x.MapperType,
+                    x.MapperType.FullyQualifiedIdentifierName(),
+                    true
+                )
             );
 
         var externalInstanceMappers = ctx.SymbolAccessor.GetAllMembers(mapperSymbol)

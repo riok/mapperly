@@ -37,9 +37,9 @@ public class UnsafeAccessorTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                [MapProperty("nested.value", "value")]
-                partial B Map(A source);
-                """,
+            [MapProperty("nested.value", "value")]
+            partial B Map(A source);
+            """,
             TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
             "class A { private C nested { get; set; } }",
             "class B { private int value { get; set; } }",
@@ -54,8 +54,8 @@ public class UnsafeAccessorTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial void Map(A source, B dest);
-                """,
+            partial void Map(A source, B dest);
+            """,
             TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
             "class A { private int value { get; set; } }",
             "class B { private int value { get; set; } }"
@@ -69,8 +69,8 @@ public class UnsafeAccessorTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial void Map(A source, B dest);
-                """,
+            partial void Map(A source, B dest);
+            """,
             TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
             "class A { private List<int> value { get; } }",
             "class B { private List<int> value { get;} }"
@@ -84,9 +84,9 @@ public class UnsafeAccessorTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                [MapProperty("nested.value", "value")]
-                partial B Map(A source);
-                """,
+            [MapProperty("nested.value", "value")]
+            partial B Map(A source);
+            """,
             TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
             "class A { private C? nested { get; set; } }",
             "class B { private int value { get; set; } }",
@@ -101,9 +101,9 @@ public class UnsafeAccessorTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                [MapProperty("nested.value", "nested.value")]
-                partial B Map(A source);
-                """,
+            [MapProperty("nested.value", "nested.value")]
+            partial B Map(A source);
+            """,
             TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
             "class A { private C nested { get; set; } }",
             "class B { private D nested { get; set; } }",
@@ -119,10 +119,10 @@ public class UnsafeAccessorTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                [MapProperty("MyValueId", "Value.Id")]
-                [MapProperty("MyValueId2", "Value.Id2")]
-                partial B Map(A source);
-                """,
+            [MapProperty("MyValueId", "Value.Id")]
+            [MapProperty("MyValueId2", "Value.Id2")]
+            partial B Map(A source);
+            """,
             TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
             "class A { public string MyValueId { get; set; } public string MyValueId2 { get; set; } }",
             "class B { private C? Value { get; set; } }",
@@ -199,10 +199,10 @@ public class UnsafeAccessorTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                [MapProperty("MyValueId", "Value.Id")]
-                [MapProperty("MyValueId2", "Value.Id2")]
-                partial B Map(A source);
-                """,
+            [MapProperty("MyValueId", "Value.Id")]
+            [MapProperty("MyValueId2", "Value.Id2")]
+            partial B Map(A source);
+            """,
             TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
             "class A { public string MyValueId { get; set; } public string MyValueId2 { get; set; } }",
             "class B { private C? Value }",
@@ -352,10 +352,10 @@ public class UnsafeAccessorTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                [MapperIgnoreSource("_value1")]
-                [MapperIgnoreTarget("_value2")]
-                partial B Map(A source);
-                """,
+            [MapperIgnoreSource("_value1")]
+            [MapperIgnoreTarget("_value2")]
+            partial B Map(A source);
+            """,
             TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
             "class A { private int _value1 { get; set; } }",
             "class B { private int _value2 { get; set; } }"
@@ -377,8 +377,8 @@ public class UnsafeAccessorTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial B Map(A source);
-                """,
+            partial B Map(A source);
+            """,
             TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.Public),
             "class A { public int PublicValue { get; set; } private int _privateValue { get; set; } internal int InternalValue { get; set; } }",
             "class B { public int PublicValue { get; set; } private int _privateValue { get; set; } internal int InternalValue { get; set; } }"
@@ -401,8 +401,8 @@ public class UnsafeAccessorTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial B Map(A source);
-                """,
+            partial B Map(A source);
+            """,
             TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All & ~MemberVisibility.Public),
             "class A { public int PublicValue { get; set; } private int _privateValue { get; set; } internal int InternalValue { get; set; } }",
             "class B { public int PublicValue { get; set; } private int _privateValue { get; set; } internal int InternalValue { get; set; } }"
