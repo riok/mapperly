@@ -1,9 +1,12 @@
-﻿namespace Riok.Mapperly.Abstractions;
+﻿using System.Diagnostics;
+
+namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
 /// Defines the maximum recursion depth that an IQueryable mapping will use.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
+[Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
 public sealed class MapperMaxRecursionDepthAttribute : Attribute
 {
     /// <summary>
