@@ -3,6 +3,7 @@
 #nullable enable
 public partial class BaseMapper2
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public override partial global::B AToB(global::A source)
     {
         var target = new global::B();

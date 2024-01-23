@@ -3,6 +3,7 @@
 #nullable enable
 public partial class Mapper
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial ((int, int), int) Map(((int, int), string) source)
     {
         var target = (source.Item1, int.Parse(source.Item2));

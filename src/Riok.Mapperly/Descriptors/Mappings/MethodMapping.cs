@@ -84,6 +84,7 @@ public abstract class MethodMapping : NewInstanceMapping
         return MethodDeclaration(returnType.AddTrailingSpace(), Identifier(MethodName))
             .WithModifiers(TokenList(BuildModifiers(ctx.IsStatic)))
             .WithParameterList(parameters)
+            .WithAttributeLists(ctx.SyntaxFactory.GeneratedCodeAttributeList())
             .WithBody(ctx.SyntaxFactory.Block(BuildBody(typeMappingBuildContext)));
     }
 

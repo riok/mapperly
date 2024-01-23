@@ -38,6 +38,6 @@ public class UnsafeFieldAccessor(IFieldSymbol value, string methodName) : IUnsaf
         var returnType = RefType(IdentifierName(_result).AddTrailingSpace())
             .WithRefKeyword(Token(TriviaList(), SyntaxKind.RefKeyword, TriviaList(Space)));
 
-        return PublicStaticExternMethod(returnType, MethodName, parameters, attributeList);
+        return PublicStaticExternMethod(ctx, returnType, MethodName, parameters, attributeList);
     }
 }

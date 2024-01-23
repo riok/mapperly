@@ -3,6 +3,7 @@
 #nullable enable
 public partial class Mapper
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial TTarget Map<TSource, TTarget>(TSource source)
     {
         var refHandler = new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler();
@@ -15,16 +16,19 @@ public partial class Mapper
         };
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::B MapToB(global::A source)
     {
         return MapToB1(source, new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler());
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::D MapToD(global::C source)
     {
         return MapToD1(source, new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler());
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private global::B MapToB1(global::A source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
     {
         if (refHandler.TryGetReference<global::A, global::B>(source, out var existingTargetReference))
@@ -35,6 +39,7 @@ public partial class Mapper
         return target;
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private global::D MapToD1(global::C source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
     {
         if (refHandler.TryGetReference<global::C, global::D>(source, out var existingTargetReference))

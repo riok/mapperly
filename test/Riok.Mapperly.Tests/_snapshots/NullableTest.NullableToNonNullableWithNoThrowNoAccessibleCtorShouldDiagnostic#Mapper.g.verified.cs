@@ -3,6 +3,7 @@
 #nullable enable
 public partial class Mapper
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::B Map(string? source)
     {
         return source == null ? throw new System.ArgumentNullException(nameof(source)) : global::B.Parse(source);

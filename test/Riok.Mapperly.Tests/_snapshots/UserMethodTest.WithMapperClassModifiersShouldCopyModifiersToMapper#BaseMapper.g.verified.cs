@@ -3,6 +3,7 @@
 #nullable enable
 internal sealed abstract partial class BaseMapper
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::B AToB(global::A source)
     {
         var target = new global::B();
@@ -11,6 +12,7 @@ internal sealed abstract partial class BaseMapper
         return target;
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     protected partial short IntToShort(int value)
     {
         return (short)value;

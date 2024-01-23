@@ -3,6 +3,7 @@
 #nullable enable
 public partial class Mapper
 {
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial object? Map(object? source, global::System.Type targetType)
     {
         return source switch
@@ -16,6 +17,7 @@ public partial class Mapper
         };
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::B MapToB(global::A source)
     {
         var target = new global::B();
@@ -23,6 +25,7 @@ public partial class Mapper
         return target;
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::D? MapToD(global::C? source)
     {
         if (source == null)
@@ -32,11 +35,13 @@ public partial class Mapper
         return target;
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial int? MapStringToInt(string? source)
     {
         return source == null ? default(int?) : int.Parse(source);
     }
 
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial int? MapIntToInt(int source)
     {
         return (int?)source;

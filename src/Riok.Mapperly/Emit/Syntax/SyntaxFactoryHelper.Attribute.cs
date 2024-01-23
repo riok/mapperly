@@ -13,6 +13,15 @@ public partial struct SyntaxFactoryHelper
 
     private static readonly IdentifierNameSyntax _unsafeAccessorKindName = IdentifierName(UnsafeAccessorKindName);
 
+    public SyntaxList<AttributeListSyntax> AttributeList(string name, params ExpressionSyntax[] arguments)
+    {
+        var args = CommaSeparatedList(arguments.Select(AttributeArgument));
+
+        var attribute = Attribute(IdentifierName(name)).WithArgumentList(AttributeArgumentList(args));
+
+        return SingletonList(SyntaxFactory.AttributeList(SingletonSeparatedList(attribute)).AddTrailingLineFeed(Indentation));
+    }
+
     public SyntaxList<AttributeListSyntax> UnsafeAccessorAttributeList(UnsafeAccessorType type, string name)
     {
         var unsafeAccessType = type switch
@@ -21,19 +30,12 @@ public partial struct SyntaxFactoryHelper
             UnsafeAccessorType.Method => "Method",
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, $"Unknown {nameof(UnsafeAccessorType)}"),
         };
-        var arguments = CommaSeparatedList(
-            AttributeArgument(
-                MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, _unsafeAccessorKindName, IdentifierName(unsafeAccessType))
-            ),
-            AttributeArgument(
-                Assignment(IdentifierName(UnsafeAccessorNameArgument), LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(name)))
-            )
+
+        return AttributeList(
+            UnsafeAccessorName,
+            MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, _unsafeAccessorKindName, IdentifierName(unsafeAccessType)),
+            Assignment(IdentifierName(UnsafeAccessorNameArgument), StringLiteral(name))
         );
-
-        var attribute = Attribute(IdentifierName(UnsafeAccessorName))
-            .WithArgumentList(AttributeArgumentList(CommaSeparatedList(arguments)));
-
-        return SingletonList(AttributeList(SingletonSeparatedList(attribute)).AddTrailingLineFeed(Indentation));
     }
 
     public enum UnsafeAccessorType

@@ -8,6 +8,7 @@ namespace Riok.Mapperly.Emit.Syntax;
 public partial struct SyntaxFactoryHelper
 {
     public static MethodDeclarationSyntax PublicStaticExternMethod(
+        SourceEmitterContext ctx,
         TypeSyntax returnType,
         string methodName,
         ParameterListSyntax parameterList,
@@ -23,7 +24,7 @@ public partial struct SyntaxFactoryHelper
                 )
             )
             .WithParameterList(parameterList)
-            .WithAttributeLists(attributeList)
+            .WithAttributeLists(ctx.SyntaxFactory.GeneratedCodeAttributeList().AddRange(attributeList))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
     }
 }

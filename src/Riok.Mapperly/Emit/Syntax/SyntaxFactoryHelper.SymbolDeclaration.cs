@@ -17,6 +17,7 @@ public partial struct SyntaxFactoryHelper
 
     public ClassDeclarationSyntax Class(string name, SyntaxTokenList modifiers, SyntaxList<MemberDeclarationSyntax> members)
     {
+        var isPartial = modifiers.Any(kind => kind.IsKind(SyntaxKind.PartialKeyword));
         return ClassDeclaration(Identifier(name))
             .WithModifiers(modifiers)
             .WithMembers(members)
@@ -24,6 +25,7 @@ public partial struct SyntaxFactoryHelper
             .WithKeyword(TrailingSpacedToken(SyntaxKind.ClassKeyword))
             .WithOpenBraceToken(LeadingLineFeedToken(SyntaxKind.OpenBraceToken))
             .WithCloseBraceToken(LeadingLineFeedToken(SyntaxKind.CloseBraceToken))
+            .WithAttributeLists(isPartial ? new SyntaxList<AttributeListSyntax>() : GeneratedCodeAttributeList())
             .AddLeadingLineFeed(Indentation);
     }
 }
