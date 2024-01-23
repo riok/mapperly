@@ -15,14 +15,13 @@ public static class RuntimeTargetTypeMappingBodyBuilder
         // therefore set source type always to nun-nullable
         // as non-nullables are also assignable to nullables.
         var mappings = GetUserMappingCandidates(ctx)
-            .Where(
-                x =>
-                    DoesTypesSatisfySubstitutionPrinciples(mapping, ctx.SymbolAccessor, x.SourceType.NonNullable(), x.TargetType)
-                    && mapping.TypeParameters.DoesTypesSatisfyTypeParameterConstraints(
-                        ctx.SymbolAccessor,
-                        x.SourceType.NonNullable(),
-                        x.TargetType
-                    )
+            .Where(x =>
+                DoesTypesSatisfySubstitutionPrinciples(mapping, ctx.SymbolAccessor, x.SourceType.NonNullable(), x.TargetType)
+                && mapping.TypeParameters.DoesTypesSatisfyTypeParameterConstraints(
+                    ctx.SymbolAccessor,
+                    x.SourceType.NonNullable(),
+                    x.TargetType
+                )
             );
 
         BuildMappingBody(ctx, mapping, mappings);
@@ -43,10 +42,9 @@ public static class RuntimeTargetTypeMappingBodyBuilder
         // therefore set source type always to nun-nullable
         // as non-nullables are also assignable to nullables.
         var mappings = GetUserMappingCandidates(ctx)
-            .Where(
-                x =>
-                    ctx.SymbolAccessor.HasImplicitConversion(x.SourceType.NonNullable(), mapping.SourceType)
-                    && ctx.SymbolAccessor.HasImplicitConversion(x.TargetType, mapping.TargetType)
+            .Where(x =>
+                ctx.SymbolAccessor.HasImplicitConversion(x.SourceType.NonNullable(), mapping.SourceType)
+                && ctx.SymbolAccessor.HasImplicitConversion(x.TargetType, mapping.TargetType)
             );
 
         BuildMappingBody(ctx, mapping, mappings);

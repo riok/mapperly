@@ -33,10 +33,9 @@ public static class EnsureCapacityBuilder
         var nonEnumeratedCountMethod = ctx.Types.Get(typeof(Enumerable))
             .GetMembers(TryGetNonEnumeratedCountMethodName)
             .OfType<IMethodSymbol>()
-            .FirstOrDefault(
-                x =>
-                    x.ReturnType.SpecialType == SpecialType.System_Boolean
-                    && x is { IsStatic: true, Parameters.Length: 2, IsGenericMethod: true }
+            .FirstOrDefault(x =>
+                x.ReturnType.SpecialType == SpecialType.System_Boolean
+                && x is { IsStatic: true, Parameters.Length: 2, IsGenericMethod: true }
             );
 
         // if non enumerated method doesnt exist then don't create EnsureCapacity

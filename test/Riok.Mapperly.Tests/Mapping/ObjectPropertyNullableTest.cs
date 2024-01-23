@@ -555,9 +555,9 @@ public class ObjectPropertyNullableTest
     {
         var mapperBody = TestSourceBuilder.CSharp(
             """
-                partial NotNullableType? To(TypeWithNullableProperty? y);
-                public Wrapper Map(double? source) => source.HasValue ? new() { Test = source.Value } : new();
-                """
+            partial NotNullableType? To(TypeWithNullableProperty? y);
+            public Wrapper Map(double? source) => source.HasValue ? new() { Test = source.Value } : new();
+            """
         );
 
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -586,9 +586,9 @@ public class ObjectPropertyNullableTest
     {
         var mapperBody = TestSourceBuilder.CSharp(
             """
-                partial NotNullableType? To(TypeWithNullableProperty? y);
-                public Wrapper Map(double source) => new() { Test = source.Value };
-                """
+            partial NotNullableType? To(TypeWithNullableProperty? y);
+            public Wrapper Map(double source) => new() { Test = source.Value };
+            """
         );
 
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

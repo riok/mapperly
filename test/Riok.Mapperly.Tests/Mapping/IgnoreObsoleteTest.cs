@@ -236,10 +236,10 @@ public class IgnoreObsoleteTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                [MapProperty("Ignored", "Ignored")]
-                [MapperIgnoreObsoleteMembers]
-                partial B Map(A source);
-                """,
+            [MapProperty("Ignored", "Ignored")]
+            [MapperIgnoreObsoleteMembers]
+            partial B Map(A source);
+            """,
             _classA,
             _classB
         );
@@ -271,10 +271,10 @@ public class IgnoreObsoleteTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                [MapProperty("Ignored", "Ignored")]
-                [MapperIgnoreObsoleteMembers(IgnoreObsoleteMembersStrategy.Source)]
-                partial B Map(A source);
-                """,
+            [MapProperty("Ignored", "Ignored")]
+            [MapperIgnoreObsoleteMembers(IgnoreObsoleteMembersStrategy.Source)]
+            partial B Map(A source);
+            """,
             _classA,
             _classB
         );
@@ -302,10 +302,10 @@ public class IgnoreObsoleteTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                [MapProperty("Ignored", "Ignored")]
-                [MapperIgnoreObsoleteMembers(IgnoreObsoleteMembersStrategy.Target)]
-                partial B Map(A source);
-                """,
+            [MapProperty("Ignored", "Ignored")]
+            [MapperIgnoreObsoleteMembers(IgnoreObsoleteMembersStrategy.Target)]
+            partial B Map(A source);
+            """,
             _classA,
             _classB
         );
@@ -333,20 +333,20 @@ public class IgnoreObsoleteTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                [MapProperty("Ignored", "Ignored")]
-                [MapperIgnoreObsoleteMembers(IgnoreObsoleteMembersStrategy.Target)]
-                partial B Map(A source);
-                """,
+            [MapProperty("Ignored", "Ignored")]
+            [MapperIgnoreObsoleteMembers(IgnoreObsoleteMembersStrategy.Target)]
+            partial B Map(A source);
+            """,
             _classA,
             """
-                class B
-                {
-                    public int Value { get; set; }
+            class B
+            {
+                public int Value { get; set; }
 
-                    [Obsolete]
-                    public int Ignored { get; init; }
-                }
-                """
+                [Obsolete]
+                public int Ignored { get; init; }
+            }
+            """
         );
 
         TestHelper
@@ -374,20 +374,20 @@ public class IgnoreObsoleteTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                [MapProperty("Ignored", "Ignored")]
-                [MapperIgnoreObsoleteMembers(IgnoreObsoleteMembersStrategy.Target)]
-                partial B Map(A source);
-                """,
+            [MapProperty("Ignored", "Ignored")]
+            [MapperIgnoreObsoleteMembers(IgnoreObsoleteMembersStrategy.Target)]
+            partial B Map(A source);
+            """,
             _classA,
             """
-                class B
-                {
-                    public int Value { get; set; }
+            class B
+            {
+                public int Value { get; set; }
 
-                    [Obsolete]
-                    public required int Ignored { get; set; }
-                }
-                """
+                [Obsolete]
+                public required int Ignored { get; set; }
+            }
+            """
         );
 
         TestHelper

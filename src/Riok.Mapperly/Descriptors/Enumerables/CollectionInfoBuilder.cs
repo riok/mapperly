@@ -203,8 +203,8 @@ public static class CollectionInfoBuilder
 
         var member = symbolAccessor
             .GetAllAccessibleMappableMembers(t)
-            .FirstOrDefault(
-                x => x.Type.SpecialType == SpecialType.System_Int32 && x.Name is nameof(ICollection<object>.Count) or nameof(Array.Length)
+            .FirstOrDefault(x =>
+                x.Type.SpecialType == SpecialType.System_Int32 && x.Name is nameof(ICollection<object>.Count) or nameof(Array.Length)
             );
         return member?.Name;
     }

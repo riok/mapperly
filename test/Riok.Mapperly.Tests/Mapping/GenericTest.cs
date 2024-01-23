@@ -8,11 +8,11 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                private partial TTarget Map<TSource, TTarget>(TSource source);
+            private partial TTarget Map<TSource, TTarget>(TSource source);
 
-                private partial B MapToB(A source);
-                private partial D MapToD(C source);
-                """,
+            private partial B MapToB(A source);
+            private partial D MapToD(C source);
+            """,
             "record struct A(string Value);",
             "record struct B(string Value);",
             "record C(string Value1);",
@@ -26,11 +26,11 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial object Map<TSource>(TSource source);
+            partial object Map<TSource>(TSource source);
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
-                """,
+            partial B MapToB(A source);
+            partial D MapToD(C source);
+            """,
             "record struct A(string Value);",
             "record struct B(string Value);",
             "record C(string Value1);",
@@ -57,12 +57,12 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial object Map<TSource>(TSource source)
-                    where TSource : A;
+            partial object Map<TSource>(TSource source)
+                where TSource : A;
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
-                """,
+            partial B MapToB(A source);
+            partial D MapToD(C source);
+            """,
             "record struct A(string Value);",
             "record struct B(string Value);",
             "record C(string Value1);",
@@ -89,12 +89,12 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial object Map<TSource>(TSource source)
-                    where TSource : notnull;
+            partial object Map<TSource>(TSource source)
+                where TSource : notnull;
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
-                """,
+            partial B MapToB(A source);
+            partial D MapToD(C source);
+            """,
             "record struct A(string Value);",
             "record struct B(string Value);",
             "record C(string Value1);",
@@ -121,12 +121,12 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial object Map<TSource>(TSource source)
-                    where TSource : struct;
+            partial object Map<TSource>(TSource source)
+                where TSource : struct;
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
-                """,
+            partial B MapToB(A source);
+            partial D MapToD(C source);
+            """,
             "record struct A(string Value);",
             "record struct B(string Value);",
             "record C(string Value1);",
@@ -152,12 +152,12 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial object Map<TSource>(TSource source)
-                    where TSource : unmanaged;
+            partial object Map<TSource>(TSource source)
+                where TSource : unmanaged;
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
-                """,
+            partial B MapToB(A source);
+            partial D MapToD(C source);
+            """,
             "record struct A(string Value);",
             "record struct B(string Value);",
             "record C(string Value1);",
@@ -183,12 +183,12 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial object Map<TSource>(TSource source)
-                    where TSource : class;
+            partial object Map<TSource>(TSource source)
+                where TSource : class;
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
-                """,
+            partial B MapToB(A source);
+            partial D MapToD(C source);
+            """,
             "record struct A(string Value);",
             "record struct B(string Value);",
             "record C(string Value1);",
@@ -214,12 +214,12 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial object Map<TSource>(TSource source)
-                    where TSource : class;
+            partial object Map<TSource>(TSource source)
+                where TSource : class;
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
-                """,
+            partial B MapToB(A source);
+            partial D MapToD(C source);
+            """,
             "record struct A(string Value);",
             "record struct B(string Value);",
             "record C(string Value1);",
@@ -245,12 +245,12 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial object Map<TSource>(TSource source)
-                    where TSource : class?;
+            partial object Map<TSource>(TSource source)
+                where TSource : class?;
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
-                """,
+            partial B MapToB(A source);
+            partial D MapToD(C source);
+            """,
             "record struct A(string Value);",
             "record struct B(string Value);",
             "record C(string Value1);",
@@ -276,13 +276,13 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial TTarget Map<TSource, TTarget>(TSource source)
-                    where TSource : class?
-                    where TTarget : class?;
+            partial TTarget Map<TSource, TTarget>(TSource source)
+                where TSource : class?
+                where TTarget : class?;
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
-                """,
+            partial B MapToB(A source);
+            partial D MapToD(C source);
+            """,
             "record struct A(string Value);",
             "record struct B(string Value);",
             "record C(string Value1);",
@@ -343,11 +343,11 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial TTarget Map<TTarget>(object source);
+            partial TTarget Map<TTarget>(object source);
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
-                """,
+            partial B MapToB(A source);
+            partial D MapToD(C source);
+            """,
             "record struct A(string Value);",
             "record struct B(string Value);",
             "record C(string Value1);",
@@ -374,12 +374,12 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial TTarget Map<TTarget>(object source)
-                    where TTarget : D;
+            partial TTarget Map<TTarget>(object source)
+                where TTarget : D;
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
-                """,
+            partial B MapToB(A source);
+            partial D MapToD(C source);
+            """,
             "record struct A(string Value);",
             "record struct B(string Value);",
             "record C(string Value1);",
@@ -440,13 +440,13 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                partial TTarget Map<TSource, TTarget>(TSource source)
-                    where TSource : C
-                    where TTarget : D;
+            partial TTarget Map<TSource, TTarget>(TSource source)
+                where TSource : C
+                where TTarget : D;
 
-                partial B MapToB(A source);
-                partial D MapToD(C source);
-                """,
+            partial B MapToB(A source);
+            partial D MapToD(C source);
+            """,
             "record struct A(string Value);",
             "record struct B(string Value);",
             "record C(string Value1);",
@@ -505,11 +505,11 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                private partial TTarget Map<TSource, TTarget>(TSource source);
+            private partial TTarget Map<TSource, TTarget>(TSource source);
 
-                private partial B MapToB(A source);
-                private partial D MapToD(C source);
-                """,
+            private partial B MapToB(A source);
+            private partial D MapToD(C source);
+            """,
             TestSourceBuilderOptions.WithReferenceHandling,
             "record struct A(string Value);",
             "record struct B(string Value);",
@@ -524,11 +524,11 @@ public class GenericTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-                private partial TTarget Map<TSource, TTarget>(TSource source, [ReferenceHandler] IReferenceHandler refHandler);
+            private partial TTarget Map<TSource, TTarget>(TSource source, [ReferenceHandler] IReferenceHandler refHandler);
 
-                private partial B MapToB(A source, [ReferenceHandler] IReferenceHandler refHandler);
-                private partial D MapToD(C source, [ReferenceHandler] IReferenceHandler refHandler);
-                """,
+            private partial B MapToB(A source, [ReferenceHandler] IReferenceHandler refHandler);
+            private partial D MapToD(C source, [ReferenceHandler] IReferenceHandler refHandler);
+            """,
             TestSourceBuilderOptions.WithReferenceHandling,
             "record struct A(string Value);",
             "record struct B(string Value);",

@@ -200,8 +200,8 @@ public static class UserMethodMappingExtractor
 
         var targetType = parameters.Target?.Type ?? methodSymbol.ReturnType;
         var targetTypeParameter = methodSymbol.TypeParameters.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x, targetType));
-        var sourceTypeParameter = methodSymbol.TypeParameters.FirstOrDefault(
-            x => SymbolEqualityComparer.Default.Equals(x, parameters.Source.Type)
+        var sourceTypeParameter = methodSymbol.TypeParameters.FirstOrDefault(x =>
+            SymbolEqualityComparer.Default.Equals(x, parameters.Source.Type)
         );
 
         var expectedTypeParametersCount = 0;
@@ -253,8 +253,8 @@ public static class UserMethodMappingExtractor
         expectedParametersCount++;
 
         // target type parameter is the second parameter (except if the reference handler is the first or the second parameter)
-        var targetTypeParameterSymbol = method.Parameters.FirstOrDefault(
-            p => p.Ordinal != sourceParameter.Ordinal && p.Ordinal != refHandlerParameterOrdinal
+        var targetTypeParameterSymbol = method.Parameters.FirstOrDefault(p =>
+            p.Ordinal != sourceParameter.Ordinal && p.Ordinal != refHandlerParameterOrdinal
         );
         if (
             targetTypeParameterSymbol == null
@@ -333,8 +333,8 @@ public static class UserMethodMappingExtractor
 
     private static MethodParameter? BuildReferenceHandlerParameter(SimpleMappingBuilderContext ctx, IMethodSymbol method)
     {
-        var refHandlerParameterSymbol = method.Parameters.FirstOrDefault(
-            p => ctx.SymbolAccessor.HasAttribute<ReferenceHandlerAttribute>(p)
+        var refHandlerParameterSymbol = method.Parameters.FirstOrDefault(p =>
+            ctx.SymbolAccessor.HasAttribute<ReferenceHandlerAttribute>(p)
         );
         if (refHandlerParameterSymbol == null)
             return null;

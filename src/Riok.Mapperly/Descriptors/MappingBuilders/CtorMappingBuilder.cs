@@ -18,11 +18,10 @@ public static class CtorMappingBuilder
         // resolve ctors which have the source as single argument
         var ctorMethod = namedTarget
             .InstanceConstructors.Where(ctx.SymbolAccessor.IsDirectlyAccessible)
-            .FirstOrDefault(
-                m =>
-                    m.Parameters.Length == 1
-                    && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type.NonNullable(), ctx.Source.NonNullable())
-                    && ctx.Source.HasSameOrStricterNullability(m.Parameters[0].Type)
+            .FirstOrDefault(m =>
+                m.Parameters.Length == 1
+                && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type.NonNullable(), ctx.Source.NonNullable())
+                && ctx.Source.HasSameOrStricterNullability(m.Parameters[0].Type)
             );
 
         return ctorMethod == null ? null : new CtorMapping(ctx.Source, ctx.Target);
