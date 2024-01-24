@@ -37,33 +37,27 @@ public static class DictionaryMappingBuilder
                 or CollectionType.IReadOnlyDictionary
         )
         {
-            if (TryGetFromEnumerable(ctx, keyMapping, valueMapping) is { } toDictionary)
-                return toDictionary;
-
-            var targetDictionarySymbol = ctx.Types.Get(typeof(Dictionary<,>)).Construct(keyMapping.TargetType, valueMapping.TargetType);
-            ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var dictionaryObjectFactory);
-            return new ForEachSetDictionaryMapping(
-                ctx.Source,
-                ctx.Target,
-                keyMapping,
-                valueMapping,
-                ctx.CollectionInfos.Source.CountIsKnown,
-                targetDictionarySymbol,
-                dictionaryObjectFactory
-            );
+            return BuildDictionaryMapping(ctx, keyMapping, valueMapping);
         }
 
         // if target is an immutable dictionary then use LinqDictionaryMapper
-        var immutableLinqMapping = ResolveImmutableCollectMethod(ctx, keyMapping, valueMapping);
+        var immutableLinqMapping = BuildImmutableMapping(ctx, keyMapping, valueMapping);
         if (immutableLinqMapping != null)
             return immutableLinqMapping;
 
+        return BuildCustomTypeMapping(ctx, keyMapping, valueMapping);
+    }
+
+    private static INewInstanceMapping? BuildCustomTypeMapping(
+        MappingBuilderContext ctx,
+        INewInstanceMapping keyMapping,
+        INewInstanceMapping valueMapping
+    )
+    {
         // the target is not a well known dictionary type
         // it should have a an object factory or a parameterless public ctor
-        if (
-            !ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory)
-            && !ctx.SymbolAccessor.HasDirectlyAccessibleParameterlessConstructor(ctx.Target)
-        )
+        var hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory);
+        if (!hasObjectFactory && !ctx.SymbolAccessor.HasDirectlyAccessibleParameterlessConstructor(ctx.Target))
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, ctx.Target);
             return null;
@@ -72,9 +66,25 @@ public static class DictionaryMappingBuilder
         if (!ctx.CollectionInfos!.Target.ImplementedTypes.HasFlag(CollectionType.IDictionary))
             return null;
 
+        var sourceType = ctx.Source;
+        if (!hasObjectFactory)
+        {
+            sourceType = BuildCollectionTypeForIDictionary(
+                ctx,
+                ctx.CollectionInfos!.Source,
+                keyMapping.SourceType,
+                valueMapping.SourceType
+            );
+            ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out objectFactory);
+
+            var existingMapping = ctx.BuildDelegatedMapping(sourceType, ctx.Target);
+            if (existingMapping != null)
+                return existingMapping;
+        }
+
         var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx);
         return new ForEachSetDictionaryMapping(
-            ctx.Source,
+            sourceType,
             ctx.Target,
             keyMapping,
             valueMapping,
@@ -82,6 +92,55 @@ public static class DictionaryMappingBuilder
             objectFactory: objectFactory,
             explicitCast: GetExplicitIndexer(ctx),
             ensureCapacity: ensureCapacityStatement
+        );
+    }
+
+    /// <summary>
+    /// Builds a for each set mapping for a dictionary.
+    /// Target type needs to be assignable from <see cref="Dictionary{TKey,TValue}"/>.
+    /// </summary>
+    private static INewInstanceMapping BuildDictionaryMapping(
+        MappingBuilderContext ctx,
+        INewInstanceMapping keyMapping,
+        INewInstanceMapping valueMapping
+    )
+    {
+        if (TryGetFromEnumerable(ctx, keyMapping, valueMapping) is { } toDictionary)
+            return toDictionary;
+
+        // there might be an object factory for the exact types
+        var hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory);
+
+        // use generalized types to reuse generated mappings
+        var sourceType = ctx.Source;
+        var targetType = ctx.Target;
+        if (!hasObjectFactory)
+        {
+            sourceType = BuildCollectionTypeForIDictionary(
+                ctx,
+                ctx.CollectionInfos!.Source,
+                keyMapping.SourceType,
+                valueMapping.SourceType
+            );
+
+            targetType = ctx.Types.Get(typeof(Dictionary<,>))
+                .Construct(keyMapping.TargetType, valueMapping.TargetType)
+                .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+
+            ctx.ObjectFactories.TryFindObjectFactory(sourceType, targetType, out objectFactory);
+
+            var delegateMapping = ctx.BuildDelegatedMapping(sourceType, targetType);
+            if (delegateMapping != null)
+                return delegateMapping;
+        }
+
+        return new ForEachSetDictionaryMapping(
+            sourceType,
+            targetType,
+            keyMapping,
+            valueMapping,
+            ctx.CollectionInfos!.Source.CountIsKnown,
+            objectFactory
         );
     }
 
@@ -182,7 +241,7 @@ public static class DictionaryMappingBuilder
         return typedInter;
     }
 
-    private static LinqDictionaryMapping? ResolveImmutableCollectMethod(
+    private static LinqDictionaryMapping? BuildImmutableMapping(
         MappingBuilderContext ctx,
         INewInstanceMapping keyMapping,
         INewInstanceMapping valueMapping
@@ -198,5 +257,31 @@ public static class DictionaryMappingBuilder
 
             _ => null,
         };
+    }
+
+    private static ITypeSymbol BuildCollectionTypeForIDictionary(
+        MappingBuilderContext ctx,
+        CollectionInfo info,
+        ITypeSymbol key,
+        ITypeSymbol value
+    )
+    {
+        return info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyDictionary)
+            ? BuildDictionaryType(ctx, CollectionType.IReadOnlyDictionary, key, value)
+            : info.ImplementedTypes.HasFlag(CollectionType.IDictionary)
+                ? BuildDictionaryType(ctx, CollectionType.IDictionary, key, value)
+                : info.Type;
+    }
+
+    private static INamedTypeSymbol BuildDictionaryType(
+        MappingBuilderContext ctx,
+        CollectionType type,
+        ITypeSymbol keyType,
+        ITypeSymbol valueType
+    )
+    {
+        var genericType = CollectionInfoBuilder.GetGenericClrCollectionType(type);
+        return (INamedTypeSymbol)
+            ctx.Types.Get(genericType).Construct(keyType, valueType).WithNullableAnnotation(NullableAnnotation.NotAnnotated);
     }
 }

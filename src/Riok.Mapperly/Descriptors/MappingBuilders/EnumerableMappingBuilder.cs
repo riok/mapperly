@@ -25,7 +25,7 @@ public static class EnumerableMappingBuilder
     private const string CreateRangeStackMethodName = "global::System.Collections.Immutable.ImmutableStack.CreateRange";
     private const string ToImmutableSortedSetMethodName = "global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet";
 
-    public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static INewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         if (!ctx.IsConversionEnabled(MappingConversionType.Enumerable))
             return null;
@@ -142,7 +142,10 @@ public static class EnumerableMappingBuilder
         return null;
     }
 
-    private static NewInstanceMapping? TryBuildFastConversion(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    /// <summary>
+    /// Tries to build a faster conversion when the source count is known and not in an expression.
+    /// </summary>
+    private static INewInstanceMapping? TryBuildFastConversion(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         if (
             ctx.IsExpression
@@ -180,50 +183,78 @@ public static class EnumerableMappingBuilder
             : BuildArrayToArrayMapping(ctx, elementMapping);
     }
 
-    private static NewInstanceMapping? BuildEnumerableToListMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    /// <summary>
+    /// Tries to build a mapping for a source for which the count is known and
+    /// a target type assignable form a list.
+    /// </summary>
+    private static INewInstanceMapping? BuildEnumerableToListMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         // if mapping is synthetic then ToList is probably faster
         if (elementMapping.IsSynthetic)
             return null;
 
-        var targetTypeToInstantiate = ctx.Types.Get(typeof(List<>))
-            .Construct(elementMapping.TargetType)
-            .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+        // try to reuse a IEnumerable<S> => List<T> mapping
+        var sourceType = BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source);
+        var targetType = BuildCollectionType(ctx, CollectionType.List, ctx.CollectionInfos.Target.EnumeratedType);
+        var existingMapping = ctx.BuildDelegatedMapping(sourceType, targetType);
+        if (existingMapping != null)
+            return new DelegateMapping(ctx.Source, ctx.Target, existingMapping);
 
         return new ForEachAddEnumerableMapping(
-            ctx.Source,
-            ctx.CollectionInfos!.Target.Type,
+            sourceType,
+            targetType,
             elementMapping,
             AddMethodName,
-            targetTypeToInstantiate,
-            ctx.CollectionInfos.Source.CountPropertyName
+            ctx.CollectionInfos!.Source.CountPropertyName
         );
     }
 
-    private static NewInstanceMapping BuildArrayToArrayMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    /// <summary>
+    /// Builds a mapping from an array to a target which is assignable from an array (e.g. array, <see cref="IReadOnlyCollection{T}"/>, ...).
+    /// </summary>
+    private static INewInstanceMapping BuildArrayToArrayMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         // if element mapping is synthetic
         // a single Array.Clone / cast mapping call should be sufficient and fast,
         // use a for loop mapping otherwise.
-        if (!elementMapping.IsSynthetic)
+        if (elementMapping.IsSynthetic)
         {
-            return new ArrayForMapping(ctx.Source, ctx.Target, elementMapping, elementMapping.TargetType);
+            return ctx.MapperConfiguration.UseDeepCloning
+                ? new ArrayCloneMapping(ctx.Source, ctx.Target)
+                : new CastMapping(ctx.Source, ctx.Target);
         }
 
-        return ctx.MapperConfiguration.UseDeepCloning
-            ? new ArrayCloneMapping(ctx.Source, ctx.Target)
-            : new CastMapping(ctx.Source, ctx.Target);
+        // ensure the target is an array and not an interface
+        // => mapping can be reused by a delegate mapping for different implementations
+        var targetType = ctx.Target.IsArrayType() ? ctx.Target : ctx.Types.GetArrayType(ctx.CollectionInfos!.Target.EnumeratedType);
+        var delegatedMapping = ctx.BuildDelegatedMapping(ctx.Source, targetType);
+        if (delegatedMapping != null)
+            return delegatedMapping;
+
+        return new ArrayForMapping(ctx.Source, targetType, elementMapping, elementMapping.TargetType);
     }
 
-    private static NewInstanceMapping? BuildEnumerableToArrayMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    /// <summary>
+    /// Builds a mapping from an <see cref="IEnumerable{T}"/> with a known count to a target which is assignable from an array (e.g. array, <see cref="IReadOnlyCollection{T}"/>, ...).
+    /// </summary>
+    private static INewInstanceMapping? BuildEnumerableToArrayMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         // if mapping is synthetic then ToArray is probably faster
         if (elementMapping.IsSynthetic)
             return null;
 
+        // ensure the source is IEnumerable<S>
+        // and ensure the target is an array and not an interface
+        // => mapping can be reused by a delegate mapping for different implementations
+        var sourceType = BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source);
+        var targetType = ctx.Target.IsArrayType() ? ctx.Target : ctx.Types.GetArrayType(ctx.CollectionInfos!.Target.EnumeratedType);
+        var delegatedMapping = ctx.BuildDelegatedMapping(sourceType, targetType);
+        if (delegatedMapping != null)
+            return delegatedMapping;
+
         return new ArrayForEachMapping(
-            ctx.Source,
-            ctx.Target,
+            sourceType,
+            targetType,
             elementMapping,
             elementMapping.TargetType,
             ctx.CollectionInfos!.Source.CountPropertyName!
@@ -253,7 +284,7 @@ public static class EnumerableMappingBuilder
             return namedType;
 
         if (ctx.CollectionInfos!.Target.CollectionType is CollectionType.ISet or CollectionType.IReadOnlySet)
-            return ctx.Types.Get(typeof(HashSet<>)).Construct(typeSymbol);
+            return BuildCollectionType(ctx, CollectionType.HashSet, typeSymbol);
 
         return null;
     }
@@ -265,15 +296,13 @@ public static class EnumerableMappingBuilder
     )
     {
         var selectMethod = elementMapping.IsSynthetic ? null : SelectMethodName;
-        return new LinqConstructorMapping(ctx.Source, ctx.Target, targetTypeToConstruct, elementMapping, selectMethod);
+        return new LinqConstructorMapping(ctx.Source, targetTypeToConstruct, elementMapping, selectMethod);
     }
 
-    private static ExistingTargetMappingMethodWrapper? BuildCustomTypeMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    private static INewInstanceMapping? BuildCustomTypeMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
-        if (
-            !ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory)
-            && !ctx.SymbolAccessor.HasDirectlyAccessibleParameterlessConstructor(ctx.Target)
-        )
+        var hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory);
+        if (!hasObjectFactory && !ctx.SymbolAccessor.HasDirectlyAccessibleParameterlessConstructor(ctx.Target))
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, ctx.Target);
             return null;
@@ -286,11 +315,24 @@ public static class EnumerableMappingBuilder
             ctx.CollectionInfos!.Target.CollectionType == CollectionType.Array
             || !ctx.CollectionInfos.Target.HasImplicitCollectionAddMethod
         )
+        {
             return null;
+        }
+
+        // try to reuse an existing mapping
+        var sourceType = ctx.Source;
+        if (!hasObjectFactory)
+        {
+            sourceType = BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos.Source);
+            ctx.ObjectFactories.TryFindObjectFactory(sourceType, ctx.Target, out objectFactory);
+            var existingMapping = ctx.BuildDelegatedMapping(sourceType, ctx.Target);
+            if (existingMapping != null)
+                return existingMapping;
+        }
 
         var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx);
         return new ForEachAddEnumerableMapping(
-            ctx.Source,
+            sourceType,
             ctx.Target,
             elementMapping,
             objectFactory,
@@ -368,4 +410,20 @@ public static class EnumerableMappingBuilder
 
     private static IMethodSymbol? GetToHashSetLinqCollectMethod(WellKnownTypes wellKnownTypes) =>
         wellKnownTypes.Get(typeof(Enumerable)).GetStaticGenericMethod(ToHashSetMethodName);
+
+    private static ITypeSymbol BuildCollectionTypeForICollection(MappingBuilderContext ctx, CollectionInfo info)
+    {
+        return info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyCollection)
+            ? BuildCollectionType(ctx, CollectionType.IReadOnlyCollection, info.EnumeratedType)
+            : info.ImplementedTypes.HasFlag(CollectionType.ICollection)
+                ? BuildCollectionType(ctx, CollectionType.ICollection, info.EnumeratedType)
+                : info.Type;
+    }
+
+    private static INamedTypeSymbol BuildCollectionType(MappingBuilderContext ctx, CollectionType type, ITypeSymbol enumeratedType)
+    {
+        var genericType = CollectionInfoBuilder.GetGenericClrCollectionType(type);
+        return (INamedTypeSymbol)
+            ctx.Types.Get(genericType).Construct(enumeratedType).WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+    }
 }

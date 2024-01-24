@@ -64,6 +64,10 @@ public static class CollectionInfoBuilder
         new CollectionTypeInfo(CollectionType.ReadOnlyMemory, typeof(ReadOnlyMemory<>)),
     };
 
+    private static readonly IReadOnlyDictionary<CollectionType, Type> _collectionClrTypeByType = _collectionTypeInfos
+        .Where(x => x.ReflectionType != null)
+        .ToDictionary(x => x.CollectionType, x => x.ReflectionType!);
+
     public static CollectionInfos? Build(
         WellKnownTypes wellKnownTypes,
         SymbolAccessor symbolAccessor,
@@ -380,4 +384,8 @@ public static class CollectionInfoBuilder
             return implementedCollectionTypes;
         }
     }
+
+    public static Type GetGenericClrCollectionType(CollectionType type) =>
+        _collectionClrTypeByType.GetValueOrDefault(type)
+        ?? throw new InvalidOperationException("Could not get clr collection type for " + type);
 }

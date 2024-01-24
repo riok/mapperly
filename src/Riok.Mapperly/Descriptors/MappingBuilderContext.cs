@@ -76,6 +76,15 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// Tries to find an existing mapping for the provided key.
     /// If none is found, <c>null</c> is returned.
     /// </summary>
+    /// <param name="source">The source type</param>
+    /// <param name="target">The target type</param>
+    /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
+    public INewInstanceMapping? FindMapping(ITypeSymbol source, ITypeSymbol target) => FindMapping(new TypeMappingKey(source, target));
+
+    /// <summary>
+    /// Tries to find an existing mapping for the provided key.
+    /// If none is found, <c>null</c> is returned.
+    /// </summary>
     /// <param name="mappingKey">The mapping key.</param>
     /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
     public virtual INewInstanceMapping? FindMapping(TypeMappingKey mappingKey) => MappingBuilder.Find(mappingKey);
@@ -226,6 +235,38 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         var userSymbol = options.HasFlag(MappingBuildingOptions.KeepUserSymbol) ? UserSymbol : null;
         var ctx = ContextForMapping(userSymbol, mappingKey, options);
         return ExistingTargetMappingBuilder.Build(ctx, options.HasFlag(MappingBuildingOptions.MarkAsReusable));
+    }
+
+    /// <summary>
+    /// Tries to build a mapping which delegates the actual mapping to an existing mapping.
+    /// Returns <c>null</c> if for the given types no mapping exists
+    /// or both types (<paramref name="source"/> and <paramref name="target"/>
+    /// equal the types of the context (<see cref="Source"/> and <see cref="Target"/>)
+    /// (since this does not make sense (delegating to yourself) and would lead to mapping recursion).
+    /// </summary>
+    /// <remarks>
+    /// This can be used to reuse mappings of more generalized types.
+    /// E.g. a mapping from <c>List&lt;A&gt;</c> to <c>IReadOnlyCollection&lt;B&gt;</c>
+    /// and a mapping from <c>IReadOnlyCollection&lt;A&gt;</c> to <c>IReadOnlyList&lt;B&gt;</c>
+    /// can both use the same mapping method with a signature of <c>List&lt;B&gt; Map(IReadOnlyCollection&lt;A&gt; source)</c>.
+    /// </remarks>
+    /// <param name="source">The source type. <see cref="Source"/> needs to be assignable to this type.</param>
+    /// <param name="target">The target type. Needs to be assignable to <see cref="Target"/>.</param>
+    /// <returns>The built <see cref="DelegateMapping"/> or <c>null</c>.</returns>
+    public DelegateMapping? BuildDelegatedMapping(ITypeSymbol source, ITypeSymbol target)
+    {
+        // don't create a delegate mapping for the same types as the current context types
+        // since this would lead to a mapping recursion.
+        if (
+            SymbolEqualityComparer.IncludeNullability.Equals(Source, source)
+            && SymbolEqualityComparer.IncludeNullability.Equals(Target, target)
+        )
+        {
+            return null;
+        }
+
+        var existingMapping = FindMapping(source, target);
+        return existingMapping == null ? null : new DelegateMapping(Source, Target, existingMapping);
     }
 
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, params object[] messageArgs) =>
