@@ -14,7 +14,6 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 public class ForEachAddEnumerableMapping : ExistingTargetMappingMethodWrapper
 {
     private readonly ObjectFactory? _objectFactory;
-    private readonly ITypeSymbol _typeToInstantiate;
     private readonly string? _countPropertyName;
 
     public ForEachAddEnumerableMapping(
@@ -30,36 +29,33 @@ public class ForEachAddEnumerableMapping : ExistingTargetMappingMethodWrapper
         )
     {
         _objectFactory = objectFactory;
-        _typeToInstantiate = targetType;
         _countPropertyName = null;
     }
 
     /// <summary>
-    /// warning: if <paramref name="countPropertyName"/> is not null then <paramref name="typeToInstantiate"/> must have a single integer constructor
+    /// warning: if <paramref name="countPropertyName"/> is not null then <paramref name="targetType"/> must have a single integer constructor
     /// </summary>
     public ForEachAddEnumerableMapping(
         ITypeSymbol sourceType,
         ITypeSymbol targetType,
         INewInstanceMapping elementMapping,
         string insertMethodName,
-        ITypeSymbol? typeToInstantiate,
         string? countPropertyName
     )
         : base(new ForEachAddEnumerableExistingTargetMapping(sourceType, targetType, elementMapping, insertMethodName, null))
     {
         _objectFactory = null;
-        _typeToInstantiate = typeToInstantiate ?? targetType;
         _countPropertyName = countPropertyName;
     }
 
     protected override ExpressionSyntax CreateTargetInstance(TypeMappingBuildContext ctx)
     {
         if (_objectFactory != null)
-            return _objectFactory.CreateType(SourceType, _typeToInstantiate, ctx.Source);
+            return _objectFactory.CreateType(SourceType, TargetType, ctx.Source);
 
         if (_countPropertyName != null)
-            return CreateInstance(_typeToInstantiate, MemberAccess(ctx.Source, _countPropertyName));
+            return CreateInstance(TargetType, MemberAccess(ctx.Source, _countPropertyName));
 
-        return CreateInstance(_typeToInstantiate);
+        return CreateInstance(TargetType);
     }
 }

@@ -11,7 +11,7 @@ public partial class Mapper
         var target = new global::B();
         if (source.Value != null)
         {
-            target.Value = MapToICollection(source.Value);
+            target.Value = MapToList(source.Value);
         }
         else
         {
@@ -21,7 +21,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::System.Collections.Generic.ICollection<string?> MapToICollection(int[] source)
+    private global::System.Collections.Generic.List<string?> MapToList(global::System.Collections.Generic.IReadOnlyCollection<int> source)
     {
         var target = new global::System.Collections.Generic.List<string?>(source.Length);
         foreach (var item in source)

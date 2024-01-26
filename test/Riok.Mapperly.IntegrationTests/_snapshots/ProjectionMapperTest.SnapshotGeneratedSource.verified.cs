@@ -95,7 +95,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             if (testObject.NullableReadOnlyObjectCollection != null)
             {
-                target.NullableReadOnlyObjectCollection = MapToIReadOnlyCollection(testObject.NullableReadOnlyObjectCollection);
+                target.NullableReadOnlyObjectCollection = MapToTestObjectNestedDtoArray(testObject.NullableReadOnlyObjectCollection);
             }
             else
             {
@@ -167,7 +167,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        private static global::System.Collections.Generic.IReadOnlyCollection<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto> MapToIReadOnlyCollection(global::System.Collections.Generic.List<global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested> source)
+        private static global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto[] MapToTestObjectNestedDtoArray(global::System.Collections.Generic.IReadOnlyCollection<global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested> source)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto[source.Count];
             var i = 0;
@@ -213,7 +213,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        private static global::System.Collections.Generic.List<global::Riok.Mapperly.IntegrationTests.Models.TestEnum> MapToList(global::System.Collections.Generic.List<global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionEnumValue> source)
+        private static global::System.Collections.Generic.List<global::Riok.Mapperly.IntegrationTests.Models.TestEnum> MapToList(global::System.Collections.Generic.IReadOnlyCollection<global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionEnumValue> source)
         {
             var target = new global::System.Collections.Generic.List<global::Riok.Mapperly.IntegrationTests.Models.TestEnum>(source.Count);
             foreach (var item in source)

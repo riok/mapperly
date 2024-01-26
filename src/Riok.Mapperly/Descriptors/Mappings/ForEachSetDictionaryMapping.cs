@@ -17,7 +17,6 @@ public class ForEachSetDictionaryMapping(
     INewInstanceMapping keyMapping,
     INewInstanceMapping valueMapping,
     bool sourceHasCount,
-    ITypeSymbol? typeToInstantiate = null,
     ObjectFactory? objectFactory = null,
     INamedTypeSymbol? explicitCast = null,
     EnsureCapacityInfo? ensureCapacity = null
@@ -28,16 +27,14 @@ public class ForEachSetDictionaryMapping(
 {
     private const string CountPropertyName = nameof(IDictionary<object, object>.Count);
 
-    private readonly ITypeSymbol _typeToInstantiate = typeToInstantiate ?? targetType;
-
     protected override ExpressionSyntax CreateTargetInstance(TypeMappingBuildContext ctx)
     {
         if (objectFactory != null)
-            return objectFactory.CreateType(SourceType, _typeToInstantiate, ctx.Source);
+            return objectFactory.CreateType(SourceType, TargetType, ctx.Source);
 
         if (sourceHasCount)
-            return CreateInstance(_typeToInstantiate, MemberAccess(ctx.Source, CountPropertyName));
+            return CreateInstance(TargetType, MemberAccess(ctx.Source, CountPropertyName));
 
-        return CreateInstance(_typeToInstantiate);
+        return CreateInstance(TargetType);
     }
 }

@@ -11,7 +11,7 @@ public partial class Mapper
         var target = new global::B();
         if (source.Value != null)
         {
-            target.Value = MapToIReadOnlyCollection(source.Value);
+            target.Value = MapToStringArray(source.Value);
         }
         else
         {
@@ -21,7 +21,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::System.Collections.Generic.IReadOnlyCollection<string?> MapToIReadOnlyCollection(int[] source)
+    private string?[] MapToStringArray(int[] source)
     {
         var target = new string?[source.Length];
         for (var i = 0; i < source.Length; i++)

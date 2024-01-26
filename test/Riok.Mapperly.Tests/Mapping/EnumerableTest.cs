@@ -554,7 +554,6 @@ public class EnumerableTest
     public Task ShouldUpgradeNullabilityOfGenericInDisabledNullableContext()
     {
         var source = TestSourceBuilder.Mapping("IList<A>", "IList<B>", "record A(int V);", "record B(int V);");
-
         return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
     }
 
@@ -700,5 +699,40 @@ public class EnumerableTest
                 """
             )
             .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+    }
+
+    [Fact]
+    public Task EnumerableShouldReuseForReadOnlyCollectionImplementorsButDifferentForICollection()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial BList Map(AList source);
+            public partial BListAgain Map(AListAgain source);
+            public partial BReadOnlyCollection Map(AList source);
+            public partial BCustomCollection Map(AList source);
+            public partial BCollection Map(AList source);g
+            public partial BReadOnlyCollection Map(AReadOnlyCollection source);
+            public partial BCustomCollection Map(ACustomReadOnlyCollection source);
+            public partial BCollection Map(ACollection source);
+            public partial BCustomCollection Map(ACustomCollection source);
+            """,
+            "record AList(List<C> Values);",
+            "record AListAgain(List<C> Values);",
+            "record AReadOnlyCollection(IReadOnlyCollection<C> Values);",
+            "record ACustomReadOnlyCollection(CustomReadOnlyCollection<C> Values);",
+            "record ACollection(ICollection<C> Values);",
+            "record ACustomCollection(CustomCollection<C> Values);",
+            "record BList(List<D> Values);",
+            "record BListAgain(List<D> Values);",
+            "record BReadOnlyCollection(IReadOnlyCollection<D> Values);",
+            "record BCollection(ICollection<D> Values);",
+            "record BCustomCollection(CustomCollection<D> Values);",
+            "public class CustomReadOnlyCollection<T> : IReadOnlyCollection<T> { public void Add(T item) {} }",
+            "public class CustomCollection<T> : ICollection<T> { public void Add(T item) {} }",
+            "record C(int Value);",
+            "record D(int Value);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
     }
 }

@@ -10,7 +10,6 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 public class LinqConstructorMapping(
     ITypeSymbol sourceType,
     ITypeSymbol targetType,
-    INamedTypeSymbol targetTypeToConstruct,
     INewInstanceMapping elementMapping,
     string? selectMethod
 ) : NewInstanceMapping(sourceType, targetType)
@@ -32,6 +31,6 @@ public class LinqConstructorMapping(
             mappedSource = elementMapping.Build(ctx);
         }
 
-        return CreateInstance(targetTypeToConstruct, mappedSource);
+        return CreateInstance(TargetType, mappedSource);
     }
 }
