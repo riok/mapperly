@@ -730,4 +730,22 @@ public class ObjectPropertyNullableTest
                 """
             );
     }
+
+    [Fact]
+    public Task NullableToNullablePropertyWithAnotherNullableToNonNullableMappingShouldDirectAssign()
+    {
+        // see https://github.com/riok/mapperly/issues/1089
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial ADest? Map(A? source);
+            public static partial BDest MapToDestinationB(B source);
+            """,
+            "public record A(int? Prop);",
+            "public record B(List<int?> Prop);",
+            "public record ADest(int? Prop);",
+            "public record BDest(List<int> Prop);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }
