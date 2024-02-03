@@ -134,11 +134,13 @@ public static class EnumMappingBuilder
         var explicitMappings = ignoreExplicitAndIgnoredMappings
             ? new Dictionary<IFieldSymbol, IFieldSymbol>(SymbolEqualityComparer.Default)
             : BuildExplicitValueMappings(ctx);
-        var sourceMembers = ctx.Source.GetMembers()
+        var sourceMembers = ctx
+            .Source.GetMembers()
             .OfType<IFieldSymbol>()
             .Where(x => !ignoredSourceMembers.Remove(x))
             .ToHashSet(FieldSymbolEqualityComparer.Default);
-        var targetMembers = ctx.Target.GetMembers()
+        var targetMembers = ctx
+            .Target.GetMembers()
             .OfType<IFieldSymbol>()
             .Where(x => !ignoredTargetMembers.Remove(x))
             .ToHashSet(FieldSymbolEqualityComparer.Default);

@@ -123,7 +123,8 @@ public static class DictionaryMappingBuilder
                 valueMapping.SourceType
             );
 
-            targetType = ctx.Types.Get(typeof(Dictionary<,>))
+            targetType = ctx
+                .Types.Get(typeof(Dictionary<,>))
                 .Construct(keyMapping.TargetType, valueMapping.TargetType)
                 .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
 
