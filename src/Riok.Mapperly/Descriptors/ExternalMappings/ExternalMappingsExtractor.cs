@@ -11,7 +11,8 @@ internal static class ExternalMappingsExtractor
 {
     public static IEnumerable<IUserMapping> ExtractExternalMappings(SimpleMappingBuilderContext ctx, INamedTypeSymbol mapperSymbol)
     {
-        var staticExternalMappers = ctx.AttributeAccessor.Access<UseStaticMapperAttribute, UseStaticMapperConfiguration>(mapperSymbol)
+        var staticExternalMappers = ctx
+            .AttributeAccessor.Access<UseStaticMapperAttribute, UseStaticMapperConfiguration>(mapperSymbol)
             .Concat(ctx.AttributeAccessor.Access<UseStaticMapperAttribute<object>, UseStaticMapperConfiguration>(mapperSymbol))
             .SelectMany(x =>
                 UserMethodMappingExtractor.ExtractUserImplementedMappings(
@@ -22,7 +23,8 @@ internal static class ExternalMappingsExtractor
                 )
             );
 
-        var externalInstanceMappers = ctx.SymbolAccessor.GetAllMembers(mapperSymbol)
+        var externalInstanceMappers = ctx
+            .SymbolAccessor.GetAllMembers(mapperSymbol)
             .Where(x => ctx.AttributeAccessor.HasAttribute<UseMapperAttribute>(x))
             .SelectMany(x => ValidateAndExtractExternalInstanceMappings(ctx, x));
 

@@ -176,7 +176,8 @@ public static class SpanMappingBuilder
 
     private static NewInstanceMapping? BuildSpanToList(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
-        var typedList = ctx.Types.Get(typeof(List<>))
+        var typedList = ctx
+            .Types.Get(typeof(List<>))
             .Construct(elementMapping.TargetType)
             .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
         if (ctx.FindOrBuildMapping(ctx.Source, typedList) is not { } listMapping)
