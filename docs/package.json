@@ -37,7 +37,7 @@
     "@types/react": "18.2.48",
     "@typescript-eslint/eslint-plugin": "6.19.1",
     "hast-util-to-html": "9.0.0",
-    "marked": "11.2.0",
+    "marked": "12.0.0",
     "prettier": "3.2.4",
     "stylelint": "16.2.0",
     "stylelint-config-standard": "36.0.0",
