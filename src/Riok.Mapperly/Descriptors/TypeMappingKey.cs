@@ -24,10 +24,6 @@ public readonly struct TypeMappingKey(
 
     public TypeMappingConfiguration Configuration { get; } = config ?? TypeMappingConfiguration.Default;
 
-    public TypeMappingKey NonNullableSource() => new(Source.NonNullable(), Target, Configuration);
-
-    public TypeMappingKey NonNullableTarget() => new(Source, Target.NonNullable(), Configuration);
-
     public TypeMappingKey NonNullable() => new(Source.NonNullable(), Target.NonNullable(), Configuration);
 
     private bool Equals(TypeMappingKey other) =>

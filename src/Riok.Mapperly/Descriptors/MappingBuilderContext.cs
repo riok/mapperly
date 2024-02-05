@@ -139,9 +139,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// Finds or builds a mapping (<seealso cref="FindOrBuildMapping(Riok.Mapperly.Descriptors.TypeMappingKey,Riok.Mapperly.Descriptors.MappingBuildingOptions,Location)"/>).
     /// Before a new mapping is built existing mappings are tried to be found by the following priorities:
     /// 1. exact match
-    /// 2. ignoring the nullability of the source (needs to be handled by the caller of this method)
-    /// 3. ignoring the nullability of the target (needs to be handled by the caller of this method)
-    /// 4. ignoring the nullability of the source and the target (needs to be handled by the caller of this method)
+    /// 2. ignoring the nullability of the source and the target (needs to be handled by the caller of this method)
     /// If no mapping can be found a new mapping is built with the source and the target as non-nullables.
     /// </summary>
     /// <param name="key">The mapping key.</param>
@@ -154,10 +152,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null
     )
     {
-        return FindMapping(key)
-            ?? FindMapping(key.NonNullableSource())
-            ?? FindMapping(key.NonNullableTarget())
-            ?? FindOrBuildMapping(key.NonNullable(), options, diagnosticLocation);
+        return FindMapping(key) ?? FindOrBuildMapping(key.NonNullable(), options, diagnosticLocation);
     }
 
     /// <summary>
