@@ -194,18 +194,18 @@ public static class EnumerableMappingBuilder
             return null;
 
         // try to reuse a IEnumerable<S> => List<T> mapping
-        var sourceType = BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source);
+        var sourceCollectionInfo = BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source);
         var targetType = BuildCollectionType(ctx, CollectionType.List, ctx.CollectionInfos.Target.EnumeratedType);
-        var existingMapping = ctx.BuildDelegatedMapping(sourceType, targetType);
+        var existingMapping = ctx.BuildDelegatedMapping(sourceCollectionInfo.Type, targetType);
         if (existingMapping != null)
             return new DelegateMapping(ctx.Source, ctx.Target, existingMapping);
 
         return new ForEachAddEnumerableMapping(
-            sourceType,
+            sourceCollectionInfo.Type,
             targetType,
             elementMapping,
             AddMethodName,
-            ctx.CollectionInfos!.Source.CountPropertyName
+            sourceCollectionInfo.CountPropertyName
         );
     }
 
@@ -246,18 +246,18 @@ public static class EnumerableMappingBuilder
         // ensure the source is IEnumerable<S>
         // and ensure the target is an array and not an interface
         // => mapping can be reused by a delegate mapping for different implementations
-        var sourceType = BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source);
+        var sourceCollectionInfo = BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source);
         var targetType = ctx.Target.IsArrayType() ? ctx.Target : ctx.Types.GetArrayType(ctx.CollectionInfos!.Target.EnumeratedType);
-        var delegatedMapping = ctx.BuildDelegatedMapping(sourceType, targetType);
+        var delegatedMapping = ctx.BuildDelegatedMapping(sourceCollectionInfo.Type, targetType);
         if (delegatedMapping != null)
             return delegatedMapping;
 
         return new ArrayForEachMapping(
-            sourceType,
+            sourceCollectionInfo.Type,
             targetType,
             elementMapping,
             elementMapping.TargetType,
-            ctx.CollectionInfos!.Source.CountPropertyName!
+            sourceCollectionInfo.CountPropertyName!
         );
     }
 
@@ -320,19 +320,19 @@ public static class EnumerableMappingBuilder
         }
 
         // try to reuse an existing mapping
-        var sourceType = ctx.Source;
+        var sourceCollectionInfo = ctx.CollectionInfos.Source;
         if (!hasObjectFactory)
         {
-            sourceType = BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos.Source);
-            ctx.ObjectFactories.TryFindObjectFactory(sourceType, ctx.Target, out objectFactory);
-            var existingMapping = ctx.BuildDelegatedMapping(sourceType, ctx.Target);
+            sourceCollectionInfo = BuildCollectionTypeForICollection(ctx, sourceCollectionInfo);
+            ctx.ObjectFactories.TryFindObjectFactory(sourceCollectionInfo.Type, ctx.Target, out objectFactory);
+            var existingMapping = ctx.BuildDelegatedMapping(sourceCollectionInfo.Type, ctx.Target);
             if (existingMapping != null)
                 return existingMapping;
         }
 
-        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx);
+        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx, sourceCollectionInfo, ctx.CollectionInfos.Target);
         return new ForEachAddEnumerableMapping(
-            sourceType,
+            sourceCollectionInfo.Type,
             ctx.Target,
             elementMapping,
             objectFactory,
@@ -411,13 +411,14 @@ public static class EnumerableMappingBuilder
     private static IMethodSymbol? GetToHashSetLinqCollectMethod(WellKnownTypes wellKnownTypes) =>
         wellKnownTypes.Get(typeof(Enumerable)).GetStaticGenericMethod(ToHashSetMethodName);
 
-    private static ITypeSymbol BuildCollectionTypeForICollection(MappingBuilderContext ctx, CollectionInfo info)
+    private static CollectionInfo BuildCollectionTypeForICollection(MappingBuilderContext ctx, CollectionInfo info)
     {
-        return info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyCollection)
+        var collectionType = info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyCollection)
             ? BuildCollectionType(ctx, CollectionType.IReadOnlyCollection, info.EnumeratedType)
             : info.ImplementedTypes.HasFlag(CollectionType.ICollection)
                 ? BuildCollectionType(ctx, CollectionType.ICollection, info.EnumeratedType)
                 : info.Type;
+        return CollectionInfoBuilder.BuildCollectionInfo(ctx.Types, ctx.SymbolAccessor, collectionType, info.EnumeratedType);
     }
 
     private static INamedTypeSymbol BuildCollectionType(MappingBuilderContext ctx, CollectionType type, ITypeSymbol enumeratedType)
