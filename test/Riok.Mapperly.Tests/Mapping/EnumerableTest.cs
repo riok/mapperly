@@ -571,6 +571,19 @@ public class EnumerableTest
     }
 
     [Fact]
+    public Task ArrayToListShouldUpgradeNullability()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public int[] Value { get; set;} }",
+            "class B { public List<string> Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
+
+    [Fact]
     public Task CollectionToReadOnlyCollectionShouldUpgradeNullability()
     {
         var source = TestSourceBuilder.Mapping(

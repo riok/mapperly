@@ -66,10 +66,10 @@ public static class DictionaryMappingBuilder
         if (!ctx.CollectionInfos!.Target.ImplementedTypes.HasFlag(CollectionType.IDictionary))
             return null;
 
-        var sourceType = ctx.Source;
+        var sourceCollectionInfo = ctx.CollectionInfos.Source;
         if (!hasObjectFactory)
         {
-            sourceType = BuildCollectionTypeForIDictionary(
+            sourceCollectionInfo = BuildCollectionTypeForIDictionary(
                 ctx,
                 ctx.CollectionInfos!.Source,
                 keyMapping.SourceType,
@@ -77,14 +77,14 @@ public static class DictionaryMappingBuilder
             );
             ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out objectFactory);
 
-            var existingMapping = ctx.BuildDelegatedMapping(sourceType, ctx.Target);
+            var existingMapping = ctx.BuildDelegatedMapping(sourceCollectionInfo.Type, ctx.Target);
             if (existingMapping != null)
                 return existingMapping;
         }
 
-        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx);
+        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx, sourceCollectionInfo, ctx.CollectionInfos.Target);
         return new ForEachSetDictionaryMapping(
-            sourceType,
+            sourceCollectionInfo.Type,
             ctx.Target,
             keyMapping,
             valueMapping,
@@ -112,13 +112,13 @@ public static class DictionaryMappingBuilder
         var hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory);
 
         // use generalized types to reuse generated mappings
-        var sourceType = ctx.Source;
+        var sourceCollectionInfo = ctx.CollectionInfos!.Source;
         var targetType = ctx.Target;
         if (!hasObjectFactory)
         {
-            sourceType = BuildCollectionTypeForIDictionary(
+            sourceCollectionInfo = BuildCollectionTypeForIDictionary(
                 ctx,
-                ctx.CollectionInfos!.Source,
+                sourceCollectionInfo,
                 keyMapping.SourceType,
                 valueMapping.SourceType
             );
@@ -128,15 +128,15 @@ public static class DictionaryMappingBuilder
                 .Construct(keyMapping.TargetType, valueMapping.TargetType)
                 .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
 
-            ctx.ObjectFactories.TryFindObjectFactory(sourceType, targetType, out objectFactory);
+            ctx.ObjectFactories.TryFindObjectFactory(sourceCollectionInfo.Type, targetType, out objectFactory);
 
-            var delegateMapping = ctx.BuildDelegatedMapping(sourceType, targetType);
+            var delegateMapping = ctx.BuildDelegatedMapping(sourceCollectionInfo.Type, targetType);
             if (delegateMapping != null)
                 return delegateMapping;
         }
 
         return new ForEachSetDictionaryMapping(
-            sourceType,
+            sourceCollectionInfo.Type,
             targetType,
             keyMapping,
             valueMapping,
@@ -260,18 +260,20 @@ public static class DictionaryMappingBuilder
         };
     }
 
-    private static ITypeSymbol BuildCollectionTypeForIDictionary(
+    private static CollectionInfo BuildCollectionTypeForIDictionary(
         MappingBuilderContext ctx,
         CollectionInfo info,
         ITypeSymbol key,
         ITypeSymbol value
     )
     {
-        return info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyDictionary)
+        var dictionaryType = info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyDictionary)
             ? BuildDictionaryType(ctx, CollectionType.IReadOnlyDictionary, key, value)
             : info.ImplementedTypes.HasFlag(CollectionType.IDictionary)
                 ? BuildDictionaryType(ctx, CollectionType.IDictionary, key, value)
                 : info.Type;
+
+        return CollectionInfoBuilder.BuildCollectionInfo(ctx.Types, ctx.SymbolAccessor, dictionaryType, info.EnumeratedType);
     }
 
     private static INamedTypeSymbol BuildDictionaryType(

@@ -90,7 +90,7 @@ public static class CollectionInfoBuilder
         return new CollectionInfos(sourceInfo, targetInfo);
     }
 
-    private static CollectionInfo BuildCollectionInfo(
+    public static CollectionInfo BuildCollectionInfo(
         WellKnownTypes wellKnownTypes,
         SymbolAccessor symbolAccessor,
         ITypeSymbol type,
