@@ -113,16 +113,7 @@ public static class NewValueTupleMappingBodyBuilder
                 return false;
             }
 
-            var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourcePath);
-
-            var memberMapping = new NullMemberMapping(
-                delegateMapping,
-                getterSourcePath,
-                targetMemberType,
-                ctx.BuilderContext.GetNullFallbackValue(targetMemberType),
-                !ctx.BuilderContext.IsExpression
-            );
-
+            var memberMapping = ctx.BuildNullMemberMapping(sourcePath, delegateMapping, targetMemberType);
             var ctorMapping = new ValueTupleConstructorParameterMapping(targetMember, memberMapping);
             constructorParameterMappings.Add(ctorMapping);
             mappedTargetMemberNames.Add(targetMember.Name);

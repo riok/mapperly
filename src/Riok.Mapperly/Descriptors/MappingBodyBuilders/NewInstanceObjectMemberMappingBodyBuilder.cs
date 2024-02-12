@@ -173,22 +173,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             return;
         }
 
-        var nullFallback = NullFallbackValue.Default;
-        if (!delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyNullable())
-        {
-            nullFallback = ctx.BuilderContext.GetNullFallbackValue(targetMember.Type);
-        }
-
-        var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourcePath);
         var setterTargetPath = SetterMemberPath.Build(ctx.BuilderContext, targetPath);
-
-        var memberMapping = new NullMemberMapping(
-            delegateMapping,
-            getterSourcePath,
-            targetMember.Type,
-            nullFallback,
-            !ctx.BuilderContext.IsExpression
-        );
+        var memberMapping = ctx.BuildNullMemberMapping(sourcePath, delegateMapping, targetMember.Type);
         var memberAssignmentMapping = new MemberAssignmentMapping(setterTargetPath, memberMapping);
         ctx.AddInitMemberMapping(memberAssignmentMapping);
     }
@@ -298,15 +284,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 return false;
             }
 
-            var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourcePath);
-
-            var memberMapping = new NullMemberMapping(
-                delegateMapping,
-                getterSourcePath,
-                parameterType,
-                ctx.BuilderContext.GetNullFallbackValue(parameterType),
-                !ctx.BuilderContext.IsExpression
-            );
+            var memberMapping = ctx.BuildNullMemberMapping(sourcePath, delegateMapping, parameterType);
             var ctorMapping = new ConstructorParameterMapping(parameter, memberMapping, skippedOptionalParam);
             constructorParameterMappings.Add(ctorMapping);
             mappedTargetMemberNames.Add(parameter.Name);

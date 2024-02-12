@@ -1,6 +1,8 @@
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
@@ -71,6 +73,23 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     public Dictionary<string, IMappableMember> TargetMembers { get; }
 
     public Dictionary<string, List<PropertyMappingConfiguration>> MemberConfigsByRootTargetName { get; }
+
+    public NullMemberMapping BuildNullMemberMapping(
+        MemberPath sourcePath,
+        INewInstanceMapping delegateMapping,
+        ITypeSymbol targetMemberType
+    )
+    {
+        var getterSourcePath = GetterMemberPath.Build(BuilderContext, sourcePath);
+
+        var nullFallback = NullFallbackValue.Default;
+        if (!delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyNullable())
+        {
+            nullFallback = BuilderContext.GetNullFallbackValue(targetMemberType);
+        }
+
+        return new NullMemberMapping(delegateMapping, getterSourcePath, targetMemberType, nullFallback, !BuilderContext.IsExpression);
+    }
 
     public void AddDiagnostics()
     {
