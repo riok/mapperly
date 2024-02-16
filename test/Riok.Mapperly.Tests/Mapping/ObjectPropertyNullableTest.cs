@@ -748,4 +748,36 @@ public class ObjectPropertyNullableTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void ClassToRecordNoAccessibleSourceCtorShouldNotDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            """
+            public class A
+            {
+                private A(C value)
+                {
+                    Value = value;
+                }
+
+                public C Value { get; }
+            }
+            """,
+            "public record B(C Value);",
+            "public record C(string StringValue);"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(source.Value);
+                return target;
+                """
+            );
+    }
 }

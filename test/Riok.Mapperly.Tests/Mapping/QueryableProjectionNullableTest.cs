@@ -143,4 +143,29 @@ public class QueryableProjectionNullableTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task ClassToRecordNoAccessibleSourceCtorShouldNotDiagnostic()
+    {
+        // see https://github.com/riok/mapperly/issues/972
+        var source = TestSourceBuilder.Mapping(
+            "System.Linq.IQueryable<A>",
+            "System.Linq.IQueryable<B>",
+            """
+            public class A
+            {
+                private A(C value)
+                {
+                    Value = value;
+                }
+
+                public C Value { get; }
+            }
+            """,
+            "public record B(C Value);",
+            "public record C(string StringValue);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

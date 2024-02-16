@@ -1,5 +1,7 @@
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
@@ -13,8 +15,6 @@ public interface IMembersBuilderContext<out T>
 {
     T Mapping { get; }
 
-    void AddDiagnostics();
-
     MappingBuilderContext BuilderContext { get; }
 
     IReadOnlyCollection<string> IgnoredSourceMemberNames { get; }
@@ -22,4 +22,8 @@ public interface IMembersBuilderContext<out T>
     Dictionary<string, IMappableMember> TargetMembers { get; }
 
     Dictionary<string, List<PropertyMappingConfiguration>> MemberConfigsByRootTargetName { get; }
+
+    void AddDiagnostics();
+
+    NullMemberMapping BuildNullMemberMapping(MemberPath sourcePath, INewInstanceMapping delegateMapping, ITypeSymbol targetMemberType);
 }
