@@ -413,12 +413,20 @@ public static class EnumerableMappingBuilder
 
     private static CollectionInfo BuildCollectionTypeForICollection(MappingBuilderContext ctx, CollectionInfo info)
     {
+        // the types cannot be changed for mappings with a user symbol
+        // as the types are defined by the user
+        if (ctx.HasUserSymbol)
+            return info;
+
         var collectionType = info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyCollection)
             ? BuildCollectionType(ctx, CollectionType.IReadOnlyCollection, info.EnumeratedType)
             : info.ImplementedTypes.HasFlag(CollectionType.ICollection)
                 ? BuildCollectionType(ctx, CollectionType.ICollection, info.EnumeratedType)
-                : info.Type;
-        return CollectionInfoBuilder.BuildCollectionInfo(ctx.Types, ctx.SymbolAccessor, collectionType, info.EnumeratedType);
+                : null;
+
+        return collectionType == null
+            ? info
+            : CollectionInfoBuilder.BuildCollectionInfo(ctx.Types, ctx.SymbolAccessor, collectionType, info.EnumeratedType);
     }
 
     private static INamedTypeSymbol BuildCollectionType(MappingBuilderContext ctx, CollectionType type, ITypeSymbol enumeratedType)

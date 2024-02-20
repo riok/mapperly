@@ -267,13 +267,20 @@ public static class DictionaryMappingBuilder
         ITypeSymbol value
     )
     {
+        // the types cannot be changed for mappings with a user symbol
+        // as the types are defined by the user
+        if (ctx.HasUserSymbol)
+            return info;
+
         var dictionaryType = info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyDictionary)
             ? BuildDictionaryType(ctx, CollectionType.IReadOnlyDictionary, key, value)
             : info.ImplementedTypes.HasFlag(CollectionType.IDictionary)
                 ? BuildDictionaryType(ctx, CollectionType.IDictionary, key, value)
-                : info.Type;
+                : null;
 
-        return CollectionInfoBuilder.BuildCollectionInfo(ctx.Types, ctx.SymbolAccessor, dictionaryType, info.EnumeratedType);
+        return dictionaryType == null
+            ? info
+            : CollectionInfoBuilder.BuildCollectionInfo(ctx.Types, ctx.SymbolAccessor, dictionaryType, info.EnumeratedType);
     }
 
     private static INamedTypeSymbol BuildDictionaryType(

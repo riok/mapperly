@@ -62,6 +62,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     protected IMethodSymbol? UserSymbol { get; }
 
+    public bool HasUserSymbol => UserSymbol != null;
+
     /// <summary>
     /// Whether the current mapping code is generated for a <see cref="System.Linq.Expressions.Expression"/>.
     /// </summary>
