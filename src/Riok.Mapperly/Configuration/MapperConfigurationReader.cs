@@ -33,7 +33,8 @@ public class MapperConfigurationReader
                 Array.Empty<string>(),
                 Array.Empty<PropertyMappingConfiguration>(),
                 Mapper.IgnoreObsoleteMembersStrategy,
-                Mapper.RequiredMappingStrategy
+                Mapper.RequiredMappingStrategy,
+                Mapper.MaxRecursionDepth
             ),
             Array.Empty<DerivedTypeMappingConfiguration>()
         );
@@ -79,13 +80,18 @@ public class MapperConfigurationReader
         var requiredMapping = _dataAccessor.Access<MapperRequiredMappingAttribute>(method).FirstOrDefault() is not { } methodWarnUnmapped
             ? _defaultConfiguration.Properties.RequiredMappingStrategy
             : methodWarnUnmapped.RequiredMappingStrategy;
+        var maxRecursionDepth = _dataAccessor.Access<MapperMaxRecursionDepthAttribute>(method).FirstOrDefault()
+            is not { } methodMaxRecursionDepth
+            ? _defaultConfiguration.Properties.MaxRecursionDepth
+            : methodMaxRecursionDepth.MaxRecursionDepth;
 
         return new PropertiesMappingConfiguration(
             ignoredSourceProperties,
             ignoredTargetProperties,
             propertyConfigurations,
             ignoreObsolete,
-            requiredMapping
+            requiredMapping,
+            maxRecursionDepth
         );
     }
 

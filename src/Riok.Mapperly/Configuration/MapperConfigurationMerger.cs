@@ -59,6 +59,9 @@ public static class MapperConfigurationMerger
             ?? defaultMapperConfiguration.PreferParameterlessConstructors
             ?? mapper.PreferParameterlessConstructors;
 
+        mapper.MaxRecursionDepth =
+            mapperConfiguration.MaxRecursionDepth ?? defaultMapperConfiguration.MaxRecursionDepth ?? mapper.MaxRecursionDepth;
+
         return mapper;
     }
 }
