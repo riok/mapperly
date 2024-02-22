@@ -1,0 +1,20 @@
+---
+sidebar_label: RMG066
+description: 'Mapperly analyzer diagnostic RMG066 — No members are mapped in an object mapping'
+---
+
+# RMG066 — No members are mapped in an object mapping
+
+If Mapperly maps to an object without mapping any member, `RMG066` is emitted.
+
+The generated implementation part of the mapping method usually looks like this:
+
+```csharp
+public partial Target Map(Source source)
+{
+    var target = new Target();
+    return target;
+}
+```
+
+Usually this is not expected.

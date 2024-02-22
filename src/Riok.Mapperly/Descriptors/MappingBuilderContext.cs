@@ -12,7 +12,7 @@ using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
 
-[DebuggerDisplay("{GetType().Name}({Source.Name} => {Target.Name})")]
+[DebuggerDisplay("{GetType().Name}({Source} => {Target})")]
 public class MappingBuilderContext : SimpleMappingBuilderContext
 {
     private readonly FormatProviderCollection _formatProviders;

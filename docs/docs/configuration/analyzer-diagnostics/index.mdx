@@ -1,0 +1,43 @@
+---
+sidebar_position: 15
+description: A list of all analyzer diagnostics used by Mapperly and how to configure them.
+---
+
+import AnalyzerRules from '@site/src/components/AnalyzerRules';
+
+# Analyzer diagnostics
+
+Mapperly emits several diagnostics:
+
+<AnalyzerRules></AnalyzerRules>
+
+:::info
+Mapperly only emits updated source code on build.
+You won't see the updated mapper code or mapper diagnostics until you perform a build.
+
+This is done for performance reasons,
+otherwise the IDE could become laggy.
+:::
+
+## Editorconfig
+
+The severity of these diagnostics can be customized via an `.editorconfig` file:
+
+```editorconfig title=".editorconfig"
+[*.cs]
+dotnet_diagnostic.{RuleID}.severity = error
+dotnet_diagnostic.RMG020.severity = error
+```
+
+## Suppress diagnostics
+
+See the Microsoft documentation on how to suppress diagnostics in C# [here](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/suppress-warnings).
+In summary, you can use one of the following approaches:
+
+- Use the `.editorconfig` file (for an entire file, directory or project, depending on the editorconfig scope)  
+  `dotnet_diagnostic.RMG066.severity = none`
+- Use the `SuppressMessageAttribute` (for a method)  
+  `[SuppressMessage("Mapper", "RMG066:No members are mapped in an object mapping")]`
+- Use precompiler directives (for specific lines of code)  
+  `#pragma warning disable RMG066 // No members are mapped in an object mapping`  
+  `#pragma warning restore RMG066 // No members are mapped in an object mapping`

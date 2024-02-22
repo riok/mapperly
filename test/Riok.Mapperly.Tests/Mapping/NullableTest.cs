@@ -202,21 +202,36 @@ public class NullableTest
     [Fact]
     public Task ShouldUpgradeNullabilityInDisabledNullableContext()
     {
-        var source = TestSourceBuilder.Mapping("A", "B", "class A {}", "class B {}");
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; set; } }"
+        );
         return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
     }
 
     [Fact]
     public Task ShouldUpgradeArrayElementNullabilityInDisabledNullableContext()
     {
-        var source = TestSourceBuilder.Mapping("A[]", "B[]", "class A {}", "class B {}");
+        var source = TestSourceBuilder.Mapping(
+            "A[]",
+            "B[]",
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; set; } }"
+        );
         return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
     }
 
     [Fact]
     public Task ShouldUpgradeGenericNullabilityInDisabledNullableContext()
     {
-        var source = TestSourceBuilder.Mapping("IEnumerable<A>", "IReadOnlyCollection<B>", "class A {}", "class B {}");
+        var source = TestSourceBuilder.Mapping(
+            "IEnumerable<A>",
+            "IReadOnlyCollection<B>",
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; set; } }"
+        );
         return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
     }
 }

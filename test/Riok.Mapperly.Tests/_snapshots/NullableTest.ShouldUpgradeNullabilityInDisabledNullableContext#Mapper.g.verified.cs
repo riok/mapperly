@@ -9,6 +9,7 @@ public partial class Mapper
         if (source == null)
             return default;
         var target = new global::B();
+        target.Value = source.Value;
         return target;
     }
 }

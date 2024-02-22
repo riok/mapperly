@@ -147,7 +147,7 @@ public class ObjectVisibilityTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.NoDiagnostics, new[] { aAssembly })
+            .GenerateMapper(source, TestHelperOptions.Default, new[] { aAssembly })
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -180,7 +180,7 @@ public class ObjectVisibilityTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.NoDiagnostics, new[] { aAssembly })
+            .GenerateMapper(source, TestHelperOptions.Default, new[] { aAssembly })
             .Should()
             .HaveSingleMethodBody(
                 """

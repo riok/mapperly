@@ -445,7 +445,7 @@ public class UnsafeAccessorTest
     }
 
     [Fact]
-    public Task AttributeShouldOverrideAssemblyDefault()
+    public Task statAttributeShouldOverrideAssemblyDefault()
     {
         var source = TestSourceBuilder.CSharp(
             """
@@ -458,9 +458,9 @@ public class UnsafeAccessorTest
                 private partial B Map(A value);
             }
 
-            class A { private int value { get; set; } }
+            class A { private int privateValue { get; set; } public int PublicValue { get; set; } }
 
-            class B { private int value { get; set; } }
+            class B { private int privateValue { get; set; } public int PublicValue { get; set; } }
             """
         );
 

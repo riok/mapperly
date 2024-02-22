@@ -1,7 +1,9 @@
+import Link from '@docusaurus/Link';
 import React from 'react';
 
 interface AnalyzerRule {
   id: string;
+  hasDocumentation: boolean;
   category: string;
   severity: string;
   notes: string;
@@ -22,7 +24,7 @@ export default function AnalyzerRules(): JSX.Element {
       <tbody>
         {rules.map((r) => (
           <tr>
-            <td>{r.id}</td>
+            <td>{r.hasDocumentation ? <Link to={r.id}>{r.id}</Link> : r.id}</td>
             <td>{r.severity}</td>
             <td>{r.notes}</td>
           </tr>

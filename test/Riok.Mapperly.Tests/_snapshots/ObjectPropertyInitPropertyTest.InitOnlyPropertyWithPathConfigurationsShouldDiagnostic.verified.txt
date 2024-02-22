@@ -19,6 +19,17 @@
       MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
       Message: The member NestedValue on the mapping source type A is not mapped to any member on the mapping target type B,
       Category: Mapper
+    },
+    {
+      Id: RMG066,
+      Title: No members are mapped in an object mapping,
+      Severity: Warning,
+      WarningLevel: 1,
+      Location: : (10,4)-(10,82),
+      HelpLink: https://localhost:3000/docs/configuration/analyzer-diagnostics/RMG066,
+      MessageFormat: No members are mapped in the object mapping from {0} to {1},
+      Message: No members are mapped in the object mapping from A to B,
+      Category: Mapper
     }
   ]
 }

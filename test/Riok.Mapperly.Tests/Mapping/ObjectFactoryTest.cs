@@ -347,7 +347,7 @@ public class ObjectFactoryTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature)
             .HaveAssertedAllDiagnostics();
@@ -363,7 +363,7 @@ public class ObjectFactoryTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature)
             .HaveAssertedAllDiagnostics();
@@ -379,7 +379,7 @@ public class ObjectFactoryTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature)
             .HaveAssertedAllDiagnostics();
@@ -395,7 +395,7 @@ public class ObjectFactoryTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature)
             .HaveAssertedAllDiagnostics();
@@ -411,7 +411,7 @@ public class ObjectFactoryTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature)
             .HaveAssertedAllDiagnostics();
@@ -427,7 +427,7 @@ public class ObjectFactoryTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature)
             .HaveAssertedAllDiagnostics();
@@ -443,7 +443,7 @@ public class ObjectFactoryTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature)
             .HaveAssertedAllDiagnostics();
@@ -459,7 +459,7 @@ public class ObjectFactoryTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature)
             .HaveAssertedAllDiagnostics();
@@ -475,7 +475,7 @@ public class ObjectFactoryTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature)
             .HaveAssertedAllDiagnostics();

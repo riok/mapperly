@@ -8,6 +8,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 /// <summary>
 /// A default implementation of <see cref="IExistingTargetMapping"/>.
 /// </summary>
+[DebuggerDisplay("{GetType().Name}({SourceType} => {TargetType})")]
 public abstract class ExistingTargetMapping : IExistingTargetMapping
 {
     protected ExistingTargetMapping(ITypeSymbol sourceType, ITypeSymbol targetType)

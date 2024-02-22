@@ -82,6 +82,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapperIgnoreTarget(nameof(TestObject.IgnoredStringValue))]
         [MapperIgnoreTarget(nameof(TestObject.IgnoredIntValue))]
         [MapperIgnoreSource(nameof(TestObjectDto.IgnoredIntValue))]
+        [MapperIgnoreSource(nameof(TestObjectDto.SpanValue))]
         public partial TestObject MapFromDto(TestObjectDto dto);
 
         [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredIntValue))]
