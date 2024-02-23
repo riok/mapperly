@@ -16,6 +16,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapperIgnoreTarget(nameof(TestObjectDtoProjection.IgnoredIntValue))]
         [MapperIgnoreSource(nameof(TestObjectProjection.IgnoredStringValue))]
         [MapProperty(nameof(TestObjectProjection.RenamedStringValue), nameof(TestObjectDtoProjection.RenamedStringValue2))]
+        [MapProperty(
+            nameof(TestObjectProjection.ManuallyMappedModified),
+            nameof(TestObjectDtoProjection.ManuallyMappedModified),
+            Use = nameof(ModifyInt)
+        )]
         [MapperIgnoreObsoleteMembers]
         private static partial TestObjectDtoProjection ProjectToDto(this TestObjectProjection testObject);
 
@@ -29,5 +34,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapDerivedType(typeof(TestObjectProjectionTypeA), typeof(TestObjectDtoProjectionTypeA))]
         [MapDerivedType(typeof(TestObjectProjectionTypeB), typeof(TestObjectDtoProjectionTypeB))]
         private static partial TestObjectDtoProjectionBaseType MapDerived(TestObjectProjectionBaseType source);
+
+        [UserMapping(Default = false)]
+        private static int ModifyInt(int v) => v + 10;
     }
 }

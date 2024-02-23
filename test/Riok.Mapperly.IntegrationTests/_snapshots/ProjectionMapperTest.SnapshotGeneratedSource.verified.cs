@@ -45,6 +45,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(x.DateTimeValueTargetDateOnly),
                 DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(x.DateTimeValueTargetTimeOnly),
                 ManuallyMapped = MapManual(x.ManuallyMapped),
+                ManuallyMappedModified = ModifyInt(x.ManuallyMappedModified),
                 ManuallyMappedList = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(x.ManuallyMappedList, x1 => MapManual(x1))),
             });
 #nullable enable
@@ -123,6 +124,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(testObject.DateTimeValueTargetDateOnly);
             target.DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(testObject.DateTimeValueTargetTimeOnly);
             target.ManuallyMapped = MapManual(testObject.ManuallyMapped);
+            target.ManuallyMappedModified = ModifyInt(testObject.ManuallyMappedModified);
             target.ManuallyMappedList = MapToList(testObject.ManuallyMappedList);
             return target;
         }

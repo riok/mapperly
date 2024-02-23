@@ -48,6 +48,7 @@
       DateTimeValueTargetDateOnly: 2018-11-29 10:11:12,
       DateTimeValueTargetTimeOnly: 2018-11-29 10:11:12,
       ManuallyMapped: fooBar5,
+      ManuallyMappedModified: 1,
       ManuallyMappedList: [
         {
           Id: 1,
@@ -66,7 +67,8 @@
     ManuallyMapped: {
       MagicIntValue: 100,
       StringValue: fooBar
-    }
+    },
+    ManuallyMappedModified: 10
   },
   {
     CtorValue: 2,
@@ -93,6 +95,7 @@
       MagicIntValue: 100,
       StringValue: fooBar5
     },
+    ManuallyMappedModified: 11,
     ManuallyMappedList: [
       Value10,
       Value20

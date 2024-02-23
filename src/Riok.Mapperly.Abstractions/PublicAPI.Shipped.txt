@@ -151,3 +151,5 @@ Riok.Mapperly.Abstractions.UserMappingAttribute.Ignore.set -> void
 Riok.Mapperly.Abstractions.UserMappingAttribute.UserMappingAttribute() -> void
 Riok.Mapperly.Abstractions.UserMappingAttribute.Default.get -> bool
 Riok.Mapperly.Abstractions.UserMappingAttribute.Default.set -> void
+Riok.Mapperly.Abstractions.MapPropertyAttribute.Use.get -> string?
+Riok.Mapperly.Abstractions.MapPropertyAttribute.Use.set -> void

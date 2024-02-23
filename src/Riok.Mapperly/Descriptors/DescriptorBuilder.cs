@@ -128,7 +128,7 @@ public class DescriptorBuilder
                 firstNonStaticUserMapping = userMapping.Method;
             }
 
-            AddUserMapping(userMapping, false);
+            AddUserMapping(userMapping, false, true);
         }
 
         if (_mapperDescriptor.Static && firstNonStaticUserMapping is not null)
@@ -166,7 +166,7 @@ public class DescriptorBuilder
     {
         foreach (var externalMapping in ExternalMappingsExtractor.ExtractExternalMappings(_builderContext, _mapperDescriptor.Symbol))
         {
-            AddUserMapping(externalMapping, true);
+            AddUserMapping(externalMapping, true, false);
         }
     }
 
@@ -209,9 +209,9 @@ public class DescriptorBuilder
         _mapperDescriptor.AddUnsafeAccessors(_unsafeAccessorContext.UnsafeAccessors);
     }
 
-    private void AddUserMapping(IUserMapping mapping, bool ignoreDuplicates)
+    private void AddUserMapping(IUserMapping mapping, bool ignoreDuplicates, bool named)
     {
-        var result = _mappings.AddUserMapping(mapping, ignoreDuplicates);
+        var result = _mappings.AddUserMapping(mapping, ignoreDuplicates, named ? mapping.Method.Name : null);
         if (result == MappingCollectionAddResult.NotAddedDuplicatedDefault)
         {
             _diagnostics.ReportDiagnostic(
@@ -225,7 +225,7 @@ public class DescriptorBuilder
 
     private void AddUserMappingDiagnostics()
     {
-        foreach (var mapping in _mappings.UsedDuplicatedNonDefaultUserMappings)
+        foreach (var mapping in _mappings.UsedDuplicatedNonDefaultNonReferencedUserMappings)
         {
             _diagnostics.ReportDiagnostic(
                 DiagnosticDescriptors.MultipleUserMappingsWithoutDefault,

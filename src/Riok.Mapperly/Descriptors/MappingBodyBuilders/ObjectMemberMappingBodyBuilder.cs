@@ -99,7 +99,7 @@ public static class ObjectMemberMappingBodyBuilder
         BuildMemberAssignmentMapping(ctx, sourceMemberPath, targetMemberPath, config);
     }
 
-    [SuppressMessage(" Meziantou.Analyzer", "MA0051:MethodIsTooLong")]
+    [SuppressMessage("Meziantou.Analyzer", "MA0051:MethodIsTooLong")]
     public static bool ValidateMappingSpecification(
         IMembersBuilderContext<IMapping> ctx,
         MemberPath sourceMemberPath,
@@ -274,28 +274,9 @@ public static class ObjectMemberMappingBodyBuilder
         if (!ValidateMappingSpecification(ctx, sourceMemberPath, targetMemberPath))
             return;
 
-        // nullability is handled inside the member mapping
-        var typeMapping = new TypeMappingKey(
-            sourceMemberPath.MemberType,
-            targetMemberPath.MemberType,
-            memberConfig?.ToTypeMappingConfiguration()
-        );
-        var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(typeMapping, diagnosticLocation: memberConfig?.Location);
-
-        // couldn't build the mapping
+        var delegateMapping = TryBuildMemberTypeMapping(ctx, sourceMemberPath, targetMemberPath, memberConfig);
         if (delegateMapping == null)
-        {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.CouldNotMapMember,
-                ctx.Mapping.SourceType,
-                sourceMemberPath.FullName,
-                sourceMemberPath.Member.Type,
-                ctx.Mapping.TargetType,
-                targetMemberPath.FullName,
-                targetMemberPath.Member.Type
-            );
             return;
-        }
 
         var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourceMemberPath);
         var setterTargetPath = SetterMemberPath.Build(ctx.BuilderContext, targetMemberPath);
@@ -327,6 +308,39 @@ public static class ObjectMemberMappingBodyBuilder
         ctx.AddNullDelegateMemberAssignmentMapping(
             new MemberAssignmentMapping(setterTargetPath, new MemberMapping(delegateMapping, getterSourcePath, false, true))
         );
+    }
+
+    private static INewInstanceMapping? TryBuildMemberTypeMapping(
+        IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
+        MemberPath sourceMemberPath,
+        MemberPath targetMemberPath,
+        PropertyMappingConfiguration? memberConfig
+    )
+    {
+        // nullability is handled inside the member mapping
+        var typeMapping = new TypeMappingKey(
+            sourceMemberPath.MemberType,
+            targetMemberPath.MemberType,
+            memberConfig?.ToTypeMappingConfiguration()
+        );
+
+        var mapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(typeMapping, diagnosticLocation: memberConfig?.Location);
+        if (mapping != null)
+        {
+            return mapping;
+        }
+
+        // couldn't build the mapping
+        ctx.BuilderContext.ReportDiagnostic(
+            DiagnosticDescriptors.CouldNotMapMember,
+            ctx.Mapping.SourceType,
+            sourceMemberPath.FullName,
+            sourceMemberPath.Member.Type,
+            ctx.Mapping.TargetType,
+            targetMemberPath.FullName,
+            targetMemberPath.Member.Type
+        );
+        return null;
     }
 
     private static bool TryAddExistingTargetMapping(

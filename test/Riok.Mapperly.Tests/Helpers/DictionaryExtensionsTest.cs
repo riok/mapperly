@@ -34,4 +34,24 @@ public class DictionaryExtensionsTest
         d.RemoveRange(new[] { "a", "c" });
         d.Keys.Should().BeEquivalentTo("b");
     }
+
+    [Fact]
+    public void TryAddShouldNotAddExistingKey()
+    {
+        var d = new Dictionary<string, int> { ["a"] = 10, };
+
+        d.TryAdd("a", 20).Should().BeFalse();
+
+        d["a"].Should().Be(10);
+    }
+
+    [Fact]
+    public void TryAddShouldAddNewKey()
+    {
+        var d = new Dictionary<string, int> { ["a"] = 10, };
+
+        d.TryAdd("b", 20).Should().BeTrue();
+
+        d["b"].Should().Be(20);
+    }
 }

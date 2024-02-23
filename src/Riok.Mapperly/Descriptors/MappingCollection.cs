@@ -38,11 +38,16 @@ public class MappingCollection
     /// <inheritdoc cref="_userMappings"/>
     public IReadOnlyCollection<IUserMapping> UserMappings => _userMappings;
 
-    /// <inheritdoc cref="MappingCollectionInstance{T}.UsedDuplicatedNonDefaultUserMappings"/>
-    public IEnumerable<IUserMapping> UsedDuplicatedNonDefaultUserMappings =>
-        _newInstanceMappings.UsedDuplicatedNonDefaultUserMappings.Concat(_existingTargetMappings.UsedDuplicatedNonDefaultUserMappings);
+    /// <inheritdoc cref="MappingCollectionInstance{T}.UsedDuplicatedNonDefaultNonReferencedUserMappings"/>
+    public IEnumerable<IUserMapping> UsedDuplicatedNonDefaultNonReferencedUserMappings =>
+        _newInstanceMappings.UsedDuplicatedNonDefaultNonReferencedUserMappings.Concat(
+            _existingTargetMappings.UsedDuplicatedNonDefaultNonReferencedUserMappings
+        );
 
     public INewInstanceMapping? FindNewInstanceMapping(TypeMappingKey mappingKey) => _newInstanceMappings.Find(mappingKey);
+
+    public INewInstanceMapping? FindNamedNewInstanceMapping(string name, out bool ambiguousName) =>
+        _newInstanceMappings.FindNamed(name, out ambiguousName);
 
     public IExistingTargetMapping? FindExistingInstanceMapping(TypeMappingKey mappingKey) => _existingTargetMappings.Find(mappingKey);
 
@@ -51,7 +56,7 @@ public class MappingCollection
     public void EnqueueToBuildBody(ITypeMapping mapping, MappingBuilderContext ctx) =>
         _mappingsToBuildBody.Enqueue((mapping, ctx), mapping.BodyBuildingPriority);
 
-    public MappingCollectionAddResult AddUserMapping(IUserMapping userMapping, bool ignoreDuplicates)
+    public MappingCollectionAddResult AddUserMapping(IUserMapping userMapping, bool ignoreDuplicates, string? name)
     {
         _userMappings.Add(userMapping);
 
@@ -63,9 +68,9 @@ public class MappingCollection
         return userMapping switch
         {
             INewInstanceMapping newInstanceMapping
-                => _newInstanceMappings.AddUserMapping(newInstanceMapping, ignoreDuplicates, userMapping.Default),
+                => _newInstanceMappings.AddUserMapping(newInstanceMapping, ignoreDuplicates, userMapping.Default, name),
             IExistingTargetMapping existingTargetMapping
-                => _existingTargetMappings.AddUserMapping(existingTargetMapping, ignoreDuplicates, userMapping.Default),
+                => _existingTargetMappings.AddUserMapping(existingTargetMapping, ignoreDuplicates, userMapping.Default, name),
             _ => throw new ArgumentOutOfRangeException(nameof(userMapping), userMapping.GetType().FullName + " mappings are not supported")
         };
     }
@@ -117,6 +122,16 @@ public class MappingCollection
         private readonly Dictionary<TypeMappingKey, T> _defaultMappings = new();
 
         /// <summary>
+        /// Named mappings by their names.
+        /// </summary>
+        private readonly Dictionary<string, T> _namedMappings = new();
+
+        /// <summary>
+        /// Duplicated mapping names.
+        /// </summary>
+        private readonly HashSet<string> _duplicatedMappingNames = new();
+
+        /// <summary>
         /// All default user mapping type keys which have an explicit default value set.
         /// </summary>
         private readonly HashSet<TypeMappingKey> _defaultUserMappingKeys = new();
@@ -128,23 +143,44 @@ public class MappingCollection
         /// </summary>
         private readonly Dictionary<TypeMappingKey, T> _firstDuplicatedNonDefaultUserMappings = new();
 
-        /// <inheritdoc cref="_firstDuplicatedNonDefaultUserMappings"/>
-        /// <remarks>
-        /// Includes only mappings for type-pair which are actually in use.
-        /// </remarks>
-        public IEnumerable<IUserMapping> UsedDuplicatedNonDefaultUserMappings =>
-            _usedMappingKeys.Select(_firstDuplicatedNonDefaultUserMappings.GetValueOrDefault).WhereNotNull().Cast<IUserMapping>();
-
         /// <summary>
         /// All mapping keys for which <see cref="Find"/> was called and returned a non-null result.
         /// </summary>
         private readonly HashSet<TypeMappingKey> _usedMappingKeys = new();
+
+        /// <summary>
+        /// All mapping names for which <see cref="FindNamed"/> was called and returned a non-null result.
+        /// </summary>
+        private readonly HashSet<string> _referencedMappingNames = new();
+
+        /// <inheritdoc cref="_firstDuplicatedNonDefaultUserMappings"/>
+        /// <remarks>
+        /// Includes only mappings for type-pairs which are actually in use.
+        /// </remarks>
+        public IEnumerable<IUserMapping> UsedDuplicatedNonDefaultNonReferencedUserMappings =>
+            _usedMappingKeys
+                .Select(_firstDuplicatedNonDefaultUserMappings.GetValueOrDefault)
+                .WhereNotNull()
+                .Cast<IUserMapping>()
+                .Where(x => !_referencedMappingNames.Contains(x.Method.Name));
 
         public T? Find(TypeMappingKey mappingKey)
         {
             if (_defaultMappings.TryGetValue(mappingKey, out var mapping))
             {
                 _usedMappingKeys.Add(mappingKey);
+            }
+
+            return mapping;
+        }
+
+        public T? FindNamed(string name, out bool ambiguousName)
+        {
+            ambiguousName = false;
+            if (_namedMappings.TryGetValue(name, out var mapping))
+            {
+                ambiguousName = _duplicatedMappingNames.Contains(name);
+                _referencedMappingNames.Add(name);
             }
 
             return mapping;
@@ -163,10 +199,15 @@ public class MappingCollection
             return MappingCollectionAddResult.Added;
         }
 
-        public MappingCollectionAddResult AddUserMapping(T mapping, bool ignoreDuplicates, bool? isDefault)
+        public MappingCollectionAddResult AddUserMapping(T mapping, bool ignoreDuplicates, bool? isDefault, string? name)
         {
             if (!mapping.CallableByOtherMappings)
                 return MappingCollectionAddResult.NotAddedIgnored;
+
+            if (name != null && !_namedMappings.TryAdd(name, mapping))
+            {
+                _duplicatedMappingNames.Add(name);
+            }
 
             return isDefault switch
             {

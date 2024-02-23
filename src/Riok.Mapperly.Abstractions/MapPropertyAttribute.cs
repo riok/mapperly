@@ -47,6 +47,11 @@ public sealed class MapPropertyAttribute : Attribute
     public IReadOnlyCollection<string> Target { get; }
 
     /// <summary>
+    /// Gets the full name of the target property path.
+    /// </summary>
+    public string TargetFullName => string.Join(PropertyAccessSeparatorStr, Target);
+
+    /// <summary>
     /// Gets or sets the format of the <c>ToString</c> conversion (implementing <see cref="IFormattable" />).
     /// </summary>
     public string? StringFormat { get; set; }
@@ -59,7 +64,7 @@ public sealed class MapPropertyAttribute : Attribute
     public string? FormatProvider { get; set; }
 
     /// <summary>
-    /// Gets the full name of the target property path.
+    /// Reference to a unique named mapping method which should be used to map this member.
     /// </summary>
-    public string TargetFullName => string.Join(PropertyAccessSeparatorStr, Target);
+    public string? Use { get; set; }
 }

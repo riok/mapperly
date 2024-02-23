@@ -326,7 +326,7 @@ public class UseMapperTest
             "record B(BExternal Value);",
             "record AExternal();",
             "record BExternal();",
-            "class OtherMapper { [UserMapping] public BExternal ToBExternal(AExternal source) => new BExternal(); }"
+            "class OtherMapper { [UserMapping(Default = true)] public BExternal ToBExternal(AExternal source) => new BExternal(); }"
         );
         TestHelper
             .GenerateMapper(source)
