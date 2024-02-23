@@ -583,6 +583,15 @@ public static class DiagnosticDescriptors
         helpLinkUri: BuildHelpUri("RMG066")
     );
 
+    public static readonly DiagnosticDescriptor InvalidMapPropertyAttributeUsage = new DiagnosticDescriptor(
+        "RMG067",
+        "Invalid usage of the MapPropertyAttribute",
+        "Invalid usage of the MapPropertyAttribute",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT
