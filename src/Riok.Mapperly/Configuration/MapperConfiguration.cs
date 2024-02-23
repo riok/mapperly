@@ -110,4 +110,9 @@ public record MapperConfiguration
     /// When <c>false</c>, accessible constructors are ordered in descending order by their parameter count.
     /// </summary>
     public bool? PreferParameterlessConstructors { get; init; }
+
+    /// <summary>
+    /// Whether to consider non-partial methods in a mapper as user implemented mapping methods.
+    /// </summary>
+    public bool? AutoUserMappings { get; set; }
 }

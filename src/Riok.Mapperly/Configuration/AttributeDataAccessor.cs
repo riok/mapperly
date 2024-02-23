@@ -20,6 +20,9 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         where TAttribute : Attribute
         where TData : notnull => Access<TAttribute, TData>(symbol).Single();
 
+    public TAttribute? AccessFirstOrDefault<TAttribute>(ISymbol symbol)
+        where TAttribute : Attribute => AccessFirstOrDefault<TAttribute, TAttribute>(symbol);
+
     public TData? AccessFirstOrDefault<TAttribute, TData>(ISymbol symbol)
         where TAttribute : Attribute
         where TData : notnull => Access<TAttribute, TData>(symbol).FirstOrDefault();

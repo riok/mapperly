@@ -429,4 +429,116 @@ public class UserMethodTest
                 """
             );
     }
+
+    [Fact]
+    public void DisabledAutoUserMappingsShouldIgnoreUserImplemented()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static int NotAMappingMethod(int s) => s;
+            public partial B Map(A s);
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "public record A(int Value);",
+            "public record B(int Value);"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(s.Value);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void DisabledAutoUserMappingWithExplicitIncludedMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static int NotAMappingMethod(int s) => s;
+            [UserMapping]
+            public static int AMappingMethod(int s) => s;
+            public partial B Map(A s);
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "public record A(int Value);",
+            "public record B(int Value);"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(AMappingMethod(s.Value));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void DisabledAutoUserMappingWithExplicitIncludedButIgnoredMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static int NotAMappingMethod(int s) => s;
+            [UserMapping(Ignore = true)]
+            public static int NotAMappingMethod2(int s) => s;
+            public partial B Map(A s);
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "public record A(int Value);",
+            "public record B(int Value);"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(s.Value);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void EnabledAutoUserMappingWithIgnoredMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UserMapping(Ignore = true)]
+            public static int NotAMappingMethod(int s) => s;
+            public partial B Map(A s);
+            """,
+            "public record A(int Value);",
+            "public record B(int Value);"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(s.Value);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public Task UserMappingAttributeOnNonMappingMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UserMapping]
+            public static void NotAMappingMethod2(int s) {}
+            public partial B Map(A s);
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "public record A(int Value);",
+            "public record B(int Value);"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
 }

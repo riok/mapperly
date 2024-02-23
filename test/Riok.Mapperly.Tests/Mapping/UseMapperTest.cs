@@ -311,4 +311,85 @@ public class UseMapperTest
                 """
             );
     }
+
+    [Fact]
+    public void UseMapperWithDisabledAutoUserMappingsExplicitlyMarkedMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UseMapper]
+            private readonly OtherMapper _otherMapper;
+            partial B Map(A source);
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "record A(AExternal Value);",
+            "record B(BExternal Value);",
+            "record AExternal();",
+            "record BExternal();",
+            "class OtherMapper { [UserMapping] public BExternal ToBExternal(AExternal source) => new BExternal(); }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(_otherMapper.ToBExternal(source.Value));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UseMapperWithDisabledAutoUserMappingsExplicitlyMarkedButIgnored()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UseMapper]
+            private readonly OtherMapper _otherMapper;
+            partial B Map(A source);
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "record A(AExternal Value);",
+            "record B(BExternal Value);",
+            "record AExternal();",
+            "record BExternal();",
+            "class OtherMapper { [UserMapping(Ignore = true)] public BExternal ToBExternal(AExternal source) => new BExternal(); }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(MapToBExternal(source.Value));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UseMapperWithExplicitlyIgnoredMappingMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UseMapper]
+            private readonly OtherMapper _otherMapper;
+            partial B Map(A source);
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "record A(AExternal Value);",
+            "record B(BExternal Value);",
+            "record AExternal();",
+            "record BExternal();",
+            "class OtherMapper { [UserMapping(Ignore = true)] public BExternal ToBExternal(AExternal source) => new BExternal(); }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(MapToBExternal(source.Value));
+                return target;
+                """
+            );
+    }
 }

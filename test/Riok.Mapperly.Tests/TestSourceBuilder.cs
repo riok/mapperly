@@ -92,7 +92,8 @@ public static class TestSourceBuilder
             Attribute(options.IgnoreObsoleteMembersStrategy),
             Attribute(options.RequiredMappingStrategy),
             Attribute(options.IncludedMembers),
-            Attribute(options.PreferParameterlessConstructors)
+            Attribute(options.PreferParameterlessConstructors),
+            Attribute(options.AutoUserMappings),
         }.WhereNotNull();
 
         return $"[Mapper({string.Join(", ", attrs)})]";

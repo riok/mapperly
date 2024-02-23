@@ -59,6 +59,9 @@ public static class MapperConfigurationMerger
             ?? defaultMapperConfiguration.PreferParameterlessConstructors
             ?? mapper.PreferParameterlessConstructors;
 
+        mapper.AutoUserMappings =
+            mapperConfiguration.AutoUserMappings ?? defaultMapperConfiguration.AutoUserMappings ?? mapper.AutoUserMappings;
+
         return mapper;
     }
 }

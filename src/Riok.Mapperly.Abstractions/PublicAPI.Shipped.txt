@@ -143,3 +143,9 @@ Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler.SetReferen
 Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler.TryGetReference<TSource, TTarget>(TSource source, out TTarget? target) -> bool
 Riok.Mapperly.Abstractions.MapperAttribute.PreferParameterlessConstructors.get -> bool
 Riok.Mapperly.Abstractions.MapperAttribute.PreferParameterlessConstructors.set -> void
+Riok.Mapperly.Abstractions.MapperAttribute.AutoUserMappings.get -> bool
+Riok.Mapperly.Abstractions.MapperAttribute.AutoUserMappings.set -> void
+Riok.Mapperly.Abstractions.UserMappingAttribute
+Riok.Mapperly.Abstractions.UserMappingAttribute.Ignore.get -> bool
+Riok.Mapperly.Abstractions.UserMappingAttribute.Ignore.set -> void
+Riok.Mapperly.Abstractions.UserMappingAttribute.UserMappingAttribute() -> void

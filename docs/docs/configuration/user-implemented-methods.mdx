@@ -22,6 +22,46 @@ public partial class CarMapper
 
 Whenever Mapperly needs a mapping from `TimeSpan` to `int` inside the `CarMapper` implementation, it will use the provided implementation.
 
+## Automatic user implemented mapping method discovery
+
+By default, user implemented mapping methods are discovered automatically.
+This can be disabled by setting `AutoUserMappings` to `false`.
+With `AutoUserMappings` disabled, only methods marked by the `UserMappingAttribute` are discovered by Mapperly.
+The `AutoUserMappings` value also applies to the usage of external mappers.
+
+```csharp
+[Mapper(AutoUserMappings = false)]
+public partial class CarMapper
+{
+    public partial CarDto CarToCarDto(Car car);
+
+    [UserMapping]
+    private int TimeSpanToHours(TimeSpan t) => t.Hours;
+
+    private int IgnoredTimeSpanToHours(TimeSpan t) => t.Minutes / 60;
+}
+```
+
+## Ignoring a user-implemented mapping method
+
+To ignore a user-implemented mapping method while using `AutoUserMappings`
+`[UserMapping(Ignore = true)]` can be applied.
+
+```csharp
+[Mapper]
+public partial class CarMapper
+{
+    public partial CarDto CarToCarDto(Car car);
+
+    // discovered and used by default (since AutoUserMappings is true by default)
+    private int TimeSpanToHours(TimeSpan t) => t.Hours;
+
+    // ignored user-implemented mapping
+    [UserMapping(Ignore = true)]
+    private int IgnoredTimeSpanToHours(TimeSpan t) => t.Minutes / 60;
+}
+```
+
 ## Use external mappings
 
 Mapperly can also consider mappings implemented in other classes.
@@ -83,4 +123,5 @@ In order for Mapperly to find the mappings, they must be made known with `UseMap
 Whenever Mapperly needs a mapping from `BananaBox` to `BananaBoxDto` inside the `BoxMapper` implementation,
 it will use the provided implementation by the `BananaMapper`.
 
-Used mappers themselves can be Mapperly backed classes.
+Used mappers themselves can be Mapperly backed classes.  
+The `AutoUserMappings` value also applies to the usage of external mappers.

@@ -50,7 +50,7 @@ public class MappingCollection
         return mapping;
     }
 
-    public void EnqueueToBuildBody(IMapping mapping, MappingBuilderContext ctx) =>
+    public void EnqueueToBuildBody(ITypeMapping mapping, MappingBuilderContext ctx) =>
         _mappingsToBuildBody.Enqueue((mapping, ctx), mapping.BodyBuildingPriority);
 
     public void Add(ITypeMapping mapping, TypeMappingConfiguration config)
