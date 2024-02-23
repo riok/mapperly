@@ -26,7 +26,8 @@ public class MapperConfigurationReader
                 null,
                 Array.Empty<IFieldSymbol>(),
                 Array.Empty<IFieldSymbol>(),
-                Array.Empty<EnumValueMappingConfiguration>()
+                Array.Empty<EnumValueMappingConfiguration>(),
+                Mapper.RequiredMappingStrategy
             ),
             new PropertiesMappingConfiguration(
                 Array.Empty<string>(),
@@ -104,13 +105,18 @@ public class MapperConfigurationReader
             .Access<MapperIgnoreTargetValueAttribute, MapperIgnoreEnumValueConfiguration>(configRef.Method)
             .Select(x => x.Value)
             .ToList();
+        var requiredMapping = _dataAccessor.Access<MapperRequiredMappingAttribute>(configRef.Method).FirstOrDefault()
+            is not { } methodWarnUnmapped
+            ? _defaultConfiguration.Enum.RequiredMappingStrategy
+            : methodWarnUnmapped.RequiredMappingStrategy;
         return new EnumMappingConfiguration(
             configData?.Strategy ?? _defaultConfiguration.Enum.Strategy,
             configData?.IgnoreCase ?? _defaultConfiguration.Enum.IgnoreCase,
             configData?.FallbackValue,
             ignoredSources,
             ignoredTargets,
-            explicitMappings
+            explicitMappings,
+            requiredMapping
         );
     }
 }

@@ -120,3 +120,44 @@ set the following two EditorConfig settings (see also [analyzer diagnostics](./a
 dotnet_diagnostic.RMG037.severity = error # Unmapped target enum value
 dotnet_diagnostic.RMG038.severity = error # Unmapped source enum value
 ```
+
+### One side strict enum member mappings
+
+To enforce strict enum member mappings on only either the source or the target,
+the `RequiredMappingStrategy` can be used.
+
+<Tabs>
+    <TabItem value="global" label="Global (mapper level)" default>
+    
+        Sets the `RequiredMappingStrategy` for all methods within the mapper,
+        by default it is `Both` requiring all members to be mapped.
+        This can be overriden by individual mapping methods using `MapperRequiredMappingAttribute`.
+    
+        ```csharp
+        // highlight-start
+        [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Source)]
+        // highlight-end
+        public partial class CarMapper
+        {
+            ...
+        }
+        ```
+    
+    </TabItem>
+    <TabItem value="local" label="Local (mapping method level)">
+    
+        Applied to the specific mapping method.
+    
+        ```csharp
+        [Mapper]
+        public partial class CarMapper
+        {
+            // highlight-start
+            [MapperRequiredMapping(RequiredMappingStrategy.Source)]
+            // highlight-end
+            public partial CarFeatureDto MapCar(CarFeature feature);
+        }
+        ```
+    
+    </TabItem>
+</Tabs>

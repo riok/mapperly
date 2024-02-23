@@ -212,17 +212,18 @@ public static class EnumMappingBuilder
         IEnumerable<IFieldSymbol> targetMembers
     )
     {
-        var missingSourceMembers = sourceMembers.Where(field => !mappings.ContainsKey(field));
-        foreach (var member in missingSourceMembers)
-        {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.SourceEnumValueNotMapped,
-                member.Name,
-                member.ConstantValue!,
-                ctx.Source,
-                ctx.Target
-            );
-        }
+        AddUnmappedSourceMembersDiagnostics(ctx, mappings, sourceMembers);
+        AddUnmappedTargetMembersDiagnostics(ctx, mappedTargetMembers, targetMembers);
+    }
+
+    private static void AddUnmappedTargetMembersDiagnostics(
+        MappingBuilderContext ctx,
+        ISet<IFieldSymbol> mappedTargetMembers,
+        IEnumerable<IFieldSymbol> targetMembers
+    )
+    {
+        if (!ctx.Configuration.Enum.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target))
+            return;
 
         var missingTargetMembers = targetMembers.Where(field =>
             !mappedTargetMembers.Contains(field) && ctx.Configuration.Enum.FallbackValue?.ConstantValue?.Equals(field.ConstantValue) != true
@@ -235,6 +236,28 @@ public static class EnumMappingBuilder
                 member.ConstantValue!,
                 ctx.Target,
                 ctx.Source
+            );
+        }
+    }
+
+    private static void AddUnmappedSourceMembersDiagnostics(
+        MappingBuilderContext ctx,
+        IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> mappings,
+        IEnumerable<IFieldSymbol> sourceMembers
+    )
+    {
+        if (!ctx.Configuration.Enum.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Source))
+            return;
+
+        var missingSourceMembers = sourceMembers.Where(field => !mappings.ContainsKey(field));
+        foreach (var member in missingSourceMembers)
+        {
+            ctx.ReportDiagnostic(
+                DiagnosticDescriptors.SourceEnumValueNotMapped,
+                member.Name,
+                member.ConstantValue!,
+                ctx.Source,
+                ctx.Target
             );
         }
     }
