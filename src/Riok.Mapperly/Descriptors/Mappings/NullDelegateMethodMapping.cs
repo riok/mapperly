@@ -14,7 +14,7 @@ public class NullDelegateMethodMapping(
     ITypeSymbol nullableTargetType,
     MethodMapping delegateMapping,
     NullFallbackValue nullFallbackValue
-) : MethodMapping(nullableSourceType, nullableTargetType)
+) : NewInstanceMethodMapping(nullableSourceType, nullableTargetType)
 {
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {

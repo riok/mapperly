@@ -54,7 +54,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     /// <returns>The <see cref="INewInstanceMapping"/> if a mapping was found or <c>null</c> if none was found.</returns>
     public override INewInstanceMapping? FindMapping(TypeMappingKey mappingKey)
     {
-        if (_inlineExpressionMappings.Find(mappingKey) is { } mapping)
+        if (_inlineExpressionMappings.FindNewInstanceMapping(mappingKey) is { } mapping)
             return mapping;
 
         // User implemented mappings are also taken into account.
@@ -63,7 +63,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         // https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/expression-trees/#limitations
         if (_parentContext.FindMapping(mappingKey) is UserImplementedMethodMapping userMapping)
         {
-            _inlineExpressionMappings.Add(userMapping, mappingKey.Configuration);
+            _inlineExpressionMappings.AddMapping(userMapping, mappingKey.Configuration);
             return userMapping;
         }
 
@@ -102,7 +102,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         mapping = BuildMapping(userSymbol, mappingKey, options, diagnosticLocation);
         if (mapping != null)
         {
-            _inlineExpressionMappings.Add(mapping, mappingKey.Configuration);
+            _inlineExpressionMappings.AddMapping(mapping, mappingKey.Configuration);
         }
 
         return mapping;

@@ -12,7 +12,7 @@ public static class MemoryMappingBuilder
     private const string SpanMemberName = nameof(Memory<int>.Span);
     private const string ToArrayMethodName = nameof(Enumerable.ToArray);
 
-    public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static INewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         if (!ctx.IsConversionEnabled(MappingConversionType.Memory))
             return null;
@@ -131,7 +131,7 @@ public static class MemoryMappingBuilder
         return new SourceObjectMemberMapping(ctx.Source, ctx.Target, SpanMemberName);
     }
 
-    private static NewInstanceMapping BuildArrayToMemoryMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    private static INewInstanceMapping BuildArrayToMemoryMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         if (!elementMapping.IsSynthetic || ctx.MapperConfiguration.UseDeepCloning)
             return new ArrayForMapping(

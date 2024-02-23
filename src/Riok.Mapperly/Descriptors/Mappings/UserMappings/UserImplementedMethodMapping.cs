@@ -12,12 +12,15 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 public class UserImplementedMethodMapping(
     string? receiver,
     IMethodSymbol method,
+    bool? isDefault,
     MethodParameter sourceParameter,
     ITypeSymbol targetType,
     MethodParameter? referenceHandlerParameter
 ) : NewInstanceMapping(sourceParameter.Type, targetType), IUserMapping
 {
     public IMethodSymbol Method { get; } = method;
+
+    public bool? Default { get; } = isDefault;
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {

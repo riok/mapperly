@@ -52,14 +52,6 @@ public class UserMethodTest
     }
 
     [Fact]
-    public void WithMultipleUserImplementedMethodShouldWork()
-    {
-        var source = TestSourceBuilder.MapperWithBody("partial int ToInt(string i);" + "int ToInt2(string i) => int.Parse(i);");
-
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return int.Parse(i);");
-    }
-
-    [Fact]
     public void WithExistingInstance()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -149,9 +141,14 @@ public class UserMethodTest
     }
 
     [Fact]
-    public void WithMultipleUserDefinedMethodShouldWork()
+    public void WithMultipleUserDefinedMethodShouldDiagnostic()
     {
-        var source = TestSourceBuilder.MapperWithBody("int ToInt(string i);" + "int ToInt2(string i);");
+        var source = TestSourceBuilder.MapperWithBody(
+            """
+            partial int ToInt(string source);
+            partial int ToInt2(string source);
+            """
+        );
 
         TestHelper.GenerateMapper(source).Should().AllMethodsHaveBody("return int.Parse(source);");
     }
@@ -479,6 +476,32 @@ public class UserMethodTest
     }
 
     [Fact]
+    public void DisabledAutoUserMappingWithMultipleExplicitIncludedMethodsOneDefault()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UserMapping]
+            public static int NotAMappingMethod(int s) => s;
+            [UserMapping(Default = true)]
+            public static int AMappingMethod(int s) => s;
+            public partial B Map(A s);
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "public record A(int Value);",
+            "public record B(int Value);"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(AMappingMethod(s.Value));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void DisabledAutoUserMappingWithExplicitIncludedButIgnoredMethod()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -540,5 +563,169 @@ public class UserMethodTest
             "public record B(int Value);"
         );
         return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task DisabledAutoUserMappingsMultipleDefaultUserMappingsShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UserMapping(Default = true)]
+            public static int IntMapping(int x) => x + 10;
+
+            [UserMapping(Default = true)]
+            public static int IntMapping2(int x) => x + 20;
+
+            public partial B Map(A s);
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "public record A(int Value);",
+            "public record B(int Value);"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MultipleDefaultUserMappingsShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UserMapping(Default = true)]
+            public static int IntMapping(int x) => x + 10;
+
+            [UserMapping(Default = true)]
+            public static int IntMapping2(int x) => x + 20;
+
+            public partial B Map(A s);
+            """,
+            "public record A(int Value);",
+            "public record B(int Value);"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void ExplicitDefaultFalseUserMappingsShouldBeIgnored()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UserMapping(Default = false)]
+            public static int IntMapping(int x) => x + 10;
+
+            [UserMapping(Default = false)]
+            public static int IntMapping2(int x) => x + 20;
+
+            public partial B Map(A s);
+            """,
+            "public record A(int Value);",
+            "public record B(int Value);"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(s.Value);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UserImplementedWithDefaultFalseUserMappingsShouldUseFirstNonFalseDefault()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UserMapping(Default = false)]
+            public static int IntMapping(int x) => x + 10;
+
+            [UserMapping(Default = false)]
+            public static int IntMapping2(int x) => x + 20;
+
+            [UserMapping]
+            public static int IntMapping3(int x) => x + 30;
+
+            [UserMapping]
+            public static int IntMapping4(int x) => x + 40;
+
+            public partial B Map(A s);
+            """,
+            "public record A(int Value);",
+            "public record B(int Value);"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.MultipleUserMappingsWithoutDefault,
+                "Multiple user mappings discovered for the mapping from int to int without specifying an explicit default"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(IntMapping3(s.Value));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UserImplementedWithDefaultTrueAndFalseUserMappingsShouldUseDefaultTrue()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UserMapping(Default = false)]
+            public static int IntMapping(int x) => x;
+
+            [UserMapping]
+            public static int IntMapping2(int x) => x + 20;
+
+            [UserMapping(Default = true)]
+            public static int IntMapping3(int x) => x + 30;
+
+            public partial B Map(A s);
+            """,
+            "public record A(int Value);",
+            "public record B(int Value);"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(IntMapping3(s.Value));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UnrelatedUserImplementedShouldNotReportDiagnostic()
+    {
+        // duplicated user mapping for int => int but
+        // but should not be used
+        // therefore no RMG060 should be reported
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public int IntMapping(int x) => x;
+            public int IntMapping2(int x) => x + 20;
+            public partial B Map(A s);
+            """,
+            "public record A(string Value);",
+            "public record B(string Value);"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(s.Value);
+                return target;
+                """
+            );
     }
 }

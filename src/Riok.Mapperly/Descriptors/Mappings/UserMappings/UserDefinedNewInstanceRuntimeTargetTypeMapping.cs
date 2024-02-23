@@ -21,7 +21,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
     bool enableReferenceHandling,
     NullFallbackValue nullArm,
     ITypeSymbol objectType
-) : MethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), IUserMapping
+) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), IUserMapping
 {
     private const string IsAssignableFromMethodName = nameof(Type.IsAssignableFrom);
     private const string GetTypeMethodName = nameof(GetType);
@@ -36,6 +36,12 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
     public override MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.AfterUserMappings;
 
     public IMethodSymbol Method { get; } = method;
+
+    /// <summary>
+    /// Always false, since <see cref="CallableByOtherMappings"/> is false
+    /// this can never be the default.
+    /// </summary>
+    public bool? Default => false;
 
     public override bool CallableByOtherMappings => false;
 

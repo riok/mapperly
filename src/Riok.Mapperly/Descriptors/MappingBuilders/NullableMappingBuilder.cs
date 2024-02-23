@@ -6,7 +6,7 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public static class NullableMappingBuilder
 {
-    public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static INewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         if (!TryBuildNonNullableMappingKey(ctx, out var mappingKey))
             return null;
@@ -38,12 +38,12 @@ public static class NullableMappingBuilder
         return true;
     }
 
-    private static NewInstanceMapping BuildNullDelegateMapping(MappingBuilderContext ctx, INewInstanceMapping mapping)
+    private static INewInstanceMapping BuildNullDelegateMapping(MappingBuilderContext ctx, INewInstanceMapping mapping)
     {
         var nullFallback = ctx.GetNullFallbackValue();
         return mapping switch
         {
-            MethodMapping methodMapping => new NullDelegateMethodMapping(ctx.Source, ctx.Target, methodMapping, nullFallback),
+            NewInstanceMethodMapping methodMapping => new NullDelegateMethodMapping(ctx.Source, ctx.Target, methodMapping, nullFallback),
             _ => new NullDelegateMapping(ctx.Source, ctx.Target, mapping, nullFallback),
         };
     }

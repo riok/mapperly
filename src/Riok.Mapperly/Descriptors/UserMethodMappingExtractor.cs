@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
@@ -114,6 +115,7 @@ public static class UserMethodMappingExtractor
             return new UserImplementedExistingTargetMethodMapping(
                 receiver,
                 method,
+                userMappingConfig.Default,
                 parameters.Source,
                 parameters.Target!.Value,
                 parameters.ReferenceHandler
@@ -123,6 +125,7 @@ public static class UserMethodMappingExtractor
         return new UserImplementedMethodMapping(
             receiver,
             method,
+            userMappingConfig.Default,
             parameters.Source,
             ctx.SymbolAccessor.UpgradeNullable(method.ReturnType),
             parameters.ReferenceHandler
@@ -188,8 +191,10 @@ public static class UserMethodMappingExtractor
             );
         }
 
+        var userMappingConfig = GetUserMappingConfig(ctx, methodSymbol, out _);
         return new UserDefinedNewInstanceMethodMapping(
             methodSymbol,
+            userMappingConfig.Default,
             parameters.Source,
             parameters.ReferenceHandler,
             ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
@@ -386,10 +391,14 @@ public static class UserMethodMappingExtractor
         return targetCanBeNull ? NullFallbackValue.Default : NullFallbackValue.ThrowArgumentNullException;
     }
 
-    private static UserMappingAttribute GetUserMappingConfig(SimpleMappingBuilderContext ctx, IMethodSymbol method, out bool hasAttribute)
+    private static UserMappingConfiguration GetUserMappingConfig(
+        SimpleMappingBuilderContext ctx,
+        IMethodSymbol method,
+        out bool hasAttribute
+    )
     {
-        var userMappingAttr = ctx.AttributeAccessor.AccessFirstOrDefault<UserMappingAttribute>(method);
+        var userMappingAttr = ctx.AttributeAccessor.AccessFirstOrDefault<UserMappingAttribute, UserMappingConfiguration>(method);
         hasAttribute = userMappingAttr != null;
-        return userMappingAttr ?? new UserMappingAttribute { Ignore = !ctx.MapperConfiguration.AutoUserMappings };
+        return userMappingAttr ?? new UserMappingConfiguration { Ignore = !ctx.MapperConfiguration.AutoUserMappings, };
     }
 }

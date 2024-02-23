@@ -1,5 +1,6 @@
 using System.Collections;
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Diagnostics;
 
@@ -12,6 +13,9 @@ public class DiagnosticCollection(Location defaultLocation) : IReadOnlyCollectio
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public int Count => _diagnostics.Count;
+
+    internal void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? symbolLocation, params object[] messageArgs) =>
+        ReportDiagnostic(descriptor, symbolLocation?.GetSyntaxLocation(), messageArgs);
 
     internal void ReportDiagnostic(DiagnosticDescriptor descriptor, Location? location = null, params object[] messageArgs)
     {

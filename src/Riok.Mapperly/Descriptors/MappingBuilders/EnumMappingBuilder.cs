@@ -9,7 +9,7 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public static class EnumMappingBuilder
 {
-    public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static INewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         var sourceIsEnum = ctx.Source.TryGetEnumUnderlyingType(out var sourceEnumType);
         var targetIsEnum = ctx.Target.TryGetEnumUnderlyingType(out var targetEnumType);
@@ -44,7 +44,7 @@ public static class EnumMappingBuilder
         };
     }
 
-    private static NewInstanceMapping BuildCastMappingAndDiagnostic(MappingBuilderContext ctx)
+    private static INewInstanceMapping BuildCastMappingAndDiagnostic(MappingBuilderContext ctx)
     {
         ctx.ReportDiagnostic(
             DiagnosticDescriptors.EnumMappingNotSupportedInProjectionMappings,
@@ -54,7 +54,7 @@ public static class EnumMappingBuilder
         return BuildEnumToEnumCastMapping(ctx, true);
     }
 
-    private static NewInstanceMapping BuildEnumToEnumCastMapping(
+    private static INewInstanceMapping BuildEnumToEnumCastMapping(
         MappingBuilderContext ctx,
         bool ignoreExplicitAndIgnoredMappings = false,
         bool checkTargetDefined = false

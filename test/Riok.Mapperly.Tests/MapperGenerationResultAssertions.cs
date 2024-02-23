@@ -84,7 +84,7 @@ public class MapperGenerationResultAssertions
         return this;
     }
 
-    public MapperGenerationResultAssertions AllMethodsHaveBody(string mapperMethodBody)
+    public MapperGenerationResultAssertions AllMethodsHaveBody([StringSyntax(LanguageNames.CSharp)] string mapperMethodBody)
     {
         mapperMethodBody = mapperMethodBody.ReplaceLineEndings().Trim();
         foreach (var method in _mapper.Methods.Values)

@@ -16,7 +16,7 @@ public class ArrayForEachMapping(
     INewInstanceMapping elementMapping,
     ITypeSymbol targetArrayElementType,
     string countPropertyName
-) : MethodMapping(sourceType, targetType)
+) : NewInstanceMethodMapping(sourceType, targetType)
 {
     private const string TargetVariableName = "target";
     private const string LoopItemVariableName = "item";

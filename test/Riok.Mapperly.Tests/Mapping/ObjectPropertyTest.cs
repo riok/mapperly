@@ -235,7 +235,8 @@ public class ObjectPropertyTest
     [Fact]
     public void ShouldUseUserImplementedMapping()
     {
-        var mapperBody = """
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
             public partial B Map(A source);
             private D UserImplementedMap(C source)
             {
@@ -244,10 +245,7 @@ public class ObjectPropertyTest
                 return target;
             }
             private partial D MapToD(C source);
-            """;
-
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            mapperBody,
+            """,
             "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",
             "class B { public string StringValue { get; set; } public D NestedValue { get; set; } }",
             "class C { public string StringValue { get; set; } }",
