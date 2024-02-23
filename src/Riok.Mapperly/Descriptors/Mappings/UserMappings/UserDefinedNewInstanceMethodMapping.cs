@@ -21,6 +21,8 @@ public class UserDefinedNewInstanceMethodMapping(
 
     public bool? Default { get; } = isDefault;
 
+    public bool IsExternal => false;
+
     public INewInstanceMapping? DelegateMapping { get; private set; }
 
     /// <summary>

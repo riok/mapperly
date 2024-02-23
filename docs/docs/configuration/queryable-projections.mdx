@@ -53,9 +53,7 @@ such mappings have several limitations:
 - Enum mappings do not support the `ByName` strategy
 - Reference handling is not supported
 - Nullable reference types are disabled
-- User implemented mapping methods need to follow expression tree [limitations](https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/expression-trees/#limitations).
-
-:::
+  :::
 
 ## Property configurations
 
@@ -76,3 +74,49 @@ public static partial class CarMapper
     private static partial CarDto Map(Car car);
 }
 ```
+
+## User-implemented mapping methods
+
+Mapperly tries to inline user-implemented mapping methods.
+For this to work, user-implemented mapping methods need to satisfy certain limitations:
+
+- Only expression-bodied methods can be inlined.
+- The body needs to follow the [expression tree limitations](https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/expression-trees/#limitations).
+- Nested MethodGroups cannot be inlined.
+
+```csharp
+[Mapper]
+public static partial class CarMapper
+{
+    public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q);
+
+    // highlight-start
+    private static string MapCarBrandName(CarBrand brand)
+      => band.Name;
+    // highlight-end
+}
+```
+
+If Mapperly is unable to inline a user-implemented method, `RMG068` is reported.
+Non-inlined method invocations can lead to more data being loaded than necessary.
+
+Ordering and aggregating collections can also be implemented with user-implemented mapping methods:
+
+```csharp
+[Mapper]
+public static partial class CarMapper
+{
+    public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q);
+
+    private static partial CarModelDto MapCarModel(CarModel model);
+
+    // highlight-start
+    private static ICollection<CarModelDto> MapOrderedCarBrandName(ICollection<CarModel> models)
+      // note: do not use the method group '.Select(MapCarModel)', as that cannot be inlined
+      => models.OrderBy(x => x.Name).Select(x => MapCarModel(x)).ToList();
+    // highlight-end
+  }
+```
+
+It is important that the types in the user-implemented mapping method match the types of the objects to be mapped exactly.
+Otherwise, Mapperly cannot resolve the user-implemented mapping methods.

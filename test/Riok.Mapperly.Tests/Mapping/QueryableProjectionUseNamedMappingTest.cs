@@ -162,4 +162,36 @@ public class QueryableProjectionUseNamedMappingTest
         );
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task TwoQueryableMappingsWithNamedUsedMappingsAndAmbiguousName()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+            public partial System.Linq.IQueryable<D> Map(System.Linq.IQueryable<C> source);
+
+            [MapProperty(nameof(A.StringValue1), nameof(B.StringValue1), Use = nameof(ModifyString)]
+            [MapProperty(nameof(A.StringValue2), nameof(B.StringValue2), Use = nameof(ModifyString2)]
+            private partial B Map(A source);
+
+            [MapProperty(nameof(A.StringValue1), nameof(B.StringValue1), Use = nameof(ModifyString)]
+            [MapProperty(nameof(A.StringValue2), nameof(B.StringValue2), Use = nameof(ModifyString2)]
+            private partial D Map(C source);
+
+            private string ModifyString(string source) => source + "-modified";
+            private int ModifyString(int value) => value + "-modified-ambiguous";
+            private string ModifyString2(string source) => source + "-modified2";
+
+            [UserMapping]
+            private string DefaultStringMapping(string source) => source;
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "record A(string StringValue, string StringValue1, string StringValue2);",
+            "record B(string StringValue, string StringValue1, string StringValue2);",
+            "record C(string StringValue, string StringValue1, string StringValue2);",
+            "record D(string StringValue, string StringValue1, string StringValue2);"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
 }

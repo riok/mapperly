@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.IntegrationTests.Dto;
@@ -25,10 +26,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         private static partial TestObjectDtoProjection ProjectToDto(this TestObjectProjection testObject);
 
         [UserMapping]
-        private static TestObjectDtoManuallyMappedProjection? MapManual(string str)
-        {
-            return new TestObjectDtoManuallyMappedProjection(100) { StringValue = str, };
-        }
+        private static TestObjectDtoManuallyMappedProjection? MapManual(string str) => new(100) { StringValue = str };
 
         [UserMapping]
         private static TestEnum MapManual(TestObjectProjectionEnumValue source) => source.Value;
@@ -36,6 +34,17 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapDerivedType(typeof(TestObjectProjectionTypeA), typeof(TestObjectDtoProjectionTypeA))]
         [MapDerivedType(typeof(TestObjectProjectionTypeB), typeof(TestObjectDtoProjectionTypeB))]
         private static partial TestObjectDtoProjectionBaseType MapDerived(TestObjectProjectionBaseType source);
+
+        [UserMapping]
+        private static ICollection<IntegerValue> OrderIntegerValues(ICollection<IntegerValue> values) =>
+            values.OrderBy(x => x.Value).ToList();
+
+        [UserMapping]
+        private static ICollection<LongValueDto> OrderAndMapLongValues(ICollection<LongValue> values) =>
+            values.OrderBy(x => x.Value).Select(x => MapLongValue(x)).ToList();
+
+        [MapperIgnoreSource(nameof(LongValue.Id))]
+        private static partial LongValueDto MapLongValue(LongValue value);
 
         private static int ModifyInt(int v) => v + 10;
     }

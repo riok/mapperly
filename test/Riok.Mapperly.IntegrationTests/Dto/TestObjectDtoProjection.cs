@@ -67,5 +67,9 @@ namespace Riok.Mapperly.IntegrationTests.Dto
         public int ManuallyMappedModified { get; set; }
 
         public List<TestEnum> ManuallyMappedList { get; set; } = new();
+
+        public ICollection<IntegerValue> IntegerValues { get; set; } = new List<IntegerValue>();
+
+        public ICollection<LongValueDto> DecimalValues { get; set; } = new List<LongValueDto>();
     }
 }

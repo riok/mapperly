@@ -26,6 +26,8 @@ public class UserDefinedExistingTargetMethodMapping(
 
     public bool? Default => false;
 
+    public bool IsExternal => false;
+
     private MethodParameter TargetParameter { get; } = targetParameter;
 
     /// <summary>

@@ -12,4 +12,10 @@ public interface IUserMapping : ITypeMapping
 
     /// <inheritdoc cref="UserMappingAttribute.Default"/>
     bool? Default { get; }
+
+    /// <summary>
+    /// An external mapping is defined in another class.
+    /// E.g. base class or imported via <see cref="UseStaticMapperAttribute{T}"/>
+    /// </summary>
+    bool IsExternal { get; }
 }

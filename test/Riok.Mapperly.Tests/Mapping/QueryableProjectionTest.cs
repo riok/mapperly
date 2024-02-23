@@ -93,7 +93,7 @@ public class QueryableProjectionTest
             """,
             "record A(Guid Id, List<C> Values);",
             "record B(string Id, List<D> Values);",
-            "enum D(V1, V2, V3);",
+            "record D(int IntValue);",
             "record C(D Value);"
         );
 
@@ -107,30 +107,12 @@ public class QueryableProjectionTest
             """
             private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
 
-            private partial List<D> Map(List<C> source) => source.Select(x => x.Value).ToList();
+            private partial List<D> Map(List<C> source) => source.Select(x => x.Value).OrderBy(x => x).ToList<D>();
             """,
             "record A(Guid Id, List<C> Values);",
             "record B(string Id, List<D> Values);",
             "enum D(V1, V2, V3);",
             "record C(D Value);"
-        );
-
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task ClassToClassWithUserImplemented()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            """
-            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
-
-            private D MapToD(C v) => new D { Value = v.Value + "-mapped" };
-            """,
-            "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",
-            "class B { public string StringValue { get; set; } public D NestedValue { get; set; } }",
-            "class C { public string Value { get; set; } }",
-            "class D { public string Value { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);

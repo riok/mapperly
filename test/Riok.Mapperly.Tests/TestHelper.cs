@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -52,6 +53,9 @@ public static class TestHelper
 
         return mapperResult;
     }
+
+    public static CSharpCompilation BuildCompilation([StringSyntax(StringSyntax.CSharp)] string source) =>
+        BuildCompilation(CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default));
 
     public static CSharpCompilation BuildCompilation(params SyntaxTree[] syntaxTrees) =>
         BuildCompilation("Tests", NullableContextOptions.Enable, true, syntaxTrees);

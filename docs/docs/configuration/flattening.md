@@ -11,7 +11,7 @@ If Mapperly can't resolve the target or source property correctly, it is possibl
 by either using the source and target property path names as arrays or using a dot separated property access path string
 
 ```csharp
-[MapProperty(new[] { nameof(Car.Make), nameof(Car.Make.Id) }, new[] { nameof(CarDto.MakeId) })]
+[MapProperty([nameof(Car.Make), nameof(Car.Make.Id)], [nameof(CarDto.MakeId)])]
 // Or alternatively
 [MapProperty("Make.Id", "MakeId")]
 // Or

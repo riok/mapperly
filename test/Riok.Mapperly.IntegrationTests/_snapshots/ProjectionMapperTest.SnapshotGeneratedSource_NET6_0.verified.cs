@@ -44,9 +44,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 } : default,
                 DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(x.DateTimeValueTargetDateOnly),
                 DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(x.DateTimeValueTargetTimeOnly),
-                ManuallyMapped = MapManual(x.ManuallyMapped),
-                ManuallyMappedModified = ModifyInt(x.ManuallyMappedModified),
-                ManuallyMappedList = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(x.ManuallyMappedList, x1 => MapManual(x1))),
+                ManuallyMapped = new(100) { StringValue = x.ManuallyMapped },
+                ManuallyMappedModified = x.ManuallyMappedModified + 10,
+                ManuallyMappedList = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(x.ManuallyMappedList, x1 => x1.Value)),
+                IntegerValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.OrderBy(x.IntegerValues, x => x.Value)),
+                DecimalValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(global::System.Linq.Enumerable.OrderBy(x.DecimalValues, x => x.Value), x => new global::Riok.Mapperly.IntegrationTests.Dto.LongValueDto()
+                {
+                    Value = x.Value,
+                })),
             });
 #nullable enable
         }
@@ -126,6 +131,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.ManuallyMapped = MapManual(testObject.ManuallyMapped);
             target.ManuallyMappedModified = ModifyInt(testObject.ManuallyMappedModified);
             target.ManuallyMappedList = MapToListOfTestEnum(testObject.ManuallyMappedList);
+            target.IntegerValues = OrderIntegerValues(testObject.IntegerValues);
+            target.DecimalValues = OrderAndMapLongValues(testObject.DecimalValues);
             return target;
         }
 
@@ -138,6 +145,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeB x => MapToTestObjectDtoProjectionTypeB(x),
                 _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionBaseType as there is no known derived type mapping", nameof(source)),
             };
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static partial global::Riok.Mapperly.IntegrationTests.Dto.LongValueDto MapLongValue(global::Riok.Mapperly.IntegrationTests.Models.LongValue value)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.LongValueDto();
+            target.Value = value.Value;
+            return target;
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

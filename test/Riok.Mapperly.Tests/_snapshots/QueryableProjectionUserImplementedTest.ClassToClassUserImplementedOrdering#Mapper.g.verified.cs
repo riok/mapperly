@@ -9,11 +9,8 @@ public partial class Mapper
 #nullable disable
         return System.Linq.Queryable.Select(source, x => new global::B()
         {
-            Parent = x.Parent != null ? new global::B()
-            {
-                IntValue = x.Parent.IntValue,
-            } : default,
-            IntValue = x.IntValue,
+            StringValue = x.StringValue,
+            NestedValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.OrderBy(x.NestedValues, x => x.Value)),
         });
 #nullable enable
     }

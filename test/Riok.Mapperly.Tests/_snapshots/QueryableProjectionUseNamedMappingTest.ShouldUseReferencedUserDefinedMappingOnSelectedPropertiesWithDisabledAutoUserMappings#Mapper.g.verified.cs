@@ -9,8 +9,8 @@ public partial class Mapper
 #nullable disable
         return System.Linq.Queryable.Select(source, x => new global::B()
         {
-            Value = MapToDWithP(x.Value),
-            Value2 = MapToDWithC(x.Value2),
+            Value = new global::D(x.Value.Value.ToString("P")),
+            Value2 = new global::D(x.Value2.Value.ToString("C")),
             ValueDefault = new global::D(x.ValueDefault.Value.ToString("N")),
         });
 #nullable enable

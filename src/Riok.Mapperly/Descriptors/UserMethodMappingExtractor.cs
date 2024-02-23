@@ -21,7 +21,14 @@ public static class UserMethodMappingExtractor
         {
             var mapping =
                 BuilderUserDefinedMapping(ctx, method)
-                ?? BuildUserImplementedMapping(ctx, method, receiver: null, allowPartial: false, isStatic: mapperSymbol.IsStatic);
+                ?? BuildUserImplementedMapping(
+                    ctx,
+                    method,
+                    receiver: null,
+                    allowPartial: false,
+                    isStatic: mapperSymbol.IsStatic,
+                    isExternal: false
+                );
             if (mapping != null)
                 yield return mapping;
         }
@@ -39,7 +46,7 @@ public static class UserMethodMappingExtractor
 
         baseAndInterfaceMethods = baseAndInterfaceMethods.Distinct(SymbolTypeEqualityComparer.MethodDefault);
 
-        foreach (var mapping in BuildUserImplementedMappings(ctx, baseAndInterfaceMethods, null, false))
+        foreach (var mapping in BuildUserImplementedMappings(ctx, baseAndInterfaceMethods, null, isStatic: false, isExternal: true))
         {
             yield return mapping;
         }
@@ -55,7 +62,7 @@ public static class UserMethodMappingExtractor
             .GetMembers(name)
             .OfType<IMethodSymbol>()
             .Where(m => IsMappingMethodCandidate(ctx, m, requireAttribute: false))
-            .Select(m => BuildUserImplementedMapping(ctx, m, null, allowPartial: true, isStatic: mapperSymbol.IsStatic))
+            .Select(m => BuildUserImplementedMapping(ctx, m, null, allowPartial: true, isStatic: mapperSymbol.IsStatic, isExternal: false))
             .OfType<INewInstanceUserMapping>();
     }
 
@@ -63,21 +70,23 @@ public static class UserMethodMappingExtractor
         SimpleMappingBuilderContext ctx,
         ITypeSymbol type,
         string? receiver,
-        bool isStatic
+        bool isStatic,
+        bool isExternal
     )
     {
         var methods = ctx
             .SymbolAccessor.GetAllMethods(type)
             .Concat(type.AllInterfaces.SelectMany(ctx.SymbolAccessor.GetAllMethods))
             .Distinct(SymbolTypeEqualityComparer.MethodDefault);
-        return BuildUserImplementedMappings(ctx, methods, receiver, isStatic);
+        return BuildUserImplementedMappings(ctx, methods, receiver, isStatic, isExternal);
     }
 
     private static IEnumerable<IUserMapping> BuildUserImplementedMappings(
         SimpleMappingBuilderContext ctx,
         IEnumerable<IMethodSymbol> methods,
         string? receiver,
-        bool isStatic
+        bool isStatic,
+        bool isExternal
     )
     {
         foreach (var method in methods)
@@ -89,7 +98,7 @@ public static class UserMethodMappingExtractor
             // but still treated as user implemented methods,
             // since the user should provide an implementation elsewhere.
             // This is the case if a partial mapper class is extended.
-            var mapping = BuildUserImplementedMapping(ctx, method, receiver, true, isStatic);
+            var mapping = BuildUserImplementedMapping(ctx, method, receiver, true, isStatic, isExternal);
             if (mapping != null)
                 yield return mapping;
         }
@@ -115,7 +124,8 @@ public static class UserMethodMappingExtractor
         IMethodSymbol method,
         string? receiver,
         bool allowPartial,
-        bool isStatic
+        bool isStatic,
+        bool isExternal
     )
     {
         var userMappingConfig = GetUserMappingConfig(ctx, method, out var hasAttribute);
@@ -143,7 +153,8 @@ public static class UserMethodMappingExtractor
                 userMappingConfig.Default,
                 parameters.Source,
                 parameters.Target!.Value,
-                parameters.ReferenceHandler
+                parameters.ReferenceHandler,
+                isExternal
             );
         }
 
@@ -153,7 +164,8 @@ public static class UserMethodMappingExtractor
             userMappingConfig.Default,
             parameters.Source,
             ctx.SymbolAccessor.UpgradeNullable(method.ReturnType),
-            parameters.ReferenceHandler
+            parameters.ReferenceHandler,
+            isExternal
         );
     }
 
