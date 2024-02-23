@@ -34,7 +34,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
     private static void BuildInitOnlyMemberMappings(INewInstanceBuilderContext<IMapping> ctx, bool includeAllMembers = false)
     {
-        var ignoreCase = ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
+        var ignoreCase = ctx.BuilderContext.Configuration.Mapper.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
 
         var initOnlyTargetMembers = includeAllMembers
             ? ctx.TargetMembers.Values.ToArray()
@@ -68,7 +68,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                         ctx.Mapping.SourceType
                     );
                 }
-                else if (ctx.BuilderContext.Configuration.Properties.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target))
+                else if (ctx.BuilderContext.Configuration.Members.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target))
                 {
                     ctx.BuilderContext.ReportDiagnostic(
                         DiagnosticDescriptors.SourceMemberNotFound,
@@ -88,7 +88,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
     private static void BuildInitMemberMapping(
         INewInstanceBuilderContext<IMapping> ctx,
         IMappableMember targetMember,
-        IReadOnlyCollection<PropertyMappingConfiguration> memberConfigs
+        IReadOnlyCollection<MemberMappingConfiguration> memberConfigs
     )
     {
         // add configured mapping
@@ -117,7 +117,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             !ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.SourceType, memberConfig.Source.Path, out var sourceMemberPath)
         )
         {
-            if (ctx.BuilderContext.Configuration.Properties.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target))
+            if (ctx.BuilderContext.Configuration.Members.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target))
             {
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.SourceMemberNotFound,
@@ -137,7 +137,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         INewInstanceBuilderContext<IMapping> ctx,
         IMappableMember targetMember,
         MemberPath sourcePath,
-        PropertyMappingConfiguration? memberConfig = null
+        MemberMappingConfiguration? memberConfig = null
     )
     {
         var targetPath = new MemberPath(new[] { targetMember });
@@ -196,7 +196,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             .OrderByDescending(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
             .ThenBy(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x));
 
-        if (ctx.BuilderContext.MapperConfiguration.PreferParameterlessConstructors)
+        if (ctx.BuilderContext.Configuration.Mapper.PreferParameterlessConstructors)
         {
             ctorCandidates = ctorCandidates.ThenByDescending(x => x.Parameters.Length == 0).ThenByDescending(x => x.Parameters.Length);
         }
@@ -297,7 +297,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         INewInstanceBuilderContext<IMapping> ctx,
         IParameterSymbol parameter,
         [NotNullWhen(true)] out MemberPath? sourcePath,
-        out PropertyMappingConfiguration? memberConfig
+        out MemberMappingConfiguration? memberConfig
     )
     {
         sourcePath = null;

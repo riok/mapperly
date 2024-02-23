@@ -10,7 +10,7 @@ public static class DirectAssignmentMappingBuilder
     {
         return
             SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, ctx.Target)
-            && (!ctx.MapperConfiguration.UseDeepCloning || ctx.Source.IsImmutable())
+            && (!ctx.Configuration.Mapper.UseDeepCloning || ctx.Source.IsImmutable())
             ? new DirectAssignmentMapping(ctx.Source)
             : null;
     }

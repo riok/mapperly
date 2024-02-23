@@ -126,7 +126,7 @@ public static class NewValueTupleMappingBodyBuilder
         INewValueTupleBuilderContext<INewValueTupleMapping> ctx,
         IFieldSymbol field,
         [NotNullWhen(true)] out MemberPath? sourcePath,
-        out PropertyMappingConfiguration? memberConfig
+        out MemberMappingConfiguration? memberConfig
     )
     {
         sourcePath = null;
@@ -170,7 +170,7 @@ public static class NewValueTupleMappingBodyBuilder
         out MemberPath? sourcePath
     )
     {
-        var ignoreCase = ctx.BuilderContext.MapperConfiguration.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
+        var ignoreCase = ctx.BuilderContext.Configuration.Mapper.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
 
         if (
             ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(

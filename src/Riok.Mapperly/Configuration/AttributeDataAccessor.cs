@@ -20,6 +20,9 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         where TAttribute : Attribute
         where TData : notnull => Access<TAttribute, TData>(symbol).Single();
 
+    public TAttribute? AccessFirstOrDefault<TAttribute>(ISymbol symbol)
+        where TAttribute : Attribute => Access<TAttribute, TAttribute>(symbol).FirstOrDefault();
+
     public TData? AccessFirstOrDefault<TAttribute, TData>(ISymbol symbol)
         where TAttribute : Attribute
         where TData : notnull => Access<TAttribute, TData>(symbol).FirstOrDefault();
@@ -158,7 +161,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             {
                 var argMemberPath = argMemberPathStr
                     .TrimStart(FullNameOfPrefix)
-                    .Split(StringMemberPath.PropertyAccessSeparator)
+                    .Split(StringMemberPath.MemberAccessSeparator)
                     .Skip(1)
                     .ToArray();
                 return new StringMemberPath(argMemberPath);
@@ -167,7 +170,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
         if (arg is { Kind: TypedConstantKind.Primitive, Value: string v })
         {
-            return new StringMemberPath(v.Split(StringMemberPath.PropertyAccessSeparator));
+            return new StringMemberPath(v.Split(StringMemberPath.MemberAccessSeparator));
         }
 
         throw new InvalidOperationException($"Cannot create {nameof(StringMemberPath)} from {arg.Kind}");

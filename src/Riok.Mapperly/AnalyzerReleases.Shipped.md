@@ -147,3 +147,6 @@ RMG059  | Mapper   | Error    | Multiple default user mappings found, only one i
 RMG060  | Mapper   | Info     | Multiple user mappings discovered without specifying an explicit default
 RMG061  | Mapper   | Error    | The referenced mapping was not found
 RMG062  | Mapper   | Error    | The referenced mapping name is ambiguous
+RMG063  | Mapper   | Error    | Cannot configure an enum mapping on a non-enum mapping
+RMG064  | Mapper   | Error    | Cannot configure an object mapping on a non-object mapping
+RMG065  | Mapper   | Warning  | Cannot configure an object mapping on a queryable projection mapping, apply the configurations to an object mapping method instead

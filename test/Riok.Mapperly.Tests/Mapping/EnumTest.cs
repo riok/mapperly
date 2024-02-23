@@ -432,4 +432,19 @@ public class EnumTest
 
         return TestHelper.VerifyGenerator(source, null, testCase);
     }
+
+    [Fact]
+    public void EnumConfigurationOnNonEnumMethodShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByValue)] partial B Map(A source);",
+            "record A(int V);",
+            "record B(int V);"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.EnumConfigurationOnNonEnumMapping)
+            .HaveAssertedAllDiagnostics();
+    }
 }

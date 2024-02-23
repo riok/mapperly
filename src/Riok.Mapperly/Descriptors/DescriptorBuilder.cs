@@ -28,7 +28,6 @@ public class DescriptorBuilder
     private readonly SimpleMappingBuilderContext _builderContext;
     private readonly DiagnosticCollection _diagnostics;
     private readonly UnsafeAccessorContext _unsafeAccessorContext;
-    private readonly MapperConfigurationReader _configurationReader;
 
     public DescriptorBuilder(
         CompilationContext compilationContext,
@@ -44,12 +43,17 @@ public class DescriptorBuilder
         _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
 
         var attributeAccessor = new AttributeDataAccessor(symbolAccessor);
-        _configurationReader = new MapperConfigurationReader(attributeAccessor, mapperDeclaration.Symbol, defaultMapperConfiguration);
+        var configurationReader = new MapperConfigurationReader(
+            attributeAccessor,
+            _types,
+            mapperDeclaration.Symbol,
+            defaultMapperConfiguration
+        );
         _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
 
         _builderContext = new SimpleMappingBuilderContext(
             compilationContext,
-            _configurationReader,
+            configurationReader,
             _symbolAccessor,
             attributeAccessor,
             _unsafeAccessorContext,
@@ -86,7 +90,7 @@ public class DescriptorBuilder
     /// </summary>
     private void ConfigureMemberVisibility()
     {
-        var includedMembers = _configurationReader.Mapper.IncludedMembers;
+        var includedMembers = _builderContext.Configuration.Mapper.IncludedMembers;
 
         if (_types.TryGet(UnsafeAccessorName) != null)
         {
@@ -185,7 +189,7 @@ public class DescriptorBuilder
 
     private void BuildReferenceHandlingParameters()
     {
-        if (!_builderContext.MapperConfiguration.UseReferenceHandling)
+        if (!_builderContext.Configuration.Mapper.UseReferenceHandling)
             return;
 
         foreach (var methodMapping in _mappings.MethodMappings)

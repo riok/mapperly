@@ -2,10 +2,10 @@ namespace Riok.Mapperly.Configuration;
 
 public record StringMemberPath(IReadOnlyCollection<string> Path)
 {
-    public const char PropertyAccessSeparator = '.';
-    private const string PropertyAccessSeparatorString = ".";
+    public const char MemberAccessSeparator = '.';
+    private const string MemberAccessSeparatorString = ".";
 
-    public string FullName => string.Join(PropertyAccessSeparatorString, Path);
+    public string FullName => string.Join(MemberAccessSeparatorString, Path);
 
     public override string ToString() => FullName;
 }

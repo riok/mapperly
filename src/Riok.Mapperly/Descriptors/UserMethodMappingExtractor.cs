@@ -148,7 +148,7 @@ public static class UserMethodMappingExtractor
             return new UserDefinedNewInstanceRuntimeTargetTypeParameterMapping(
                 methodSymbol,
                 runtimeTargetTypeParams,
-                ctx.MapperConfiguration.UseReferenceHandling,
+                ctx.Configuration.Mapper.UseReferenceHandling,
                 ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
                 GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams, null),
                 ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
@@ -168,7 +168,7 @@ public static class UserMethodMappingExtractor
                 typeParameters.Value,
                 parameters,
                 ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
-                ctx.MapperConfiguration.UseReferenceHandling,
+                ctx.Configuration.Mapper.UseReferenceHandling,
                 GetTypeSwitchNullArm(methodSymbol, parameters, typeParameters),
                 ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
             );
@@ -187,7 +187,7 @@ public static class UserMethodMappingExtractor
                 parameters.Source,
                 parameters.Target.Value,
                 parameters.ReferenceHandler,
-                ctx.MapperConfiguration.UseReferenceHandling
+                ctx.Configuration.Mapper.UseReferenceHandling
             );
         }
 
@@ -198,7 +198,7 @@ public static class UserMethodMappingExtractor
             parameters.Source,
             parameters.ReferenceHandler,
             ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
-            ctx.MapperConfiguration.UseReferenceHandling
+            ctx.Configuration.Mapper.UseReferenceHandling
         );
     }
 
@@ -368,7 +368,7 @@ public static class UserMethodMappingExtractor
             );
         }
 
-        if (!ctx.MapperConfiguration.UseReferenceHandling)
+        if (!ctx.Configuration.Mapper.UseReferenceHandling)
         {
             ctx.ReportDiagnostic(
                 DiagnosticDescriptors.ReferenceHandlingNotEnabled,
@@ -399,6 +399,6 @@ public static class UserMethodMappingExtractor
     {
         var userMappingAttr = ctx.AttributeAccessor.AccessFirstOrDefault<UserMappingAttribute, UserMappingConfiguration>(method);
         hasAttribute = userMappingAttr != null;
-        return userMappingAttr ?? new UserMappingConfiguration { Ignore = !ctx.MapperConfiguration.AutoUserMappings, };
+        return userMappingAttr ?? new UserMappingConfiguration { Ignore = !ctx.Configuration.Mapper.AutoUserMappings, };
     }
 }
