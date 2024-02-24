@@ -15,7 +15,7 @@ public class UserDefinedNewInstanceRuntimeTargetTypeParameterMapping(
     RuntimeTargetTypeMappingMethodParameters parameters,
     bool enableReferenceHandling,
     ITypeSymbol targetType,
-    NullFallbackValue nullArm,
+    NullFallbackValue? nullArm,
     ITypeSymbol objectType
 )
     : UserDefinedNewInstanceRuntimeTargetTypeMapping(

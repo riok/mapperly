@@ -57,6 +57,7 @@ public class DescriptorBuilder
             compilationContext,
             configurationReader,
             _symbolAccessor,
+            new GenericTypeChecker(_symbolAccessor, _types),
             attributeAccessor,
             _unsafeAccessorContext,
             _diagnostics,

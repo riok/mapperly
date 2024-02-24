@@ -375,7 +375,7 @@ public static class CollectionInfoBuilder
                 if (typeInfo.GetTypeSymbol(types) is not { } typeSymbol)
                     continue;
 
-                if (type.ImplementsGeneric(typeSymbol, out _))
+                if (type.ExtendsOrImplementsGeneric(typeSymbol, out _))
                 {
                     implementedCollectionTypes |= typeInfo.CollectionType;
                 }

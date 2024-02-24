@@ -61,7 +61,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public DictionaryInfos? DictionaryInfos => _dictionaryInfos ??= DictionaryInfoBuilder.Build(Types, CollectionInfos);
 
-    protected IMethodSymbol? UserSymbol { get; }
+    public IMethodSymbol? UserSymbol { get; }
 
     public bool HasUserSymbol => UserSymbol != null;
 

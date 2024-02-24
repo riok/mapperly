@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 
@@ -82,12 +83,53 @@ internal static class SymbolExtensions
             || t.AllInterfaces.Any(x => SymbolEqualityComparer.Default.Equals(x, interfaceSymbol));
     }
 
+    internal static bool ExtendsOrImplementsGeneric(
+        this ITypeSymbol t,
+        INamedTypeSymbol genericSymbol,
+        [NotNullWhen(true)] out INamedTypeSymbol? typedGenericSymbol
+    )
+    {
+        return genericSymbol.TypeKind == TypeKind.Interface
+            ? t.ImplementsGeneric(genericSymbol, out typedGenericSymbol)
+            : t.ExtendsGeneric(genericSymbol, out typedGenericSymbol);
+    }
+
+    internal static bool ExtendsGeneric(
+        this ITypeSymbol t,
+        INamedTypeSymbol genericSymbol,
+        [NotNullWhen(true)] out INamedTypeSymbol? typedGenericSymbol
+    )
+    {
+        Debug.Assert(genericSymbol.IsGenericType);
+
+        if (SymbolEqualityComparer.Default.Equals(t.OriginalDefinition, genericSymbol))
+        {
+            typedGenericSymbol = (INamedTypeSymbol)t;
+            return true;
+        }
+
+        for (var baseType = t.BaseType; baseType != null; baseType = baseType.BaseType)
+        {
+            if (!SymbolEqualityComparer.Default.Equals(baseType.OriginalDefinition, genericSymbol))
+                continue;
+
+            typedGenericSymbol = baseType;
+            return true;
+        }
+
+        typedGenericSymbol = null;
+        return false;
+    }
+
     internal static bool ImplementsGeneric(
         this ITypeSymbol t,
         INamedTypeSymbol genericInterfaceSymbol,
         [NotNullWhen(true)] out INamedTypeSymbol? typedInterface
     )
     {
+        Debug.Assert(genericInterfaceSymbol.IsGenericType);
+        Debug.Assert(genericInterfaceSymbol.TypeKind == TypeKind.Interface);
+
         if (SymbolEqualityComparer.Default.Equals(t.OriginalDefinition, genericInterfaceSymbol))
         {
             typedInterface = (INamedTypeSymbol)t;
@@ -115,6 +157,9 @@ internal static class SymbolExtensions
         out bool isExplicit
     )
     {
+        Debug.Assert(genericInterfaceSymbol.IsGenericType);
+        Debug.Assert(genericInterfaceSymbol.TypeKind == TypeKind.Interface);
+
         if (SymbolEqualityComparer.Default.Equals(t.OriginalDefinition, genericInterfaceSymbol))
         {
             typedInterface = (INamedTypeSymbol)t;

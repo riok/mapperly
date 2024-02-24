@@ -153,3 +153,4 @@ RMG065  | Mapper   | Warning  | Cannot configure an object mapping on a queryabl
 RMG066  | Mapper   | Warning  | No members are mapped in an object mapping
 RMG067  | Mapper   | Error    | Invalid usage of the MapPropertyAttribute
 RMG068  | Mapper   | Info     | Cannot inline user implemented queryable expression mapping
+RMG069  | Mapper   | Warning  | Runtime target type or generic type mapping does not match any mappings

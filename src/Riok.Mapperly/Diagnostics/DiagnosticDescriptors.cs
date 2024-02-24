@@ -667,6 +667,16 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static readonly DiagnosticDescriptor RuntimeTargetTypeMappingNoContentMappings =
+        new(
+            "RMG069",
+            "Runtime target type or generic type mapping does not match any mappings",
+            "Runtime target type or generic type mapping does not match any mappings",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Warning,
+            true
+        );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT

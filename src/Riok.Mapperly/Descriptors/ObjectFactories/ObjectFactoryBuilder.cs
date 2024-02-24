@@ -77,12 +77,12 @@ public static class ObjectFactoryBuilder
         if (returnTypeIsGeneric)
         {
             return hasSourceParameter
-                ? new GenericTargetObjectFactoryWithSource(ctx.SymbolAccessor, methodSymbol)
-                : new GenericTargetObjectFactory(ctx.SymbolAccessor, methodSymbol);
+                ? new GenericTargetObjectFactoryWithSource(ctx.GenericTypeChecker, ctx.SymbolAccessor, methodSymbol)
+                : new GenericTargetObjectFactory(ctx.GenericTypeChecker, ctx.SymbolAccessor, methodSymbol);
         }
 
         if (hasSourceParameter)
-            return new GenericSourceObjectFactory(ctx.SymbolAccessor, methodSymbol);
+            return new GenericSourceObjectFactory(ctx.GenericTypeChecker, ctx.SymbolAccessor, methodSymbol);
 
         ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature, methodSymbol, methodSymbol.Name);
         return null;
@@ -110,6 +110,6 @@ public static class ObjectFactoryBuilder
             return null;
         }
 
-        return new GenericSourceTargetObjectFactory(ctx.SymbolAccessor, methodSymbol, sourceParameterIndex);
+        return new GenericSourceTargetObjectFactory(ctx.GenericTypeChecker, ctx.SymbolAccessor, methodSymbol, sourceParameterIndex);
     }
 }

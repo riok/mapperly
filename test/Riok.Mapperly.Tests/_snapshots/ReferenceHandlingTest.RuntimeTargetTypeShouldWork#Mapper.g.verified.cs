@@ -10,7 +10,6 @@ public partial class Mapper
         return source switch
         {
             global::A x when destinationType.IsAssignableFrom(typeof(global::B)) => MapToB(x, refHandler),
-            null => throw new System.ArgumentNullException(nameof(source)),
             _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {destinationType} as there is no known type mapping", nameof(source)),
         };
     }

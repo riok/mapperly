@@ -10,8 +10,6 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 /// </summary>
 public abstract class ObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol method)
 {
-    protected SymbolAccessor SymbolAccessor { get; } = symbolAccessor;
-
     protected IMethodSymbol Method { get; } = method;
 
     public ExpressionSyntax CreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
@@ -35,7 +33,7 @@ public abstract class ObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol
         if (!Method.ReturnType.IsNullable())
             return expression;
 
-        ExpressionSyntax nullFallback = SymbolAccessor.HasDirectlyAccessibleParameterlessConstructor(typeToCreate)
+        ExpressionSyntax nullFallback = symbolAccessor.HasDirectlyAccessibleParameterlessConstructor(typeToCreate)
             ? CreateInstance(typeToCreate)
             : ThrowNullReferenceException($"The object factory {Method.Name} returned null");
 

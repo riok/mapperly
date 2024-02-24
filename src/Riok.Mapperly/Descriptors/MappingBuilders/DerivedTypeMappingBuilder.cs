@@ -61,33 +61,34 @@ public static class DerivedTypeMappingBuilder
     {
         var derivedTypeMappingSourceTypes = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
         var derivedTypeMappings = new List<TMapping>(configs.Count);
-        Func<ITypeSymbol, bool> isAssignableToSource = ctx.Source is ITypeParameterSymbol sourceTypeParameter
-            ? t => ctx.SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(sourceTypeParameter, t)
-            : t => ctx.SymbolAccessor.HasImplicitConversion(t, ctx.Source);
-        Func<ITypeSymbol, bool> isAssignableToTarget = ctx.Target is ITypeParameterSymbol targetTypeParameter
-            ? t => ctx.SymbolAccessor.DoesTypeSatisfyTypeParameterConstraints(targetTypeParameter, t)
-            : t => ctx.SymbolAccessor.HasImplicitConversion(t, ctx.Target);
 
         foreach (var config in configs)
         {
             // set types non-nullable as they can never be null when type-switching.
             var sourceType = config.SourceType.NonNullable();
+            var targetType = config.TargetType.NonNullable();
             if (!duplicatedSourceTypesAllowed && !derivedTypeMappingSourceTypes.Add(sourceType))
             {
                 ctx.ReportDiagnostic(DiagnosticDescriptors.DerivedSourceTypeDuplicated, sourceType);
                 continue;
             }
 
-            if (!isAssignableToSource(sourceType))
+            var typeCheckerResult = ctx.GenericTypeChecker.InferAndCheckTypes(
+                ctx.UserSymbol!.TypeParameters,
+                (ctx.Source, sourceType),
+                (ctx.Target, targetType)
+            );
+            if (!typeCheckerResult.Success)
             {
-                ctx.ReportDiagnostic(DiagnosticDescriptors.DerivedSourceTypeIsNotAssignableToParameterType, sourceType, ctx.Source);
-                continue;
-            }
+                if (ReferenceEquals(sourceType, typeCheckerResult.FailedArgument))
+                {
+                    ctx.ReportDiagnostic(DiagnosticDescriptors.DerivedSourceTypeIsNotAssignableToParameterType, sourceType, ctx.Source);
+                }
+                else
+                {
+                    ctx.ReportDiagnostic(DiagnosticDescriptors.DerivedTargetTypeIsNotAssignableToReturnType, targetType, ctx.Target);
+                }
 
-            var targetType = config.TargetType.NonNullable();
-            if (!isAssignableToTarget(targetType))
-            {
-                ctx.ReportDiagnostic(DiagnosticDescriptors.DerivedTargetTypeIsNotAssignableToReturnType, targetType, ctx.Target);
                 continue;
             }
 

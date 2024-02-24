@@ -32,7 +32,6 @@ public abstract class MethodMapping : ITypeMapping
     };
 
     private readonly ITypeSymbol _returnType;
-    private readonly IMethodSymbol? _partialMethodDefinition;
 
     private string? _methodName;
 
@@ -54,10 +53,15 @@ public abstract class MethodMapping : ITypeMapping
         SourceParameter = sourceParameter;
         IsExtensionMethod = method.IsExtensionMethod;
         ReferenceHandlerParameter = referenceHandlerParameter;
-        _partialMethodDefinition = method;
+        Method = method;
+        MethodDeclarationSyntax = Method?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
         _methodName = method.Name;
         _returnType = method.ReturnsVoid ? method.ReturnType : targetType;
     }
+
+    protected IMethodSymbol? Method { get; }
+
+    protected MethodDeclarationSyntax? MethodDeclarationSyntax { get; }
 
     protected bool IsExtensionMethod { get; }
 
@@ -117,11 +121,11 @@ public abstract class MethodMapping : ITypeMapping
 
     private IEnumerable<SyntaxToken> BuildModifiers(bool isStatic)
     {
-        // if a syntax is referenced it is the implementation part of partial method definition
-        // then copy all modifiers otherwise only set private and optionally static
-        if (_partialMethodDefinition?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is MethodDeclarationSyntax syntax)
+        // if a syntax is referenced the code written by the user copy all modifiers,
+        // otherwise only set private and optionally static
+        if (MethodDeclarationSyntax != null)
         {
-            return syntax.Modifiers.Select(x => TrailingSpacedToken(x.Kind()));
+            return MethodDeclarationSyntax.Modifiers.Select(x => TrailingSpacedToken(x.Kind()));
         }
 
         return isStatic ? _privateStaticSyntaxToken : _privateSyntaxToken;

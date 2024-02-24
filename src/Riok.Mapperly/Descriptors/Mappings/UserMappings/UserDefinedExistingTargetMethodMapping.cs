@@ -22,7 +22,7 @@ public class UserDefinedExistingTargetMethodMapping(
 {
     private IExistingTargetMapping? _delegateMapping;
 
-    public IMethodSymbol Method { get; } = method;
+    public new IMethodSymbol Method { get; } = method;
 
     public bool? Default => false;
 

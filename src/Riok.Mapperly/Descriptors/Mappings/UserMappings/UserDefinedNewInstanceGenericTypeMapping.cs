@@ -16,11 +16,10 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 /// </summary>
 public class UserDefinedNewInstanceGenericTypeMapping(
     IMethodSymbol method,
-    GenericMappingTypeParameters typeParameters,
     MappingMethodParameters parameters,
     ITypeSymbol targetType,
     bool enableReferenceHandling,
-    NullFallbackValue nullArm,
+    NullFallbackValue? nullArm,
     ITypeSymbol objectType
 )
     : UserDefinedNewInstanceRuntimeTargetTypeMapping(
@@ -33,16 +32,16 @@ public class UserDefinedNewInstanceGenericTypeMapping(
         objectType
     )
 {
-    public GenericMappingTypeParameters TypeParameters { get; } = typeParameters;
-
-    public override MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx) =>
-        base.BuildMethod(ctx).WithTypeParameterList(TypeParameterList(TypeParameters.SourceType, TypeParameters.TargetType));
+    public override MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
+    {
+        var methodSyntax = (MethodDeclarationSyntax)Method.DeclaringSyntaxReferences.First().GetSyntax();
+        return base.BuildMethod(ctx).WithTypeParameterList(methodSyntax.TypeParameterList);
+    }
 
     protected override ExpressionSyntax BuildTargetType()
     {
-        // typeof(TTarget) or typeof(<ReturnType>)
-        var targetTypeName = TypeParameters.TargetType ?? TargetType;
-        return TypeOfExpression(FullyQualifiedIdentifier(targetTypeName.NonNullable()));
+        // typeof(<ReturnType>)
+        return TypeOfExpression(FullyQualifiedIdentifier(Method.ReturnType.NonNullable()));
     }
 
     protected override ExpressionSyntax? BuildSwitchArmWhenClause(ExpressionSyntax targetType, RuntimeTargetTypeMapping mapping)
