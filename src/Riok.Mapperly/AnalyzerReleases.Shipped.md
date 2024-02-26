@@ -151,3 +151,4 @@ RMG063  | Mapper   | Error    | Cannot configure an enum mapping on a non-enum m
 RMG064  | Mapper   | Error    | Cannot configure an object mapping on a non-object mapping
 RMG065  | Mapper   | Warning  | Cannot configure an object mapping on a queryable projection mapping, apply the configurations to an object mapping method instead
 RMG066  | Mapper   | Warning | No members are mapped in an object mapping
+RMG067  | Mapper   | Error    | Invalid usage of the MapPropertyAttribute

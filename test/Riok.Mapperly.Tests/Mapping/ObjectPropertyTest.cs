@@ -496,4 +496,25 @@ public class ObjectPropertyTest
                 """
             );
     }
+
+    [Fact]
+    public void InvalidMapPropertyAttributeUsageShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("IntValue", "StringValue", StringFormat = "D", Use = nameof(IntToString))]
+            partial B Map(A src);
+
+            string IntToString(int x) => x.ToString();
+            """,
+            "class A { public int IntValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.InvalidMapPropertyAttributeUsage, "Invalid usage of the MapPropertyAttribute")
+            .HaveAssertedAllDiagnostics();
+    }
 }
