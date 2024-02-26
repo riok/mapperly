@@ -171,8 +171,8 @@ public class IncrementalGeneratorTest
                 public partial B Map(A source);
             }
 
-            record A();
-            record B();
+            record A(string Value);
+            record B(string Value);
             enum E1 { value, value2 }
             enum E2 { Value }
             """

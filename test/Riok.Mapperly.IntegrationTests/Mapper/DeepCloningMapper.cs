@@ -11,6 +11,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapperIgnoreSource(nameof(TestObject.IgnoredIntValue))]
         [MapperIgnoreSource(nameof(TestObject.IgnoredStringValue))]
         [MapperIgnoreSource(nameof(TestObject.ImmutableHashSetValue))]
+        [MapperIgnoreSource(nameof(TestObject.SpanValue))]
         [MapperIgnoreObsoleteMembers]
         public static partial TestObject Copy(TestObject src);
     }

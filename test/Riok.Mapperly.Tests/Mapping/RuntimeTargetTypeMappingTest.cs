@@ -270,7 +270,7 @@ public class RuntimeTargetTypeMappingTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature)
             .HaveAssertedAllDiagnostics();
@@ -286,7 +286,7 @@ public class RuntimeTargetTypeMappingTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature)
             .HaveAssertedAllDiagnostics();
@@ -303,10 +303,10 @@ public class RuntimeTargetTypeMappingTest
             private partial D MapToD(C source);
             """,
             TestSourceBuilderOptions.WithReferenceHandling,
-            "class A {}",
-            "class B {}",
-            "class C {}",
-            "class D {}"
+            "class A { public int IntValue { get; set; } }",
+            "class B { public int IntValue { get; set; } }",
+            "class C { public int IntValue { get; set; } }",
+            "class D { public int IntValue { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);
@@ -323,10 +323,10 @@ public class RuntimeTargetTypeMappingTest
             private partial D MapToD(C source, [ReferenceHandler] IReferenceHandler refHandler);
             """,
             TestSourceBuilderOptions.WithReferenceHandling,
-            "class A {}",
-            "class B {}",
-            "class C {}",
-            "class D {}"
+            "class A { public int IntValue { get; set; } }",
+            "class B { public int IntValue { get; set; } }",
+            "class C { public int IntValue { get; set; } }",
+            "class D { public int IntValue { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);

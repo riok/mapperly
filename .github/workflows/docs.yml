@@ -24,9 +24,12 @@ on:
         description: A boolean indicating whether the built pages should be deployed
       environment:
         required: false
-        type: string
+        type: choice
         default: 'next'
-        description: The github deployment which is targeted, gets prefixed by 'docs-', should be 'next' or 'stable'
+        options:
+          - next
+          - stable
+        description: The github deployment which is targeted, gets prefixed by 'docs-'
       version:
         required: false
         type: string

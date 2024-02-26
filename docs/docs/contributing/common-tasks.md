@@ -17,9 +17,10 @@ To introduce a new diagnostic follow these steps:
    The highest used number can be found in `AnalyzerReleases.Shipped.md` as there may be removed diagnostics which are not present in `DiagnosticDescriptors` anymore
    but which should still not be used for new diagnostics.
 3. Add the new diagnostic to `AnalyzerReleases.Shipped.md` (Mapperly does not use the `Unshipped` file).
-4. Add a unit test generating and asserting the added diagnostic (use `TestHelperOptions.AllowDiagnostics` and `Should().HaveDiagnostic(...)`.
+4. Add a new documentation file at `docs/docs/configuration/analyzer-diagnostics/{id}.mdx` (as needed)
+5. Add a unit test generating and asserting the added diagnostic (use `TestHelperOptions.AllowDiagnostics` and `Should().HaveDiagnostic(...).HaveAssertedAllDiagnostics()`.
 
-It is not necessary to update the `Analyzer diagnostics` documentation page manually,
+It is not necessary to update the `analyzer-diagnostics/index.mdx` documentation file manually,
 as it is generated automatically on the basis of the `AnalyzerReleases.Shipped.md` file.
 
 ## New public API

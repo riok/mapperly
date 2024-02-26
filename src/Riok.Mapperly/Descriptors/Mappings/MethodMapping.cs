@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -13,6 +14,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// <summary>
 /// Represents a mapping which is not a single expression but an entire method.
 /// </summary>
+[DebuggerDisplay("{GetType().Name}({SourceType} => {TargetType})")]
 public abstract class MethodMapping : ITypeMapping
 {
     protected const string DefaultReferenceHandlerParameterName = "refHandler";

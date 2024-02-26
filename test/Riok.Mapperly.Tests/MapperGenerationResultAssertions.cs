@@ -26,7 +26,7 @@ public class MapperGenerationResultAssertions
         return this;
     }
 
-    public MapperGenerationResultAssertions NotHaveDiagnostics(IReadOnlySet<DiagnosticSeverity> allowedDiagnosticSeverities)
+    public MapperGenerationResultAssertions OnlyHaveDiagnosticSeverities(IReadOnlySet<DiagnosticSeverity> allowedDiagnosticSeverities)
     {
         _mapper.Diagnostics.FirstOrDefault(d => !allowedDiagnosticSeverities.Contains(d.Severity)).Should().BeNull();
         return this;

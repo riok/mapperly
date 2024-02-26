@@ -109,8 +109,8 @@ public class ReferenceHandlingTest
             private partial B MapToB(A source, [ReferenceHandler] IReferenceHandler refHandler);
             """,
             TestSourceBuilderOptions.WithReferenceHandling,
-            "class A {}",
-            "class B {}"
+            "class A { public int IntValue { get; set; } }",
+            "class B { public int IntValue { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);
@@ -163,8 +163,8 @@ public class ReferenceHandlingTest
             private partial B MapToB(A source, [ReferenceHandler] IReferenceHandler refHandler);
             """,
             TestSourceBuilderOptions.WithReferenceHandling,
-            "class A {}",
-            "class B {}"
+            "class A { public int IntValue { get; set; } }",
+            "class B { public int IntValue { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);

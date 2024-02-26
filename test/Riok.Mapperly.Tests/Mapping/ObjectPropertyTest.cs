@@ -201,8 +201,8 @@ public class ObjectPropertyTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "private partial B Map(A source);",
             new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseSensitive },
-            "class A { public string StringValue { get; set; } }",
-            "class B { public string stringvalue { get; set; } }"
+            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
+            "class B { public string stringvalue { get; set; } public int IntValue { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);
@@ -436,7 +436,7 @@ public class ObjectPropertyTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
             .HaveAssertedAllDiagnostics();
@@ -456,7 +456,7 @@ public class ObjectPropertyTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
             .HaveDiagnostic(

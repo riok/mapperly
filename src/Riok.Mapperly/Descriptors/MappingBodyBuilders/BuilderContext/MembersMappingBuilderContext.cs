@@ -22,6 +22,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     private readonly IReadOnlyCollection<string> _ignoredUnmatchedTargetMemberNames;
     private readonly IReadOnlyCollection<string> _ignoredUnmatchedSourceMemberNames;
 
+    private bool _hasMemberMapping;
+
     protected MembersMappingBuilderContext(MappingBuilderContext builderContext, T mapping)
     {
         BuilderContext = builderContext;
@@ -99,9 +101,14 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         AddUnmatchedSourceMembersDiagnostics();
         AddMappedAndIgnoredSourceMembersDiagnostics();
         AddMappedAndIgnoredTargetMembersDiagnostics();
+        AddNoMemberMappedDiagnostic();
     }
 
-    protected void SetSourceMemberMapped(MemberPath sourcePath) => _unmappedSourceMemberNames.Remove(sourcePath.Path.First().Name);
+    protected void SetSourceMemberMapped(MemberPath sourcePath)
+    {
+        _hasMemberMapping = true;
+        _unmappedSourceMemberNames.Remove(sourcePath.Path.First().Name);
+    }
 
     private HashSet<string> InitIgnoredUnmatchedProperties(IEnumerable<string> allProperties, IEnumerable<string> mappedProperties)
     {
@@ -229,6 +236,18 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
                 DiagnosticDescriptors.IgnoredSourceMemberExplicitlyMapped,
                 sourceMemberName,
                 Mapping.SourceType
+            );
+        }
+    }
+
+    private void AddNoMemberMappedDiagnostic()
+    {
+        if (!_hasMemberMapping)
+        {
+            BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.NoMemberMappings,
+                BuilderContext.Source.ToDisplayString(),
+                BuilderContext.Target.ToDisplayString()
             );
         }
     }

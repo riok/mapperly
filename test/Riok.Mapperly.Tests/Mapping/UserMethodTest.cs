@@ -188,7 +188,7 @@ public class UserMethodTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "Map has an unsupported mapping method signature")
             .HaveAssertedAllDiagnostics();
@@ -205,7 +205,7 @@ public class UserMethodTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature)
             .HaveAssertedAllDiagnostics();
@@ -221,7 +221,7 @@ public class UserMethodTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature)
             .HaveAssertedAllDiagnostics();

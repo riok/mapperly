@@ -29,7 +29,7 @@ public static class TestHelper
         IReadOnlyCollection<TestAssembly>? additionalAssemblies = null
     )
     {
-        options ??= TestHelperOptions.NoDiagnostics;
+        options ??= TestHelperOptions.Default;
 
         var result = Generate(source, options, additionalAssemblies).GetRunResult();
 
@@ -38,13 +38,16 @@ public static class TestHelper
             ?.GetRoot();
         var methods = ExtractAllMethods(syntaxRoot).Select(x => new GeneratedMethod(x)).ToDictionary(x => x.Name);
 
-        var groupedDiagnostics = result
-            .Diagnostics.GroupBy(x => x.Descriptor.Id)
+        var ignoredDiagnosticDescriptorIds = options.IgnoredDiagnostics?.Select(x => x.Id).ToHashSet() ?? new HashSet<string>();
+        var filteredDiagnostics = result.Diagnostics.Where(x => !ignoredDiagnosticDescriptorIds.Contains(x.Descriptor.Id)).ToList();
+        var groupedDiagnostics = filteredDiagnostics
+            .GroupBy(x => x.Descriptor.Id)
             .ToDictionary(x => x.Key, x => (IReadOnlyCollection<Diagnostic>)x.ToList());
-        var mapperResult = new MapperGenerationResult(result.Diagnostics, groupedDiagnostics, methods);
-        if (options.AllowedDiagnostics != null)
+
+        var mapperResult = new MapperGenerationResult(filteredDiagnostics, groupedDiagnostics, methods);
+        if (options.AllowedDiagnosticSeverities != null)
         {
-            mapperResult.Should().NotHaveDiagnostics(options.AllowedDiagnostics);
+            mapperResult.Should().OnlyHaveDiagnosticSeverities(options.AllowedDiagnosticSeverities);
         }
 
         return mapperResult;
@@ -76,7 +79,7 @@ public static class TestHelper
         IReadOnlyCollection<TestAssembly>? additionalAssemblies = null
     )
     {
-        options ??= TestHelperOptions.NoDiagnostics;
+        options ??= TestHelperOptions.Default;
 
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default.WithLanguageVersion(options.LanguageVersion));
         var compilation = BuildCompilation(options.AssemblyName, options.NullableOption, true, syntaxTree);

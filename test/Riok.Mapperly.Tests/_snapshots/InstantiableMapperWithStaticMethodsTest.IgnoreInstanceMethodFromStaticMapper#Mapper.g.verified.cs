@@ -13,7 +13,7 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private static global::BExternal MapToBExternal(global::AExternal source)
     {
-        var target = new global::BExternal();
+        var target = new global::BExternal(source.ExternalValue);
         return target;
     }
 }

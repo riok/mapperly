@@ -1,6 +1,7 @@
 const { exec } = require('child_process');
 const { readFile, writeFile, copyFile, mkdir, readdir, rm } =
   require('fs').promises;
+const { existsSync } = require('fs');
 const { join } = require('path');
 const util = require('util');
 const { marked } = require('marked');
@@ -47,6 +48,8 @@ async function buildAnalyzerRulesData(): Promise<void> {
   // extract analyzer rules from AnalyzerReleases.Shipped.md and write to a json file
   const targetFile = join(generatedDataDir, 'analyzer-rules.json');
   const sourceFile = '../src/Riok.Mapperly/AnalyzerReleases.Shipped.md';
+  const analyzerDiagnosticsDocsDir =
+    './docs/configuration/analyzer-diagnostics';
 
   let rules = {};
   let removingRules = true;
@@ -72,6 +75,9 @@ async function buildAnalyzerRulesData(): Promise<void> {
         category: row[1].text,
         severity: row[2].text,
         notes: row[3].text,
+        hasDocumentation: existsSync(
+          join(analyzerDiagnosticsDocsDir, `${id}.mdx`),
+        ),
       };
     }
 

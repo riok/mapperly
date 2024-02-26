@@ -22,6 +22,7 @@ public partial class Mapper
             return existingTargetReference;
         var target = new global::B();
         refHandler.SetReference<global::A, global::B>(source, target);
+        target.IntValue = source.IntValue;
         return target;
     }
 }

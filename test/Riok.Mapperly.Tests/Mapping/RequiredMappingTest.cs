@@ -233,7 +233,7 @@ public class RequiredMappingTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.NoConstructorFound)
             .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)

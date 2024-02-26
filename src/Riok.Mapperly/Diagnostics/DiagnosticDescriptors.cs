@@ -572,4 +572,27 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         true
     );
+
+    public static readonly DiagnosticDescriptor NoMemberMappings = new DiagnosticDescriptor(
+        "RMG066",
+        "No members are mapped in an object mapping",
+        "No members are mapped in the object mapping from {0} to {1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        true,
+        helpLinkUri: BuildHelpUri("RMG066")
+    );
+
+    private static string BuildHelpUri(string id)
+    {
+#if ENV_NEXT
+        var host = "next.mapperly.riok.app";
+#elif ENV_LOCAL
+        var host = "localhost:3000";
+#else
+        var host = "mapperly.riok.app";
+#endif
+
+        return $"https://{host}/docs/configuration/analyzer-diagnostics/{id}";
+    }
 }

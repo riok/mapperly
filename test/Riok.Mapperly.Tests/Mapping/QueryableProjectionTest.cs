@@ -143,8 +143,8 @@ public class QueryableProjectionTest
         var source = TestSourceBuilder.Mapping(
             "System.Linq.IQueryable<A>",
             "System.Linq.IQueryable<B>",
-            "class A { public A? Parent { get; set; } }",
-            "class B { public B? Parent { get; set; } }"
+            "class A { public A? Parent { get; set; } public int IntValue { get; set; } }",
+            "class B { public B? Parent { get; set; } public int IntValue { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);
@@ -156,8 +156,8 @@ public class QueryableProjectionTest
         var source = TestSourceBuilder.Mapping(
             "System.Linq.IQueryable<A>",
             "System.Linq.IQueryable<B>",
-            "class A { public A? Parent { get; set; } }",
-            "class B { public B(B? parent) {} }"
+            "class A { public A? Parent { get; set; } public int IntValue { get; set; } }",
+            "class B { public B(B? parent) {} public int IntValue { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);

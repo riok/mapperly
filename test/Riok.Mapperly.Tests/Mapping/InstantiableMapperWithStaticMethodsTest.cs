@@ -164,8 +164,8 @@ public class InstantiableMapperWithStaticMethodsTest
 
             record A(AExternal Value);
             record B(BExternal Value);
-            record AExternal();
-            record BExternal();
+            record AExternal(int ExternalValue);
+            record BExternal(int ExternalValue);
 
             class OtherMapper {
                 public BExternal ToBExternal(AExternal source) => new BExternal();
@@ -196,7 +196,7 @@ public class InstantiableMapperWithStaticMethodsTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.MixingStaticPartialWithInstanceMethod)
             .HaveAssertedAllDiagnostics();
@@ -224,7 +224,7 @@ public class InstantiableMapperWithStaticMethodsTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature)
             .HaveAssertedAllDiagnostics();
@@ -243,7 +243,7 @@ public class InstantiableMapperWithStaticMethodsTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAllDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
                 DiagnosticDescriptors.MixingStaticPartialWithInstanceMethod,
