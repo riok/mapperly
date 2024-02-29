@@ -5,7 +5,7 @@
       Title: Cannot map to the configured constructor to be used by Mapperly,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (10,4)-(10,36),
+      Location: : (11,4)-(11,36),
       MessageFormat: Cannot map from {0} to the configured constructor {1},
       Message: Cannot map from A to the configured constructor B.B(string),
       Category: Mapper

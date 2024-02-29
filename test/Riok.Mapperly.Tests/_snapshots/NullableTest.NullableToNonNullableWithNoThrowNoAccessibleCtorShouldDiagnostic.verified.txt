@@ -5,7 +5,7 @@
       Title: No accessible parameterless constructor found,
       Severity: Error,
       WarningLevel: 0,
-      Location: : (10,4)-(10,42),
+      Location: : (11,4)-(11,42),
       MessageFormat: {0} has no accessible parameterless constructor,
       Message: B has no accessible parameterless constructor,
       Category: Mapper
