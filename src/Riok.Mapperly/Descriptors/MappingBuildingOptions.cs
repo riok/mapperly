@@ -17,7 +17,7 @@ public enum MappingBuildingOptions
     KeepUserSymbol = 1 << 1,
 
     /// <summary>
-    /// Clears the derived types of the configuration.
+    /// Ignores the derived types of the configuration.
     /// </summary>
-    ClearDerivedTypes = 1 << 2,
+    IgnoreDerivedTypes = 1 << 2,
 }

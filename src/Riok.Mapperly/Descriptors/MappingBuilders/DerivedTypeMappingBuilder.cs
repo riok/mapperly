@@ -94,7 +94,7 @@ public static class DerivedTypeMappingBuilder
             var mapping = findOrBuildMapping(
                 sourceType,
                 targetType,
-                MappingBuildingOptions.KeepUserSymbol | MappingBuildingOptions.MarkAsReusable | MappingBuildingOptions.ClearDerivedTypes,
+                MappingBuildingOptions.KeepUserSymbol | MappingBuildingOptions.MarkAsReusable | MappingBuildingOptions.IgnoreDerivedTypes,
                 config.Location
             );
             if (mapping == null)

@@ -89,7 +89,7 @@ public static class EnumMappingBuilder
         );
         var differentValueExplicitEnumMappings = enumMemberMappings
             .ExplicitMemberMappings.Where(x => x.Key.ConstantValue?.Equals(x.Value.ConstantValue) != true)
-            .ToDictionary(x => x.Key, x => x.Value, (IEqualityComparer<IFieldSymbol>)SymbolEqualityComparer.Default);
+            .ToDictionary(x => x.Key, x => x.Value, SymbolTypeEqualityComparer.FieldDefault);
 
         if (differentValueExplicitEnumMappings.Count == 0)
             return castFallbackMapping;
@@ -127,10 +127,10 @@ public static class EnumMappingBuilder
     {
         var ignoredSourceMembers = ignoreExplicitAndIgnoredMappings
             ? new HashSet<IFieldSymbol>(SymbolEqualityComparer.Default)
-            : ctx.Configuration.Enum.IgnoredSourceMembers.ToHashSet(FieldSymbolEqualityComparer.Default);
+            : ctx.Configuration.Enum.IgnoredSourceMembers.ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
         var ignoredTargetMembers = ignoreExplicitAndIgnoredMappings
             ? new HashSet<IFieldSymbol>(SymbolEqualityComparer.Default)
-            : ctx.Configuration.Enum.IgnoredTargetMembers.ToHashSet(FieldSymbolEqualityComparer.Default);
+            : ctx.Configuration.Enum.IgnoredTargetMembers.ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
         var explicitMappings = ignoreExplicitAndIgnoredMappings
             ? new Dictionary<IFieldSymbol, IFieldSymbol>(SymbolEqualityComparer.Default)
             : BuildExplicitValueMappings(ctx);
@@ -138,12 +138,12 @@ public static class EnumMappingBuilder
             .Source.GetMembers()
             .OfType<IFieldSymbol>()
             .Where(x => !ignoredSourceMembers.Remove(x))
-            .ToHashSet(FieldSymbolEqualityComparer.Default);
+            .ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
         var targetMembers = ctx
             .Target.GetMembers()
             .OfType<IFieldSymbol>()
             .Where(x => !ignoredTargetMembers.Remove(x))
-            .ToHashSet(FieldSymbolEqualityComparer.Default);
+            .ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
 
         var targetMembersByProperty = propertyComparer
             .Select(pc => targetMembers.DistinctBy(propertySelector, pc).ToDictionary(propertySelector, x => x, pc))

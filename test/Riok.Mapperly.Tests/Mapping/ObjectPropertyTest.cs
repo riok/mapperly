@@ -238,12 +238,15 @@ public class ObjectPropertyTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             public partial B Map(A source);
+
+            [UserMapping(Default = true)]
             private D UserImplementedMap(C source)
             {
                 var target = Map(source);
                 target.StringValue += "ok";
                 return target;
             }
+
             private partial D MapToD(C source);
             """,
             "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",

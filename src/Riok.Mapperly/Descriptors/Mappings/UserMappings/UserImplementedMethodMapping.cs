@@ -16,7 +16,7 @@ public class UserImplementedMethodMapping(
     MethodParameter sourceParameter,
     ITypeSymbol targetType,
     MethodParameter? referenceHandlerParameter
-) : NewInstanceMapping(sourceParameter.Type, targetType), IUserMapping
+) : NewInstanceMapping(sourceParameter.Type, targetType), INewInstanceUserMapping
 {
     public IMethodSymbol Method { get; } = method;
 
