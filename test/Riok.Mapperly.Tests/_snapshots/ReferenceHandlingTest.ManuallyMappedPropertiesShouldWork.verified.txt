@@ -5,7 +5,7 @@
       Title: Source member was not found for target member,
       Severity: Info,
       WarningLevel: 1,
-      Location: : (10,4)-(10,73),
+      Location: : (11,4)-(11,73),
       MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
       Message: The member MyValue2 on the mapping target type B was not found on the mapping source type A,
       Category: Mapper
@@ -15,7 +15,7 @@
       Title: Source member was not found for target member,
       Severity: Info,
       WarningLevel: 1,
-      Location: : (10,73)-(10,144),
+      Location: : (11,73)-(11,144),
       MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
       Message: The member MyValue on the mapping target type B was not found on the mapping source type A,
       Category: Mapper

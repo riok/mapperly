@@ -41,6 +41,7 @@ public static class TestSourceBuilder
         return CSharp(
             $$"""
             using System;
+            using System.Linq;
             using System.Collections.Generic;
             using Riok.Mapperly.Abstractions;
             using Riok.Mapperly.Abstractions.ReferenceHandling;

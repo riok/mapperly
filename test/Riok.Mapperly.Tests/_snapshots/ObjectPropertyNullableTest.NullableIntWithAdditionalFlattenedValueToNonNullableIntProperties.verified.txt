@@ -5,7 +5,7 @@
       Title: Source member is not mapped to any target member,
       Severity: Info,
       WarningLevel: 1,
-      Location: : (10,4)-(10,36),
+      Location: : (11,4)-(11,36),
       MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
       Message: The member Value2 on the mapping source type C is not mapped to any member on the mapping target type D,
       Category: Mapper

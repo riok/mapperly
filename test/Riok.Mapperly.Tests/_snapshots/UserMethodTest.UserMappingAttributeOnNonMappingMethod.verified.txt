@@ -5,7 +5,7 @@
       Title: Has an unsupported mapping method signature,
       Severity: Error,
       WarningLevel: 0,
-      Location: : (10,4)-(11,47),
+      Location: : (11,4)-(12,47),
       MessageFormat: {0} has an unsupported mapping method signature,
       Message: NotAMappingMethod2 has an unsupported mapping method signature,
       Category: Mapper

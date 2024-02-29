@@ -5,7 +5,7 @@
       Title: Cannot map to write only member path,
       Severity: Info,
       WarningLevel: 1,
-      Location: : (10,4)-(10,76),
+      Location: : (11,4)-(11,76),
       MessageFormat: Cannot map from member {0}.{1} of type {2} to write only member path {3}.{4} of type {5},
       Message: Cannot map from member A.MyValueId of type string to write only member path B.Value.Id of type string,
       Category: Mapper
@@ -15,7 +15,7 @@
       Title: Source member is not mapped to any target member,
       Severity: Info,
       WarningLevel: 1,
-      Location: : (10,4)-(10,76),
+      Location: : (11,4)-(11,76),
       MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
       Message: The member MyValueId on the mapping source type A is not mapped to any member on the mapping target type B,
       Category: Mapper
@@ -25,7 +25,7 @@
       Title: No members are mapped in an object mapping,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (10,4)-(10,76),
+      Location: : (11,4)-(11,76),
       HelpLink: https://localhost:3000/docs/configuration/analyzer-diagnostics/RMG066,
       MessageFormat: No members are mapped in the object mapping from {0} to {1},
       Message: No members are mapped in the object mapping from A to B,

@@ -5,7 +5,7 @@
       Title: An enum member could not be found on the source enum,
       Severity: Info,
       WarningLevel: 1,
-      Location: : (10,4)-(10,36),
+      Location: : (11,4)-(11,36),
       MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
       Message: Enum member Value2 (1) on D not found on source enum C,
       Category: Mapper
@@ -15,7 +15,7 @@
       Title: An enum member could not be found on the source enum,
       Severity: Info,
       WarningLevel: 1,
-      Location: : (10,4)-(10,36),
+      Location: : (11,4)-(11,36),
       MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
       Message: Enum member Value3 (2) on D not found on source enum C,
       Category: Mapper
