@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.IntegrationTests.Models;
 
 namespace Riok.Mapperly.IntegrationTests.Dto
@@ -118,6 +119,9 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         [Obsolete]
         public int IgnoredObsoleteValue { get; set; }
+
+        [MapperIgnoreMember]
+        public int IgnoredMemberValue { get; set; }
 
         public DateOnly DateTimeValueTargetDateOnly { get; set; }
 
