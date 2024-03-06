@@ -11,6 +11,12 @@ To run custom code before or after a mapping, the generated map method can be wr
 [Mapper]
 public partial class CarMapper
 {
+    private partial CarDto CarToCarDto(Car car);
+
+    // highlight-start
+    // Default ensures Mapperly uses this mapping whenever a conversion
+    // from Car to CarDto is needed instead of the `CarToCarDto` method.
+    [UserMapping(Default = true)]
     public CarDto MapCarToCarDto(Car car)
     {
         // custom before map code...
@@ -18,7 +24,6 @@ public partial class CarMapper
         // custom after map code...
         return dto;
     }
-
-    private partial CarDto CarToCarDto(Car car);
+    // highlight-end
 }
 ```

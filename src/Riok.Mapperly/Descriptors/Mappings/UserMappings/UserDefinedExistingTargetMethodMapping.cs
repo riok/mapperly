@@ -18,7 +18,7 @@ public class UserDefinedExistingTargetMethodMapping(
     MethodParameter targetParameter,
     MethodParameter? referenceHandlerParameter,
     bool enableReferenceHandling
-) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetParameter.Type), IUserMapping
+) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetParameter.Type), IExistingTargetUserMapping
 {
     private IExistingTargetMapping? _delegateMapping;
 
@@ -37,6 +37,9 @@ public class UserDefinedExistingTargetMethodMapping(
     public void SetDelegateMapping(IExistingTargetMapping delegateMapping) => _delegateMapping = delegateMapping;
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
+        throw new InvalidOperationException($"{nameof(UserDefinedExistingTargetMethodMapping)} does not support {nameof(Build)}");
+
+    public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target) =>
         throw new InvalidOperationException($"{nameof(UserDefinedExistingTargetMethodMapping)} does not support {nameof(Build)}");
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)

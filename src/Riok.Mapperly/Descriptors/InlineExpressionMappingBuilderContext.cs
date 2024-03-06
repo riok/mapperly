@@ -27,9 +27,9 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         IMethodSymbol? userSymbol,
         Location? diagnosticLocation,
         TypeMappingKey mappingKey,
-        bool clearDerivedTypes
+        bool ignoreDerivedTypes
     )
-        : base(ctx, userSymbol, diagnosticLocation, mappingKey, clearDerivedTypes)
+        : base(ctx, userSymbol, diagnosticLocation, mappingKey, ignoreDerivedTypes)
     {
         _parentContext = ctx;
         _inlineExpressionMappings = ctx._inlineExpressionMappings;
@@ -44,6 +44,22 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         =>
         conversionType is not MappingConversionType.EnumToString and not MappingConversionType.Dictionary
         && base.IsConversionEnabled(conversionType);
+
+    /// <summary>
+    /// <inheritdoc cref="MappingBuilderContext.FindNamedMapping"/>
+    /// Only returns <see cref="INewInstanceUserMapping"/>s.
+    /// </summary>
+    public override INewInstanceMapping? FindNamedMapping(string mappingName)
+    {
+        // Only user implemented mappings are taken into account.
+        // This works as long as the user implemented methods
+        // follow the expression tree limitations:
+        // https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/expression-trees/#limitations
+        if (base.FindNamedMapping(mappingName) is INewInstanceUserMapping mapping)
+            return mapping;
+
+        return null;
+    }
 
     /// <summary>
     /// Tries to find an existing mapping for the provided types + config.
@@ -62,45 +78,55 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         // follow the expression tree limitations:
         // https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/expression-trees/#limitations
         if (_parentContext.FindMapping(mappingKey) is UserImplementedMethodMapping userMapping)
-        {
-            _inlineExpressionMappings.AddMapping(userMapping, mappingKey.Configuration);
             return userMapping;
-        }
 
         return null;
     }
 
     /// <summary>
-    /// Always builds a new mapping with the user symbol of the first user defined mapping method for the provided types
-    /// or no user symbol if no user defined mapping is available unless if this <see cref="InlineExpressionMappingBuilderContext"/>
-    /// already built a mapping for the specified types, then this mapping is reused.
-    /// The nullable annotation of reference types is ignored and always set to non-nullable.
-    /// This ensures, the configuration of the user defined method is reused.
-    /// <seealso cref="MappingBuilderContext.FindOrBuildMapping"/>
+    /// Builds a new mapping but always uses the user symbol of the default defined mapping (if it is a user mapping)
+    /// or no user symbol if no user default mapping exists.
+    /// <seealso cref="MappingBuilderContext.BuildMapping"/>
     /// </summary>
     /// <param name="mappingKey">The mapping key.</param>
     /// <param name="options">The options, <see cref="MappingBuildingOptions.MarkAsReusable"/> is ignored.</param>
     /// <param name="diagnosticLocation">The updated to location where to report diagnostics if a new mapping is being built.</param>
-    /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
-    public override INewInstanceMapping? FindOrBuildMapping(
+    /// <returns>The created mapping, or <c>null</c> if no mapping could be created.</returns>
+    public override INewInstanceMapping? BuildMapping(
         TypeMappingKey mappingKey,
         MappingBuildingOptions options = MappingBuildingOptions.Default,
         Location? diagnosticLocation = null
     )
     {
-        var mapping = FindMapping(mappingKey);
-        if (mapping != null)
-            return mapping;
-
         var userSymbol = options.HasFlag(MappingBuildingOptions.KeepUserSymbol) ? UserSymbol : null;
 
+        // inline expression mappings don't reuse the user-defined mappings directly
+        // but to apply the same configurations the default mapping user symbol is used
+        // if there is no other user symbol.
+        // this makes sure the configuration of the default mapping user symbol is used
+        // for inline expression mappings.
+        // This is not needed for regular mappings as these user defined method mappings
+        // are directly built (with KeepUserSymbol) and called by the other mappings.
         userSymbol ??= (MappingBuilder.Find(mappingKey) as IUserMapping)?.Method;
+        options &= ~MappingBuildingOptions.KeepUserSymbol;
+        return BuildMapping(userSymbol, mappingKey, options, diagnosticLocation);
+    }
 
-        // unset MarkAsReusable and KeepUserSymbol as they have special handling for inline mappings
-        options &= ~(MappingBuildingOptions.MarkAsReusable | MappingBuildingOptions.KeepUserSymbol);
+    protected override INewInstanceMapping? BuildMapping(
+        IMethodSymbol? userSymbol,
+        TypeMappingKey mappingKey,
+        MappingBuildingOptions options,
+        Location? diagnosticLocation
+    )
+    {
+        // unset mark as reusable as an inline expression mapping
+        // should never be reused by the default mapping builder context,
+        // only by other inline mapping builder contexts.
+        var reusable = (options & MappingBuildingOptions.MarkAsReusable) != MappingBuildingOptions.MarkAsReusable;
+        options &= ~MappingBuildingOptions.MarkAsReusable;
 
-        mapping = BuildMapping(userSymbol, mappingKey, options, diagnosticLocation);
-        if (mapping != null)
+        var mapping = base.BuildMapping(userSymbol, mappingKey, options, diagnosticLocation);
+        if (reusable && mapping != null)
         {
             _inlineExpressionMappings.AddMapping(mapping, mappingKey.Configuration);
         }
@@ -145,7 +171,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
             userSymbol,
             diagnosticLocation,
             mappingKey,
-            options.HasFlag(MappingBuildingOptions.ClearDerivedTypes)
+            options.HasFlag(MappingBuildingOptions.IgnoreDerivedTypes)
         );
     }
 }

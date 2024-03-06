@@ -17,7 +17,7 @@ public class UserImplementedExistingTargetMethodMapping(
     MethodParameter sourceParameter,
     MethodParameter targetParameter,
     MethodParameter? referenceHandlerParameter
-) : ExistingTargetMapping(method.Parameters[0].Type, targetParameter.Type), IUserMapping
+) : ExistingTargetMapping(method.Parameters[0].Type, targetParameter.Type), IExistingTargetUserMapping
 {
     public IMethodSymbol Method { get; } = method;
 

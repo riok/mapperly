@@ -20,7 +20,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
     {
         var mappingCtx = new NewInstanceBuilderContext<NewInstanceObjectMemberMapping>(ctx, mapping);
         BuildConstructorMapping(mappingCtx);
-        BuildInitOnlyMemberMappings(mappingCtx, true);
+        BuildInitMemberMappings(mappingCtx, true);
         mappingCtx.AddDiagnostics();
     }
 
@@ -28,11 +28,11 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
     {
         var mappingCtx = new NewInstanceContainerBuilderContext<NewInstanceObjectMemberMethodMapping>(ctx, mapping);
         BuildConstructorMapping(mappingCtx);
-        BuildInitOnlyMemberMappings(mappingCtx);
+        BuildInitMemberMappings(mappingCtx);
         ObjectMemberMappingBodyBuilder.BuildMappingBody(mappingCtx);
     }
 
-    private static void BuildInitOnlyMemberMappings(INewInstanceBuilderContext<IMapping> ctx, bool includeAllMembers = false)
+    private static void BuildInitMemberMappings(INewInstanceBuilderContext<IMapping> ctx, bool includeAllMembers = false)
     {
         var ignoreCase = ctx.BuilderContext.Configuration.Mapper.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
 

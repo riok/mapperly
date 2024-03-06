@@ -38,13 +38,13 @@ public class MapperDescriptor
 
     public UniqueNameBuilder NameBuilder { get; }
 
-    public IReadOnlyCollection<MethodMapping> MethodTypeMappings => _methodMappings;
+    public IReadOnlyCollection<MethodMapping> MethodMappings => _methodMappings;
 
     public IReadOnlyCollection<IUnsafeAccessor> UnsafeAccessors => _unsafeAccessors;
 
-    public void AddTypeMapping(MethodMapping mapping) => _methodMappings.Add(mapping);
+    public void AddMethodMappings(IReadOnlyCollection<MethodMapping> mappings) => _methodMappings.AddRange(mappings);
 
-    public void AddUnsafeAccessors(IEnumerable<IUnsafeAccessor> accessors) => _unsafeAccessors.AddRange(accessors);
+    public void AddUnsafeAccessors(IReadOnlyCollection<IUnsafeAccessor> accessors) => _unsafeAccessors.AddRange(accessors);
 
     private string BuildName(INamedTypeSymbol symbol)
     {

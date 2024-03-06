@@ -16,11 +16,12 @@ public static class UserMethodMappingExtractor
     internal static IEnumerable<IUserMapping> ExtractUserMappings(SimpleMappingBuilderContext ctx, ITypeSymbol mapperSymbol)
     {
         // extract user implemented and user defined mappings from mapper
-        foreach (var methodSymbol in ExtractMethods(mapperSymbol))
+        var methods = mapperSymbol.GetMembers().OfType<IMethodSymbol>().Where(method => IsMappingMethodCandidate(ctx, method));
+        foreach (var method in methods)
         {
             var mapping =
-                BuilderUserDefinedMapping(ctx, methodSymbol)
-                ?? BuildUserImplementedMapping(ctx, methodSymbol, receiver: null, allowPartial: false, mapperSymbol.IsStatic);
+                BuilderUserDefinedMapping(ctx, method)
+                ?? BuildUserImplementedMapping(ctx, method, receiver: null, allowPartial: false, isStatic: mapperSymbol.IsStatic);
             if (mapping != null)
                 yield return mapping;
         }
@@ -30,16 +31,32 @@ public static class UserMethodMappingExtractor
             yield break;
 
         // extract user implemented mappings from base methods
-        var methods = mapperSymbol.AllInterfaces.SelectMany(ctx.SymbolAccessor.GetAllMethods);
+        var baseAndInterfaceMethods = mapperSymbol.AllInterfaces.SelectMany(ctx.SymbolAccessor.GetAllMethods);
         if (mapperSymbol.BaseType is { } mapperBaseSymbol)
         {
-            methods = methods.Concat(ctx.SymbolAccessor.GetAllMethods(mapperBaseSymbol));
+            baseAndInterfaceMethods = baseAndInterfaceMethods.Concat(ctx.SymbolAccessor.GetAllMethods(mapperBaseSymbol));
         }
 
-        foreach (var mapping in BuildUserImplementedMappings(ctx, methods, null, false))
+        baseAndInterfaceMethods = baseAndInterfaceMethods.Distinct(SymbolTypeEqualityComparer.MethodDefault);
+
+        foreach (var mapping in BuildUserImplementedMappings(ctx, baseAndInterfaceMethods, null, false))
         {
             yield return mapping;
         }
+    }
+
+    internal static IEnumerable<INewInstanceUserMapping> ExtractNamedUserImplementedNewInstanceMappings(
+        SimpleMappingBuilderContext ctx,
+        ITypeSymbol mapperSymbol,
+        string name
+    )
+    {
+        return mapperSymbol
+            .GetMembers(name)
+            .OfType<IMethodSymbol>()
+            .Where(m => IsMappingMethodCandidate(ctx, m, requireAttribute: false))
+            .Select(m => BuildUserImplementedMapping(ctx, m, null, allowPartial: true, isStatic: mapperSymbol.IsStatic))
+            .OfType<INewInstanceUserMapping>();
     }
 
     internal static IEnumerable<IUserMapping> ExtractUserImplementedMappings(
@@ -49,11 +66,12 @@ public static class UserMethodMappingExtractor
         bool isStatic
     )
     {
-        var methods = ctx.SymbolAccessor.GetAllMethods(type).Concat(type.AllInterfaces.SelectMany(ctx.SymbolAccessor.GetAllMethods));
+        var methods = ctx
+            .SymbolAccessor.GetAllMethods(type)
+            .Concat(type.AllInterfaces.SelectMany(ctx.SymbolAccessor.GetAllMethods))
+            .Distinct(SymbolTypeEqualityComparer.MethodDefault);
         return BuildUserImplementedMappings(ctx, methods, receiver, isStatic);
     }
-
-    private static IEnumerable<IMethodSymbol> ExtractMethods(ITypeSymbol mapperSymbol) => mapperSymbol.GetMembers().OfType<IMethodSymbol>();
 
     private static IEnumerable<IUserMapping> BuildUserImplementedMappings(
         SimpleMappingBuilderContext ctx,
@@ -77,12 +95,19 @@ public static class UserMethodMappingExtractor
         }
     }
 
-    private static bool IsMappingMethodCandidate(SimpleMappingBuilderContext ctx, IMethodSymbol method)
+    private static bool IsMappingMethodCandidate(SimpleMappingBuilderContext ctx, IMethodSymbol method, bool requireAttribute = true)
     {
+        requireAttribute &= !ctx.Configuration.Mapper.AutoUserMappings;
+
         // ignore all non ordinary methods (eg. ctor, operators, etc.) and methods declared on the object type (eg. ToString)
         return method.MethodKind == MethodKind.Ordinary
             && ctx.SymbolAccessor.IsDirectlyAccessible(method)
-            && !SymbolEqualityComparer.Default.Equals(method.ReceiverType, ctx.Compilation.ObjectType);
+            && !SymbolEqualityComparer.Default.Equals(method.ReceiverType, ctx.Compilation.ObjectType)
+            && (
+                !requireAttribute
+                || ctx.SymbolAccessor.HasAttribute<UserMappingAttribute>(method)
+                || method.IsPartialDefinition && ctx.SymbolAccessor.HasAttribute<MapperAttribute>(method.ContainingType)
+            );
     }
 
     private static IUserMapping? BuildUserImplementedMapping(
@@ -107,7 +132,7 @@ public static class UserMethodMappingExtractor
             return null;
         }
 
-        if (userMappingConfig.Ignore)
+        if (userMappingConfig.Ignore == true)
             return null;
 
         if (method.ReturnsVoid)
@@ -399,6 +424,6 @@ public static class UserMethodMappingExtractor
     {
         var userMappingAttr = ctx.AttributeAccessor.AccessFirstOrDefault<UserMappingAttribute, UserMappingConfiguration>(method);
         hasAttribute = userMappingAttr != null;
-        return userMappingAttr ?? new UserMappingConfiguration { Ignore = !ctx.Configuration.Mapper.AutoUserMappings, };
+        return userMappingAttr ?? new UserMappingConfiguration();
     }
 }

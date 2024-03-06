@@ -39,6 +39,25 @@ public class ObjectPropertyUseNamedMappingTest
     }
 
     [Fact]
+    public Task ShouldUseReferencedMappingOnSelectedPropertiesWithRecordConstructors()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.StringValue1), nameof(B.StringValue1), Use = nameof(ModifyString)]
+            [MapProperty(nameof(A.StringValue2), nameof(B.StringValue2), Use = nameof(ModifyString2)]
+            public partial B Map(A source);
+
+            private string DefaultStringMapping(string source) => source;
+            private string ModifyString(string source) => source + "-modified";
+            private string ModifyString2(string source) => source + "-modified2";
+            """,
+            "record A(string StringValue, string StringValue1, string StringValue2);",
+            "record B(string StringValue, string StringValue1, string StringValue2);"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task MultipleNonDefaultUserImplementedButReferencedMappingMethodsShouldNotDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -287,5 +306,46 @@ public class ObjectPropertyUseNamedMappingTest
                 return target;
                 """
             );
+    }
+
+    [Fact]
+    public Task ShouldUseReferencedUserDefinedMappingOnSelectedProperties()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(MapToDWithP)]
+            [MapProperty(nameof(A.Value2), nameof(B.Value2), Use = nameof(MapToDWithC)]
+            public partial B Map(A source);
+
+            [MapProperty(nameof(C.Value), nameof(D.Value), StringFormat = "P")]
+            private partial D MapToDWithP(C source);
+
+            [MapProperty(nameof(C.Value), nameof(D.Value), StringFormat = "C")]
+            private partial D MapToDWithC(C source);
+
+            [UserMapping(Default = true)]
+            [MapProperty(nameof(C.Value), nameof(D.Value), StringFormat = "N")]
+            private partial D MapToDDefault(C source);
+            """,
+            """
+            class A
+            {
+                public C Value { get; set; }
+                public C Value2 { get; set; }
+                public C ValueDefault { get; set; }
+            }
+            """,
+            """
+            class B
+            {
+                public D Value { get; set; }
+                public D Value2 { get; set; }
+                public D ValueDefault { get; set; }
+            }
+            """,
+            "record C(int Value);",
+            "record D(string Value);"
+        );
+        return TestHelper.VerifyGenerator(source);
     }
 }
