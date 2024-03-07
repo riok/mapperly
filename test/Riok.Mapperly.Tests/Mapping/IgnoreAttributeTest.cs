@@ -3,7 +3,7 @@ using Riok.Mapperly.Diagnostics;
 namespace Riok.Mapperly.Tests.Mapping;
 
 [UsesVerify]
-public class IgnoreMemberTest
+public class IgnoreAttributeTest
 {
     private readonly string _classA = TestSourceBuilder.CSharp(
         """
@@ -11,7 +11,7 @@ public class IgnoreMemberTest
         {
             public int Value { get; set; }
 
-            [MapperIgnoreMember]
+            [MapperIgnore]
             public int Ignored { get; set; }
         }
         """
@@ -23,7 +23,7 @@ public class IgnoreMemberTest
         {
             public int Value { get; set; }
 
-            [MapperIgnoreMember]
+            [MapperIgnore]
             public int Ignored { get; set; }
         }
         """

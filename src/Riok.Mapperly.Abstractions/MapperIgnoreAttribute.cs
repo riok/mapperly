@@ -5,6 +5,6 @@ namespace Riok.Mapperly.Abstractions;
 /// <summary>
 /// Ignores a member from the mapping.
 /// </summary>
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
 [Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
-public sealed class MapperIgnoreMemberAttribute : Attribute;
+public sealed class MapperIgnoreAttribute : Attribute;

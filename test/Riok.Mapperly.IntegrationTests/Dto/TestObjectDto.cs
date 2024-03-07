@@ -120,7 +120,7 @@ namespace Riok.Mapperly.IntegrationTests.Dto
         [Obsolete]
         public int IgnoredObsoleteValue { get; set; }
 
-        [MapperIgnoreMember]
+        [MapperIgnore]
         public int IgnoredMemberValue { get; set; }
 
         public DateOnly DateTimeValueTargetDateOnly { get; set; }

@@ -149,7 +149,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     {
         return BuilderContext
             .SymbolAccessor.GetAllAccessibleMappableMembers(Mapping.TargetType)
-            .Where(x => BuilderContext.SymbolAccessor.HasAttribute<MapperIgnoreMemberAttribute>(x.MemberSymbol))
+            .Where(x => BuilderContext.SymbolAccessor.HasAttribute<MapperIgnoreAttribute>(x.MemberSymbol))
             .Select(x => x.Name);
     }
 
@@ -157,7 +157,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     {
         return BuilderContext
             .SymbolAccessor.GetAllAccessibleMappableMembers(Mapping.SourceType)
-            .Where(x => BuilderContext.SymbolAccessor.HasAttribute<MapperIgnoreMemberAttribute>(x.MemberSymbol))
+            .Where(x => BuilderContext.SymbolAccessor.HasAttribute<MapperIgnoreAttribute>(x.MemberSymbol))
             .Select(x => x.Name);
     }
 

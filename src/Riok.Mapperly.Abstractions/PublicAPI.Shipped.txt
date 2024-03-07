@@ -42,8 +42,8 @@ Riok.Mapperly.Abstractions.MapperConstructorAttribute.MapperConstructorAttribute
 Riok.Mapperly.Abstractions.MapperIgnoreObsoleteMembersAttribute
 Riok.Mapperly.Abstractions.MapperIgnoreObsoleteMembersAttribute.IgnoreObsoleteStrategy.get -> Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy
 Riok.Mapperly.Abstractions.MapperIgnoreObsoleteMembersAttribute.MapperIgnoreObsoleteMembersAttribute(Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy ignoreObsoleteStrategy = (Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy)-1) -> void
-Riok.Mapperly.Abstractions.MapperIgnoreMemberAttribute
-Riok.Mapperly.Abstractions.MapperIgnoreMemberAttribute.MapperIgnoreMemberAttribute() -> void
+Riok.Mapperly.Abstractions.MapperIgnoreAttribute
+Riok.Mapperly.Abstractions.MapperIgnoreAttribute.MapperIgnoreAttribute() -> void
 Riok.Mapperly.Abstractions.MapperIgnoreSourceAttribute
 Riok.Mapperly.Abstractions.MapperIgnoreSourceAttribute.MapperIgnoreSourceAttribute(string! source) -> void
 Riok.Mapperly.Abstractions.MapperIgnoreSourceAttribute.Source.get -> string!
