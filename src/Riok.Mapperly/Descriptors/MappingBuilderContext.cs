@@ -17,6 +17,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 {
     private readonly FormatProviderCollection _formatProviders;
     private CollectionInfos? _collectionInfos;
+    private DictionaryInfos? _dictionaryInfos;
 
     public MappingBuilderContext(
         SimpleMappingBuilderContext parentCtx,
@@ -57,6 +58,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     public ITypeSymbol Target => MappingKey.Target;
 
     public CollectionInfos? CollectionInfos => _collectionInfos ??= CollectionInfoBuilder.Build(Types, SymbolAccessor, Source, Target);
+
+    public DictionaryInfos? DictionaryInfos => _dictionaryInfos ??= DictionaryInfoBuilder.Build(Types, CollectionInfos);
 
     protected IMethodSymbol? UserSymbol { get; }
 

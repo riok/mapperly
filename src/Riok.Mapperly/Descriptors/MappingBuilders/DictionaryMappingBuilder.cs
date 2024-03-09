@@ -22,7 +22,7 @@ public static class DictionaryMappingBuilder
         if (!ctx.IsConversionEnabled(MappingConversionType.Dictionary))
             return null;
 
-        if (ctx.CollectionInfos == null)
+        if (ctx.DictionaryInfos == null)
             return null;
 
         if (BuildKeyValueMapping(ctx) is not var (keyMapping, valueMapping))
@@ -69,12 +69,7 @@ public static class DictionaryMappingBuilder
         var sourceCollectionInfo = ctx.CollectionInfos.Source;
         if (!hasObjectFactory)
         {
-            sourceCollectionInfo = BuildCollectionTypeForIDictionary(
-                ctx,
-                ctx.CollectionInfos!.Source,
-                keyMapping.SourceType,
-                valueMapping.SourceType
-            );
+            sourceCollectionInfo = BuildCollectionTypeForSourceIDictionary(ctx);
             ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out objectFactory);
 
             var existingMapping = ctx.BuildDelegatedMapping(sourceCollectionInfo.Type, ctx.Target);
@@ -116,16 +111,10 @@ public static class DictionaryMappingBuilder
         var targetType = ctx.Target;
         if (!hasObjectFactory)
         {
-            sourceCollectionInfo = BuildCollectionTypeForIDictionary(
-                ctx,
-                sourceCollectionInfo,
-                keyMapping.SourceType,
-                valueMapping.SourceType
-            );
-
+            sourceCollectionInfo = BuildCollectionTypeForSourceIDictionary(ctx);
             targetType = ctx
                 .Types.Get(typeof(Dictionary<,>))
-                .Construct(keyMapping.TargetType, valueMapping.TargetType)
+                .Construct(ctx.DictionaryInfos!.Target.Key, ctx.DictionaryInfos.Target.Value)
                 .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
 
             ctx.ObjectFactories.TryFindObjectFactory(sourceCollectionInfo.Type, targetType, out objectFactory);
@@ -181,17 +170,11 @@ public static class DictionaryMappingBuilder
 
     private static (INewInstanceMapping, INewInstanceMapping)? BuildKeyValueMapping(MappingBuilderContext ctx)
     {
-        if (ctx.CollectionInfos!.Target.GetDictionaryKeyValueTypes(ctx) is not var (targetKeyType, targetValueType))
-            return null;
-
-        if (ctx.CollectionInfos.Source.GetEnumeratedKeyValueTypes(ctx.Types) is not var (sourceKeyType, sourceValueType))
-            return null;
-
-        var keyMapping = ctx.FindOrBuildMapping(sourceKeyType, targetKeyType);
+        var keyMapping = ctx.FindOrBuildMapping(ctx.DictionaryInfos!.Source.Key, ctx.DictionaryInfos.Target.Key);
         if (keyMapping == null)
             return null;
 
-        var valueMapping = ctx.FindOrBuildMapping(sourceValueType, targetValueType);
+        var valueMapping = ctx.FindOrBuildMapping(ctx.DictionaryInfos.Source.Value, ctx.DictionaryInfos.Target.Value);
         if (valueMapping == null)
             return null;
 
@@ -260,22 +243,19 @@ public static class DictionaryMappingBuilder
         };
     }
 
-    private static CollectionInfo BuildCollectionTypeForIDictionary(
-        MappingBuilderContext ctx,
-        CollectionInfo info,
-        ITypeSymbol key,
-        ITypeSymbol value
-    )
+    private static CollectionInfo BuildCollectionTypeForSourceIDictionary(MappingBuilderContext ctx)
     {
+        var info = ctx.CollectionInfos!.Source;
+
         // the types cannot be changed for mappings with a user symbol
         // as the types are defined by the user
         if (ctx.HasUserSymbol)
             return info;
 
         var dictionaryType = info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyDictionary)
-            ? BuildDictionaryType(ctx, CollectionType.IReadOnlyDictionary, key, value)
+            ? BuildSourceDictionaryType(ctx, CollectionType.IReadOnlyDictionary)
             : info.ImplementedTypes.HasFlag(CollectionType.IDictionary)
-                ? BuildDictionaryType(ctx, CollectionType.IDictionary, key, value)
+                ? BuildSourceDictionaryType(ctx, CollectionType.IDictionary)
                 : null;
 
         return dictionaryType == null
@@ -283,15 +263,13 @@ public static class DictionaryMappingBuilder
             : CollectionInfoBuilder.BuildCollectionInfo(ctx.Types, ctx.SymbolAccessor, dictionaryType, info.EnumeratedType);
     }
 
-    private static INamedTypeSymbol BuildDictionaryType(
-        MappingBuilderContext ctx,
-        CollectionType type,
-        ITypeSymbol keyType,
-        ITypeSymbol valueType
-    )
+    private static INamedTypeSymbol BuildSourceDictionaryType(MappingBuilderContext ctx, CollectionType type)
     {
         var genericType = CollectionInfoBuilder.GetGenericClrCollectionType(type);
         return (INamedTypeSymbol)
-            ctx.Types.Get(genericType).Construct(keyType, valueType).WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+            ctx
+                .Types.Get(genericType)
+                .Construct(ctx.DictionaryInfos!.Source.Key, ctx.DictionaryInfos!.Source.Value)
+                .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
     }
 }
