@@ -29,7 +29,7 @@ public class MappingCollection
     /// <summary>
     /// Queue of mappings which don't have the body built yet
     /// </summary>
-    private readonly PriorityQueue<(IMapping, MappingBuilderContext), MappingBodyBuildingPriority> _mappingsToBuildBody = new();
+    private readonly Queue<(IMapping, MappingBuilderContext)> _mappingsToBuildBody = new();
 
     /// <summary>
     /// All new instance mappings
@@ -62,8 +62,7 @@ public class MappingCollection
 
     public IEnumerable<(IMapping, MappingBuilderContext)> DequeueMappingsToBuildBody() => _mappingsToBuildBody.DequeueAll();
 
-    public void EnqueueToBuildBody(ITypeMapping mapping, MappingBuilderContext ctx) =>
-        _mappingsToBuildBody.Enqueue((mapping, ctx), mapping.BodyBuildingPriority);
+    public void EnqueueToBuildBody(ITypeMapping mapping, MappingBuilderContext ctx) => _mappingsToBuildBody.Enqueue((mapping, ctx));
 
     public MappingCollectionAddResult AddUserMapping(IUserMapping userMapping, bool ignoreDuplicates, string? name)
     {
@@ -138,7 +137,8 @@ public class MappingCollection
         where TUserMapping : T, IUserMapping
     {
         /// <summary>
-        /// Callable mapping of each type pair + config.
+        /// Default mappings of each type pair + config.
+        /// A default mappings is the mapping Mapperly should use to convert from one type to another.
         /// Contains mappings to build and already built mappings.
         /// </summary>
         private readonly Dictionary<TypeMappingKey, T> _defaultMappings = new();
@@ -228,9 +228,6 @@ public class MappingCollection
 
         public MappingCollectionAddResult TryAddAsDefault(T mapping, TypeMappingConfiguration config)
         {
-            if (!mapping.CallableByOtherMappings)
-                return MappingCollectionAddResult.NotAddedIgnored;
-
             var mappingKey = new TypeMappingKey(mapping, config);
             if (_defaultMappings.ContainsKey(mappingKey))
                 return MappingCollectionAddResult.NotAddedDuplicated;
@@ -241,9 +238,6 @@ public class MappingCollection
 
         public MappingCollectionAddResult AddUserMapping(TUserMapping mapping, bool ignoreDuplicates, bool? isDefault, string? name)
         {
-            if (!mapping.CallableByOtherMappings)
-                return MappingCollectionAddResult.NotAddedIgnored;
-
             AddNamedUserMapping(name, mapping);
 
             return isDefault switch

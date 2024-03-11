@@ -22,11 +22,6 @@ public abstract class NewInstanceMapping : INewInstanceMapping
 
     public ITypeSymbol TargetType { get; }
 
-    public virtual MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.Default;
-
-    /// <inheritdoc cref="INewInstanceMapping.CallableByOtherMappings"/>
-    public virtual bool CallableByOtherMappings => true;
-
     /// <inheritdoc cref="INewInstanceMapping.IsSynthetic"/>
     public virtual bool IsSynthetic => false;
 

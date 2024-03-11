@@ -817,6 +817,4 @@ public class UserMethodTest
         );
         return TestHelper.VerifyGenerator(source);
     }
-
-    // TODO test interface methods should not be discovered
 }
