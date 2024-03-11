@@ -6,7 +6,7 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::B Map(global::A source)
     {
-        var target = new global::B(MapToDictionary(source.Dict));
+        var target = new global::B(MapToDictionaryOfInt32AndList(source.Dict));
         return target;
     }
 
@@ -18,7 +18,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::System.Collections.Generic.List<global::D> MapToList(global::System.Collections.Generic.IReadOnlyCollection<global::C> source)
+    private global::System.Collections.Generic.List<global::D> MapToListOfD(global::System.Collections.Generic.IReadOnlyCollection<global::C> source)
     {
         var target = new global::System.Collections.Generic.List<global::D>(source.Count);
         foreach (var item in source)
@@ -29,12 +29,12 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::System.Collections.Generic.Dictionary<int, global::System.Collections.Generic.List<global::D>> MapToDictionary(global::System.Collections.Generic.IReadOnlyDictionary<int, global::System.Collections.Generic.List<global::C>> source)
+    private global::System.Collections.Generic.Dictionary<int, global::System.Collections.Generic.List<global::D>> MapToDictionaryOfInt32AndList(global::System.Collections.Generic.IReadOnlyDictionary<int, global::System.Collections.Generic.List<global::C>> source)
     {
         var target = new global::System.Collections.Generic.Dictionary<int, global::System.Collections.Generic.List<global::D>>(source.Count);
         foreach (var item in source)
         {
-            target[item.Key] = MapToList(item.Value);
+            target[item.Key] = MapToListOfD(item.Value);
         }
         return target;
     }

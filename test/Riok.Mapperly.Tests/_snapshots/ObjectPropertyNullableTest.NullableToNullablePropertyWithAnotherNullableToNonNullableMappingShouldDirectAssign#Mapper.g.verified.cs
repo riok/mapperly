@@ -15,12 +15,12 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public static partial global::BDest MapToDestinationB(global::B source)
     {
-        var target = new global::BDest(MapToList(source.Prop));
+        var target = new global::BDest(MapToListOfInt32(source.Prop));
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private static global::System.Collections.Generic.List<int> MapToList(global::System.Collections.Generic.IReadOnlyCollection<int?> source)
+    private static global::System.Collections.Generic.List<int> MapToListOfInt32(global::System.Collections.Generic.IReadOnlyCollection<int?> source)
     {
         var target = new global::System.Collections.Generic.List<int>(source.Count);
         foreach (var item in source)

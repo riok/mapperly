@@ -6,13 +6,13 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial ((int, int D) C, int) Map(((int F, int G), string B) source)
     {
-        var target = (C: MapToValueTuple(source.Item1), int.Parse(source.B));
+        var target = (C: MapToValueTupleOfInt32AndInt32(source.Item1), int.Parse(source.B));
         target.C.D = int.Parse(source.B);
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private (int, int D) MapToValueTuple((int F, int G) source)
+    private (int, int D) MapToValueTupleOfInt32AndInt32((int F, int G) source)
     {
         var target = (source.F, D: source.G);
         return target;

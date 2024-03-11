@@ -10,7 +10,7 @@ public partial class Mapper
         target.EnsureCapacity(source.Count + target.Count);
         foreach (var item in source)
         {
-            target[item.Key] = MapToList(item.Value);
+            target[item.Key] = MapToListOfD(item.Value);
         }
         return target;
     }
@@ -23,7 +23,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::System.Collections.Generic.List<global::D> MapToList(global::System.Collections.Generic.IReadOnlyCollection<global::C> source)
+    private global::System.Collections.Generic.List<global::D> MapToListOfD(global::System.Collections.Generic.IReadOnlyCollection<global::C> source)
     {
         var target = new global::System.Collections.Generic.List<global::D>(source.Count);
         foreach (var item in source)

@@ -6,14 +6,14 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BList Map(global::AList source)
     {
-        var target = new global::BList(MapToList(source.Values));
+        var target = new global::BList(MapToListOfD(source.Values));
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BListAgain Map(global::AListAgain source)
     {
-        var target = new global::BListAgain(MapToList(source.Values));
+        var target = new global::BListAgain(MapToListOfD(source.Values));
         return target;
     }
 
@@ -27,14 +27,14 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BCustomCollection Map(global::AList source)
     {
-        var target = new global::BCustomCollection(MapToCustomCollection(source.Values));
+        var target = new global::BCustomCollection(MapToCustomCollectionOfD(source.Values));
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BCollection Map(global::AList source)
     {
-        var target = new global::BCollection(MapToList(source.Values));
+        var target = new global::BCollection(MapToListOfD(source.Values));
         return target;
     }
 
@@ -48,21 +48,21 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BCustomCollection Map(global::ACustomReadOnlyCollection source)
     {
-        var target = new global::BCustomCollection(MapToCustomCollection(source.Values));
+        var target = new global::BCustomCollection(MapToCustomCollectionOfD(source.Values));
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BCollection Map(global::ACollection source)
     {
-        var target = new global::BCollection(MapToList1(source.Values));
+        var target = new global::BCollection(MapToListOfD1(source.Values));
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BCustomCollection Map(global::ACustomCollection source)
     {
-        var target = new global::BCustomCollection(MapToCustomCollection1(source.Values));
+        var target = new global::BCustomCollection(MapToCustomCollectionOfD1(source.Values));
         return target;
     }
 
@@ -74,7 +74,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::System.Collections.Generic.List<global::D> MapToList(global::System.Collections.Generic.IReadOnlyCollection<global::C> source)
+    private global::System.Collections.Generic.List<global::D> MapToListOfD(global::System.Collections.Generic.IReadOnlyCollection<global::C> source)
     {
         var target = new global::System.Collections.Generic.List<global::D>(source.Count);
         foreach (var item in source)
@@ -98,7 +98,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::CustomCollection<global::D> MapToCustomCollection(global::System.Collections.Generic.IReadOnlyCollection<global::C> source)
+    private global::CustomCollection<global::D> MapToCustomCollectionOfD(global::System.Collections.Generic.IReadOnlyCollection<global::C> source)
     {
         var target = new global::CustomCollection<global::D>();
         foreach (var item in source)
@@ -109,7 +109,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::System.Collections.Generic.List<global::D> MapToList1(global::System.Collections.Generic.ICollection<global::C> source)
+    private global::System.Collections.Generic.List<global::D> MapToListOfD1(global::System.Collections.Generic.ICollection<global::C> source)
     {
         var target = new global::System.Collections.Generic.List<global::D>(source.Count);
         foreach (var item in source)
@@ -120,7 +120,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::CustomCollection<global::D> MapToCustomCollection1(global::System.Collections.Generic.ICollection<global::C> source)
+    private global::CustomCollection<global::D> MapToCustomCollectionOfD1(global::System.Collections.Generic.ICollection<global::C> source)
     {
         var target = new global::CustomCollection<global::D>();
         foreach (var item in source)

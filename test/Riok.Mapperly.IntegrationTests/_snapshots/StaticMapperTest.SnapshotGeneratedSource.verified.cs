@@ -93,7 +93,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             if (src.TupleValue != null)
             {
-                target.TupleValue = MapToValueTuple(src.TupleValue.Value);
+                target.TupleValue = MapToValueTupleOfInt32AndInt32(src.TupleValue.Value);
             }
             else
             {
@@ -206,7 +206,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             if (testObject.TupleValue != null)
             {
-                target.TupleValue = MapToValueTuple(testObject.TupleValue.Value);
+                target.TupleValue = MapToValueTupleOfInt32AndInt32(testObject.TupleValue.Value);
             }
             else
             {
@@ -307,7 +307,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             if (dto.TupleValue != null)
             {
-                target.TupleValue = MapToValueTuple1(dto.TupleValue.Value);
+                target.TupleValue = MapToValueTupleOfStringAndString(dto.TupleValue.Value);
             }
             else
             {
@@ -412,7 +412,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             if (source.TupleValue != null)
             {
-                target.TupleValue = MapToValueTuple(source.TupleValue.Value);
+                target.TupleValue = MapToValueTupleOfInt32AndInt32(source.TupleValue.Value);
             }
             else
             {
@@ -683,7 +683,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        private static (int A, int) MapToValueTuple((string A, string) source)
+        private static (int A, int) MapToValueTupleOfInt32AndInt32((string A, string) source)
         {
             var target = (A: ParseableInt(source.A), ParseableInt(source.Item2));
             return target;
@@ -766,7 +766,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        private static (string A, string) MapToValueTuple1((int A, int) source)
+        private static (string A, string) MapToValueTupleOfStringAndString((int A, int) source)
         {
             var target = (A: source.A.ToString(), source.Item2.ToString());
             return target;

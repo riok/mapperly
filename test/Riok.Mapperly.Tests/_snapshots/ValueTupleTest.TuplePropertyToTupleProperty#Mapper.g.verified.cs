@@ -7,12 +7,12 @@ public partial class Mapper
     private partial global::B Map(global::A source)
     {
         var target = new global::B();
-        target.Value = MapToValueTuple(source.Value);
+        target.Value = MapToValueTupleOfStringAndInt32(source.Value);
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private (string A, int) MapToValueTuple((int A, int) source)
+    private (string A, int) MapToValueTupleOfStringAndInt32((int A, int) source)
     {
         var target = (A: source.A.ToString(), source.Item2);
         return target;

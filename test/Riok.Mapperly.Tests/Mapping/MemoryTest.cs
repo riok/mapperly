@@ -108,21 +108,21 @@ public class MemoryTest
     public void MemoryToSpanOfCastedTypes()
     {
         var source = TestSourceBuilder.Mapping("Memory<int>", "Span<long>");
-        TestHelper.GenerateMapper(source).Should().HaveMapMethodBody("return MapToSpan(source.Span);");
+        TestHelper.GenerateMapper(source).Should().HaveMapMethodBody("return MapToSpanOfInt64(source.Span);");
     }
 
     [Fact]
     public void MemoryToReadOnlySpanOfCastedTypes()
     {
         var source = TestSourceBuilder.Mapping("Memory<int>", "ReadOnlySpan<long>");
-        TestHelper.GenerateMapper(source).Should().HaveMapMethodBody("return MapToReadOnlySpan(source.Span);");
+        TestHelper.GenerateMapper(source).Should().HaveMapMethodBody("return MapToReadOnlySpanOfInt64(source.Span);");
     }
 
     [Fact]
     public void ReadOnlyMemoryToReadOnlySpanOfCastedTypes()
     {
         var source = TestSourceBuilder.Mapping("ReadOnlyMemory<int>", "ReadOnlySpan<long>");
-        TestHelper.GenerateMapper(source).Should().HaveMapMethodBody("return MapToReadOnlySpan(source.Span);");
+        TestHelper.GenerateMapper(source).Should().HaveMapMethodBody("return MapToReadOnlySpanOfInt64(source.Span);");
     }
 
     [Fact]

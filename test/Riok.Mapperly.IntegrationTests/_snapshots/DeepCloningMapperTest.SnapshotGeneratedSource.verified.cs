@@ -46,7 +46,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             if (src.TupleValue != null)
             {
-                target.TupleValue = MapToValueTuple(src.TupleValue.Value);
+                target.TupleValue = MapToValueTupleOfStringAndString(src.TupleValue.Value);
             }
             else
             {
@@ -141,7 +141,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        private static (string A, string) MapToValueTuple((string A, string) source)
+        private static (string A, string) MapToValueTupleOfStringAndString((string A, string) source)
         {
             var target = (A: source.A, source.Item2);
             return target;
