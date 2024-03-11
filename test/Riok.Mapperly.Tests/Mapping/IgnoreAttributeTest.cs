@@ -35,7 +35,7 @@ public class IgnoreAttributeTest
         var source = TestSourceBuilder.Mapping("A", "B", TestSourceBuilderOptions.Default, _classA, _classB);
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """

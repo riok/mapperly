@@ -68,7 +68,7 @@ public partial class CarMapper
 }
 ```
 
-#### IgnoreAttribute
+#### Ignore a memeber at definition
 
 To ignore a property or field at definition, the `MapperIgnoreAttribute` can be used.
 
@@ -90,12 +90,7 @@ public class Car
 
 public class CarDto
 {
-    // highlight-start
-    [MapperIgnore]
-    // highlight-end
-    public int MakeId { get; set; }
-
-    public string modelName { get; set; }
+    public string ModelName { get; set; }
 }
 ```
 
