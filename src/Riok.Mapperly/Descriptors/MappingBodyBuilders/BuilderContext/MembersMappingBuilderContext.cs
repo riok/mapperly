@@ -34,10 +34,12 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         TargetMembers = GetTargetMembers();
 
         IgnoredSourceMemberNames = builderContext
-            .Configuration.Members.IgnoredSources.Concat(GetIgnoredObsoleteSourceMembers())
+            .Configuration.Members.IgnoredSources.Concat(GetIgnoredSourceMembers())
+            .Concat(GetIgnoredObsoleteSourceMembers())
             .ToHashSet();
         var ignoredTargetMemberNames = builderContext
-            .Configuration.Members.IgnoredTargets.Concat(GetIgnoredObsoleteTargetMembers())
+            .Configuration.Members.IgnoredTargets.Concat(GetIgnoredTargetMembers())
+            .Concat(GetIgnoredObsoleteTargetMembers())
             .ToHashSet();
 
         _ignoredUnmatchedSourceMemberNames = InitIgnoredUnmatchedProperties(IgnoredSourceMemberNames, _unmappedSourceMemberNames);
@@ -140,6 +142,22 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         return BuilderContext
             .SymbolAccessor.GetAllAccessibleMappableMembers(Mapping.SourceType)
             .Where(x => BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x.MemberSymbol))
+            .Select(x => x.Name);
+    }
+
+    private IEnumerable<string> GetIgnoredTargetMembers()
+    {
+        return BuilderContext
+            .SymbolAccessor.GetAllAccessibleMappableMembers(Mapping.TargetType)
+            .Where(x => BuilderContext.SymbolAccessor.HasAttribute<MapperIgnoreAttribute>(x.MemberSymbol))
+            .Select(x => x.Name);
+    }
+
+    private IEnumerable<string> GetIgnoredSourceMembers()
+    {
+        return BuilderContext
+            .SymbolAccessor.GetAllAccessibleMappableMembers(Mapping.SourceType)
+            .Where(x => BuilderContext.SymbolAccessor.HasAttribute<MapperIgnoreAttribute>(x.MemberSymbol))
             .Select(x => x.Name);
     }
 

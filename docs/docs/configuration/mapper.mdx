@@ -68,6 +68,32 @@ public partial class CarMapper
 }
 ```
 
+#### Ignore a memeber at definition
+
+To ignore a property or field at definition, the `MapperIgnoreAttribute` can be used.
+
+```csharp
+public partial class CarMapper
+{
+    public partial CarDto ToDto(Car car);
+}
+
+public class Car
+{
+    // highlight-start
+    [MapperIgnore]
+    // highlight-end
+    public int Id { get; set; }
+
+    public string ModelName { get; set; }
+}
+
+public class CarDto
+{
+    public string ModelName { get; set; }
+}
+```
+
 #### Ignore obsolete members
 
 By default, Mapperly will map source/target members marked with `ObsoleteAttribute`.
