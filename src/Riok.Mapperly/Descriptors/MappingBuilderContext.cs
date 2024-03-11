@@ -17,6 +17,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 {
     private readonly FormatProviderCollection _formatProviders;
     private CollectionInfos? _collectionInfos;
+    private DictionaryInfos? _dictionaryInfos;
 
     public MappingBuilderContext(
         SimpleMappingBuilderContext parentCtx,
@@ -40,11 +41,11 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         IMethodSymbol? userSymbol,
         Location? diagnosticLocation,
         TypeMappingKey mappingKey,
-        bool clearDerivedTypes
+        bool ignoreDerivedTypes
     )
         : this(ctx, ctx.ObjectFactories, ctx._formatProviders, userSymbol, mappingKey, diagnosticLocation)
     {
-        if (clearDerivedTypes)
+        if (ignoreDerivedTypes)
         {
             Configuration = Configuration with { DerivedTypes = Array.Empty<DerivedTypeMappingConfiguration>() };
         }
@@ -57,6 +58,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     public ITypeSymbol Target => MappingKey.Target;
 
     public CollectionInfos? CollectionInfos => _collectionInfos ??= CollectionInfoBuilder.Build(Types, SymbolAccessor, Source, Target);
+
+    public DictionaryInfos? DictionaryInfos => _dictionaryInfos ??= DictionaryInfoBuilder.Build(Types, CollectionInfos);
 
     protected IMethodSymbol? UserSymbol { get; }
 
@@ -78,9 +81,9 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// </summary>
     /// <param name="mappingName">The name of the mapping.</param>
     /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
-    public INewInstanceMapping? FindNamedMapping(string mappingName)
+    public virtual INewInstanceMapping? FindNamedMapping(string mappingName)
     {
-        var mapping = MappingBuilder.FindNamed(mappingName, out var ambiguousName);
+        var mapping = MappingBuilder.FindOrResolveNamed(this, mappingName, out var ambiguousName);
         if (ambiguousName)
         {
             ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingAmbiguous, mappingName);
@@ -143,13 +146,13 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="options">The mapping building options.</param>
     /// <param name="diagnosticLocation">The updated to location where to report diagnostics if a new mapping is being built.</param>
     /// <returns>The found or created mapping, or <c>null</c> if no mapping could be created.</returns>
-    public virtual INewInstanceMapping? FindOrBuildMapping(
+    public INewInstanceMapping? FindOrBuildMapping(
         TypeMappingKey mappingKey,
         MappingBuildingOptions options = MappingBuildingOptions.Default,
         Location? diagnosticLocation = null
     )
     {
-        return MappingBuilder.Find(mappingKey) ?? BuildMapping(mappingKey, options, diagnosticLocation);
+        return FindMapping(mappingKey) ?? BuildMapping(mappingKey, options, diagnosticLocation);
     }
 
     /// <summary>
@@ -179,7 +182,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="options">The options.</param>
     /// <param name="diagnosticLocation">The updated to location where to report diagnostics if a new mapping is being built.</param>
     /// <returns>The created mapping, or <c>null</c> if no mapping could be created.</returns>
-    public INewInstanceMapping? BuildMapping(
+    public virtual INewInstanceMapping? BuildMapping(
         TypeMappingKey mappingKey,
         MappingBuildingOptions options = MappingBuildingOptions.Default,
         Location? diagnosticLocation = null
@@ -326,10 +329,10 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null
     )
     {
-        return new(this, userSymbol, diagnosticLocation, mappingKey, options.HasFlag(MappingBuildingOptions.ClearDerivedTypes));
+        return new(this, userSymbol, diagnosticLocation, mappingKey, options.HasFlag(MappingBuildingOptions.IgnoreDerivedTypes));
     }
 
-    protected INewInstanceMapping? BuildMapping(
+    protected virtual INewInstanceMapping? BuildMapping(
         IMethodSymbol? userSymbol,
         TypeMappingKey mappingKey,
         MappingBuildingOptions options,

@@ -5,7 +5,7 @@ using Riok.Mapperly.IntegrationTests.Models;
 
 namespace Riok.Mapperly.IntegrationTests.Mapper
 {
-    [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByValue)]
+    [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByValue, AutoUserMappings = false)]
     public static partial class ProjectionMapper
     {
         public static partial IQueryable<TestObjectDtoProjection> ProjectToDto(this IQueryable<TestObjectProjection> q);
@@ -24,18 +24,19 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapperIgnoreObsoleteMembers]
         private static partial TestObjectDtoProjection ProjectToDto(this TestObjectProjection testObject);
 
+        [UserMapping]
         private static TestObjectDtoManuallyMappedProjection? MapManual(string str)
         {
             return new TestObjectDtoManuallyMappedProjection(100) { StringValue = str, };
         }
 
+        [UserMapping]
         private static TestEnum MapManual(TestObjectProjectionEnumValue source) => source.Value;
 
         [MapDerivedType(typeof(TestObjectProjectionTypeA), typeof(TestObjectDtoProjectionTypeA))]
         [MapDerivedType(typeof(TestObjectProjectionTypeB), typeof(TestObjectDtoProjectionTypeB))]
         private static partial TestObjectDtoProjectionBaseType MapDerived(TestObjectProjectionBaseType source);
 
-        [UserMapping(Default = false)]
         private static int ModifyInt(int v) => v + 10;
     }
 }

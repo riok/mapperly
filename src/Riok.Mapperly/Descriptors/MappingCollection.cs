@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
@@ -8,29 +10,36 @@ namespace Riok.Mapperly.Descriptors;
 public class MappingCollection
 {
     /// <summary>
-    /// A list of all method mappings.
+    /// A list of all method mappings in order of registration/discovery.
+    /// This is kept outside of <see cref="MappingCollectionInstance{T,TUserMapping}"/>
+    /// to keep track of the registration order and generate the members in the same order as they are registered
+    /// (the user defined order).
     /// </summary>
     private readonly List<MethodMapping> _methodMappings = new();
 
     /// <summary>
     /// A list of all user mappings.
+    /// Does only include mappings which are discovered during the initial user mapping discovery.
+    /// If a mapping is discovered afterwards (eg. by a name reference) it is not added to this collection.
+    /// This is kept outside of <see cref="MappingCollectionInstance{T,TUserMapping}"/>
+    /// to keep track of the registration order and generate the members in the same order as they are registered.
     /// </summary>
     private readonly List<IUserMapping> _userMappings = new();
 
     /// <summary>
     /// Queue of mappings which don't have the body built yet
     /// </summary>
-    private readonly PriorityQueue<(IMapping, MappingBuilderContext), MappingBodyBuildingPriority> _mappingsToBuildBody = new();
+    private readonly Queue<(IMapping, MappingBuilderContext)> _mappingsToBuildBody = new();
 
     /// <summary>
     /// All new instance mappings
     /// </summary>
-    private readonly MappingCollectionInstance<INewInstanceMapping> _newInstanceMappings = new();
+    private readonly MappingCollectionInstance<INewInstanceMapping, INewInstanceUserMapping> _newInstanceMappings = new();
 
     /// <summary>
     /// All existing target mappings
     /// </summary>
-    private readonly MappingCollectionInstance<IExistingTargetMapping> _existingTargetMappings = new();
+    private readonly MappingCollectionInstance<IExistingTargetMapping, IExistingTargetUserMapping> _existingTargetMappings = new();
 
     /// <inheritdoc cref="_methodMappings"/>
     public IReadOnlyCollection<MethodMapping> MethodMappings => _methodMappings;
@@ -38,11 +47,11 @@ public class MappingCollection
     /// <inheritdoc cref="_userMappings"/>
     public IReadOnlyCollection<IUserMapping> UserMappings => _userMappings;
 
-    /// <inheritdoc cref="MappingCollectionInstance{T}.UsedDuplicatedNonDefaultNonReferencedUserMappings"/>
+    /// <inheritdoc cref="MappingCollectionInstance{T,TUserMapping}.UsedDuplicatedNonDefaultNonReferencedUserMappings"/>
     public IEnumerable<IUserMapping> UsedDuplicatedNonDefaultNonReferencedUserMappings =>
-        _newInstanceMappings.UsedDuplicatedNonDefaultNonReferencedUserMappings.Concat(
-            _existingTargetMappings.UsedDuplicatedNonDefaultNonReferencedUserMappings
-        );
+        _newInstanceMappings
+            .UsedDuplicatedNonDefaultNonReferencedUserMappings.Cast<IUserMapping>()
+            .Concat(_existingTargetMappings.UsedDuplicatedNonDefaultNonReferencedUserMappings);
 
     public INewInstanceMapping? FindNewInstanceMapping(TypeMappingKey mappingKey) => _newInstanceMappings.Find(mappingKey);
 
@@ -53,8 +62,7 @@ public class MappingCollection
 
     public IEnumerable<(IMapping, MappingBuilderContext)> DequeueMappingsToBuildBody() => _mappingsToBuildBody.DequeueAll();
 
-    public void EnqueueToBuildBody(ITypeMapping mapping, MappingBuilderContext ctx) =>
-        _mappingsToBuildBody.Enqueue((mapping, ctx), mapping.BodyBuildingPriority);
+    public void EnqueueToBuildBody(ITypeMapping mapping, MappingBuilderContext ctx) => _mappingsToBuildBody.Enqueue((mapping, ctx));
 
     public MappingCollectionAddResult AddUserMapping(IUserMapping userMapping, bool ignoreDuplicates, string? name)
     {
@@ -67,9 +75,9 @@ public class MappingCollection
 
         return userMapping switch
         {
-            INewInstanceMapping newInstanceMapping
+            INewInstanceUserMapping newInstanceMapping
                 => _newInstanceMappings.AddUserMapping(newInstanceMapping, ignoreDuplicates, userMapping.Default, name),
-            IExistingTargetMapping existingTargetMapping
+            IExistingTargetUserMapping existingTargetMapping
                 => _existingTargetMappings.AddUserMapping(existingTargetMapping, ignoreDuplicates, userMapping.Default, name),
             _ => throw new ArgumentOutOfRangeException(nameof(userMapping), userMapping.GetType().FullName + " mappings are not supported")
         };
@@ -112,19 +120,38 @@ public class MappingCollection
         _existingTargetMappings.TryAddAsDefault(mapping, config);
     }
 
-    private class MappingCollectionInstance<T>
+    public void AddNamedNewInstanceUserMappings(string name, IEnumerable<INewInstanceUserMapping> mappings)
+    {
+        foreach (var mapping in mappings)
+        {
+            Debug.Assert(
+                mapping.Default != true,
+                $"Cannot add a named mapping ({name}, {mapping.Method.Name}) after the initial discovery which is a default mapping"
+            );
+            _newInstanceMappings.AddNamedUserMapping(name, mapping);
+        }
+    }
+
+    private class MappingCollectionInstance<T, TUserMapping>
         where T : ITypeMapping
+        where TUserMapping : T, IUserMapping
     {
         /// <summary>
-        /// Callable mapping of each type pair + config.
+        /// Default mappings of each type pair + config.
+        /// A default mappings is the mapping Mapperly should use to convert from one type to another.
         /// Contains mappings to build and already built mappings.
         /// </summary>
         private readonly Dictionary<TypeMappingKey, T> _defaultMappings = new();
 
         /// <summary>
+        /// Registered user mapping methods.
+        /// </summary>
+        private readonly HashSet<IMethodSymbol> _knownUserMappingMethods = new(SymbolEqualityComparer.Default);
+
+        /// <summary>
         /// Named mappings by their names.
         /// </summary>
-        private readonly Dictionary<string, T> _namedMappings = new();
+        private readonly Dictionary<string, TUserMapping> _namedMappings = new();
 
         /// <summary>
         /// Duplicated mapping names.
@@ -132,16 +159,15 @@ public class MappingCollection
         private readonly HashSet<string> _duplicatedMappingNames = new();
 
         /// <summary>
-        /// All default user mapping type keys which have an explicit default value set.
+        /// All mapping type keys which for which an explicit default mapping is configured.
         /// </summary>
-        private readonly HashSet<TypeMappingKey> _defaultUserMappingKeys = new();
+        private readonly HashSet<TypeMappingKey> _explicitDefaultMappingKeys = new();
 
         /// <summary>
-        /// Contains the first duplicated (=second) user implemented mapping
-        /// for each type pair group with multiple user mappings
-        /// but no default user mapping.
+        /// Contains the duplicated user implemented mappings
+        /// for type pairs with no explicit default mapping.
         /// </summary>
-        private readonly Dictionary<TypeMappingKey, T> _firstDuplicatedNonDefaultUserMappings = new();
+        private readonly ListDictionary<TypeMappingKey, TUserMapping> _duplicatedNonDefaultUserMappings = new();
 
         /// <summary>
         /// All mapping keys for which <see cref="Find"/> was called and returned a non-null result.
@@ -149,20 +175,16 @@ public class MappingCollection
         private readonly HashSet<TypeMappingKey> _usedMappingKeys = new();
 
         /// <summary>
-        /// All mapping names for which <see cref="FindNamed"/> was called and returned a non-null result.
+        /// All mappings for which <see cref="FindNamed"/> was called and returned a non-null result.
         /// </summary>
-        private readonly HashSet<string> _referencedMappingNames = new();
+        private readonly HashSet<TUserMapping> _referencedNamedMappings = new();
 
-        /// <inheritdoc cref="_firstDuplicatedNonDefaultUserMappings"/>
+        /// <inheritdoc cref="_duplicatedNonDefaultUserMappings"/>
         /// <remarks>
         /// Includes only mappings for type-pairs which are actually in use.
         /// </remarks>
-        public IEnumerable<IUserMapping> UsedDuplicatedNonDefaultNonReferencedUserMappings =>
-            _usedMappingKeys
-                .Select(_firstDuplicatedNonDefaultUserMappings.GetValueOrDefault)
-                .WhereNotNull()
-                .Cast<IUserMapping>()
-                .Where(x => !_referencedMappingNames.Contains(x.Method.Name));
+        public IEnumerable<TUserMapping> UsedDuplicatedNonDefaultNonReferencedUserMappings =>
+            _usedMappingKeys.SelectMany(_duplicatedNonDefaultUserMappings.GetOrEmpty).Where(x => !_referencedNamedMappings.Contains(x));
 
         public T? Find(TypeMappingKey mappingKey)
         {
@@ -180,17 +202,32 @@ public class MappingCollection
             if (_namedMappings.TryGetValue(name, out var mapping))
             {
                 ambiguousName = _duplicatedMappingNames.Contains(name);
-                _referencedMappingNames.Add(name);
+                _referencedNamedMappings.Add(mapping);
             }
 
             return mapping;
         }
 
+        public void AddNamedUserMapping(string? name, TUserMapping mapping)
+        {
+            if (name == null)
+                return;
+
+            var isNewUserMappingMethod = _knownUserMappingMethods.Add(mapping.Method);
+            if (_namedMappings.TryAdd(name, mapping))
+                return;
+
+            // if the name is duplicated
+            // and there is already another user mapping instance registered for the same method symbol,
+            // this name is not considered duplicated as the mapping just got re-discovered
+            if (isNewUserMappingMethod)
+            {
+                _duplicatedMappingNames.Add(name);
+            }
+        }
+
         public MappingCollectionAddResult TryAddAsDefault(T mapping, TypeMappingConfiguration config)
         {
-            if (!mapping.CallableByOtherMappings)
-                return MappingCollectionAddResult.NotAddedIgnored;
-
             var mappingKey = new TypeMappingKey(mapping, config);
             if (_defaultMappings.ContainsKey(mappingKey))
                 return MappingCollectionAddResult.NotAddedDuplicated;
@@ -199,15 +236,9 @@ public class MappingCollection
             return MappingCollectionAddResult.Added;
         }
 
-        public MappingCollectionAddResult AddUserMapping(T mapping, bool ignoreDuplicates, bool? isDefault, string? name)
+        public MappingCollectionAddResult AddUserMapping(TUserMapping mapping, bool ignoreDuplicates, bool? isDefault, string? name)
         {
-            if (!mapping.CallableByOtherMappings)
-                return MappingCollectionAddResult.NotAddedIgnored;
-
-            if (name != null && !_namedMappings.TryAdd(name, mapping))
-            {
-                _duplicatedMappingNames.Add(name);
-            }
+            AddNamedUserMapping(name, mapping);
 
             return isDefault switch
             {
@@ -225,7 +256,7 @@ public class MappingCollection
             };
         }
 
-        private MappingCollectionAddResult TryAddUserMappingAsDefault(T mapping, bool ignoreDuplicates)
+        private MappingCollectionAddResult TryAddUserMappingAsDefault(TUserMapping mapping, bool ignoreDuplicates)
         {
             var addResult = TryAddAsDefault(mapping, TypeMappingConfiguration.Default);
             var mappingKey = new TypeMappingKey(mapping);
@@ -238,18 +269,16 @@ public class MappingCollection
             // the mapping was not added due to it being a duplicate,
             // there is no default mapping declared (yet)
             // and no duplicate is registered yet
-            // and it is a user mapping implementation
             // then store this as duplicate
             // this is needed to report a diagnostic if multiple non-default mappings
             // are registered for the same type-pair without any default mapping.
             if (
                 addResult == MappingCollectionAddResult.NotAddedDuplicated
-                && !_defaultUserMappingKeys.Contains(mappingKey)
-                && !_firstDuplicatedNonDefaultUserMappings.ContainsKey(mappingKey)
-                && mapping is UserImplementedMethodMapping or UserImplementedExistingTargetMethodMapping
+                && !_explicitDefaultMappingKeys.Contains(mappingKey)
+                && !_duplicatedNonDefaultUserMappings.ContainsKey(mappingKey)
             )
             {
-                _firstDuplicatedNonDefaultUserMappings.Add(mappingKey, mapping);
+                _duplicatedNonDefaultUserMappings.Add(mappingKey, mapping);
             }
 
             return addResult;
@@ -258,12 +287,12 @@ public class MappingCollection
         private MappingCollectionAddResult AddDefaultUserMapping(T mapping, bool ignoreDuplicates)
         {
             var mappingKey = new TypeMappingKey(mapping);
-            if (!_defaultUserMappingKeys.Add(mappingKey))
+            if (!_explicitDefaultMappingKeys.Add(mappingKey))
             {
                 return ignoreDuplicates ? MappingCollectionAddResult.NotAddedIgnored : MappingCollectionAddResult.NotAddedDuplicatedDefault;
             }
 
-            _firstDuplicatedNonDefaultUserMappings.Remove(mappingKey);
+            _duplicatedNonDefaultUserMappings.Remove(mappingKey);
             _defaultMappings[mappingKey] = mapping;
             return MappingCollectionAddResult.Added;
         }

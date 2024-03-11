@@ -141,7 +141,7 @@ public class UserMethodTest
     }
 
     [Fact]
-    public void WithMultipleUserDefinedMethodShouldDiagnostic()
+    public void WithMultipleUserDefinedMethodsShouldNotDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBody(
             """
@@ -228,7 +228,7 @@ public class UserMethodTest
     }
 
     [Fact]
-    public void WithInvalidGenericSignatureShouldDiagnostic()
+    public void InvalidSignatureGenericShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes("partial TTarget Map<TSource, TTarget, TOther>(TSource source);");
 
@@ -364,6 +364,7 @@ public class UserMethodTest
             {
                 public virtual partial B AToB(A source);
 
+                [UserMapping(Default = true)]
                 public partial short IntToShort(int value);
             }
 
@@ -643,6 +644,43 @@ public class UserMethodTest
             [UserMapping(Default = false)]
             public static int IntMapping2(int x) => x + 20;
 
+            public static int IntMapping3(int x) => x + 30;
+
+            public static int IntMapping4(int x) => x + 40;
+
+            public partial B Map(A s);
+            """,
+            "public record A(int Value);",
+            "public record B(int Value);"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.MultipleUserMappingsWithoutDefault,
+                "Multiple user mappings discovered for the mapping from int to int without specifying an explicit default"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(IntMapping3(s.Value));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void DisabledAutoUserMappingDiscoveryShouldUseFirstNonFalseDefault()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UserMapping(Default = false)]
+            public static int IntMapping(int x) => x + 10;
+
+            [UserMapping(Default = false)]
+            public static int IntMapping2(int x) => x + 20;
+
             [UserMapping]
             public static int IntMapping3(int x) => x + 30;
 
@@ -651,6 +689,7 @@ public class UserMethodTest
 
             public partial B Map(A s);
             """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
             "public record A(int Value);",
             "public record B(int Value);"
         );
@@ -727,5 +766,55 @@ public class UserMethodTest
                 return target;
                 """
             );
+    }
+
+    [Fact]
+    public Task ShouldDiscoverBaseClassPartialMappingMethodsWithDisabledAutoUserMappings()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.WithBaseClass("BaseMapper") with
+            {
+                AutoUserMappings = false
+            },
+            """
+            [Mapper]
+            public class BaseMapper
+            {
+                public partial D BaseMapping(C source);
+            }
+            """,
+            "record A(C NestedValue);",
+            "record B(D NestedValue);",
+            "record C(int Value);",
+            "record D(int Value);"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldNotDiscoverInterfaceMappingMethodsWithDisabledAutoUserMappings()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.WithBaseClass("IBaseMapper") with
+            {
+                AutoUserMappings = false
+            },
+            """
+            public interface IBaseMapper
+            {
+                public static D BaseMapping(C source)
+                    => new D(source.Value + 10);
+            }
+            """,
+            "record A(C NestedValue);",
+            "record B(D NestedValue);",
+            "record C(int Value);",
+            "record D(int Value);"
+        );
+        return TestHelper.VerifyGenerator(source);
     }
 }

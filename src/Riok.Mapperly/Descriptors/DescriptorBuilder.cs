@@ -58,7 +58,7 @@ public class DescriptorBuilder
             attributeAccessor,
             _unsafeAccessorContext,
             _diagnostics,
-            new MappingBuilder(_mappings),
+            new MappingBuilder(_mappings, mapperDeclaration),
             new ExistingTargetMappingBuilder(_mappings),
             mapperDeclaration.Syntax.GetLocation()
         );
@@ -201,10 +201,7 @@ public class DescriptorBuilder
     private void AddMappingsToDescriptor()
     {
         // add generated mappings to the mapper
-        foreach (var mapping in _mappings.MethodMappings)
-        {
-            _mapperDescriptor.AddTypeMapping(mapping);
-        }
+        _mapperDescriptor.AddMethodMappings(_mappings.MethodMappings);
     }
 
     private void AddAccessorsToDescriptor()

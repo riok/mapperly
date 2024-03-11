@@ -48,7 +48,7 @@ public static class SourceEmitter
         CancellationToken cancellationToken
     )
     {
-        foreach (var mapping in descriptor.MethodTypeMappings)
+        foreach (var mapping in descriptor.MethodMappings)
         {
             cancellationToken.ThrowIfCancellationRequested();
             yield return mapping.BuildMethod(ctx);

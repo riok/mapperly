@@ -73,4 +73,4 @@ static partial class FruitMapper
   </TabItem>
 </Tabs>
 
-See also [null value handling](http://localhost:3000/docs/configuration/mapper/#null-values).
+See also [null value handling](./mapper.mdx#null-values).

@@ -28,10 +28,10 @@ public static class UserMethodMappingBodyBuilder
     {
         var options = MappingBuildingOptions.KeepUserSymbol;
 
-        // this this mapping is not callable by others
-        // the delegate mapping is probably callable by others
-        // and therefore reusable
-        if (!mapping.CallableByOtherMappings)
+        // the delegate mapping is not embedded
+        // and is therefore reusable
+        // if embedded, only the original mapping is callable by others
+        if (mapping.InternalReferenceHandlingEnabled)
         {
             options |= MappingBuildingOptions.MarkAsReusable;
         }

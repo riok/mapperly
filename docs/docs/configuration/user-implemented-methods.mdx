@@ -30,7 +30,6 @@ and [default user-implemented mapping method](#default-user-implemented-mapping-
 By default, user implemented mapping methods are discovered automatically.
 This can be disabled by setting `AutoUserMappings` to `false`.
 With `AutoUserMappings` disabled, only methods marked by the `UserMappingAttribute` are discovered by Mapperly.
-The `AutoUserMappings` value also applies to the usage of external mappers.
 
 ```csharp
 // highlight-start
@@ -49,6 +48,11 @@ public partial class CarMapper
     private int IgnoredTimeSpanToHours(TimeSpan t) => t.Minutes / 60;
 }
 ```
+
+The `AutoUserMappings` value also applies to the usage of external mappers:
+With `AutoUserMappings` enabled all methods with a mapping method signature are discovered.
+With `AutoUserMappings` disabled, only methods with a `UserMappingAttribute` and,
+if the containing class has a `MapperAttribute`, partial methods are discovered.
 
 ## Ignoring a user-implemented mapping method
 
@@ -80,7 +84,7 @@ Whenever Mapperly will need a mapping for a given type-pair,
 it will use the default user-implemented mapping.
 A user-implemented mapping is considered the default mapping for a type-pair
 if `Default = true` is set on the `UserMapping` attribute.
-If no user-implemented mapping with `Default = true` exists,
+If no user-implemented mapping with `Default = true` exists and `AutoUserMappings` is enabled,
 the first user-implemented mapping which has an unspecified `Default` value is used.
 For each type-pair only one default mapping can exist.
 
@@ -154,4 +158,4 @@ Whenever Mapperly needs a mapping from `BananaBox` to `BananaBoxDto` inside the 
 it will use the provided implementation by the `BananaMapper`.
 
 Used mappers themselves can be Mapperly backed classes.  
-The `AutoUserMappings` value also applies to the usage of external mappers.
+The [`AutoUserMappings`](#automatic-user-implemented-mapping-method-discovery) value also applies to the usage of external mappers.

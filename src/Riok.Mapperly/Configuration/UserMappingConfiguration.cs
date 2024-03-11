@@ -15,5 +15,5 @@ public record UserMappingConfiguration
     public bool? Default { get; set; }
 
     /// <inheritdoc cref="UserMappingAttribute.Ignore"/>
-    public bool Ignore { get; set; }
+    public bool? Ignore { get; set; }
 }

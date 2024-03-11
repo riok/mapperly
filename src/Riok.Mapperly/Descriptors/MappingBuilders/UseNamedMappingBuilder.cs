@@ -18,14 +18,26 @@ public static class UseNamedMappingBuilder
             return null;
         }
 
-        mapping = MapSourceIfNeeded(ctx, mapping);
-        if (mapping == null)
-            return null;
+        var differentSourceType = !SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, mapping.SourceType);
+        var differentTargetType = !SymbolEqualityComparer.IncludeNullability.Equals(ctx.Target, mapping.TargetType);
 
-        return MapTargetIfNeeded(ctx, mapping);
+        // use a delegate mapping,
+        // otherwise the user-defined method mapping may get built twice
+        // (if it is returned here directly it is re-added to the mappings to be built)
+        if (!differentSourceType && !differentTargetType)
+            return new DelegateMapping(mapping.SourceType, mapping.TargetType, mapping);
+
+        if (differentSourceType)
+        {
+            mapping = TryMapSource(ctx, mapping);
+            if (mapping == null)
+                return null;
+        }
+
+        return differentTargetType ? TryMapTarget(ctx, mapping) : mapping;
     }
 
-    private static INewInstanceMapping? MapTargetIfNeeded(MappingBuilderContext ctx, INewInstanceMapping mapping)
+    private static INewInstanceMapping? TryMapTarget(MappingBuilderContext ctx, INewInstanceMapping mapping)
     {
         if (SymbolEqualityComparer.IncludeNullability.Equals(ctx.Target, mapping.TargetType))
             return mapping;
@@ -44,11 +56,8 @@ public static class UseNamedMappingBuilder
         return new CompositeMapping(outputMapping, mapping);
     }
 
-    private static INewInstanceMapping? MapSourceIfNeeded(MappingBuilderContext ctx, INewInstanceMapping mapping)
+    private static INewInstanceMapping? TryMapSource(MappingBuilderContext ctx, INewInstanceMapping mapping)
     {
-        if (SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, mapping.SourceType))
-            return mapping;
-
         var inputMapping = ctx.FindOrBuildMapping(ctx.Source, mapping.SourceType);
         if (inputMapping == null)
         {

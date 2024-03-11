@@ -323,27 +323,50 @@ the `Use` property of the `MapProperty` attribute can be used.
 Set it to a unique name of a user-implemented mapping method.
 The use of `nameof` is encouraged.
 See also [user-implemented mapping methods](./user-implemented-methods.mdx).
-The referenced mapping method needs to be discovered as a user-implemented
-mapping method by Mapperly
-(this happens automatically when `AutoUserMappings` is `true` (default) or manually with the `UserMapping` attribute).
 
-```csharp
-[Mapper]
-public partial class CarMapper
-{
-  // highlight-start
-  [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = nameof(MapPrice))]
-  // highlight-end
-  public partial CarDto MapCar(Car source);
+<Tabs>
+  <TabItem value="auto-user-mappings-enabled" label="enabled AutoUserMappings (default)" default>
+    ```csharp
+    [Mapper]
+    public partial class CarMapper
+    {
+      // highlight-start
+      [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = nameof(MapPrice))]
+      // highlight-end
+      public partial CarDto MapCar(Car source);
+    
+      // highlight-start
+      // set Default = false to not use it for all decimal => string conversions
+      // if using AutoUserMappings = false, the UserMapping is not needed.
+      [UserMapping(Default = false)]
+      private string MapPrice(decimal price)
+          => (price / 100).ToString("C");
+      // highlight-end
+    
+      // generates
+      target.Price = MapPrice(source.Price);
+    }
+    ```
+  </TabItem>
+  <TabItem value="auto-user-mappings-disabled" label="disabled AutoUserMappings">
+    ```csharp
+    [Mapper(AutoUserMappings = false)]
+    public partial class CarMapper
+    {
+      // highlight-start
+      [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = nameof(MapPrice))]
+      // highlight-end
+      public partial CarDto MapCar(Car source);
 
-  // highlight-start
-  // set Default = false to not use it for all decimal => string conversions
-  [UserMapping(Default = false)]
-  // highlight-end
-  private string MapPrice(decimal price)
-      => (price / 100).ToString("C");
+      // highlight-start
+      private string MapPrice(decimal price)
+        => (price / 100).ToString("C");
+      // highlight-end
 
-  // generates
-  target.Price = MapPrice(source.Price);
-}
-```
+      // generates
+      target.Price = MapPrice(source.Price);
+    }
+    ```
+
+  </TabItem>
+</Tabs>

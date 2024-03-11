@@ -1,10 +1,13 @@
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
-public class MappingBuilder(MappingCollection mappings)
+public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapperDeclaration)
 {
+    private HashSet<string> _resolvedMappingNames = new();
+
     private delegate INewInstanceMapping? BuildMapping(MappingBuilderContext context);
 
     private static readonly IReadOnlyCollection<BuildMapping> _builders = new BuildMapping[]
@@ -37,8 +40,23 @@ public class MappingBuilder(MappingCollection mappings)
 
     public INewInstanceMapping? Find(TypeMappingKey mapping) => mappings.FindNewInstanceMapping(mapping);
 
-    public INewInstanceMapping? FindNamed(string name, out bool ambiguousName) =>
-        mappings.FindNamedNewInstanceMapping(name, out ambiguousName);
+    public INewInstanceMapping? FindOrResolveNamed(SimpleMappingBuilderContext ctx, string name, out bool ambiguousName)
+    {
+        if (!ctx.Configuration.Mapper.AutoUserMappings && _resolvedMappingNames.Add(name))
+        {
+            // all user-defined mappings are already discovered
+            // resolve user-implemented mappings which were not discovered in the initialization discovery
+            // since no UserMappingAttribute was present
+            var namedMappings = UserMethodMappingExtractor.ExtractNamedUserImplementedNewInstanceMappings(
+                ctx,
+                mapperDeclaration.Symbol,
+                name
+            );
+            mappings.AddNamedNewInstanceUserMappings(name, namedMappings);
+        }
+
+        return mappings.FindNamedNewInstanceMapping(name, out ambiguousName);
+    }
 
     public INewInstanceMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {

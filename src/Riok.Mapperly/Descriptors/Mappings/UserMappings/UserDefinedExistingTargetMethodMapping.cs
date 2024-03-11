@@ -18,26 +18,38 @@ public class UserDefinedExistingTargetMethodMapping(
     MethodParameter targetParameter,
     MethodParameter? referenceHandlerParameter,
     bool enableReferenceHandling
-) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetParameter.Type), IUserMapping
+) : MethodMapping(method, sourceParameter, referenceHandlerParameter, targetParameter.Type), IExistingTargetUserMapping
 {
     private IExistingTargetMapping? _delegateMapping;
 
     public IMethodSymbol Method { get; } = method;
 
-    /// <summary>
-    /// Always false, since <see cref="CallableByOtherMappings"/> is false
-    /// this can never be the default.
-    /// </summary>
     public bool? Default => false;
 
     private MethodParameter TargetParameter { get; } = targetParameter;
 
-    public override bool CallableByOtherMappings => false;
+    /// <summary>
+    /// The reference handling is enabled but is only internal to this method.
+    /// No reference handler parameter is passed.
+    /// </summary>
+    private bool InternalReferenceHandlingEnabled => enableReferenceHandling && ReferenceHandlerParameter == null;
 
     public void SetDelegateMapping(IExistingTargetMapping delegateMapping) => _delegateMapping = delegateMapping;
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
         throw new InvalidOperationException($"{nameof(UserDefinedExistingTargetMethodMapping)} does not support {nameof(Build)}");
+
+    public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
+    {
+        return ctx.SyntaxFactory.SingleStatement(
+            Invocation(
+                MethodName,
+                SourceParameter.WithArgument(ctx.Source),
+                TargetParameter.WithArgument(target),
+                ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+            )
+        );
+    }
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
@@ -57,7 +69,7 @@ public class UserDefinedExistingTargetMethodMapping(
 
         // if reference handling is enabled and no reference handler parameter is declared
         // a new reference handler is instantiated and used.
-        if (enableReferenceHandling && ReferenceHandlerParameter == null)
+        if (InternalReferenceHandlingEnabled)
         {
             // var refHandler = new RefHandler();
             var referenceHandlerName = ctx.NameBuilder.New(DefaultReferenceHandlerParameterName);

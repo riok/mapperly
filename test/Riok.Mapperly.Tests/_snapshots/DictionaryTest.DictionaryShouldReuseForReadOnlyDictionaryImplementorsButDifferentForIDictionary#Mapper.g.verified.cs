@@ -27,7 +27,7 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BCustomDictionary Map(global::ADictionary source)
     {
-        var target = new global::BCustomDictionary(MapToCustomDictionary1(source.Values));
+        var target = new global::BCustomDictionary(MapToCustomDictionary(source.Values));
         return target;
     }
 
@@ -48,7 +48,7 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BCustomDictionary Map(global::ACustomReadOnlyDictionary source)
     {
-        var target = new global::BCustomDictionary(MapToCustomDictionary1(source.Values));
+        var target = new global::BCustomDictionary(MapToCustomDictionary(source.Values));
         return target;
     }
 
@@ -62,7 +62,7 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BCustomDictionary Map(global::ACustomDictionary source)
     {
-        var target = new global::BCustomDictionary(MapToCustomDictionary(source.Values));
+        var target = new global::BCustomDictionary(MapToCustomDictionary1(source.Values));
         return target;
     }
 
@@ -85,7 +85,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::CustomDictionary<global::D> MapToCustomDictionary(global::System.Collections.Generic.IDictionary<int, global::C> source)
+    private global::CustomDictionary<global::D> MapToCustomDictionary(global::System.Collections.Generic.IReadOnlyDictionary<int, global::C> source)
     {
         var target = new global::CustomDictionary<global::D>();
         var targetDict = (global::System.Collections.Generic.IDictionary<int, global::D>)target;
@@ -97,7 +97,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::CustomDictionary<global::D> MapToCustomDictionary1(global::System.Collections.Generic.IReadOnlyDictionary<int, global::C> source)
+    private global::CustomDictionary<global::D> MapToCustomDictionary1(global::System.Collections.Generic.IDictionary<int, global::C> source)
     {
         var target = new global::CustomDictionary<global::D>();
         var targetDict = (global::System.Collections.Generic.IDictionary<int, global::D>)target;

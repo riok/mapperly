@@ -50,21 +50,8 @@ public static class RuntimeTargetTypeMappingBodyBuilder
         BuildMappingBody(ctx, mapping, mappings);
     }
 
-    private static IEnumerable<ITypeMapping> GetUserMappingCandidates(MappingBuilderContext ctx)
-    {
-        foreach (var userMapping in ctx.UserMappings)
-        {
-            // exclude runtime target type
-            if (userMapping is UserDefinedNewInstanceRuntimeTargetTypeMapping)
-                continue;
-
-            if (userMapping.CallableByOtherMappings)
-                yield return userMapping;
-
-            if (userMapping is IDelegateUserMapping { DelegateMapping.CallableByOtherMappings: true } delegateUserMapping)
-                yield return delegateUserMapping.DelegateMapping;
-        }
-    }
+    private static IEnumerable<ITypeMapping> GetUserMappingCandidates(MappingBuilderContext ctx) =>
+        ctx.UserMappings.Where(x => x is not UserDefinedNewInstanceRuntimeTargetTypeMapping);
 
     private static void BuildMappingBody(
         MappingBuilderContext ctx,

@@ -229,6 +229,34 @@ public class DictionaryTest
     }
 
     [Fact]
+    public Task DictionaryWithList()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "record A(Dictionary<int, List<C>> Dict);",
+            "record B(Dictionary<int, List<D>> Dict);",
+            "record C(int Value);",
+            "record D(int Value);"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task CustomDictionaryWithList()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A : Dictionary<int, List<C>>;",
+            "class B : Dictionary<int, List<D>>;",
+            "record C(int Value);",
+            "record D(int Value);"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public void KeyValueEnumerableToExistingDictionary()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

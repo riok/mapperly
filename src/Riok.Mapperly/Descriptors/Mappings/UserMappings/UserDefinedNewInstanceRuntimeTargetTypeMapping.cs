@@ -21,29 +21,26 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
     bool enableReferenceHandling,
     NullFallbackValue nullArm,
     ITypeSymbol objectType
-) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), IUserMapping
+) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), INewInstanceUserMapping
 {
     private const string IsAssignableFromMethodName = nameof(Type.IsAssignableFrom);
     private const string GetTypeMethodName = nameof(GetType);
 
     private readonly List<RuntimeTargetTypeMapping> _mappings = new();
 
-    // requires the user mapping bodies
-    // as the delegate mapping of user mappings is only set after bodies are built
-    // and if reference handling is enabled,
-    // but the user mapping does not have a reference handling parameter,
-    // only the delegate mapping is callable by other mappings.
-    public override MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.AfterUserMappings;
-
     public IMethodSymbol Method { get; } = method;
 
     /// <summary>
-    /// Always false, since <see cref="CallableByOtherMappings"/> is false
+    /// Always false, as this cannot be called by other mappings,
     /// this can never be the default.
     /// </summary>
     public bool? Default => false;
 
-    public override bool CallableByOtherMappings => false;
+    /// <summary>
+    /// The reference handling is enabled but is only internal to this method.
+    /// No reference handler parameter is passed.
+    /// </summary>
+    private bool InternalReferenceHandlingEnabled => enableReferenceHandling && ReferenceHandlerParameter == null;
 
     public void AddMappings(IEnumerable<RuntimeTargetTypeMapping> mappings) => _mappings.AddRange(mappings);
 
@@ -51,7 +48,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
     {
         // if reference handling is enabled and no reference handler parameter is declared
         // a new reference handler is instantiated and used.
-        if (enableReferenceHandling && ReferenceHandlerParameter == null)
+        if (InternalReferenceHandlingEnabled)
         {
             // var refHandler = new RefHandler();
             var referenceHandlerName = ctx.NameBuilder.New(DefaultReferenceHandlerParameterName);

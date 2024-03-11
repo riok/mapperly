@@ -61,7 +61,7 @@ public abstract class MethodMapping : ITypeMapping
 
     protected bool IsExtensionMethod { get; }
 
-    private string MethodName => _methodName ?? throw new InvalidOperationException();
+    protected string MethodName => _methodName ?? throw new InvalidOperationException();
 
     protected MethodParameter SourceParameter { get; }
 
@@ -71,11 +71,7 @@ public abstract class MethodMapping : ITypeMapping
 
     public ITypeSymbol TargetType { get; }
 
-    public virtual bool CallableByOtherMappings => true;
-
     public bool IsSynthetic => false;
-
-    public virtual MappingBodyBuildingPriority BodyBuildingPriority => MappingBodyBuildingPriority.Default;
 
     public virtual ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
         Invocation(MethodName, SourceParameter.WithArgument(ctx.Source), ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
@@ -106,8 +102,6 @@ public abstract class MethodMapping : ITypeMapping
     {
         _methodName ??= methodNameBuilder(this);
     }
-
-    public bool HasReferenceHandlingParameter() => ReferenceHandlerParameter.HasValue;
 
     internal virtual void EnableReferenceHandling(INamedTypeSymbol iReferenceHandlerType)
     {
