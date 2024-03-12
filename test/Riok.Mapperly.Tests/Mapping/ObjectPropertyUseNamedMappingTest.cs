@@ -2,7 +2,6 @@ using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
 
-[UsesVerify]
 public class ObjectPropertyUseNamedMappingTest
 {
     [Fact]
