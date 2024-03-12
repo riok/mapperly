@@ -125,7 +125,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(testObject.DateTimeValueTargetTimeOnly);
             target.ManuallyMapped = MapManual(testObject.ManuallyMapped);
             target.ManuallyMappedModified = ModifyInt(testObject.ManuallyMappedModified);
-            target.ManuallyMappedList = MapToList(testObject.ManuallyMappedList);
+            target.ManuallyMappedList = MapToListOfTestEnum(testObject.ManuallyMappedList);
             return target;
         }
 
@@ -215,7 +215,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        private static global::System.Collections.Generic.List<global::Riok.Mapperly.IntegrationTests.Models.TestEnum> MapToList(global::System.Collections.Generic.IReadOnlyCollection<global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionEnumValue> source)
+        private static global::System.Collections.Generic.List<global::Riok.Mapperly.IntegrationTests.Models.TestEnum> MapToListOfTestEnum(global::System.Collections.Generic.IReadOnlyCollection<global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionEnumValue> source)
         {
             var target = new global::System.Collections.Generic.List<global::Riok.Mapperly.IntegrationTests.Models.TestEnum>(source.Count);
             foreach (var item in source)

@@ -6,63 +6,63 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BDictionary Map(global::ADictionary source)
     {
-        var target = new global::BDictionary(MapToDictionary(source.Values));
+        var target = new global::BDictionary(MapToDictionaryOfInt32AndD(source.Values));
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BDictionaryAgain Map(global::ADictionaryAgain source)
     {
-        var target = new global::BDictionaryAgain(MapToDictionary(source.Values));
+        var target = new global::BDictionaryAgain(MapToDictionaryOfInt32AndD(source.Values));
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BReadOnlyDictionary Map(global::ADictionary source)
     {
-        var target = new global::BReadOnlyDictionary(MapToDictionary(source.Values));
+        var target = new global::BReadOnlyDictionary(MapToDictionaryOfInt32AndD(source.Values));
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BCustomDictionary Map(global::ADictionary source)
     {
-        var target = new global::BCustomDictionary(MapToCustomDictionary(source.Values));
+        var target = new global::BCustomDictionary(MapToCustomDictionaryOfD(source.Values));
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BDictionary Map(global::ADictionary source)
     {
-        var target = new global::BDictionary(MapToDictionary(source.Values));
+        var target = new global::BDictionary(MapToDictionaryOfInt32AndD(source.Values));
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BReadOnlyDictionary Map(global::AReadOnlyDictionary source)
     {
-        var target = new global::BReadOnlyDictionary(MapToDictionary(source.Values));
+        var target = new global::BReadOnlyDictionary(MapToDictionaryOfInt32AndD(source.Values));
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BCustomDictionary Map(global::ACustomReadOnlyDictionary source)
     {
-        var target = new global::BCustomDictionary(MapToCustomDictionary(source.Values));
+        var target = new global::BCustomDictionary(MapToCustomDictionaryOfD(source.Values));
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BDictionary Map(global::ADictionary source)
     {
-        var target = new global::BDictionary(MapToDictionary(source.Values));
+        var target = new global::BDictionary(MapToDictionaryOfInt32AndD(source.Values));
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::BCustomDictionary Map(global::ACustomDictionary source)
     {
-        var target = new global::BCustomDictionary(MapToCustomDictionary1(source.Values));
+        var target = new global::BCustomDictionary(MapToCustomDictionaryOfD1(source.Values));
         return target;
     }
 
@@ -74,7 +74,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::System.Collections.Generic.Dictionary<int, global::D> MapToDictionary(global::System.Collections.Generic.IReadOnlyDictionary<int, global::C> source)
+    private global::System.Collections.Generic.Dictionary<int, global::D> MapToDictionaryOfInt32AndD(global::System.Collections.Generic.IReadOnlyDictionary<int, global::C> source)
     {
         var target = new global::System.Collections.Generic.Dictionary<int, global::D>(source.Count);
         foreach (var item in source)
@@ -85,7 +85,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::CustomDictionary<global::D> MapToCustomDictionary(global::System.Collections.Generic.IReadOnlyDictionary<int, global::C> source)
+    private global::CustomDictionary<global::D> MapToCustomDictionaryOfD(global::System.Collections.Generic.IReadOnlyDictionary<int, global::C> source)
     {
         var target = new global::CustomDictionary<global::D>();
         var targetDict = (global::System.Collections.Generic.IDictionary<int, global::D>)target;
@@ -97,7 +97,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::CustomDictionary<global::D> MapToCustomDictionary1(global::System.Collections.Generic.IDictionary<int, global::C> source)
+    private global::CustomDictionary<global::D> MapToCustomDictionaryOfD1(global::System.Collections.Generic.IDictionary<int, global::C> source)
     {
         var target = new global::CustomDictionary<global::D>();
         var targetDict = (global::System.Collections.Generic.IDictionary<int, global::D>)target;
