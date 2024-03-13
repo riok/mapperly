@@ -9,7 +9,6 @@ using Xunit;
 
 namespace Riok.Mapperly.IntegrationTests
 {
-    [UsesVerify]
     public class StaticMapperTest : BaseMapperTest
     {
         [Fact]

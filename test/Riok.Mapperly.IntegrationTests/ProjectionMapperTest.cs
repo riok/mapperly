@@ -14,7 +14,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Riok.Mapperly.IntegrationTests
 {
-    [UsesVerify]
     public class ProjectionMapperTest : BaseMapperTest
     {
         [Fact]

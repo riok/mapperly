@@ -9,7 +9,6 @@ using FluentAssertions;
 
 namespace Riok.Mapperly.IntegrationTests
 {
-    [UsesVerify]
     public class MapperTest : BaseMapperTest
     {
         [Fact]

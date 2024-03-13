@@ -2,7 +2,6 @@ using Riok.Mapperly.Abstractions;
 
 namespace Riok.Mapperly.Tests.Mapping;
 
-[UsesVerify]
 public class EnumerableExistingTargetTest
 {
     [Fact]

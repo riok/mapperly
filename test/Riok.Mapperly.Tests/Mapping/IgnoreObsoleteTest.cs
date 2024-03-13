@@ -3,7 +3,6 @@ using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
 
-[UsesVerify]
 public class IgnoreObsoleteTest
 {
     private readonly string _classA = TestSourceBuilder.CSharp(

@@ -1,6 +1,5 @@
 namespace Riok.Mapperly.Tests.Mapping;
 
-[UsesVerify]
 public class NullableTest
 {
     [Fact]
