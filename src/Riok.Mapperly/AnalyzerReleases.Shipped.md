@@ -144,11 +144,11 @@ RMG018  | Mapper   | Disabled | Partial static mapping method in an instance map
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 RMG059  | Mapper   | Error    | Multiple default user mappings found, only one is allowed
-RMG060  | Mapper   | Info     | Multiple user mappings discovered without specifying an explicit default
+RMG060  | Mapper   | Warning  | Multiple user mappings discovered without specifying an explicit default
 RMG061  | Mapper   | Error    | The referenced mapping was not found
 RMG062  | Mapper   | Error    | The referenced mapping name is ambiguous
 RMG063  | Mapper   | Error    | Cannot configure an enum mapping on a non-enum mapping
 RMG064  | Mapper   | Error    | Cannot configure an object mapping on a non-object mapping
 RMG065  | Mapper   | Warning  | Cannot configure an object mapping on a queryable projection mapping, apply the configurations to an object mapping method instead
-RMG066  | Mapper   | Warning | No members are mapped in an object mapping
+RMG066  | Mapper   | Warning  | No members are mapped in an object mapping
 RMG067  | Mapper   | Error    | Invalid usage of the MapPropertyAttribute

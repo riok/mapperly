@@ -9,6 +9,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
     [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByValue)]
     public static partial class StaticTestMapper
     {
+        [UserMapping(Default = true)]
         public static partial int DirectInt(int value);
 
         public static partial int? DirectIntNullable(int? value);
@@ -33,6 +34,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapperRequiredMapping(RequiredMappingStrategy.Target)]
         public static partial TestObjectDto MapToDtoExt(this TestObject src);
 
+        [UserMapping(Default = true)]
         public static TestObjectDto MapToDto(TestObject src)
         {
             var target = MapToDtoInternal(src);
@@ -120,6 +122,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapperIgnoreTargetValue(TestEnum.Value30)]
         public static partial TestEnum MapToEnumByNameWithIgnored(TestEnumDtoAdditionalValue v);
 
+        [UserMapping(Default = true)]
         [MapEnum(EnumMappingStrategy.ByValueCheckDefined)]
         public static partial TestEnum MapToEnumByValueCheckDefined(TestEnumDtoByValue v);
 
