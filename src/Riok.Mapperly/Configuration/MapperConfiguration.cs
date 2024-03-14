@@ -114,5 +114,5 @@ public record MapperConfiguration
     /// <summary>
     /// Whether to consider non-partial methods in a mapper as user implemented mapping methods.
     /// </summary>
-    public bool? AutoUserMappings { get; set; }
+    public bool? AutoUserMappings { get; init; }
 }
