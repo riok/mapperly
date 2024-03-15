@@ -581,8 +581,9 @@ public static class DiagnosticDescriptors
             "Multiple user mappings discovered without specifying an explicit default",
             "Multiple user mappings discovered for the mapping from {0} to {1} without specifying an explicit default",
             DiagnosticCategories.Mapper,
-            DiagnosticSeverity.Info,
-            true
+            DiagnosticSeverity.Warning,
+            true,
+            helpLinkUri: BuildHelpUri("RMG060")
         );
 
     public static readonly DiagnosticDescriptor ReferencedMappingNotFound =

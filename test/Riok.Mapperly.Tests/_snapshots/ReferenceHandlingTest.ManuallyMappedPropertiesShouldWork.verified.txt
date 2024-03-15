@@ -23,9 +23,10 @@
     {
       Id: RMG060,
       Title: Multiple user mappings discovered without specifying an explicit default,
-      Severity: Info,
+      Severity: Warning,
       WarningLevel: 1,
       Location: : (12,0)-(12,71),
+      HelpLink: https://localhost:3000/docs/configuration/analyzer-diagnostics/RMG060,
       MessageFormat: Multiple user mappings discovered for the mapping from {0} to {1} without specifying an explicit default,
       Message: Multiple user mappings discovered for the mapping from A to B without specifying an explicit default,
       Category: Mapper

@@ -654,7 +654,7 @@ public class UserMethodTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
                 DiagnosticDescriptors.MultipleUserMappingsWithoutDefault,
@@ -694,7 +694,7 @@ public class UserMethodTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
                 DiagnosticDescriptors.MultipleUserMappingsWithoutDefault,

@@ -32,6 +32,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             _formatEnUs.NumberFormat.CurrencyPositivePattern = 2;
         }
 
+        [UserMapping(Default = true)]
         public partial int DirectInt(int value);
 
         public partial long ImplicitCastInt(int value);
@@ -48,6 +49,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public partial IEnumerable<TestObjectDto> MapAllDtos(IEnumerable<TestObject> objects);
 
+        [UserMapping(Default = true)]
         public TestObjectDto MapToDto(TestObject src)
         {
             var target = MapToDtoInternal(src);

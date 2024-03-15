@@ -23,7 +23,7 @@
     CtorValue: 5,
     CtorValue2: 100,
     RequiredValue: 4,
-    StringValue: ,
+    StringValue: +after-map,
     RenamedStringValue2: ,
     Unflattening: {},
     NestedNullableTargetNotNullable: {},

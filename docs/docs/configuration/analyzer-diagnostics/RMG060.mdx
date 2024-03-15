@@ -1,0 +1,61 @@
+---
+sidebar_label: RMG060
+description: 'Mapperly analyzer diagnostic RMG060 — Multiple user mappings discovered without specifying an explicit default'
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# RMG060 — Multiple user-mappings discovered without specifying an explicit default
+
+Multiple user-mappings for the same type pair are discovered
+without specifying an explicit default.
+Mapperly needs to now which mapping it should use.
+
+To specify a default apply `[UserMapping(Default = true)]`.
+
+See also [user-implemented mappings](../user-implemented-methods.mdx#default-user-implemented-mapping-method).
+
+## Example
+
+Two mappings from `Car` to `CarDto` are defined.
+When Mapperly needs to map from `Car` to `CarDto` in `CarsToCarDtos`
+it needs to know whether to use `CarToCarDto` or `CarToCarDtoIgnoreId`.
+Apply `[UserMapping(Default = true)]` to the mapping which Mapperly should use
+in such cases.
+
+<Tabs>
+  <TabItem value="bad" label="Invalid" default>
+    ```csharp
+    [Mapper]
+    public partial class CarMapper
+    {
+      public paratial List<CarDto> CarsToCarDtos(List<Car> cars);
+
+      public partial CarDto CarToCarDto(Car car);
+
+      [MapperIgnoreSource(nameof(Car.Id))]
+      public partial CarDto CarToCarDtoIgnoreId(Car car);
+    }
+    ```
+
+  </TabItem>
+  <TabItem value="fixed" label="Fixed">
+    ```csharp
+    [Mapper]
+    public partial class CarMapper
+    {
+      public paratial List<CarDto> CarsToCarDtos(List<Car> cars);
+
+      // highlight-start
+      [UserMapping(Default = true)]
+      // highlight-end
+      public partial CarDto CarToCarDto(Car car);
+
+      [MapperIgnoreSource(nameof(Car.Id))]
+      public partial CarDto CarToCarDtoIgnoreId(Car car);
+    }
+    ```
+
+  </TabItem>
+</Tabs>
