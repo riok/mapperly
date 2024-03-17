@@ -199,6 +199,19 @@ public static class UserMethodMappingExtractor
             );
         }
 
+        if (BuildGenericTypeProjectionParameters(methodSymbol, parameters, ctx.Types, out var projectionTypeParameters))
+        {
+            return new UserDefinedNewInstanceGenericTypeProjection(
+                methodSymbol,
+                projectionTypeParameters.Value,
+                parameters,
+                ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
+                ctx.Configuration.Mapper.UseReferenceHandling,
+                GetTypeSwitchNullArm(methodSymbol, parameters, typeParameters),
+                ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
+            );
+        }
+
         if (methodSymbol.IsGenericMethod)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, methodSymbol, methodSymbol.Name);
@@ -263,6 +276,43 @@ public static class UserMethodMappingExtractor
         }
 
         typeParameters = new GenericMappingTypeParameters(sourceTypeParameter, targetTypeParameter);
+        return true;
+    }
+
+    private static bool BuildGenericTypeProjectionParameters(
+        IMethodSymbol methodSymbol,
+        MappingMethodParameters parameters,
+        WellKnownTypes types,
+        [NotNullWhen(true)] out GenericProjectionTypeParameters? typeParameters
+    )
+    {
+        typeParameters = null;
+
+        if (!methodSymbol.IsGenericMethod)
+            return false;
+
+        var sourceType = parameters.Source.Type;
+        var targetType = parameters.Target?.Type ?? methodSymbol.ReturnType;
+
+        if (!sourceType.Implements(types.Get(typeof(IQueryable))))
+            return false;
+        if (!targetType.ImplementsGeneric(types.Get(typeof(IQueryable<>)), out var t))
+            return false;
+
+        var targetTypeParameter = (ITypeParameterSymbol)t.TypeArguments[0];
+        var sourceTypeParameter = sourceType.ImplementsGeneric(types.Get(typeof(IQueryable<>)), out var s)
+            ? (ITypeParameterSymbol)s.TypeArguments[0]
+            : null;
+
+        var expectedTypeParametersCount = 1;
+
+        if (sourceTypeParameter is not null && SymbolEqualityComparer.Default.Equals(sourceTypeParameter, targetTypeParameter) is false)
+            expectedTypeParametersCount++;
+
+        if (methodSymbol.TypeParameters.Length != expectedTypeParametersCount)
+            return false;
+
+        typeParameters = new GenericProjectionTypeParameters(sourceType, sourceTypeParameter, targetType, targetTypeParameter, types);
         return true;
     }
 

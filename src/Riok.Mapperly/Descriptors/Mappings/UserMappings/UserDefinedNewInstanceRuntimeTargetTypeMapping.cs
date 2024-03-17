@@ -23,7 +23,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
     ITypeSymbol objectType
 ) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), INewInstanceUserMapping
 {
-    private const string IsAssignableFromMethodName = nameof(Type.IsAssignableFrom);
+    protected const string IsAssignableFromMethodName = nameof(Type.IsAssignableFrom);
     private const string GetTypeMethodName = nameof(GetType);
 
     private readonly List<RuntimeTargetTypeMapping> _mappings = new();

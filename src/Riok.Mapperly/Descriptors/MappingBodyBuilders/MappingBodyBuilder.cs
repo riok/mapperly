@@ -44,6 +44,9 @@ public class MappingBodyBuilder(MappingCollection mappings)
                 case UserDefinedNewInstanceGenericTypeMapping mapping:
                     RuntimeTargetTypeMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;
+                case UserDefinedNewInstanceGenericTypeProjection mapping:
+                    RuntimeTargetTypeProjectionBodyBuilder.BuildMappingBody(ctx, mapping);
+                    break;
             }
         }
     }
