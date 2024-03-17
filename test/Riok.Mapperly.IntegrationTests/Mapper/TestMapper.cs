@@ -69,7 +69,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         )]
         [MapProperty(nameof(TestObject.RenamedStringValue), nameof(TestObjectDto.RenamedStringValue2))]
         [MapProperty(
-            new[] { nameof(TestObject.UnflatteningIdValue) },
+            nameof(TestObject.UnflatteningIdValue),
             new[] { nameof(TestObjectDto.Unflattening), nameof(TestObjectDto.Unflattening.IdValue) }
         )]
         [MapProperty(
