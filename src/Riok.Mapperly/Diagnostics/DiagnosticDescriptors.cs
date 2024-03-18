@@ -657,6 +657,16 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static readonly DiagnosticDescriptor QueryableProjectionMappingCannotInline =
+        new(
+            "RMG068",
+            "Cannot inline user implemented queryable expression mapping",
+            "Cannot inline user implemented queryable expression mapping",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Info,
+            true
+        );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT

@@ -21,6 +21,8 @@ public partial class CarMapper
 ```
 
 Whenever Mapperly needs a mapping from `TimeSpan` to `int` inside the `CarMapper` implementation, it will use the provided implementation.
+The types of the user-implemented mapping method need to match the types to map exactly, including nullability.
+
 If there are multiple user-implemented mapping methods suiting the given type-pair, by default, the first one is used.
 This can be customized by using [automatic user-implemented mapping method discovery](#automatic-user-implemented-mapping-method-discovery)
 and [default user-implemented mapping method](#default-user-implemented-mapping-method).

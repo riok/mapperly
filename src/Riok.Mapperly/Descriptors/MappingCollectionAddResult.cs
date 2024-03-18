@@ -5,5 +5,4 @@ public enum MappingCollectionAddResult
     Added,
     NotAddedIgnored,
     NotAddedDuplicated,
-    NotAddedDuplicatedDefault,
 }

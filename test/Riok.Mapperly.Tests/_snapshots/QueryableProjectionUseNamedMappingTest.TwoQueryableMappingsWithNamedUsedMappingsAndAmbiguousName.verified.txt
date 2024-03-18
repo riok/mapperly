@@ -1,0 +1,24 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG062,
+      Title: The referenced mapping name is ambiguous,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (14,1)-(14,87),
+      MessageFormat: The referenced mapping name {0} is ambiguous, use a unique name,
+      Message: The referenced mapping name ModifyString is ambiguous, use a unique name,
+      Category: Mapper
+    },
+    {
+      Id: RMG062,
+      Title: The referenced mapping name is ambiguous,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (14,1)-(14,87),
+      MessageFormat: The referenced mapping name {0} is ambiguous, use a unique name,
+      Message: The referenced mapping name ModifyString is ambiguous, use a unique name,
+      Category: Mapper
+    }
+  ]
+}

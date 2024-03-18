@@ -9,9 +9,9 @@ public partial class Mapper
 #nullable disable
         return System.Linq.Queryable.Select(source, x => new global::B()
         {
-            StringValue = DefaultStringMapping(x.StringValue),
-            StringValue1 = ModifyString(x.StringValue1),
-            StringValue2 = ModifyString2(x.StringValue2),
+            StringValue = x.StringValue,
+            StringValue1 = x.StringValue1 + "-modified",
+            StringValue2 = x.StringValue2 + "-modified2",
         });
 #nullable enable
     }

@@ -15,12 +15,14 @@ public class UserImplementedMethodMapping(
     bool? isDefault,
     MethodParameter sourceParameter,
     ITypeSymbol targetType,
-    MethodParameter? referenceHandlerParameter
+    MethodParameter? referenceHandlerParameter,
+    bool isExternal
 ) : NewInstanceMapping(sourceParameter.Type, targetType), INewInstanceUserMapping
 {
     public IMethodSymbol Method { get; } = method;
 
     public bool? Default { get; } = isDefault;
+    public bool IsExternal { get; } = isExternal;
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {

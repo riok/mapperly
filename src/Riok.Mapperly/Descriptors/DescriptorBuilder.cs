@@ -23,6 +23,8 @@ public class DescriptorBuilder
     private readonly WellKnownTypes _types;
 
     private readonly MappingCollection _mappings = new();
+    private readonly InlinedExpressionMappingCollection _inlineMappings = new();
+
     private readonly MethodNameBuilder _methodNameBuilder = new();
     private readonly MappingBodyBuilder _mappingBodyBuilder;
     private readonly SimpleMappingBuilderContext _builderContext;
@@ -60,6 +62,7 @@ public class DescriptorBuilder
             _diagnostics,
             new MappingBuilder(_mappings, mapperDeclaration),
             new ExistingTargetMappingBuilder(_mappings),
+            _inlineMappings,
             mapperDeclaration.Syntax.GetLocation()
         );
     }
@@ -212,8 +215,9 @@ public class DescriptorBuilder
 
     private void AddUserMapping(IUserMapping mapping, bool ignoreDuplicates, bool named)
     {
-        var result = _mappings.AddUserMapping(mapping, ignoreDuplicates, named ? mapping.Method.Name : null);
-        if (result == MappingCollectionAddResult.NotAddedDuplicatedDefault)
+        var name = named ? mapping.Method.Name : null;
+        var result = _mappings.AddUserMapping(mapping, name);
+        if (!ignoreDuplicates && mapping.Default == true && result == MappingCollectionAddResult.NotAddedDuplicated)
         {
             _diagnostics.ReportDiagnostic(
                 DiagnosticDescriptors.MultipleDefaultUserMappings,
@@ -222,6 +226,8 @@ public class DescriptorBuilder
                 mapping.TargetType.ToDisplayString()
             );
         }
+
+        _inlineMappings.AddUserMapping(mapping, name);
     }
 
     private void AddUserMappingDiagnostics()

@@ -18,8 +18,9 @@ internal static class ExternalMappingsExtractor
                 UserMethodMappingExtractor.ExtractUserImplementedMappings(
                     ctx,
                     x.MapperType,
-                    x.MapperType.FullyQualifiedIdentifierName(),
-                    true
+                    receiver: x.MapperType.FullyQualifiedIdentifierName(),
+                    isStatic: true,
+                    isExternal: true
                 )
             );
 
@@ -44,7 +45,7 @@ internal static class ExternalMappingsExtractor
             return Enumerable.Empty<IUserMapping>();
 
         if (nullableAnnotation != NullableAnnotation.Annotated)
-            return UserMethodMappingExtractor.ExtractUserImplementedMappings(ctx, type, name, false);
+            return UserMethodMappingExtractor.ExtractUserImplementedMappings(ctx, type, name, isStatic: false, isExternal: true);
 
         ctx.ReportDiagnostic(DiagnosticDescriptors.ExternalMapperMemberCannotBeNullable, symbol, symbol.ToDisplayString());
         return Enumerable.Empty<IUserMapping>();

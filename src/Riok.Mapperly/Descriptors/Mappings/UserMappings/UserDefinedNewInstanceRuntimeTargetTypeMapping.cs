@@ -36,6 +36,8 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
     /// </summary>
     public bool? Default => false;
 
+    public bool IsExternal => false;
+
     /// <summary>
     /// The reference handling is enabled but is only internal to this method.
     /// No reference handler parameter is passed.

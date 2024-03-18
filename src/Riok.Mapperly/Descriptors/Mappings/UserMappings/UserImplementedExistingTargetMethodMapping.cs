@@ -16,12 +16,15 @@ public class UserImplementedExistingTargetMethodMapping(
     bool? isDefault,
     MethodParameter sourceParameter,
     MethodParameter targetParameter,
-    MethodParameter? referenceHandlerParameter
+    MethodParameter? referenceHandlerParameter,
+    bool isExternal
 ) : ExistingTargetMapping(method.Parameters[0].Type, targetParameter.Type), IExistingTargetUserMapping
 {
     public IMethodSymbol Method { get; } = method;
 
     public bool? Default { get; } = isDefault;
+
+    public bool IsExternal { get; } = isExternal;
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {

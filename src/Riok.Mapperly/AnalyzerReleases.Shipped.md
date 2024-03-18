@@ -152,3 +152,4 @@ RMG064  | Mapper   | Error    | Cannot configure an object mapping on a non-obje
 RMG065  | Mapper   | Warning  | Cannot configure an object mapping on a queryable projection mapping, apply the configurations to an object mapping method instead
 RMG066  | Mapper   | Warning  | No members are mapped in an object mapping
 RMG067  | Mapper   | Error    | Invalid usage of the MapPropertyAttribute
+RMG068  | Mapper   | Info     | Cannot inline user implemented queryable expression mapping

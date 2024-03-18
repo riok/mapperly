@@ -6,7 +6,7 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapperDeclaration)
 {
-    private HashSet<string> _resolvedMappingNames = new();
+    private readonly HashSet<string> _resolvedMappingNames = new();
 
     private delegate INewInstanceMapping? BuildMapping(MappingBuilderContext context);
 

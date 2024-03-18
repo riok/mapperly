@@ -46,7 +46,7 @@ public static class TestSourceBuilder
             using Riok.Mapperly.Abstractions;
             using Riok.Mapperly.Abstractions.ReferenceHandling;
 
-            {{(options.Namespace != null ? $"namespace {options.Namespace};" : string.Empty)}}
+            {{(options.Namespace != null ? $"namespace {options.Namespace};" : "")}}
 
             {{BuildAttribute(options)}}
             public {{(options.Static ? "static " : "")}}partial class {{options.MapperClassName}}{{(

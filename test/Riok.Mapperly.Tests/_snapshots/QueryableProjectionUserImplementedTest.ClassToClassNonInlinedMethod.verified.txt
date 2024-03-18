@@ -1,0 +1,14 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG068,
+      Title: Cannot inline user implemented queryable expression mapping,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (11,4)-(11,84),
+      MessageFormat: Cannot inline user implemented queryable expression mapping,
+      Message: Cannot inline user implemented queryable expression mapping,
+      Category: Mapper
+    }
+  ]
+}

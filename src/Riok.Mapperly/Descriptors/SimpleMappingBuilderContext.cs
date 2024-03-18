@@ -20,6 +20,7 @@ public class SimpleMappingBuilderContext(
     DiagnosticCollection diagnostics,
     MappingBuilder mappingBuilder,
     ExistingTargetMappingBuilder existingTargetMappingBuilder,
+    InlinedExpressionMappingCollection inlinedMappings,
     Location diagnosticLocation
 )
 {
@@ -38,6 +39,7 @@ public class SimpleMappingBuilderContext(
             ctx._diagnostics,
             ctx.MappingBuilder,
             ctx.ExistingTargetMappingBuilder,
+            ctx.InlinedMappings,
             diagnosticLocation ?? ctx._diagnosticLocation
         ) { }
 
@@ -56,6 +58,13 @@ public class SimpleMappingBuilderContext(
     protected MappingBuilder MappingBuilder { get; } = mappingBuilder;
 
     protected ExistingTargetMappingBuilder ExistingTargetMappingBuilder { get; } = existingTargetMappingBuilder;
+
+    /// <summary>
+    /// The inline expression mappings.
+    /// Note: No method mappings should be added to this collection
+    /// and the body of these mappings is never built.
+    /// </summary>
+    protected InlinedExpressionMappingCollection InlinedMappings { get; } = inlinedMappings;
 
     public virtual bool IsConversionEnabled(MappingConversionType conversionType) =>
         Configuration.Mapper.EnabledConversions.HasFlag(conversionType);
