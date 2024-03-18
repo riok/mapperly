@@ -11,7 +11,7 @@ on:
         required: true
         type: string
     secrets:
-      nuget_api_key:
+      NUGET_API_TOKEN:
         required: true
     outputs:
       version:
@@ -49,7 +49,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUGET_SOURCE: ${{ inputs.nuget_source }}
-          NUGET_API_KEY: ${{ secrets.nuget_api_key }}
+          NUGET_API_TOKEN: ${{ secrets.NUGET_API_TOKEN }}
           MAPPERLY_ENVIRONMENT: ${{ inputs.environment }}
       - id: release-version
         run: echo "version=${{ env.RELEASE_VERSION }}" >> "$GITHUB_OUTPUT"

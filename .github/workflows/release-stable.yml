@@ -6,6 +6,8 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/test.yml
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   release:
     needs: test
@@ -13,7 +15,7 @@ jobs:
     with:
       environment: stable
     secrets:
-      nuget_api_key: ${{ secrets.NUGET_API_TOKEN }}
+      NUGET_API_TOKEN: ${{ secrets.NUGET_API_TOKEN }}
 
   docs:
     uses: ./.github/workflows/docs.yml
@@ -22,3 +24,6 @@ jobs:
       deploy: true
       environment: stable
       version: ${{ needs.release.outputs.version }}
+    secrets:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

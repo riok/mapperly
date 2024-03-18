@@ -15,6 +15,11 @@ on:
         required: false
         type: string
         default: '0.0.1-dev'
+    secrets:
+      CLOUDFLARE_API_TOKEN:
+        required: false
+      CLOUDFLARE_ACCOUNT_ID:
+        required: false
   workflow_dispatch:
     inputs:
       deploy:
