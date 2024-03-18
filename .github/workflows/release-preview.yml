@@ -12,6 +12,8 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/test.yml
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   release-preview:
     if: ${{ inputs.create_preview_release }}
@@ -20,7 +22,7 @@ jobs:
     with:
       environment: next
     secrets:
-      nuget_api_key: ${{ secrets.NUGET_API_TOKEN }}
+      NUGET_API_TOKEN: ${{ secrets.NUGET_API_TOKEN }}
 
   docs:
     uses: ./.github/workflows/docs.yml
@@ -29,6 +31,9 @@ jobs:
       deploy: true
       environment: next
       version: ${{ needs.release-preview.outputs.version }}
+    secrets:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
   release-stable-update-branch:
     runs-on: ubuntu-latest

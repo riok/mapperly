@@ -14,4 +14,4 @@ plugins:
   - - "@semantic-release/exec"
     - verifyReleaseCmd: "echo RELEASE_VERSION=\"${nextRelease.version}\" >> $GITHUB_ENV"
       prepareCmd: "RELEASE_NOTES=\"${nextRelease.notes}\" RELEASE_VERSION=\"${nextRelease.version}\" ./build/package.sh"
-      publishCmd: "dotnet nuget push './artifacts/*.nupkg' --source $NUGET_SOURCE --api-key $NUGET_API_KEY"
+      publishCmd: "dotnet nuget push './artifacts/*.nupkg' --source $NUGET_SOURCE --api-key $NUGET_API_TOKEN"
