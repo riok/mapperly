@@ -352,7 +352,11 @@ public static class ObjectMemberMappingBodyBuilder
         // if the member is readonly
         // and the target and source path is readable,
         // we try to create an existing target mapping
-        if (targetMemberPath.Member.CanSet || !targetMemberPath.Path.All(op => op.CanGet) || !sourceMemberPath.Path.All(op => op.CanGet))
+        if (
+            targetMemberPath.Member is { CanSet: true, IsInitOnly: false }
+            || !targetMemberPath.Path.All(op => op.CanGet)
+            || !sourceMemberPath.Path.All(op => op.CanGet)
+        )
         {
             return false;
         }
