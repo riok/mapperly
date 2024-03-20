@@ -12,13 +12,17 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 public class MemberNullDelegateAssignmentMapping(
     GetterMemberPath nullConditionalSourcePath,
     IMemberAssignmentMappingContainer parent,
-    bool throwInsteadOfConditionalNullMapping,
     bool needsNullSafeAccess
 ) : MemberAssignmentMappingContainer(parent)
 {
     private readonly GetterMemberPath _nullConditionalSourcePath = nullConditionalSourcePath;
-    private readonly bool _throwInsteadOfConditionalNullMapping = throwInsteadOfConditionalNullMapping;
     private readonly List<SetterMemberPath> _targetsToSetNull = new();
+    private bool _throwOnSourcePathNull;
+
+    public void ThrowOnSourcePathNull()
+    {
+        _throwOnSourcePathNull = true;
+    }
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
@@ -48,16 +52,11 @@ public class MemberNullDelegateAssignmentMapping(
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((MemberNullDelegateAssignmentMapping)obj);
+        var other = (MemberNullDelegateAssignmentMapping)obj;
+        return _nullConditionalSourcePath.Equals(other._nullConditionalSourcePath);
     }
 
-    public override int GetHashCode()
-    {
-        unchecked
-        {
-            return (_nullConditionalSourcePath.GetHashCode() * 397) ^ _throwInsteadOfConditionalNullMapping.GetHashCode();
-        }
-    }
+    public override int GetHashCode() => _nullConditionalSourcePath.GetHashCode();
 
     public static bool operator ==(MemberNullDelegateAssignmentMapping? left, MemberNullDelegateAssignmentMapping? right) =>
         Equals(left, right);
@@ -65,15 +64,9 @@ public class MemberNullDelegateAssignmentMapping(
     public static bool operator !=(MemberNullDelegateAssignmentMapping? left, MemberNullDelegateAssignmentMapping? right) =>
         !Equals(left, right);
 
-    protected bool Equals(MemberNullDelegateAssignmentMapping other)
-    {
-        return _nullConditionalSourcePath.Equals(other._nullConditionalSourcePath)
-            && _throwInsteadOfConditionalNullMapping == other._throwInsteadOfConditionalNullMapping;
-    }
-
     private IEnumerable<StatementSyntax>? BuildElseClause(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
-        if (_throwInsteadOfConditionalNullMapping)
+        if (_throwOnSourcePathNull)
         {
             // throw new ArgumentNullException
             var nameofSourceAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, false, false, true);

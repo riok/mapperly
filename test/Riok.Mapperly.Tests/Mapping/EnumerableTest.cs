@@ -63,14 +63,14 @@ public class EnumerableTest
     [Fact]
     public void ArrayCustomClassToArrayCustomClass()
     {
-        var source = TestSourceBuilder.Mapping("B[]", "B[]", "class B { public int Value {get; set; }}");
+        var source = TestSourceBuilder.Mapping("B[]", "B[]", "class B { public int Value { get; set; } }");
         TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source;");
     }
 
     [Fact]
     public void ArrayCustomClassNullableToArrayCustomClassNonNullable()
     {
-        var source = TestSourceBuilder.Mapping("B?[]", "B[]", "class B { public int Value {get; set; }}");
+        var source = TestSourceBuilder.Mapping("B?[]", "B[]", "class B { public int Value { get; set; } }");
         TestHelper
             .GenerateMapper(source)
             .Should()
@@ -89,7 +89,7 @@ public class EnumerableTest
     [Fact]
     public void ArrayCustomClassNonNullableToArrayCustomClassNullable()
     {
-        var source = TestSourceBuilder.Mapping("B[]", "B?[]", "class B { public int Value {get; set; }}");
+        var source = TestSourceBuilder.Mapping("B[]", "B?[]", "class B { public int Value { get; set; } }");
         TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::B?[])source;");
     }
 

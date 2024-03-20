@@ -30,6 +30,10 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         {
             container.AddNullMemberAssignment(SetterMemberPath.Build(BuilderContext, memberMapping.TargetPath));
         }
+        else if (BuilderContext.Configuration.Mapper.ThrowOnPropertyMappingNullMismatch)
+        {
+            container.ThrowOnSourcePathNull();
+        }
     }
 
     private void AddMemberAssignmentMapping(IMemberAssignmentMappingContainer container, IMemberAssignmentMapping mapping)
@@ -95,7 +99,6 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         mapping = new MemberNullDelegateAssignmentMapping(
             GetterMemberPath.Build(BuilderContext, nullConditionSourcePath),
             parentMapping,
-            BuilderContext.Configuration.Mapper.ThrowOnPropertyMappingNullMismatch,
             needsNullSafeAccess
         );
         _nullDelegateMappings[nullConditionSourcePath] = mapping;
