@@ -43,7 +43,7 @@ This ignores all properties on the source with a `null` value.
 // highlight-end
 static partial class FruitMapper
 {
-    public static partial void ApplyUpdate(this Fruit fruit, FruitUpdate update);
+    public static partial void ApplyUpdate(FruitUpdate update, Fruit fruit);
 }
 
 class Fruit { public required string Name { get; set; } public required string Color { get; set; } }
