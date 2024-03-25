@@ -216,7 +216,7 @@ public class ValueTupleTest
         var source = TestSourceBuilder.Mapping(
             "A",
             "(int B, string C)",
-            "public class A { public int B { get;set;} public int C {get;set;} }"
+            "public class A { public int B { get; set; } public int C { get; set; } }"
         );
 
         TestHelper
@@ -280,7 +280,7 @@ public class ValueTupleTest
             [MapperIgnoreSource("A")]
             partial (int, int) Map(B source);
             """,
-            "public class B { public int Item1 { get;set;} public int A {get;set;} public int Item2 {get;set;} }"
+            "public class B { public int Item1 { get;set;} public int A { get; set; } public int Item2 {get;set;} }"
         );
 
         TestHelper
