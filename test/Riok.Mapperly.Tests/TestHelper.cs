@@ -77,16 +77,20 @@ public static class TestHelper
         return driver.RunGenerators(compilation);
     }
 
+    public static Compilation BuildCompilation([StringSyntax(StringSyntax.CSharp)] string source, TestHelperOptions? options)
+    {
+        options ??= TestHelperOptions.Default;
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default.WithLanguageVersion(options.LanguageVersion));
+        return BuildCompilation(options.AssemblyName, options.NullableOption, true, syntaxTree);
+    }
+
     private static GeneratorDriver Generate(
-        string source,
+        [StringSyntax(StringSyntax.CSharp)] string source,
         TestHelperOptions? options,
         IReadOnlyCollection<TestAssembly>? additionalAssemblies = null
     )
     {
-        options ??= TestHelperOptions.Default;
-
-        var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default.WithLanguageVersion(options.LanguageVersion));
-        var compilation = BuildCompilation(options.AssemblyName, options.NullableOption, true, syntaxTree);
+        var compilation = BuildCompilation(source, options);
         if (additionalAssemblies != null)
         {
             compilation = compilation.AddReferences(additionalAssemblies.Select(x => x.MetadataReference));

@@ -1,0 +1,14 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG069,
+      Title: Runtime target type or generic type mapping does not match any mappings,
+      Severity: Warning,
+      WarningLevel: 1,
+      Location: : (11,4)-(11,76),
+      MessageFormat: Runtime target type or generic type mapping does not match any mappings,
+      Message: Runtime target type or generic type mapping does not match any mappings,
+      Category: Mapper
+    }
+  ]
+}

@@ -15,6 +15,7 @@ public class SimpleMappingBuilderContext(
     CompilationContext compilationContext,
     MapperConfigurationReader configurationReader,
     SymbolAccessor symbolAccessor,
+    GenericTypeChecker genericTypeChecker,
     AttributeDataAccessor attributeAccessor,
     UnsafeAccessorContext unsafeAccessorContext,
     DiagnosticCollection diagnostics,
@@ -34,6 +35,7 @@ public class SimpleMappingBuilderContext(
             ctx._compilationContext,
             ctx._configurationReader,
             ctx.SymbolAccessor,
+            ctx.GenericTypeChecker,
             ctx.AttributeAccessor,
             ctx.UnsafeAccessorContext,
             ctx._diagnostics,
@@ -50,6 +52,8 @@ public class SimpleMappingBuilderContext(
     public WellKnownTypes Types => _compilationContext.Types;
 
     public SymbolAccessor SymbolAccessor { get; } = symbolAccessor;
+
+    public GenericTypeChecker GenericTypeChecker { get; } = genericTypeChecker;
 
     public AttributeDataAccessor AttributeAccessor { get; } = attributeAccessor;
 

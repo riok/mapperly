@@ -19,7 +19,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
     MethodParameter? referenceHandlerParameter,
     ITypeSymbol targetType,
     bool enableReferenceHandling,
-    NullFallbackValue nullArm,
+    NullFallbackValue? nullArm,
     ITypeSymbol objectType
 ) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), INewInstanceUserMapping
 {
@@ -28,7 +28,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
 
     private readonly List<RuntimeTargetTypeMapping> _mappings = new();
 
-    public IMethodSymbol Method { get; } = method;
+    public new IMethodSymbol Method { get; } = method;
 
     /// <summary>
     /// Always false, as this cannot be called by other mappings,
@@ -77,7 +77,11 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
         var arms = _mappings.Select(x => BuildSwitchArm(typeArmContext, typeArmVariableName, x, targetTypeExpr));
 
         // null => default / throw
-        arms = arms.Append(SwitchArm(ConstantPattern(NullLiteral()), NullSubstitute(TargetType, ctx.Source, nullArm)));
+        if (nullArm.HasValue)
+        {
+            arms = arms.Append(SwitchArm(ConstantPattern(NullLiteral()), NullSubstitute(TargetType, ctx.Source, nullArm.Value)));
+        }
+
         arms = arms.Append(fallbackArm);
         var switchExpression = ctx.SyntaxFactory.Switch(ctx.Source, arms);
         yield return ctx.SyntaxFactory.Return(switchExpression);
@@ -85,11 +89,11 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
 
     protected abstract ExpressionSyntax BuildTargetType();
 
-    protected virtual ExpressionSyntax? BuildSwitchArmWhenClause(ExpressionSyntax targetType, RuntimeTargetTypeMapping mapping)
+    protected virtual ExpressionSyntax? BuildSwitchArmWhenClause(ExpressionSyntax runtimeTargetType, RuntimeTargetTypeMapping mapping)
     {
         // targetType.IsAssignableFrom(typeof(ADto))
         return Invocation(
-            MemberAccess(targetType, IsAssignableFromMethodName),
+            MemberAccess(runtimeTargetType, IsAssignableFromMethodName),
             TypeOfExpression(FullyQualifiedIdentifier(mapping.Mapping.TargetType.NonNullable()))
         );
     }

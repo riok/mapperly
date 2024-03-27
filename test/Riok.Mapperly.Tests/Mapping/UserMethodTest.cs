@@ -227,18 +227,6 @@ public class UserMethodTest
     }
 
     [Fact]
-    public void InvalidSignatureGenericShouldDiagnostic()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes("partial TTarget Map<TSource, TTarget, TOther>(TSource source);");
-
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "Map has an unsupported mapping method signature")
-            .HaveAssertedAllDiagnostics();
-    }
-
-    [Fact]
     public Task WithClassBaseTypeShouldWork()
     {
         var source = TestSourceBuilder.CSharp(

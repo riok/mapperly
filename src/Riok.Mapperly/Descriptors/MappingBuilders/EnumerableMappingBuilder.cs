@@ -324,7 +324,7 @@ public static class EnumerableMappingBuilder
         if (!hasObjectFactory)
         {
             sourceCollectionInfo = BuildCollectionTypeForICollection(ctx, sourceCollectionInfo);
-            ctx.ObjectFactories.TryFindObjectFactory(sourceCollectionInfo.Type, ctx.Target, out objectFactory);
+            ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out objectFactory);
             var existingMapping = ctx.BuildDelegatedMapping(sourceCollectionInfo.Type, ctx.Target);
             if (existingMapping != null)
                 return existingMapping;

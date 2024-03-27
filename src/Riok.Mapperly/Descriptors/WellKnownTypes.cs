@@ -15,6 +15,9 @@ public class WellKnownTypes(Compilation compilation)
     public ITypeSymbol GetArrayType(ITypeSymbol type) =>
         compilation.CreateArrayTypeSymbol(type, elementNullableAnnotation: type.NullableAnnotation).NonNullable();
 
+    public ITypeSymbol GetArrayType(ITypeSymbol elementType, int rank, NullableAnnotation elementNullableAnnotation) =>
+        compilation.CreateArrayTypeSymbol(elementType, rank, elementNullableAnnotation);
+
     public INamedTypeSymbol Get<T>() => Get(typeof(T));
 
     public INamedTypeSymbol Get(Type type)

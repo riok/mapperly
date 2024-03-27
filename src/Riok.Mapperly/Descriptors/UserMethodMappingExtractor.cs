@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
@@ -187,7 +188,7 @@ public static class UserMethodMappingExtractor
                 runtimeTargetTypeParams,
                 ctx.Configuration.Mapper.UseReferenceHandling,
                 ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
-                GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams, null),
+                GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams),
                 ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
             );
         }
@@ -198,23 +199,16 @@ public static class UserMethodMappingExtractor
             return null;
         }
 
-        if (BuildGenericTypeParameters(methodSymbol, parameters, out var typeParameters))
+        if (methodSymbol.IsGenericMethod)
         {
             return new UserDefinedNewInstanceGenericTypeMapping(
                 methodSymbol,
-                typeParameters.Value,
                 parameters,
                 ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
                 ctx.Configuration.Mapper.UseReferenceHandling,
-                GetTypeSwitchNullArm(methodSymbol, parameters, typeParameters),
+                GetTypeSwitchNullArm(methodSymbol, parameters),
                 ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
             );
-        }
-
-        if (methodSymbol.IsGenericMethod)
-        {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, methodSymbol, methodSymbol.Name);
-            return null;
         }
 
         if (parameters.Target.HasValue)
@@ -237,45 +231,6 @@ public static class UserMethodMappingExtractor
             ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
             ctx.Configuration.Mapper.UseReferenceHandling
         );
-    }
-
-    private static bool BuildGenericTypeParameters(
-        IMethodSymbol methodSymbol,
-        MappingMethodParameters parameters,
-        [NotNullWhen(true)] out GenericMappingTypeParameters? typeParameters
-    )
-    {
-        if (!methodSymbol.IsGenericMethod)
-        {
-            typeParameters = null;
-            return false;
-        }
-
-        var targetType = parameters.Target?.Type ?? methodSymbol.ReturnType;
-        var targetTypeParameter = methodSymbol.TypeParameters.FirstOrDefault(x => SymbolEqualityComparer.Default.Equals(x, targetType));
-        var sourceTypeParameter = methodSymbol.TypeParameters.FirstOrDefault(x =>
-            SymbolEqualityComparer.Default.Equals(x, parameters.Source.Type)
-        );
-
-        var expectedTypeParametersCount = 0;
-        if (targetTypeParameter != null)
-        {
-            expectedTypeParametersCount++;
-        }
-
-        if (sourceTypeParameter != null && !SymbolEqualityComparer.Default.Equals(sourceTypeParameter, targetTypeParameter))
-        {
-            expectedTypeParametersCount++;
-        }
-
-        if (methodSymbol.TypeParameters.Length != expectedTypeParametersCount)
-        {
-            typeParameters = null;
-            return false;
-        }
-
-        typeParameters = new GenericMappingTypeParameters(sourceTypeParameter, targetTypeParameter);
-        return true;
     }
 
     private static bool BuildRuntimeTargetTypeMappingParameters(
@@ -418,14 +373,24 @@ public static class UserMethodMappingExtractor
         return refHandlerParameter;
     }
 
-    private static NullFallbackValue GetTypeSwitchNullArm(
-        IMethodSymbol method,
-        MappingMethodParameters parameters,
-        GenericMappingTypeParameters? typeParameters
-    )
+    private static NullFallbackValue? GetTypeSwitchNullArm(IMethodSymbol method, MappingMethodParameters parameters)
     {
-        var targetCanBeNull = typeParameters?.TargetNullable ?? parameters.Target?.Type.IsNullable() ?? method.ReturnType.IsNullable();
-        return targetCanBeNull ? NullFallbackValue.Default : NullFallbackValue.ThrowArgumentNullException;
+        // target is always the return type for runtime target mappings
+        Debug.Assert(parameters.Target == null);
+        var targetType = method.ReturnType;
+        var sourceType = parameters.Source.Type;
+
+        // no polymorphism for extension methods...
+        // for type parameters:
+        // for the target type we assume a non-nullable by default
+        // for the source type we assume a nullable by default
+        var targetCanBeNull = targetType is ITypeParameterSymbol tpsTarget ? tpsTarget.IsNullable() ?? false : targetType.IsNullable();
+        var sourceCanBeNull = sourceType is ITypeParameterSymbol tpsSource ? tpsSource.IsNullable() ?? true : sourceType.IsNullable();
+        return !sourceCanBeNull
+            ? null
+            : targetCanBeNull
+                ? NullFallbackValue.Default
+                : NullFallbackValue.ThrowArgumentNullException;
     }
 
     private static UserMappingConfiguration GetUserMappingConfig(

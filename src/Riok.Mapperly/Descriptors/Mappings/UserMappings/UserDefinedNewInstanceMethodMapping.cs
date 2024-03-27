@@ -17,7 +17,7 @@ public class UserDefinedNewInstanceMethodMapping(
     bool enableReferenceHandling
 ) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), INewInstanceUserMapping
 {
-    public IMethodSymbol Method { get; } = method;
+    public new IMethodSymbol Method { get; } = method;
 
     public bool? Default { get; } = isDefault;
 

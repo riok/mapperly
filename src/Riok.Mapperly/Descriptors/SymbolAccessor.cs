@@ -53,27 +53,19 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     public bool HasImplicitConversion(ITypeSymbol source, ITypeSymbol destination) =>
         Compilation.ClassifyConversion(source, destination).IsImplicit && (destination.IsNullable() || !source.IsNullable());
 
-    public bool DoesTypeSatisfyTypeParameterConstraints(ITypeParameterSymbol typeParameter, ITypeSymbol type)
+    /// <summary>
+    /// Returns true when a conversion form the <paramref name="sourceType"/>
+    /// to the <paramref name="targetType"/> is possible with a conversion
+    /// of type identity, boxing or implicit and compatible nullability.
+    /// </summary>
+    /// <param name="sourceType">The source type.</param>
+    /// <param name="targetType">The target type.</param>
+    /// <returns>Whether the assignment is valid</returns>
+    public bool CanAssign(ITypeSymbol sourceType, ITypeSymbol targetType)
     {
-        if (typeParameter.HasConstructorConstraint && !HasDirectlyAccessibleParameterlessConstructor(type))
-            return false;
-
-        if (!typeParameter.IsNullable() && type.IsNullable())
-            return false;
-
-        if (typeParameter.HasValueTypeConstraint && !type.IsValueType)
-            return false;
-
-        if (typeParameter.HasReferenceTypeConstraint && !type.IsReferenceType)
-            return false;
-
-        foreach (var constraintType in typeParameter.ConstraintTypes)
-        {
-            if (!Compilation.ClassifyConversion(type, UpgradeNullable(constraintType)).IsImplicit)
-                return false;
-        }
-
-        return true;
+        var conversion = Compilation.ClassifyConversion(sourceType, targetType);
+        return (conversion.IsIdentity || conversion.IsBoxing || conversion.IsImplicit)
+            && (targetType.IsNullable() || !sourceType.IsNullable());
     }
 
     public MethodParameter? WrapOptionalMethodParameter(IParameterSymbol? symbol)
@@ -123,12 +115,8 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
                 break;
 
             case IArrayTypeSymbol { ElementType.IsValueType: false, ElementNullableAnnotation: NullableAnnotation.None } arrayTypeSymbol:
-                upgradedSymbol = compilationContext
-                    .Compilation.CreateArrayTypeSymbol(
-                        UpgradeNullable(arrayTypeSymbol.ElementType),
-                        arrayTypeSymbol.Rank,
-                        NullableAnnotation.Annotated
-                    )
+                upgradedSymbol = Compilation
+                    .CreateArrayTypeSymbol(UpgradeNullable(arrayTypeSymbol.ElementType), arrayTypeSymbol.Rank, NullableAnnotation.Annotated)
                     .WithNullableAnnotation(NullableAnnotation.Annotated);
                 break;
 

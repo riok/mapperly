@@ -26,6 +26,25 @@ public class RuntimeTargetTypeMappingTest
     }
 
     [Fact]
+    public Task WithGenericSourceAndTarget()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial IQueryable<TTarget> Map<TSource, TTarget>(IQueryable<TSource> source);
+
+            private partial IQueryable<B> ProjectToB(IQueryable<A> q);
+            private partial IQueryable<D> ProjectToD(IQueryable<C> q);
+            """,
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string Value2 { get; set; } }",
+            "class D { public string Value2 { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public void WithNonNullableReturnTypeShouldOnlyIncludeNonNullableMappings()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -49,7 +68,6 @@ public class RuntimeTargetTypeMappingTest
                 return source switch
                 {
                     global::A x when targetType.IsAssignableFrom(typeof(global::B)) => MapToB(x),
-                    null => throw new System.ArgumentNullException(nameof(source)),
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
                 };
                 """
@@ -83,7 +101,6 @@ public class RuntimeTargetTypeMappingTest
                 return source switch
                 {
                     global::A x when targetType.IsAssignableFrom(typeof(global::B)) => MapToB(x),
-                    null => throw new System.ArgumentNullException(nameof(source)),
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
                 };
                 """
@@ -119,7 +136,6 @@ public class RuntimeTargetTypeMappingTest
                     global::B x when targetType.IsAssignableFrom(typeof(global::C)) => MapBToC(x),
                     global::Base2 x when targetType.IsAssignableFrom(typeof(global::C)) => MapB2ToC(x),
                     global::Base1 x when targetType.IsAssignableFrom(typeof(global::C)) => MapB1ToC(x),
-                    null => throw new System.ArgumentNullException(nameof(source)),
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
                 };
                 """
@@ -152,7 +168,6 @@ public class RuntimeTargetTypeMappingTest
                 return source switch
                 {
                     global::Base x when targetType.IsAssignableFrom(typeof(global::BaseDto)) => MapDerivedTypes(x),
-                    null => throw new System.ArgumentNullException(nameof(source)),
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
                 };
                 """
@@ -188,7 +203,6 @@ public class RuntimeTargetTypeMappingTest
                     global::A x when targetType.IsAssignableFrom(typeof(global::D)) => MapToD(x),
                     global::C x when targetType.IsAssignableFrom(typeof(global::B)) => MapToB1(x),
                     global::C x when targetType.IsAssignableFrom(typeof(global::D)) => MapToD1(x),
-                    null => throw new System.ArgumentNullException(nameof(source)),
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
                 };
                 """
@@ -221,7 +235,6 @@ public class RuntimeTargetTypeMappingTest
                 {
                     global::A x when targetType.IsAssignableFrom(typeof(global::B)) => MapToB(x),
                     global::B x when targetType.IsAssignableFrom(typeof(global::D)) => MapToD(x),
-                    null => throw new System.ArgumentNullException(nameof(source)),
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
                 };
                 """
@@ -253,7 +266,6 @@ public class RuntimeTargetTypeMappingTest
                 return source switch
                 {
                     global::A x when targetType.IsAssignableFrom(typeof(global::B)) => MapToB(x),
-                    null => throw new System.ArgumentNullException(nameof(source)),
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
                 };
                 """

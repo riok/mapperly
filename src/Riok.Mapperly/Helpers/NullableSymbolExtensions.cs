@@ -63,19 +63,37 @@ public static class NullableSymbolExtensions
     /// Whether or not the <see cref="ITypeParameterSymbol"/> is nullable.
     /// </summary>
     /// <param name="typeParameter">The type parameter.</param>
-    /// <returns>A boolean indicating whether <c>null</c> can be used to satisfy the type parameter constraints.</returns>
-    internal static bool IsNullable(this ITypeParameterSymbol typeParameter)
+    /// <returns>A boolean indicating whether <c>null</c> can be used to satisfy the type parameter constraints. Null means unspecified.</returns>
+    internal static bool? IsNullable(this ITypeParameterSymbol typeParameter)
     {
-        if (typeParameter.NullableAnnotation == NullableAnnotation.Annotated)
+        if (typeParameter.NullableAnnotation != NullableAnnotation.NotAnnotated)
             return true;
 
         if (typeParameter.HasNotNullConstraint || typeParameter.HasValueTypeConstraint || typeParameter.HasUnmanagedTypeConstraint)
             return false;
 
-        if (typeParameter.ConstraintTypes.Length > 0 && typeParameter.ConstraintTypes.All(t => t.NullableAnnotation.IsNullable()))
-            return true;
+        bool? fallback = null;
 
-        return typeParameter.HasReferenceTypeConstraint && typeParameter.ReferenceTypeConstraintNullableAnnotation.IsNullable();
+        if (typeParameter.HasReferenceTypeConstraint)
+        {
+            if (!typeParameter.ReferenceTypeConstraintNullableAnnotation.IsNullable())
+                return false;
+
+            fallback = true;
+        }
+
+        if (typeParameter.ConstraintTypes.Length > 0)
+        {
+            foreach (var constraint in typeParameter.ConstraintTypes)
+            {
+                if (!constraint.IsNullable())
+                    return false;
+
+                fallback = true;
+            }
+        }
+
+        return fallback;
     }
 
     internal static bool IsNullableUpgraded(this ITypeSymbol symbol)
