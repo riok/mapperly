@@ -94,6 +94,9 @@ public class MapperConfigurationBuilderTest
         if (type == typeof(bool))
             return !modifiedValue;
 
+        if (type == typeof(int))
+            return !modifiedValue;
+
         if (type.IsEnum)
             return type.GetEnumValues().GetValue(modifiedValue ? 1 : 0);
 
