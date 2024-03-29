@@ -100,15 +100,6 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
 
     public INewInstanceMapping? FindNewInstanceMapping(IMethodSymbol method)
     {
-        // // check for recursion loop returning null to prevent a loop or default when recursion limit is reached.
-        // var count = _parentTypes.GetDepth(mappingKey);
-        // if (count >= 1)
-        // {
-        //     return count >= Configuration.Properties.MaxRecursionDepth + 2
-        //         ? new DefaultMemberMapping(mappingKey.Source, mappingKey.Target)
-        //         : null;
-        // }
-
         INewInstanceMapping? mapping = InlinedMappings.FindNewInstanceUserMapping(method, out var isInlined);
         if (mapping == null)
             return null;
