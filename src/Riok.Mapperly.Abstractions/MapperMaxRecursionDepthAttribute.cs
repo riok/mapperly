@@ -13,7 +13,7 @@ public sealed class MapperMaxRecursionDepthAttribute : Attribute
     /// Defines the maximum recursion depth that an IQueryable mapping will use.
     /// </summary>
     /// <param name="maxRecursionDepth">The maximum recursion depth used when mapping IQueryable members.</param>
-    public MapperMaxRecursionDepthAttribute(int maxRecursionDepth)
+    public MapperMaxRecursionDepthAttribute(uint maxRecursionDepth)
     {
         MaxRecursionDepth = maxRecursionDepth;
     }
@@ -21,5 +21,5 @@ public sealed class MapperMaxRecursionDepthAttribute : Attribute
     /// <summary>
     /// The maximum recursion depth used when mapping IQueryable members.
     /// </summary>
-    public int MaxRecursionDepth { get; }
+    public uint MaxRecursionDepth { get; }
 }

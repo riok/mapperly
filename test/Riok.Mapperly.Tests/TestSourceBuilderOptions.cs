@@ -21,7 +21,7 @@ public record TestSourceBuilderOptions(
     bool Static = false,
     bool PreferParameterlessConstructors = true,
     bool AutoUserMappings = true,
-    int? MaxRecursionDepth = null
+    uint? MaxRecursionDepth = null
 )
 {
     public const string DefaultMapperClassName = "Mapper";

@@ -158,5 +158,5 @@ Riok.Mapperly.Abstractions.MapPropertyAttribute.Use.set -> void
 Riok.Mapperly.Abstractions.MapperAttribute.MaxRecursionDepth.get -> int
 Riok.Mapperly.Abstractions.MapperAttribute.MaxRecursionDepth.set -> void
 Riok.Mapperly.Abstractions.MapperMaxRecursionDepthAttribute
-Riok.Mapperly.Abstractions.MapperMaxRecursionDepthAttribute.MapperMaxRecursionDepthAttribute(int maxRecursionDepth) -> void
-Riok.Mapperly.Abstractions.MapperMaxRecursionDepthAttribute.MaxRecursionDepth.get -> int
+Riok.Mapperly.Abstractions.MapperMaxRecursionDepthAttribute.MapperMaxRecursionDepthAttribute(uint maxRecursionDepth) -> void
+Riok.Mapperly.Abstractions.MapperMaxRecursionDepthAttribute.MaxRecursionDepth.get -> uint

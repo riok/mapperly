@@ -119,5 +119,5 @@ public record MapperConfiguration
     /// <summary>
     /// Defines the maximum recursion depth that an IQueryable mapping will use.
     /// </summary>
-    public int? MaxRecursionDepth { get; init; }
+    public uint? MaxRecursionDepth { get; init; }
 }
