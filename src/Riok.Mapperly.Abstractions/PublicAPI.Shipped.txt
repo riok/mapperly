@@ -155,7 +155,7 @@ Riok.Mapperly.Abstractions.UserMappingAttribute.Default.get -> bool
 Riok.Mapperly.Abstractions.UserMappingAttribute.Default.set -> void
 Riok.Mapperly.Abstractions.MapPropertyAttribute.Use.get -> string?
 Riok.Mapperly.Abstractions.MapPropertyAttribute.Use.set -> void
-Riok.Mapperly.Abstractions.MapperAttribute.MaxRecursionDepth.get -> int
+Riok.Mapperly.Abstractions.MapperAttribute.MaxRecursionDepth.get -> uint
 Riok.Mapperly.Abstractions.MapperAttribute.MaxRecursionDepth.set -> void
 Riok.Mapperly.Abstractions.MapperMaxRecursionDepthAttribute
 Riok.Mapperly.Abstractions.MapperMaxRecursionDepthAttribute.MapperMaxRecursionDepthAttribute(uint maxRecursionDepth) -> void
