@@ -121,6 +121,19 @@ public class MapperGenerationResultAssertions
     public MapperGenerationResultAssertions HaveMapMethodBody([StringSyntax(StringSyntax.CSharp)] string mapperMethodBody) =>
         HaveMethodBody(TestSourceBuilder.DefaultMapMethodName, mapperMethodBody);
 
+    public MapperGenerationResultAssertions HaveMapMethodWithGenericConstraints(
+        string methodName,
+        [StringSyntax(StringSyntax.CSharp)] string? constraintClauses
+    )
+    {
+        _mapper.Methods[methodName].ConstraintClauses.Should().Be(constraintClauses);
+        return this;
+    }
+
+    public MapperGenerationResultAssertions HaveMapMethodWithGenericConstraints(
+        [StringSyntax(StringSyntax.CSharp)] string? constraintClauses
+    ) => HaveMapMethodWithGenericConstraints(TestSourceBuilder.DefaultMapMethodName, constraintClauses);
+
     private IReadOnlyCollection<Diagnostic> GetDiagnostics(DiagnosticDescriptor descriptor)
     {
         if (_mapper.DiagnosticsByDescriptorId.TryGetValue(descriptor.Id, out var diagnostics))

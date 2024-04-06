@@ -4,7 +4,7 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private partial TTarget Map<TSource, TTarget, TSource2, TTarget2>(TSource source)
+    private partial TTarget Map<TSource, TTarget, TSource2, TTarget2>(TSource source) where TSource : global::System.Linq.IQueryable<TSource2> where TTarget : global::System.Linq.IQueryable<TTarget2>
     {
         return source switch
         {

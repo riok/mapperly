@@ -86,6 +86,9 @@ internal static class SyntaxIndentationExtensions
         return syntax.WithTrailingTrivia(trivia);
     }
 
+    public static TSyntax AddLeadingSpace<TSyntax>(this TSyntax syntax)
+        where TSyntax : SyntaxNode => syntax.WithLeadingTrivia(syntax.GetLeadingTrivia().Add(ElasticSpace));
+
     public static TSyntax AddTrailingSpace<TSyntax>(this TSyntax syntax)
         where TSyntax : SyntaxNode => syntax.WithTrailingTrivia(syntax.GetTrailingTrivia().Add(ElasticSpace));
 
