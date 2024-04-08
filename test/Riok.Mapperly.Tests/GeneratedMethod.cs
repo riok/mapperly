@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Riok.Mapperly.Tests;
@@ -8,6 +9,7 @@ public class GeneratedMethod
     {
         Name = declarationSyntax.Identifier.ToString();
         Signature = $"{declarationSyntax.ReturnType.ToString()} {Name}{declarationSyntax.ParameterList.ToString().Trim()}";
+        ConstraintClauses = ExtractParameterConstraints(declarationSyntax.ConstraintClauses);
         Body = ExtractBody(declarationSyntax);
     }
 
@@ -15,7 +17,17 @@ public class GeneratedMethod
 
     public string Signature { get; }
 
+    public string? ConstraintClauses { get; }
+
     public string Body { get; }
+
+    private static string? ExtractParameterConstraints(SyntaxList<TypeParameterConstraintClauseSyntax> typeParameterConstraints)
+    {
+        if (typeParameterConstraints.Count == 0)
+            return null;
+
+        return typeParameterConstraints.ToFullString().Trim(' ', '\r', '\n').ReplaceLineEndings();
+    }
 
     /// <summary>
     /// Builds the method body without the method body braces and without the method body level indentation.

@@ -122,7 +122,8 @@ public class GenericTest
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints(null);
     }
 
     [Fact]
@@ -135,11 +136,14 @@ public class GenericTest
 
             partial B MapToB(A source);
             partial D MapToD(C source);
+            partial F MapToF(E source);
             """,
-            "record struct A(string Value);",
+            "record A(string Value);",
             "record struct B(string Value);",
             "record C(string Value1);",
-            "record D(string Value1);"
+            "record D(string Value1);",
+            "record E(string Value) : A(Value);",
+            "record struct F(string Value) : B(Value);"
         );
         TestHelper
             .GenerateMapper(source)
@@ -148,13 +152,13 @@ public class GenericTest
                 """
                 return source switch
                 {
+                    global::E x => MapToF(x),
                     global::A x => MapToB(x),
-                    global::C x => MapToD(x),
-                    null => throw new System.ArgumentNullException(nameof(source)),
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints("where TSource : global::A");
     }
 
     [Fact]
@@ -185,7 +189,8 @@ public class GenericTest
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints("where TSource : notnull");
     }
 
     [Fact]
@@ -215,7 +220,8 @@ public class GenericTest
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints("where TSource : struct");
     }
 
     [Fact]
@@ -245,7 +251,8 @@ public class GenericTest
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints("where TSource : unmanaged");
     }
 
     [Fact]
@@ -275,7 +282,8 @@ public class GenericTest
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints("where TSource : class");
     }
 
     [Fact]
@@ -306,7 +314,8 @@ public class GenericTest
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints("where TSource : class");
     }
 
     [Fact]
@@ -337,7 +346,8 @@ public class GenericTest
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints("where TSource : class");
     }
 
     [Fact]
@@ -369,7 +379,8 @@ public class GenericTest
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints("where TSource : class where TTarget : class");
     }
 
     [Fact]
@@ -404,7 +415,8 @@ public class GenericTest
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(global::BaseDto)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints(null);
     }
 
     [Fact]
@@ -434,7 +446,8 @@ public class GenericTest
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints(null);
     }
 
     [Fact]
@@ -464,7 +477,8 @@ public class GenericTest
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints("where TTarget : global::D");
     }
 
     [Fact]
@@ -498,7 +512,8 @@ public class GenericTest
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints(null);
     }
 
     [Fact]
@@ -529,7 +544,8 @@ public class GenericTest
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints("where TSource : global::C where TTarget : global::D");
     }
 
     [Fact]
@@ -562,7 +578,26 @@ public class GenericTest
                     _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
-            );
+            )
+            .HaveMapMethodWithGenericConstraints(null);
+    }
+
+    [Fact]
+    public Task WithGenericConstructorConstraint()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial TTarget Map<TSource, TTarget>(TSource source) where TSource : new() where TTarget : new();
+
+            private partial B MapToB(A source);
+            private partial D MapToD(C source);
+            """,
+            "record struct A(string Value) { public A() : this(default!) {} }",
+            "record struct B(string Value) { public B() : this(default!) {} }",
+            "record C(string Value1);",
+            "record D(string Value1);"
+        );
+        return TestHelper.VerifyGenerator(source);
     }
 
     [Fact]
