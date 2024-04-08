@@ -2,19 +2,24 @@ name: test
 
 on:
   workflow_call:
-    secrets:
-      CODECOV_TOKEN:
-        required: false
   pull_request:
     branches:
       - '**'
   push:
     branches:
       - main
+  # run on the first day of each month
+  # since the coverage artifacts will expire after 35d
+  schedule:
+    - cron: '0 0 1 * *'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+permissions:
+  # needed to write the coverage PR comment
+  pull-requests: write
 
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
@@ -23,15 +28,34 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      # needed to write the coverage PR comment
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
       - run: dotnet build /p:TreatWarningsAsErrors=true
-      - run: dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
-      - uses: codecov/codecov-action@v4
+      - run: dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+      - uses: danielpalme/ReportGenerator-GitHub-Action@5
         with:
-          fail_ci_if_error: true
-          token: ${{ secrets.CODECOV_TOKEN }}
+          reports: 'test/**/*cobertura.xml'
+          reporttypes: 'Cobertura'
+          targetdir: '${{ github.workspace }}'
+      - uses: clearlyip/code-coverage-report-action@v4
+        id: code_coverage_report_action
+        # dont run for dependabot
+        if: ${{ github.actor != 'dependabot[bot]'}}
+        with:
+          filename: 'Cobertura.xml'
+          fail_on_negative_difference: true
+          negative_difference_threshold: 5
+          overall_coverage_fail_threshold: 75
+          retention_days: 35
+      - uses: marocchino/sticky-pull-request-comment@v2
+        if: steps.code_coverage_report_action.outputs.file != '' && github.event_name == 'pull_request' && (success() || failure())
+        with:
+          recreate: true
+          path: code-coverage-results.md
   package:
     runs-on: ubuntu-latest
     steps:

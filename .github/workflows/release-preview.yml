@@ -12,8 +12,6 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/test.yml
-    secrets:
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   release-preview:
     if: ${{ inputs.create_preview_release }}
