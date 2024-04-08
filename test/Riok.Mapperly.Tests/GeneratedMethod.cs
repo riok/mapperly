@@ -26,7 +26,7 @@ public class GeneratedMethod
         if (typeParameterConstraints.Count == 0)
             return null;
 
-        return typeParameterConstraints.ToFullString().Trim(' ', '\r', '\n').Trim('\r', '\n').ReplaceLineEndings();
+        return typeParameterConstraints.ToFullString().Trim(' ', '\r', '\n').ReplaceLineEndings();
     }
 
     /// <summary>
