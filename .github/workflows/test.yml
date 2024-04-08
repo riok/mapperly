@@ -2,7 +2,8 @@ name: test
 
 on:
   workflow_call:
-  pull_request:
+  workflow_dispatch:
+  pull_request_target:
     branches:
       - '**'
   push:
@@ -16,10 +17,6 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
-
-permissions:
-  # needed to write the coverage PR comment
-  pull-requests: write
 
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
@@ -52,7 +49,7 @@ jobs:
           overall_coverage_fail_threshold: 75
           retention_days: 35
       - uses: marocchino/sticky-pull-request-comment@v2
-        if: steps.code_coverage_report_action.outputs.file != '' && github.event_name == 'pull_request' && (success() || failure())
+        if: steps.code_coverage_report_action.outputs.file != '' && github.event_name == 'pull_request_target' && (success() || failure())
         with:
           recreate: true
           path: code-coverage-results.md
