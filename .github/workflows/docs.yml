@@ -98,6 +98,11 @@ jobs:
         with:
           _input-text: ${{ inputs.environment }}
           stable: main
+      # we never want to deploy with no version set
+      # stop the deployment here
+      - name: Version not set
+        if: ${{ inputs.version }} == ''
+        run: exit 1
       - uses: cloudflare/pages-action@v1
         id: deployment
         with:
