@@ -28,8 +28,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
       - run: dotnet build /p:TreatWarningsAsErrors=true
-      - run: dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+      - run: dotnet test --no-build --logger 'junit' /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
+      - uses: test-summary/action@v2
+        if: always()
+        with:
+          paths: 'test/**/TestResults/**/*.xml'
       - uses: danielpalme/ReportGenerator-GitHub-Action@5
+        if: always()
         with:
           reports: 'test/**/*cobertura.xml'
           reporttypes: 'Cobertura'
@@ -37,7 +42,7 @@ jobs:
       - uses: clearlyip/code-coverage-report-action@v4
         id: code_coverage_report_action
         # dont run for dependabot
-        if: ${{ github.actor != 'dependabot[bot]'}}
+        if: always() && ${{ github.actor != 'dependabot[bot]'}}
         with:
           filename: 'Cobertura.xml'
           overall_coverage_fail_threshold: 75
