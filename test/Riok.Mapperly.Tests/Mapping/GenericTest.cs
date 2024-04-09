@@ -474,6 +474,51 @@ public class GenericTest
     }
 
     [Fact]
+    public Task WithGenericTargetMixedMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial TTarget Map<TTarget>(object source);
+
+            partial B MapToBInternal(A source);
+
+            B MapToB(A source) => MapToBInternal(source);
+
+            partial D MapToD(C source);
+            """,
+            "record struct A(string Value);",
+            "record struct B(string Value);",
+            "record C(string Value1);",
+            "record D(string Value1);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithGenericTargetMixedMappingWithUserMappingAttribute()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial TTarget Map<TTarget>(object source);
+
+            partial B MapToBInternal(A source);
+
+            [UserMapping(Default = true)]
+            B MapToB(A source) => MapToBInternal(source);
+
+            partial D MapToD(C source);
+            """,
+            "record struct A(string Value);",
+            "record struct B(string Value);",
+            "record C(string Value1);",
+            "record D(string Value1);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public void WithGenericTargetTypeConstraints()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
