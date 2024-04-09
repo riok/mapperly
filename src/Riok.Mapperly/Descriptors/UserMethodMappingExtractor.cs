@@ -113,6 +113,7 @@ public static class UserMethodMappingExtractor
         return method.MethodKind == MethodKind.Ordinary
             && ctx.SymbolAccessor.IsDirectlyAccessible(method)
             && !SymbolEqualityComparer.Default.Equals(method.ReceiverType, ctx.Compilation.ObjectType)
+            && !ctx.SymbolAccessor.HasAttribute<ObjectFactoryAttribute>(method)
             && (
                 !requireAttribute
                 || ctx.SymbolAccessor.HasAttribute<UserMappingAttribute>(method)

@@ -451,6 +451,29 @@ public class GenericTest
     }
 
     [Fact]
+    public Task WithGenericTargetMapWithObjectFactory()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial TTarget Map<TTarget>(object source);
+
+            [ObjectFactory]
+            B CreateB(A source) => new B(default!);
+
+            partial B MapToB(A source);
+
+            partial D MapToD(C source);
+            """,
+            "record struct A(string Value);",
+            "record struct B(string Value);",
+            "record C(string Value1);",
+            "record D(string Value1);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public void WithGenericTargetTypeConstraints()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
