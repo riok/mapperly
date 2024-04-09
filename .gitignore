@@ -11,6 +11,9 @@ obj/
 # dot user settings
 *.DotSettings.user
 
+# test logs
+**/TestResults/**/*.xml
+
 # code coverage results
 *.coverage
 *.coveragexml
