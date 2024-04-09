@@ -101,7 +101,7 @@ jobs:
       # we never want to deploy with no version set
       # stop the deployment here
       - name: Version not set
-        if: ${{ inputs.version }} == ''
+        if: ${{ inputs.version == '' || inputs.version == '0.0.1-dev' }}
         run: exit 1
       - uses: cloudflare/pages-action@v1
         id: deployment
