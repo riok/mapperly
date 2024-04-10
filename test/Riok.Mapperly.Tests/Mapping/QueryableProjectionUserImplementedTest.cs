@@ -119,4 +119,22 @@ public class QueryableProjectionUserImplementedTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task ClassToClassUserImplementedWithUsingMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+
+            private static DateTimeOffset MapToDateTimeOffset(
+                DateTime dateTime
+            ) => new(dateTime, TimeSpan.Zero);
+            """,
+            "class A { public DateTime Value { get; set; } }",
+            "class B { public DateTimeOffset Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

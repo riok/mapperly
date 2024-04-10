@@ -55,6 +55,18 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
         return node.WithArguments(SeparatedList(args));
     }
 
+    public override SyntaxNode? VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
+    {
+        if (semanticModel.GetSymbolInfo(node.Expression).Symbol is ITypeSymbol namedTypeSymbol)
+        {
+            var expression = FullyQualifiedIdentifier(namedTypeSymbol).WithTriviaFrom(node.Expression);
+
+            return node.WithExpression(expression);
+        }
+
+        return base.VisitMemberAccessExpression(node);
+    }
+
     public override SyntaxNode VisitArrayType(ArrayTypeSyntax node)
     {
         var fullyQualifiedElementType = FullyQualifiedType(node.ElementType);
