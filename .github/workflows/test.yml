@@ -42,7 +42,7 @@ jobs:
       - uses: clearlyip/code-coverage-report-action@v4
         id: code_coverage_report_action
         # dont run for dependabot
-        if: always() && ${{ github.actor != 'dependabot[bot]'}}
+        if: ${{ always() && github.actor != 'dependabot[bot]'}}
         with:
           filename: 'Cobertura.xml'
           overall_coverage_fail_threshold: 75
