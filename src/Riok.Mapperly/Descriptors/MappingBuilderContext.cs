@@ -175,7 +175,16 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null
     )
     {
-        return FindMapping(key) ?? FindOrBuildMapping(key.NonNullable(), options, diagnosticLocation);
+        if (FindMapping(key) is { } mapping)
+            return mapping;
+
+        // if a user mapping is referenced
+        // build it with the exact types
+        // as it may expect a nullable source type
+        if (key.Configuration.UseNamedMapping != null)
+            return BuildMapping(key, options, diagnosticLocation);
+
+        return FindOrBuildMapping(key.NonNullable(), options, diagnosticLocation);
     }
 
     /// <summary>
