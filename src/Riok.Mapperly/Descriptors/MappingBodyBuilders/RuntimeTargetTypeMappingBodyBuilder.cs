@@ -41,7 +41,10 @@ public static class RuntimeTargetTypeMappingBodyBuilder
     }
 
     private static IEnumerable<INewInstanceUserMapping> GetUserMappingCandidates(MappingBuilderContext ctx) =>
-        ctx.UserMappings.Where(x => x is not UserDefinedNewInstanceRuntimeTargetTypeMapping).OfType<INewInstanceUserMapping>();
+        ctx
+            .NewInstanceMappings.Select(x => x.Value)
+            .Where(x => x is not UserDefinedNewInstanceRuntimeTargetTypeMapping)
+            .OfType<INewInstanceUserMapping>();
 
     private static void BuildMappingBody(
         MappingBuilderContext ctx,

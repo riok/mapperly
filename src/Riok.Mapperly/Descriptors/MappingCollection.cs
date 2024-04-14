@@ -47,6 +47,9 @@ public class MappingCollection
     /// <inheritdoc cref="_userMappings"/>
     public IReadOnlyCollection<IUserMapping> UserMappings => _userMappings;
 
+    /// <inheritdoc cref="MappingCollectionInstance{INewInstanceMapping, INewInstanceUserMapping}.DefaultMappings"/>
+    public IReadOnlyDictionary<TypeMappingKey, INewInstanceMapping> NewInstanceMappings => _newInstanceMappings.DefaultMappings;
+
     /// <inheritdoc cref="MappingCollectionInstance{T,TUserMapping}.UsedDuplicatedNonDefaultNonReferencedUserMappings"/>
     public IEnumerable<IUserMapping> UsedDuplicatedNonDefaultNonReferencedUserMappings =>
         _newInstanceMappings
@@ -168,6 +171,9 @@ public class MappingCollection
         /// All mappings for which <see cref="FindNamed"/> was called and returned a non-null result.
         /// </summary>
         private readonly HashSet<TUserMapping> _referencedNamedMappings = new();
+
+        /// <inheritdoc cref="_defaultMappings"/>
+        public IReadOnlyDictionary<TypeMappingKey, T> DefaultMappings => _defaultMappings;
 
         /// <inheritdoc cref="_duplicatedNonDefaultUserMappings"/>
         /// <remarks>
