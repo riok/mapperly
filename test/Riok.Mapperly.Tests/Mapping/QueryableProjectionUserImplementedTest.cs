@@ -127,12 +127,46 @@ public class QueryableProjectionUserImplementedTest
             """
             private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
 
-            private static DateTimeOffset MapToDateTimeOffset(
-                DateTime dateTime
-            ) => new(dateTime, TimeSpan.Zero);
+            private static DateTimeOffset MapToDateTimeOffset(DateTime dateTime)
+                => new DateTimeOffset(dateTime, TimeSpan.Zero);
             """,
             "class A { public DateTime Value { get; set; } }",
             "class B { public DateTimeOffset Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ClassToClassUserImplementedWithTargetTypeNew()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+
+            private static DateTimeOffset MapToDateTimeOffset(DateTime dateTime)
+                => new(dateTime, TimeSpan.Zero);
+            """,
+            "class A { public DateTime Value { get; set; } }",
+            "class B { public DateTimeOffset Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ClassToClassUserImplementedWithTargetTypeNewInitializer()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+
+            private static C MapIt(DateTime dateTime)
+                => new(1) { Value2 = 10 };
+            """,
+            "class A { public DateTime Value { get; set; } }",
+            "class B { public C Value { get; set; } }",
+            "class C(int value1) { public int Value2 { set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);
