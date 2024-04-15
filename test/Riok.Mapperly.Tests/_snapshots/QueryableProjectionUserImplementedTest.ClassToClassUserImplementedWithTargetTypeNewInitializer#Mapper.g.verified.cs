@@ -9,7 +9,7 @@ public partial class Mapper
 #nullable disable
         return System.Linq.Queryable.Select(source, x => new global::B()
         {
-            Value = new global::System.DateTimeOffset(x.Value, global::System.TimeSpan.Zero),
+            Value = new global::C(1) { Value2 = 10 },
         });
 #nullable enable
     }

@@ -60,11 +60,31 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
         if (semanticModel.GetSymbolInfo(node.Expression).Symbol is ITypeSymbol namedTypeSymbol)
         {
             var expression = FullyQualifiedIdentifier(namedTypeSymbol).WithTriviaFrom(node.Expression);
-
             return node.WithExpression(expression);
         }
 
         return base.VisitMemberAccessExpression(node);
+    }
+
+    public override SyntaxNode VisitImplicitObjectCreationExpression(ImplicitObjectCreationExpressionSyntax node)
+    {
+        if (
+            semanticModel.GetSymbolInfo(node).Symbol is IMethodSymbol
+            {
+                MethodKind: MethodKind.Constructor,
+                ReceiverType: not null
+            } ctorSymbol
+        )
+        {
+            return ObjectCreationExpression(
+                TrailingSpacedToken(SyntaxKind.NewKeyword),
+                FullyQualifiedIdentifier(ctorSymbol.ReceiverType),
+                (ArgumentListSyntax?)base.VisitArgumentList(node.ArgumentList),
+                node.Initializer == null ? null : (InitializerExpressionSyntax?)base.VisitInitializerExpression(node.Initializer)
+            );
+        }
+
+        return node;
     }
 
     public override SyntaxNode VisitArrayType(ArrayTypeSyntax node)

@@ -44,7 +44,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 } : default,
                 DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(x.DateTimeValueTargetDateOnly),
                 DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(x.DateTimeValueTargetTimeOnly),
-                ManuallyMapped = new(100) { StringValue = x.ManuallyMapped },
+                ManuallyMapped = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoManuallyMappedProjection(100) { StringValue = x.ManuallyMapped },
                 ManuallyMappedModified = x.ManuallyMappedModified + 10,
                 ManuallyMappedList = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(x.ManuallyMappedList, x1 => x1.Value)),
                 IntegerValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.OrderBy(x.IntegerValues, x => x.Value)),
