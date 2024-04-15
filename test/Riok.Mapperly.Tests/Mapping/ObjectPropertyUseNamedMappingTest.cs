@@ -347,4 +347,34 @@ public class ObjectPropertyUseNamedMappingTest
         );
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task ShouldPassNullValueToNullableUserMappingMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(MapString)]
+            public partial B Map(A source);
+
+            [UserMapping(Default = false)]
+            private string MapString(string? source)
+                => source ?? "(null)";
+            """,
+            """
+            class A
+            {
+                public string? Value { get; }
+                public string? Value2 { get; }
+            }
+            """,
+            """
+            class B
+            {
+                public string Value { set; }
+                public string Value2 { set; }
+            }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
 }
