@@ -34,15 +34,15 @@
     "@docusaurus/eslint-plugin": "3.2.1",
     "@docusaurus/module-type-aliases": "3.2.1",
     "@docusaurus/tsconfig": "3.2.1",
-    "@types/react": "18.2.57",
-    "@typescript-eslint/eslint-plugin": "6.21.0",
-    "hast-util-to-html": "9.0.0",
+    "@types/react": "18.2.79",
+    "@typescript-eslint/eslint-plugin": "7.7.0",
+    "hast-util-to-html": "9.0.1",
     "marked": "11.2.0",
     "prettier": "3.2.5",
-    "stylelint": "16.2.1",
+    "stylelint": "16.3.1",
     "stylelint-config-standard": "36.0.0",
     "ts-node": "10.9.2",
-    "typescript": "5.3.3",
+    "typescript": "5.4.5",
     "unist-util-visit": "5.0.0"
   },
   "browserslist": {
@@ -58,6 +58,6 @@
     ]
   },
   "engines": {
-    "node": ">=18.16"
+    "node": ">=20.12.2"
   }
 }
