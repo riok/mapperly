@@ -61,6 +61,12 @@
     StringValue: ,
     RenamedStringValue: ,
     Flattening: {},
+    Extension: {
+      ExtensionId: 123,
+      ExtensionNested: {
+        IntValue: 223
+      }
+    },
     ImmutableArrayValue: null,
     ImmutableQueueValue: [],
     ImmutableStackValue: [],

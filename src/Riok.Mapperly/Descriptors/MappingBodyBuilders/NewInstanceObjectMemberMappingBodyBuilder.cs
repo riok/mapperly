@@ -34,8 +34,6 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
     private static void BuildInitMemberMappings(INewInstanceBuilderContext<IMapping> ctx, bool includeAllMembers = false)
     {
-        var ignoreCase = ctx.BuilderContext.Configuration.Mapper.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
-
         var initOnlyTargetMembers = includeAllMembers
             ? ctx.TargetMembers.Values.ToArray()
             : ctx.TargetMembers.Values.Where(x => x.CanOnlySetViaInitializer()).ToArray();
@@ -49,15 +47,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 continue;
             }
 
-            if (
-                !ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
-                    ctx.Mapping.SourceType,
-                    MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
-                    ctx.IgnoredSourceMemberNames,
-                    ignoreCase,
-                    out var sourceMemberPath
-                )
-            )
+            if (!ctx.TryFindNestedSourceMembersPath(targetMember.Name, out var sourceMemberPath))
             {
                 if (targetMember.IsRequired)
                 {
@@ -308,13 +298,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             || !ctx.MemberConfigsByRootTargetName.TryGetValue(parameterName, out var memberConfigs)
         )
         {
-            return ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
-                ctx.Mapping.SourceType,
-                MemberPathCandidateBuilder.BuildMemberPathCandidates(parameter.Name),
-                ctx.IgnoredSourceMemberNames,
-                true,
-                out sourcePath
-            );
+            return ctx.TryFindNestedSourceMembersPath(parameter.Name, out sourcePath, true);
         }
 
         if (memberConfigs.Count > 1)

@@ -40,15 +40,7 @@ public static class ObjectMemberMappingBodyBuilder
                 continue;
             }
 
-            if (
-                ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
-                    ctx.Mapping.SourceType,
-                    MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
-                    ctx.IgnoredSourceMemberNames,
-                    ignoreCase,
-                    out var sourceMemberPath
-                )
-            )
+            if (ctx.TryFindNestedSourceMembersPath(targetMember.Name, out var sourceMemberPath))
             {
                 BuildMemberAssignmentMapping(ctx, sourceMemberPath, new MemberPath(new[] { targetMember }));
                 continue;

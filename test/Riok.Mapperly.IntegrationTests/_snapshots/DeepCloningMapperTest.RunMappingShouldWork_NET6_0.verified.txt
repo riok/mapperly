@@ -19,6 +19,12 @@
     IntValue: 100
   },
   NestedNullableTargetNotNullable: {},
+  Extension: {
+    ExtensionId: 12,
+    ExtensionNested: {
+      IntValue: 22
+    }
+  },
   StringNullableTargetNotNullable: fooBar3,
   TupleValue: {
     Item1: 10,
@@ -52,6 +58,12 @@
     StringValue: ,
     RenamedStringValue: ,
     Flattening: {},
+    Extension: {
+      ExtensionId: 123,
+      ExtensionNested: {
+        IntValue: 223
+      }
+    },
     MemoryValue: {
       IsEmpty: true
     },

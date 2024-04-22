@@ -38,6 +38,7 @@ public class MapperConfigurationReader
                 Array.Empty<string>(),
                 Array.Empty<string>(),
                 Array.Empty<MemberMappingConfiguration>(),
+                Array.Empty<NestedMembersMappingConfiguration>(),
                 mapper.IgnoreObsoleteMembersStrategy,
                 mapper.RequiredMappingStrategy
             ),
@@ -82,6 +83,9 @@ public class MapperConfigurationReader
             .WhereNotNull()
             .ToList();
         var memberConfigurations = _dataAccessor.Access<MapPropertyAttribute, MemberMappingConfiguration>(configRef.Method).ToList();
+        var nestedMembersConfigurations = _dataAccessor
+            .Access<MapNestedPropertiesAttribute, NestedMembersMappingConfiguration>(configRef.Method)
+            .ToList();
         var ignoreObsolete = _dataAccessor
             .AccessFirstOrDefault<MapperIgnoreObsoleteMembersAttribute>(configRef.Method)
             ?.IgnoreObsoleteStrategy;
@@ -115,6 +119,7 @@ public class MapperConfigurationReader
             ignoredSourceMembers,
             ignoredTargetMembers,
             memberConfigurations,
+            nestedMembersConfigurations,
             ignoreObsolete ?? MapperConfiguration.Members.IgnoreObsoleteMembersStrategy,
             requiredMapping ?? MapperConfiguration.Members.RequiredMappingStrategy
         );
