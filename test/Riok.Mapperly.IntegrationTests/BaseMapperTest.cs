@@ -155,7 +155,9 @@ namespace Riok.Mapperly.IntegrationTests
                 IReadOnlySet = new HashSet<string> { "1", "2", "3", },
 #endif
                 HashSet = new HashSet<string> { "1", "2", "3", },
-                SortedSet = new SortedSet<string> { "1", "2", "3", }
+                SortedSet = new SortedSet<string> { "1", "2", "3", },
+                SumComponent1 = 32,
+                SumComponent2 = 64
             };
         }
 

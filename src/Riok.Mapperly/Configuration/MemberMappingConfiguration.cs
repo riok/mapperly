@@ -4,6 +4,9 @@ namespace Riok.Mapperly.Configuration;
 
 public record MemberMappingConfiguration(StringMemberPath Source, StringMemberPath Target) : HasSyntaxReference
 {
+    public MemberMappingConfiguration(StringMemberPath Target)
+        : this(Source: StringMemberPath.Empty, Target) { }
+
     public string? StringFormat { get; set; }
 
     public string? FormatProvider { get; set; }

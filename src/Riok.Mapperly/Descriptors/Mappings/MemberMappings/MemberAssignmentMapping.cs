@@ -15,7 +15,7 @@ public class MemberAssignmentMapping(SetterMemberPath targetPath, IMemberMapping
 
     public GetterMemberPath SourcePath => _mapping.SourcePath;
 
-    public MemberPath TargetPath => targetPath;
+    public NonEmptyMemberPath TargetPath => targetPath;
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess) =>
         ctx.SyntaxFactory.SingleStatement(BuildExpression(ctx, targetAccess));

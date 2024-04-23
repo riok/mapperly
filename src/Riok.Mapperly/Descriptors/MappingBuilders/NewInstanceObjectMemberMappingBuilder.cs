@@ -10,7 +10,7 @@ public static class NewInstanceObjectMemberMappingBuilder
 {
     public static INewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
-        if (ctx.Target.SpecialType != SpecialType.None || ctx.Source.SpecialType != SpecialType.None)
+        if (ctx.Target.SpecialType != SpecialType.None)
             return null;
 
         if (ctx.Source.IsDelegate() || ctx.Target.IsDelegate())

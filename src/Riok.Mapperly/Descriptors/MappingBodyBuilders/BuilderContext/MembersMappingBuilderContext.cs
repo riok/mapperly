@@ -57,7 +57,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
 
         // source and target properties may have been ignored and mapped explicitly
         _mappedAndIgnoredSourceMemberNames = MemberConfigsByRootTargetName
-            .Values.SelectMany(v => v.Select(s => s.Source.Path.First()))
+            .Values.SelectMany(v => v.Where(s => s.Source.Path.Count > 0).Select(s => s.Source.Path.First()))
             .ToHashSet();
         _mappedAndIgnoredSourceMemberNames.IntersectWith(IgnoredSourceMemberNames);
 
@@ -113,7 +113,12 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     protected void SetSourceMemberMapped(MemberPath sourcePath)
     {
         _hasMemberMapping = true;
-        _unmappedSourceMemberNames.Remove(sourcePath.Path.First().Name);
+
+        if (sourcePath.Path.FirstOrDefault() is { } sourceMember)
+            _unmappedSourceMemberNames.Remove(sourceMember.Name);
+        else
+            // Assume all source members are used when the source object is used itself.
+            _unmappedSourceMemberNames.Clear();
     }
 
     public bool TryFindNestedSourceMembersPath(

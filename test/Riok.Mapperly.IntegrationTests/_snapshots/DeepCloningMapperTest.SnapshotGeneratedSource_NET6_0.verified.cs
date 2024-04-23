@@ -140,6 +140,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.DateTimeValue = src.DateTimeValue;
             target.DateTimeValueTargetDateOnly = src.DateTimeValueTargetDateOnly;
             target.DateTimeValueTargetTimeOnly = src.DateTimeValueTargetTimeOnly;
+            target.SumComponent1 = src.SumComponent1;
+            target.SumComponent2 = src.SumComponent2;
             return target;
         }
 

@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Emit.Syntax;
@@ -49,19 +48,13 @@ public class GetterMemberPath : MemberPath
     }
 
     public ExpressionSyntax BuildAccess(
-        ExpressionSyntax? baseAccess,
+        ExpressionSyntax baseAccess,
         bool addValuePropertyOnNullable = false,
         bool nullConditional = false,
         bool skipTrailingNonNullable = false
     )
     {
         var path = skipTrailingNonNullable ? PathWithoutTrailingNonNullable() : Path;
-
-        if (baseAccess == null)
-        {
-            baseAccess = SyntaxFactory.IdentifierName(path.First().Name);
-            path = path.Skip(1);
-        }
 
         if (nullConditional)
         {

@@ -10,7 +10,7 @@ public interface IMemberAssignmentMapping
 {
     GetterMemberPath SourcePath { get; }
 
-    MemberPath TargetPath { get; }
+    NonEmptyMemberPath TargetPath { get; }
 
     IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess);
 }

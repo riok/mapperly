@@ -82,7 +82,10 @@ public class MapperConfigurationReader
             .Select(x => x.Target)
             .WhereNotNull()
             .ToList();
-        var memberConfigurations = _dataAccessor.Access<MapPropertyAttribute, MemberMappingConfiguration>(configRef.Method).ToList();
+        var memberConfigurations = _dataAccessor
+            .Access<MapPropertyAttribute, MemberMappingConfiguration>(configRef.Method)
+            .Concat(_dataAccessor.Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(configRef.Method))
+            .ToList();
         var nestedMembersConfigurations = _dataAccessor
             .Access<MapNestedPropertiesAttribute, NestedMembersMappingConfiguration>(configRef.Method)
             .ToList();

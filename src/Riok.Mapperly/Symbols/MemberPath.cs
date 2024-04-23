@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
@@ -25,14 +26,14 @@ public class MemberPath(IReadOnlyList<IMappableMember> path)
     public IEnumerable<IMappableMember> ObjectPath => Path.SkipLast();
 
     /// <summary>
-    /// Gets the last part of the path or throws if there is none.
+    /// Gets the last part of the path or <see langword="null"/> if there is none.
     /// </summary>
-    public IMappableMember Member => Path[^1];
+    public IMappableMember? Member => Path.Count > 0 ? Path[^1] : null;
 
     /// <summary>
-    /// Gets the type of the <see cref="Member"/>. If any part of the path is nullable, this type will be nullable too.
+    /// Gets the type of the <see cref="Member"/> if it exists. If any part of the path is nullable, this type will be nullable too.
     /// </summary>
-    public ITypeSymbol MemberType => IsAnyNullable() ? Member.Type.WithNullableAnnotation(NullableAnnotation.Annotated) : Member.Type;
+    public ITypeSymbol? MemberType => IsAnyNullable() ? Member?.Type.WithNullableAnnotation(NullableAnnotation.Annotated) : Member?.Type;
 
     /// <summary>
     /// Gets the full name of the path (eg. A.B.C).
@@ -66,6 +67,18 @@ public class MemberPath(IReadOnlyList<IMappableMember> path)
     public bool IsAnyNullable() => Path.Any(p => p.IsNullable);
 
     public bool IsAnyObjectPathNullable() => ObjectPath.Any(p => p.IsNullable);
+
+    public bool TryGetNonEmptyMemberPath([NotNullWhen(true)] out NonEmptyMemberPath? nonEmptyMemberPath)
+    {
+        if (Path.Count == 0)
+        {
+            nonEmptyMemberPath = null;
+            return false;
+        }
+
+        nonEmptyMemberPath = new NonEmptyMemberPath(Path);
+        return true;
+    }
 
     /// <summary>
     /// Builds a condition (the resulting expression evaluates to a boolean)
@@ -127,4 +140,10 @@ public class MemberPath(IReadOnlyList<IMappableMember> path)
     public static bool operator !=(MemberPath? left, MemberPath? right) => !Equals(left, right);
 
     private bool Equals(MemberPath other) => Path.SequenceEqual(other.Path);
+
+    public string ToDisplayString(ITypeSymbol rootType, bool includeType = true)
+    {
+        var ofType = includeType && Member is { Type: var memberType } ? $" of type {memberType.ToDisplayString()}" : null;
+        return string.Join(MemberAccessSeparator, Path.Select(x => x.Name).Prepend(rootType.ToDisplayString())) + ofType;
+    }
 }

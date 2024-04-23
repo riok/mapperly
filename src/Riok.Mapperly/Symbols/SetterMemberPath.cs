@@ -7,7 +7,7 @@ using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Symbols;
 
-public class SetterMemberPath : MemberPath
+public class SetterMemberPath : NonEmptyMemberPath
 {
     private SetterMemberPath(IReadOnlyList<IMappableMember> path, bool isMethod)
         : base(path)
@@ -21,7 +21,7 @@ public class SetterMemberPath : MemberPath
     /// </summary>
     public bool IsMethod { get; }
 
-    public static SetterMemberPath Build(MappingBuilderContext ctx, MemberPath memberPath)
+    public static SetterMemberPath Build(MappingBuilderContext ctx, NonEmptyMemberPath memberPath)
     {
         // object path is the same as a getter
         var setterPath = GetterMemberPath.Build(ctx, memberPath.ObjectPath).ToList();

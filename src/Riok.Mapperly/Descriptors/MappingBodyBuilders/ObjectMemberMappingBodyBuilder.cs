@@ -40,7 +40,7 @@ public static class ObjectMemberMappingBodyBuilder
 
             if (ctx.TryFindNestedSourceMembersPath(targetMember.Name, out var sourceMemberPath))
             {
-                BuildMemberAssignmentMapping(ctx, sourceMemberPath, new MemberPath(new[] { targetMember }));
+                BuildMemberAssignmentMapping(ctx, sourceMemberPath, new NonEmptyMemberPath(new[] { targetMember }));
                 continue;
             }
 
@@ -66,7 +66,10 @@ public static class ObjectMemberMappingBodyBuilder
         MemberMappingConfiguration config
     )
     {
-        if (!ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.TargetType, config.Target.Path, out var targetMemberPath))
+        if (
+            !ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.TargetType, config.Target.Path, out var emptyTargetMemberPath)
+            || !emptyTargetMemberPath.TryGetNonEmptyMemberPath(out var targetMemberPath)
+        )
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ConfiguredMappingTargetMemberNotFound,
@@ -93,7 +96,7 @@ public static class ObjectMemberMappingBodyBuilder
     public static bool ValidateMappingSpecification(
         IMembersBuilderContext<IMapping> ctx,
         MemberPath sourceMemberPath,
-        MemberPath targetMemberPath,
+        NonEmptyMemberPath targetMemberPath,
         bool allowInitOnlyMember = false
     )
     {
@@ -102,12 +105,8 @@ public static class ObjectMemberMappingBodyBuilder
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToReadOnlyMember,
-                ctx.Mapping.SourceType,
-                sourceMemberPath.FullName,
-                sourceMemberPath.Member.Type,
-                ctx.Mapping.TargetType,
-                targetMemberPath.FullName,
-                targetMemberPath.Member.Type
+                sourceMemberPath.ToDisplayString(ctx.Mapping.SourceType),
+                targetMemberPath.ToDisplayString(ctx.Mapping.TargetType)
             );
             return false;
         }
@@ -123,12 +122,8 @@ public static class ObjectMemberMappingBodyBuilder
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToReadOnlyMember,
-                ctx.Mapping.SourceType,
-                sourceMemberPath.FullName,
-                sourceMemberPath.Member.Type,
-                ctx.Mapping.TargetType,
-                targetMemberPath.FullName,
-                targetMemberPath.Member.Type
+                sourceMemberPath.ToDisplayString(ctx.Mapping.SourceType),
+                targetMemberPath.ToDisplayString(ctx.Mapping.TargetType)
             );
             return false;
         }
@@ -145,12 +140,8 @@ public static class ObjectMemberMappingBodyBuilder
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToWriteOnlyMemberPath,
-                ctx.Mapping.SourceType,
-                sourceMemberPath.FullName,
-                sourceMemberPath.Member.Type,
-                ctx.Mapping.TargetType,
-                targetMemberPath.FullName,
-                targetMemberPath.Member.Type
+                sourceMemberPath.ToDisplayString(ctx.Mapping.SourceType),
+                targetMemberPath.ToDisplayString(ctx.Mapping.TargetType)
             );
             return false;
         }
@@ -166,12 +157,8 @@ public static class ObjectMemberMappingBodyBuilder
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToInitOnlyMemberPath,
-                ctx.Mapping.SourceType,
-                sourceMemberPath.FullName,
-                sourceMemberPath.Member.Type,
-                ctx.Mapping.TargetType,
-                targetMemberPath.FullName,
-                targetMemberPath.Member.Type
+                sourceMemberPath.ToDisplayString(ctx.Mapping.SourceType),
+                targetMemberPath.ToDisplayString(ctx.Mapping.TargetType)
             );
             return false;
         }
@@ -188,18 +175,14 @@ public static class ObjectMemberMappingBodyBuilder
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapFromWriteOnlyMember,
-                ctx.Mapping.SourceType,
-                sourceMemberPath.FullName,
-                sourceMemberPath.Member.Type,
-                ctx.Mapping.TargetType,
-                targetMemberPath.FullName,
-                targetMemberPath.Member.Type
+                sourceMemberPath.ToDisplayString(ctx.Mapping.SourceType),
+                targetMemberPath.ToDisplayString(ctx.Mapping.TargetType)
             );
             return false;
         }
 
         // cannot map from an indexed member
-        if (sourceMemberPath.Member.IsIndexer)
+        if (sourceMemberPath.Member?.IsIndexer == true)
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapFromIndexedMember,
@@ -232,12 +215,8 @@ public static class ObjectMemberMappingBodyBuilder
             {
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.CannotMapToTemporarySourceMember,
-                    ctx.Mapping.SourceType,
-                    sourceMemberPath.FullName,
-                    sourceMemberPath.Member.Type,
-                    ctx.Mapping.TargetType,
-                    targetMemberPath.FullName,
-                    targetMemberPath.Member.Type,
+                    sourceMemberPath.ToDisplayString(ctx.Mapping.SourceType),
+                    targetMemberPath.ToDisplayString(ctx.Mapping.TargetType),
                     member.Name,
                     member.Type
                 );
@@ -254,7 +233,7 @@ public static class ObjectMemberMappingBodyBuilder
     private static void BuildMemberAssignmentMapping(
         IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
         MemberPath sourceMemberPath,
-        MemberPath targetMemberPath,
+        NonEmptyMemberPath targetMemberPath,
         MemberMappingConfiguration? memberConfig = null
     )
     {
@@ -303,13 +282,13 @@ public static class ObjectMemberMappingBodyBuilder
     private static INewInstanceMapping? TryBuildMemberTypeMapping(
         IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
         MemberPath sourceMemberPath,
-        MemberPath targetMemberPath,
+        NonEmptyMemberPath targetMemberPath,
         MemberMappingConfiguration? memberConfig
     )
     {
         // nullability is handled inside the member mapping
         var typeMapping = new TypeMappingKey(
-            sourceMemberPath.MemberType,
+            sourceMemberPath.MemberType ?? ctx.Mapping.SourceType,
             targetMemberPath.MemberType,
             memberConfig?.ToTypeMappingConfiguration()
         );
@@ -323,12 +302,8 @@ public static class ObjectMemberMappingBodyBuilder
         // couldn't build the mapping
         ctx.BuilderContext.ReportDiagnostic(
             DiagnosticDescriptors.CouldNotMapMember,
-            ctx.Mapping.SourceType,
-            sourceMemberPath.FullName,
-            sourceMemberPath.Member.Type,
-            ctx.Mapping.TargetType,
-            targetMemberPath.FullName,
-            targetMemberPath.Member.Type
+            sourceMemberPath.ToDisplayString(ctx.Mapping.SourceType),
+            targetMemberPath.ToDisplayString(ctx.Mapping.TargetType)
         );
         return null;
     }
@@ -336,7 +311,7 @@ public static class ObjectMemberMappingBodyBuilder
     private static bool TryAddExistingTargetMapping(
         IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
         MemberPath sourceMemberPath,
-        MemberPath targetMemberPath
+        NonEmptyMemberPath targetMemberPath
     )
     {
         // if the member is readonly
@@ -351,7 +326,7 @@ public static class ObjectMemberMappingBodyBuilder
             return false;
         }
 
-        var mappingKey = new TypeMappingKey(sourceMemberPath.MemberType, targetMemberPath.MemberType);
+        var mappingKey = new TypeMappingKey(sourceMemberPath.MemberType ?? ctx.Mapping.SourceType, targetMemberPath.MemberType);
         var existingTargetMapping = ctx.BuilderContext.FindOrBuildExistingTargetMapping(mappingKey);
         if (existingTargetMapping == null)
             return false;
@@ -359,7 +334,7 @@ public static class ObjectMemberMappingBodyBuilder
         var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourceMemberPath);
         var setterTargetPath = GetterMemberPath.Build(ctx.BuilderContext, targetMemberPath);
 
-        var memberMapping = new MemberExistingTargetMapping(existingTargetMapping, getterSourcePath, setterTargetPath);
+        var memberMapping = new MemberExistingTargetMapping(existingTargetMapping, getterSourcePath, setterTargetPath, targetMemberPath);
         ctx.AddMemberAssignmentMapping(memberMapping);
         return true;
     }

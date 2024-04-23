@@ -81,7 +81,11 @@ public static class NewValueTupleMappingBodyBuilder
 
             // nullability is handled inside the member expressionMapping
             var targetMemberType = ctx.BuilderContext.SymbolAccessor.UpgradeNullable(targetMember.Type);
-            var mappingKey = new TypeMappingKey(sourcePath.MemberType, targetMemberType, memberConfig?.ToTypeMappingConfiguration());
+            var mappingKey = new TypeMappingKey(
+                sourcePath.MemberType ?? ctx.Mapping.SourceType,
+                targetMemberType,
+                memberConfig?.ToTypeMappingConfiguration()
+            );
             var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(
                 mappingKey,
                 diagnosticLocation: memberConfig?.Location
@@ -90,12 +94,8 @@ public static class NewValueTupleMappingBodyBuilder
             {
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.CouldNotMapMember,
-                    ctx.Mapping.SourceType,
-                    sourcePath.FullName,
-                    sourcePath.Member.Type,
-                    ctx.Mapping.TargetType,
-                    targetMember.Name,
-                    targetMember.Type
+                    sourcePath.ToDisplayString(ctx.Mapping.SourceType),
+                    FormatTargetMemberForDiagnostic(ctx.Mapping.TargetType, targetMember)
                 );
                 return false;
             }
@@ -104,8 +104,7 @@ public static class NewValueTupleMappingBodyBuilder
             {
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.ReferenceLoopInCtorMapping,
-                    ctx.Mapping.SourceType,
-                    sourcePath.FullName,
+                    sourcePath.ToDisplayString(ctx.Mapping.SourceType, includeType: false),
                     ctx.Mapping.TargetType,
                     targetMember.Name
                 );
@@ -119,6 +118,14 @@ public static class NewValueTupleMappingBodyBuilder
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Formats the target member in the same way that <see cref="MemberPath.ToDisplayString"/> does.
+    /// </summary>
+    private static string FormatTargetMemberForDiagnostic(ITypeSymbol targetType, IFieldSymbol targetMember)
+    {
+        return $"{targetType.ToDisplayString()}.{targetMember.Name} of type {targetMember.Type.ToDisplayString()}";
     }
 
     private static bool TryFindConstructorParameterSourcePath(

@@ -130,23 +130,23 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         MemberMappingConfiguration? memberConfig = null
     )
     {
-        var targetPath = new MemberPath(new[] { targetMember });
+        var targetPath = new NonEmptyMemberPath(new[] { targetMember });
         if (!ObjectMemberMappingBodyBuilder.ValidateMappingSpecification(ctx, sourcePath, targetPath, true))
             return;
 
-        var mappingKey = new TypeMappingKey(sourcePath.MemberType, targetMember.Type, memberConfig?.ToTypeMappingConfiguration());
+        var mappingKey = new TypeMappingKey(
+            sourcePath.MemberType ?? ctx.Mapping.SourceType,
+            targetMember.Type,
+            memberConfig?.ToTypeMappingConfiguration()
+        );
         var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(mappingKey, diagnosticLocation: memberConfig?.Location);
 
         if (delegateMapping == null)
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CouldNotMapMember,
-                ctx.Mapping.SourceType,
-                sourcePath.FullName,
-                sourcePath.Member.Type,
-                ctx.Mapping.TargetType,
-                targetPath.FullName,
-                targetPath.Member.Type
+                sourcePath.ToDisplayString(ctx.Mapping.SourceType),
+                targetPath.ToDisplayString(ctx.Mapping.TargetType)
             );
             return;
         }
@@ -155,10 +155,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ReferenceLoopInInitOnlyMapping,
-                ctx.Mapping.SourceType,
-                sourcePath.FullName,
-                ctx.Mapping.TargetType,
-                targetPath.FullName
+                sourcePath.ToDisplayString(ctx.Mapping.SourceType, includeType: false),
+                targetPath.ToDisplayString(ctx.Mapping.TargetType, includeType: false)
             );
             return;
         }
@@ -247,7 +245,11 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
             // nullability is handled inside the member mapping
             var parameterType = ctx.BuilderContext.SymbolAccessor.UpgradeNullable(parameter.Type);
-            var typeMapping = new TypeMappingKey(sourcePath.MemberType, parameterType, memberConfig?.ToTypeMappingConfiguration());
+            var typeMapping = new TypeMappingKey(
+                sourcePath.MemberType ?? ctx.Mapping.SourceType,
+                parameterType,
+                memberConfig?.ToTypeMappingConfiguration()
+            );
             var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(
                 typeMapping,
                 diagnosticLocation: memberConfig?.Location
@@ -266,8 +268,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             {
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.ReferenceLoopInCtorMapping,
-                    ctx.Mapping.SourceType,
-                    sourcePath.FullName,
+                    sourcePath.ToDisplayString(ctx.Mapping.SourceType, includeType: false),
                     ctx.Mapping.TargetType,
                     parameter.Name
                 );

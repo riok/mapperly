@@ -160,3 +160,14 @@ Riok.Mapperly.Abstractions.MapNestedPropertiesAttribute.MapNestedPropertiesAttri
 Riok.Mapperly.Abstractions.MapNestedPropertiesAttribute.MapNestedPropertiesAttribute(string![]! source) -> void
 Riok.Mapperly.Abstractions.MapNestedPropertiesAttribute.Source.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
 Riok.Mapperly.Abstractions.MapNestedPropertiesAttribute.SourceFullName.get -> string!
+Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute
+Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute.MapPropertyFromSourceAttribute(string! target) -> void
+Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute.MapPropertyFromSourceAttribute(string![]! target) -> void
+Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute.Target.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
+Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute.TargetFullName.get -> string!
+Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute.StringFormat.get -> string?
+Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute.StringFormat.set -> void
+Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute.FormatProvider.get -> string?
+Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute.FormatProvider.set -> void
+Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute.Use.get -> string?
+Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute.Use.set -> void

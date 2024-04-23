@@ -47,7 +47,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
     {
         foreach (var nullableTrailPath in path.ObjectPathNullableSubPaths())
         {
-            var nullablePath = new MemberPath(nullableTrailPath);
+            var nullablePath = new NonEmptyMemberPath(nullableTrailPath);
             var type = nullablePath.Member.Type;
 
             if (!nullablePath.Member.CanSet)

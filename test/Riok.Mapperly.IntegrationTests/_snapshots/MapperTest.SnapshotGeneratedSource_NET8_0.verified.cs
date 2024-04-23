@@ -181,6 +181,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.FormattedIntValue = testObject.IntValue.ToString("C", _formatDeCh);
             target.FormattedDateValue = testObject.DateTimeValue.ToString("D", _formatEnUs);
             target.SetPrivateValue(DirectInt(testObject.GetPrivateValue()));
+            target.Sum = ComputeSum(testObject);
             return target;
         }
 
