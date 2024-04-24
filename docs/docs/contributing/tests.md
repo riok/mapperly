@@ -22,7 +22,7 @@ The unit tests are located in the `tests/Riok.Mapperly.*.Tests` projects.
 These unit tests usually test exactly one unit of code or one type of mapping by isolating its code
 and verifying the reported diagnostics and the emitted code.
 Unit tests are easy to debug (you can debug them like any other code),
-but be reminded that these kind of tests only run on the latest supported target framework.
+but be reminded that these kinds of tests only run on the latest supported target framework.
 
 The `TestSourceBuilder` class can be used to generate the source code of a Mapper class.
 The `TestHelper` class can be used to run the source generator and assert or snapshot the result.
@@ -38,21 +38,19 @@ are run on several supported target frameworks (including .NET 7.0 but also .NET
 
 If the content of the snapshot is different depending on the target framework used,
 `[VersionedSnapshot(...)]` can be applied on a test class or method.
-The version of each version,
-which produces a changed snapshot content should be passed to the `VersionedSnapshotAttribute`.
-Eg.
-if a snapshots content is different for .NET 6.0, .NET 7.0 and .NET Framework 4.8 but .NET 8.0 is the same as .NET 7.0,
-`[VersionedSnapshot(Versions.NET6_0 | Versions.NET7_0)]` can be applied.
+Each target framework version, which introduces snapshot changes compared to the previous supported version,
+should be passed to the `VersionedSnapshotAttribute` constructor.
+E.g., if a snapshot's content is different for .NET 6.0, .NET 7.0 and .NET Framework 4.8 but .NET 8.0 is the same as .NET 7.0,
+`NET6_0` and `NET7_0` introduce changes, therefore `[VersionedSnapshot(Versions.NET6_0 | Versions.NET7_0)]` should be applied.
 The resulting snapshot is then stored three times:
 in `default` for .NET Framework 4.8, in `NET6_0` for .NET 6.0 and in `NET7_0` for .NET 7.0 and later.
 You may need to manually update older versions.
 The received snapshots of the tests are saved in the GitHub Actions as artifacts
 and can be downloaded.
 
-Debugging integration tests is a lot harder than debugging unit tests.
-Therefore if an integration test needs to be debugged,
-it is often easier to implement an unit test for the to be tested behaviour
-and debug the unit test instead of the integration test.
+Debugging integration tests is a bit harder than debugging unit tests.
+If an integration test needs to be debugged,
+consider implementing a unit test.
 See also the [debugging documentation](./debugging.md) topic on how to debug Mapperly.
 
 ## VerifyTests
@@ -61,6 +59,7 @@ Several tests use [VerifyTests/Verify](https://github.com/VerifyTests/Verify)
 and [VerifyTests/Verify.SourceGenerators](https://github.com/VerifyTests/Verify.SourceGenerators)
 to verify reported diagnostics and snapshot emitted code.
 To work with the tests of Mapperly you may find it helpful to read the documentation of it.
+For several IDE's, nice plugins make working with VerifyTests easier.
 
 ## Linting
 
