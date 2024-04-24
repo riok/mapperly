@@ -1,5 +1,3 @@
-using Riok.Mapperly.Diagnostics;
-
 namespace Riok.Mapperly.Tests.Mapping;
 
 public class QueryableProjectionTest
@@ -119,32 +117,6 @@ public class QueryableProjectionTest
     }
 
     [Fact]
-    public Task ReferenceLoopInitProperty()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "System.Linq.IQueryable<A>",
-            "System.Linq.IQueryable<B>",
-            "class A { public A? Parent { get; set; } public int IntValue { get; set; } }",
-            "class B { public B? Parent { get; set; } public int IntValue { get; set; } }"
-        );
-
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task ReferenceLoopCtor()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "System.Linq.IQueryable<A>",
-            "System.Linq.IQueryable<B>",
-            "class A { public A? Parent { get; set; } public int IntValue { get; set; } }",
-            "class B { public B(B? parent) {} public int IntValue { get; set; } }"
-        );
-
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
     public Task CtorShouldSkipUnmatchedOptionalParameters()
     {
         var source = TestSourceBuilder.Mapping(
@@ -155,21 +127,5 @@ public class QueryableProjectionTest
         );
 
         return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public void WithReferenceHandlingShouldDiagnostic()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "System.Linq.IQueryable<long>",
-            "System.Linq.IQueryable<int>",
-            TestSourceBuilderOptions.WithReferenceHandling
-        );
-
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingsDoNotSupportReferenceHandling)
-            .HaveAssertedAllDiagnostics();
     }
 }

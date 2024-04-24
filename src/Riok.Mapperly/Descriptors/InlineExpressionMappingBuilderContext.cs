@@ -77,6 +77,15 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     /// <returns>The <see cref="INewInstanceMapping"/> if a mapping was found or <c>null</c> if none was found.</returns>
     public override INewInstanceMapping? FindMapping(TypeMappingKey mappingKey)
     {
+        // check for recursion loop returning null to prevent a loop or default when recursion limit is reached.
+        var count = _parentTypes.GetDepth(mappingKey);
+        if (count >= 1)
+        {
+            return count >= Configuration.Members.MaxRecursionDepth + 2
+                ? new DefaultMemberMapping(mappingKey.Source, mappingKey.Target)
+                : null;
+        }
+
         var mapping = InlinedMappings.Find(mappingKey, out var isInlined);
         if (mapping == null)
             return null;

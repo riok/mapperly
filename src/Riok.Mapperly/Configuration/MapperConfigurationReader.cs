@@ -39,7 +39,8 @@ public class MapperConfigurationReader
                 Array.Empty<string>(),
                 Array.Empty<MemberMappingConfiguration>(),
                 mapper.IgnoreObsoleteMembersStrategy,
-                mapper.RequiredMappingStrategy
+                mapper.RequiredMappingStrategy,
+                mapper.MaxRecursionDepth
             ),
             Array.Empty<DerivedTypeMappingConfiguration>()
         );
@@ -86,6 +87,7 @@ public class MapperConfigurationReader
             .AccessFirstOrDefault<MapperIgnoreObsoleteMembersAttribute>(configRef.Method)
             ?.IgnoreObsoleteStrategy;
         var requiredMapping = _dataAccessor.AccessFirstOrDefault<MapperRequiredMappingAttribute>(configRef.Method)?.RequiredMappingStrategy;
+        var maxRecursionDepth = _dataAccessor.AccessFirstOrDefault<MapperMaxRecursionDepthAttribute>(configRef.Method)?.MaxRecursionDepth;
 
         // ignore the required mapping / ignore obsolete as the same attribute is used for other mapping types
         // e.g. enum to enum
@@ -116,7 +118,8 @@ public class MapperConfigurationReader
             ignoredTargetMembers,
             memberConfigurations,
             ignoreObsolete ?? MapperConfiguration.Members.IgnoreObsoleteMembersStrategy,
-            requiredMapping ?? MapperConfiguration.Members.RequiredMappingStrategy
+            requiredMapping ?? MapperConfiguration.Members.RequiredMappingStrategy,
+            maxRecursionDepth ?? MapperConfiguration.Members.MaxRecursionDepth
         );
     }
 

@@ -11,9 +11,11 @@ public partial class Mapper
         {
             Parent = x.Parent != null ? new global::B()
             {
-                IntValue = x.Parent.IntValue,
+                Parent = x.Parent.Parent != null ? new global::B()
+                {
+                    Parent = x.Parent.Parent.Parent != null ? default : default,
+                } : default,
             } : default,
-            IntValue = x.IntValue,
         });
 #nullable enable
     }

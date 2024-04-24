@@ -20,7 +20,8 @@ public record TestSourceBuilderOptions(
     MemberVisibility? IncludedMembers = null,
     bool Static = false,
     bool PreferParameterlessConstructors = true,
-    bool AutoUserMappings = true
+    bool AutoUserMappings = true,
+    uint? MaxRecursionDepth = null
 )
 {
     public const string DefaultMapperClassName = "Mapper";
