@@ -44,13 +44,13 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.NestedNullableTargetNotNullable = null;
             }
-            if (src.Extension != null)
+            if (src.NestedMember != null)
             {
-                target.Extension = MapToTestObjectExtension(src.Extension);
+                target.NestedMember = MapToTestObjectNestedMember(src.NestedMember);
             }
             else
             {
-                target.Extension = null;
+                target.NestedMember = null;
             }
             if (src.TupleValue != null)
             {
@@ -152,18 +152,18 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        private static global::Riok.Mapperly.IntegrationTests.Models.TestObjectExtension MapToTestObjectExtension(global::Riok.Mapperly.IntegrationTests.Models.TestObjectExtension source)
+        private static global::Riok.Mapperly.IntegrationTests.Models.TestObjectNestedMember MapToTestObjectNestedMember(global::Riok.Mapperly.IntegrationTests.Models.TestObjectNestedMember source)
         {
-            var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObjectExtension();
-            if (source.ExtensionNested != null)
+            var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObjectNestedMember();
+            if (source.NestedMemberObject != null)
             {
-                target.ExtensionNested = MapToTestObjectNested(source.ExtensionNested);
+                target.NestedMemberObject = MapToTestObjectNested(source.NestedMemberObject);
             }
             else
             {
-                target.ExtensionNested = null;
+                target.NestedMemberObject = null;
             }
-            target.ExtensionId = source.ExtensionId;
+            target.NestedMemberId = source.NestedMemberId;
             return target;
         }
 

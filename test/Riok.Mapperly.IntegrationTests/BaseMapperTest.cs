@@ -97,10 +97,10 @@ namespace Riok.Mapperly.IntegrationTests
                 NullableFlattening = new() { IdValue = 100 },
                 UnflatteningIdValue = 20,
                 NullableUnflatteningIdValue = 200,
-                Extension = new()
+                NestedMember = new()
                 {
-                    ExtensionId = 12,
-                    ExtensionNested = new() { IntValue = 22 }
+                    NestedMemberId = 12,
+                    NestedMemberObject = new() { IntValue = 22 }
                 },
                 TupleValue = ("10", "20"),
                 RecursiveObject = new(5)
@@ -119,10 +119,10 @@ namespace Riok.Mapperly.IntegrationTests
                 {
                     IntValue = 99,
                     RequiredValue = 98,
-                    Extension = new()
+                    NestedMember = new()
                     {
-                        ExtensionId = 123,
-                        ExtensionNested = new() { IntValue = 223 }
+                        NestedMemberId = 123,
+                        NestedMemberObject = new() { IntValue = 223 }
                     }
                 },
                 MemoryValue = new[] { "1", "2", "3" },

@@ -46,6 +46,22 @@ public class QueryableProjectionTest
     }
 
     [Fact]
+    public Task ClassToClassNestedMemberAttribute()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+            [MapNestedProperties(nameof(A.Value))] private partial B MapToB(A source);
+            """,
+            "class A { public C Value { get; set; } }",
+            "class B { public int Id { get; set; } }",
+            "class C { public int Id { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ClassToClassWithConfigs()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

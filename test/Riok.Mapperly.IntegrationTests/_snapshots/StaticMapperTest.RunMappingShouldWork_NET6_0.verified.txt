@@ -61,9 +61,9 @@
     StringValue: ,
     RenamedStringValue: ,
     Flattening: {},
-    Extension: {
-      ExtensionId: 123,
-      ExtensionNested: {
+    NestedMember: {
+      NestedMemberId: 123,
+      NestedMemberObject: {
         IntValue: 223
       }
     },

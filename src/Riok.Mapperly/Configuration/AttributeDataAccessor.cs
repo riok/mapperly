@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors;
@@ -45,9 +44,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     /// <typeparam name="TData">The type of the data class. If no type parameters are involved, this is usually the same as <see cref="TAttribute"/>.</typeparam>
     /// <returns>The attribute data.</returns>
     /// <exception cref="InvalidOperationException">If a property or ctor argument of <see cref="TData"/> could not be read on the attribute.</exception>
-    public IEnumerable<TData> Access<TAttribute, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TData>(
-        ISymbol symbol
-    )
+    public IEnumerable<TData> Access<TAttribute, TData>(ISymbol symbol)
         where TAttribute : Attribute
         where TData : notnull
     {

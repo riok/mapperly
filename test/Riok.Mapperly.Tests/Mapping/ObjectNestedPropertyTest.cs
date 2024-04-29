@@ -1,11 +1,12 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
 
 public class ObjectNestedPropertyTest
 {
-    private static readonly TestHelperOptions ignoreNestedMemberNotUsed =
+    private static readonly TestHelperOptions _ignoreNestedMemberNotUsed =
         new() { IgnoredDiagnostics = new HashSet<DiagnosticDescriptor> { DiagnosticDescriptors.NestedMemberNotUsed } };
 
     [Fact]
@@ -87,7 +88,7 @@ public class ObjectNestedPropertyTest
         );
 
         TestHelper
-            .GenerateMapper(source, ignoreNestedMemberNotUsed)
+            .GenerateMapper(source, _ignoreNestedMemberNotUsed)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -98,6 +99,10 @@ public class ObjectNestedPropertyTest
             );
     }
 
+    /// <summary>
+    /// Same as <see cref="NestedPropertyWithMemberNameOfSource"/>, but the property name being <c>ValueId</c> means that auto-flattening will be tried first.
+    /// This checks that the nested member lookup works correctly afterward as well.
+    /// </summary>
     [Fact]
     public void NestedPropertyWithSourcePathName()
     {
@@ -131,7 +136,7 @@ public class ObjectNestedPropertyTest
         );
 
         TestHelper
-            .GenerateMapper(source, ignoreNestedMemberNotUsed)
+            .GenerateMapper(source, _ignoreNestedMemberNotUsed)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -143,7 +148,120 @@ public class ObjectNestedPropertyTest
     }
 
     [Fact]
-    public void UnusedNestedPropertiesShouldDiagnostic()
+    public void NestedPropertyToConstructorParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapNestedProperties(nameof(A.Value))] partial B Map(A source);",
+            "class A { public C Value { get; set; } }",
+            "class B { public B(int nestedId) {} }",
+            "class C { public int NestedId { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B(source.Value.NestedId);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NestedPropertyToInitOnlyProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapNestedProperties(nameof(A.Value))] partial B Map(A source);",
+            "class A { public C Value { get; set; } }",
+            "class B { public int NestedId { get; init; } }",
+            "class C { public int NestedId { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    NestedId = source.Value.NestedId,
+                };
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NestedPropertyToTuple()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapNestedProperties(nameof(A.Value))] partial (int NestedId, string ValueName) Map(A source);",
+            "class A { public C Value { get; set; } }",
+            "class C { public int NestedId { get; set; } public string Name { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = (NestedId: source.Value.NestedId, ValueName: source.Value.Name);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NestedPropertyWithMemberNameOfSource_CaseInsensitiveNameMappingStrategy()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapNestedProperties(nameof(A.Value))] partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseInsensitive },
+            "class A { public C Value { get; set; } }",
+            "class B { public string id { get; set; } }",
+            "class C { public string Id { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.id = source.Value.Id;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableNestedPropertyWithMemberNameOfSource()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapNestedProperties(nameof(A.Value))] partial B Map(A source);",
+            "class A { public C? Value { get; set; } }",
+            "class B { public string Id { get; set; } }",
+            "class C { public string Id { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.Value != null)
+                {
+                    target.Id = source.Value.Id;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public Task UnusedNestedPropertiesShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapNestedProperties(nameof(A.Value))] partial B Map(A source);",
@@ -152,19 +270,7 @@ public class ObjectNestedPropertyTest
             "class C { public string MyId { get; set; } }"
         );
 
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.NestedMemberNotUsed)
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
-            .HaveAssertedAllDiagnostics()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::B();
-                target.Id = source.Id;
-                return target;
-                """
-            );
+        return TestHelper.VerifyGenerator(source);
     }
 
     [Fact]
@@ -192,7 +298,7 @@ public class ObjectNestedPropertyTest
     }
 
     [Fact]
-    public void InvalidNestedPropertiesPathShouldDiagnostic()
+    public Task InvalidNestedPropertiesPathShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapNestedProperties(\"Value\")] partial B Map(A source);",
@@ -200,11 +306,7 @@ public class ObjectNestedPropertyTest
             "class B { public string Id { get; set; } }"
         );
 
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.ConfiguredMappingNestedMemberNotFound)
-            .HaveAssertedAllDiagnostics();
+        return TestHelper.VerifyGenerator(source);
     }
 
     [Fact]

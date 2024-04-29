@@ -45,7 +45,7 @@ namespace Riok.Mapperly.IntegrationTests.Models
 
         public TestObjectNested? NestedNullableTargetNotNullable { get; set; }
 
-        public TestObjectExtension? Extension { get; set; }
+        public TestObjectNestedMember? NestedMember { get; set; }
 
         public string? StringNullableTargetNotNullable { get; set; }
 

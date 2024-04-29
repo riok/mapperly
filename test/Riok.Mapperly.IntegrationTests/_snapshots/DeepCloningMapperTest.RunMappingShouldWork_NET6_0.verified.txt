@@ -19,9 +19,9 @@
     IntValue: 100
   },
   NestedNullableTargetNotNullable: {},
-  Extension: {
-    ExtensionId: 12,
-    ExtensionNested: {
+  NestedMember: {
+    NestedMemberId: 12,
+    NestedMemberObject: {
       IntValue: 22
     }
   },
@@ -58,9 +58,9 @@
     StringValue: ,
     RenamedStringValue: ,
     Flattening: {},
-    Extension: {
-      ExtensionId: 123,
-      ExtensionNested: {
+    NestedMember: {
+      NestedMemberId: 123,
+      NestedMemberObject: {
         IntValue: 223
       }
     },

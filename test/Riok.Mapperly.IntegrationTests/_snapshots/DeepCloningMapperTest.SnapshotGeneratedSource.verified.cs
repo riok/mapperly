@@ -44,6 +44,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.NestedNullableTargetNotNullable = null;
             }
+            if (src.NestedMember != null)
+            {
+                target.NestedMember = MapToTestObjectNestedMember(src.NestedMember);
+            }
+            else
+            {
+                target.NestedMember = null;
+            }
             if (src.TupleValue != null)
             {
                 target.TupleValue = MapToValueTupleOfStringAndString(src.TupleValue.Value);
@@ -137,6 +145,22 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested();
             target.IntValue = source.IntValue;
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static global::Riok.Mapperly.IntegrationTests.Models.TestObjectNestedMember MapToTestObjectNestedMember(global::Riok.Mapperly.IntegrationTests.Models.TestObjectNestedMember source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObjectNestedMember();
+            if (source.NestedMemberObject != null)
+            {
+                target.NestedMemberObject = MapToTestObjectNested(source.NestedMemberObject);
+            }
+            else
+            {
+                target.NestedMemberObject = null;
+            }
+            target.NestedMemberId = source.NestedMemberId;
             return target;
         }
 

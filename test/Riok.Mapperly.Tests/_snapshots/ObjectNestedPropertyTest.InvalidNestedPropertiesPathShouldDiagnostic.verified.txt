@@ -1,0 +1,14 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG070,
+      Title: Mapping nested member not found,
+      Severity: Error,
+      WarningLevel: 0,
+      Location: : (11,4)-(11,59),
+      MessageFormat: Specified nested member {0} on source type {1} was not found,
+      Message: Specified nested member Value on source type A was not found,
+      Category: Mapper
+    }
+  ]
+}
