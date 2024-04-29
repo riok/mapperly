@@ -213,7 +213,7 @@ public class ObjectNestedPropertyTest
     }
 
     [Fact]
-    public void NestedPropertyWithMemberNameOfSource_CaseInsensitiveNameMappingStrategy()
+    public void NestedPropertyWithMemberNameOfSourceAndCaseInsensitiveNameMappingStrategy()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapNestedProperties(nameof(A.Value))] partial B Map(A source);",

@@ -697,6 +697,26 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static readonly DiagnosticDescriptor ReferencedMappingSourceTypeMismatch =
+        new(
+            "RMG072",
+            "The source type of the referenced mapping does not match",
+            "The source type {1} of the referenced mapping {0} does not match the expected type {2}",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Warning,
+            true
+        );
+
+    public static readonly DiagnosticDescriptor ReferencedMappingTargetTypeMismatch =
+        new(
+            "RMG073",
+            "The target type of the referenced mapping does not match",
+            "The target type {1} of the referenced mapping {0} does not match the expected type {2}",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Warning,
+            true
+        );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT
