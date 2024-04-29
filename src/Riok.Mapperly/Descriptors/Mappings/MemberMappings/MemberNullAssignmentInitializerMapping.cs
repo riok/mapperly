@@ -9,9 +9,9 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// A member initializer which initializes null members to new objects.
 /// </summary>
 [DebuggerDisplay("MemberNullAssignmentInitializerMapping({_pathToInitialize} ??= new())")]
-public class MemberNullAssignmentInitializerMapping(SetterMemberPath pathToInitialize) : MemberAssignmentMappingContainer
+public class MemberNullAssignmentInitializerMapping(MemberPathSetterBuilder pathToInitialize) : MemberAssignmentMappingContainer
 {
-    private readonly SetterMemberPath _pathToInitialize = pathToInitialize;
+    private readonly MemberPathSetterBuilder _pathToInitialize = pathToInitialize;
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {

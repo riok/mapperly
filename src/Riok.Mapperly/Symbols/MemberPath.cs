@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
@@ -9,14 +7,12 @@ using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 namespace Riok.Mapperly.Symbols;
 
 /// <summary>
-/// Represents a set of members to access a certain member.
-/// Eg. A.B.C
+/// Represents a (possibly empty) list of members to access a certain member.
+/// E.g. A.B.C
 /// </summary>
-[DebuggerDisplay("{FullName}")]
-public class MemberPath(IReadOnlyList<IMappableMember> path)
+public abstract class MemberPath(ITypeSymbol rootType, IReadOnlyList<IMappableMember> path)
 {
-    private const string MemberAccessSeparator = ".";
-    protected const string NullableValueProperty = "Value";
+    protected const string MemberAccessSeparator = ".";
 
     public IReadOnlyList<IMappableMember> Path { get; } = path;
 
@@ -25,23 +21,26 @@ public class MemberPath(IReadOnlyList<IMappableMember> path)
     /// </summary>
     public IEnumerable<IMappableMember> ObjectPath => Path.SkipLast();
 
+    public ITypeSymbol RootType { get; } = rootType;
+
     /// <summary>
     /// Gets the last part of the path or <see langword="null"/> if there is none.
     /// </summary>
-    public IMappableMember? Member => Path.Count > 0 ? Path[^1] : null;
+    public abstract IMappableMember? Member { get; }
 
     /// <summary>
-    /// Gets the type of the <see cref="Member"/> if it exists. If any part of the path is nullable, this type will be nullable too.
+    /// Gets the type of the total path, e.g. that of the <see cref="Member"/> if it exists, or the <see cref="RootType"/> otherwise.
+    /// If any part of the path is nullable, this type will be nullable too.
     /// </summary>
-    public ITypeSymbol? MemberType => IsAnyNullable() ? Member?.Type.WithNullableAnnotation(NullableAnnotation.Annotated) : Member?.Type;
+    public abstract ITypeSymbol MemberType { get; }
 
     /// <summary>
-    /// Gets the full name of the path (eg. A.B.C).
+    /// Gets the full name of the path (e.g. A.B.C).
     /// </summary>
     public string FullName { get; } = string.Join(MemberAccessSeparator, path.Select(x => x.Name));
 
     /// <summary>
-    /// Builds a member path skipping trailing path items which are non nullable.
+    /// Builds a member path skipping trailing path items which are non-nullable.
     /// </summary>
     /// <returns>The built path.</returns>
     public IEnumerable<IMappableMember> PathWithoutTrailingNonNullable() => Path.Reverse().SkipWhile(x => !x.IsNullable).Reverse();
@@ -67,18 +66,6 @@ public class MemberPath(IReadOnlyList<IMappableMember> path)
     public bool IsAnyNullable() => Path.Any(p => p.IsNullable);
 
     public bool IsAnyObjectPathNullable() => ObjectPath.Any(p => p.IsNullable);
-
-    public bool TryGetNonEmptyMemberPath([NotNullWhen(true)] out NonEmptyMemberPath? nonEmptyMemberPath)
-    {
-        if (Path.Count == 0)
-        {
-            nonEmptyMemberPath = null;
-            return false;
-        }
-
-        nonEmptyMemberPath = new NonEmptyMemberPath(Path);
-        return true;
-    }
 
     /// <summary>
     /// Builds a condition (the resulting expression evaluates to a boolean)
@@ -110,6 +97,16 @@ public class MemberPath(IReadOnlyList<IMappableMember> path)
         return condition;
     }
 
+    public static MemberPath Create(ITypeSymbol rootType, IReadOnlyList<IMappableMember> path)
+    {
+        if (path.Count == 0)
+        {
+            return new EmptyMemberPath(rootType);
+        }
+
+        return new NonEmptyMemberPath(rootType, path);
+    }
+
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj))
@@ -139,11 +136,8 @@ public class MemberPath(IReadOnlyList<IMappableMember> path)
 
     public static bool operator !=(MemberPath? left, MemberPath? right) => !Equals(left, right);
 
-    private bool Equals(MemberPath other) => Path.SequenceEqual(other.Path);
+    private bool Equals(MemberPath other) =>
+        RootType.Equals(other.RootType, SymbolEqualityComparer.IncludeNullability) && Path.SequenceEqual(other.Path);
 
-    public string ToDisplayString(ITypeSymbol rootType, bool includeType = true)
-    {
-        var ofType = includeType && Member is { Type: var memberType } ? $" of type {memberType.ToDisplayString()}" : null;
-        return string.Join(MemberAccessSeparator, Path.Select(x => x.Name).Prepend(rootType.ToDisplayString())) + ofType;
-    }
+    public abstract string ToDisplayString(bool includeMemberType = true);
 }

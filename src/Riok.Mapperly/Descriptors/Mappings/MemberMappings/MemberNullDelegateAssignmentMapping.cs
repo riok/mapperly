@@ -10,13 +10,13 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// </summary>
 [DebuggerDisplay("MemberNullDelegateAssignmentMapping({_nullConditionalSourcePath} != null)")]
 public class MemberNullDelegateAssignmentMapping(
-    GetterMemberPath nullConditionalSourcePath,
+    MemberPathGetterBuilder nullConditionalSourcePath,
     IMemberAssignmentMappingContainer parent,
     bool needsNullSafeAccess
 ) : MemberAssignmentMappingContainer(parent)
 {
-    private readonly GetterMemberPath _nullConditionalSourcePath = nullConditionalSourcePath;
-    private readonly List<SetterMemberPath> _targetsToSetNull = new();
+    private readonly MemberPathGetterBuilder _nullConditionalSourcePath = nullConditionalSourcePath;
+    private readonly List<MemberPathSetterBuilder> _targetsToSetNull = new();
     private bool _throwOnSourcePathNull;
 
     public void ThrowOnSourcePathNull()
@@ -39,7 +39,7 @@ public class MemberNullDelegateAssignmentMapping(
         return new[] { ifExpression };
     }
 
-    public void AddNullMemberAssignment(SetterMemberPath targetPath) => _targetsToSetNull.Add(targetPath);
+    public void AddNullMemberAssignment(MemberPathSetterBuilder targetPath) => _targetsToSetNull.Add(targetPath);
 
     public override bool Equals(object? obj)
     {

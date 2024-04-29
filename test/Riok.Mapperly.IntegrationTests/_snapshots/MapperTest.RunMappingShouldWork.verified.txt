@@ -191,5 +191,6 @@
   DateTimeValueTargetTimeOnly: 3:10 PM,
   FormattedIntValue: CHF 10.00,
   FormattedDateValue: Friday, January 3, 2020,
-  ExposePrivateValue: 28
+  ExposePrivateValue: 28,
+  Sum: 96
 }

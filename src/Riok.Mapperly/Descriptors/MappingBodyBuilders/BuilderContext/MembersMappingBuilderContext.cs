@@ -87,7 +87,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         ITypeSymbol targetMemberType
     )
     {
-        var getterSourcePath = GetterMemberPath.Build(BuilderContext, sourcePath);
+        var getterSourcePath = MemberPathGetterBuilder.Build(BuilderContext, sourcePath);
 
         var nullFallback = NullFallbackValue.Default;
         if (!delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyNullable())
@@ -115,10 +115,14 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         _hasMemberMapping = true;
 
         if (sourcePath.Path.FirstOrDefault() is { } sourceMember)
+        {
             _unmappedSourceMemberNames.Remove(sourceMember.Name);
+        }
         else
-            // Assume all source members are used when the source object is used itself.
+        // Assume all source members are used when the source object is used itself.
+        {
             _unmappedSourceMemberNames.Clear();
+        }
     }
 
     public bool TryFindNestedSourceMembersPath(
@@ -156,7 +160,10 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
                 )
             )
             {
-                sourceMemberPath = new MemberPath(nestedMemberPath.Path.Concat(nestedSourceMemberPath.Path).ToList());
+                sourceMemberPath = new NonEmptyMemberPath(
+                    Mapping.SourceType,
+                    nestedMemberPath.Path.Concat(nestedSourceMemberPath.Path).ToList()
+                );
                 _unusedNestedMemberPaths.Remove(nestedMemberPath.FullName);
                 return true;
             }

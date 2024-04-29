@@ -213,7 +213,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
             if (ignoredNames.Contains(foundPath[0].Name))
                 continue;
 
-            memberPath = new(foundPath);
+            memberPath = new NonEmptyMemberPath(type, foundPath);
             return true;
         }
 
@@ -226,7 +226,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         var foundPath = new List<IMappableMember>();
         if (TryFindPath(type, path, false, foundPath))
         {
-            memberPath = new(foundPath);
+            memberPath = MemberPath.Create(type, foundPath);
             return true;
         }
 

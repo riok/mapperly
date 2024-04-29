@@ -52,6 +52,21 @@ public partial class CarMapper
 }
 ```
 
+#### Mapping from source
+
+The source object itself can be mapped to a property of the target object with the `MapPropertyFromSource` attribute:
+
+```csharp
+[Mapper]
+public partial class CarMapper
+{
+    // highlight-start
+    [MapPropertyFromSource(nameof(CarChanges.OriginalCar))]
+    // highlight-end
+    public partial CarChanges ToChanges(Car car);
+}
+```
+
 ### Ignore properties / fields
 
 To ignore a property or field, the `MapperIgnoreTargetAttribute` or `MapperIgnoreSourceAttribute` can be used.
@@ -371,8 +386,8 @@ See also [user-implemented mapping methods](./user-implemented-methods.mdx).
   </TabItem>
 </Tabs>
 
-#### Mapping from source
-To access multiple properties of the source in the mapping method, the `MapPropertyFromSource` attribute can be used:
+#### User-implemented mapping from source
+The `Use` property can also be assigned on the `MapPropertyFromSource` attribute, for example to access multiple properties of the source in the mapping method:
 
 ```csharp
 [Mapper]

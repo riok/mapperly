@@ -4,6 +4,9 @@ namespace Riok.Mapperly.Configuration;
 
 public record MemberMappingConfiguration(StringMemberPath Source, StringMemberPath Target) : HasSyntaxReference
 {
+    /// <summary>
+    /// Used to adapt from <see cref="Abstractions.MapPropertyFromSourceAttribute"/>
+    /// </summary>
     public MemberMappingConfiguration(StringMemberPath Target)
         : this(Source: StringMemberPath.Empty, Target) { }
 

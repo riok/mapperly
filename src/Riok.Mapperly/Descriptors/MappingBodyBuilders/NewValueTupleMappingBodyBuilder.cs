@@ -81,11 +81,7 @@ public static class NewValueTupleMappingBodyBuilder
 
             // nullability is handled inside the member expressionMapping
             var targetMemberType = ctx.BuilderContext.SymbolAccessor.UpgradeNullable(targetMember.Type);
-            var mappingKey = new TypeMappingKey(
-                sourcePath.MemberType ?? ctx.Mapping.SourceType,
-                targetMemberType,
-                memberConfig?.ToTypeMappingConfiguration()
-            );
+            var mappingKey = new TypeMappingKey(sourcePath.MemberType, targetMemberType, memberConfig?.ToTypeMappingConfiguration());
             var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(
                 mappingKey,
                 diagnosticLocation: memberConfig?.Location
@@ -94,7 +90,7 @@ public static class NewValueTupleMappingBodyBuilder
             {
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.CouldNotMapMember,
-                    sourcePath.ToDisplayString(ctx.Mapping.SourceType),
+                    sourcePath.ToDisplayString(),
                     FormatTargetMemberForDiagnostic(ctx.Mapping.TargetType, targetMember)
                 );
                 return false;
@@ -104,7 +100,7 @@ public static class NewValueTupleMappingBodyBuilder
             {
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.ReferenceLoopInCtorMapping,
-                    sourcePath.ToDisplayString(ctx.Mapping.SourceType, includeType: false),
+                    sourcePath.ToDisplayString(includeMemberType: false),
                     ctx.Mapping.TargetType,
                     targetMember.Name
                 );
@@ -195,7 +191,7 @@ public static class NewValueTupleMappingBodyBuilder
         if (mappableField == default)
             return false;
 
-        sourcePath = new MemberPath(new[] { new FieldMember(mappableField, ctx.BuilderContext.SymbolAccessor) });
+        sourcePath = new NonEmptyMemberPath(namedType, new[] { new FieldMember(mappableField, ctx.BuilderContext.SymbolAccessor) });
         return true;
     }
 }

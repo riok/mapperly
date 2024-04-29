@@ -27,7 +27,7 @@ public class NewValueTupleExpressionBuilderContext<T>(MappingBuilderContext buil
             }
         }
 
-        SetSourceMemberMapped(mapping.DelegateMapping.SourcePath);
+        SetSourceMemberMapped(mapping.DelegateMapping.SourceGetter.MemberPath);
         Mapping.AddConstructorParameterMapping(mapping);
     }
 }

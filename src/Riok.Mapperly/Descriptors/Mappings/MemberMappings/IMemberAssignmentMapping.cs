@@ -8,7 +8,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// </summary>
 public interface IMemberAssignmentMapping
 {
-    GetterMemberPath SourcePath { get; }
+    MemberPathGetterBuilder SourceGetter { get; }
 
     NonEmptyMemberPath TargetPath { get; }
 

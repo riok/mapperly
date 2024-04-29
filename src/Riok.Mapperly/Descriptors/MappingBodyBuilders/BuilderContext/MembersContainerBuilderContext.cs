@@ -20,7 +20,10 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
 
     public void AddNullDelegateMemberAssignmentMapping(IMemberAssignmentMapping memberMapping)
     {
-        var nullConditionSourcePath = new MemberPath(memberMapping.SourcePath.PathWithoutTrailingNonNullable().ToList());
+        var nullConditionSourcePath = MemberPath.Create(
+            memberMapping.SourceGetter.MemberPath.RootType,
+            memberMapping.SourceGetter.MemberPath.PathWithoutTrailingNonNullable().ToList()
+        );
         var container = GetOrCreateNullDelegateMappingForPath(nullConditionSourcePath);
         AddMemberAssignmentMapping(container, memberMapping);
 
@@ -28,7 +31,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         // and the source is null
         if (BuilderContext.Configuration.Mapper.AllowNullPropertyAssignment && memberMapping.TargetPath.Member.Type.IsNullable())
         {
-            container.AddNullMemberAssignment(SetterMemberPath.Build(BuilderContext, memberMapping.TargetPath));
+            container.AddNullMemberAssignment(MemberPathSetterBuilder.Build(BuilderContext, memberMapping.TargetPath));
         }
         else if (BuilderContext.Configuration.Mapper.ThrowOnPropertyMappingNullMismatch)
         {
@@ -38,7 +41,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
 
     private void AddMemberAssignmentMapping(IMemberAssignmentMappingContainer container, IMemberAssignmentMapping mapping)
     {
-        SetSourceMemberMapped(mapping.SourcePath);
+        SetSourceMemberMapped(mapping.SourceGetter.MemberPath);
         AddNullMemberInitializers(container, mapping.TargetPath);
         container.AddMemberMapping(mapping);
     }
@@ -47,7 +50,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
     {
         foreach (var nullableTrailPath in path.ObjectPathNullableSubPaths())
         {
-            var nullablePath = new NonEmptyMemberPath(nullableTrailPath);
+            var nullablePath = new NonEmptyMemberPath(path.RootType, nullableTrailPath);
             var type = nullablePath.Member.Type;
 
             if (!nullablePath.Member.CanSet)
@@ -59,11 +62,11 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
                 continue;
             }
 
-            var setterNullablePath = SetterMemberPath.Build(BuilderContext, nullablePath);
+            var setterNullablePath = MemberPathSetterBuilder.Build(BuilderContext, nullablePath);
 
             if (setterNullablePath.IsMethod)
             {
-                var getterNullablePath = GetterMemberPath.Build(BuilderContext, nullablePath);
+                var getterNullablePath = MemberPathGetterBuilder.Build(BuilderContext, nullablePath);
                 container.AddMemberMappingContainer(
                     new MethodMemberNullAssignmentInitializerMapping(setterNullablePath, getterNullablePath)
                 );
@@ -87,7 +90,12 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         var needsNullSafeAccess = false;
         foreach (var nullablePath in nullConditionSourcePath.ObjectPathNullableSubPaths().Reverse())
         {
-            if (_nullDelegateMappings.TryGetValue(new MemberPath(nullablePath), out var parentMappingHolder))
+            if (
+                _nullDelegateMappings.TryGetValue(
+                    new NonEmptyMemberPath(nullConditionSourcePath.RootType, nullablePath),
+                    out var parentMappingHolder
+                )
+            )
             {
                 parentMapping = parentMappingHolder;
                 break;
@@ -97,7 +105,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         }
 
         mapping = new MemberNullDelegateAssignmentMapping(
-            GetterMemberPath.Build(BuilderContext, nullConditionSourcePath),
+            MemberPathGetterBuilder.Build(BuilderContext, nullConditionSourcePath),
             parentMapping,
             needsNullSafeAccess
         );

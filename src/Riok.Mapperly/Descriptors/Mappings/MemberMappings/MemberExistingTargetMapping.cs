@@ -9,19 +9,18 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// </summary>
 public class MemberExistingTargetMapping(
     IExistingTargetMapping delegateMapping,
-    GetterMemberPath sourcePath,
-    GetterMemberPath targetGetterPath,
-    NonEmptyMemberPath targetMemberPath
+    MemberPathGetterBuilder sourcePath,
+    MemberPathGetterBuilder targetPath
 ) : IMemberAssignmentMapping
 {
-    public GetterMemberPath SourcePath { get; } = sourcePath;
+    public MemberPathGetterBuilder SourceGetter { get; } = sourcePath;
 
-    public NonEmptyMemberPath TargetPath => targetMemberPath;
+    public NonEmptyMemberPath TargetPath => (NonEmptyMemberPath)targetPath.MemberPath;
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
-        var source = SourcePath.BuildAccess(ctx.Source);
-        var target = targetGetterPath.BuildAccess(targetAccess);
+        var source = SourceGetter.BuildAccess(ctx.Source);
+        var target = targetPath.BuildAccess(targetAccess);
         return delegateMapping.Build(ctx.WithSource(source), target);
     }
 }

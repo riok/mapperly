@@ -1,3 +1,4 @@
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
@@ -73,6 +74,7 @@ public class ObjectPropertyFromSourceTest
             [MapPropertyFromSource(nameof(B.FloatValue), Use = nameof(MakeFloat)]
             partial B Map(A source);
 
+            [UserMapping(Default = false)]
             float MakeFloat(A x) => 3f * x.IntValue + x.Offset;
             """,
             "class A { public int IntValue { get; set; } public int Offset { get; set; } }",
@@ -99,6 +101,7 @@ public class ObjectPropertyFromSourceTest
             [MapPropertyFromSource(nameof(B.Value)]
             partial B Map(A source);
 
+            [UserMapping(Default = true)]
             C ConvertAToC(A x) => new C { FloatValue = 3f * x.IntValue + x.Offset };
             """,
             "class A { public int IntValue { get; set; } public int Offset { get; set; } }",
@@ -113,6 +116,91 @@ public class ObjectPropertyFromSourceTest
                 """
                 var target = new global::B();
                 target.Value = ConvertAToC(source);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ToConstructorParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapPropertyFromSource(\"value\")] partial B Map(A source);",
+            "class A { }",
+            "class B { public B(A value) {} }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return new global::B(source);
+                """
+            );
+    }
+
+    [Fact]
+    public void ToInitOnlyProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapPropertyFromSource(nameof(B.Value))] partial B Map(A source);",
+            "class A { }",
+            "class B { public A Value { get; init; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    Value = source,
+                };
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ToTuple()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapPropertyFromSource(\"Original\")] partial (int IntValue, A Original) Map(A source);",
+            "class A { public int IntValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = (IntValue: source.IntValue, Original: source);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableNestedPropertyWithMemberNameOfSource()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapPropertyFromSource(nameof(B.Value))] partial B Map(A? source);",
+            new TestSourceBuilderOptions { ThrowOnMappingNullMismatch = false },
+            "class A { }",
+            "class B { public A? Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return new global::B();
+                var target = new global::B();
+                target.Value = source;
                 return target;
                 """
             );
