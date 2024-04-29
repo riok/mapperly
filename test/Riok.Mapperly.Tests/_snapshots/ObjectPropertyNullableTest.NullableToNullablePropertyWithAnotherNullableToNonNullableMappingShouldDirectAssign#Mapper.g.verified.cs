@@ -25,7 +25,7 @@ public partial class Mapper
         var target = new global::System.Collections.Generic.List<int>(source.Count);
         foreach (var item in source)
         {
-            target.Add(item == null ? throw new System.ArgumentNullException(nameof(item)) : item.Value);
+            target.Add(item ?? throw new System.ArgumentNullException(nameof(item)));
         }
         return target;
     }
