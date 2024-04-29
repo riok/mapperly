@@ -39,8 +39,16 @@ public static class UseNamedMappingBuilder
 
     private static INewInstanceMapping? TryMapTarget(MappingBuilderContext ctx, INewInstanceMapping mapping)
     {
-        if (SymbolEqualityComparer.IncludeNullability.Equals(ctx.Target, mapping.TargetType))
-            return mapping;
+        // only report if there are other differences than nullability
+        if (!SymbolEqualityComparer.Default.Equals(ctx.Target, mapping.TargetType))
+        {
+            ctx.ReportDiagnostic(
+                DiagnosticDescriptors.ReferencedMappingTargetTypeMismatch,
+                ctx.MappingKey.Configuration.UseNamedMapping!,
+                mapping.TargetType.ToDisplayString(),
+                ctx.Target.ToDisplayString()
+            );
+        }
 
         var outputMapping = ctx.FindOrBuildMapping(mapping.TargetType, ctx.Target);
         if (outputMapping == null)
@@ -58,6 +66,17 @@ public static class UseNamedMappingBuilder
 
     private static INewInstanceMapping? TryMapSource(MappingBuilderContext ctx, INewInstanceMapping mapping)
     {
+        // only report if there are other differences than nullability
+        if (!SymbolEqualityComparer.Default.Equals(ctx.Source, mapping.SourceType))
+        {
+            ctx.ReportDiagnostic(
+                DiagnosticDescriptors.ReferencedMappingSourceTypeMismatch,
+                ctx.MappingKey.Configuration.UseNamedMapping!,
+                mapping.SourceType.ToDisplayString(),
+                ctx.Source.ToDisplayString()
+            );
+        }
+
         var inputMapping = ctx.FindOrBuildMapping(ctx.Source, mapping.SourceType);
         if (inputMapping == null)
         {
