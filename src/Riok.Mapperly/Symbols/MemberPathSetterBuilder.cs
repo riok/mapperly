@@ -7,7 +7,7 @@ using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Symbols;
 
-public class MemberPathSetterBuilder
+public class MemberPathSetterBuilder : IEquatable<MemberPathSetterBuilder>
 {
     private MemberPathSetterBuilder(NonEmptyMemberPath memberPath, bool isMethod)
     {
@@ -88,10 +88,12 @@ public class MemberPathSetterBuilder
         return Assignment(memberPath, valueToAssign);
     }
 
-    public bool Equals(MemberPathSetterBuilder other)
-        => IsMethod == other.IsMethod && MemberPath.Equals(other.MemberPath);
+    public bool Equals(MemberPathSetterBuilder other) => IsMethod == other.IsMethod && MemberPath.Equals(other.MemberPath);
 
-    public override bool Equals(object? obj) {
+    bool IEquatable<MemberPathSetterBuilder>.Equals(MemberPathSetterBuilder? other) => other is not null && Equals(other);
+
+    public override bool Equals(object? obj)
+    {
         if (ReferenceEquals(null, obj))
         {
             return false;
@@ -105,12 +107,9 @@ public class MemberPathSetterBuilder
         return obj is MemberPathSetterBuilder setterBuilder && Equals(setterBuilder);
     }
 
-    public override int GetHashCode()
-        => HashCode.Combine(IsMethod, MemberPath);
+    public override int GetHashCode() => HashCode.Combine(IsMethod, MemberPath);
 
-    public static bool operator ==(MemberPathSetterBuilder? left, MemberPathSetterBuilder? right)
-        => Equals(left, right);
+    public static bool operator ==(MemberPathSetterBuilder? left, MemberPathSetterBuilder? right) => Equals(left, right);
 
-    public static bool operator !=(MemberPathSetterBuilder? left, MemberPathSetterBuilder? right)
-        => !Equals(left, right);
+    public static bool operator !=(MemberPathSetterBuilder? left, MemberPathSetterBuilder? right) => !Equals(left, right);
 }

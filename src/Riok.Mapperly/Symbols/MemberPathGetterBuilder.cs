@@ -6,7 +6,7 @@ using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Symbols;
 
-public class MemberPathGetterBuilder
+public class MemberPathGetterBuilder : IEquatable<MemberPathGetterBuilder>
 {
     private const string NullableValueProperty = "Value";
 
@@ -89,10 +89,12 @@ public class MemberPathGetterBuilder
         return path.Aggregate(baseAccess, (a, b) => b.BuildAccess(a));
     }
 
-    public bool Equals(MemberPathGetterBuilder other)
-        => MemberPath.Equals(other.MemberPath);
+    public bool Equals(MemberPathGetterBuilder other) => MemberPath.Equals(other.MemberPath);
 
-    public override bool Equals(object? obj) {
+    bool IEquatable<MemberPathGetterBuilder>.Equals(MemberPathGetterBuilder? other) => other is not null && Equals(other);
+
+    public override bool Equals(object? obj)
+    {
         if (ReferenceEquals(null, obj))
         {
             return false;
@@ -106,12 +108,9 @@ public class MemberPathGetterBuilder
         return obj is MemberPathGetterBuilder getterBuilder && Equals(getterBuilder);
     }
 
-    public override int GetHashCode()
-        => MemberPath.GetHashCode();
+    public override int GetHashCode() => MemberPath.GetHashCode();
 
-    public static bool operator ==(MemberPathGetterBuilder? left, MemberPathGetterBuilder? right)
-        => Equals(left, right);
+    public static bool operator ==(MemberPathGetterBuilder? left, MemberPathGetterBuilder? right) => Equals(left, right);
 
-    public static bool operator !=(MemberPathGetterBuilder? left, MemberPathGetterBuilder? right)
-        => !Equals(left, right);
+    public static bool operator !=(MemberPathGetterBuilder? left, MemberPathGetterBuilder? right) => !Equals(left, right);
 }
