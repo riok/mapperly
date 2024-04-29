@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
@@ -17,10 +18,12 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     where T : IMapping
 {
     private readonly HashSet<string> _unmappedSourceMemberNames;
+    private readonly HashSet<string> _unusedNestedMemberPaths;
     private readonly HashSet<string> _mappedAndIgnoredTargetMemberNames;
     private readonly HashSet<string> _mappedAndIgnoredSourceMemberNames;
     private readonly IReadOnlyCollection<string> _ignoredUnmatchedTargetMemberNames;
     private readonly IReadOnlyCollection<string> _ignoredUnmatchedSourceMemberNames;
+    private readonly IReadOnlyCollection<MemberPath> _nestedMemberPaths;
 
     private bool _hasMemberMapping;
 
@@ -29,6 +32,8 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         BuilderContext = builderContext;
         Mapping = mapping;
         MemberConfigsByRootTargetName = GetMemberConfigurations();
+        _nestedMemberPaths = GetNestedMemberPaths();
+        _unusedNestedMemberPaths = _nestedMemberPaths.Select(c => c.FullName).ToHashSet();
 
         _unmappedSourceMemberNames = GetSourceMemberNames();
         TargetMembers = GetTargetMembers();
@@ -49,8 +54,6 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         );
 
         _unmappedSourceMemberNames.ExceptWith(IgnoredSourceMemberNames);
-
-        MemberConfigsByRootTargetName = GetMemberConfigurations();
 
         // source and target properties may have been ignored and mapped explicitly
         _mappedAndIgnoredSourceMemberNames = MemberConfigsByRootTargetName
@@ -101,6 +104,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         AddUnmatchedIgnoredSourceMembersDiagnostics();
         AddUnmatchedTargetMembersDiagnostics();
         AddUnmatchedSourceMembersDiagnostics();
+        AddUnusedNestedMembersDiagnostics();
         AddMappedAndIgnoredSourceMembersDiagnostics();
         AddMappedAndIgnoredTargetMembersDiagnostics();
         AddNoMemberMappedDiagnostic();
@@ -110,6 +114,50 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
     {
         _hasMemberMapping = true;
         _unmappedSourceMemberNames.Remove(sourcePath.Path.First().Name);
+    }
+
+    public bool TryFindNestedSourceMembersPath(
+        string targetMemberName,
+        [NotNullWhen(true)] out MemberPath? sourceMemberPath,
+        bool? ignoreCase = null
+    )
+    {
+        ignoreCase ??= BuilderContext.Configuration.Mapper.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
+        var pathCandidates = MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMemberName).Select(cs => cs.ToList()).ToList();
+
+        // First, try to find the property on (a sub-path of) the source type itself. (If this is undesired, an Ignore property can be used.)
+        if (
+            BuilderContext.SymbolAccessor.TryFindMemberPath(
+                Mapping.SourceType,
+                pathCandidates,
+                IgnoredSourceMemberNames,
+                ignoreCase.Value,
+                out sourceMemberPath
+            )
+        )
+            return true;
+
+        // Otherwise, search all nested members
+        foreach (var nestedMemberPath in _nestedMemberPaths)
+        {
+            if (
+                BuilderContext.SymbolAccessor.TryFindMemberPath(
+                    nestedMemberPath.MemberType,
+                    pathCandidates,
+                    // Use empty ignore list to support ignoring a property for normal search while flattening its properties
+                    Array.Empty<string>(),
+                    ignoreCase.Value,
+                    out var nestedSourceMemberPath
+                )
+            )
+            {
+                sourceMemberPath = new MemberPath(nestedMemberPath.Path.Concat(nestedSourceMemberPath.Path).ToList());
+                _unusedNestedMemberPaths.Remove(nestedMemberPath.FullName);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private HashSet<string> InitIgnoredUnmatchedProperties(IEnumerable<string> allProperties, IEnumerable<string> mappedProperties)
@@ -180,6 +228,27 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
             .ToDictionary(x => x.Key, x => x.ToList());
     }
 
+    private IReadOnlyCollection<MemberPath> GetNestedMemberPaths()
+    {
+        var nestedMemberPaths = new List<MemberPath>();
+
+        foreach (var nestedMemberConfig in BuilderContext.Configuration.Members.NestedMappings)
+        {
+            if (!BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.SourceType, nestedMemberConfig.Source.Path, out var memberPath))
+            {
+                BuilderContext.ReportDiagnostic(
+                    DiagnosticDescriptors.ConfiguredMappingNestedMemberNotFound,
+                    nestedMemberConfig.Source.FullName,
+                    Mapping.SourceType
+                );
+                continue;
+            }
+            nestedMemberPaths.Add(memberPath);
+        }
+
+        return nestedMemberPaths;
+    }
+
     private void AddUnmatchedIgnoredTargetMembersDiagnostics()
     {
         foreach (var notFoundIgnoredMember in _ignoredUnmatchedTargetMemberNames)
@@ -231,6 +300,14 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
                 Mapping.SourceType,
                 Mapping.TargetType
             );
+        }
+    }
+
+    private void AddUnusedNestedMembersDiagnostics()
+    {
+        foreach (var sourceMemberPath in _unusedNestedMemberPaths)
+        {
+            BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NestedMemberNotUsed, sourceMemberPath, Mapping.SourceType);
         }
     }
 

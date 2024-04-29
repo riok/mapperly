@@ -47,6 +47,10 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         public TestObjectNestedDto NestedNullableTargetNotNullable { get; set; } = new();
 
+        public int NestedMemberId { get; set; }
+
+        public int NestedMemberObjectIntValue { get; set; }
+
         public string StringNullableTargetNotNullable { get; set; } = string.Empty;
 
         public (int A, int)? TupleValue { get; set; }

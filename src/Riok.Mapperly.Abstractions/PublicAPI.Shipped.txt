@@ -155,3 +155,8 @@ Riok.Mapperly.Abstractions.UserMappingAttribute.Default.get -> bool
 Riok.Mapperly.Abstractions.UserMappingAttribute.Default.set -> void
 Riok.Mapperly.Abstractions.MapPropertyAttribute.Use.get -> string?
 Riok.Mapperly.Abstractions.MapPropertyAttribute.Use.set -> void
+Riok.Mapperly.Abstractions.MapNestedPropertiesAttribute
+Riok.Mapperly.Abstractions.MapNestedPropertiesAttribute.MapNestedPropertiesAttribute(string! source) -> void
+Riok.Mapperly.Abstractions.MapNestedPropertiesAttribute.MapNestedPropertiesAttribute(string![]! source) -> void
+Riok.Mapperly.Abstractions.MapNestedPropertiesAttribute.Source.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
+Riok.Mapperly.Abstractions.MapNestedPropertiesAttribute.SourceFullName.get -> string!

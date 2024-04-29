@@ -23,8 +23,6 @@ public static class ObjectMemberMappingBodyBuilder
 
     public static void BuildMappingBody(IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx)
     {
-        var ignoreCase = ctx.BuilderContext.Configuration.Mapper.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
-
         foreach (var targetMember in ctx.TargetMembers.Values)
         {
             if (ctx.MemberConfigsByRootTargetName.Remove(targetMember.Name, out var memberConfigs))
@@ -40,15 +38,7 @@ public static class ObjectMemberMappingBodyBuilder
                 continue;
             }
 
-            if (
-                ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
-                    ctx.Mapping.SourceType,
-                    MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMember.Name),
-                    ctx.IgnoredSourceMemberNames,
-                    ignoreCase,
-                    out var sourceMemberPath
-                )
-            )
+            if (ctx.TryFindNestedSourceMembersPath(targetMember.Name, out var sourceMemberPath))
             {
                 BuildMemberAssignmentMapping(ctx, sourceMemberPath, new MemberPath(new[] { targetMember }));
                 continue;

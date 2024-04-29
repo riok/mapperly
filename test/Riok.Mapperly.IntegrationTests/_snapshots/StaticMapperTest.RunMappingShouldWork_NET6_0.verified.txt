@@ -61,6 +61,12 @@
     StringValue: ,
     RenamedStringValue: ,
     Flattening: {},
+    NestedMember: {
+      NestedMemberId: 123,
+      NestedMemberObject: {
+        IntValue: 223
+      }
+    },
     ImmutableArrayValue: null,
     ImmutableQueueValue: [],
     ImmutableStackValue: [],

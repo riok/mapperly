@@ -76,6 +76,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             nameof(TestObject.NullableUnflatteningIdValue),
             nameof(TestObjectDto.NullableUnflattening) + "." + nameof(TestObjectDto.NullableUnflattening.IdValue)
         )]
+        [MapNestedProperties(nameof(TestObject.NestedMember))]
         [MapperIgnoreObsoleteMembers]
         private partial TestObjectDto MapToDtoInternal(TestObject testObject);
 

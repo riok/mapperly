@@ -19,6 +19,12 @@
     IntValue: 100
   },
   NestedNullableTargetNotNullable: {},
+  NestedMember: {
+    NestedMemberId: 12,
+    NestedMemberObject: {
+      IntValue: 22
+    }
+  },
   StringNullableTargetNotNullable: fooBar3,
   TupleValue: {
     Item1: 10,
@@ -52,6 +58,12 @@
     StringValue: ,
     RenamedStringValue: ,
     Flattening: {},
+    NestedMember: {
+      NestedMemberId: 123,
+      NestedMemberObject: {
+        IntValue: 223
+      }
+    },
     MemoryValue: {
       IsEmpty: true
     },

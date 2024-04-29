@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
-using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
@@ -170,17 +169,7 @@ public static class NewValueTupleMappingBodyBuilder
         out MemberPath? sourcePath
     )
     {
-        var ignoreCase = ctx.BuilderContext.Configuration.Mapper.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
-
-        if (
-            ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
-                ctx.Mapping.SourceType,
-                MemberPathCandidateBuilder.BuildMemberPathCandidates(field.Name),
-                ctx.IgnoredSourceMemberNames,
-                ignoreCase,
-                out sourcePath
-            )
-        )
+        if (ctx.TryFindNestedSourceMembersPath(field.Name, out sourcePath))
         {
             return true;
         }

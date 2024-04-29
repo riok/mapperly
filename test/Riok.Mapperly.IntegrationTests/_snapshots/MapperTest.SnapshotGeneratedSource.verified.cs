@@ -86,6 +86,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(testObject.NestedNullableTargetNotNullable);
             }
+            if (testObject.NestedMember != null)
+            {
+                if (testObject.NestedMember.NestedMemberObject != null)
+                {
+                    target.NestedMemberObjectIntValue = DirectInt(testObject.NestedMember.NestedMemberObject.IntValue);
+                }
+                target.NestedMemberId = DirectInt(testObject.NestedMember.NestedMemberId);
+            }
             if (testObject.StringNullableTargetNotNullable != null)
             {
                 target.StringNullableTargetNotNullable = testObject.StringNullableTargetNotNullable;

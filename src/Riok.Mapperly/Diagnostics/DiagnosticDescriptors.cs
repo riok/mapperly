@@ -677,6 +677,26 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static readonly DiagnosticDescriptor ConfiguredMappingNestedMemberNotFound =
+        new(
+            "RMG070",
+            "Mapping nested member not found",
+            "Specified nested member {0} on source type {1} was not found",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Error,
+            true
+        );
+
+    public static readonly DiagnosticDescriptor NestedMemberNotUsed =
+        new(
+            "RMG071",
+            "Nested properties mapping is not used",
+            "Configured nested member {0} on source type {1} is not used",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Warning,
+            true
+        );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT

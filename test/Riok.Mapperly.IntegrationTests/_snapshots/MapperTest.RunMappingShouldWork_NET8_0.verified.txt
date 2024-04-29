@@ -19,6 +19,8 @@
     IntValue: 100
   },
   NestedNullableTargetNotNullable: {},
+  NestedMemberId: 12,
+  NestedMemberObjectIntValue: 22,
   StringNullableTargetNotNullable: fooBar3,
   TupleValue: {
     Item1: 10,
@@ -61,6 +63,12 @@
     StringValue: ,
     RenamedStringValue: ,
     Flattening: {},
+    NestedMember: {
+      NestedMemberId: 123,
+      NestedMemberObject: {
+        IntValue: 223
+      }
+    },
     ImmutableArrayValue: null,
     ImmutableQueueValue: [],
     ImmutableStackValue: [],
