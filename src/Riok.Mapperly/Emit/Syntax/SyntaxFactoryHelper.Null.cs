@@ -43,7 +43,10 @@ public partial struct SyntaxFactoryHelper
                         $"Sequence {NameOf(memberAccess.Expression)}, contained a null value at index {memberAccess.ArgumentList.Arguments[0].Expression}."
                     )
                 ),
-            _ => ThrowArgumentNullException(argument),
+            _ when argument is MemberAccessExpressionSyntax or SimpleNameSyntax => ThrowArgumentNullException(argument),
+            _ when argument is InvocationExpressionSyntax invocation
+                => ThrowNullReferenceException(StringLiteral(invocation.Expression + " returned null")),
+            _ => ThrowNullReferenceException(StringLiteral(argument + " is null")),
         };
     }
 
