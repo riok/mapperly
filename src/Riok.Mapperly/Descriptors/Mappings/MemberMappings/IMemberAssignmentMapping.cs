@@ -8,9 +8,9 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// </summary>
 public interface IMemberAssignmentMapping
 {
-    GetterMemberPath SourcePath { get; }
+    GetterMemberPath SourceGetter { get; }
 
-    MemberPath TargetPath { get; }
+    NonEmptyMemberPath TargetPath { get; }
 
     IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess);
 }

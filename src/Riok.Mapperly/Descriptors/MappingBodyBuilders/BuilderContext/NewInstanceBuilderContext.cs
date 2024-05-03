@@ -20,7 +20,7 @@ public class NewInstanceBuilderContext<T> : MembersMappingBuilderContext<T>, INe
 
     public void AddInitMemberMapping(MemberAssignmentMapping mapping)
     {
-        SetSourceMemberMapped(mapping.SourcePath);
+        SetSourceMemberMapped(mapping.SourceGetter.MemberPath);
         Mapping.AddInitMemberMapping(mapping);
     }
 
@@ -28,7 +28,7 @@ public class NewInstanceBuilderContext<T> : MembersMappingBuilderContext<T>, INe
     {
         var paramName = RootTargetNameCasingMapping.GetValueOrDefault(mapping.Parameter.Name, defaultValue: mapping.Parameter.Name);
         MemberConfigsByRootTargetName.Remove(paramName);
-        SetSourceMemberMapped(mapping.DelegateMapping.SourcePath);
+        SetSourceMemberMapped(mapping.DelegateMapping.SourceGetter.MemberPath);
         Mapping.AddConstructorParameterMapping(mapping);
     }
 }

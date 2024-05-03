@@ -273,8 +273,8 @@ public class ObjectPropertyTest
         var source = TestSourceBuilder.Mapping(
             "A",
             "B",
-            "class A { public DateTime Value { get; set; } }",
-            "class B { public Version Value { get; set; } }"
+            "class A { public Version Value { get; set; } }",
+            "class B { public DateTime Value { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);

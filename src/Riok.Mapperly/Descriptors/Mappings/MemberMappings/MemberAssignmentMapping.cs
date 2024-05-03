@@ -8,14 +8,14 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// Represents a simple member mapping including an assignment to a target member.
 /// (eg. target.A = source.B)
 /// </summary>
-[DebuggerDisplay("MemberAssignmentMapping({SourcePath.FullName} => {TargetPath.FullName})")]
+[DebuggerDisplay("MemberAssignmentMapping({SourceGetter.MemberPath.FullName} => {TargetPath.FullName})")]
 public class MemberAssignmentMapping(SetterMemberPath targetPath, IMemberMapping mapping) : IMemberAssignmentMapping
 {
     private readonly IMemberMapping _mapping = mapping;
 
-    public GetterMemberPath SourcePath => _mapping.SourcePath;
+    public GetterMemberPath SourceGetter => _mapping.SourceGetter;
 
-    public MemberPath TargetPath => targetPath;
+    public NonEmptyMemberPath TargetPath => targetPath.MemberPath;
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess) =>
         ctx.SyntaxFactory.SingleStatement(BuildExpression(ctx, targetAccess));
@@ -47,7 +47,7 @@ public class MemberAssignmentMapping(SetterMemberPath targetPath, IMemberMapping
         unchecked
         {
             var hashCode = _mapping.GetHashCode();
-            hashCode = (hashCode * 397) ^ SourcePath.GetHashCode();
+            hashCode = (hashCode * 397) ^ SourceGetter.GetHashCode();
             hashCode = (hashCode * 397) ^ TargetPath.GetHashCode();
             return hashCode;
         }
@@ -59,6 +59,6 @@ public class MemberAssignmentMapping(SetterMemberPath targetPath, IMemberMapping
 
     protected bool Equals(MemberAssignmentMapping other)
     {
-        return _mapping.Equals(other._mapping) && SourcePath.Equals(other.SourcePath) && TargetPath.Equals(other.TargetPath);
+        return _mapping.Equals(other._mapping) && SourceGetter.Equals(other.SourceGetter) && TargetPath.Equals(other.TargetPath);
     }
 }

@@ -6,7 +6,7 @@
       Severity: Error,
       WarningLevel: 0,
       Location: : (11,4)-(11,84),
-      MessageFormat: Reference loop detected while mapping from {0}.{1} to the init only member {2}.{3}, consider ignoring this member,
+      MessageFormat: Reference loop detected while mapping from {0} to the init only member {1}, consider ignoring this member,
       Message: Reference loop detected while mapping from A.Parent to the init only member B.Parent, consider ignoring this member,
       Category: Mapper
     },

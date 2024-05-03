@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Emit.Syntax;
@@ -7,15 +6,26 @@ using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Symbols;
 
-public class GetterMemberPath : MemberPath
+public class GetterMemberPath : IEquatable<GetterMemberPath>
 {
-    private GetterMemberPath(IReadOnlyList<IMappableMember> path)
-        : base(path) { }
+    private const string NullableValueProperty = "Value";
+
+    private GetterMemberPath(MemberPath memberPath)
+    {
+        MemberPath = memberPath;
+    }
+
+    public MemberPath MemberPath { get; }
 
     public static GetterMemberPath Build(MappingBuilderContext ctx, MemberPath memberPath)
     {
+        if (memberPath.Path.Count == 0)
+        {
+            return new GetterMemberPath(memberPath);
+        }
+
         var memberPathArray = memberPath.Path.Select(item => BuildMappableMember(ctx, item)).ToArray();
-        return new GetterMemberPath(memberPathArray);
+        return new GetterMemberPath(new NonEmptyMemberPath(memberPath.RootType, memberPathArray));
     }
 
     public static IEnumerable<IMappableMember> Build(MappingBuilderContext ctx, IEnumerable<IMappableMember> path)
@@ -49,19 +59,13 @@ public class GetterMemberPath : MemberPath
     }
 
     public ExpressionSyntax BuildAccess(
-        ExpressionSyntax? baseAccess,
+        ExpressionSyntax baseAccess,
         bool addValuePropertyOnNullable = false,
         bool nullConditional = false,
         bool skipTrailingNonNullable = false
     )
     {
-        var path = skipTrailingNonNullable ? PathWithoutTrailingNonNullable() : Path;
-
-        if (baseAccess == null)
-        {
-            baseAccess = SyntaxFactory.IdentifierName(path.First().Name);
-            path = path.Skip(1);
-        }
+        var path = skipTrailingNonNullable ? MemberPath.PathWithoutTrailingNonNullable() : MemberPath.Path;
 
         if (nullConditional)
         {
@@ -84,4 +88,29 @@ public class GetterMemberPath : MemberPath
 
         return path.Aggregate(baseAccess, (a, b) => b.BuildAccess(a));
     }
+
+    public bool Equals(GetterMemberPath other) => MemberPath.Equals(other.MemberPath);
+
+    bool IEquatable<GetterMemberPath>.Equals(GetterMemberPath? other) => other is not null && Equals(other);
+
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(null, obj))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        return obj is GetterMemberPath getterBuilder && Equals(getterBuilder);
+    }
+
+    public override int GetHashCode() => MemberPath.GetHashCode();
+
+    public static bool operator ==(GetterMemberPath? left, GetterMemberPath? right) => Equals(left, right);
+
+    public static bool operator !=(GetterMemberPath? left, GetterMemberPath? right) => !Equals(left, right);
 }

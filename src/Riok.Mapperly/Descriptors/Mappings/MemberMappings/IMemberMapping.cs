@@ -9,7 +9,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// </summary>
 public interface IMemberMapping
 {
-    GetterMemberPath SourcePath { get; }
+    GetterMemberPath SourceGetter { get; }
 
     ExpressionSyntax Build(TypeMappingBuildContext ctx);
 }

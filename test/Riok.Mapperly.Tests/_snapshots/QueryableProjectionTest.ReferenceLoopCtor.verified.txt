@@ -6,7 +6,7 @@
       Severity: Warning,
       WarningLevel: 1,
       Location: : (11,4)-(11,84),
-      MessageFormat: Reference loop detected while mapping from {0}.{1} to the constructor parameter {3} of {2}, consider ignoring this member or mark another constructor as mapping constructor,
+      MessageFormat: Reference loop detected while mapping from {0} to the constructor parameter {2} of {1}, consider ignoring this member or mark another constructor as mapping constructor,
       Message: Reference loop detected while mapping from A.Parent to the constructor parameter parent of B, consider ignoring this member or mark another constructor as mapping constructor,
       Category: Mapper
     },

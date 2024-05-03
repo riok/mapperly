@@ -69,7 +69,7 @@ public static class DiagnosticDescriptors
         new(
             "RMG007",
             "Could not map member",
-            "Could not map member {0}.{1} of type {2} to {3}.{4} of type {5}",
+            "Could not map member {0} to {1}",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Error,
             true
@@ -89,7 +89,7 @@ public static class DiagnosticDescriptors
         new(
             "RMG009",
             "Cannot map to read only member",
-            "Cannot map member {0}.{1} of type {2} to read only member {3}.{4} of type {5}",
+            "Cannot map member {0} to read only member {1}",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Info,
             true
@@ -99,7 +99,7 @@ public static class DiagnosticDescriptors
         new(
             "RMG010",
             "Cannot map from write only member",
-            "Cannot map from write only member {0}.{1} of type {2} to member {3}.{4} of type {5}",
+            "Cannot map from write only member {0} to member {1}",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Info,
             true
@@ -109,7 +109,7 @@ public static class DiagnosticDescriptors
         new(
             "RMG011",
             "Cannot map to write only member path",
-            "Cannot map from member {0}.{1} of type {2} to write only member path {3}.{4} of type {5}",
+            "Cannot map from member {0} to write only member path {1}",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Info,
             true
@@ -149,7 +149,7 @@ public static class DiagnosticDescriptors
         new(
             "RMG015",
             "Cannot map to init only member path",
-            "Cannot map from member {0}.{1} of type {2} to init only member path {3}.{4} of type {5}",
+            "Cannot map from member {0} to init only member path {1}",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Info,
             true
@@ -279,7 +279,7 @@ public static class DiagnosticDescriptors
         new(
             "RMG030",
             "Reference loop detected while mapping to an init only member",
-            "Reference loop detected while mapping from {0}.{1} to the init only member {2}.{3}, consider ignoring this member",
+            "Reference loop detected while mapping from {0} to the init only member {1}, consider ignoring this member",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Error,
             true
@@ -289,7 +289,7 @@ public static class DiagnosticDescriptors
         new(
             "RMG031",
             "Reference loop detected while mapping to a constructor parameter",
-            "Reference loop detected while mapping from {0}.{1} to the constructor parameter {3} of {2}, consider ignoring this member or mark another constructor as mapping constructor",
+            "Reference loop detected while mapping from {0} to the constructor parameter {2} of {1}, consider ignoring this member or mark another constructor as mapping constructor",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Warning,
             true
@@ -449,7 +449,7 @@ public static class DiagnosticDescriptors
         new(
             "RMG047",
             "Cannot map to member path due to modifying a temporary value, see CS1612",
-            "Cannot map from member {0}.{1} of type {2} to member path {3}.{4} of type {5} because {6}.{7} is a value type, returning a temporary value, see CS1612",
+            "Cannot map from member {0} to member path {1} because {2}.{3} is a value type, returning a temporary value, see CS1612",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Error,
             true

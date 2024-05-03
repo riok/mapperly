@@ -127,5 +127,8 @@ namespace Riok.Mapperly.IntegrationTests.Models
         public int ExposePrivateValue => PrivateValue;
 
         private int PrivateValue { get; set; }
+
+        public int SumComponent1 { get; set; }
+        public int SumComponent2 { get; set; }
     }
 }

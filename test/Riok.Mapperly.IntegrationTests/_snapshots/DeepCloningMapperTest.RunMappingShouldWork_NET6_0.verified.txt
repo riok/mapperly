@@ -183,5 +183,7 @@
   DateTimeValue: 2020-01-03 15:10:05 Utc,
   DateTimeValueTargetDateOnly: 2020-01-03 15:10:05 Utc,
   DateTimeValueTargetTimeOnly: 2020-01-03 15:10:05 Utc,
-  ExposePrivateValue: 18
+  ExposePrivateValue: 18,
+  SumComponent1: 32,
+  SumComponent2: 64
 }

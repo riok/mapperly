@@ -9,16 +9,16 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// </summary>
 public class MemberMapping(
     INewInstanceMapping delegateMapping,
-    GetterMemberPath sourcePath,
+    GetterMemberPath sourceGetter,
     bool nullConditionalAccess,
     bool addValuePropertyOnNullable
 ) : IMemberMapping
 {
-    public GetterMemberPath SourcePath { get; } = sourcePath;
+    public GetterMemberPath SourceGetter { get; } = sourceGetter;
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        ctx = ctx.WithSource(SourcePath.BuildAccess(ctx.Source, addValuePropertyOnNullable, nullConditionalAccess));
+        ctx = ctx.WithSource(SourceGetter.BuildAccess(ctx.Source, addValuePropertyOnNullable, nullConditionalAccess));
         return delegateMapping.Build(ctx);
     }
 }

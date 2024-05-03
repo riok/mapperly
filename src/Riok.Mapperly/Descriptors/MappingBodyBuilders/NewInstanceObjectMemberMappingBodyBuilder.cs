@@ -130,7 +130,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         MemberMappingConfiguration? memberConfig = null
     )
     {
-        var targetPath = new MemberPath(new[] { targetMember });
+        var targetPath = new NonEmptyMemberPath(ctx.Mapping.TargetType, new[] { targetMember });
         if (!ObjectMemberMappingBodyBuilder.ValidateMappingSpecification(ctx, sourcePath, targetPath, true))
             return;
 
@@ -141,12 +141,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CouldNotMapMember,
-                ctx.Mapping.SourceType,
-                sourcePath.FullName,
-                sourcePath.Member.Type,
-                ctx.Mapping.TargetType,
-                targetPath.FullName,
-                targetPath.Member.Type
+                sourcePath.ToDisplayString(),
+                targetPath.ToDisplayString()
             );
             return;
         }
@@ -155,10 +151,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ReferenceLoopInInitOnlyMapping,
-                ctx.Mapping.SourceType,
-                sourcePath.FullName,
-                ctx.Mapping.TargetType,
-                targetPath.FullName
+                sourcePath.ToDisplayString(includeMemberType: false),
+                targetPath.ToDisplayString(includeMemberType: false)
             );
             return;
         }
@@ -266,8 +260,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             {
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.ReferenceLoopInCtorMapping,
-                    ctx.Mapping.SourceType,
-                    sourcePath.FullName,
+                    sourcePath.ToDisplayString(includeMemberType: false),
                     ctx.Mapping.TargetType,
                     parameter.Name
                 );

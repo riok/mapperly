@@ -90,12 +90,8 @@ public static class NewValueTupleMappingBodyBuilder
             {
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.CouldNotMapMember,
-                    ctx.Mapping.SourceType,
-                    sourcePath.FullName,
-                    sourcePath.Member.Type,
-                    ctx.Mapping.TargetType,
-                    targetMember.Name,
-                    targetMember.Type
+                    sourcePath.ToDisplayString(),
+                    FormatTargetMemberForDiagnostic(ctx.Mapping.TargetType, targetMember)
                 );
                 return false;
             }
@@ -104,8 +100,7 @@ public static class NewValueTupleMappingBodyBuilder
             {
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.ReferenceLoopInCtorMapping,
-                    ctx.Mapping.SourceType,
-                    sourcePath.FullName,
+                    sourcePath.ToDisplayString(includeMemberType: false),
                     ctx.Mapping.TargetType,
                     targetMember.Name
                 );
@@ -119,6 +114,14 @@ public static class NewValueTupleMappingBodyBuilder
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Formats the target member in the same way that <see cref="MemberPath.ToDisplayString"/> does.
+    /// </summary>
+    private static string FormatTargetMemberForDiagnostic(ITypeSymbol targetType, IFieldSymbol targetMember)
+    {
+        return $"{targetType.ToDisplayString()}.{targetMember.Name} of type {targetMember.Type.ToDisplayString()}";
     }
 
     private static bool TryFindConstructorParameterSourcePath(
@@ -188,7 +191,7 @@ public static class NewValueTupleMappingBodyBuilder
         if (mappableField == default)
             return false;
 
-        sourcePath = new MemberPath(new[] { new FieldMember(mappableField, ctx.BuilderContext.SymbolAccessor) });
+        sourcePath = new NonEmptyMemberPath(namedType, new[] { new FieldMember(mappableField, ctx.BuilderContext.SymbolAccessor) });
         return true;
     }
 }
