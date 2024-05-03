@@ -364,6 +364,25 @@ public class ObjectPropertyUseNamedMappingTest
     }
 
     [Fact]
+    public Task UserMethodReturnsNullableShouldThrow()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("Name", "Value", Use = nameof(ToC))]
+            public partial B Map(A source);
+
+            [UserMapping(Default = false)]
+            public C? ToC(string name) => new C(name);
+            """,
+            "class A { public string? Name { get; set; } }",
+            "class B { public C Value { get; set; } }",
+            "record C(string Name);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ShouldPassNullValueToNullableUserMappingMethod()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

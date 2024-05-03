@@ -109,6 +109,11 @@ public class CarDto
 }
 ```
 
+If you want to use the `MapperIgnoreAttribute` in another .NET Project than the Mapper itself,
+that project needs to preserve the Mapperly attributes at runtime,
+see [preserving Mapperly attributes at runtime](../getting-started/installation.mdx#preserving-the-attributes-at-runtime).
+Without this, the `MapperIgnoreAttribute` is not visible to Mapperly.
+
 #### Ignore obsolete members
 
 By default, Mapperly will map source/target members marked with `ObsoleteAttribute`.

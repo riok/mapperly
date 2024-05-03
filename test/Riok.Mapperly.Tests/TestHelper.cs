@@ -16,7 +16,7 @@ public static class TestHelper
         var driver = Generate(source, options);
         var verify = Verify(driver);
 
-        if (args.Any())
+        if (args.Length != 0)
         {
             verify.UseParameters(args);
         }
