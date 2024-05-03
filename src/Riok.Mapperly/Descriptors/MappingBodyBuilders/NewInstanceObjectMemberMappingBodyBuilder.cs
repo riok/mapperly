@@ -157,7 +157,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             return;
         }
 
-        var setterTargetPath = MemberPathSetterBuilder.Build(ctx.BuilderContext, targetPath);
+        var setterTargetPath = SetterMemberPath.Build(ctx.BuilderContext, targetPath);
         var memberMapping = ctx.BuildNullMemberMapping(sourcePath, delegateMapping, targetMember.Type);
         var memberAssignmentMapping = new MemberAssignmentMapping(setterTargetPath, memberMapping);
         ctx.AddInitMemberMapping(memberAssignmentMapping);

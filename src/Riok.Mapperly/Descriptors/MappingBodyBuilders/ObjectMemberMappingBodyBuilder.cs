@@ -247,8 +247,8 @@ public static class ObjectMemberMappingBodyBuilder
         if (delegateMapping == null)
             return;
 
-        var getterSourcePath = MemberPathGetterBuilder.Build(ctx.BuilderContext, sourceMemberPath);
-        var setterTargetPath = MemberPathSetterBuilder.Build(ctx.BuilderContext, targetMemberPath);
+        var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourceMemberPath);
+        var setterTargetPath = SetterMemberPath.Build(ctx.BuilderContext, targetMemberPath);
 
         // no member of the source path is nullable, no null handling needed
         if (!sourceMemberPath.IsAnyNullable())
@@ -331,8 +331,8 @@ public static class ObjectMemberMappingBodyBuilder
         if (existingTargetMapping == null)
             return false;
 
-        var getterSourcePath = MemberPathGetterBuilder.Build(ctx.BuilderContext, sourceMemberPath);
-        var setterTargetPath = MemberPathGetterBuilder.Build(ctx.BuilderContext, targetMemberPath);
+        var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourceMemberPath);
+        var setterTargetPath = GetterMemberPath.Build(ctx.BuilderContext, targetMemberPath);
 
         var memberMapping = new MemberExistingTargetMapping(existingTargetMapping, getterSourcePath, setterTargetPath);
         ctx.AddMemberAssignmentMapping(memberMapping);

@@ -31,7 +31,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         // and the source is null
         if (BuilderContext.Configuration.Mapper.AllowNullPropertyAssignment && memberMapping.TargetPath.Member.Type.IsNullable())
         {
-            container.AddNullMemberAssignment(MemberPathSetterBuilder.Build(BuilderContext, memberMapping.TargetPath));
+            container.AddNullMemberAssignment(SetterMemberPath.Build(BuilderContext, memberMapping.TargetPath));
         }
         else if (BuilderContext.Configuration.Mapper.ThrowOnPropertyMappingNullMismatch)
         {
@@ -62,11 +62,11 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
                 continue;
             }
 
-            var setterNullablePath = MemberPathSetterBuilder.Build(BuilderContext, nullablePath);
+            var setterNullablePath = SetterMemberPath.Build(BuilderContext, nullablePath);
 
             if (setterNullablePath.IsMethod)
             {
-                var getterNullablePath = MemberPathGetterBuilder.Build(BuilderContext, nullablePath);
+                var getterNullablePath = GetterMemberPath.Build(BuilderContext, nullablePath);
                 container.AddMemberMappingContainer(
                     new MethodMemberNullAssignmentInitializerMapping(setterNullablePath, getterNullablePath)
                 );
@@ -105,7 +105,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         }
 
         mapping = new MemberNullDelegateAssignmentMapping(
-            MemberPathGetterBuilder.Build(BuilderContext, nullConditionSourcePath),
+            GetterMemberPath.Build(BuilderContext, nullConditionSourcePath),
             parentMapping,
             needsNullSafeAccess
         );

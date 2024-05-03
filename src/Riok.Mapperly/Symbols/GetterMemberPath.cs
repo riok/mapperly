@@ -6,26 +6,26 @@ using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Symbols;
 
-public class MemberPathGetterBuilder : IEquatable<MemberPathGetterBuilder>
+public class GetterMemberPath : IEquatable<GetterMemberPath>
 {
     private const string NullableValueProperty = "Value";
 
-    private MemberPathGetterBuilder(MemberPath memberPath)
+    private GetterMemberPath(MemberPath memberPath)
     {
         MemberPath = memberPath;
     }
 
     public MemberPath MemberPath { get; }
 
-    public static MemberPathGetterBuilder Build(MappingBuilderContext ctx, MemberPath memberPath)
+    public static GetterMemberPath Build(MappingBuilderContext ctx, MemberPath memberPath)
     {
         if (memberPath.Path.Count == 0)
         {
-            return new MemberPathGetterBuilder(memberPath);
+            return new GetterMemberPath(memberPath);
         }
 
         var memberPathArray = memberPath.Path.Select(item => BuildMappableMember(ctx, item)).ToArray();
-        return new MemberPathGetterBuilder(new NonEmptyMemberPath(memberPath.RootType, memberPathArray));
+        return new GetterMemberPath(new NonEmptyMemberPath(memberPath.RootType, memberPathArray));
     }
 
     public static IEnumerable<IMappableMember> Build(MappingBuilderContext ctx, IEnumerable<IMappableMember> path)
@@ -89,9 +89,9 @@ public class MemberPathGetterBuilder : IEquatable<MemberPathGetterBuilder>
         return path.Aggregate(baseAccess, (a, b) => b.BuildAccess(a));
     }
 
-    public bool Equals(MemberPathGetterBuilder other) => MemberPath.Equals(other.MemberPath);
+    public bool Equals(GetterMemberPath other) => MemberPath.Equals(other.MemberPath);
 
-    bool IEquatable<MemberPathGetterBuilder>.Equals(MemberPathGetterBuilder? other) => other is not null && Equals(other);
+    bool IEquatable<GetterMemberPath>.Equals(GetterMemberPath? other) => other is not null && Equals(other);
 
     public override bool Equals(object? obj)
     {
@@ -105,12 +105,12 @@ public class MemberPathGetterBuilder : IEquatable<MemberPathGetterBuilder>
             return true;
         }
 
-        return obj is MemberPathGetterBuilder getterBuilder && Equals(getterBuilder);
+        return obj is GetterMemberPath getterBuilder && Equals(getterBuilder);
     }
 
     public override int GetHashCode() => MemberPath.GetHashCode();
 
-    public static bool operator ==(MemberPathGetterBuilder? left, MemberPathGetterBuilder? right) => Equals(left, right);
+    public static bool operator ==(GetterMemberPath? left, GetterMemberPath? right) => Equals(left, right);
 
-    public static bool operator !=(MemberPathGetterBuilder? left, MemberPathGetterBuilder? right) => !Equals(left, right);
+    public static bool operator !=(GetterMemberPath? left, GetterMemberPath? right) => !Equals(left, right);
 }

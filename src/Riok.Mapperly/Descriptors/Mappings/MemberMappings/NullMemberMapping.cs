@@ -14,7 +14,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 [DebuggerDisplay("NullMemberMapping({SourceGetter}: {_delegateMapping})")]
 public class NullMemberMapping(
     INewInstanceMapping delegateMapping,
-    MemberPathGetterBuilder sourceGetter,
+    GetterMemberPath sourceGetter,
     ITypeSymbol targetType,
     NullFallbackValue nullFallback,
     bool useNullConditionalAccess
@@ -23,7 +23,7 @@ public class NullMemberMapping(
     private readonly INewInstanceMapping _delegateMapping = delegateMapping;
     private readonly NullFallbackValue _nullFallback = nullFallback;
 
-    public MemberPathGetterBuilder SourceGetter { get; } = sourceGetter;
+    public GetterMemberPath SourceGetter { get; } = sourceGetter;
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {

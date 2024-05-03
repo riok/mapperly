@@ -87,7 +87,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
         ITypeSymbol targetMemberType
     )
     {
-        var getterSourcePath = MemberPathGetterBuilder.Build(BuilderContext, sourcePath);
+        var getterSourcePath = GetterMemberPath.Build(BuilderContext, sourcePath);
 
         var nullFallback = NullFallbackValue.Default;
         if (!delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyNullable())

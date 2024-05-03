@@ -9,11 +9,11 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// (eg. target.A = source.B)
 /// </summary>
 [DebuggerDisplay("MemberAssignmentMapping({SourceGetter.MemberPath.FullName} => {TargetPath.FullName})")]
-public class MemberAssignmentMapping(MemberPathSetterBuilder targetPath, IMemberMapping mapping) : IMemberAssignmentMapping
+public class MemberAssignmentMapping(SetterMemberPath targetPath, IMemberMapping mapping) : IMemberAssignmentMapping
 {
     private readonly IMemberMapping _mapping = mapping;
 
-    public MemberPathGetterBuilder SourceGetter => _mapping.SourceGetter;
+    public GetterMemberPath SourceGetter => _mapping.SourceGetter;
 
     public NonEmptyMemberPath TargetPath => targetPath.MemberPath;
 

@@ -7,13 +7,10 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// <summary>
 /// A <see cref="IMemberAssignmentMapping"/> which maps to an existing target instance.
 /// </summary>
-public class MemberExistingTargetMapping(
-    IExistingTargetMapping delegateMapping,
-    MemberPathGetterBuilder sourcePath,
-    MemberPathGetterBuilder targetPath
-) : IMemberAssignmentMapping
+public class MemberExistingTargetMapping(IExistingTargetMapping delegateMapping, GetterMemberPath sourcePath, GetterMemberPath targetPath)
+    : IMemberAssignmentMapping
 {
-    public MemberPathGetterBuilder SourceGetter { get; } = sourcePath;
+    public GetterMemberPath SourceGetter { get; } = sourcePath;
 
     public NonEmptyMemberPath TargetPath => (NonEmptyMemberPath)targetPath.MemberPath;
 
