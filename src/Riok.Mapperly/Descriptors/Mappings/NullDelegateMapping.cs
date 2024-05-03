@@ -48,7 +48,7 @@ public class NullDelegateMapping : NewInstanceMapping
         if (!SourceType.IsNullable())
         {
             // if the target type is a nullable value type, there needs to be an additional cast in some cases
-            // (eg. in a linq expression, int => int?)
+            // (e.g. in a linq expression, int => int?)
             return TargetType.IsNullableValueType()
                 ? CastExpression(FullyQualifiedIdentifier(TargetType), _delegateMapping.Build(ctx))
                 : _delegateMapping.Build(ctx);
@@ -56,21 +56,42 @@ public class NullDelegateMapping : NewInstanceMapping
 
         // source is nullable and the mapping method cannot handle nulls,
         // call mapping only if source is not null.
+        // with coalesce: Map(source ?? throw)
+        // or with if-else:
         // source == null ? <null-substitute> : Map(source)
         // or for nullable value types:
         // source == null ? <null-substitute> : Map(source.Value)
-        var sourceValue = SourceType.IsNullableValueType() ? MemberAccess(ctx.Source, NullableValueProperty) : ctx.Source;
+        var nullSubstitute = NullSubstitute(TargetType, ctx.Source, _nullFallbackValue);
 
-        // disable nullable waring if accessing array
-        if (sourceValue is ElementAccessExpressionSyntax)
+        // if throw is used instead of a default value
+        // and the delegate mapping is a synthetic or method mapping
+        // the coalesce operator can be used
+        // (the Map method isn't invoked in the null case since the exception is thrown,
+        // and it is ensured no parentheses are needed since it is directly used or is passed as argument).
+        // This simplifies the generated source code.
+        if (
+            _nullFallbackValue == NullFallbackValue.ThrowArgumentNullException
+            && (_delegateMapping.IsSynthetic || _delegateMapping is MethodMapping)
+        )
         {
-            sourceValue = PostfixUnaryExpression(SyntaxKind.SuppressNullableWarningExpression, sourceValue);
+            ctx = ctx.WithSource(Coalesce(ctx.Source, nullSubstitute));
+            return _delegateMapping.Build(ctx);
         }
 
-        return Conditional(
-            IsNull(ctx.Source),
-            NullSubstitute(TargetType, ctx.Source, _nullFallbackValue),
-            _delegateMapping.Build(ctx.WithSource(sourceValue))
-        );
+        var nonNullableSourceValue = ctx.Source;
+
+        // disable nullable waring if accessing array
+        if (nonNullableSourceValue is ElementAccessExpressionSyntax)
+        {
+            nonNullableSourceValue = PostfixUnaryExpression(SyntaxKind.SuppressNullableWarningExpression, nonNullableSourceValue);
+        }
+
+        // if it is a value type, access the value property
+        if (SourceType.IsNullableValueType())
+        {
+            nonNullableSourceValue = MemberAccess(nonNullableSourceValue, NullableValueProperty);
+        }
+
+        return Conditional(IsNull(ctx.Source), nullSubstitute, _delegateMapping.Build(ctx.WithSource(nonNullableSourceValue)));
     }
 }
