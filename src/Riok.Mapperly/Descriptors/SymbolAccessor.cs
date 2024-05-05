@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Riok.Mapperly.Abstractions;
@@ -10,6 +11,10 @@ namespace Riok.Mapperly.Descriptors;
 
 public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSymbol mapperSymbol)
 {
+    // this is a weak reference table
+    // since if there is no reference to the key
+    // the values should not be kept in the memory anymore / are not needed anymore.
+    private readonly ConditionalWeakTable<ITypeSymbol, ITypeSymbol> _originalNullableTypes = new();
     private readonly Dictionary<ISymbol, ImmutableArray<AttributeData>> _attributes = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<ISymbol>> _allMembers = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<IMappableMember>> _allAccessibleMembers =
@@ -125,7 +130,38 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
                 break;
         }
 
+        _originalNullableTypes.Add(upgradedSymbol, symbol);
         return true;
+    }
+
+    /// <summary>
+    /// Returns a non-nullable variant of <paramref name="type"/>
+    /// if the <paramref name="userMappingType"/> declared by the user
+    /// does not have nullable annotations (<see cref="NullableAnnotation.None"/>).
+    /// If no user-mapping type is provided, the <paramref name="type"/> is used
+    /// to resolve the original nullable values.
+    /// This can be used in contexts where the original nullable annotations are important
+    /// (the not-yet "upgraded" values).
+    /// Usually this is the case if <see cref="NullableAnnotation.None"/> should
+    /// behave differently than <see cref="NullableAnnotation.Annotated"/>
+    /// (<see cref="NullableAnnotation.None"/> is upgraded to <see cref="NullableAnnotation.Annotated"/>
+    /// while reading the user symbols).
+    /// </summary>
+    /// <param name="type">The type</param>
+    /// <param name="userMappingType">The user mapping type.</param>
+    /// <returns>The <paramref name="type"/> or its non-nullable variant.</returns>
+    internal ITypeSymbol NonNullableIfNullableReferenceTypesDisabled(ITypeSymbol type, ITypeSymbol? userMappingType = null)
+    {
+        if (
+            type.IsNullableReferenceType()
+            && _originalNullableTypes.TryGetValue(userMappingType ?? type, out var originalType)
+            && originalType.NullableAnnotation == NullableAnnotation.None
+        )
+        {
+            return type.NonNullable();
+        }
+
+        return type;
     }
 
     internal IEnumerable<AttributeData> GetAttributes<T>(ISymbol symbol)

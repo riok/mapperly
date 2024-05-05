@@ -7,12 +7,12 @@ public enum MappingBuildingOptions
     Default = MarkAsReusable,
 
     /// <summary>
-    /// Whether the built mapping can be reused and is findable by <see cref="MappingBuilderContext.FindMapping"/>.
+    /// Whether the built mapping can be reused and is findable by <see cref="MappingBuilderContext.FindMapping(TypeMappingKey)"/>.
     /// </summary>
     MarkAsReusable = 1 << 0,
 
     /// <summary>
-    /// Keeps the existing user symbol (method) and its configuration if present.
+    /// Keeps the existing user symbol (user mapping / method) and its configuration if present.
     /// </summary>
     KeepUserSymbol = 1 << 1,
 

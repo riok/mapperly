@@ -162,7 +162,7 @@ public class DescriptorBuilder
                 _builderContext,
                 objectFactories,
                 formatProviders,
-                userMapping.Method,
+                userMapping,
                 new TypeMappingKey(userMapping.SourceType, userMapping.TargetType)
             );
 
