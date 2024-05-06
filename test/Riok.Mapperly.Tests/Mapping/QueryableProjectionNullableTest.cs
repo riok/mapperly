@@ -167,4 +167,18 @@ public class QueryableProjectionNullableTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task RecordToClassDisabledNullableContext()
+    {
+        // see https://github.com/riok/mapperly/issues/1196
+        var source = TestSourceBuilder.Mapping(
+            "System.Linq.IQueryable<A>",
+            "System.Linq.IQueryable<B>",
+            "public record A(string Value);",
+            "public record B(string Value);"
+        );
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
 }

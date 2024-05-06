@@ -16,16 +16,16 @@ namespace Riok.Mapperly.Descriptors;
 public class InlineExpressionMappingBuilderContext : MappingBuilderContext
 {
     public InlineExpressionMappingBuilderContext(MappingBuilderContext ctx, TypeMappingKey mappingKey)
-        : base(ctx, (ctx.FindMapping(mappingKey) as IUserMapping)?.Method, null, mappingKey, false) { }
+        : base(ctx, ctx.FindMapping(mappingKey) as IUserMapping, null, mappingKey, false) { }
 
     private InlineExpressionMappingBuilderContext(
         InlineExpressionMappingBuilderContext ctx,
-        IMethodSymbol? userSymbol,
+        IUserMapping? userMapping,
         Location? diagnosticLocation,
         TypeMappingKey mappingKey,
         bool ignoreDerivedTypes
     )
-        : base(ctx, userSymbol, diagnosticLocation, mappingKey, ignoreDerivedTypes) { }
+        : base(ctx, userMapping, diagnosticLocation, mappingKey, ignoreDerivedTypes) { }
 
     public override bool IsExpression => true;
 
@@ -118,7 +118,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         Location? diagnosticLocation = null
     )
     {
-        var userSymbol = options.HasFlag(MappingBuildingOptions.KeepUserSymbol) ? UserSymbol : null;
+        var userMapping = options.HasFlag(MappingBuildingOptions.KeepUserSymbol) ? UserMapping : null;
 
         // inline expression mappings don't reuse the user-defined mappings directly
         // but to apply the same configurations the default mapping user symbol is used
@@ -127,13 +127,13 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         // for inline expression mappings.
         // This is not needed for regular mappings as these user defined method mappings
         // are directly built (with KeepUserSymbol) and called by the other mappings.
-        userSymbol ??= (MappingBuilder.Find(mappingKey) as IUserMapping)?.Method;
+        userMapping ??= (MappingBuilder.Find(mappingKey) as IUserMapping);
         options &= ~MappingBuildingOptions.KeepUserSymbol;
-        return BuildMapping(userSymbol, mappingKey, options, diagnosticLocation);
+        return BuildMapping(userMapping, mappingKey, options, diagnosticLocation);
     }
 
     protected override INewInstanceMapping? BuildMapping(
-        IMethodSymbol? userSymbol,
+        IUserMapping? userMapping,
         TypeMappingKey mappingKey,
         MappingBuildingOptions options,
         Location? diagnosticLocation
@@ -145,7 +145,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         var reusable = options.HasFlag(MappingBuildingOptions.MarkAsReusable);
         options &= ~MappingBuildingOptions.MarkAsReusable;
 
-        var mapping = base.BuildMapping(userSymbol, mappingKey, options, diagnosticLocation);
+        var mapping = base.BuildMapping(userMapping, mappingKey, options, diagnosticLocation);
         if (mapping == null)
             return null;
 
@@ -183,7 +183,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         base.GetNullFallbackValue(targetType, false); // never throw inside expressions (not translatable)
 
     protected override MappingBuilderContext ContextForMapping(
-        IMethodSymbol? userSymbol,
+        IUserMapping? userMapping,
         TypeMappingKey mappingKey,
         MappingBuildingOptions options,
         Location? diagnosticLocation = null
@@ -191,7 +191,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     {
         return new InlineExpressionMappingBuilderContext(
             this,
-            userSymbol,
+            userMapping,
             diagnosticLocation,
             mappingKey,
             options.HasFlag(MappingBuildingOptions.IgnoreDerivedTypes)
@@ -209,7 +209,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
             // build an inlined version
             IUserMapping userMapping
                 => BuildMapping(
-                    userMapping.Method,
+                    userMapping,
                     new TypeMappingKey(userMapping),
                     MappingBuildingOptions.Default,
                     userMapping.Method.GetSyntaxLocation()

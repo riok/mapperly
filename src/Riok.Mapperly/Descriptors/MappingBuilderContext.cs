@@ -23,27 +23,27 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         SimpleMappingBuilderContext parentCtx,
         ObjectFactoryCollection objectFactories,
         FormatProviderCollection formatProviders,
-        IMethodSymbol? userSymbol,
+        IUserMapping? userMapping,
         TypeMappingKey mappingKey,
         Location? diagnosticLocation = null
     )
-        : base(parentCtx, diagnosticLocation ?? userSymbol?.GetSyntaxLocation())
+        : base(parentCtx, diagnosticLocation ?? userMapping?.Method.GetSyntaxLocation())
     {
         ObjectFactories = objectFactories;
         _formatProviders = formatProviders;
-        UserSymbol = userSymbol;
+        UserMapping = userMapping;
         MappingKey = mappingKey;
         Configuration = ReadConfiguration(new MappingConfigurationReference(UserSymbol, mappingKey.Source, mappingKey.Target));
     }
 
     protected MappingBuilderContext(
         MappingBuilderContext ctx,
-        IMethodSymbol? userSymbol,
+        IUserMapping? userMapping,
         Location? diagnosticLocation,
         TypeMappingKey mappingKey,
         bool ignoreDerivedTypes
     )
-        : this(ctx, ctx.ObjectFactories, ctx._formatProviders, userSymbol, mappingKey, diagnosticLocation)
+        : this(ctx, ctx.ObjectFactories, ctx._formatProviders, userMapping, mappingKey, diagnosticLocation)
     {
         if (ignoreDerivedTypes)
         {
@@ -61,7 +61,9 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public DictionaryInfos? DictionaryInfos => _dictionaryInfos ??= DictionaryInfoBuilder.Build(Types, CollectionInfos);
 
-    public IMethodSymbol? UserSymbol { get; }
+    public IUserMapping? UserMapping { get; }
+
+    public IMethodSymbol? UserSymbol => UserMapping?.Method;
 
     public bool HasUserSymbol => UserSymbol != null;
 
@@ -200,8 +202,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null
     )
     {
-        var userSymbol = options.HasFlag(MappingBuildingOptions.KeepUserSymbol) ? UserSymbol : null;
-        return BuildMapping(userSymbol, mappingKey, options, diagnosticLocation);
+        var userMapping = options.HasFlag(MappingBuildingOptions.KeepUserSymbol) ? UserMapping : null;
+        return BuildMapping(userMapping, mappingKey, options, diagnosticLocation);
     }
 
     /// <summary>
@@ -259,8 +261,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         MappingBuildingOptions options = MappingBuildingOptions.Default
     )
     {
-        var userSymbol = options.HasFlag(MappingBuildingOptions.KeepUserSymbol) ? UserSymbol : null;
-        var ctx = ContextForMapping(userSymbol, mappingKey, options);
+        var userMapping = options.HasFlag(MappingBuildingOptions.KeepUserSymbol) ? UserMapping : null;
+        var ctx = ContextForMapping(userMapping, mappingKey, options);
         return ExistingTargetMappingBuilder.Build(ctx, options.HasFlag(MappingBuildingOptions.MarkAsReusable));
     }
 
@@ -335,23 +337,23 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     }
 
     protected virtual MappingBuilderContext ContextForMapping(
-        IMethodSymbol? userSymbol,
+        IUserMapping? userMapping,
         TypeMappingKey mappingKey,
         MappingBuildingOptions options,
         Location? diagnosticLocation = null
     )
     {
-        return new(this, userSymbol, diagnosticLocation, mappingKey, options.HasFlag(MappingBuildingOptions.IgnoreDerivedTypes));
+        return new(this, userMapping, diagnosticLocation, mappingKey, options.HasFlag(MappingBuildingOptions.IgnoreDerivedTypes));
     }
 
     protected virtual INewInstanceMapping? BuildMapping(
-        IMethodSymbol? userSymbol,
+        IUserMapping? userMapping,
         TypeMappingKey mappingKey,
         MappingBuildingOptions options,
         Location? diagnosticLocation
     )
     {
-        var ctx = ContextForMapping(userSymbol, mappingKey, options, diagnosticLocation);
+        var ctx = ContextForMapping(userMapping, mappingKey, options, diagnosticLocation);
         return MappingBuilder.Build(ctx, options.HasFlag(MappingBuildingOptions.MarkAsReusable));
     }
 }
