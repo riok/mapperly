@@ -14,8 +14,8 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.7.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Build.Locator" Version="1.7.1" />
-    <PackageReference Include="NuGet.Frameworks" Version="6.9.1" />
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.7.8" />
+    <PackageReference Include="NuGet.Frameworks" Version="6.10.0" />
   </ItemGroup>
 
   <ItemGroup>
