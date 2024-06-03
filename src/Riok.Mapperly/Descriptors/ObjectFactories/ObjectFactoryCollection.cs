@@ -5,18 +5,19 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 
 public class ObjectFactoryCollection(IReadOnlyCollection<ObjectFactory> objectFactories)
 {
-    private readonly Dictionary<ITypeSymbol, ObjectFactory> _concreteObjectFactories = new(SymbolEqualityComparer.IncludeNullability);
+    private readonly Dictionary<TypeMappingKey, ObjectFactory> _concreteObjectFactories = new();
 
     public bool TryFindObjectFactory(ITypeSymbol sourceType, ITypeSymbol targetType, [NotNullWhen(true)] out ObjectFactory? objectFactory)
     {
-        if (_concreteObjectFactories.TryGetValue(targetType, out objectFactory))
+        var key = new TypeMappingKey(sourceType, targetType);
+        if (_concreteObjectFactories.TryGetValue(key, out objectFactory))
             return true;
 
         objectFactory = objectFactories.FirstOrDefault(f => f.CanCreateType(sourceType, targetType));
         if (objectFactory == null)
             return false;
 
-        _concreteObjectFactories[targetType] = objectFactory;
+        _concreteObjectFactories[key] = objectFactory;
         return true;
     }
 }

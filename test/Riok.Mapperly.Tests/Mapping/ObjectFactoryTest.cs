@@ -205,10 +205,19 @@ public class ObjectFactoryTest
     public void ShouldUseFirstMatchingObjectFactory()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[ObjectFactory] A CreateA() => new A();"
-                + "[ObjectFactory] B CreateB() => new B();"
-                + "[ObjectFactory] T Create<T>() where T : new() => new T();"
-                + "partial B Map(A a);",
+            """
+            [ObjectFactory]
+            A CreateA() => new A();
+
+            [ObjectFactory]
+            B CreateB() => new B();
+
+            [ObjectFactory]
+            T Create<T>() where T : new()
+                => new T();
+
+            partial B Map(A a);
+            """,
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }"
         );
@@ -367,6 +376,46 @@ public class ObjectFactoryTest
                 """
                 var target = Create<global::B>() ?? throw new System.NullReferenceException("The object factory Create returned null");
                 target.StringValue = a.StringValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MultipleObjectFactoriesMultipleMappingsShouldUseCorrect()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [ObjectFactory]
+            private C CreateCFromA(A source)
+                => new C();
+
+            [ObjectFactory]
+            private C CreateCFromB(B source)
+                => new C();
+
+            partial C MapA(A source);
+            partial C MapB(B source);
+            """,
+            "record A;",
+            "record B;",
+            "record C;"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMethodBody(
+                "MapA",
+                """
+                var target = CreateCFromA(source);
+                return target;
+                """
+            )
+            .HaveMethodBody(
+                "MapB",
+                """
+                var target = CreateCFromB(source);
                 return target;
                 """
             );
