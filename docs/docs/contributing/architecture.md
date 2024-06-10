@@ -18,8 +18,8 @@ and [here](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-
 - `src` Source code of Mapperly
   - `Riok.Mapperly` The source generator implementation
   - `Riok.Mapperly.Abstractions` Abstractions and attributes to be used by the application code to configure Mapperly.
-    This is referenced by the source generator but is not needed at runtime.
-  - `Riok.Mapperly.Templates` Templates of code files which are embedded as resources into `Riok.Mapperly` and may be emitted during source generation depending on enabled features.
+    This is referenced by the source generator but is not needed at runtime
+    (except for some features, e.g., reference handling).
 - `test` Unit- and integration tests of Mapperly
 
 ## Flow
