@@ -1,11 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
-using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
-using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
@@ -19,94 +16,43 @@ public static class ObjectMemberMappingBodyBuilder
     {
         var mappingCtx = new MembersContainerBuilderContext<IMemberAssignmentTypeMapping>(ctx, mapping);
         BuildMappingBody(mappingCtx);
+
+        // init only members should not result in unmapped diagnostics for existing target mappings
+        foreach (var initOnlyTargetMember in mappingCtx.EnumerateUnmappedTargetMembers().Where(x => x.IsInitOnly))
+        {
+            mappingCtx.SetTargetMemberMapped(initOnlyTargetMember);
+        }
+        mappingCtx.AddDiagnostics();
     }
 
     public static void BuildMappingBody(IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx)
     {
-        foreach (var targetMember in ctx.TargetMembers.Values)
+        foreach (var targetMember in ctx.EnumerateUnmappedOrConfiguredTargetMembers())
         {
-            if (ctx.MemberConfigsByRootTargetName.Remove(targetMember.Name, out var memberConfigs))
+            foreach (var memberMappingInfo in ctx.MatchMembers(targetMember))
             {
-                // add all configured mappings
-                // order by target path count to map less nested items first (otherwise they would overwrite all others)
-                // eg. target.A = source.B should be mapped before target.A.Id = source.B.Id
-                foreach (var config in memberConfigs.OrderBy(x => x.Target.Path.Count))
-                {
-                    BuildMemberAssignmentMapping(ctx, config);
-                }
-
-                continue;
-            }
-
-            if (ctx.TryFindNestedSourceMembersPath(targetMember.Name, out var sourceMemberPath))
-            {
-                BuildMemberAssignmentMapping(ctx, sourceMemberPath, new NonEmptyMemberPath(ctx.Mapping.TargetType, new[] { targetMember }));
-                continue;
-            }
-
-            if (
-                targetMember.CanSet
-                && ctx.BuilderContext.Configuration.Members.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target)
-            )
-            {
-                ctx.BuilderContext.ReportDiagnostic(
-                    DiagnosticDescriptors.SourceMemberNotFound,
-                    targetMember.Name,
-                    ctx.Mapping.TargetType,
-                    ctx.Mapping.SourceType
-                );
+                BuildMemberAssignmentMapping(ctx, memberMappingInfo);
             }
         }
-
-        ctx.AddDiagnostics();
-    }
-
-    private static void BuildMemberAssignmentMapping(
-        IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
-        MemberMappingConfiguration config
-    )
-    {
-        if (
-            !ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.TargetType, config.Target.Path, out var foundMemberPath)
-            || foundMemberPath is not NonEmptyMemberPath targetMemberPath
-        )
-        {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.ConfiguredMappingTargetMemberNotFound,
-                config.Target.FullName,
-                ctx.Mapping.TargetType
-            );
-            return;
-        }
-
-        if (!ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(ctx.Mapping.SourceType, config.Source.Path, out var sourceMemberPath))
-        {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.ConfiguredMappingSourceMemberNotFound,
-                config.Source.FullName,
-                ctx.Mapping.SourceType
-            );
-            return;
-        }
-
-        BuildMemberAssignmentMapping(ctx, sourceMemberPath, targetMemberPath, config);
     }
 
     [SuppressMessage("Meziantou.Analyzer", "MA0051:MethodIsTooLong")]
     public static bool ValidateMappingSpecification(
         IMembersBuilderContext<IMapping> ctx,
-        MemberPath sourceMemberPath,
-        NonEmptyMemberPath targetMemberPath,
+        MemberMappingInfo memberInfo,
         bool allowInitOnlyMember = false
     )
     {
+        var sourceMemberPath = memberInfo.SourceMember;
+        var targetMemberPath = memberInfo.TargetMember;
+
         // the target member path is readonly or not accessible
         if (!targetMemberPath.Member.CanSet)
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToReadOnlyMember,
-                sourceMemberPath.ToDisplayString(),
-                targetMemberPath.ToDisplayString()
+                memberInfo.DescribeSource(),
+                targetMemberPath.ToDisplayString(includeMemberType: false)
             );
             return false;
         }
@@ -122,8 +68,8 @@ public static class ObjectMemberMappingBodyBuilder
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToReadOnlyMember,
-                sourceMemberPath.ToDisplayString(),
-                targetMemberPath.ToDisplayString()
+                memberInfo.DescribeSource(),
+                targetMemberPath.ToDisplayString(includeMemberType: false)
             );
             return false;
         }
@@ -140,7 +86,7 @@ public static class ObjectMemberMappingBodyBuilder
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToWriteOnlyMemberPath,
-                sourceMemberPath.ToDisplayString(),
+                memberInfo.DescribeSource(),
                 targetMemberPath.ToDisplayString()
             );
             return false;
@@ -148,7 +94,7 @@ public static class ObjectMemberMappingBodyBuilder
 
         // cannot assign to intermediate value type, error CS1612
         // invalid mapping a value type has a property set
-        if (!ValidateStructModification(ctx, sourceMemberPath, targetMemberPath))
+        if (!ValidateStructModification(ctx, memberInfo))
             return false;
 
         // a target member path part is init only
@@ -157,7 +103,7 @@ public static class ObjectMemberMappingBodyBuilder
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToInitOnlyMemberPath,
-                sourceMemberPath.ToDisplayString(includeMemberType: false),
+                memberInfo.DescribeSource(),
                 targetMemberPath.ToDisplayString(includeMemberType: false)
             );
             return false;
@@ -197,28 +143,24 @@ public static class ObjectMemberMappingBodyBuilder
         return true;
     }
 
-    private static bool ValidateStructModification(
-        IMembersBuilderContext<IMapping> ctx,
-        MemberPath sourceMemberPath,
-        MemberPath targetMemberPath
-    )
+    private static bool ValidateStructModification(IMembersBuilderContext<IMapping> ctx, MemberMappingInfo memberInfo)
     {
-        if (targetMemberPath.Path.Count <= 1)
+        if (memberInfo.TargetMember.Path.Count <= 1)
             return true;
 
         // iterate backwards, if a reference type property is found then path is valid
         // if a value type property is found then invalid, a temporary struct is being modified
-        for (var i = targetMemberPath.Path.Count - 2; i >= 0; i--)
+        for (var i = memberInfo.TargetMember.Path.Count - 2; i >= 0; i--)
         {
-            var member = targetMemberPath.Path[i];
+            var member = memberInfo.TargetMember.Path[i];
             if (member is PropertyMember { Type: { IsValueType: true, IsRefLikeType: false } })
             {
                 ctx.BuilderContext.ReportDiagnostic(
                     DiagnosticDescriptors.CannotMapToTemporarySourceMember,
-                    sourceMemberPath.ToDisplayString(),
-                    targetMemberPath.ToDisplayString(),
-                    member.Name,
-                    member.Type
+                    memberInfo.DescribeSource(),
+                    memberInfo.TargetMember.ToDisplayString(),
+                    member.Type,
+                    member.Name
                 );
                 return false;
             }
@@ -232,88 +174,41 @@ public static class ObjectMemberMappingBodyBuilder
 
     private static void BuildMemberAssignmentMapping(
         IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
-        MemberPath sourceMemberPath,
-        NonEmptyMemberPath targetMemberPath,
-        MemberMappingConfiguration? memberConfig = null
+        MemberMappingInfo memberMappingInfo
     )
     {
-        if (TryAddExistingTargetMapping(ctx, sourceMemberPath, targetMemberPath))
+        // consume member configs
+        // to ensure no further mappings are created for these configurations,
+        // even if a mapping validation fails
+        ctx.ConsumeMemberConfig(memberMappingInfo);
+
+        if (TryAddExistingTargetMapping(ctx, memberMappingInfo))
             return;
 
-        if (!ValidateMappingSpecification(ctx, sourceMemberPath, targetMemberPath))
+        if (!ValidateMappingSpecification(ctx, memberMappingInfo))
             return;
 
-        var delegateMapping = TryBuildMemberTypeMapping(ctx, sourceMemberPath, targetMemberPath, memberConfig);
-        if (delegateMapping == null)
+        if (!MemberMappingBuilder.TryBuildContainerAssignment(ctx, memberMappingInfo, out var requiresNullHandling, out var mapping))
             return;
 
-        var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourceMemberPath);
-        var setterTargetPath = SetterMemberPath.Build(ctx.BuilderContext, targetMemberPath);
-
-        // no member of the source path is nullable, no null handling needed
-        if (!sourceMemberPath.IsAnyNullable())
+        if (requiresNullHandling)
         {
-            var memberMapping = new MemberMapping(delegateMapping, getterSourcePath, false, true);
-            ctx.AddMemberAssignmentMapping(new MemberAssignmentMapping(setterTargetPath, memberMapping));
-            return;
+            ctx.AddNullDelegateMemberAssignmentMapping(mapping);
         }
-
-        // If null property assignments are allowed,
-        // and the delegate mapping accepts nullable types (and converts it to a non-nullable type),
-        // or the mapping is synthetic and the target accepts nulls
-        // access the source in a null save matter (via ?.) but no other special handling required.
-        if (
-            ctx.BuilderContext.Configuration.Mapper.AllowNullPropertyAssignment
-            && (delegateMapping.SourceType.IsNullable() || delegateMapping.IsSynthetic && targetMemberPath.Member.IsNullable)
-        )
+        else
         {
-            var memberMapping = new MemberMapping(delegateMapping, getterSourcePath, true, false);
-            ctx.AddMemberAssignmentMapping(new MemberAssignmentMapping(setterTargetPath, memberMapping));
-            return;
+            ctx.AddMemberAssignmentMapping(mapping);
         }
-
-        // additional null condition check
-        // (only map if source is not null, else may throw depending on settings)
-        ctx.AddNullDelegateMemberAssignmentMapping(
-            new MemberAssignmentMapping(setterTargetPath, new MemberMapping(delegateMapping, getterSourcePath, false, true))
-        );
-    }
-
-    private static INewInstanceMapping? TryBuildMemberTypeMapping(
-        IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
-        MemberPath sourceMemberPath,
-        NonEmptyMemberPath targetMemberPath,
-        MemberMappingConfiguration? memberConfig
-    )
-    {
-        // nullability is handled inside the member mapping
-        var typeMapping = new TypeMappingKey(
-            sourceMemberPath.MemberType,
-            targetMemberPath.MemberType,
-            memberConfig?.ToTypeMappingConfiguration()
-        );
-
-        var mapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(typeMapping, diagnosticLocation: memberConfig?.Location);
-        if (mapping != null)
-        {
-            return mapping;
-        }
-
-        // couldn't build the mapping
-        ctx.BuilderContext.ReportDiagnostic(
-            DiagnosticDescriptors.CouldNotMapMember,
-            sourceMemberPath.ToDisplayString(),
-            targetMemberPath.ToDisplayString()
-        );
-        return null;
     }
 
     private static bool TryAddExistingTargetMapping(
         IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
-        MemberPath sourceMemberPath,
-        NonEmptyMemberPath targetMemberPath
+        MemberMappingInfo memberMappingInfo
     )
     {
+        var sourceMemberPath = memberMappingInfo.SourceMember;
+        var targetMemberPath = memberMappingInfo.TargetMember;
+
         // if the member is readonly
         // and the target and source path is readable,
         // we try to create an existing target mapping
@@ -326,15 +221,14 @@ public static class ObjectMemberMappingBodyBuilder
             return false;
         }
 
-        var mappingKey = new TypeMappingKey(sourceMemberPath.MemberType, targetMemberPath.MemberType);
-        var existingTargetMapping = ctx.BuilderContext.FindOrBuildExistingTargetMapping(mappingKey);
+        var existingTargetMapping = ctx.BuilderContext.FindOrBuildExistingTargetMapping(memberMappingInfo.ToTypeMappingKey());
         if (existingTargetMapping == null)
             return false;
 
         var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourceMemberPath);
-        var setterTargetPath = GetterMemberPath.Build(ctx.BuilderContext, targetMemberPath);
+        var getterTargetPath = GetterMemberPath.Build(ctx.BuilderContext, targetMemberPath);
 
-        var memberMapping = new MemberExistingTargetMapping(existingTargetMapping, getterSourcePath, setterTargetPath);
+        var memberMapping = new MemberExistingTargetMapping(existingTargetMapping, getterSourcePath, getterTargetPath, memberMappingInfo);
         ctx.AddMemberAssignmentMapping(memberMapping);
         return true;
     }

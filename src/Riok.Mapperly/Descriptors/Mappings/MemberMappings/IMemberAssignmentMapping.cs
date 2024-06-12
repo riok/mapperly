@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -8,9 +7,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// </summary>
 public interface IMemberAssignmentMapping
 {
-    GetterMemberPath SourceGetter { get; }
-
-    NonEmptyMemberPath TargetPath { get; }
+    MemberMappingInfo MemberInfo { get; }
 
     IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess);
 }

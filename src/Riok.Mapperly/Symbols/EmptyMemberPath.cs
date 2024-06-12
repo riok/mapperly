@@ -10,5 +10,6 @@ public class EmptyMemberPath(ITypeSymbol rootType) : MemberPath(rootType, [])
 
     public override ITypeSymbol MemberType => RootType;
 
-    public override string ToDisplayString(bool includeMemberType = true) => RootType.ToDisplayString();
+    public override string ToDisplayString(bool includeRootType = true, bool includeMemberType = true) =>
+        includeRootType ? RootType.ToDisplayString() : string.Empty;
 }

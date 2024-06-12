@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
@@ -7,27 +10,96 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// An implementation of <see cref="INewValueTupleBuilderContext{T}"/>.
 /// </summary>
 /// <typeparam name="T">The type of the mapping.</typeparam>
-public class NewValueTupleExpressionBuilderContext<T>(MappingBuilderContext builderContext, T mapping)
-    : MembersContainerBuilderContext<T>(builderContext, mapping),
-        INewValueTupleBuilderContext<T>
+public class NewValueTupleExpressionBuilderContext<T> : MembersContainerBuilderContext<T>, INewValueTupleBuilderContext<T>
     where T : INewValueTupleMapping, IMemberAssignmentTypeMapping
 {
+    private readonly IReadOnlyDictionary<string, IFieldSymbol> _secondarySourceNames;
+
+    /// <summary>
+    /// An implementation of <see cref="INewValueTupleBuilderContext{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the mapping.</typeparam>
+    public NewValueTupleExpressionBuilderContext(MappingBuilderContext builderContext, T mapping)
+        : base(builderContext, mapping)
+    {
+        _secondarySourceNames = mapping.SourceType.IsTupleType
+            ? BuildSecondarySourceFields()
+            : new Dictionary<string, IFieldSymbol>(StringComparer.Ordinal);
+    }
+
+    public bool TryMatchTupleElement(IFieldSymbol member, [NotNullWhen(true)] out MemberMappingInfo? memberInfo)
+    {
+        if (TryMatchMember(new FieldMember(member, BuilderContext.SymbolAccessor), null, out memberInfo))
+            return true;
+
+        if (
+            member.CorrespondingTupleField != null
+            && !string.Equals(member.CorrespondingTupleField.Name, member.Name, StringComparison.Ordinal)
+        )
+        {
+            if (TryMatchMember(new FieldMember(member.CorrespondingTupleField, BuilderContext.SymbolAccessor), null, out memberInfo))
+                return true;
+        }
+
+        return false;
+    }
+
     public void AddTupleConstructorParameterMapping(ValueTupleConstructorParameterMapping mapping)
     {
-        if (MemberConfigsByRootTargetName.TryGetValue(mapping.Parameter.Name, out var value))
-        {
-            // remove the mapping used to map the tuple constructor
-            value.RemoveAll(x => x.Target.Path.Count == 1);
+        Mapping.AddConstructorParameterMapping(mapping);
+        SetTargetMemberMapped(mapping.Parameter.Name);
+        MappingAdded(mapping.MemberInfo);
+    }
 
-            // remove from dictionary and target members if there aren't any more mappings
-            if (!value.Any())
+    protected override bool TryFindSourcePath(
+        IReadOnlyList<IReadOnlyList<string>> pathCandidates,
+        bool ignoreCase,
+        [NotNullWhen(true)] out MemberPath? sourceMemberPath
+    )
+    {
+        if (base.TryFindSourcePath(pathCandidates, ignoreCase, out sourceMemberPath))
+            return true;
+
+        if (TryFindSecondaryTupleSourceField(pathCandidates, out sourceMemberPath))
+            return true;
+
+        return false;
+    }
+
+    private bool TryFindSecondaryTupleSourceField(
+        IReadOnlyList<IReadOnlyList<string>> pathCandidates,
+        [NotNullWhen(true)] out MemberPath? sourceMemberPath
+    )
+    {
+        foreach (var pathParts in pathCandidates)
+        {
+            if (pathParts.Count != 1)
+                continue;
+
+            var name = pathParts[0];
+            if (_secondarySourceNames.TryGetValue(name, out var sourceField))
             {
-                MemberConfigsByRootTargetName.Remove(mapping.Parameter.Name);
-                TargetMembers.Remove(mapping.Parameter.Name);
+                sourceMemberPath = new NonEmptyMemberPath(
+                    Mapping.SourceType,
+                    [new FieldMember(sourceField, BuilderContext.SymbolAccessor)]
+                );
+                return true;
             }
         }
 
-        SetSourceMemberMapped(mapping.DelegateMapping.SourceGetter.MemberPath);
-        Mapping.AddConstructorParameterMapping(mapping);
+        sourceMemberPath = null;
+        return false;
+    }
+
+    private Dictionary<string, IFieldSymbol> BuildSecondarySourceFields()
+    {
+        return ((INamedTypeSymbol)Mapping.SourceType)
+            .TupleElements.Where(t =>
+                t.CorrespondingTupleField != null
+                && !string.Equals(t.Name, t.CorrespondingTupleField.Name, StringComparison.Ordinal)
+                && !IsIgnoredSourceMember(t.Name)
+                && !IsIgnoredSourceMember(t.CorrespondingTupleField.Name)
+            )
+            .ToDictionary(t => t.CorrespondingTupleField!.Name, t => t, StringComparer.Ordinal);
     }
 }

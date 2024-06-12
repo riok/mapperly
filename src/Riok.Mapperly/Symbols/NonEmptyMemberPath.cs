@@ -24,9 +24,10 @@ public class NonEmptyMemberPath : MemberPath
     public override ITypeSymbol MemberType =>
         IsAnyNullable() ? Member.Type.WithNullableAnnotation(NullableAnnotation.Annotated) : Member.Type;
 
-    public override string ToDisplayString(bool includeMemberType = true)
+    public override string ToDisplayString(bool includeRootType = true, bool includeMemberType = true)
     {
         var ofType = includeMemberType ? $" of type {Member.Type.ToDisplayString()}" : null;
-        return RootType.ToDisplayString() + MemberAccessSeparator + FullName + ofType;
+        var rootType = includeRootType ? RootType.ToDisplayString() + MemberAccessSeparator : null;
+        return rootType + FullName + ofType;
     }
 }

@@ -74,9 +74,6 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public ObjectFactoryCollection ObjectFactories { get; }
 
-    /// <inheritdoc cref="MappingBuilders.MappingBuilder.UserMappings"/>
-    public IReadOnlyCollection<IUserMapping> UserMappings => MappingBuilder.UserMappings;
-
     /// <inheritdoc cref="MappingBuilders.MappingBuilder.NewInstanceMappings"/>
     public IReadOnlyDictionary<TypeMappingKey, INewInstanceMapping> NewInstanceMappings => MappingBuilder.NewInstanceMappings;
 

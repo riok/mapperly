@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -11,5 +13,7 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 public interface INewValueTupleBuilderContext<out T> : IMembersBuilderContext<T>
     where T : IMapping
 {
+    bool TryMatchTupleElement(IFieldSymbol member, [NotNullWhen(true)] out MemberMappingInfo? memberInfo);
+
     void AddTupleConstructorParameterMapping(ValueTupleConstructorParameterMapping mapping);
 }

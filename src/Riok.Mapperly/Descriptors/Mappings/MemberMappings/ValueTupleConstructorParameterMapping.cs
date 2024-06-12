@@ -1,23 +1,26 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
-public class ValueTupleConstructorParameterMapping(IFieldSymbol parameter, NullMemberMapping delegateMapping)
+public class ValueTupleConstructorParameterMapping(IFieldSymbol parameter, ISourceValue sourceValue, MemberMappingInfo memberInfo)
 {
+    public MemberMappingInfo MemberInfo { get; } = memberInfo;
+
     /// <summary>
     /// The parameter the value tuple.
     /// Note: the nullability of it may not be "upgraded".
     /// </summary>
     public IFieldSymbol Parameter { get; } = parameter;
 
-    public NullMemberMapping DelegateMapping { get; } = delegateMapping;
+    private readonly ISourceValue _sourceValue = sourceValue;
 
     public ArgumentSyntax BuildArgument(TypeMappingBuildContext ctx, bool emitFieldName)
     {
-        var argumentExpression = DelegateMapping.Build(ctx);
+        var argumentExpression = _sourceValue.Build(ctx);
         var argument = Argument(argumentExpression);
 
         // tuples inside expression cannot use the expression form (A: .., ..) instead new ValueTuple<>(..) must be used
@@ -32,7 +35,7 @@ public class ValueTupleConstructorParameterMapping(IFieldSymbol parameter, NullM
     }
 
     protected bool Equals(ValueTupleConstructorParameterMapping other) =>
-        Parameter.Equals(other.Parameter, SymbolEqualityComparer.Default) && DelegateMapping.Equals(other.DelegateMapping);
+        Parameter.Equals(other.Parameter, SymbolEqualityComparer.Default) && _sourceValue.Equals(other._sourceValue);
 
     public override bool Equals(object? obj)
     {
@@ -53,7 +56,7 @@ public class ValueTupleConstructorParameterMapping(IFieldSymbol parameter, NullM
         unchecked
         {
             var hashCode = SymbolEqualityComparer.Default.GetHashCode(Parameter);
-            hashCode = (hashCode * 397) ^ DelegateMapping.GetHashCode();
+            hashCode = (hashCode * 397) ^ _sourceValue.GetHashCode();
             return hashCode;
         }
     }

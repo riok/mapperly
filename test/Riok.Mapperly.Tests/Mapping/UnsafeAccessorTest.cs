@@ -249,6 +249,8 @@ public class UnsafeAccessorTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToInitOnlyMemberPath)
+            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)
             .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
             .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
@@ -274,6 +276,7 @@ public class UnsafeAccessorTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
+            .HaveDiagnostic(DiagnosticDescriptors.RequiredMemberNotMapped)
             .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
             .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
@@ -299,6 +302,7 @@ public class UnsafeAccessorTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)
             .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
             .HaveAssertedAllDiagnostics();
     }
@@ -319,6 +323,7 @@ public class UnsafeAccessorTest
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.CannotMapFromWriteOnlyMember)
             .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
+            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)
             .HaveAssertedAllDiagnostics();
     }
 

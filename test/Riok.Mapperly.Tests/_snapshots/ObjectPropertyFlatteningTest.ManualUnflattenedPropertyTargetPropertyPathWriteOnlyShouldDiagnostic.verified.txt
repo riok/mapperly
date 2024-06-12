@@ -7,7 +7,7 @@
       WarningLevel: 1,
       Location: : (11,4)-(11,76),
       MessageFormat: Cannot map from {0} to write only member path {1},
-      Message: Cannot map from A.MyValueId of type string to write only member path B.Value.Id of type string,
+      Message: Cannot map from A.MyValueId to write only member path B.Value.Id of type string,
       Category: Mapper
     },
     {
@@ -18,6 +18,16 @@
       Location: : (11,4)-(11,76),
       MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
       Message: The member MyValueId on the mapping source type A is not mapped to any member on the mapping target type B,
+      Category: Mapper
+    },
+    {
+      Id: RMG012,
+      Title: Source member was not found for target member,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (11,4)-(11,76),
+      MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
+      Message: The member Value on the mapping target type B was not found on the mapping source type A,
       Category: Mapper
     },
     {

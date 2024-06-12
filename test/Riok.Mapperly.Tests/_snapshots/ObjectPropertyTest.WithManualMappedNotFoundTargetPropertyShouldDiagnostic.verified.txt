@@ -1,16 +1,6 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG012,
-      Title: Source member was not found for target member,
-      Severity: Info,
-      WarningLevel: 1,
-      Location: : (11,4)-(11,96),
-      MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
-      Message: The member StringValue2 on the mapping target type B was not found on the mapping source type A,
-      Category: Mapper
-    },
-    {
       Id: RMG005,
       Title: Mapping target member not found,
       Severity: Error,
@@ -28,6 +18,16 @@
       Location: : (11,4)-(11,96),
       MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
       Message: The member StringValue on the mapping source type A is not mapped to any member on the mapping target type B,
+      Category: Mapper
+    },
+    {
+      Id: RMG012,
+      Title: Source member was not found for target member,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (11,4)-(11,96),
+      MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
+      Message: The member StringValue2 on the mapping target type B was not found on the mapping source type A,
       Category: Mapper
     },
     {

@@ -174,6 +174,24 @@ public class QueryableProjectionTest
     }
 
     [Fact]
+    public Task CtorWithPathMappingShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial IQueryable<B> Map(IQueryable<A> source);
+
+            [MapProperty("Value1", "ValueC.Value3")]
+            private partial B MapObj(A source);
+            """,
+            "class A { public int Value1 { get; set; } public C ValueC { get; set; } }",
+            "class B(int value1, C valueC) { public int Value1 { get; set; } public C ValueC { get; set; } }",
+            "class C { public int Value2 { get; set; } public int Value3 { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public void WithReferenceHandlingShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(

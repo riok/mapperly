@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
@@ -14,348 +13,187 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// An abstract base implementation of <see cref="IMembersBuilderContext{T}"/>.
 /// </summary>
 /// <typeparam name="T">The type of the mapping.</typeparam>
-public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T>
+public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext builderContext, T mapping) : IMembersBuilderContext<T>
     where T : IMapping
 {
-    private readonly HashSet<string> _unmappedSourceMemberNames;
-    private readonly HashSet<string> _unusedNestedMemberPaths;
-    private readonly HashSet<string> _mappedAndIgnoredTargetMemberNames;
-    private readonly HashSet<string> _mappedAndIgnoredSourceMemberNames;
-    private readonly IReadOnlyCollection<string> _ignoredUnmatchedTargetMemberNames;
-    private readonly IReadOnlyCollection<string> _ignoredUnmatchedSourceMemberNames;
-    private readonly IReadOnlyCollection<MemberPath> _nestedMemberPaths;
+    private readonly MembersMappingState _state = MembersMappingStateBuilder.Build(builderContext);
 
-    private bool _hasMemberMapping;
+    private readonly NestedMappingsContext _nestedMappingsContext = NestedMappingsContext.Create(builderContext);
 
-    protected MembersMappingBuilderContext(MappingBuilderContext builderContext, T mapping)
-    {
-        BuilderContext = builderContext;
-        Mapping = mapping;
-        MemberConfigsByRootTargetName = GetMemberConfigurations();
-        _nestedMemberPaths = GetNestedMemberPaths();
-        _unusedNestedMemberPaths = _nestedMemberPaths.Select(c => c.FullName).ToHashSet();
+    public MappingBuilderContext BuilderContext { get; } = builderContext;
 
-        _unmappedSourceMemberNames = GetSourceMemberNames();
-        TargetMembers = GetTargetMembers();
-
-        IgnoredSourceMemberNames = builderContext
-            .Configuration.Members.IgnoredSources.Concat(GetIgnoredSourceMembers())
-            .Concat(GetIgnoredObsoleteSourceMembers())
-            .ToHashSet();
-        var ignoredTargetMemberNames = builderContext
-            .Configuration.Members.IgnoredTargets.Concat(GetIgnoredTargetMembers())
-            .Concat(GetIgnoredObsoleteTargetMembers())
-            .ToHashSet();
-
-        _ignoredUnmatchedSourceMemberNames = InitIgnoredUnmatchedProperties(IgnoredSourceMemberNames, _unmappedSourceMemberNames);
-        _ignoredUnmatchedTargetMemberNames = InitIgnoredUnmatchedProperties(
-            builderContext.Configuration.Members.IgnoredTargets,
-            TargetMembers.Keys
-        );
-
-        _unmappedSourceMemberNames.ExceptWith(IgnoredSourceMemberNames);
-
-        // source and target properties may have been ignored and mapped explicitly
-        _mappedAndIgnoredSourceMemberNames = MemberConfigsByRootTargetName
-            .Values.SelectMany(v => v.Where(s => s.Source.Path.Count > 0).Select(s => s.Source.Path.First()))
-            .ToHashSet();
-        _mappedAndIgnoredSourceMemberNames.IntersectWith(IgnoredSourceMemberNames);
-
-        _mappedAndIgnoredTargetMemberNames = new HashSet<string>(ignoredTargetMemberNames);
-        _mappedAndIgnoredTargetMemberNames.IntersectWith(MemberConfigsByRootTargetName.Keys);
-
-        // remove explicitly mapped ignored targets from ignoredTargetMemberNames
-        // then remove all ignored targets from TargetMembers, leaving unignored and explicitly mapped ignored members
-        ignoredTargetMemberNames.ExceptWith(_mappedAndIgnoredTargetMemberNames);
-
-        TargetMembers.RemoveRange(ignoredTargetMemberNames);
-    }
-
-    public MappingBuilderContext BuilderContext { get; }
-
-    public T Mapping { get; }
-
-    public IReadOnlyCollection<string> IgnoredSourceMemberNames { get; }
-
-    public Dictionary<string, IMappableMember> TargetMembers { get; }
-
-    public Dictionary<string, List<MemberMappingConfiguration>> MemberConfigsByRootTargetName { get; }
-
-    public NullMemberMapping BuildNullMemberMapping(
-        MemberPath sourcePath,
-        INewInstanceMapping delegateMapping,
-        ITypeSymbol targetMemberType
-    )
-    {
-        var getterSourcePath = GetterMemberPath.Build(BuilderContext, sourcePath);
-
-        var nullFallback = NullFallbackValue.Default;
-        if (!delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyNullable())
-        {
-            nullFallback = BuilderContext.GetNullFallbackValue(targetMemberType);
-        }
-
-        return new NullMemberMapping(delegateMapping, getterSourcePath, targetMemberType, nullFallback, !BuilderContext.IsExpression);
-    }
+    public T Mapping { get; } = mapping;
 
     public void AddDiagnostics()
     {
-        AddUnmatchedIgnoredTargetMembersDiagnostics();
-        AddUnmatchedIgnoredSourceMembersDiagnostics();
-        AddUnmatchedTargetMembersDiagnostics();
-        AddUnmatchedSourceMembersDiagnostics();
-        AddUnusedNestedMembersDiagnostics();
-        AddMappedAndIgnoredSourceMembersDiagnostics();
-        AddMappedAndIgnoredTargetMembersDiagnostics();
-        AddNoMemberMappedDiagnostic();
+        MemberMappingDiagnosticReporter.ReportDiagnostics(BuilderContext, _state);
+        _nestedMappingsContext.ReportDiagnostics();
     }
 
-    protected void SetSourceMemberMapped(MemberPath sourcePath)
+    public IEnumerable<IMappableMember> EnumerateUnmappedTargetMembers() => _state.EnumerateUnmappedTargetMembers();
+
+    public IEnumerable<IMappableMember> EnumerateUnmappedOrConfiguredTargetMembers() => _state.EnumerateUnmappedOrConfiguredTargetMembers();
+
+    public void SetTargetMemberMapped(IMappableMember targetMember) => _state.SetTargetMemberMapped(targetMember);
+
+    protected void SetTargetMemberMapped(string targetMemberName, bool ignoreCase = false) =>
+        _state.SetTargetMemberMapped(targetMemberName, ignoreCase);
+
+    public void SetMembersMapped(MemberMappingInfo memberInfo) => _state.SetMembersMapped(memberInfo, false);
+
+    public void ConsumeMemberConfig(MemberMappingInfo members)
     {
-        _hasMemberMapping = true;
-
-        if (sourcePath.Path.FirstOrDefault() is { } sourceMember)
+        if (members.Configuration != null)
         {
-            _unmappedSourceMemberNames.Remove(sourceMember.Name);
-        }
-        else
-        // Assume all source members are used when the source object is used itself.
-        {
-            _unmappedSourceMemberNames.Clear();
+            ConsumeMemberConfig(members.Configuration);
         }
     }
 
-    public bool TryFindNestedSourceMembersPath(
+    protected void MappingAdded(MemberMappingInfo info, bool ignoreTargetCasing = false) => _state.MappingAdded(info, ignoreTargetCasing);
+
+    protected void ConsumeMemberConfig(MemberMappingConfiguration config) => _state.ConsumeMemberConfig(config);
+
+    public IEnumerable<MemberMappingInfo> MatchMembers(IMappableMember targetMember)
+    {
+        if (TryGetMemberConfigs(targetMember.Name, false, out var memberConfigs))
+        {
+            // return configs with shorter target member paths first
+            // to prevent NRE's in the generated code
+            return ResolveMemberMappingInfo(memberConfigs.ToList()).OrderBy(x => x.TargetMember.Path.Count);
+        }
+
+        // match directly
+        if (TryFindSourcePath(targetMember.Name, out var sourceMemberPath))
+        {
+            return [new MemberMappingInfo(sourceMemberPath, new NonEmptyMemberPath(Mapping.TargetType, [targetMember]))];
+        }
+
+        return [];
+    }
+
+    protected bool TryMatchMember(IMappableMember targetMember, [NotNullWhen(true)] out MemberMappingInfo? memberInfo) =>
+        TryMatchMember(targetMember, null, out memberInfo);
+
+    protected bool TryMatchMember(IMappableMember targetMember, bool? ignoreCase, [NotNullWhen(true)] out MemberMappingInfo? memberInfo)
+    {
+        memberInfo = TryGetMemberConfigMappingInfo(targetMember, ignoreCase == true);
+        if (memberInfo != null)
+            return true;
+
+        // if no config was found, match the source path
+        if (TryFindSourcePath(targetMember.Name, out var sourceMemberPath, ignoreCase))
+        {
+            memberInfo = new MemberMappingInfo(sourceMemberPath, new NonEmptyMemberPath(BuilderContext.Target, [targetMember]));
+            return true;
+        }
+
+        memberInfo = null;
+        return false;
+    }
+
+    protected bool TryGetMemberConfigs(
         string targetMemberName,
-        [NotNullWhen(true)] out MemberPath? sourceMemberPath,
-        bool? ignoreCase = null
+        bool ignoreCase,
+        [NotNullWhen(true)] out IReadOnlyList<MemberMappingConfiguration>? memberConfigs
+    ) => _state.TryGetMemberConfigs(targetMemberName, ignoreCase, out memberConfigs);
+
+    protected virtual bool TryFindSourcePath(
+        IReadOnlyList<IReadOnlyList<string>> pathCandidates,
+        bool ignoreCase,
+        [NotNullWhen(true)] out MemberPath? sourceMemberPath
     )
+    {
+        return BuilderContext.SymbolAccessor.TryFindMemberPath(
+            Mapping.SourceType,
+            pathCandidates,
+            _state.IgnoredSourceMemberNames,
+            ignoreCase,
+            out sourceMemberPath
+        );
+    }
+
+    protected bool IsIgnoredSourceMember(string sourceMemberName) => _state.IgnoredSourceMemberNames.Contains(sourceMemberName);
+
+    private IReadOnlyList<MemberMappingInfo> ResolveMemberMappingInfo(IEnumerable<MemberMappingConfiguration> configs) =>
+        configs.Select(ResolveMemberMappingInfo).WhereNotNull().ToList();
+
+    private MemberMappingInfo? ResolveMemberMappingInfo(MemberMappingConfiguration config)
+    {
+        if (
+            !BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.TargetType, config.Target.Path, out var foundMemberPath)
+            || foundMemberPath is not NonEmptyMemberPath targetMemberPath
+        )
+        {
+            BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.ConfiguredMappingTargetMemberNotFound,
+                config.Target.FullName,
+                Mapping.TargetType
+            );
+
+            // consume this member config and prevent its further usage
+            // as it is invalid, and a diagnostic has already been reported
+            _state.ConsumeMemberConfig(config);
+            return null;
+        }
+
+        if (!ResolveMemberConfigSourcePath(config, out var sourceMemberPath))
+            return null;
+
+        return new MemberMappingInfo(sourceMemberPath, targetMemberPath, config);
+    }
+
+    private bool ResolveMemberConfigSourcePath(MemberMappingConfiguration config, [NotNullWhen(true)] out MemberPath? sourceMemberPath)
+    {
+        if (!BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.SourceType, config.Source.Path, out sourceMemberPath))
+        {
+            BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.ConfiguredMappingSourceMemberNotFound,
+                config.Source.FullName,
+                Mapping.SourceType
+            );
+
+            // consume this member config and prevent its further usage
+            // as it is invalid, and a diagnostic has already been reported
+            _state.ConsumeMemberConfig(config);
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool TryFindSourcePath(string targetMemberName, [NotNullWhen(true)] out MemberPath? sourceMemberPath, bool? ignoreCase = null)
     {
         ignoreCase ??= BuilderContext.Configuration.Mapper.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
         var pathCandidates = MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMemberName).Select(cs => cs.ToList()).ToList();
 
         // First, try to find the property on (a sub-path of) the source type itself. (If this is undesired, an Ignore property can be used.)
-        if (
-            BuilderContext.SymbolAccessor.TryFindMemberPath(
-                Mapping.SourceType,
-                pathCandidates,
-                IgnoredSourceMemberNames,
-                ignoreCase.Value,
-                out sourceMemberPath
-            )
-        )
+        if (TryFindSourcePath(pathCandidates, ignoreCase.Value, out sourceMemberPath))
             return true;
 
         // Otherwise, search all nested members
-        foreach (var nestedMemberPath in _nestedMemberPaths)
+        return _nestedMappingsContext.TryFindNestedSourcePath(pathCandidates, ignoreCase.Value, out sourceMemberPath);
+    }
+
+    private MemberMappingInfo? TryGetMemberConfigMappingInfo(IMappableMember targetMember, bool ignoreCase)
+    {
+        if (TryGetMemberConfigs(targetMember.Name, false, out var memberConfigs))
         {
-            if (
-                BuilderContext.SymbolAccessor.TryFindMemberPath(
-                    nestedMemberPath.MemberType,
-                    pathCandidates,
-                    // Use empty ignore list to support ignoring a property for normal search while flattening its properties
-                    [],
-                    ignoreCase.Value,
-                    out var nestedSourceMemberPath
-                )
-            )
+            var memberConfig = memberConfigs.FirstOrDefault(x => x.Target.Path.Count == 1);
+            if (memberConfig != null && ResolveMemberConfigSourcePath(memberConfig, out var sourceMember))
             {
-                sourceMemberPath = new NonEmptyMemberPath(
-                    Mapping.SourceType,
-                    nestedMemberPath.Path.Concat(nestedSourceMemberPath.Path).ToList()
-                );
-                _unusedNestedMemberPaths.Remove(nestedMemberPath.FullName);
-                return true;
+                return new MemberMappingInfo(sourceMember, new NonEmptyMemberPath(BuilderContext.Target, [targetMember]), memberConfig);
             }
         }
 
-        return false;
-    }
-
-    private HashSet<string> InitIgnoredUnmatchedProperties(IEnumerable<string> allProperties, IEnumerable<string> mappedProperties)
-    {
-        var unmatched = new HashSet<string>(allProperties);
-        unmatched.ExceptWith(mappedProperties);
-        return unmatched;
-    }
-
-    private IEnumerable<string> GetIgnoredObsoleteTargetMembers()
-    {
-        var obsoleteStrategy = BuilderContext.Configuration.Members.IgnoreObsoleteMembersStrategy;
-
-        if (!obsoleteStrategy.HasFlag(IgnoreObsoleteMembersStrategy.Target))
-            return Enumerable.Empty<string>();
-
-        return BuilderContext
-            .SymbolAccessor.GetAllAccessibleMappableMembers(Mapping.TargetType)
-            .Where(x => BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x.MemberSymbol))
-            .Select(x => x.Name);
-    }
-
-    private IEnumerable<string> GetIgnoredObsoleteSourceMembers()
-    {
-        var obsoleteStrategy = BuilderContext.Configuration.Members.IgnoreObsoleteMembersStrategy;
-
-        if (!obsoleteStrategy.HasFlag(IgnoreObsoleteMembersStrategy.Source))
-            return Enumerable.Empty<string>();
-
-        return BuilderContext
-            .SymbolAccessor.GetAllAccessibleMappableMembers(Mapping.SourceType)
-            .Where(x => BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x.MemberSymbol))
-            .Select(x => x.Name);
-    }
-
-    private IEnumerable<string> GetIgnoredTargetMembers()
-    {
-        return BuilderContext
-            .SymbolAccessor.GetAllAccessibleMappableMembers(Mapping.TargetType)
-            .Where(x => BuilderContext.SymbolAccessor.HasAttribute<MapperIgnoreAttribute>(x.MemberSymbol))
-            .Select(x => x.Name);
-    }
-
-    private IEnumerable<string> GetIgnoredSourceMembers()
-    {
-        return BuilderContext
-            .SymbolAccessor.GetAllAccessibleMappableMembers(Mapping.SourceType)
-            .Where(x => BuilderContext.SymbolAccessor.HasAttribute<MapperIgnoreAttribute>(x.MemberSymbol))
-            .Select(x => x.Name);
-    }
-
-    private HashSet<string> GetSourceMemberNames()
-    {
-        return BuilderContext.SymbolAccessor.GetAllAccessibleMappableMembers(Mapping.SourceType).Select(x => x.Name).ToHashSet();
-    }
-
-    private Dictionary<string, IMappableMember> GetTargetMembers()
-    {
-        return BuilderContext
-            .SymbolAccessor.GetAllAccessibleMappableMembers(Mapping.TargetType)
-            .ToDictionary(x => x.Name, StringComparer.OrdinalIgnoreCase);
-    }
-
-    private Dictionary<string, List<MemberMappingConfiguration>> GetMemberConfigurations()
-    {
-        return BuilderContext
-            .Configuration.Members.ExplicitMappings.GroupBy(x => x.Target.Path.First())
-            .ToDictionary(x => x.Key, x => x.ToList());
-    }
-
-    private IReadOnlyCollection<MemberPath> GetNestedMemberPaths()
-    {
-        var nestedMemberPaths = new List<MemberPath>();
-
-        foreach (var nestedMemberConfig in BuilderContext.Configuration.Members.NestedMappings)
+        if (ignoreCase && TryGetMemberConfigs(targetMember.Name, true, out memberConfigs))
         {
-            if (!BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.SourceType, nestedMemberConfig.Source.Path, out var memberPath))
+            var memberConfig = memberConfigs.FirstOrDefault(x => x.Target.Path.Count == 1);
+            if (memberConfig != null && ResolveMemberConfigSourcePath(memberConfig, out var sourceMember))
             {
-                BuilderContext.ReportDiagnostic(
-                    DiagnosticDescriptors.ConfiguredMappingNestedMemberNotFound,
-                    nestedMemberConfig.Source.FullName,
-                    Mapping.SourceType
-                );
-                continue;
+                return new MemberMappingInfo(sourceMember, new NonEmptyMemberPath(BuilderContext.Target, [targetMember]), memberConfig);
             }
-            nestedMemberPaths.Add(memberPath);
         }
 
-        return nestedMemberPaths;
-    }
-
-    private void AddUnmatchedIgnoredTargetMembersDiagnostics()
-    {
-        foreach (var notFoundIgnoredMember in _ignoredUnmatchedTargetMemberNames)
-        {
-            if (notFoundIgnoredMember.Contains(StringMemberPath.MemberAccessSeparator, StringComparison.Ordinal))
-            {
-                BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NestedIgnoredTargetMember, notFoundIgnoredMember, Mapping.TargetType);
-                continue;
-            }
-            BuilderContext.ReportDiagnostic(DiagnosticDescriptors.IgnoredTargetMemberNotFound, notFoundIgnoredMember, Mapping.TargetType);
-        }
-    }
-
-    private void AddUnmatchedIgnoredSourceMembersDiagnostics()
-    {
-        foreach (var notFoundIgnoredMember in _ignoredUnmatchedSourceMemberNames)
-        {
-            if (notFoundIgnoredMember.Contains(StringMemberPath.MemberAccessSeparator, StringComparison.Ordinal))
-            {
-                BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NestedIgnoredSourceMember, notFoundIgnoredMember, Mapping.TargetType);
-                continue;
-            }
-            BuilderContext.ReportDiagnostic(DiagnosticDescriptors.IgnoredSourceMemberNotFound, notFoundIgnoredMember, Mapping.SourceType);
-        }
-    }
-
-    private void AddUnmatchedTargetMembersDiagnostics()
-    {
-        foreach (var memberConfig in MemberConfigsByRootTargetName.Values.SelectMany(x => x))
-        {
-            BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.ConfiguredMappingTargetMemberNotFound,
-                memberConfig.Target.FullName,
-                Mapping.TargetType
-            );
-        }
-    }
-
-    private void AddUnmatchedSourceMembersDiagnostics()
-    {
-        if (!BuilderContext.Configuration.Members.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Source))
-            return;
-
-        foreach (var sourceMemberName in _unmappedSourceMemberNames)
-        {
-            BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.SourceMemberNotMapped,
-                sourceMemberName,
-                Mapping.SourceType,
-                Mapping.TargetType
-            );
-        }
-    }
-
-    private void AddUnusedNestedMembersDiagnostics()
-    {
-        foreach (var sourceMemberPath in _unusedNestedMemberPaths)
-        {
-            BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NestedMemberNotUsed, sourceMemberPath, Mapping.SourceType);
-        }
-    }
-
-    private void AddMappedAndIgnoredTargetMembersDiagnostics()
-    {
-        foreach (var targetMemberName in _mappedAndIgnoredTargetMemberNames)
-        {
-            BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.IgnoredTargetMemberExplicitlyMapped,
-                targetMemberName,
-                Mapping.TargetType
-            );
-        }
-    }
-
-    private void AddMappedAndIgnoredSourceMembersDiagnostics()
-    {
-        foreach (var sourceMemberName in _mappedAndIgnoredSourceMemberNames)
-        {
-            BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.IgnoredSourceMemberExplicitlyMapped,
-                sourceMemberName,
-                Mapping.SourceType
-            );
-        }
-    }
-
-    private void AddNoMemberMappedDiagnostic()
-    {
-        if (!_hasMemberMapping)
-        {
-            BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.NoMemberMappings,
-                BuilderContext.Source.ToDisplayString(),
-                BuilderContext.Target.ToDisplayString()
-            );
-        }
+        return null;
     }
 }

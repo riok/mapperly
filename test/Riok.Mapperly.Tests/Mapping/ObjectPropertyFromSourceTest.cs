@@ -37,7 +37,10 @@ public class ObjectPropertyFromSourceTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.ConfiguredMappingTargetMemberNotFound)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.ConfiguredMappingTargetMemberNotFound,
+                "Specified member Value on mapping target type B was not found"
+            )
             .HaveAssertedAllDiagnostics();
     }
 

@@ -252,6 +252,31 @@ public class ValueTupleTest
     }
 
     [Fact]
+    public void TupleToTupleWithAdditionalSourceTupleFieldShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial (int, string) Map((int A, string B, int C) source);
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member C on the mapping source type (int A, string B, int C) is not mapped to any member on the mapping target type (int, string)"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = (source.A, source.B);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void TupleToTupleWithIgnoredSourceByPosition()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -375,7 +400,10 @@ public class ValueTupleTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.NoConstructorFound)
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member A on the mapping source type (string, int A) is not mapped to any member on the mapping target type (int, int A)"
+            )
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
@@ -460,14 +488,14 @@ public class ValueTupleTest
             """
             [MapProperty("C", "A")]
             [MapProperty("Item3", "Item2")]
+            [MapperIgnoreSource("B")]
             partial (int A, int) Map((int B, int C, int) source);
             """
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
             .HaveSingleMethodBody(
                 """
                 var target = (A: source.C, source.Item3);
@@ -605,7 +633,7 @@ public class ValueTupleTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty("B", "A")]
-            [MapProperty("B", "A")]
+            [MapProperty("Item1", "A")]
             partial (int A, int) Map((int, string B) source);
             """
         );
@@ -613,7 +641,15 @@ public class ValueTupleTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.MultipleConfigurationsForConstructorParameter);
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member Item1 on the mapping source type (int, string B) is not mapped to any member on the mapping target type (int A, int)"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.MultipleConfigurationsForTargetMember,
+                "Multiple mappings are configured for the same target member (int A, int).A"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -629,7 +665,11 @@ public class ValueTupleTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.ConfiguredMappingTargetMemberNotFound);
+            .HaveDiagnostic(
+                DiagnosticDescriptors.ConfiguredMappingSourceMemberNotFound,
+                "Specified member Item2 on source type (int C, int D) was not found"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]

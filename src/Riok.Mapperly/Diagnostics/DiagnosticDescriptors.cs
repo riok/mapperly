@@ -165,16 +165,6 @@ public static class DiagnosticDescriptors
             true
         );
 
-    public static readonly DiagnosticDescriptor MultipleConfigurationsForInitOnlyMember =
-        new(
-            "RMG017",
-            "An init only member can have one configuration at max",
-            "The init only member {0}.{1} can have one configuration at max",
-            DiagnosticCategories.Mapper,
-            DiagnosticSeverity.Warning,
-            true
-        );
-
     public static readonly DiagnosticDescriptor SourceMemberNotMapped =
         new(
             "RMG020",
@@ -242,26 +232,6 @@ public static class DiagnosticDescriptors
             "Cannot map from indexed member {0}.{1} to member {2}.{3}",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Info,
-            true
-        );
-
-    public static readonly DiagnosticDescriptor MultipleConfigurationsForConstructorParameter =
-        new(
-            "RMG027",
-            "A constructor parameter can have one configuration at max",
-            "The constructor parameter at {0}.{1} can have one configuration at max",
-            DiagnosticCategories.Mapper,
-            DiagnosticSeverity.Warning,
-            true
-        );
-
-    public static readonly DiagnosticDescriptor ConstructorParameterDoesNotSupportPaths =
-        new(
-            "RMG028",
-            "Constructor parameter cannot handle target paths",
-            "Cannot map to constructor parameter target path {0}.{1}",
-            DiagnosticCategories.Mapper,
-            DiagnosticSeverity.Error,
             true
         );
 
@@ -714,6 +684,16 @@ public static class DiagnosticDescriptors
             "The target type {1} of the referenced mapping {0} does not match the expected type {2}",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Warning,
+            true
+        );
+
+    public static readonly DiagnosticDescriptor MultipleConfigurationsForTargetMember =
+        new(
+            "RMG074",
+            "Multiple mappings are configured for the same target member",
+            "Multiple mappings are configured for the same target member {0}.{1}",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Error,
             true
         );
 
