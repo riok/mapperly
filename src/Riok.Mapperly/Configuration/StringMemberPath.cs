@@ -1,8 +1,10 @@
+using Riok.Mapperly.Helpers;
+
 namespace Riok.Mapperly.Configuration;
 
-public record StringMemberPath(IReadOnlyCollection<string> Path)
+public record StringMemberPath(ImmutableEquatableArray<string> Path)
 {
-    public static readonly StringMemberPath Empty = new(Array.Empty<string>());
+    public static readonly StringMemberPath Empty = new(ImmutableEquatableArray<string>.Empty);
 
     public const char MemberAccessSeparator = '.';
     private const string MemberAccessSeparatorString = ".";

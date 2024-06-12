@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using Riok.Mapperly.Descriptors;
 
 namespace Riok.Mapperly.Configuration;
 
+[DebuggerDisplay("{Source} => {Target}")]
 public record MemberMappingConfiguration(StringMemberPath Source, StringMemberPath Target) : HasSyntaxReference
 {
     /// <summary>

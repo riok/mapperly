@@ -140,7 +140,10 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     {
         if (arg.Kind == TypedConstantKind.Array)
         {
-            var values = arg.Values.Select(x => (string?)BuildArgumentValue(x, typeof(string), null)).WhereNotNull().ToList();
+            var values = arg
+                .Values.Select(x => (string?)BuildArgumentValue(x, typeof(string), null))
+                .WhereNotNull()
+                .ToImmutableEquatableArray();
             return new StringMemberPath(values);
         }
 
@@ -163,14 +166,14 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
                     .TrimStart(FullNameOfPrefix)
                     .Split(StringMemberPath.MemberAccessSeparator)
                     .Skip(1)
-                    .ToArray();
+                    .ToImmutableEquatableArray();
                 return new StringMemberPath(argMemberPath);
             }
         }
 
         if (arg is { Kind: TypedConstantKind.Primitive, Value: string v })
         {
-            return new StringMemberPath(v.Split(StringMemberPath.MemberAccessSeparator));
+            return new StringMemberPath(v.Split(StringMemberPath.MemberAccessSeparator).ToImmutableEquatableArray());
         }
 
         throw new InvalidOperationException($"Cannot create {nameof(StringMemberPath)} from {arg.Kind}");

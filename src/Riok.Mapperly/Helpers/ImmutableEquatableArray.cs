@@ -8,12 +8,30 @@ namespace Riok.Mapperly.Helpers;
 /// <summary>
 /// Provides an immutable list implementation which implements sequence equality.
 /// </summary>
-public sealed class ImmutableEquatableArray<T>(IEnumerable<T> values) : IEquatable<ImmutableEquatableArray<T>>, IReadOnlyList<T>
+public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableArray<T>>, IReadOnlyList<T>
     where T : IEquatable<T>
 {
-    private readonly T[] _values = values.ToArray();
+    private static ImmutableEquatableArray<T>? _empty;
+
+    private readonly T[] _values;
+
     public T this[int index] => _values[index];
     public int Count => _values.Length;
+
+    public ImmutableEquatableArray(IEnumerable<T> values)
+        : this(values.ToArray()) { }
+
+    /// <summary>
+    /// Initializes a new <see cref="ImmutableEquatableArray{T}"/> instance.
+    /// This constructor should only be called with arrays
+    /// which are never modified.
+    /// </summary>
+    private ImmutableEquatableArray(T[] values)
+    {
+        _values = values;
+    }
+
+    public static ImmutableEquatableArray<T> Empty => _empty ??= new([]);
 
     public bool Equals(ImmutableEquatableArray<T>? other) => other != null && ((ReadOnlySpan<T>)_values).SequenceEqual(other._values);
 

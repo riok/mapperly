@@ -113,9 +113,9 @@ public class MapperConfigurationReader
             return MapperConfiguration.Members;
         }
 
-        foreach (var invalidMemberConfigs in memberConfigurations.Where(x => !x.IsValid))
+        foreach (var invalidMemberConfig in memberConfigurations.Where(x => !x.IsValid))
         {
-            diagnostics.ReportDiagnostic(DiagnosticDescriptors.InvalidMapPropertyAttributeUsage, invalidMemberConfigs.Location);
+            diagnostics.ReportDiagnostic(DiagnosticDescriptors.InvalidMapPropertyAttributeUsage, invalidMemberConfig.Location);
         }
 
         return new MembersMappingConfiguration(
