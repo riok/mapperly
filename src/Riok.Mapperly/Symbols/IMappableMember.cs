@@ -5,7 +5,7 @@ namespace Riok.Mapperly.Symbols;
 
 /// <summary>
 /// A mappable member is a member of a class which can take part in a mapping.
-/// (eg. a field or a property).
+/// (e.g., a field or a property).
 /// </summary>
 public interface IMappableMember
 {

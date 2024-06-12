@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors;
@@ -6,6 +7,7 @@ using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Symbols;
 
+[DebuggerDisplay("{Name}")]
 internal class PropertyMember(IPropertySymbol propertySymbol, SymbolAccessor symbolAccessor) : IMappableMember
 {
     private readonly IPropertySymbol _propertySymbol = propertySymbol;
