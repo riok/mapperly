@@ -1,9 +1,11 @@
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Symbols;
 
+[DebuggerDisplay("Accessor {Name}")]
 public class MethodAccessorMember(IMappableMember mappableMember, string methodName, bool methodRequiresParameter = false) : IMappableMember
 {
     /// <summary>

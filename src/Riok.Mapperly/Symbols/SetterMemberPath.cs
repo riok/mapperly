@@ -7,6 +7,12 @@ using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Symbols;
 
+/// <summary>
+/// Wraps a writeable member.
+/// Could be a directly accessible member
+/// or one that is only accessible with an unsafe accessor method, <seealso cref="UnsafeAccessorContext"/>.
+/// </summary>
+[DebuggerDisplay("{MemberPath}")]
 public class SetterMemberPath : IEquatable<SetterMemberPath>
 {
     private SetterMemberPath(NonEmptyMemberPath memberPath, bool isMethod)

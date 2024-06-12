@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors;
@@ -6,6 +7,12 @@ using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Symbols;
 
+/// <summary>
+/// Wraps a readable member.
+/// Could be a directly accessible member
+/// or one that is only accessible with an unsafe accessor method, <seealso cref="UnsafeAccessorContext"/>.
+/// </summary>
+[DebuggerDisplay("{MemberPath}")]
 public class GetterMemberPath : IEquatable<GetterMemberPath>
 {
     private const string NullableValueProperty = "Value";
