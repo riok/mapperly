@@ -6,8 +6,8 @@
       Severity: Info,
       WarningLevel: 1,
       Location: : (11,4)-(11,36),
-      MessageFormat: Cannot map member {0} to read only member {1},
-      Message: Cannot map member A.StringValue2 of type string to read only member B.StringValue2 of type string,
+      MessageFormat: Cannot map {0} to read only member {1},
+      Message: Cannot map A.StringValue2 of type string to read only member B.StringValue2 of type string,
       Category: Mapper
     },
     {
