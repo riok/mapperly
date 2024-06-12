@@ -154,7 +154,7 @@ public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T
                     nestedMemberPath.MemberType,
                     pathCandidates,
                     // Use empty ignore list to support ignoring a property for normal search while flattening its properties
-                    Array.Empty<string>(),
+                    [],
                     ignoreCase.Value,
                     out var nestedSourceMemberPath
                 )

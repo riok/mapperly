@@ -66,7 +66,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         var syntaxArguments =
             (IReadOnlyList<AttributeArgumentSyntax>?)syntax?.ArgumentList?.Arguments
             ?? new AttributeArgumentSyntax[attrData.ConstructorArguments.Length + attrData.NamedArguments.Length];
-        var typeArguments = (IReadOnlyCollection<ITypeSymbol>?)attrData.AttributeClass?.TypeArguments ?? Array.Empty<ITypeSymbol>();
+        var typeArguments = (IReadOnlyCollection<ITypeSymbol>?)attrData.AttributeClass?.TypeArguments ?? [];
         var attr = Create<TData>(typeArguments, attrData.ConstructorArguments, syntaxArguments);
 
         var syntaxIndex = attrData.ConstructorArguments.Length;

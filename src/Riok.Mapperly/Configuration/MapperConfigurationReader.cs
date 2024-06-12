@@ -29,20 +29,13 @@ public class MapperConfigurationReader
                 mapper.EnumMappingStrategy,
                 mapper.EnumMappingIgnoreCase,
                 null,
-                Array.Empty<IFieldSymbol>(),
-                Array.Empty<IFieldSymbol>(),
-                Array.Empty<EnumValueMappingConfiguration>(),
+                [],
+                [],
+                [],
                 mapper.RequiredMappingStrategy
             ),
-            new MembersMappingConfiguration(
-                Array.Empty<string>(),
-                Array.Empty<string>(),
-                Array.Empty<MemberMappingConfiguration>(),
-                Array.Empty<NestedMembersMappingConfiguration>(),
-                mapper.IgnoreObsoleteMembersStrategy,
-                mapper.RequiredMappingStrategy
-            ),
-            Array.Empty<DerivedTypeMappingConfiguration>()
+            new MembersMappingConfiguration([], [], [], [], mapper.IgnoreObsoleteMembersStrategy, mapper.RequiredMappingStrategy),
+            []
         );
     }
 
