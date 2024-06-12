@@ -89,7 +89,7 @@ public static class DiagnosticDescriptors
         new(
             "RMG009",
             "Cannot map to read only member",
-            "Cannot map member {0} to read only member {1}",
+            "Cannot map {0} to read only member {1}",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Info,
             true
@@ -109,7 +109,7 @@ public static class DiagnosticDescriptors
         new(
             "RMG011",
             "Cannot map to write only member path",
-            "Cannot map from member {0} to write only member path {1}",
+            "Cannot map from {0} to write only member path {1}",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Info,
             true
@@ -149,7 +149,7 @@ public static class DiagnosticDescriptors
         new(
             "RMG015",
             "Cannot map to init only member path",
-            "Cannot map from member {0} to init only member path {1}",
+            "Cannot map from {0} to init only member path {1}",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Info,
             true
@@ -469,7 +469,7 @@ public static class DiagnosticDescriptors
         new(
             "RMG049",
             "Source member is ignored and also explicitly mapped",
-            "The source member {0} on {1} is ignored, but is also mapped by the " + nameof(MapPropertyAttribute),
+            "The source member {0} on {1} is ignored, but is also mapped explicitly",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Warning,
             true
@@ -479,7 +479,7 @@ public static class DiagnosticDescriptors
         new(
             "RMG050",
             "Target member is ignored and also explicitly mapped",
-            "The target member {0} on {1} is ignored, but is also mapped by the " + nameof(MapPropertyAttribute),
+            "The target member {0} on {1} is ignored, but is also mapped explicitly",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Warning,
             true
@@ -650,8 +650,8 @@ public static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor InvalidMapPropertyAttributeUsage =
         new(
             "RMG067",
-            "Invalid usage of the MapPropertyAttribute",
-            "Invalid usage of the MapPropertyAttribute",
+            "Invalid usage of the " + nameof(MapPropertyAttribute),
+            "Invalid usage of the " + nameof(MapPropertyAttribute),
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Error,
             true

@@ -70,11 +70,11 @@ public class IgnoreAttributeTest
             )
             .HaveDiagnostic(
                 DiagnosticDescriptors.IgnoredSourceMemberExplicitlyMapped,
-                "The source member Ignored on A is ignored, but is also mapped by the MapPropertyAttribute"
+                "The source member Ignored on A is ignored, but is also mapped explicitly"
             )
             .HaveDiagnostic(
                 DiagnosticDescriptors.IgnoredTargetMemberExplicitlyMapped,
-                "The target member Ignored on B is ignored, but is also mapped by the MapPropertyAttribute"
+                "The target member Ignored on B is ignored, but is also mapped explicitly"
             )
             .HaveAssertedAllDiagnostics();
     }

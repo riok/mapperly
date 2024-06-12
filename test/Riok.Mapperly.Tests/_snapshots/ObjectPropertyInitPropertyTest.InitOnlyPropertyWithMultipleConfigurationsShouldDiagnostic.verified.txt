@@ -5,7 +5,7 @@
       Title: An init only member can have one configuration at max,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,128),
+      Location: : (11,4)-(11,126),
       MessageFormat: The init only member {0}.{1} can have one configuration at max,
       Message: The init only member string.StringValue can have one configuration at max,
       Category: Mapper
@@ -15,7 +15,7 @@
       Title: Source member is not mapped to any target member,
       Severity: Info,
       WarningLevel: 1,
-      Location: : (11,4)-(11,128),
+      Location: : (11,4)-(11,126),
       MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
       Message: The member StringValue3 on the mapping source type A is not mapped to any member on the mapping target type B,
       Category: Mapper

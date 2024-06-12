@@ -157,8 +157,8 @@ public static class ObjectMemberMappingBodyBuilder
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToInitOnlyMemberPath,
-                sourceMemberPath.ToDisplayString(),
-                targetMemberPath.ToDisplayString()
+                sourceMemberPath.ToDisplayString(includeMemberType: false),
+                targetMemberPath.ToDisplayString(includeMemberType: false)
             );
             return false;
         }
