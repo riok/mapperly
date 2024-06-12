@@ -9,7 +9,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
     [UseStaticMapper(typeof(DateTimeMapper))]
     public static partial class UseExternalMapperFromAnotherAssembly
     {
-        public static partial IQueryable<Target> MapToTarget(IQueryable<Source> source);
+        public static partial IQueryable<Target> ProjectToTarget(IQueryable<Source> source);
 
         public static partial Target MapToTarget(Source source);
 
