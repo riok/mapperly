@@ -74,7 +74,19 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions HaveSingleMethodBody([StringSyntax(StringSyntax.CSharp)] string mapperMethodBody)
     {
-        _mapper.Methods.Single().Value.Body.Should().Be(mapperMethodBody.ReplaceLineEndings());
+        switch (_mapper.Methods.Count)
+        {
+            case 0:
+                Assert.Fail("No generated method found");
+                break;
+            case 1:
+                _mapper.Methods.First().Value.Body.Should().Be(mapperMethodBody.ReplaceLineEndings());
+                break;
+            default:
+                Assert.Fail($"Found multiple methods ({_mapper.Methods.Count}): {string.Join(", ", _mapper.Methods.Select(x => x.Key))}");
+                break;
+        }
+
         return this;
     }
 
@@ -139,7 +151,7 @@ public class MapperGenerationResultAssertions
         if (_mapper.DiagnosticsByDescriptorId.TryGetValue(descriptor.Id, out var diagnostics))
             return diagnostics;
 
-        var foundIds = string.Join(", ", _mapper.Diagnostics.Select(x => x.Descriptor.Id));
-        throw new InvalidOperationException($"No diagnostic with id {descriptor.Id} found, found diagnostic ids: {foundIds}");
+        var foundIds = _mapper.Diagnostics.Count == 0 ? "<none>" : string.Join(", ", _mapper.Diagnostics.Select(x => x.Descriptor.Id));
+        throw new Exception($"No diagnostic with id {descriptor.Id} found, found diagnostic ids: {foundIds}");
     }
 }
