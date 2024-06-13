@@ -34,7 +34,7 @@ public class MapperConfigurationReader
                 [],
                 mapper.RequiredMappingStrategy
             ),
-            new MembersMappingConfiguration([], [], [], [], mapper.IgnoreObsoleteMembersStrategy, mapper.RequiredMappingStrategy),
+            new MembersMappingConfiguration([], [], [], [], [], mapper.IgnoreObsoleteMembersStrategy, mapper.RequiredMappingStrategy),
             []
         );
     }
@@ -75,6 +75,7 @@ public class MapperConfigurationReader
             .Select(x => x.Target)
             .WhereNotNull()
             .ToList();
+        var memberValueConfigurations = _dataAccessor.Access<MapValueAttribute, MemberValueMappingConfiguration>(configRef.Method).ToList();
         var memberConfigurations = _dataAccessor
             .Access<MapPropertyAttribute, MemberMappingConfiguration>(configRef.Method)
             .Concat(_dataAccessor.Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(configRef.Method))
@@ -106,6 +107,11 @@ public class MapperConfigurationReader
             return MapperConfiguration.Members;
         }
 
+        foreach (var invalidMemberConfig in memberValueConfigurations.Where(x => !x.IsValid))
+        {
+            diagnostics.ReportDiagnostic(DiagnosticDescriptors.InvalidMapValueAttributeUsage, invalidMemberConfig.Location);
+        }
+
         foreach (var invalidMemberConfig in memberConfigurations.Where(x => !x.IsValid))
         {
             diagnostics.ReportDiagnostic(DiagnosticDescriptors.InvalidMapPropertyAttributeUsage, invalidMemberConfig.Location);
@@ -114,6 +120,7 @@ public class MapperConfigurationReader
         return new MembersMappingConfiguration(
             ignoredSourceMembers,
             ignoredTargetMembers,
+            memberValueConfigurations,
             memberConfigurations,
             nestedMembersConfigurations,
             ignoreObsolete ?? MapperConfiguration.Members.IgnoreObsoleteMembersStrategy,

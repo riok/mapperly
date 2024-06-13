@@ -44,6 +44,8 @@ public partial struct SyntaxFactoryHelper
         return InvocationExpression(method).WithArgumentList(ArgumentList(arguments));
     }
 
+    public static InvocationExpressionSyntax Invocation(string methodName) => Invocation(IdentifierName(methodName));
+
     public static InvocationExpressionSyntax Invocation(ExpressionSyntax method) => Invocation(method, Array.Empty<ArgumentSyntax>());
 
     public static InvocationExpressionSyntax Invocation(ExpressionSyntax method, params ArgumentSyntax[] arguments)

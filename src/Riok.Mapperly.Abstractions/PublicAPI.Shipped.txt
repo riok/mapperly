@@ -171,3 +171,13 @@ Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute.FormatProvider.get -> 
 Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute.FormatProvider.set -> void
 Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute.Use.get -> string?
 Riok.Mapperly.Abstractions.MapPropertyFromSourceAttribute.Use.set -> void
+Riok.Mapperly.Abstractions.MapValueAttribute
+Riok.Mapperly.Abstractions.MapValueAttribute.Use.get -> string?
+Riok.Mapperly.Abstractions.MapValueAttribute.Use.set -> void
+Riok.Mapperly.Abstractions.MapValueAttribute.MapValueAttribute(string! target) -> void
+Riok.Mapperly.Abstractions.MapValueAttribute.MapValueAttribute(string! target, object? value) -> void
+Riok.Mapperly.Abstractions.MapValueAttribute.MapValueAttribute(string![]! target) -> void
+Riok.Mapperly.Abstractions.MapValueAttribute.MapValueAttribute(string![]! target, object? value) -> void
+Riok.Mapperly.Abstractions.MapValueAttribute.Target.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
+Riok.Mapperly.Abstractions.MapValueAttribute.TargetFullName.get -> string!
+Riok.Mapperly.Abstractions.MapValueAttribute.Value.get -> object?

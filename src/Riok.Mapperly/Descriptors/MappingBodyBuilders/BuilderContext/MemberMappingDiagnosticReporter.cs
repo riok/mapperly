@@ -34,7 +34,7 @@ internal static class MemberMappingDiagnosticReporter
 
     private static void AddUnmappedTargetMembersDiagnostics(MappingBuilderContext ctx, MembersMappingState state)
     {
-        foreach (var targetMember in state.UnmappedTargetMembers)
+        foreach (var targetMember in state.EnumerateUnmappedTargetMembers())
         {
             if (targetMember.IsRequired)
             {

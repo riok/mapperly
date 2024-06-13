@@ -123,6 +123,8 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     {
         return arg.Kind switch
         {
+            _ when (targetType == typeof(AttributeValue?) || targetType == typeof(AttributeValue)) && syntax != null
+                => new AttributeValue(arg, syntax.Expression),
             _ when arg.IsNull => null,
             _ when targetType == typeof(StringMemberPath) => CreateMemberPath(arg, syntax),
             TypedConstantKind.Enum => GetEnumValue(arg, targetType),

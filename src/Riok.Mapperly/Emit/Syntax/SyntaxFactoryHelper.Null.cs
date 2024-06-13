@@ -60,4 +60,7 @@ public partial struct SyntaxFactoryHelper
 
         return If(IsNull(expression), ifExpression);
     }
+
+    public static ExpressionSyntax SuppressNullableWarning(ExpressionSyntax expression) =>
+        PostfixUnaryExpression(SyntaxKind.SuppressNullableWarningExpression, expression);
 }

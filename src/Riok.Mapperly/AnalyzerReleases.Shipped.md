@@ -173,6 +173,12 @@ RMG073  | Mapper   | Warning  | The target type of the referenced mapping does n
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 RMG074  | Mapper   | Error    | Multiple mappings are configured for the same target member
+RMG075  | Mapper   | Error    | Invalid usage of the MapValueAttribute
+RMG076  | Mapper   | Warning  | Cannot assign null to non-nullable member
+RMG077  | Mapper   | Error    | Cannot assign constant value because the type of the value does not match the type of the target
+RMG078  | Mapper   | Error    | Cannot assign method return type because the type of the value does not match the type of the target
+RMG079  | Mapper   | Error    | The referenced method could not be found or has an unsupported signature
+RMG080  | Mapper   | Error    | The MapValueAttribute does not support types and arrays
 
 ### Removed Rules
 

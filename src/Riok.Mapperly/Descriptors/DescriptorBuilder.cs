@@ -55,6 +55,7 @@ public class DescriptorBuilder
 
         _builderContext = new SimpleMappingBuilderContext(
             compilationContext,
+            mapperDeclaration,
             configurationReader,
             _symbolAccessor,
             new GenericTypeChecker(_symbolAccessor, _types),

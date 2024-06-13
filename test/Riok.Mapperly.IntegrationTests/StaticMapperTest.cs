@@ -63,5 +63,13 @@ namespace Riok.Mapperly.IntegrationTests
             var dto = StaticTestMapper.MapGeneric<TestObject, TestObjectDto>(obj);
             dto.IntValue.Should().Be(obj.IntValue);
         }
+
+        [Fact]
+        public Task ConstantValuesShouldWork()
+        {
+            var obj = new ConstantValuesObject { CtorMappedValue = 10, MappedValue = 11 };
+            var dto = StaticTestMapper.MapConstantValues(obj);
+            return Verifier.Verify(dto);
+        }
     }
 }

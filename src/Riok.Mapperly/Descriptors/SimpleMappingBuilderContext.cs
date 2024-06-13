@@ -13,6 +13,7 @@ namespace Riok.Mapperly.Descriptors;
 /// </summary>
 public class SimpleMappingBuilderContext(
     CompilationContext compilationContext,
+    MapperDeclaration mapperDeclaration,
     MapperConfigurationReader configurationReader,
     SymbolAccessor symbolAccessor,
     GenericTypeChecker genericTypeChecker,
@@ -33,6 +34,7 @@ public class SimpleMappingBuilderContext(
     protected SimpleMappingBuilderContext(SimpleMappingBuilderContext ctx, Location? diagnosticLocation)
         : this(
             ctx._compilationContext,
+            ctx.MapperDeclaration,
             ctx._configurationReader,
             ctx.SymbolAccessor,
             ctx.GenericTypeChecker,
@@ -44,6 +46,8 @@ public class SimpleMappingBuilderContext(
             ctx.InlinedMappings,
             diagnosticLocation ?? ctx._diagnosticLocation
         ) { }
+
+    public MapperDeclaration MapperDeclaration { get; } = mapperDeclaration;
 
     public Compilation Compilation => _compilationContext.Compilation;
 

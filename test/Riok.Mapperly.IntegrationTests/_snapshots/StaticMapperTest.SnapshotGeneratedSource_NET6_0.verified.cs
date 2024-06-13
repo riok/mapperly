@@ -530,6 +530,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 string x when targetType.IsAssignableFrom(typeof(int)) => ParseableInt(x),
                 global::Riok.Mapperly.IntegrationTests.Models.TestObject x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto)) => MapToDto(x),
                 global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestObject)) => MapFromDto(x),
+                global::Riok.Mapperly.IntegrationTests.Models.ConstantValuesObject x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.ConstantValuesDto)) => MapConstantValues(x),
                 global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => MapAllDtos(x),
                 object x when targetType.IsAssignableFrom(typeof(object)) => DerivedTypes(x),
                 _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
@@ -554,6 +555,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 string x when targetType.IsAssignableFrom(typeof(int)) => ParseableInt(x),
                 global::Riok.Mapperly.IntegrationTests.Models.TestObject x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto)) => MapToDto(x),
                 global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestObject)) => MapFromDto(x),
+                global::Riok.Mapperly.IntegrationTests.Models.ConstantValuesObject x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.ConstantValuesDto)) => MapConstantValues(x),
                 global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => MapAllDtos(x),
                 object x when targetType.IsAssignableFrom(typeof(object)) => DerivedTypes(x),
                 null => default,
@@ -579,6 +581,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 string x when typeof(TTarget).IsAssignableFrom(typeof(int)) => (TTarget)(object)ParseableInt(x),
                 global::Riok.Mapperly.IntegrationTests.Models.TestObject x when typeof(TTarget).IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto)) => (TTarget)(object)MapToDto(x),
                 global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto x when typeof(TTarget).IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestObject)) => (TTarget)(object)MapFromDto(x),
+                global::Riok.Mapperly.IntegrationTests.Models.ConstantValuesObject x when typeof(TTarget).IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.ConstantValuesDto)) => (TTarget)(object)MapConstantValues(x),
                 global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when typeof(TTarget).IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => (TTarget)(object)MapAllDtos(x),
                 object x when typeof(TTarget).IsAssignableFrom(typeof(object)) => (TTarget)(object)DerivedTypes(x),
                 null => throw new System.ArgumentNullException(nameof(source)),
@@ -680,6 +683,16 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value30 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
                 _ => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10,
             };
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public static partial global::Riok.Mapperly.IntegrationTests.Dto.ConstantValuesDto MapConstantValues(global::Riok.Mapperly.IntegrationTests.Models.ConstantValuesObject source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.ConstantValuesDto("fooBar", DirectInt(source.CtorMappedValue));
+            target.MappedValue = DirectInt(source.MappedValue);
+            target.ConstantValue = 1;
+            target.ConstantValueByMethod = IntValueBuilder();
+            return target;
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

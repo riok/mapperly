@@ -28,7 +28,7 @@ internal static class MemberMappingBuilder
         [NotNullWhen(true)] out MemberAssignmentMapping? mapping
     )
     {
-        if (!TryBuild(ctx, memberInfo, CodeStyle.Statement, out var mappedSourceValue))
+        if (!SourceValueBuilder.TryBuildMappedSourceValue(ctx, memberInfo, CodeStyle.Statement, out var mappedSourceValue))
         {
             mapping = null;
             requiresNullHandling = false;
@@ -47,7 +47,7 @@ internal static class MemberMappingBuilder
         [NotNullWhen(true)] out MemberAssignmentMapping? mapping
     )
     {
-        if (!TryBuild(ctx, memberInfo, CodeStyle.Expression, out var mappedSourceValue))
+        if (!SourceValueBuilder.TryBuildMappedSourceValue(ctx, memberInfo, out var mappedSourceValue))
         {
             mapping = null;
             return false;
@@ -71,7 +71,7 @@ internal static class MemberMappingBuilder
             diagnosticLocation: memberMappingInfo.Configuration?.Location
         );
 
-        var sourceMember = memberMappingInfo.SourceMember;
+        var sourceMember = memberMappingInfo.SourceMember!;
         var targetMember = memberMappingInfo.TargetMember;
         if (delegateMapping == null)
         {

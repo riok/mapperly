@@ -1,0 +1,48 @@
+---
+sidebar_position: 4
+description: Map constant and generated values
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Constant and generated values
+
+## Constant values
+
+To map a constant value to a member or a constructor parameter `MapValue` can be used.
+Make sure the value exactly matches the target type.
+
+<Tabs>
+  <TabItem value="declaration" label="Declaration" default>
+    ```csharp [MapValue(nameof(CarDto.SourceSystem), "C1")] partial CarDto
+    Map(Car car); ```
+  </TabItem>
+  <TabItem value="generated" label="Generated code" default>
+    ```csharp target.SourceSystem = "C1"; ```
+  </TabItem>
+</Tabs>
+
+## Method generated values
+
+To map a method generated value to a member or a constructor parameter `MapValue` can be used.
+Make sure the return type exactly matches the target type.
+
+<Tabs>
+    <TabItem value="declaration" label="Declaration" default>
+        ```csharp
+        [MapValue(nameof(CarDto.SourceSystem), nameof(GetSourceSystem))]
+        partial CarDto Map(Car car);
+
+        string GetSourceSystem() => "C1";
+        ```
+    </TabItem>
+    <TabItem value="generated" label="Generated code" default>
+        ```csharp
+        target.SourceSystem = GetSourceSystem();
+        ```
+    </TabItem>
+
+</Tabs>
+
+This also works for constructor parameters.

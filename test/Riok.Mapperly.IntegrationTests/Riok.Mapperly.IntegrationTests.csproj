@@ -38,6 +38,11 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.5" Condition="'$(TargetFramework)' == 'net8.0'" />
   </ItemGroup>
 
+  <!-- diffplex is only compatible with net7.0 up to 2.x-->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0' OR '$(TargetFramework)' == 'net6.0'">
+    <PackageReference Update="Verify.DiffPlex" Version="2.2.1" />
+  </ItemGroup>
+
   <!-- cannot use source generated polyfills since they require language version 11 -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
     <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />

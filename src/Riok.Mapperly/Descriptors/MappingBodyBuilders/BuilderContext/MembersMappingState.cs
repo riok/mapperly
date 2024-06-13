@@ -21,6 +21,7 @@ internal class MembersMappingState(
     HashSet<string> unmappedTargetMemberNames,
     IReadOnlyDictionary<string, string> targetMemberCaseMapping,
     IReadOnlyDictionary<string, IMappableMember> targetMembers,
+    Dictionary<string, List<MemberValueMappingConfiguration>> memberValueConfigsByRootTargetName,
     Dictionary<string, List<MemberMappingConfiguration>> memberConfigsByRootTargetName,
     IReadOnlyCollection<string> ignoredSourceMemberNames
 )
@@ -44,8 +45,6 @@ internal class MembersMappingState(
 
     public IEnumerable<string> UnmappedSourceMemberNames => _unmappedSourceMemberNames;
 
-    public IEnumerable<IMappableMember> UnmappedTargetMembers => _unmappedTargetMemberNames.Select(x => targetMembers[x]);
-
     public IEnumerable<MemberMappingConfiguration> UnusedMemberConfigs => memberConfigsByRootTargetName.Values.SelectMany(x => x);
 
     public IEnumerable<IMappableMember> EnumerateUnmappedTargetMembers() => _unmappedTargetMemberNames.Select(x => targetMembers[x]);
@@ -53,6 +52,7 @@ internal class MembersMappingState(
     public IEnumerable<IMappableMember> EnumerateUnmappedOrConfiguredTargetMembers()
     {
         return _unmappedTargetMemberNames
+            .Concat(memberValueConfigsByRootTargetName.Keys)
             .Concat(memberConfigsByRootTargetName.Keys)
             .Distinct()
             .Select(targetMembers.GetValueOrDefault)
@@ -80,13 +80,25 @@ internal class MembersMappingState(
     public void SetMembersMapped(MemberMappingInfo info, bool ignoreTargetCasing)
     {
         SetTargetMemberMapped(info.TargetMember.Path[0].Name, ignoreTargetCasing);
-        SetSourceMemberMapped(info.SourceMember);
+
+        if (info.SourceMember != null)
+        {
+            SetSourceMemberMapped(info.SourceMember);
+        }
 
         if (info.Configuration != null)
         {
             ConsumeMemberConfig(info.Configuration);
         }
+
+        if (info.ValueConfiguration != null)
+        {
+            ConsumeMemberConfig(info.ValueConfiguration);
+        }
     }
+
+    public void ConsumeMemberConfig(MemberValueMappingConfiguration config) =>
+        ConsumeMemberConfig(config, config.Target, memberValueConfigsByRootTargetName);
 
     public void ConsumeMemberConfig(MemberMappingConfiguration config) =>
         ConsumeMemberConfig(config, config.Target, memberConfigsByRootTargetName);
@@ -103,6 +115,27 @@ internal class MembersMappingState(
         }
 
         if (memberConfigsByRootTargetName.TryGetValue(targetMemberName, out var configs))
+        {
+            memberConfigs = configs;
+            return true;
+        }
+
+        memberConfigs = null;
+        return false;
+    }
+
+    public bool TryGetMemberValueConfigs(
+        string targetMemberName,
+        bool ignoreCase,
+        [NotNullWhen(true)] out IReadOnlyList<MemberValueMappingConfiguration>? memberConfigs
+    )
+    {
+        if (ignoreCase)
+        {
+            targetMemberName = targetMemberCaseMapping.GetValueOrDefault(targetMemberName, targetMemberName);
+        }
+
+        if (memberValueConfigsByRootTargetName.TryGetValue(targetMemberName, out var configs))
         {
             memberConfigs = configs;
             return true;

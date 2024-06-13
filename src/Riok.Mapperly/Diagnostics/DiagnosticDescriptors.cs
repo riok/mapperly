@@ -697,6 +697,66 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static readonly DiagnosticDescriptor InvalidMapValueAttributeUsage =
+        new(
+            "RMG075",
+            "Invalid usage of the " + nameof(MapValueAttribute),
+            "Invalid usage of the " + nameof(MapValueAttribute),
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Error,
+            true
+        );
+
+    public static readonly DiagnosticDescriptor CannotMapValueNullToNonNullable =
+        new(
+            "RMG076",
+            "Cannot assign null to non-nullable member",
+            "Cannot assign null to non-nullable member {0}",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Warning,
+            true
+        );
+
+    public static readonly DiagnosticDescriptor MapValueTypeMismatch =
+        new(
+            "RMG077",
+            "Cannot assign constant value because the type of the value does not match the type of the target",
+            "Cannot assign constant value {0} of type {1} to {2}",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Error,
+            true
+        );
+
+    public static readonly DiagnosticDescriptor MapValueMethodTypeMismatch =
+        new(
+            "RMG078",
+            "Cannot assign method return type because the type of the value does not match the type of the target",
+            "Cannot assign method return type {1} of {0}() to {2}",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Error,
+            true
+        );
+
+    public static readonly DiagnosticDescriptor MapValueReferencedMethodNotFound =
+        new(
+            "RMG079",
+            "The referenced method could not be found or has an unsupported signature",
+            "The referenced method {0} could not be found or has an unsupported signature",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Error,
+            true
+        );
+
+    public static readonly DiagnosticDescriptor MapValueUnsupportedType =
+        new(
+            "RMG080",
+            $"The {nameof(MapValueAttribute)} does not support types and arrays",
+            $"The {nameof(MapValueAttribute)} does not support types and arrays",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Error,
+            true
+        );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT
