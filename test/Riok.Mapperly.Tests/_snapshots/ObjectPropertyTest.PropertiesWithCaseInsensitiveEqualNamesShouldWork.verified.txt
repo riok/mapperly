@@ -1,0 +1,14 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG012,
+      Title: Source member was not found for target member,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (11,4)-(11,36),
+      MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
+      Message: The member value on the mapping target type B was not found on the mapping source type A,
+      Category: Mapper
+    }
+  ]
+}
