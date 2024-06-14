@@ -25,7 +25,7 @@ public class NewInstanceObjectMemberMapping(ITypeSymbol sourceType, ITypeSymbol 
     {
         // new T(ctorArgs) { ... };
         var ctorArgs = _constructorPropertyMappings.Select(x => x.BuildArgument(ctx)).ToArray();
-        var objectCreationExpression = CreateInstance(TargetType, ctorArgs);
+        var objectCreationExpression = ctx.SyntaxFactory.CreateInstance(TargetType, ctorArgs);
 
         // add initializer
         if (_initPropertyMappings.Count > 0)

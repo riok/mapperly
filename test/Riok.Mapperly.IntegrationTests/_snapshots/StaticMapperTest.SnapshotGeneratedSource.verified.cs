@@ -61,7 +61,10 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto MapToDtoExt(this global::Riok.Mapperly.IntegrationTests.Models.TestObject src)
         {
-            var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto(DirectInt(src.CtorValue), ctorValue2: DirectInt(src.CtorValue2))
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto(
+                DirectInt(src.CtorValue),
+                ctorValue2: DirectInt(src.CtorValue2)
+            )
             {
                 IntInitOnlyValue = DirectInt(src.IntInitOnlyValue),
                 RequiredValue = DirectInt(src.RequiredValue),
@@ -169,7 +172,10 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         private static partial global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto MapToDtoInternal(global::Riok.Mapperly.IntegrationTests.Models.TestObject testObject)
         {
-            var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto(DirectInt(testObject.CtorValue), ctorValue2: DirectInt(testObject.CtorValue2))
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto(
+                DirectInt(testObject.CtorValue),
+                ctorValue2: DirectInt(testObject.CtorValue2)
+            )
             {
                 IntInitOnlyValue = DirectInt(testObject.IntInitOnlyValue),
                 RequiredValue = DirectInt(testObject.RequiredValue),
@@ -284,7 +290,10 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial global::Riok.Mapperly.IntegrationTests.Models.TestObject MapFromDto(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto dto)
         {
-            var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObject(DirectInt(dto.CtorValue), ctorValue2: DirectInt(dto.CtorValue2))
+            var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObject(
+                DirectInt(dto.CtorValue),
+                ctorValue2: DirectInt(dto.CtorValue2)
+            )
             {
                 IntInitOnlyValue = DirectInt(dto.IntInitOnlyValue),
                 RequiredValue = DirectInt(dto.RequiredValue),

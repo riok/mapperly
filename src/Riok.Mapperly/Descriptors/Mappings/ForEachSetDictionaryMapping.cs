@@ -33,7 +33,7 @@ public class ForEachSetDictionaryMapping(
             return objectFactory.CreateType(SourceType, TargetType, ctx.Source);
 
         if (sourceHasCount)
-            return CreateInstance(TargetType, MemberAccess(ctx.Source, CountPropertyName));
+            return ctx.SyntaxFactory.CreateInstance(TargetType, MemberAccess(ctx.Source, CountPropertyName));
 
         return CreateInstance(TargetType);
     }

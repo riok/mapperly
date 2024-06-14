@@ -125,6 +125,12 @@ public partial struct SyntaxFactoryHelper
         return $"{qualifiedReceiverName}.{method.Name}";
     }
 
+    private ArgumentListSyntax LineSeparatedArgumentList(IEnumerable<ExpressionSyntax> argSyntaxes) =>
+        SyntaxFactory.ArgumentList(ConditionalCommaLineFeedSeparatedList(argSyntaxes.Select(Argument)));
+
+    private ArgumentListSyntax LineSeparatedArgumentList(IEnumerable<ArgumentSyntax> argSyntaxes) =>
+        SyntaxFactory.ArgumentList(ConditionalCommaLineFeedSeparatedList(argSyntaxes));
+
     private static ArgumentListSyntax ArgumentList(params ExpressionSyntax[] argSyntaxes) =>
         SyntaxFactory.ArgumentList(CommaSeparatedList(argSyntaxes.Select(Argument)));
 
