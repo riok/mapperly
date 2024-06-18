@@ -251,8 +251,7 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new global::System.Collections.Generic.List<int>();
-                target.EnsureCapacity(source.Length + target.Count);
+                var target = new global::System.Collections.Generic.List<int>(source.Length);
                 foreach (var item in source)
                 {
                     target.Add(item);
@@ -271,8 +270,7 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new global::System.Collections.Generic.Stack<int>();
-                target.EnsureCapacity(source.Length + target.Count);
+                var target = new global::System.Collections.Generic.Stack<int>(source.Length);
                 foreach (var item in source)
                 {
                     target.Push(item);
@@ -291,8 +289,7 @@ public class SpanTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new global::System.Collections.Generic.Queue<int>();
-                target.EnsureCapacity(source.Length + target.Count);
+                var target = new global::System.Collections.Generic.Queue<int>(source.Length);
                 foreach (var item in source)
                 {
                     target.Enqueue(item);

@@ -15,6 +15,10 @@ public interface IMembersBuilderContext<out T>
 
     MappingBuilderContext BuilderContext { get; }
 
+    void IgnoreMembers(string memberName);
+
+    void SetMembersMapped(string memberName);
+
     void SetTargetMemberMapped(IMappableMember targetMember);
 
     void ConsumeMemberConfigs(MemberMappingInfo members);

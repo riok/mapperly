@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Enumerables;
-using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Diagnostics;
@@ -66,27 +65,35 @@ public static class DictionaryMappingBuilder
         if (!ctx.CollectionInfos!.Target.ImplementedTypes.HasFlag(CollectionType.IDictionary))
             return null;
 
-        var sourceCollectionInfo = ctx.CollectionInfos.Source;
+        var collectionInfos = ctx.CollectionInfos;
         if (!hasObjectFactory)
         {
-            sourceCollectionInfo = BuildCollectionTypeForSourceIDictionary(ctx);
-            ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out objectFactory);
-
-            var existingMapping = ctx.BuildDelegatedMapping(sourceCollectionInfo.Type, ctx.Target);
+            collectionInfos = collectionInfos with { Source = BuildCollectionTypeForSourceIDictionary(ctx) };
+            var existingMapping = ctx.BuildDelegatedMapping(collectionInfos.Source.Type, ctx.Target);
             if (existingMapping != null)
                 return existingMapping;
+
+            hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out objectFactory);
         }
 
-        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx, sourceCollectionInfo, ctx.CollectionInfos.Target);
+        if (hasObjectFactory)
+        {
+            return new ForEachSetDictionaryObjectFactoryMapping(
+                collectionInfos,
+                keyMapping,
+                valueMapping,
+                GetExplicitIndexer(ctx),
+                objectFactory!,
+                ctx.Configuration.Mapper.UseReferenceHandling
+            );
+        }
+
         return new ForEachSetDictionaryMapping(
-            sourceCollectionInfo.Type,
-            ctx.Target,
+            collectionInfos,
             keyMapping,
             valueMapping,
-            false,
-            objectFactory: objectFactory,
-            explicitCast: GetExplicitIndexer(ctx),
-            ensureCapacity: ensureCapacityStatement
+            GetExplicitIndexer(ctx),
+            ctx.Configuration.Mapper.UseReferenceHandling
         );
     }
 
@@ -107,30 +114,43 @@ public static class DictionaryMappingBuilder
         var hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory);
 
         // use generalized types to reuse generated mappings
-        var sourceCollectionInfo = ctx.CollectionInfos!.Source;
-        var targetType = ctx.Target;
+        var collectionInfos = ctx.CollectionInfos!;
         if (!hasObjectFactory)
         {
-            sourceCollectionInfo = BuildCollectionTypeForSourceIDictionary(ctx);
-            targetType = ctx
-                .Types.Get(typeof(Dictionary<,>))
-                .Construct(ctx.DictionaryInfos!.Target.Key, ctx.DictionaryInfos.Target.Value)
-                .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+            collectionInfos = new CollectionInfos(
+                BuildCollectionTypeForSourceIDictionary(ctx),
+                CollectionInfoBuilder.BuildGenericCollectionInfo(ctx, CollectionType.Dictionary, ctx.DictionaryInfos!.Target)
+            );
 
-            ctx.ObjectFactories.TryFindObjectFactory(sourceCollectionInfo.Type, targetType, out objectFactory);
-
-            var delegateMapping = ctx.BuildDelegatedMapping(sourceCollectionInfo.Type, targetType);
+            var delegateMapping = ctx.BuildDelegatedMapping(collectionInfos.Source.Type, collectionInfos.Target.Type);
             if (delegateMapping != null)
                 return delegateMapping;
+
+            hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(
+                collectionInfos.Source.Type,
+                collectionInfos.Target.Type,
+                out objectFactory
+            );
+        }
+
+        if (hasObjectFactory)
+        {
+            return new ForEachSetDictionaryObjectFactoryMapping(
+                collectionInfos,
+                keyMapping,
+                valueMapping,
+                GetExplicitIndexer(ctx),
+                objectFactory!,
+                ctx.Configuration.Mapper.UseReferenceHandling
+            );
         }
 
         return new ForEachSetDictionaryMapping(
-            sourceCollectionInfo.Type,
-            targetType,
+            collectionInfos,
             keyMapping,
             valueMapping,
-            ctx.CollectionInfos!.Source.CountIsKnown,
-            objectFactory
+            GetExplicitIndexer(ctx),
+            ctx.Configuration.Mapper.UseReferenceHandling
         );
     }
 
@@ -155,16 +175,11 @@ public static class DictionaryMappingBuilder
             return null;
         }
 
-        // add values to dictionary by setting key values in a foreach loop
-        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx);
-
         return new ForEachSetDictionaryExistingTargetMapping(
-            ctx.Source,
-            ctx.Target,
+            ctx.CollectionInfos,
             keyMapping,
             valueMapping,
-            explicitCast: GetExplicitIndexer(ctx),
-            ensureCapacity: ensureCapacityStatement
+            explicitCast: GetExplicitIndexer(ctx)
         );
     }
 
@@ -252,24 +267,14 @@ public static class DictionaryMappingBuilder
         if (ctx.HasUserSymbol)
             return info;
 
-        var dictionaryType = info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyDictionary)
-            ? BuildSourceDictionaryType(ctx, CollectionType.IReadOnlyDictionary)
+        CollectionType? dictionaryType = info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyDictionary)
+            ? CollectionType.IReadOnlyDictionary
             : info.ImplementedTypes.HasFlag(CollectionType.IDictionary)
-                ? BuildSourceDictionaryType(ctx, CollectionType.IDictionary)
+                ? CollectionType.IDictionary
                 : null;
 
         return dictionaryType == null
             ? info
-            : CollectionInfoBuilder.BuildCollectionInfo(ctx.Types, ctx.SymbolAccessor, dictionaryType, info.EnumeratedType);
-    }
-
-    private static INamedTypeSymbol BuildSourceDictionaryType(MappingBuilderContext ctx, CollectionType type)
-    {
-        var genericType = CollectionInfoBuilder.GetGenericClrCollectionType(type);
-        return (INamedTypeSymbol)
-            ctx
-                .Types.Get(genericType)
-                .Construct(ctx.DictionaryInfos!.Source.Key, ctx.DictionaryInfos!.Source.Value)
-                .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+            : CollectionInfoBuilder.BuildGenericCollectionInfo(ctx, dictionaryType.Value, ctx.DictionaryInfos!.Source);
     }
 }

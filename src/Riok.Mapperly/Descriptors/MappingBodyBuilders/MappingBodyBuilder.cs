@@ -17,6 +17,12 @@ public class MappingBodyBuilder(MappingCollection mappings)
 
             switch (typeMapping)
             {
+                case INewInstanceEnumerableMapping mapping:
+                    EnumerableMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                    break;
+                case IEnumerableMapping mapping:
+                    EnumerableMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                    break;
                 case NewInstanceObjectMemberMethodMapping mapping:
                     NewInstanceObjectMemberMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;

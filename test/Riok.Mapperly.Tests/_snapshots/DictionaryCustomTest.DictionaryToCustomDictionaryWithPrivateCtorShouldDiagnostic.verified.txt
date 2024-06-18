@@ -11,16 +11,6 @@
       Category: Mapper
     },
     {
-      Id: RMG002,
-      Title: No accessible parameterless constructor found,
-      Severity: Error,
-      WarningLevel: 0,
-      Location: : (11,4)-(11,59),
-      MessageFormat: {0} has no accessible parameterless constructor,
-      Message: A has no accessible parameterless constructor,
-      Category: Mapper
-    },
-    {
       Id: RMG008,
       Title: Could not create mapping,
       Severity: Error,

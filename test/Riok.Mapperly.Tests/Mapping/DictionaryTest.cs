@@ -46,6 +46,29 @@ public class DictionaryTest
     }
 
     [Fact]
+    public void DictionaryToDictionaryExplicitCastedValueDeepCloning()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "Dictionary<string, long>",
+            "Dictionary<string, int>",
+            TestSourceBuilderOptions.WithDeepCloning
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::System.Collections.Generic.Dictionary<string, int>(source.Count);
+                foreach (var item in source)
+                {
+                    target[item.Key] = (int)item.Value;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void DictionaryToDictionaryNullableToNonNullable()
     {
         var source = TestSourceBuilder.Mapping("Dictionary<string, int?>", "Dictionary<string, int>");
@@ -120,98 +143,10 @@ public class DictionaryTest
     }
 
     [Fact]
-    public void CustomDictionaryToIDictionary()
-    {
-        var source = TestSourceBuilder.Mapping("A", "IDictionary<string, int>", "class A : Dictionary<string, int> {}");
-        TestHelper
-            .GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return new global::System.Collections.Generic.Dictionary<string, int>(source);");
-    }
-
-    [Fact]
-    public void CustomKeyValueListToIDictionary()
-    {
-        var source = TestSourceBuilder.Mapping("A", "IDictionary<string, int>", "class A : List<KeyValuePair<string, int>> {}");
-        TestHelper
-            .GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody("return new global::System.Collections.Generic.Dictionary<string, int>(source);");
-    }
-
-    [Fact]
-    public void DictionaryToCustomDictionary()
-    {
-        var source = TestSourceBuilder.Mapping("IDictionary<string, int>", "A", "class A : Dictionary<string, int> {}");
-        TestHelper
-            .GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::A();
-                target.EnsureCapacity(source.Count + target.Count);
-                foreach (var item in source)
-                {
-                    target[item.Key] = item.Value;
-                }
-                return target;
-                """
-            );
-    }
-
-    [Fact]
-    public void DictionaryToCustomDictionaryWithObjectFactory()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            """
-            [ObjectFactory]
-            A CreateA() => new();
-            partial A Map(IDictionary<string, int> source);
-            """,
-            "class A : Dictionary<string, int> {}"
-        );
-        TestHelper
-            .GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody(
-                """
-                var target = CreateA();
-                target.EnsureCapacity(source.Count + target.Count);
-                foreach (var item in source)
-                {
-                    target[item.Key] = item.Value;
-                }
-                return target;
-                """
-            );
-    }
-
-    [Fact]
     public void MapToExistingDictionary()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial void Map(IDictionary<string, int> source, Dictionary<string, int> target);"
-        );
-        TestHelper
-            .GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody(
-                """
-                target.EnsureCapacity(source.Count + target.Count);
-                foreach (var item in source)
-                {
-                    target[item.Key] = item.Value;
-                }
-                """
-            );
-    }
-
-    [Fact]
-    public void MapToExistingCustomDictionary()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial void Map(IDictionary<string, int> source, A target);",
-            "class A : Dictionary<string, int> {}"
         );
         TestHelper
             .GenerateMapper(source)
@@ -235,20 +170,6 @@ public class DictionaryTest
             "B",
             "record A(Dictionary<int, List<C>> Dict);",
             "record B(Dictionary<int, List<D>> Dict);",
-            "record C(int Value);",
-            "record D(int Value);"
-        );
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task CustomDictionaryWithList()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "B",
-            "class A : Dictionary<int, List<C>>;",
-            "class B : Dictionary<int, List<D>>;",
             "record C(int Value);",
             "record D(int Value);"
         );
@@ -455,29 +376,6 @@ public class DictionaryTest
     }
 
     [Fact]
-    public Task DictionaryToCustomDictionaryWithPrivateCtorShouldDiagnostic()
-    {
-        var source = TestSourceBuilder.Mapping("IDictionary<string, int>", "A", "class A : Dictionary<string, int> { private A(){} }");
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public void ReadOnlyDictionaryToCustomTypeReadOnlyReadOnlyDictionaryShouldIgnore()
-    {
-        var source = TestSourceBuilder.Mapping("IReadOnlyDictionary<string, string>", "A", "class A : IReadOnlyDictionary<int, int> {}");
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
-            .HaveMapMethodBody(
-                """
-                var target = new global::A();
-                return target;
-                """
-            );
-    }
-
-    [Fact]
     public void ReadOnlyDictionaryToReadOnlyDictionaryExistingInstanceShouldIgnore()
     {
         var source = TestSourceBuilder.Mapping(
@@ -522,6 +420,9 @@ public class DictionaryTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
+            .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """
                 var target = new global::B();

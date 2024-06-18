@@ -54,7 +54,7 @@ internal static class SymbolExtensions
         return level;
     }
 
-    internal static bool IsArrayType(this ITypeSymbol symbol) => symbol is IArrayTypeSymbol;
+    internal static bool IsArrayType(this ITypeSymbol symbol) => symbol.TypeKind == TypeKind.Array;
 
     internal static bool IsArrayType(this ITypeSymbol symbol, [NotNullWhen(true)] out IArrayTypeSymbol? arrayTypeSymbol)
     {
@@ -209,4 +209,25 @@ internal static class SymbolExtensions
 
     internal static bool HasImplicitGenericImplementation(this ITypeSymbol symbol, INamedTypeSymbol inter, string methodName) =>
         symbol.ImplementsGeneric(inter, methodName, out _, out var isExplicit) && !isExplicit;
+
+    internal static IEnumerable<ITypeSymbol> WalkTypeHierarchy(this ITypeSymbol symbol)
+    {
+        yield return symbol;
+        while (symbol.BaseType != null)
+        {
+            yield return symbol.BaseType;
+            symbol = symbol.BaseType;
+        }
+    }
+
+    internal static bool IsInRootNamespace(this ISymbol symbol, string ns)
+    {
+        var namespaceSymbol = symbol.ContainingNamespace;
+        while (namespaceSymbol.ContainingNamespace is { IsGlobalNamespace: false })
+        {
+            namespaceSymbol = namespaceSymbol.ContainingNamespace;
+        }
+
+        return string.Equals(namespaceSymbol.Name, ns, StringComparison.Ordinal);
+    }
 }

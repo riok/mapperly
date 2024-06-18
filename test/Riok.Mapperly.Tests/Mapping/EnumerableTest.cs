@@ -311,45 +311,6 @@ public class EnumerableTest
     }
 
     [Fact]
-    public void EnumerableToCustomCollection()
-    {
-        var source = TestSourceBuilder.Mapping("IEnumerable<long>", "B", "class B : ICollection<int> { public void Add(int item) {} }");
-        TestHelper
-            .GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::B();
-                foreach (var item in source)
-                {
-                    target.Add((int)item);
-                }
-                return target;
-                """
-            );
-    }
-
-    [Fact]
-    public void EnumerableToExplicitAddCustomCollection()
-    {
-        // should not create a mapping using a looping add method inside a foreach loop when the add method is explicit
-        var source = TestSourceBuilder.Mapping(
-            "IEnumerable<int>",
-            "B",
-            "class B : ICollection<int> { void ICollection<int>.Add(int item) {} }"
-        );
-        TestHelper
-            .GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::B();
-                return target;
-                """
-            );
-    }
-
-    [Fact]
     public void ReadOnlyCollectionToList()
     {
         var source = TestSourceBuilder.Mapping(
@@ -509,28 +470,6 @@ public class EnumerableTest
                 """
                 var target = new global::B();
                 target.Value = new global::System.Collections.Generic.Queue<long>(global::System.Linq.Enumerable.Select(source.Value, x => (long)x));
-                return target;
-                """
-            );
-    }
-
-    [Fact]
-    public void EnumerableToCustomCollectionWithObjectFactory()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[ObjectFactory] B CreateB() => new();" + "partial B Map(IEnumerable<long> source);",
-            "class B : ICollection<int> { public void Add(int item) {} }"
-        );
-        TestHelper
-            .GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody(
-                """
-                var target = CreateB();
-                foreach (var item in source)
-                {
-                    target.Add((int)item);
-                }
                 return target;
                 """
             );

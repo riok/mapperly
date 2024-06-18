@@ -98,7 +98,7 @@ public static class MemoryMappingBuilder
             return null;
 
         var sourceSpan = ctx.Types.Get(typeof(ReadOnlySpan<>)).Construct(elementMapping.SourceType);
-        if (ctx.FindOrBuildExistingTargetMapping(sourceSpan, ctx.Target) is not ExistingTargetMapping enumerableMapping)
+        if (ctx.FindOrBuildExistingTargetMapping(sourceSpan, ctx.Target) is not { } enumerableMapping)
             return null;
 
         return new SourceObjectMemberDelegateExistingTargetMapping(ctx.Source, ctx.Target, SpanMemberName, enumerableMapping);

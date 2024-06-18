@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.ObjectFactories;
-using Riok.Mapperly.Emit;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
@@ -22,26 +21,10 @@ public class NewInstanceObjectFactoryMemberMapping(
     {
         var targetVariableName = ctx.NameBuilder.New(TargetVariableName);
 
-        if (enableReferenceHandling)
+        // create instance
+        foreach (var statement in objectFactory.CreateInstance(ctx, this, enableReferenceHandling, targetVariableName))
         {
-            // TryGetReference
-            yield return ReferenceHandlingSyntaxFactoryHelper.TryGetReference(ctx, this);
-        }
-
-        // var target = CreateMyObject<T>();
-        yield return ctx.SyntaxFactory.DeclareLocalVariable(
-            targetVariableName,
-            objectFactory.CreateType(SourceType, TargetType, ctx.Source)
-        );
-
-        // set the reference as soon as it is created,
-        // as property mappings could refer to the same instance.
-        if (enableReferenceHandling)
-        {
-            // SetReference
-            yield return ctx.SyntaxFactory.ExpressionStatement(
-                ReferenceHandlingSyntaxFactoryHelper.SetReference(this, ctx, IdentifierName(targetVariableName))
-            );
+            yield return statement;
         }
 
         // map properties

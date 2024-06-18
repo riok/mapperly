@@ -12,7 +12,7 @@ namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 /// target.EnsureCapacity(source.Length + target.Count);
 /// </code>
 /// </remarks>
-public class EnsureCapacityMember(string targetAccessor, string sourceAccessor) : EnsureCapacityInfo
+public class EnsureCapacityMember(string? targetAccessor, string sourceAccessor) : EnsureCapacityInfo
 {
     public override StatementSyntax Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
@@ -20,7 +20,7 @@ public class EnsureCapacityMember(string targetAccessor, string sourceAccessor) 
             ctx.SyntaxFactory,
             target,
             MemberAccess(ctx.Source, sourceAccessor),
-            MemberAccess(target, targetAccessor)
+            targetAccessor != null ? MemberAccess(target, targetAccessor) : null
         );
     }
 }

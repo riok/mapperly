@@ -10,24 +10,19 @@ public static class EnsureCapacityBuilder
     private const string EnsureCapacityName = "EnsureCapacity";
     private const string TryGetNonEnumeratedCountMethodName = "TryGetNonEnumeratedCount";
 
-    public static EnsureCapacityInfo? TryBuildEnsureCapacity(MappingBuilderContext ctx) =>
-        ctx.CollectionInfos == null ? null : TryBuildEnsureCapacity(ctx, ctx.CollectionInfos.Source, ctx.CollectionInfos.Target);
-
-    public static EnsureCapacityInfo? TryBuildEnsureCapacity(MappingBuilderContext ctx, CollectionInfo source, CollectionInfo target)
+    public static EnsureCapacityInfo? TryBuildEnsureCapacity(MappingBuilderContext ctx, CollectionInfos collectionInfos)
     {
+        var source = collectionInfos.Source;
+        var target = collectionInfos.Target;
         var capacityMethod = ctx
             .SymbolAccessor.GetAllMethods(target.Type, EnsureCapacityName)
-            .FirstOrDefault(x => x.Parameters.Length == 1 && x.Parameters[0].Type.SpecialType == SpecialType.System_Int32 && !x.IsStatic);
+            .FirstOrDefault(x => x.Parameters is [{ Type.SpecialType: SpecialType.System_Int32 }] && !x.IsStatic);
 
         // if EnsureCapacity is not available then return null
         if (capacityMethod == null)
             return null;
 
-        // if target does not have a count then return null
-        if (!target.CountIsKnown)
-            return null;
-
-        // if target and source count are known then create a simple EnsureCapacity statement
+        // if source count is known, create a simple EnsureCapacity statement
         if (source.CountIsKnown)
             return new EnsureCapacityMember(target.CountPropertyName, source.CountPropertyName);
 

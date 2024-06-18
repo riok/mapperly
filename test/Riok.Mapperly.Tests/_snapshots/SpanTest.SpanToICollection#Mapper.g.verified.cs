@@ -12,8 +12,7 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private global::System.Collections.Generic.List<int> MapToListOfInt32(global::System.Span<int> source)
     {
-        var target = new global::System.Collections.Generic.List<int>();
-        target.EnsureCapacity(source.Length + target.Count);
+        var target = new global::System.Collections.Generic.List<int>(source.Length);
         foreach (var item in source)
         {
             target.Add(item);

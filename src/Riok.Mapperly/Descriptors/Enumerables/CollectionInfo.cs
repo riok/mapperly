@@ -15,6 +15,8 @@ public record CollectionInfo(
 {
     public bool ImplementsIEnumerable => ImplementedTypes.HasFlag(CollectionType.IEnumerable);
 
+    public bool ImplementsDictionary =
+        ImplementedTypes.HasFlag(CollectionType.IDictionary) || ImplementedTypes.HasFlag(CollectionType.IReadOnlyDictionary);
     public bool IsArray => CollectionType is CollectionType.Array;
     public bool IsMemory => CollectionType is CollectionType.Memory or CollectionType.ReadOnlyMemory;
     public bool IsSpan => CollectionType is CollectionType.Span or CollectionType.ReadOnlySpan;

@@ -67,9 +67,7 @@ public class UnsafeAccessorTest
     public Task PrivateExistingTargetEnumerableProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            """
-            partial void Map(A source, B dest);
-            """,
+            "partial void Map(A source, B dest);",
             TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
             "class A { private List<int> value { get; } }",
             "class B { private List<int> value { get;} }"

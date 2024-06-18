@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Enumerables;
-using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.ObjectFactories;
@@ -105,14 +104,7 @@ public static class SpanMappingBuilder
 
         ForEachAddEnumerableExistingTargetMapping CreateForEach(string methodName)
         {
-            var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx);
-            return new ForEachAddEnumerableExistingTargetMapping(
-                ctx.Source,
-                ctx.Target,
-                elementMapping,
-                methodName,
-                ensureCapacityStatement
-            );
+            return new ForEachAddEnumerableExistingTargetMapping(ctx.CollectionInfos, elementMapping, methodName);
         }
     }
 
@@ -150,10 +142,25 @@ public static class SpanMappingBuilder
 
         return MapSpanArrayToEnumerableMethod(ctx);
 
-        ExistingTargetMappingMethodWrapper CreateForEach(string methodName, ObjectFactory? factory)
+        INewInstanceMapping CreateForEach(string methodName, ObjectFactory? factory)
         {
-            var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx);
-            return new ForEachAddEnumerableMapping(ctx.Source, ctx.Target, elementMapping, factory, methodName, ensureCapacityStatement);
+            if (factory != null)
+            {
+                return new ForEachAddEnumerableObjectFactoryMapping(
+                    ctx.CollectionInfos,
+                    elementMapping,
+                    factory,
+                    ctx.Configuration.Mapper.UseReferenceHandling,
+                    methodName
+                );
+            }
+
+            return new ForEachAddEnumerableMapping(
+                ctx.CollectionInfos,
+                elementMapping,
+                ctx.Configuration.Mapper.UseReferenceHandling,
+                methodName
+            );
         }
     }
 

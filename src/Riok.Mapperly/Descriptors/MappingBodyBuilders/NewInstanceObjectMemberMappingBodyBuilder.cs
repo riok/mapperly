@@ -14,6 +14,11 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 /// </summary>
 public static class NewInstanceObjectMemberMappingBodyBuilder
 {
+    public record ConstructorMappingBuilderOptions(
+        IReadOnlyDictionary<string, MemberPath>? AdditionalParameterSourceValues = null,
+        bool? PreferParameterlessConstructor = null
+    );
+
     public static void BuildMappingBody(MappingBuilderContext ctx, NewInstanceObjectMemberMapping mapping)
     {
         var mappingCtx = new NewInstanceBuilderContext<NewInstanceObjectMemberMapping>(ctx, mapping);
@@ -31,7 +36,76 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         mappingCtx.AddDiagnostics();
     }
 
-    private static void BuildInitMemberMappings(
+    /// <summary>
+    /// Tries to build a constructor invocation.
+    /// </summary>
+    /// <returns>A <see cref="HashSet{T}"/> containing all used <see cref="ConstructorMappingBuilderOptions.AdditionalParameterSourceValues"/>.</returns>
+    public static HashSet<string> BuildConstructorMapping(
+        INewInstanceBuilderContext<INewInstanceObjectMemberMapping> ctx,
+        ConstructorMappingBuilderOptions? options = null
+    )
+    {
+        if (ctx.Mapping.TargetType is not INamedTypeSymbol namedTargetType)
+        {
+            ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoConstructorFound, ctx.BuilderContext.Target);
+            return [];
+        }
+
+        // attributed ctor is prio 1
+        // if preferParameterlessConstructors is true (default) :parameterless ctor is prio 2 then by descending parameter count
+        // the reverse if preferParameterlessConstructors is false , descending parameter count is prio2 then parameterless ctor
+        // ctors annotated with [Obsolete] are considered last unless they have a MapperConstructor attribute set
+        var ctorCandidates = namedTargetType
+            .InstanceConstructors.Where(ctor => ctx.BuilderContext.SymbolAccessor.IsDirectlyAccessible(ctor))
+            .OrderByDescending(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
+            .ThenBy(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x));
+
+        if (options?.PreferParameterlessConstructor ?? ctx.BuilderContext.Configuration.Mapper.PreferParameterlessConstructors)
+        {
+            ctorCandidates = ctorCandidates.ThenByDescending(x => x.Parameters.Length == 0).ThenByDescending(x => x.Parameters.Length);
+        }
+        else
+        {
+            ctorCandidates = ctorCandidates.ThenByDescending(x => x.Parameters.Length).ThenByDescending(x => x.Parameters.Length == 0);
+        }
+
+        foreach (var ctorCandidate in ctorCandidates)
+        {
+            if (
+                !TryBuildConstructorMapping(
+                    ctx,
+                    ctorCandidate,
+                    options,
+                    out var usedAdditionalParameterSourceValues,
+                    out var constructorParameterMappings
+                )
+            )
+            {
+                if (ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(ctorCandidate))
+                {
+                    ctx.BuilderContext.ReportDiagnostic(
+                        DiagnosticDescriptors.CannotMapToConfiguredConstructor,
+                        ctx.Mapping.SourceType,
+                        ctorCandidate
+                    );
+                }
+
+                continue;
+            }
+
+            foreach (var mapping in constructorParameterMappings)
+            {
+                ctx.AddConstructorParameterMapping(mapping);
+            }
+
+            return usedAdditionalParameterSourceValues;
+        }
+
+        ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoConstructorFound, ctx.BuilderContext.Target);
+        return [];
+    }
+
+    public static void BuildInitMemberMappings(
         INewInstanceBuilderContext<INewInstanceObjectMemberMapping> ctx,
         bool includeAllMembers = false
     )
@@ -79,72 +153,28 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         ctx.AddInitMemberMapping(memberAssignmentMapping);
     }
 
-    private static void BuildConstructorMapping(INewInstanceBuilderContext<INewInstanceObjectMemberMapping> ctx)
-    {
-        if (ctx.Mapping.TargetType is not INamedTypeSymbol namedTargetType)
-        {
-            ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoConstructorFound, ctx.BuilderContext.Target);
-            return;
-        }
-
-        // attributed ctor is prio 1
-        // if preferParameterlessConstructors is true (default) :parameterless ctor is prio 2 then by descending parameter count
-        // the reverse if preferParameterlessConstructors is false , descending parameter count is prio2 then parameterless ctor
-        // ctors annotated with [Obsolete] are considered last unless they have a MapperConstructor attribute set
-        var ctorCandidates = namedTargetType
-            .InstanceConstructors.Where(ctor => ctx.BuilderContext.SymbolAccessor.IsDirectlyAccessible(ctor))
-            .OrderByDescending(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
-            .ThenBy(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x));
-
-        if (ctx.BuilderContext.Configuration.Mapper.PreferParameterlessConstructors)
-        {
-            ctorCandidates = ctorCandidates.ThenByDescending(x => x.Parameters.Length == 0).ThenByDescending(x => x.Parameters.Length);
-        }
-        else
-        {
-            ctorCandidates = ctorCandidates.ThenByDescending(x => x.Parameters.Length).ThenByDescending(x => x.Parameters.Length == 0);
-        }
-
-        foreach (var ctorCandidate in ctorCandidates)
-        {
-            if (!TryBuildConstructorMapping(ctx, ctorCandidate, out var constructorParameterMappings))
-            {
-                if (ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(ctorCandidate))
-                {
-                    ctx.BuilderContext.ReportDiagnostic(
-                        DiagnosticDescriptors.CannotMapToConfiguredConstructor,
-                        ctx.Mapping.SourceType,
-                        ctorCandidate
-                    );
-                }
-
-                continue;
-            }
-
-            foreach (var mapping in constructorParameterMappings)
-            {
-                ctx.AddConstructorParameterMapping(mapping);
-            }
-
-            return;
-        }
-
-        ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoConstructorFound, ctx.BuilderContext.Target);
-    }
-
     private static bool TryBuildConstructorMapping(
         INewInstanceBuilderContext<IMapping> ctx,
         IMethodSymbol ctor,
+        ConstructorMappingBuilderOptions? options,
+        [NotNullWhen(true)] out HashSet<string>? usedAdditionalParameterSourceValues,
         [NotNullWhen(true)] out List<ConstructorParameterMapping>? constructorParameterMappings
     )
     {
         constructorParameterMappings = new List<ConstructorParameterMapping>();
+        usedAdditionalParameterSourceValues = new HashSet<string>();
+
         var skippedOptionalParam = false;
         foreach (var parameter in ctor.Parameters)
         {
             if (
-                !ctx.TryMatchParameter(parameter, out var memberMappingInfo)
-                || !SourceValueBuilder.TryBuildMappedSourceValue(ctx, memberMappingInfo, out var sourceValue)
+                !TryMatchParameter(
+                    ctx,
+                    options?.AdditionalParameterSourceValues,
+                    usedAdditionalParameterSourceValues,
+                    parameter,
+                    out var memberMappingInfo
+                ) || !SourceValueBuilder.TryBuildMappedSourceValue(ctx, memberMappingInfo, out var sourceValue)
             )
             {
                 // expressions do not allow skipping of optional parameters
@@ -160,5 +190,32 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         }
 
         return true;
+    }
+
+    private static bool TryMatchParameter(
+        INewInstanceBuilderContext<IMapping> ctx,
+        IReadOnlyDictionary<string, MemberPath>? additionalParameterMappings,
+        HashSet<string> usedAdditionalParameterSourceValues,
+        IParameterSymbol parameter,
+        [NotNullWhen(true)] out MemberMappingInfo? memberInfo
+    )
+    {
+        if (ctx.TryMatchParameter(parameter, out memberInfo))
+            return true;
+
+        if (additionalParameterMappings?.TryGetValue(parameter.Name, out var sourcePath) == true)
+        {
+            memberInfo = new MemberMappingInfo(
+                sourcePath,
+                new NonEmptyMemberPath(
+                    ctx.Mapping.TargetType,
+                    [new ConstructorParameterMember(parameter, ctx.BuilderContext.SymbolAccessor)]
+                )
+            );
+            usedAdditionalParameterSourceValues.Add(parameter.Name);
+            return true;
+        }
+
+        return false;
     }
 }
