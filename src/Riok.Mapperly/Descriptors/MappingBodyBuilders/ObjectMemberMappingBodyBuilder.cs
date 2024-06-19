@@ -130,19 +130,6 @@ public static class ObjectMemberMappingBodyBuilder
             return false;
         }
 
-        // cannot map from an indexed member
-        if (sourceMemberPath?.Member?.IsIndexer == true)
-        {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.CannotMapFromIndexedMember,
-                ctx.Mapping.SourceType,
-                sourceMemberPath.FullName,
-                ctx.Mapping.TargetType,
-                targetMemberPath.FullName
-            );
-            return false;
-        }
-
         return true;
     }
 

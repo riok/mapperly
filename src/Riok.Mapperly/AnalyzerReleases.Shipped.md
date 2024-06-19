@@ -185,5 +185,6 @@ RMG080  | Mapper   | Error    | The MapValueAttribute does not support types and
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 RMG017  | Mapper   | Warning  | An init only member can have one configuration at max
+RMG026  | Mapper   | Info     | Cannot map from indexed member
 RMG027  | Mapper   | Warning  | A constructor parameter can have one configuration at max
 RMG028  | Mapper   | Warning  | Constructor parameter cannot handle target paths

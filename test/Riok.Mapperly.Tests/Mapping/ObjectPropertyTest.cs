@@ -120,7 +120,7 @@ public class ObjectPropertyTest
     }
 
     [Fact]
-    public void ShouldIgnoreIndexedPropertyOnSourceWithDiagnostic()
+    public void ShouldIgnoreIndexedProperty()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -130,9 +130,16 @@ public class ObjectPropertyTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowAndIncludeAllDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapFromIndexedMember, "Cannot map from indexed member A.this[] to member B.this[]");
+            .HaveDiagnostic(DiagnosticDescriptors.NoMemberMappings, "No members are mapped in the object mapping from A to B")
+            .HaveAssertedAllDiagnostics()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                return target;
+                """
+            );
     }
 
     [Fact]

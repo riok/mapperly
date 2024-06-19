@@ -9,7 +9,7 @@ public class ObjectNoMemberMappingsTest
     {
         var source = TestSourceBuilder.Mapping("A", "B", "class A;", "class B;");
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAndIncludeDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowAndIncludeAllDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.NoMemberMappings, "No members are mapped in the object mapping from A to B")
             .HaveAssertedAllDiagnostics();
@@ -27,7 +27,7 @@ public class ObjectNoMemberMappingsTest
             "class D;"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowAndIncludeDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowAndIncludeAllDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.NoMemberMappings, "No members are mapped in the object mapping from C to D")
             .HaveAssertedAllDiagnostics();

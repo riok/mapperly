@@ -225,16 +225,6 @@ public static class DiagnosticDescriptors
             true
         );
 
-    public static readonly DiagnosticDescriptor CannotMapFromIndexedMember =
-        new(
-            "RMG026",
-            "Cannot map from indexed member",
-            "Cannot map from indexed member {0}.{1} to member {2}.{3}",
-            DiagnosticCategories.Mapper,
-            DiagnosticSeverity.Info,
-            true
-        );
-
     public static readonly DiagnosticDescriptor QueryableProjectionMappingsDoNotSupportReferenceHandling =
         new(
             "RMG029",
