@@ -121,7 +121,7 @@ public static class DiagnosticDescriptors
             "Source member was not found for target member",
             "The member {0} on the mapping target type {1} was not found on the mapping source type {2}",
             DiagnosticCategories.Mapper,
-            DiagnosticSeverity.Info,
+            DiagnosticSeverity.Warning,
             true
         );
 
@@ -171,7 +171,7 @@ public static class DiagnosticDescriptors
             "Source member is not mapped to any target member",
             "The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2}",
             DiagnosticCategories.Mapper,
-            DiagnosticSeverity.Info,
+            DiagnosticSeverity.Warning,
             true
         );
 
@@ -311,7 +311,7 @@ public static class DiagnosticDescriptors
             "An enum member could not be found on the source enum",
             "Enum member {0} ({1}) on {2} not found on source enum {3}",
             DiagnosticCategories.Mapper,
-            DiagnosticSeverity.Info,
+            DiagnosticSeverity.Warning,
             true
         );
 
@@ -321,7 +321,7 @@ public static class DiagnosticDescriptors
             "An enum member could not be found on the target enum",
             "Enum member {0} ({1}) on {2} not found on target enum {3}",
             DiagnosticCategories.Mapper,
-            DiagnosticSeverity.Info,
+            DiagnosticSeverity.Warning,
             true
         );
 

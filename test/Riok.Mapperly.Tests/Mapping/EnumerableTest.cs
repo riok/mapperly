@@ -710,15 +710,17 @@ public class EnumerableTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
                 return target;
                 """
-            )
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+            );
     }
 
     [Fact]

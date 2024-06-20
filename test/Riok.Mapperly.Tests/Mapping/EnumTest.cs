@@ -25,8 +25,21 @@ public class EnumTest
     {
         var source = TestSourceBuilder.Mapping("E1", "E2", "enum E1 : short {A, B, C}", "enum E2 : byte {A, B, C}");
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostics(
+                DiagnosticDescriptors.SourceEnumValueNotMapped,
+                "Enum member A (0) on E1 not found on target enum E2",
+                "Enum member B (1) on E1 not found on target enum E2",
+                "Enum member C (2) on E1 not found on target enum E2"
+            )
+            .HaveDiagnostics(
+                DiagnosticDescriptors.TargetEnumValueNotMapped,
+                "Enum member A (0) on E2 not found on source enum E1",
+                "Enum member B (1) on E2 not found on source enum E1",
+                "Enum member C (2) on E2 not found on source enum E1"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody("return (global::E2)source;");
     }
 
@@ -52,8 +65,21 @@ public class EnumTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostics(
+                DiagnosticDescriptors.SourceEnumValueNotMapped,
+                "Enum member A (0) on E1 not found on target enum E2",
+                "Enum member B (1) on E1 not found on target enum E2",
+                "Enum member C (2) on E1 not found on target enum E2"
+            )
+            .HaveDiagnostics(
+                DiagnosticDescriptors.TargetEnumValueNotMapped,
+                "Enum member A (100) on E2 not found on source enum E1",
+                "Enum member B (101) on E2 not found on source enum E1",
+                "Enum member C (102) on E2 not found on source enum E1"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody("return (global::E2)source;");
     }
 
@@ -101,8 +127,15 @@ public class EnumTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member D (3) on E1 not found on target enum E2")
+            .HaveDiagnostics(
+                DiagnosticDescriptors.TargetEnumValueNotMapped,
+                "Enum member d (103) on E2 not found on source enum E1",
+                "Enum member e (104) on E2 not found on source enum E1"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 return source switch
@@ -127,8 +160,10 @@ public class EnumTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member e (104) on E2 not found on source enum E1")
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 return source switch

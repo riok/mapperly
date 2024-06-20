@@ -17,7 +17,7 @@ public class RequiredMappingTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
             .HaveAssertedAllDiagnostics()
@@ -42,7 +42,7 @@ public class RequiredMappingTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)
             .HaveAssertedAllDiagnostics()
@@ -67,10 +67,16 @@ public class RequiredMappingTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member UnmappedSource on the mapping source type A is not mapped to any member on the mapping target type B"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotFound,
+                "The member UnmappedTarget on the mapping target type B was not found on the mapping source type A"
+            )
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
@@ -115,9 +121,12 @@ public class RequiredMappingTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member UnmappedSource on the mapping source type A is not mapped to any member on the mapping target type B"
+            )
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
@@ -138,9 +147,12 @@ public class RequiredMappingTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotFound,
+                "The member UnmappedTarget on the mapping target type B was not found on the mapping source type A"
+            )
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
@@ -161,10 +173,16 @@ public class RequiredMappingTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member UnmappedSource on the mapping source type A is not mapped to any member on the mapping target type B"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotFound,
+                "The member UnmappedTarget on the mapping target type B was not found on the mapping source type A"
+            )
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
@@ -208,7 +226,7 @@ public class RequiredMappingTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)
             .HaveAssertedAllDiagnostics()

@@ -1,0 +1,4 @@
+[*.cs]
+# unmapped enum members
+dotnet_diagnostic.RMG037.severity = suggestion
+dotnet_diagnostic.RMG038.severity = suggestion

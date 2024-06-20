@@ -179,6 +179,10 @@ RMG077  | Mapper   | Error    | Cannot assign constant value because the type of
 RMG078  | Mapper   | Error    | Cannot assign method return type because the type of the value does not match the type of the target
 RMG079  | Mapper   | Error    | The referenced method could not be found or has an unsupported signature
 RMG080  | Mapper   | Error    | The MapValueAttribute does not support types and arrays
+RMG012  | Mapper   | Warning  | Source member was not found for target member
+RMG020  | Mapper   | Warning  | Source member is not mapped to any target member
+RMG037  | Mapper   | Warning  | An enum member could not be found on the source enum
+RMG038  | Mapper   | Warning  | An enum member could not be found on the target enum
 
 ### Removed Rules
 

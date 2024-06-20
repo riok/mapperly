@@ -13,7 +13,7 @@
     {
       Id: RMG020,
       Title: Source member is not mapped to any target member,
-      Severity: Info,
+      Severity: Warning,
       WarningLevel: 1,
       Location: : (11,4)-(11,78),
       MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
@@ -23,7 +23,7 @@
     {
       Id: RMG012,
       Title: Source member was not found for target member,
-      Severity: Info,
+      Severity: Warning,
       WarningLevel: 1,
       Location: : (11,4)-(11,78),
       MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},

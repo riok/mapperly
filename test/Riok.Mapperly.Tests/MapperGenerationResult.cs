@@ -4,7 +4,7 @@ namespace Riok.Mapperly.Tests;
 
 public record MapperGenerationResult(
     IReadOnlyCollection<Diagnostic> Diagnostics,
-    IReadOnlyDictionary<string, IReadOnlyCollection<Diagnostic>> DiagnosticsByDescriptorId,
+    IReadOnlyDictionary<string, IReadOnlyList<Diagnostic>> DiagnosticsByDescriptorId,
     IReadOnlyDictionary<string, GeneratedMethod> Methods
 )
 {

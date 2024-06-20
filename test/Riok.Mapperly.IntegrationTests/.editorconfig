@@ -1,3 +1,9 @@
-# keep namespaces block scoped, because .NET Framework language version does not support this
 [*.cs]
+# unmapped members
+dotnet_diagnostic.RMG012.severity = suggestion
+dotnet_diagnostic.RMG020.severity = suggestion
+dotnet_diagnostic.RMG037.severity = suggestion
+dotnet_diagnostic.RMG038.severity = suggestion
+
+# keep namespaces block scoped, because .NET Framework language version does not support this
 csharp_style_namespace_declarations = block_scoped:warning
