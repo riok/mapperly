@@ -594,4 +594,20 @@ public class ObjectPropertyConstructorResolverTest
                 """
             );
     }
+
+    [Fact]
+    public Task MapConstructorAndMapPropertyWithPathShouldMapPath()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("Value1", "ValueC.Value3")]
+            private partial B Map(A source);
+            """,
+            "class A { public int Value1 { get; set; } public C ValueC { get; set; } }",
+            "class B(int value1, C valueC) { public int Value1 { get; set; } public C ValueC { get; set; } }",
+            "class C { public int Value2 { get; set; } public int Value3 { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

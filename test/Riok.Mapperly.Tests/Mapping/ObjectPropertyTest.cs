@@ -170,6 +170,36 @@ public class ObjectPropertyTest
     }
 
     [Fact]
+    public void WithManualMappedPropertyDuplicated()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.StringValue), nameof(B.StringValue2)]
+            [MapProperty(nameof(A.StringValue), nameof(B.StringValue2)]
+            partial B Map(A source);
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue2 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.MultipleConfigurationsForTargetMember,
+                "Multiple mappings are configured for the same target member B.StringValue2"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.StringValue2 = source.StringValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void WithPropertyNameMappingStrategyCaseInsensitive()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -460,10 +490,17 @@ public class ObjectPropertyTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member StringValue on the mapping source type A is not mapped to any member on the mapping target type B"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotFound,
+                "The member NestedValue on the mapping target type B was not found on the mapping source type A"
+            )
             .HaveDiagnostic(
                 DiagnosticDescriptors.CannotMapToTemporarySourceMember,
-                "Cannot map from member A.StringValue of type string to member path B.NestedValue.StringValue of type string because NestedValue.C is a value type, returning a temporary value, see CS1612"
+                "Cannot map from member A.StringValue to member path B.NestedValue.StringValue of type string because C.NestedValue is a value type, returning a temporary value, see CS1612"
             )
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(

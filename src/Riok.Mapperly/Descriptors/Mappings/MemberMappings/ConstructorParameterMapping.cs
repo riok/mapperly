@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
@@ -7,30 +8,27 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 public class ConstructorParameterMapping(
     IParameterSymbol parameter,
-    NullMemberMapping delegateMapping,
-    bool selfOrPreviousIsUnmappedOptional
+    ISourceValue sourceValue,
+    bool selfOrPreviousIsUnmappedOptional,
+    MemberMappingInfo memberInfo
 )
 {
+    public MemberMappingInfo MemberInfo { get; } = memberInfo;
+
     private readonly bool _selfOrPreviousIsUnmappedOptional = selfOrPreviousIsUnmappedOptional;
-
-    /// <summary>
-    /// The parameter of the constructor.
-    /// Note: the nullability of it may not be "upgraded".
-    /// </summary>
-    public IParameterSymbol Parameter { get; } = parameter;
-
-    public NullMemberMapping DelegateMapping { get; } = delegateMapping;
+    private readonly IParameterSymbol _parameter = parameter;
+    private readonly ISourceValue _sourceValue = sourceValue;
 
     public ArgumentSyntax BuildArgument(TypeMappingBuildContext ctx)
     {
-        var argumentExpression = DelegateMapping.Build(ctx);
+        var argumentExpression = _sourceValue.Build(ctx);
         var arg = Argument(argumentExpression);
-        return _selfOrPreviousIsUnmappedOptional ? arg.WithNameColon(SpacedNameColon(Parameter.Name)) : arg;
+        return _selfOrPreviousIsUnmappedOptional ? arg.WithNameColon(SpacedNameColon(_parameter.Name)) : arg;
     }
 
     protected bool Equals(ConstructorParameterMapping other) =>
-        Parameter.Equals(other.Parameter, SymbolEqualityComparer.Default)
-        && DelegateMapping.Equals(other.DelegateMapping)
+        _parameter.Equals(other._parameter, SymbolEqualityComparer.Default)
+        && _sourceValue.Equals(other._sourceValue)
         && _selfOrPreviousIsUnmappedOptional == other._selfOrPreviousIsUnmappedOptional;
 
     public override bool Equals(object? obj)
@@ -51,8 +49,8 @@ public class ConstructorParameterMapping(
     {
         unchecked
         {
-            var hashCode = SymbolEqualityComparer.Default.GetHashCode(Parameter);
-            hashCode = (hashCode * 397) ^ DelegateMapping.GetHashCode();
+            var hashCode = SymbolEqualityComparer.Default.GetHashCode(_parameter);
+            hashCode = (hashCode * 397) ^ _sourceValue.GetHashCode();
             hashCode = (hashCode * 397) ^ _selfOrPreviousIsUnmappedOptional.GetHashCode();
             return hashCode;
         }

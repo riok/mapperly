@@ -5,33 +5,32 @@ using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
-namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
+namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
 
 /// <summary>
-/// Represents a null safe <see cref="IMemberMapping"/>.
-/// (eg. <c>source?.A?.B ?? null-substitute</c> or <c>source?.A?.B != null ? MapToD(source.A.B) : null-substitute</c>)
+/// A mapped source member with additional null handling.
+/// (e.g. <c>source?.A?.B ?? null-substitute</c> or <c>source?.A?.B != null ? MapToD(source.A.B) : null-substitute</c>)
 /// </summary>
-[DebuggerDisplay("NullMemberMapping({SourceGetter}: {_delegateMapping})")]
-public class NullMemberMapping(
+[DebuggerDisplay("NullMappedMemberSourceValue({_sourceGetter}: {_delegateMapping})")]
+public class NullMappedMemberSourceValue(
     INewInstanceMapping delegateMapping,
     GetterMemberPath sourceGetter,
     ITypeSymbol targetType,
     NullFallbackValue nullFallback,
     bool useNullConditionalAccess
-) : IMemberMapping
+) : ISourceValue
 {
     private readonly INewInstanceMapping _delegateMapping = delegateMapping;
     private readonly NullFallbackValue _nullFallback = nullFallback;
-
-    public GetterMemberPath SourceGetter { get; } = sourceGetter;
+    private readonly GetterMemberPath _sourceGetter = sourceGetter;
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         // the source type of the delegate mapping is nullable or the source path is not nullable
         // build mapping with null conditional access
-        if (_delegateMapping.SourceType.IsNullable() || !SourceGetter.MemberPath.IsAnyNullable())
+        if (_delegateMapping.SourceType.IsNullable() || !_sourceGetter.MemberPath.IsAnyNullable())
         {
-            ctx = ctx.WithSource(SourceGetter.BuildAccess(ctx.Source, nullConditional: true));
+            ctx = ctx.WithSource(_sourceGetter.BuildAccess(ctx.Source, nullConditional: true));
             return _delegateMapping.Build(ctx);
         }
 
@@ -42,10 +41,10 @@ public class NullMemberMapping(
         // source.A?.B == null ? <null-substitute> : Map(source.A.B.Value)
         // use simplified coalesce expression for synthetic mappings:
         // source.A?.B ?? <null-substitute>
-        if (_delegateMapping.IsSynthetic && (useNullConditionalAccess || !SourceGetter.MemberPath.IsAnyObjectPathNullable()))
+        if (_delegateMapping.IsSynthetic && (useNullConditionalAccess || !_sourceGetter.MemberPath.IsAnyObjectPathNullable()))
         {
-            var nullConditionalSourceAccess = SourceGetter.BuildAccess(ctx.Source, nullConditional: true);
-            var nameofSourceAccess = SourceGetter.BuildAccess(ctx.Source, nullConditional: false);
+            var nullConditionalSourceAccess = _sourceGetter.BuildAccess(ctx.Source, nullConditional: true);
+            var nameofSourceAccess = _sourceGetter.BuildAccess(ctx.Source, nullConditional: false);
             var mapping = _delegateMapping.Build(ctx.WithSource(nullConditionalSourceAccess));
             return _nullFallback == NullFallbackValue.Default && targetType.IsNullable()
                 ? mapping
@@ -53,15 +52,19 @@ public class NullMemberMapping(
         }
 
         var notNullCondition = useNullConditionalAccess
-            ? IsNotNull(SourceGetter.BuildAccess(ctx.Source, nullConditional: true, skipTrailingNonNullable: true))
-            : SourceGetter.MemberPath.BuildNonNullConditionWithoutConditionalAccess(ctx.Source)!;
-        var sourceMemberAccess = SourceGetter.BuildAccess(ctx.Source, true);
+            ? IsNotNull(_sourceGetter.BuildAccess(ctx.Source, nullConditional: true, skipTrailingNonNullable: true))
+            : _sourceGetter.MemberPath.BuildNonNullConditionWithoutConditionalAccess(ctx.Source)!;
+        var sourceMemberAccess = _sourceGetter.BuildAccess(ctx.Source, true);
         ctx = ctx.WithSource(sourceMemberAccess);
         return Conditional(notNullCondition, _delegateMapping.Build(ctx), NullSubstitute(targetType, sourceMemberAccess, _nullFallback));
     }
 
-    protected bool Equals(NullMemberMapping other) =>
-        _delegateMapping.Equals(other._delegateMapping) && _nullFallback == other._nullFallback && SourceGetter.Equals(other.SourceGetter);
+    protected bool Equals(NullMappedMemberSourceValue other)
+    {
+        return _delegateMapping.Equals(other._delegateMapping)
+            && _nullFallback == other._nullFallback
+            && _sourceGetter.Equals(other._sourceGetter);
+    }
 
     public override bool Equals(object? obj)
     {
@@ -74,21 +77,12 @@ public class NullMemberMapping(
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((NullMemberMapping)obj);
+        return Equals((NullMappedMemberSourceValue)obj);
     }
 
-    public override int GetHashCode()
-    {
-        unchecked
-        {
-            var hashCode = _delegateMapping.GetHashCode();
-            hashCode = (hashCode * 397) ^ (int)_nullFallback;
-            hashCode = (hashCode * 397) ^ SourceGetter.GetHashCode();
-            return hashCode;
-        }
-    }
+    public override int GetHashCode() => HashCode.Combine(_delegateMapping, _nullFallback, _sourceGetter);
 
-    public static bool operator ==(NullMemberMapping? left, NullMemberMapping? right) => Equals(left, right);
+    public static bool operator ==(NullMappedMemberSourceValue? left, NullMappedMemberSourceValue? right) => Equals(left, right);
 
-    public static bool operator !=(NullMemberMapping? left, NullMemberMapping? right) => !Equals(left, right);
+    public static bool operator !=(NullMappedMemberSourceValue? left, NullMappedMemberSourceValue? right) => !Equals(left, right);
 }

@@ -1,5 +1,4 @@
 using Riok.Mapperly.Descriptors.Mappings;
-using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
@@ -34,9 +33,6 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
         ToStringMappingBuilder.TryBuildMapping,
         NewInstanceObjectMemberMappingBuilder.TryBuildMapping,
     };
-
-    /// <inheritdoc cref="MappingCollection.UserMappings"/>
-    public IReadOnlyCollection<IUserMapping> UserMappings => mappings.UserMappings;
 
     /// <inheritdoc cref="MappingCollection.NewInstanceMappings"/>
     public IReadOnlyDictionary<TypeMappingKey, INewInstanceMapping> NewInstanceMappings => mappings.NewInstanceMappings;

@@ -7,7 +7,7 @@
       WarningLevel: 1,
       Location: : (11,4)-(11,36),
       MessageFormat: Cannot map {0} to read only member {1},
-      Message: Cannot map A.NestedValue of type C to read only member B.NestedValue of type D,
+      Message: Cannot map A.NestedValue to read only member B.NestedValue,
       Category: Mapper
     },
     {

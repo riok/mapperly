@@ -6,10 +6,8 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::B Map(global::A source)
     {
-        var target = new global::B()
-        {
-            StringValue = source.StringValue,
-        };
+        var target = new global::B(source.Value1, source.ValueC);
+        target.ValueC.Value3 = source.Value1;
         return target;
     }
 }

@@ -165,3 +165,19 @@ Rule ID | Category | Severity | Notes
 RMG071  | Mapper   | Warning  | Nested properties mapping is not used
 RMG072  | Mapper   | Warning  | The source type of the referenced mapping does not match
 RMG073  | Mapper   | Warning  | The target type of the referenced mapping does not match
+
+## Release 4.0
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+RMG074  | Mapper   | Error    | Multiple mappings are configured for the same target member
+
+### Removed Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+RMG017  | Mapper   | Warning  | An init only member can have one configuration at max
+RMG027  | Mapper   | Warning  | A constructor parameter can have one configuration at max
+RMG028  | Mapper   | Warning  | Constructor parameter cannot handle target paths

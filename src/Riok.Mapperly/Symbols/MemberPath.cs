@@ -139,5 +139,5 @@ public abstract class MemberPath(ITypeSymbol rootType, IReadOnlyList<IMappableMe
     private bool Equals(MemberPath other) =>
         RootType.Equals(other.RootType, SymbolEqualityComparer.IncludeNullability) && Path.SequenceEqual(other.Path);
 
-    public abstract string ToDisplayString(bool includeMemberType = true);
+    public abstract string ToDisplayString(bool includeRootType = true, bool includeMemberType = true);
 }

@@ -1,6 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.CodeAnalysis;
-using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Symbols;
@@ -18,22 +15,13 @@ public interface IMembersBuilderContext<out T>
 
     MappingBuilderContext BuilderContext { get; }
 
-    IReadOnlyCollection<string> IgnoredSourceMemberNames { get; }
+    void SetTargetMemberMapped(IMappableMember targetMember);
 
-    Dictionary<string, IMappableMember> TargetMembers { get; }
+    void ConsumeMemberConfig(MemberMappingInfo members);
 
-    Dictionary<string, List<MemberMappingConfiguration>> MemberConfigsByRootTargetName { get; }
+    IEnumerable<IMappableMember> EnumerateUnmappedTargetMembers();
 
-    void AddDiagnostics();
+    IEnumerable<IMappableMember> EnumerateUnmappedOrConfiguredTargetMembers();
 
-    /// <summary>
-    /// Tries to find a (possibly nested) MemberPath on the source type that can be mapped to <paramref name="targetMemberName"/>.
-    /// </summary>
-    bool TryFindNestedSourceMembersPath(
-        string targetMemberName,
-        [NotNullWhen(true)] out MemberPath? sourceMemberPath,
-        bool? ignoreCase = null
-    );
-
-    NullMemberMapping BuildNullMemberMapping(MemberPath sourcePath, INewInstanceMapping delegateMapping, ITypeSymbol targetMemberType);
+    IEnumerable<MemberMappingInfo> MatchMembers(IMappableMember targetMember);
 }
