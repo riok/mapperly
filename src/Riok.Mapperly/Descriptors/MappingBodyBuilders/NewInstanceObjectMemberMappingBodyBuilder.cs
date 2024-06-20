@@ -68,7 +68,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         // consume member configs
         // to ensure no further mappings are created for these configurations,
         // even if a mapping validation fails
-        ctx.ConsumeMemberConfig(memberInfo);
+        ctx.ConsumeMemberConfigs(memberInfo);
 
         if (!ObjectMemberMappingBodyBuilder.ValidateMappingSpecification(ctx, memberInfo, true))
             return;
@@ -144,7 +144,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         {
             if (
                 !ctx.TryMatchParameter(parameter, out var memberMappingInfo)
-                || !MemberMappingBuilder.TryBuild(ctx, memberMappingInfo, MemberMappingBuilder.CodeStyle.Expression, out var sourceValue)
+                || !SourceValueBuilder.TryBuildMappedSourceValue(ctx, memberMappingInfo, out var sourceValue)
             )
             {
                 // expressions do not allow skipping of optional parameters

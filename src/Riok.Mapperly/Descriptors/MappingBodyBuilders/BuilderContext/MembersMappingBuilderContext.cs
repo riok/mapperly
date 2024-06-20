@@ -41,11 +41,16 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
 
     public void SetMembersMapped(MemberMappingInfo memberInfo) => _state.SetMembersMapped(memberInfo, false);
 
-    public void ConsumeMemberConfig(MemberMappingInfo members)
+    public void ConsumeMemberConfigs(MemberMappingInfo members)
     {
         if (members.Configuration != null)
         {
             ConsumeMemberConfig(members.Configuration);
+        }
+
+        if (members.ValueConfiguration != null)
+        {
+            ConsumeMemberConfig(members.ValueConfiguration);
         }
     }
 
@@ -53,13 +58,26 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
 
     protected void ConsumeMemberConfig(MemberMappingConfiguration config) => _state.ConsumeMemberConfig(config);
 
+    protected void ConsumeMemberConfig(MemberValueMappingConfiguration config) => _state.ConsumeMemberConfig(config);
+
     public IEnumerable<MemberMappingInfo> MatchMembers(IMappableMember targetMember)
     {
+        var matchedMemberMappingInfos = new List<MemberMappingInfo>();
+        if (TryGetMemberValueConfigs(targetMember.Name, false, out var memberValueConfigs))
+        {
+            matchedMemberMappingInfos.AddRange(ResolveMemberMappingInfo(memberValueConfigs.ToList()));
+        }
+
         if (TryGetMemberConfigs(targetMember.Name, false, out var memberConfigs))
+        {
+            matchedMemberMappingInfos.AddRange(ResolveMemberMappingInfo(memberConfigs.ToList()));
+        }
+
+        if (matchedMemberMappingInfos.Count > 0)
         {
             // return configs with shorter target member paths first
             // to prevent NRE's in the generated code
-            return ResolveMemberMappingInfo(memberConfigs.ToList()).OrderBy(x => x.TargetMember.Path.Count);
+            return matchedMemberMappingInfos.OrderBy(x => x.TargetMember.Path.Count);
         }
 
         // match directly
@@ -76,8 +94,7 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
 
     protected bool TryMatchMember(IMappableMember targetMember, bool? ignoreCase, [NotNullWhen(true)] out MemberMappingInfo? memberInfo)
     {
-        memberInfo = TryGetMemberConfigMappingInfo(targetMember, ignoreCase == true);
-        if (memberInfo != null)
+        if (TryGetConfiguredMemberMappingInfo(targetMember, ignoreCase == true, out memberInfo))
             return true;
 
         // if no config was found, match the source path
@@ -96,6 +113,12 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
         bool ignoreCase,
         [NotNullWhen(true)] out IReadOnlyList<MemberMappingConfiguration>? memberConfigs
     ) => _state.TryGetMemberConfigs(targetMemberName, ignoreCase, out memberConfigs);
+
+    protected bool TryGetMemberValueConfigs(
+        string targetMemberName,
+        bool ignoreCase,
+        [NotNullWhen(true)] out IReadOnlyList<MemberValueMappingConfiguration>? memberConfigs
+    ) => _state.TryGetMemberValueConfigs(targetMemberName, ignoreCase, out memberConfigs);
 
     protected virtual bool TryFindSourcePath(
         IReadOnlyList<IReadOnlyList<string>> pathCandidates,
@@ -116,6 +139,31 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
 
     private IReadOnlyList<MemberMappingInfo> ResolveMemberMappingInfo(IEnumerable<MemberMappingConfiguration> configs) =>
         configs.Select(ResolveMemberMappingInfo).WhereNotNull().ToList();
+
+    private IEnumerable<MemberMappingInfo> ResolveMemberMappingInfo(IEnumerable<MemberValueMappingConfiguration> configs) =>
+        configs.Select(ResolveMemberMappingInfo).WhereNotNull().ToList();
+
+    private MemberMappingInfo? ResolveMemberMappingInfo(MemberValueMappingConfiguration config)
+    {
+        if (
+            !BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.TargetType, config.Target.Path, out var foundMemberPath)
+            || foundMemberPath is not NonEmptyMemberPath targetMemberPath
+        )
+        {
+            BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.ConfiguredMappingTargetMemberNotFound,
+                config.Target.FullName,
+                Mapping.TargetType
+            );
+
+            // consume this member config and prevent its further usage
+            // as it is invalid, and a diagnostic has already been reported
+            _state.ConsumeMemberConfig(config);
+            return null;
+        }
+
+        return new MemberMappingInfo(targetMemberPath, config);
+    }
 
     private MemberMappingInfo? ResolveMemberMappingInfo(MemberMappingConfiguration config)
     {
@@ -191,6 +239,55 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
             if (memberConfig != null && ResolveMemberConfigSourcePath(memberConfig, out var sourceMember))
             {
                 return new MemberMappingInfo(sourceMember, new NonEmptyMemberPath(BuilderContext.Target, [targetMember]), memberConfig);
+            }
+        }
+
+        return null;
+    }
+
+    private bool TryGetConfiguredMemberMappingInfo(
+        IMappableMember targetMember,
+        bool ignoreCase,
+        [NotNullWhen(true)] out MemberMappingInfo? memberMappingInfo
+    )
+    {
+        var valueMemberInfo = TryGetMemberValueMappingInfo(targetMember, ignoreCase);
+        var configMemberInfo = TryGetMemberConfigMappingInfo(targetMember, ignoreCase);
+
+        // If both exist (a value and a mapping config)
+        // the one with the shorter target member path has the higher priority.
+        // This prevents NRE's in the generated code.
+        if (
+            valueMemberInfo != null
+            && configMemberInfo != null
+            && valueMemberInfo.TargetMember.Path.Count > configMemberInfo.TargetMember.Path.Count
+        )
+        {
+            memberMappingInfo = configMemberInfo;
+            return true;
+        }
+
+        memberMappingInfo = valueMemberInfo ?? configMemberInfo;
+        return memberMappingInfo != null;
+    }
+
+    private MemberMappingInfo? TryGetMemberValueMappingInfo(IMappableMember targetMember, bool ignoreCase)
+    {
+        if (TryGetMemberValueConfigs(targetMember.Name, false, out var memberValueConfigs))
+        {
+            var memberValueConfig = memberValueConfigs.FirstOrDefault(x => x.Target.Path.Count == 1);
+            if (memberValueConfig != null)
+            {
+                return new MemberMappingInfo(new NonEmptyMemberPath(BuilderContext.Target, [targetMember]), memberValueConfig);
+            }
+        }
+
+        if (ignoreCase && TryGetMemberValueConfigs(targetMember.Name, true, out memberValueConfigs))
+        {
+            var memberValueConfig = memberValueConfigs.FirstOrDefault(x => x.Target.Path.Count == 1);
+            if (memberValueConfig != null)
+            {
+                return new MemberMappingInfo(new NonEmptyMemberPath(BuilderContext.Target, [targetMember]), memberValueConfig);
             }
         }
 

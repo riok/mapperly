@@ -25,6 +25,12 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
     /// <param name="memberMapping">The member mapping to be applied if the source member is not null</param>
     public void AddNullDelegateMemberAssignmentMapping(IMemberAssignmentMapping memberMapping)
     {
+        if (memberMapping.MemberInfo.SourceMember == null)
+        {
+            AddMemberAssignmentMapping(memberMapping);
+            return;
+        }
+
         var nullConditionSourcePath = new NonEmptyMemberPath(
             memberMapping.MemberInfo.SourceMember.RootType,
             memberMapping.MemberInfo.SourceMember.PathWithoutTrailingNonNullable().ToList()

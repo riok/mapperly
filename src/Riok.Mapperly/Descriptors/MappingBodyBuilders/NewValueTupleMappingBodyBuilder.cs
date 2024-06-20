@@ -70,9 +70,7 @@ public static class NewValueTupleMappingBodyBuilder
                 return false;
             }
 
-            if (
-                !MemberMappingBuilder.TryBuild(ctx, memberMappingInfo, MemberMappingBuilder.CodeStyle.Expression, out var mappedSourceValue)
-            )
+            if (!SourceValueBuilder.TryBuildMappedSourceValue(ctx, memberMappingInfo, out var mappedSourceValue))
             {
                 ctx.SetTargetMemberMapped(targetMember);
                 return false;

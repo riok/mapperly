@@ -11,6 +11,7 @@ internal static class MembersMappingStateBuilder
     {
         // build configurations
         var configuredTargetMembers = new HashSet<StringMemberPath>();
+        var memberValueConfigsByRootTargetName = BuildMemberValueConfigurations(ctx, configuredTargetMembers);
         var memberConfigsByRootTargetName = BuildMemberConfigurations(ctx, configuredTargetMembers);
 
         // build all members
@@ -36,6 +37,7 @@ internal static class MembersMappingStateBuilder
             unmappedTargetMemberNames,
             targetMemberCaseMapping,
             targetMembers,
+            memberValueConfigsByRootTargetName,
             memberConfigsByRootTargetName,
             ignoredSourceMemberNames
         );
@@ -49,6 +51,16 @@ internal static class MembersMappingStateBuilder
     private static Dictionary<string, IMappableMember> GetTargetMembers(MappingBuilderContext ctx)
     {
         return ctx.SymbolAccessor.GetAllAccessibleMappableMembers(ctx.Target).ToDictionary(x => x.Name);
+    }
+
+    private static Dictionary<string, List<MemberValueMappingConfiguration>> BuildMemberValueConfigurations(
+        MappingBuilderContext ctx,
+        HashSet<StringMemberPath> configuredTargetMembers
+    )
+    {
+        return GetUniqueTargetConfigurations(ctx, configuredTargetMembers, ctx.Configuration.Members.ValueMappings, x => x.Target)
+            .GroupBy(x => x.Target.Path[0])
+            .ToDictionary(x => x.Key, x => x.ToList());
     }
 
     private static Dictionary<string, List<MemberMappingConfiguration>> BuildMemberConfigurations(

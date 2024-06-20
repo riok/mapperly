@@ -112,10 +112,13 @@ public static class ObjectMemberMappingBodyBuilder
         // a source member path is write only or not accessible
         // an expressions source member path is only accessible with unsafe access
         if (
-            sourceMemberPath.Path.Any(p => !p.CanGet)
-            || (
-                ctx.BuilderContext.IsExpression
-                && sourceMemberPath.Path.Any(p => !ctx.BuilderContext.SymbolAccessor.IsDirectlyAccessible(p.MemberSymbol))
+            sourceMemberPath != null
+            && (
+                sourceMemberPath.Path.Any(p => !p.CanGet)
+                || (
+                    ctx.BuilderContext.IsExpression
+                    && sourceMemberPath.Path.Any(p => !ctx.BuilderContext.SymbolAccessor.IsDirectlyAccessible(p.MemberSymbol))
+                )
             )
         )
         {
@@ -128,7 +131,7 @@ public static class ObjectMemberMappingBodyBuilder
         }
 
         // cannot map from an indexed member
-        if (sourceMemberPath.Member?.IsIndexer == true)
+        if (sourceMemberPath?.Member?.IsIndexer == true)
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapFromIndexedMember,
@@ -180,7 +183,7 @@ public static class ObjectMemberMappingBodyBuilder
         // consume member configs
         // to ensure no further mappings are created for these configurations,
         // even if a mapping validation fails
-        ctx.ConsumeMemberConfig(memberMappingInfo);
+        ctx.ConsumeMemberConfigs(memberMappingInfo);
 
         if (TryAddExistingTargetMapping(ctx, memberMappingInfo))
             return;
@@ -206,6 +209,10 @@ public static class ObjectMemberMappingBodyBuilder
         MemberMappingInfo memberMappingInfo
     )
     {
+        // can only map with an existing target from a source member
+        if (memberMappingInfo.SourceMember == null)
+            return false;
+
         var sourceMemberPath = memberMappingInfo.SourceMember;
         var targetMemberPath = memberMappingInfo.TargetMember;
 

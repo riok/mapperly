@@ -34,6 +34,17 @@ public class NewInstanceContainerBuilderContext<T>(MappingBuilderContext builder
         if (TryMatchMember(targetMember, out memberInfo))
             return true;
 
+        if (TryGetMemberValueConfigs(targetMember.Name, false, out var valueConfigs))
+        {
+            BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.InitOnlyMemberDoesNotSupportPaths,
+                Mapping.TargetType,
+                valueConfigs[0].Target.FullName
+            );
+            ConsumeMemberConfig(valueConfigs[0]);
+            return false;
+        }
+
         if (TryGetMemberConfigs(targetMember.Name, false, out var configs))
         {
             BuilderContext.ReportDiagnostic(

@@ -17,7 +17,7 @@ public interface IMembersBuilderContext<out T>
 
     void SetTargetMemberMapped(IMappableMember targetMember);
 
-    void ConsumeMemberConfig(MemberMappingInfo members);
+    void ConsumeMemberConfigs(MemberMappingInfo members);
 
     IEnumerable<IMappableMember> EnumerateUnmappedTargetMembers();
 

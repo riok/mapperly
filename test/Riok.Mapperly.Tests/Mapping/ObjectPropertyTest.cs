@@ -499,6 +499,14 @@ public class ObjectPropertyTest
                 "The member NestedValue on the mapping target type B was not found on the mapping source type A"
             )
             .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member StringValue on the mapping source type A is not mapped to any member on the mapping target type B"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotFound,
+                "The member NestedValue on the mapping target type B was not found on the mapping source type A"
+            )
+            .HaveDiagnostic(
                 DiagnosticDescriptors.CannotMapToTemporarySourceMember,
                 "Cannot map from member A.StringValue to member path B.NestedValue.StringValue of type string because C.NestedValue is a value type, returning a temporary value, see CS1612"
             )

@@ -1,0 +1,7 @@
+{
+  MappedValue: 11,
+  CtorMappedValue: 10,
+  CtorConstantValue: fooBar,
+  ConstantValue: 1,
+  ConstantValueByMethod: 2
+}

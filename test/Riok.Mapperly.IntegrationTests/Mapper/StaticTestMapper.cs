@@ -134,5 +134,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         [MapEnum(EnumMappingStrategy.ByName, FallbackValue = TestEnum.Value10)]
         public static partial TestEnum MapToEnumByNameWithFallback(TestEnumDtoByName v);
+
+        [MapValue(nameof(ConstantValuesDto.CtorConstantValue), "fooBar")]
+        [MapValue(nameof(ConstantValuesDto.ConstantValue), 1)]
+        [MapValue(nameof(ConstantValuesDto.ConstantValueByMethod), Use = nameof(IntValueBuilder))]
+        public static partial ConstantValuesDto MapConstantValues(ConstantValuesObject source);
+
+        private static int IntValueBuilder() => 2;
     }
 }
