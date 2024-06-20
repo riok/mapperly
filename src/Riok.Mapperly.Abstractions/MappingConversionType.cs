@@ -115,6 +115,11 @@ public enum MappingConversionType
     Tuple = 1 << 15,
 
     /// <summary>
+    /// Allow using the underlying type of an enum to map from or to an enum type.
+    /// </summary>
+    EnumUnderlyingType = 1 << 16,
+
+    /// <summary>
     /// Enables all supported conversions.
     /// </summary>
     All = ~None,

@@ -446,4 +446,33 @@ public class EnumTest
             .HaveDiagnostic(DiagnosticDescriptors.EnumConfigurationOnNonEnumMapping)
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public void FromEnumUnderlyingTypeMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial A Map(string source);",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.StringToEnum),
+            "enum A { V1, V2 }"
+        );
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::A)int.Parse(source);");
+    }
+
+    [Fact]
+    public void FromEnumUnderlyingTypeMappingDisabledUnderlayingConversion()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial A Map(string source);",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(
+                MappingConversionType.StringToEnum,
+                MappingConversionType.EnumUnderlyingType
+            ),
+            "enum A { V1, V2 }"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
+            .HaveAssertedAllDiagnostics();
+    }
 }
