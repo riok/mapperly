@@ -83,6 +83,7 @@ Riok.Mapperly.Abstractions.MappingConversionType.StringToEnum = 32 -> Riok.Mappe
 Riok.Mapperly.Abstractions.MappingConversionType.ToStringMethod = 16 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.Tuple = 32768 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MappingConversionType.Queryable = 1024 -> Riok.Mapperly.Abstractions.MappingConversionType
+Riok.Mapperly.Abstractions.MappingConversionType.EnumUnderlyingType = 65536 -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MapperAttribute.UseReferenceHandling.get -> bool
 Riok.Mapperly.Abstractions.MapperAttribute.UseReferenceHandling.set -> void
 Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler
