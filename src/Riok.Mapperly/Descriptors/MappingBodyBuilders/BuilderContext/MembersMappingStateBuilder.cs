@@ -30,7 +30,9 @@ internal static class MembersMappingStateBuilder
         unmappedSourceMemberNames.ExceptWith(ignoredSourceMemberNames);
         targetMembers.RemoveRange(ignoredTargetMemberNames);
 
-        var targetMemberCaseMapping = targetMembers.Keys.ToDictionary(x => x, x => x, StringComparer.OrdinalIgnoreCase);
+        var targetMemberCaseMapping = targetMembers
+            .Keys.GroupBy(x => x, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
         var unmappedTargetMemberNames = targetMembers.Keys.ToHashSet();
         return new MembersMappingState(
             unmappedSourceMemberNames,

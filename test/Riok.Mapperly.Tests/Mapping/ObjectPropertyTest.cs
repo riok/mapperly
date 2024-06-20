@@ -436,6 +436,35 @@ public class ObjectPropertyTest
     }
 
     [Fact]
+    public Task PropertiesWithCaseInsensitiveEqualNamesShouldWork()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public int Value { get; set; } }",
+            "class B { public int value { get; set; } public int Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task PropertyConfigurationShouldPreferExactCasing()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("Value", "value")]
+            [MapProperty("value", "Value")]
+            public partial B Map(A source);
+            """,
+            "class A { public int value { get; set; } public int Value { get; set; } }",
+            "class B { public int value { get; set; } public int Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public void ShouldIgnoreStaticProperty()
     {
         var source = TestSourceBuilder.Mapping(
