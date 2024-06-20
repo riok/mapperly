@@ -35,7 +35,7 @@ public record TestHelperOptions(
     /// <summary>
     /// Includes all ignored diagnostics.
     /// </summary>
-    public static readonly TestHelperOptions AllowAndIncludeDiagnostics = AllowDiagnostics with { IgnoredDiagnostics = null, };
+    public static readonly TestHelperOptions AllowAndIncludeAllDiagnostics = AllowDiagnostics with { IgnoredDiagnostics = null, };
 
     public static readonly TestHelperOptions AllowInfoDiagnostics = Default with
     {
