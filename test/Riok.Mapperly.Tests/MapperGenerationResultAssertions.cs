@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests;
 
@@ -22,8 +24,40 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions HaveAssertedAllDiagnostics()
     {
-        _notAssertedDiagnostics.Should().BeEmpty();
+        if (_notAssertedDiagnostics.Count == 0)
+            return this;
+
+        var assertions = _notAssertedDiagnostics.GroupBy(x => x.Descriptor.Id).Select(x => BuildDiagnosticAssertions(x));
+        Assert.Fail(
+            $"""
+            {_notAssertedDiagnostics.Count} not asserted diagnostics found.
+            Code to assert missing diagnostics:
+            .{string.Join(Environment.NewLine + ".", assertions)}
+            """
+        );
         return this;
+    }
+
+    private string BuildDiagnosticAssertions(IGrouping<string, Diagnostic> diagnosticGroup)
+    {
+        var diagnosticDescriptorFieldName = typeof(DiagnosticDescriptors)
+            .GetFields(BindingFlags.Static | BindingFlags.Public)
+            .Select(x => (x.Name, Value: x.GetValue(null)))
+            .Where(x => x.Value is DiagnosticDescriptor && ((DiagnosticDescriptor)x.Value!).Id.Equals(diagnosticGroup.Key))
+            .Select(x => x.Name)
+            .Single();
+        var diagnosticDescriptorAccess = $"{nameof(DiagnosticDescriptors)}.{diagnosticDescriptorFieldName}";
+        if (!diagnosticGroup.Skip(1).Any())
+        {
+            return $"{nameof(HaveDiagnostic)}({diagnosticDescriptorAccess}, \"{diagnosticGroup.First().GetMessage()}\")";
+        }
+
+        return $"""
+            {nameof(HaveDiagnostics)}(
+                {diagnosticDescriptorAccess},
+                {string.Join($",{Environment.NewLine}    ", diagnosticGroup.Select(y => $"\"{y.GetMessage()}\""))}
+            )
+            """;
     }
 
     public MapperGenerationResultAssertions OnlyHaveDiagnosticSeverities(IReadOnlySet<DiagnosticSeverity> allowedDiagnosticSeverities)
@@ -34,12 +68,13 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions HaveDiagnostics(DiagnosticDescriptor descriptor, params string[] messages)
     {
-        var i = 0;
-        foreach (var diagnostic in GetDiagnostics(descriptor))
+        var diagnostics = GetDiagnostics(descriptor);
+        var max = Math.Min(diagnostics.Count, messages.Length);
+        for (var i = 0; i < max; i++)
         {
+            var diagnostic = diagnostics[i];
             diagnostic.GetMessage().Should().Be(messages[i]);
             _notAssertedDiagnostics.Remove(diagnostic);
-            i++;
         }
 
         return this;
@@ -146,7 +181,7 @@ public class MapperGenerationResultAssertions
         [StringSyntax(StringSyntax.CSharp)] string? constraintClauses
     ) => HaveMapMethodWithGenericConstraints(TestSourceBuilder.DefaultMapMethodName, constraintClauses);
 
-    private IReadOnlyCollection<Diagnostic> GetDiagnostics(DiagnosticDescriptor descriptor)
+    private IReadOnlyList<Diagnostic> GetDiagnostics(DiagnosticDescriptor descriptor)
     {
         if (_mapper.DiagnosticsByDescriptorId.TryGetValue(descriptor.Id, out var diagnostics))
             return diagnostics;

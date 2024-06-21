@@ -105,8 +105,13 @@ public class ObjectPropertyFlatteningTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member Value on the mapping source type A is not mapped to any member on the mapping target type B"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();

@@ -13,7 +13,7 @@ public class EnumExplicitMapTest
             "public enum E2 {A = 100, B, C, d, e, E, f}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -47,7 +47,7 @@ public class EnumExplicitMapTest
             "public enum E2 {A = 100, B, C, d, e, E, f}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveSingleMethodBody(
                 """

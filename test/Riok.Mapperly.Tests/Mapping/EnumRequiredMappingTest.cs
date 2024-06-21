@@ -17,7 +17,7 @@ public class EnumRequiredMappingTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member V3 (2) on E1 not found on target enum E2")
             .HaveAssertedAllDiagnostics()
@@ -40,7 +40,7 @@ public class EnumRequiredMappingTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member V3 (2) on E1 not found on target enum E2")
             .HaveAssertedAllDiagnostics()
@@ -68,7 +68,7 @@ public class EnumRequiredMappingTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member V3 (2) on E2 not found on source enum E1")
             .HaveAssertedAllDiagnostics()
@@ -91,7 +91,7 @@ public class EnumRequiredMappingTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member V3 (2) on E2 not found on source enum E1")
             .HaveAssertedAllDiagnostics()

@@ -14,7 +14,7 @@ public class EnumIgnoreTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member E (101) on E1 not found on target enum E2")
             .HaveAssertedAllDiagnostics()
@@ -31,7 +31,7 @@ public class EnumIgnoreTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member EE (101) on E2 not found on source enum E1")
             .HaveAssertedAllDiagnostics()

@@ -577,7 +577,7 @@ public class ObjectPropertyNullableTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(
                 DiagnosticDescriptors.SourceMemberNotMapped,

@@ -3,7 +3,7 @@
     {
       Id: RMG037,
       Title: An enum member could not be found on the source enum,
-      Severity: Info,
+      Severity: Warning,
       WarningLevel: 1,
       Location: : (11,4)-(11,36),
       MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
@@ -13,7 +13,7 @@
     {
       Id: RMG037,
       Title: An enum member could not be found on the source enum,
-      Severity: Info,
+      Severity: Warning,
       WarningLevel: 1,
       Location: : (11,4)-(11,36),
       MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},

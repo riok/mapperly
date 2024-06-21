@@ -222,22 +222,9 @@ If `ThrowOnMappingNullMismatch` is `true` (default), an `ArgumentNullException` 
 are ignored for required init properties and `IQueryable<T>` projection mappings.
 :::
 
-### Strict property mappings
+### One side strict property mappings
 
-To enforce strict mappings
-(all source members have to be mapped to a target member
-and all target members have to be mapped from a source member,
-except for ignored members)
-set the following two EditorConfig settings (see also [analyzer diagnostics](./analyzer-diagnostics/index.mdx)):
-
-```editorconfig title=".editorconfig"
-[*.cs]
-dotnet_diagnostic.RMG012.severity = error # Unmapped target member
-dotnet_diagnostic.RMG020.severity = error # Unmapped source member
-```
-
-#### One side strict property mappings
-
+By default Mapperly emits diagnostics with a severity of warning if there are unmapped source or target members.
 To enforce strict mappings on only either the source or the target,
 the `RequiredMappingStrategy` can be used.
 
@@ -276,11 +263,6 @@ the `RequiredMappingStrategy` can be used.
   
   </TabItem>
 </Tabs>
-
-### Strict enum mappings
-
-To enforce strict enum mappings set `RMG037` and `RMG038` to error, see [strict enum mappings](./enum.mdx#strict-enum-mappings).
-One side strict enum member mappings work the same way as one side property mappings.
 
 ### String format
 
