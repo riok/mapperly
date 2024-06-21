@@ -64,20 +64,20 @@ public readonly partial struct SyntaxFactoryHelper
         return SeparatedList<T>(joinedNodes);
     }
 
-    public SeparatedSyntaxList<T> ConditionalCommaLineFeedSeparatedList<T>(IEnumerable<T> nodes)
+    private SeparatedSyntaxList<T> ConditionalCommaLineFeedSeparatedList<T>(IEnumerable<T> nodes)
         where T : SyntaxNode
     {
+        const int MultilineSeparatedListThreshold = 20;
         var nodesList = nodes.ToList();
         var sep = Token(SyntaxKind.CommaToken);
-        if (nodesList.Count > 1)
+        if (nodesList.Sum(x => x.FullSpan.Length) > MultilineSeparatedListThreshold)
         {
             sep = sep.AddTrailingLineFeed(Indentation + 1);
             nodesList[0] = nodesList[0].AddLeadingLineFeed(Indentation + 1);
             nodesList[^1] = nodesList[^1].AddTrailingLineFeed(Indentation);
         }
         var joinedNodes = Join(sep, false, nodesList);
-        var result = SeparatedList<T>(joinedNodes);
-        return result;
+        return SeparatedList<T>(joinedNodes);
     }
 
     private SeparatedSyntaxList<T> CommaLineFeedSeparatedList<T>(IEnumerable<T> nodes)

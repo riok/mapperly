@@ -141,7 +141,4 @@ public partial struct SyntaxFactoryHelper
         SyntaxFactory.TypeArgumentList(CommaSeparatedList(argSyntaxes));
 
     private static ArgumentListSyntax ArgumentList(params ArgumentSyntax[] args) => SyntaxFactory.ArgumentList(CommaSeparatedList(args));
-
-    private static ArgumentListSyntax ArgumentList(IEnumerable<ArgumentSyntax> args) =>
-        SyntaxFactory.ArgumentList(CommaSeparatedList(args));
 }
