@@ -11,7 +11,7 @@ If Mapperly can't resolve the target or source property correctly, it is possibl
 by either using the source and target property path names as arrays or using a dot separated property access path string
 
 ```csharp
-[MapProperty([nameof(Car.Make), nameof(Car.Make.Id)], [nameof(CarDto.MakeId)])]
+[MapProperty([nameof(Car.Make), nameof(Car.Make.Id)], nameof(CarDto.MakeId))]
 // Or alternatively
 [MapProperty("Make.Id", "MakeId")]
 // Or
@@ -29,9 +29,9 @@ If a property has many members that need to be flattened but that cannot be figu
 This will bring all sub-members of a specified member into scope as if they were defined on the source object:
 
 ```csharp
-[MapProperty([nameof(Car.Engine), nameof(Car.Engine.Horsepower)], [nameof(CarDto.Horsepower)])]
-[MapProperty([nameof(Car.Engine), nameof(Car.Engine.FuelType)], [nameof(CarDto.FuelType)])]
-[MapProperty([nameof(Car.Engine), nameof(Car.Engine.Cylinders)], [nameof(CarDto.Cylinders)])]
+[MapProperty([nameof(Car.Engine), nameof(Car.Engine.Horsepower)], nameof(CarDto.Horsepower))]
+[MapProperty([nameof(Car.Engine), nameof(Car.Engine.FuelType)], nameof(CarDto.FuelType))]
+[MapProperty([nameof(Car.Engine), nameof(Car.Engine.Cylinders)], nameof(CarDto.Cylinders))]
 // Is equivalent to:
 // highlight-start
 [MapNestedProperties(nameof(Car.Engine))]

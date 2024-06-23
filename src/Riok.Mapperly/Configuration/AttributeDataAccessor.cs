@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors;
@@ -112,11 +113,16 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
                 (arg, i) => BuildArgumentValue(arg, parameters[i + typeArguments.Count].ParameterType, argumentSyntax[i])
             );
             var constructorTypeAndValueArguments = typeArguments.Concat(constructorArgumentValues).ToArray();
+            if (!ValidateParameterTypes(constructorTypeAndValueArguments, parameters))
+                continue;
+
             return (TData?)Activator.CreateInstance(typeof(TData), constructorTypeAndValueArguments)
                 ?? throw new InvalidOperationException($"Could not create instance of {typeof(TData)}");
         }
 
-        throw new InvalidOperationException($"{typeof(TData)} does not have a constructor with {argCount} parameters");
+        throw new InvalidOperationException(
+            $"{typeof(TData)} does not have a constructor with {argCount} parameters and matchable arguments"
+        );
     }
 
     private static object? BuildArgumentValue(TypedConstant arg, Type targetType, AttributeArgumentSyntax? syntax)
@@ -205,5 +211,24 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         }
 
         return Enum.ToObject(targetType, arg.Value);
+    }
+
+    private static bool ValidateParameterTypes(object?[] arguments, ParameterInfo[] parameters)
+    {
+        if (arguments.Length != parameters.Length)
+            return false;
+
+        for (var argIdx = 0; argIdx < arguments.Length; argIdx++)
+        {
+            var value = arguments[argIdx];
+            var param = parameters[argIdx];
+            if (value == null && param.ParameterType.IsValueType)
+                return false;
+
+            if (value?.GetType().IsAssignableTo(param.ParameterType) == false)
+                return false;
+        }
+
+        return true;
     }
 }

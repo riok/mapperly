@@ -1,1 +1,3 @@
 #nullable enable
+Riok.Mapperly.Abstractions.MapPropertyAttribute.MapPropertyAttribute(string! source, string![]! target) -> void
+Riok.Mapperly.Abstractions.MapPropertyAttribute.MapPropertyAttribute(string![]! source, string! target) -> void
