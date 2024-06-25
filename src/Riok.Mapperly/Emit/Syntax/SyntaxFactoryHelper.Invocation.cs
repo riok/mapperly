@@ -125,6 +125,12 @@ public partial struct SyntaxFactoryHelper
         return $"{qualifiedReceiverName}.{method.Name}";
     }
 
+    private ArgumentListSyntax LineSeparatedArgumentList(IEnumerable<ExpressionSyntax> argSyntaxes) =>
+        SyntaxFactory.ArgumentList(ConditionalCommaLineFeedSeparatedList(argSyntaxes.Select(Argument)));
+
+    private ArgumentListSyntax LineSeparatedArgumentList(IEnumerable<ArgumentSyntax> argSyntaxes) =>
+        SyntaxFactory.ArgumentList(ConditionalCommaLineFeedSeparatedList(argSyntaxes));
+
     private static ArgumentListSyntax ArgumentList(params ExpressionSyntax[] argSyntaxes) =>
         SyntaxFactory.ArgumentList(CommaSeparatedList(argSyntaxes.Select(Argument)));
 
@@ -135,7 +141,4 @@ public partial struct SyntaxFactoryHelper
         SyntaxFactory.TypeArgumentList(CommaSeparatedList(argSyntaxes));
 
     private static ArgumentListSyntax ArgumentList(params ArgumentSyntax[] args) => SyntaxFactory.ArgumentList(CommaSeparatedList(args));
-
-    private static ArgumentListSyntax ArgumentList(IEnumerable<ArgumentSyntax> args) =>
-        SyntaxFactory.ArgumentList(CommaSeparatedList(args));
 }

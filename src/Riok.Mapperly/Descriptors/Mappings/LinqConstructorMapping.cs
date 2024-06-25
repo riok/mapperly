@@ -31,6 +31,6 @@ public class LinqConstructorMapping(
             mappedSource = elementMapping.Build(ctx);
         }
 
-        return CreateInstance(TargetType, mappedSource);
+        return ctx.SyntaxFactory.CreateInstance(TargetType, mappedSource);
     }
 }

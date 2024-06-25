@@ -54,7 +54,7 @@ public class ForEachAddEnumerableMapping : ExistingTargetMappingMethodWrapper
             return _objectFactory.CreateType(SourceType, TargetType, ctx.Source);
 
         if (_countPropertyName != null)
-            return CreateInstance(TargetType, MemberAccess(ctx.Source, _countPropertyName));
+            return ctx.SyntaxFactory.CreateInstance(TargetType, MemberAccess(ctx.Source, _countPropertyName));
 
         return CreateInstance(TargetType);
     }

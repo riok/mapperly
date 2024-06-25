@@ -13,14 +13,14 @@ public partial struct SyntaxFactoryHelper
         return CreateObject(type, SyntaxFactory.ArgumentList());
     }
 
-    public static ObjectCreationExpressionSyntax CreateGenericInstance(
+    public ObjectCreationExpressionSyntax CreateGenericInstance(
         string typeName,
         TypeArgumentListSyntax typeArguments,
         IEnumerable<ArgumentSyntax> arguments
     )
     {
         var type = GenericName(typeName).WithTypeArgumentList(typeArguments);
-        return CreateObject(type, ArgumentList(arguments));
+        return CreateObject(type, LineSeparatedArgumentList(arguments));
     }
 
     public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol)
@@ -29,16 +29,16 @@ public partial struct SyntaxFactoryHelper
         return CreateObject(type, SyntaxFactory.ArgumentList());
     }
 
-    public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, params ExpressionSyntax[] args)
+    public ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, params ExpressionSyntax[] args)
     {
         var type = NonNullableIdentifier(typeSymbol);
-        return CreateObject(type, ArgumentList(args));
+        return CreateObject(type, LineSeparatedArgumentList(args));
     }
 
-    public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, params ArgumentSyntax[] args)
+    public ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, params ArgumentSyntax[] args)
     {
         var type = NonNullableIdentifier(typeSymbol);
-        return CreateObject(type, ArgumentList(args));
+        return CreateObject(type, LineSeparatedArgumentList(args));
     }
 
     public InitializerExpressionSyntax ObjectInitializer(params ExpressionSyntax[] expressions)

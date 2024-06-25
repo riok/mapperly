@@ -15,7 +15,10 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial global::Riok.Mapperly.IntegrationTests.Models.TestObject Copy(global::Riok.Mapperly.IntegrationTests.Models.TestObject src)
         {
-            var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObject(src.CtorValue, ctorValue2: src.CtorValue2)
+            var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObject(
+                src.CtorValue,
+                ctorValue2: src.CtorValue2
+            )
             {
                 IntInitOnlyValue = src.IntInitOnlyValue,
                 RequiredValue = src.RequiredValue,
