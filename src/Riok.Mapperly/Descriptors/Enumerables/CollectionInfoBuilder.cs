@@ -90,7 +90,38 @@ public static class CollectionInfoBuilder
         return new CollectionInfos(sourceInfo, targetInfo);
     }
 
-    public static CollectionInfo BuildCollectionInfo(
+    public static CollectionInfo BuildGenericCollectionInfo(
+        SimpleMappingBuilderContext ctx,
+        CollectionType collectionType,
+        CollectionInfo info
+    )
+    {
+        var type = BuildGenericCollectionType(ctx, collectionType, info.EnumeratedType);
+        return BuildCollectionInfo(ctx.Types, ctx.SymbolAccessor, type, info.EnumeratedType);
+    }
+
+    public static CollectionInfo BuildGenericCollectionInfo(
+        SimpleMappingBuilderContext ctx,
+        CollectionType collectionType,
+        DictionaryInfo info
+    )
+    {
+        var type = BuildGenericCollectionType(ctx, collectionType, info.Key, info.Value);
+        return BuildCollectionInfo(ctx.Types, ctx.SymbolAccessor, type, info.Collection.EnumeratedType);
+    }
+
+    public static INamedTypeSymbol BuildGenericCollectionType(
+        SimpleMappingBuilderContext ctx,
+        CollectionType collectionType,
+        params ITypeSymbol[] typeArguments
+    )
+    {
+        var genericType = GetGenericClrCollectionType(collectionType);
+        return (INamedTypeSymbol)
+            ctx.Types.Get(genericType).Construct(typeArguments).WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+    }
+
+    private static CollectionInfo BuildCollectionInfo(
         WellKnownTypes wellKnownTypes,
         SymbolAccessor symbolAccessor,
         ITypeSymbol type,
@@ -138,7 +169,7 @@ public static class CollectionInfoBuilder
             return namedType.TypeArguments[0];
         }
 
-        // Memory<> or ReadOnlyMemory<> etc, get the type symbol
+        // Memory<> or ReadOnlyMemory<> etc., get the type symbol
         if (
             SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, types.Get(typeof(Memory<>)))
             || SymbolEqualityComparer.Default.Equals(type.OriginalDefinition, types.Get(typeof(ReadOnlyMemory<>)))
@@ -385,7 +416,7 @@ public static class CollectionInfoBuilder
         }
     }
 
-    public static Type GetGenericClrCollectionType(CollectionType type) =>
+    private static Type GetGenericClrCollectionType(CollectionType type) =>
         _collectionClrTypeByType.GetValueOrDefault(type)
         ?? throw new InvalidOperationException("Could not get clr collection type for " + type);
 }

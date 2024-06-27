@@ -25,5 +25,6 @@ public abstract class ObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeSym
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess) => BuildBody(ctx, targetAccess);
 
-    protected IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx, ExpressionSyntax target) => _mapping.Build(ctx, target);
+    protected virtual IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx, ExpressionSyntax target) =>
+        _mapping.Build(ctx, target);
 }

@@ -2,21 +2,28 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Enumerables;
 using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
+using Riok.Mapperly.Descriptors.ObjectFactories;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
 /// <summary>
-/// Represents a foreach enumerable mapping which works by creating a new target instance,
+/// Represents a foreach enumerable mapping which works by creating a new target instance via an object factory,
 /// looping through the source, mapping each element and adding it to the target collection.
 /// </summary>
-public class ForEachAddEnumerableMapping(
+public class ForEachAddEnumerableObjectFactoryMapping(
     CollectionInfos collectionInfos,
     INewInstanceMapping elementMapping,
+    ObjectFactory objectFactory,
     bool enableReferenceHandling,
     string insertMethodName
 )
-    : NewInstanceObjectMemberMethodMapping(collectionInfos.Source.Type, collectionInfos.Target.Type, enableReferenceHandling),
-        INewInstanceEnumerableMapping
+    : NewInstanceObjectFactoryMemberMapping(
+        collectionInfos.Source.Type,
+        collectionInfos.Target.Type,
+        objectFactory,
+        enableReferenceHandling
+    ),
+        IEnumerableMapping
 {
     private readonly ForEachAddEnumerableExistingTargetMapping _existingTargetMapping =
         new(collectionInfos, elementMapping, insertMethodName);

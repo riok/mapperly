@@ -52,10 +52,9 @@ internal static class SourceValueBuilder
         [NotNullWhen(true)] out ISourceValue? sourceValue
     )
     {
-        // set the target member as mapped
-        // if the mapping does not work
-        // another diagnostic is reported as error
-        ctx.SetTargetMemberMapped(memberMappingInfo.TargetMember.Member);
+        // always set the member mapped,
+        // as other diagnostics are reported if the mapping fails to be built
+        ctx.SetMembersMapped(memberMappingInfo.TargetMember.Path[0].Name);
 
         if (memberMappingInfo.ValueConfiguration!.Value != null)
             return TryBuildConstantSourceValue(ctx, memberMappingInfo, out sourceValue);

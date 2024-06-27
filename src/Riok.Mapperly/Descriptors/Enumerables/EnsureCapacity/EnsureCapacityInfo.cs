@@ -15,10 +15,15 @@ public abstract class EnsureCapacityInfo
         SyntaxFactoryHelper syntaxFactory,
         ExpressionSyntax target,
         ExpressionSyntax sourceCount,
-        ExpressionSyntax targetCount
+        ExpressionSyntax? targetCount
     )
     {
-        var sum = Add(sourceCount, targetCount);
+        var sum = sourceCount;
+        if (targetCount != null)
+        {
+            sum = Add(sourceCount, targetCount);
+        }
+
         return syntaxFactory.ExpressionStatement(Invocation(MemberAccess(target, EnsureCapacityName), sum));
     }
 }

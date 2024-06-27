@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.Enumerables;
 using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
@@ -11,21 +12,30 @@ namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 /// mapping each element and set it to the target collection.
 /// </summary>
 public class ForEachSetDictionaryExistingTargetMapping(
-    ITypeSymbol sourceType,
-    ITypeSymbol targetType,
+    CollectionInfos collectionInfos,
     INewInstanceMapping keyMapping,
     INewInstanceMapping valueMapping,
-    INamedTypeSymbol? explicitCast,
-    EnsureCapacityInfo? ensureCapacity
-) : ExistingTargetMapping(sourceType, targetType)
+    INamedTypeSymbol? explicitCast
+) : ObjectMemberExistingTargetMapping(collectionInfos.Source.Type, collectionInfos.Target.Type), IEnumerableMapping
 {
     private const string LoopItemVariableName = "item";
     private const string ExplicitCastVariableName = "targetDict";
     private const string KeyPropertyName = nameof(KeyValuePair<object, object>.Key);
     private const string ValuePropertyName = nameof(KeyValuePair<object, object>.Value);
 
+    private EnsureCapacityInfo? _ensureCapacityInfo;
+
+    public CollectionInfos CollectionInfos => collectionInfos;
+
+    public void AddEnsureCapacity(EnsureCapacityInfo ensureCapacityInfo) => _ensureCapacityInfo = ensureCapacityInfo;
+
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
+        foreach (var statement in base.Build(ctx, target))
+        {
+            yield return statement;
+        }
+
         if (explicitCast != null)
         {
             var type = FullyQualifiedIdentifier(explicitCast);
@@ -37,9 +47,9 @@ public class ForEachSetDictionaryExistingTargetMapping(
             yield return ctx.SyntaxFactory.DeclareLocalVariable(castedVariable, cast);
         }
 
-        if (ensureCapacity != null)
+        if (_ensureCapacityInfo != null)
         {
-            yield return ensureCapacity.Build(ctx, target);
+            yield return _ensureCapacityInfo.Build(ctx, target);
         }
 
         var loopItemVariableName = ctx.NameBuilder.New(LoopItemVariableName);

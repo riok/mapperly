@@ -27,6 +27,24 @@ public class NewInstanceObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeS
     {
         var targetVariableName = ctx.NameBuilder.New(TargetVariableName);
 
+        // create target instance
+        foreach (var statement in CreateTargetInstance(ctx, targetVariableName))
+        {
+            yield return statement;
+        }
+
+        // map properties
+        foreach (var expression in BuildBody(ctx, IdentifierName(targetVariableName)))
+        {
+            yield return expression;
+        }
+
+        // return target;
+        yield return ctx.SyntaxFactory.ReturnVariable(targetVariableName);
+    }
+
+    private IEnumerable<StatementSyntax> CreateTargetInstance(TypeMappingBuildContext ctx, string targetVariableName)
+    {
         if (enableReferenceHandling)
         {
             // TryGetReference
@@ -57,14 +75,5 @@ public class NewInstanceObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeS
                 ReferenceHandlingSyntaxFactoryHelper.SetReference(this, ctx, IdentifierName(targetVariableName))
             );
         }
-
-        // map properties
-        foreach (var expression in BuildBody(ctx, IdentifierName(targetVariableName)))
-        {
-            yield return expression;
-        }
-
-        // return target;
-        yield return ctx.SyntaxFactory.ReturnVariable(targetVariableName);
     }
 }

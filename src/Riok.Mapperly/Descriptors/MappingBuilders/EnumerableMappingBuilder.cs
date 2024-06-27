@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Enumerables;
-using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Diagnostics;
@@ -101,14 +100,7 @@ public static class EnumerableMappingBuilder
 
         ForEachAddEnumerableExistingTargetMapping CreateForEach(string methodName)
         {
-            var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx);
-            return new ForEachAddEnumerableExistingTargetMapping(
-                ctx.Source,
-                ctx.Target,
-                elementMapping,
-                methodName,
-                ensureCapacityStatement
-            );
+            return new ForEachAddEnumerableExistingTargetMapping(ctx.CollectionInfos, elementMapping, methodName);
         }
     }
 
@@ -194,18 +186,19 @@ public static class EnumerableMappingBuilder
             return null;
 
         // try to reuse a IEnumerable<S> => List<T> mapping
-        var sourceCollectionInfo = BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source);
-        var targetType = BuildCollectionType(ctx, CollectionType.List, ctx.CollectionInfos.Target.EnumeratedType);
-        var existingMapping = ctx.BuildDelegatedMapping(sourceCollectionInfo.Type, targetType);
+        var collectionInfos = new CollectionInfos(
+            BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source),
+            CollectionInfoBuilder.BuildGenericCollectionInfo(ctx, CollectionType.List, ctx.CollectionInfos.Target)
+        );
+        var existingMapping = ctx.BuildDelegatedMapping(collectionInfos.Source.Type, collectionInfos.Target.Type);
         if (existingMapping != null)
             return new DelegateMapping(ctx.Source, ctx.Target, existingMapping);
 
         return new ForEachAddEnumerableMapping(
-            sourceCollectionInfo.Type,
-            targetType,
+            collectionInfos,
             elementMapping,
-            AddMethodName,
-            sourceCollectionInfo.CountPropertyName
+            ctx.Configuration.Mapper.UseReferenceHandling,
+            AddMethodName
         );
     }
 
@@ -284,7 +277,7 @@ public static class EnumerableMappingBuilder
             return namedType;
 
         if (ctx.CollectionInfos!.Target.CollectionType is CollectionType.ISet or CollectionType.IReadOnlySet)
-            return BuildCollectionType(ctx, CollectionType.HashSet, typeSymbol);
+            return CollectionInfoBuilder.BuildGenericCollectionType(ctx, CollectionType.HashSet, typeSymbol);
 
         return null;
     }
@@ -302,11 +295,6 @@ public static class EnumerableMappingBuilder
     private static INewInstanceMapping? BuildCustomTypeMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         var hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory);
-        if (!hasObjectFactory && !ctx.SymbolAccessor.HasDirectlyAccessibleParameterlessConstructor(ctx.Target))
-        {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, ctx.Target);
-            return null;
-        }
 
         // create a foreach loop with add calls if source is not an array
         // and has an implicit .Add() method
@@ -320,24 +308,33 @@ public static class EnumerableMappingBuilder
         }
 
         // try to reuse an existing mapping
-        var sourceCollectionInfo = ctx.CollectionInfos.Source;
+        var collectionInfos = ctx.CollectionInfos;
         if (!hasObjectFactory)
         {
-            sourceCollectionInfo = BuildCollectionTypeForICollection(ctx, sourceCollectionInfo);
-            ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out objectFactory);
-            var existingMapping = ctx.BuildDelegatedMapping(sourceCollectionInfo.Type, ctx.Target);
+            collectionInfos = collectionInfos with { Source = BuildCollectionTypeForICollection(ctx, collectionInfos.Source) };
+            var existingMapping = ctx.BuildDelegatedMapping(collectionInfos.Source.Type, ctx.Target);
             if (existingMapping != null)
                 return existingMapping;
+
+            hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out objectFactory);
         }
 
-        var ensureCapacityStatement = EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx, sourceCollectionInfo, ctx.CollectionInfos.Target);
+        if (hasObjectFactory)
+        {
+            return new ForEachAddEnumerableObjectFactoryMapping(
+                collectionInfos,
+                elementMapping,
+                objectFactory!,
+                ctx.Configuration.Mapper.UseReferenceHandling,
+                AddMethodName
+            );
+        }
+
         return new ForEachAddEnumerableMapping(
-            sourceCollectionInfo.Type,
-            ctx.Target,
+            collectionInfos,
             elementMapping,
-            objectFactory,
-            AddMethodName,
-            ensureCapacityStatement
+            ctx.Configuration.Mapper.UseReferenceHandling,
+            AddMethodName
         );
     }
 
@@ -418,21 +415,12 @@ public static class EnumerableMappingBuilder
         if (ctx.HasUserSymbol)
             return info;
 
-        var collectionType = info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyCollection)
-            ? BuildCollectionType(ctx, CollectionType.IReadOnlyCollection, info.EnumeratedType)
+        CollectionType? collectionType = info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyCollection)
+            ? CollectionType.IReadOnlyCollection
             : info.ImplementedTypes.HasFlag(CollectionType.ICollection)
-                ? BuildCollectionType(ctx, CollectionType.ICollection, info.EnumeratedType)
+                ? CollectionType.ICollection
                 : null;
 
-        return collectionType == null
-            ? info
-            : CollectionInfoBuilder.BuildCollectionInfo(ctx.Types, ctx.SymbolAccessor, collectionType, info.EnumeratedType);
-    }
-
-    private static INamedTypeSymbol BuildCollectionType(MappingBuilderContext ctx, CollectionType type, ITypeSymbol enumeratedType)
-    {
-        var genericType = CollectionInfoBuilder.GetGenericClrCollectionType(type);
-        return (INamedTypeSymbol)
-            ctx.Types.Get(genericType).Construct(enumeratedType).WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+        return collectionType == null ? info : CollectionInfoBuilder.BuildGenericCollectionInfo(ctx, collectionType.Value, info);
     }
 }

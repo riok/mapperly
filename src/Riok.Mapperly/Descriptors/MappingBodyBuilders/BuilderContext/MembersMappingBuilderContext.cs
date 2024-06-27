@@ -16,7 +16,7 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext builderContext, T mapping) : IMembersBuilderContext<T>
     where T : IMapping
 {
-    private readonly MembersMappingState _state = MembersMappingStateBuilder.Build(builderContext);
+    private readonly MembersMappingState _state = MembersMappingStateBuilder.Build(builderContext, mapping);
 
     private readonly NestedMappingsContext _nestedMappingsContext = NestedMappingsContext.Create(builderContext);
 
@@ -39,7 +39,9 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
     protected void SetTargetMemberMapped(string targetMemberName, bool ignoreCase = false) =>
         _state.SetTargetMemberMapped(targetMemberName, ignoreCase);
 
-    public void SetMembersMapped(MemberMappingInfo memberInfo) => _state.SetMembersMapped(memberInfo, false);
+    public void SetMembersMapped(string memberName) => _state.SetMembersMapped(memberName);
+
+    public void IgnoreMembers(string memberName) => _state.IgnoreMembers(memberName);
 
     public void ConsumeMemberConfigs(MemberMappingInfo members)
     {
@@ -53,6 +55,8 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
             ConsumeMemberConfig(members.ValueConfiguration);
         }
     }
+
+    public void MappingAdded() => _state.MappingAdded();
 
     protected void MappingAdded(MemberMappingInfo info, bool ignoreTargetCasing = false) => _state.MappingAdded(info, ignoreTargetCasing);
 

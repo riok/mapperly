@@ -1,5 +1,5 @@
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.Enumerables;
 using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
@@ -10,20 +10,29 @@ namespace Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 /// mapping each element and adding it to the target collection.
 /// </summary>
 public class ForEachAddEnumerableExistingTargetMapping(
-    ITypeSymbol sourceType,
-    ITypeSymbol targetType,
+    CollectionInfos collectionInfos,
     INewInstanceMapping elementMapping,
-    string insertMethodName,
-    EnsureCapacityInfo? ensureCapacityBuilder
-) : ExistingTargetMapping(sourceType, targetType)
+    string insertMethodName
+) : ObjectMemberExistingTargetMapping(collectionInfos.Source.Type, collectionInfos.Target.Type), IEnumerableMapping
 {
     private const string LoopItemVariableName = "item";
 
+    private EnsureCapacityInfo? _ensureCapacityInfo;
+
+    public CollectionInfos CollectionInfos => collectionInfos;
+
+    public void AddEnsureCapacity(EnsureCapacityInfo ensureCapacityInfo) => _ensureCapacityInfo = ensureCapacityInfo;
+
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
-        if (ensureCapacityBuilder != null)
+        foreach (var statement in base.Build(ctx, target))
         {
-            yield return ensureCapacityBuilder.Build(ctx, target);
+            yield return statement;
+        }
+
+        if (_ensureCapacityInfo != null)
+        {
+            yield return _ensureCapacityInfo.Build(ctx, target);
         }
 
         var (loopItemCtx, loopItemVariableName) = ctx.WithNewSource(LoopItemVariableName);
