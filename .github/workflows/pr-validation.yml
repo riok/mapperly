@@ -1,4 +1,4 @@
-name: pr-label-check
+name: pr-validation
 
 on:
   pull_request:
