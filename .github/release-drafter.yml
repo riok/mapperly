@@ -4,7 +4,7 @@ change-template: '- $TITLE by @$AUTHOR in #$NUMBER'
 change-title-escapes: '\<*_&'
 sort-direction: ascending
 exclude-labels:
-  - dependency
+  - dependencies
   - no-changelog
   - documentation
 categories:
