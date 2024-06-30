@@ -25,3 +25,5 @@ jobs:
           !contains(github.event.pull_request.labels.*.name, 'no-changelog') &&
           !contains(github.event.pull_request.labels.*.name, 'documentation')
         run: exit 1
+      - name: PR has changelog label
+        run: echo "ok :)"
