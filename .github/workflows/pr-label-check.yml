@@ -1,0 +1,25 @@
+name: pr-label-check
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - labeled
+      - unlabeled
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  check-changelog-labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: PR has no changelog label
+        if: |
+          !contains(github.event.pull_request.labels.*.name, 'bug') &&
+          !contains(github.event.pull_request.labels.*.name, 'enhancement') &&
+          !contains(github.event.pull_request.labels.*.name, 'breaking-change') &&
+          !contains(github.event.pull_request.labels.*.name, 'no-changelog')
+        run: exit 1

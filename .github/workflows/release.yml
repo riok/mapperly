@@ -1,55 +1,75 @@
 name: release
 
 on:
-  workflow_call:
-    inputs:
-      nuget_source:
-        required: false
-        type: string
-        default: 'https://api.nuget.org/v3/index.json'
-      environment:
-        required: true
-        type: string
-    secrets:
-      NUGET_API_TOKEN:
-        required: true
-    outputs:
-      version:
-        description: 'The created version'
-        value: ${{ jobs.release.outputs.version }}
+  release:
+    types:
+      - published
 
+# required secrets: NUGET_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
   DOTNET_NOLOGO: true
+  NUGET_SOURCE: 'https://nuget.pkg.github.com/latonz/index.json' #'https://api.nuget.org/v3/index.json'
+
+concurrency:
+  group: ${{ github.workflow }}
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment: ${{ github.event.release.prerelease && 'next' || 'stable' }}
+    permissions:
+      contents: write
     outputs:
-      version: ${{ steps.release-version.outputs.version }}
+      version: ${{ steps.extract-version.outputs.RELEASE_VERSION }}
     steps:
-      - uses: actions/checkout@v4
+      - name: checkout git
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-dotnet@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-      - run: sudo apt update && sudo apt -y install zipmerge # zipmerge is used to merge the multi target nupkg
-      - run: |
-          npm i \
-          semantic-release@21.0.2 \
-          conventional-changelog-conventionalcommits@5.0.0 \
-          @semantic-release/exec@6.0.3 \
-          @semantic-release/commit-analyzer@9.0.2 \
-          @semantic-release/release-notes-generator@10.0.3 \
-          @semantic-release/github@8.0.7
-      - run: npx semantic-release
+      - id: extract-version
+        name: extract version
+        run: echo "RELEASE_VERSION=${RELEASE_NAME#v}" >> "$GITHUB_OUTPUT"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NUGET_SOURCE: ${{ inputs.nuget_source }}
-          NUGET_API_TOKEN: ${{ secrets.NUGET_API_TOKEN }}
-          MAPPERLY_ENVIRONMENT: ${{ inputs.environment }}
-      - id: release-version
-        run: echo "version=${{ env.RELEASE_VERSION }}" >> "$GITHUB_OUTPUT"
+          RELEASE_NAME: ${{ github.event.release.name }}
+      - name: extract release notes
+        id: extract-release-notes
+        run: |
+          {
+            echo 'RELEASE_NOTES<<EOF';
+            gh release view '${{ github.event.release.name }}' --json body --jq .body;
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: convert release notes markdown to text
+        id: release-notes-text
+        uses: koistya/strip-markdown@v1
+        with:
+          content: ${{ steps.extract-release-notes.outputs.RELEASE_NOTES }}
+      - name: setup dotnet
+        uses: actions/setup-dotnet@v4
+      - name: install dependencies
+        run: sudo apt update && sudo apt -y install zipmerge # zipmerge is used to merge the multi target nupkg
+      - name: build release
+        run: ./build/package.sh
+        env:
+          MAPPERLY_ENVIRONMENT: ${{ github.event.release.prerelease && 'next' || 'stable' }}
+          RELEASE_NOTES: ${{ steps.release-notes-text.outputs.content }}
+          RELEASE_VERSION: ${{ steps.extract-version.outputs.RELEASE_VERSION }}
+      - name: publish nuget
+        run: dotnet nuget push './artifacts/*.nupkg' --source "$NUGET_SOURCE" --api-key '${{ secrets.NUGET_API_TOKEN }}'
+      - name: add release assets
+        run: gh release upload "${{ github.event.release.name }}" artifacts/*.nupkg
+        env:
+          GH_TOKEN: ${{ github.token }}
+  docs:
+    uses: ./.github/workflows/docs.yml
+    needs: release
+    with:
+      deploy: true
+      environment: ${{ github.event.release.prerelease && 'next' || 'stable' }}
+      version: ${{ needs.release.outputs.version }}
+    secrets:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

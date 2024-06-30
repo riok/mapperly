@@ -65,7 +65,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
 
 6. Create your patch, including appropriate [test](./tests) cases and [documentation](./docs) updates.
 
-7. Commit your changes using a descriptive commit message that follows our [commit message conventions](#commit).
+7. Commit your changes using a descriptive commit message.
    Adherence to these conventions is necessary because release notes are automatically generated from these messages.
    [Husky](https://alirezanet.github.io/Husky.Net/) and [csharpier](https://csharpier.com/) automatically format changed files when commited.
 
@@ -111,18 +111,3 @@ For more information on the failure, check the output logs of the jobs.
 
 The reviewers will provide you feedback and approve your changes as soon as they are satisfied.
 If we ask you for changes in the code, you can follow the [GitHub Guide](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/incorporating-feedback-in-your-pull-request) to incorporate feedback in your pull request.
-
-#### <a name="commit"></a> Commit message format
-
-Make sure you use [conventional commit message format](https://www.conventionalcommits.org/en/v1.0.0/#summary).
-
-`<type>: <short summary>`
-
-#### Type
-
-Must be one of the following:
-
-- **feat**: New Feature
-- **fix**: Bugfix
-- **docs**: Documentation
-- **chore**: Chores which should not lead to a changelog / release notes entry
