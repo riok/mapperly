@@ -14,7 +14,7 @@ RELEASE_NOTES=${RELEASE_NOTES:-''}
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 artifacts_dir="${script_dir}/../artifacts"
 
-echo "building Mapperly v${RELEASE_VERSION}"
+echo "building Mapperly v${RELEASE_VERSION} for ${MAPPERLY_ENVIRONMENT:-'local'}"
 echo "cleaning artifacts dir"
 mkdir -p "${artifacts_dir}"
 rm -rf "${artifacts_dir:?}"/*

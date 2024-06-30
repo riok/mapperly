@@ -1,0 +1,29 @@
+name: draft-releases
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  draft-releases:
+    permissions:
+      # write permission is required to create a github release
+      contents: write
+      pull-requests: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: draft next
+        uses: leukeleu/release-drafter@filter-draft-releases
+        with:
+          prerelease: true
+          prerelease-identifier: next
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: draft stable
+        uses: leukeleu/release-drafter@filter-draft-releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
