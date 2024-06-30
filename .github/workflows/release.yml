@@ -9,7 +9,7 @@ on:
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
   DOTNET_NOLOGO: true
-  NUGET_SOURCE: 'https://nuget.pkg.github.com/latonz/index.json' #'https://api.nuget.org/v3/index.json'
+  NUGET_SOURCE: 'https://api.nuget.org/v3/index.json'
 
 concurrency:
   group: ${{ github.workflow }}
