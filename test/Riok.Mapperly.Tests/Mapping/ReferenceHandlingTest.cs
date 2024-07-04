@@ -301,4 +301,24 @@ public class ReferenceHandlingTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void ReferenceHandlerParameterIsAlsoMappingTargetParameterShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "public partial B Map(A source, [MappingTarget, ReferenceHandler] IReferenceHandler refHandler);",
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "record A;",
+            "record b;"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "Map has an unsupported mapping method signature")
+            .HaveDiagnostic(
+                DiagnosticDescriptors.CouldNotCreateMapping,
+                "Could not create mapping from A to B. Consider implementing the mapping manually."
+            )
+            .HaveAssertedAllDiagnostics();
+    }
 }

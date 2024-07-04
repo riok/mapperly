@@ -11,7 +11,7 @@ Mapperly supports static mappers and extension methods:
 [Mapper]
 public static partial class CarMapper
 {
-    public static partial CarDto CarToCarDto(this Car car);
+    public static partial CarDto ToCarDto(this Car car);
 
     private static int TimeSpanToHours(TimeSpan t) => t.Hours;
 }

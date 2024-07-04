@@ -73,10 +73,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
             && (targetType.IsNullable() || !sourceType.IsNullable());
     }
 
-    public MethodParameter? WrapOptionalMethodParameter(IParameterSymbol? symbol)
-    {
-        return symbol == null ? null : WrapMethodParameter(symbol);
-    }
+    public MethodParameter? WrapOptionalMethodParameter(IParameterSymbol? symbol) => symbol == null ? null : WrapMethodParameter(symbol);
 
     public MethodParameter WrapMethodParameter(IParameterSymbol symbol) => new(symbol, UpgradeNullable(symbol.Type));
 
