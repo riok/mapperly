@@ -182,3 +182,7 @@ Riok.Mapperly.Abstractions.MapValueAttribute.MapValueAttribute(string![]! target
 Riok.Mapperly.Abstractions.MapValueAttribute.Target.get -> System.Collections.Generic.IReadOnlyCollection<string!>!
 Riok.Mapperly.Abstractions.MapValueAttribute.TargetFullName.get -> string!
 Riok.Mapperly.Abstractions.MapValueAttribute.Value.get -> object?
+Riok.Mapperly.Abstractions.MappingTargetAttribute
+Riok.Mapperly.Abstractions.MappingTargetAttribute.MappingTargetAttribute() -> void
+Riok.Mapperly.Abstractions.MapPropertyAttribute.MapPropertyAttribute(string! source, string![]! target) -> void
+Riok.Mapperly.Abstractions.MapPropertyAttribute.MapPropertyAttribute(string![]! source, string! target) -> void

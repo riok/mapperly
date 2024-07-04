@@ -804,4 +804,15 @@ public class UserMethodTest
         );
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void MappingMethodWithSingleTargetParameterShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes("public partial B Map([MappingTarget] A source);", "record A;", "record b;");
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "Map has an unsupported mapping method signature")
+            .HaveAssertedAllDiagnostics();
+    }
 }

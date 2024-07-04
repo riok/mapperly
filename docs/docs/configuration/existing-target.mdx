@@ -1,0 +1,114 @@
+---
+sidebar_position: 9
+description: Map to an existing target object
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Existing target object
+
+If an existing object instance should be used as target, you can define the mapping method as void with the target as second parameter:
+
+<Tabs>
+  <TabItem value="declaration" label="Declaration" default>
+    ```csharp
+    [Mapper]
+    public partial class CarMapper
+    {
+        // highlight-start
+        public partial void UpdateCarDto(Car car, CarDto dto);
+        // highlight-end
+    }
+    ```
+  </TabItem>
+  <TabItem value="usage" label="Usage">
+    ```csharp
+    var mapper = new CarMapper();
+    var car = new Car { NumberOfSeats = 10, ... };
+    var dto = new CarDto();
+    
+    mapper.UpdateCarDto(car, dto);
+    dto.NumberOfSeats.Should().Be(10);
+    ```
+  </TabItem>
+</Tabs>
+
+## Merge objects
+
+To merge two objects together, `AllowNullPropertyAssignment` can be set to `false`.
+This ignores all properties on the source with a `null` value.
+
+<Tabs>
+  <TabItem value="declaration" label="Declaration" default>
+    ```csharp
+    // highlight-start
+    [Mapper(AllowNullPropertyAssignment = false)]
+    // highlight-end
+    static partial class FruitMapper
+    {
+        // highlight-start
+        public static partial void ApplyUpdate(FruitUpdate update, Fruit fruit);
+        // highlight-end
+    }
+    
+    class Fruit { public required string Name { get; set; } public required string Color { get; set; } }
+    record FruitUpdate(string? Name, string? Color);
+    ```
+  </TabItem>
+  <TabItem value="usage" label="Usage">
+    ```csharp
+    FruitMapper.ApplyUpdate(myUpdateRequest, myFruit);
+    ```
+  </TabItem>
+  <TabItem value="generated" label="Generated code" default>
+    ```csharp
+    static partial class FruitMapper
+    {
+        public static partial void Update(global::FruitUpdate update, global::Fruit fruit)
+        {
+            if (update.Name != null)
+            {
+                fruit.Name = update.Name;
+            }
+            if (update.Color != null)
+            {
+                fruit.Color = update.Color;
+            }
+        }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+See also [null value handling](./mapper.mdx#null-values).
+
+The `MappingTarget` attribute allows setting the first method parameter as mapping target:
+
+<Tabs>
+  <TabItem value="declaration" label="Declaration" default>
+
+    ```csharp
+    // highlight-start
+    [Mapper(AllowNullPropertyAssignment = false)]
+    // highlight-end
+    static partial class FruitMapper
+    {
+      // highlight-start
+      public static partial void ApplyUpdate([MappingTarget] this Fruit fruit, FruitUpdate update);
+      // highlight-end
+    }
+
+    class Fruit { public required string Name { get; set; } public required string Color { get; set; } }
+    record FruitUpdate(string? Name, string? Color);
+    ```
+
+</TabItem>
+  <TabItem value="usage" label="Usage">
+    ```csharp
+    myFruit.ApplyUpdate(myUpdateRequest);
+    ```
+  </TabItem>
+</Tabs>
+
+See also [extension methods](./static-mappers.md).

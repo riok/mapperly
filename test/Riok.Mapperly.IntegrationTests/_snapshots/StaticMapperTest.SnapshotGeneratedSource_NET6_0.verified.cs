@@ -53,6 +53,18 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public static partial void MapIdTargetExt(this global::Riok.Mapperly.IntegrationTests.Models.IdObject target, global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto source)
+        {
+            target.IdValue = DirectInt(source.IdValue);
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public static partial void MapIdTargetFirst(global::Riok.Mapperly.IntegrationTests.Models.IdObject target, global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto source)
+        {
+            target.IdValue = DirectInt(source.IdValue);
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto> MapAllDtos(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> objects)
         {
             return global::System.Linq.Enumerable.Select(objects, x => MapToDto(x));

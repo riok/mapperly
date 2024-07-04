@@ -71,5 +71,21 @@ namespace Riok.Mapperly.IntegrationTests
             var dto = StaticTestMapper.MapConstantValues(obj);
             return Verifier.Verify(dto);
         }
+
+        [Fact]
+        public void RunMappingIdTargetExtShouldWork()
+        {
+            var model = new IdObject { IdValue = 10 };
+            model.MapIdTargetExt(new IdObjectDto { IdValue = 20 });
+            model.IdValue.Should().Be(20);
+        }
+
+        [Fact]
+        public void RunMappingIdTargetFirstShouldWork()
+        {
+            var model = new IdObject { IdValue = 10 };
+            StaticTestMapper.MapIdTargetFirst(model, new IdObjectDto { IdValue = 20 });
+            model.IdValue.Should().Be(20);
+        }
     }
 }
