@@ -17,4 +17,11 @@ public partial struct SyntaxFactoryHelper
 
     public static LiteralExpressionSyntax StringLiteral(string content) =>
         LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(content));
+
+    public static MemberAccessExpressionSyntax EnumLiteral(Enum @enum) =>
+        MemberAccessExpression(
+            SyntaxKind.SimpleMemberAccessExpression,
+            IdentifierName($"global::{@enum.GetType().FullName}"),
+            IdentifierName(@enum.ToString())
+        );
 }
