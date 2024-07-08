@@ -5,6 +5,7 @@
 public class BaseMapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public partial global::D BaseMapping(global::C source)
     {
         var target = new global::D(source.Value);

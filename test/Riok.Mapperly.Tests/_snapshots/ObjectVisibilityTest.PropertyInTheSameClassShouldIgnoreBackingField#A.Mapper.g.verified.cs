@@ -6,6 +6,7 @@ public partial class A
     internal partial class Mapper
     {
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public partial global::A Clone(global::A source)
         {
             var target = new global::A();
