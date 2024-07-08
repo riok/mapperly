@@ -5,6 +5,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
     public static partial class DeepCloningMapper
     {
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public static partial global::Riok.Mapperly.IntegrationTests.Models.IdObject Copy(global::Riok.Mapperly.IntegrationTests.Models.IdObject src)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.IdObject();
@@ -13,6 +14,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public static partial global::Riok.Mapperly.IntegrationTests.Models.TestObject Copy(global::Riok.Mapperly.IntegrationTests.Models.TestObject src)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObject(src.CtorValue, ctorValue2: src.CtorValue2)
@@ -143,6 +145,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested MapToTestObjectNested(global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested source)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested();
@@ -151,6 +154,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static global::Riok.Mapperly.IntegrationTests.Models.TestObjectNestedMember MapToTestObjectNestedMember(global::Riok.Mapperly.IntegrationTests.Models.TestObjectNestedMember source)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObjectNestedMember();
@@ -167,6 +171,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static (string A, string) MapToValueTupleOfStringAndString((string A, string) source)
         {
             var target = (A: source.A, source.Item2);
@@ -174,6 +179,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested[] MapToTestObjectNestedArray(global::System.Collections.Generic.IReadOnlyCollection<global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested> source)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested[source.Count];
@@ -187,6 +193,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static global::Riok.Mapperly.IntegrationTests.Models.InheritanceSubObject MapToInheritanceSubObject(global::Riok.Mapperly.IntegrationTests.Models.InheritanceSubObject source)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.InheritanceSubObject();
