@@ -50,6 +50,11 @@ public partial struct SyntaxFactoryHelper
         };
     }
 
+    public IfStatementSyntax IfNull(ExpressionSyntax value, ExpressionSyntax body) =>
+        IfNull(value, AddIndentation().ExpressionStatement(body));
+
+    public IfStatementSyntax IfNull(ExpressionSyntax value, StatementSyntax statement) => If(IsNull(value), statement);
+
     public StatementSyntax IfNullReturnOrThrow(ExpressionSyntax expression, ExpressionSyntax? returnOrThrowExpression = null)
     {
         StatementSyntax ifExpression = returnOrThrowExpression switch
@@ -58,7 +63,7 @@ public partial struct SyntaxFactoryHelper
             _ => AddIndentation().Return(returnOrThrowExpression),
         };
 
-        return If(IsNull(expression), ifExpression);
+        return IfNull(expression, ifExpression);
     }
 
     public static ExpressionSyntax SuppressNullableWarning(ExpressionSyntax expression) =>

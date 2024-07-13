@@ -12,7 +12,11 @@ using AliasedTupleTarget = (string X, string Y);
 namespace Riok.Mapperly.IntegrationTests.Mapper
 {
 #if NET8_0_OR_GREATER
-    [Mapper(IncludedMembers = MemberVisibility.All, EnumMappingStrategy = EnumMappingStrategy.ByValue)]
+    [Mapper(
+        IncludedMembers = MemberVisibility.All,
+        IncludedConstructors = MemberVisibility.All,
+        EnumMappingStrategy = EnumMappingStrategy.ByValue
+    )]
 #else
     [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByValue)]
 #endif
@@ -102,6 +106,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         private int ComputeSum(TestObject testObject) => testObject.SumComponent1 + testObject.SumComponent2;
 
 #if NET8_0_OR_GREATER
+        public partial PrivateCtorDto MapPrivateDto(PrivateCtorObject testObject);
+
         public partial AliasedTupleTarget MapAliasedTuple(AliasedTupleSource source);
 #endif
     }

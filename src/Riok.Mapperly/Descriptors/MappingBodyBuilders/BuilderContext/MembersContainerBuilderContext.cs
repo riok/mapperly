@@ -66,12 +66,12 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         foreach (var nullableTrailPath in path.ObjectPathNullableSubPaths())
         {
             var nullablePath = new NonEmptyMemberPath(path.RootType, nullableTrailPath);
-            var type = nullablePath.Member.Type;
+            var type = nullablePath.Member.Type.NonNullable();
 
             if (!nullablePath.Member.CanSet)
                 continue;
 
-            if (!BuilderContext.SymbolAccessor.HasDirectlyAccessibleParameterlessConstructor(type))
+            if (!BuilderContext.InstanceConstructors.TryBuild(BuilderContext.Source, type, out var ctor))
             {
                 BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, type);
                 continue;
@@ -82,12 +82,12 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
             {
                 var nullablePathGetter = nullablePath.BuildGetter(BuilderContext);
                 container.AddMemberMappingContainer(
-                    new MethodMemberNullAssignmentInitializerMapping(nullablePathSetter, nullablePathGetter)
+                    new MethodMemberNullAssignmentInitializerMapping(nullablePathSetter, nullablePathGetter, ctor)
                 );
                 continue;
             }
 
-            container.AddMemberMappingContainer(new MemberNullAssignmentInitializerMapping(nullablePathSetter));
+            container.AddMemberMappingContainer(new MemberNullAssignmentInitializerMapping(nullablePathSetter, ctor));
         }
     }
 

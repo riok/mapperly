@@ -35,7 +35,10 @@ public partial struct SyntaxFactoryHelper
         return CreateObject(type, ArgumentList(args));
     }
 
-    public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, params ArgumentSyntax[] args)
+    public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, params ArgumentSyntax[] args) =>
+        CreateInstance(typeSymbol, (IEnumerable<ArgumentSyntax>)args);
+
+    public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, IEnumerable<ArgumentSyntax> args)
     {
         var type = NonNullableIdentifier(typeSymbol);
         return CreateObject(type, ArgumentList(args));

@@ -1,3 +1,4 @@
+using Riok.Mapperly.Descriptors.Constructors;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
@@ -7,6 +8,10 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public interface INewInstanceObjectMemberMapping : INewInstanceMapping
 {
+    IInstanceConstructor Constructor { get; set; }
+
+    bool HasConstructor { get; }
+
     void AddConstructorParameterMapping(ConstructorParameterMapping mapping);
 
     void AddInitMemberMapping(MemberAssignmentMapping mapping);

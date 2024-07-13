@@ -13,7 +13,7 @@ public class ObjectFactoryCollection(IReadOnlyCollection<ObjectFactory> objectFa
         if (_concreteObjectFactories.TryGetValue(key, out objectFactory))
             return true;
 
-        objectFactory = objectFactories.FirstOrDefault(f => f.CanCreateType(sourceType, targetType));
+        objectFactory = objectFactories.FirstOrDefault(f => f.CanCreateInstanceOfType(sourceType, targetType));
         if (objectFactory == null)
             return false;
 

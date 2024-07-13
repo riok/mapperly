@@ -1,9 +1,8 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.Constructors;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
-using Riok.Mapperly.Emit;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -16,12 +15,22 @@ public class NewInstanceObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeS
         INewInstanceObjectMemberMapping
 {
     private const string TargetVariableName = "target";
-    private readonly HashSet<ConstructorParameterMapping> _constructorPropertyMappings = new();
-    private readonly HashSet<MemberAssignmentMapping> _initPropertyMappings = new();
 
-    public void AddConstructorParameterMapping(ConstructorParameterMapping mapping) => _constructorPropertyMappings.Add(mapping);
+    private IInstanceConstructor? _constructor;
+    private readonly HashSet<ConstructorParameterMapping> _constructorMemberMappings = new();
+    private readonly HashSet<MemberAssignmentMapping> _initMemberMappings = new();
 
-    public void AddInitMemberMapping(MemberAssignmentMapping mapping) => _initPropertyMappings.Add(mapping);
+    public IInstanceConstructor Constructor
+    {
+        get => _constructor ?? throw new InvalidOperationException("constructor is not set");
+        set => _constructor = value;
+    }
+
+    public bool HasConstructor => _constructor != null;
+
+    public void AddConstructorParameterMapping(ConstructorParameterMapping mapping) => _constructorMemberMappings.Add(mapping);
+
+    public void AddInitMemberMapping(MemberAssignmentMapping mapping) => _initMemberMappings.Add(mapping);
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
@@ -45,35 +54,13 @@ public class NewInstanceObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeS
 
     private IEnumerable<StatementSyntax> CreateTargetInstance(TypeMappingBuildContext ctx, string targetVariableName)
     {
-        if (enableReferenceHandling)
-        {
-            // TryGetReference
-            yield return ReferenceHandlingSyntaxFactoryHelper.TryGetReference(ctx, this);
-        }
-
-        // new T(ctorArgs) { ... };
-        var ctorArgs = _constructorPropertyMappings.Select(x => x.BuildArgument(ctx)).ToArray();
-        var objectCreationExpression = CreateInstance(TargetType, ctorArgs);
-
-        // add initializer
-        if (_initPropertyMappings.Count > 0)
-        {
-            var initPropertiesContext = ctx.AddIndentation();
-            var initMappings = _initPropertyMappings.Select(x => x.BuildExpression(initPropertiesContext, null)).ToArray();
-            objectCreationExpression = objectCreationExpression.WithInitializer(ctx.SyntaxFactory.ObjectInitializer(initMappings));
-        }
-
-        // var target = new T() { ... };
-        yield return ctx.SyntaxFactory.DeclareLocalVariable(targetVariableName, objectCreationExpression);
-
-        // set the reference as soon as it is created,
-        // as property mappings could refer to the same instance.
-        if (enableReferenceHandling)
-        {
-            // SetReference
-            yield return ctx.SyntaxFactory.ExpressionStatement(
-                ReferenceHandlingSyntaxFactoryHelper.SetReference(this, ctx, IdentifierName(targetVariableName))
-            );
-        }
+        return Constructor.CreateTargetInstance(
+            ctx,
+            this,
+            targetVariableName,
+            enableReferenceHandling,
+            _constructorMemberMappings,
+            _initMemberMappings
+        );
     }
 }

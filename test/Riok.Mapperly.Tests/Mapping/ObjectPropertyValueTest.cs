@@ -107,7 +107,7 @@ public class ObjectPropertyValueTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                target.Nested ??= new();
+                target.Nested ??= new global::C();
                 target.Nested.Value = "fooBar";
                 return target;
                 """

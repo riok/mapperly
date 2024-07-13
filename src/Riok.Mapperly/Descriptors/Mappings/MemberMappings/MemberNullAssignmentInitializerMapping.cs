@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.Constructors;
 using Riok.Mapperly.Symbols.Members;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -9,16 +9,16 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// A member initializer which initializes null members to new objects.
 /// </summary>
 [DebuggerDisplay("MemberNullAssignmentInitializerMapping({_pathToInitialize} ??= new())")]
-public class MemberNullAssignmentInitializerMapping(MemberPathSetter pathToInitialize) : MemberAssignmentMappingContainer
+public class MemberNullAssignmentInitializerMapping(MemberPathSetter pathToInitialize, IInstanceConstructor constructor)
+    : MemberAssignmentMappingContainer
 {
     private readonly MemberPathSetter _pathToInitialize = pathToInitialize;
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
         // source.Value ??= new();
-        var initializer = ctx.SyntaxFactory.ExpressionStatement(
-            _pathToInitialize.BuildAssignment(targetAccess, ImplicitObjectCreationExpression(), true)
-        );
+        var newObj = constructor.CreateInstance(ctx);
+        var initializer = ctx.SyntaxFactory.ExpressionStatement(_pathToInitialize.BuildAssignment(targetAccess, newObj, true));
         return base.Build(ctx, targetAccess).Prepend(initializer);
     }
 

@@ -6,48 +6,50 @@ using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.UnsafeAccess;
 
-public class UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor symbolAccessor)
+public class UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor symbolAccessor, string className)
 {
     private readonly List<IUnsafeAccessor> _unsafeAccessors = new();
     private readonly Dictionary<UnsafeAccessorKey, IUnsafeAccessor> _unsafeAccessorsBySymbol = new();
     private readonly UniqueNameBuilder _nameBuilder = nameBuilder.NewScope();
-    public IReadOnlyCollection<IUnsafeAccessor> UnsafeAccessors => _unsafeAccessors;
+
+    public IReadOnlyCollection<IUnsafeAccessor> Accessors => _unsafeAccessors;
 
     public UnsafeSetPropertyAccessor GetOrBuildPropertySetter(PropertyMember member)
     {
         return GetOrBuild(
-            "Set",
             UnsafeAccessorType.SetProperty,
             member.Symbol,
-            static (m, methodName) => new UnsafeSetPropertyAccessor(m, methodName)
+            static (m, _, methodName) => new UnsafeSetPropertyAccessor(m, methodName)
         );
     }
 
     public UnsafeGetPropertyAccessor GetOrBuildPropertyGetter(PropertyMember member)
     {
         return GetOrBuild(
-            "Get",
             UnsafeAccessorType.GetProperty,
             member.Symbol,
-            static (m, methodName) => new UnsafeGetPropertyAccessor(m, methodName)
+            static (m, _, methodName) => new UnsafeGetPropertyAccessor(m, methodName)
         );
     }
 
     public UnsafeFieldAccessor GetOrBuildFieldGetter(FieldMember member)
     {
+        return GetOrBuild(UnsafeAccessorType.GetField, member.Symbol, static (m, _, methodName) => new UnsafeFieldAccessor(m, methodName));
+    }
+
+    public UnsafeConstructorAccessor GetOrBuildConstructor(IMethodSymbol ctorSymbol)
+    {
         return GetOrBuild(
-            "Get",
-            UnsafeAccessorType.GetField,
-            member.Symbol,
-            static (m, methodName) => new UnsafeFieldAccessor(m, methodName)
+            UnsafeAccessorType.Constructor,
+            ctorSymbol,
+            static (s, className, methodName) => new UnsafeConstructorAccessor(s, className, methodName)
         );
     }
 
     private TAccessor GetOrBuild<TAccessor, TSymbol>(
-        string methodNamePrefix,
         UnsafeAccessorType type,
         TSymbol symbol,
-        Func<TSymbol, string, TAccessor> factory
+        Func<TSymbol, string, string, TAccessor> factory
     )
         where TAccessor : IUnsafeAccessor
         where TSymbol : ISymbol
@@ -56,8 +58,14 @@ public class UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor
         if (TryGetAccessor<TAccessor>(key, out var accessor))
             return accessor;
 
-        var methodName = BuildMethodName(methodNamePrefix, symbol);
-        return CacheAccessor(key, factory(symbol, methodName));
+        var methodName = type switch
+        {
+            UnsafeAccessorType.GetProperty or UnsafeAccessorType.GetField => BuildExtensionMethodName("Get", symbol),
+            UnsafeAccessorType.SetProperty => BuildExtensionMethodName("Set", symbol),
+            UnsafeAccessorType.Constructor => _nameBuilder.New("Create" + symbol.ContainingType.Name),
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Unknown type")
+        };
+        return CacheAccessor(key, factory(symbol, className, methodName));
     }
 
     private T CacheAccessor<T>(UnsafeAccessorKey key, T accessor)
@@ -81,7 +89,7 @@ public class UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor
         return false;
     }
 
-    private string BuildMethodName(string prefix, ISymbol symbol)
+    private string BuildExtensionMethodName(string prefix, ISymbol symbol)
     {
         var methodName = prefix + FormatAccessorName(symbol.Name);
         return GetUniqueMethodName(symbol.ContainingType, methodName);
@@ -112,6 +120,7 @@ public class UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor
         GetProperty,
         SetProperty,
         GetField,
+        Constructor,
     }
 
     private readonly struct UnsafeAccessorKey(ISymbol member, UnsafeAccessorType type) : IEquatable<UnsafeAccessorKey>

@@ -95,6 +95,7 @@ public static class TestSourceBuilder
             Attribute(options.IgnoreObsoleteMembersStrategy),
             Attribute(options.RequiredMappingStrategy),
             Attribute(options.IncludedMembers),
+            Attribute(options.IncludedConstructors),
             Attribute(options.PreferParameterlessConstructors),
             Attribute(options.AutoUserMappings),
         }.WhereNotNull();

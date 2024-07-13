@@ -132,12 +132,72 @@ public class UnsafeAccessorTest
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
-                target.SetValue(target.GetValue() ?? new());
+                if (target.GetValue() == null)
+                {
+                    target.SetValue(new global::C());
+                }
                 target.GetValue().Id = source.MyValueId;
                 target.GetValue().Id2 = source.MyValueId2;
                 return target;
                 """
             );
+    }
+
+    [Fact]
+    public void ManualUnflattenedPropertyNullablePathWithWithObjectFactory()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [ObjectFactory]
+            C CreateMyC() => new C();
+
+            [MapProperty("MyValueId", "Value.Id")]
+            [MapProperty("MyValueId2", "Value.Id2")]
+            partial B Map(A source);
+            """,
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "class A { public string MyValueId { get; set; } public string MyValueId2 { get; set; } }",
+            "class B { private C? Value { get; set; } }",
+            "class C { public string Id { get; set; } public string Id2 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                if (target.GetValue() == null)
+                {
+                    target.SetValue(CreateMyC());
+                }
+                target.GetValue().Id = source.MyValueId;
+                target.GetValue().Id2 = source.MyValueId2;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public Task ManualUnflattenedPropertyNullablePathWithPrivateConstructor()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("MyValueId", "Value.Id")]
+            [MapProperty("MyValueId2", "Value.Id2")]
+            partial B Map(A source);
+            """,
+            TestSourceBuilderOptions.Default with
+            {
+                IncludedMembers = MemberVisibility.All,
+                IncludedConstructors = MemberVisibility.All
+            },
+            "class A { public string MyValueId { get; set; } public string MyValueId2 { get; set; } }",
+            "class B { private C? Value { get; set; } }",
+            "class C { private C() {} public string Id { get; set; } public string Id2 { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
     }
 
     [Fact]
@@ -212,12 +272,34 @@ public class UnsafeAccessorTest
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
-                target.GetValue() ??= new();
+                target.GetValue() ??= new global::C();
                 target.GetValue().Id = source.MyValueId;
                 target.GetValue().Id2 = source.MyValueId2;
                 return target;
                 """
             );
+    }
+
+    [Fact]
+    public Task ManualUnflattenedFieldNullablePathPrivateConstructor()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("MyValueId", "Value.Id")]
+            [MapProperty("MyValueId2", "Value.Id2")]
+            partial B Map(A source);
+            """,
+            TestSourceBuilderOptions.Default with
+            {
+                IncludedMembers = MemberVisibility.All,
+                IncludedConstructors = MemberVisibility.All,
+            },
+            "class A { public string MyValueId { get; set; } public string MyValueId2 { get; set; } }",
+            "class B { private C? Value }",
+            "class C { private C() {} public string Id { get; set; } public string Id2 { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
     }
 
     [Fact]
@@ -399,6 +481,36 @@ public class UnsafeAccessorTest
     }
 
     [Fact]
+    public Task PrivateConstructor()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            TestSourceBuilderOptions.WithConstructorVisibility(MemberVisibility.All),
+            "class A { public int IntValue { get; set; } private string _stringValue { get; set; } }",
+            "class B { private B(int intValue) {} private string _stringValue { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task PrivateConstructorAndMember()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            TestSourceBuilderOptions.Default with
+            {
+                IncludedMembers = MemberVisibility.All,
+                IncludedConstructors = MemberVisibility.All,
+            },
+            "class A { private int _intValue { get; set; } private string _stringValue { get; set; } }",
+            "class B { private B(int _intValue) {} private string _stringValue { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public void MemberVisibilityAllWithoutPublic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -447,7 +559,7 @@ public class UnsafeAccessorTest
     }
 
     [Fact]
-    public Task statAttributeShouldOverrideAssemblyDefault()
+    public Task ClassAttributeShouldOverrideAssemblyDefault()
     {
         var source = TestSourceBuilder.CSharp(
             """

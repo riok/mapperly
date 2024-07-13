@@ -54,6 +54,9 @@ public static class MapperConfigurationMerger
         mapper.IncludedMembers =
             mapperConfiguration.IncludedMembers ?? defaultMapperConfiguration.IncludedMembers ?? mapper.IncludedMembers;
 
+        mapper.IncludedConstructors =
+            mapperConfiguration.IncludedConstructors ?? defaultMapperConfiguration.IncludedConstructors ?? mapper.IncludedConstructors;
+
         mapper.PreferParameterlessConstructors =
             mapperConfiguration.PreferParameterlessConstructors
             ?? defaultMapperConfiguration.PreferParameterlessConstructors

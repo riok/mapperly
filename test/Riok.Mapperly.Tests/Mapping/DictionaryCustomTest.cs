@@ -34,7 +34,7 @@ public class DictionaryCustomTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::A();
-                target.EnsureCapacity(source.Count + target.Count);
+                target.EnsureCapacity(source.Count);
                 foreach (var item in source)
                 {
                     target[item.Key] = item.Value;
@@ -60,7 +60,7 @@ public class DictionaryCustomTest
                 """
                 var target = new global::B();
                 target.Value = source.Value;
-                target.EnsureCapacity(source.Count + target.Count);
+                target.EnsureCapacity(source.Count);
                 foreach (var item in source)
                 {
                     target[item.Key] = item.Value;
@@ -87,7 +87,7 @@ public class DictionaryCustomTest
             .HaveSingleMethodBody(
                 """
                 var target = CreateA();
-                target.EnsureCapacity(source.Count + target.Count);
+                target.EnsureCapacity(source.Count);
                 foreach (var item in source)
                 {
                     target[item.Key] = item.Value;
@@ -116,7 +116,7 @@ public class DictionaryCustomTest
                 """
                 var target = CreateB();
                 target.Value = source.Value;
-                target.EnsureCapacity(source.Count + target.Count);
+                target.EnsureCapacity(source.Count);
                 foreach (var item in source)
                 {
                     target[item.Key] = item.Value;

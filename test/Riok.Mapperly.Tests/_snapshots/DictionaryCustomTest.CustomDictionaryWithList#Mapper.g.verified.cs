@@ -7,7 +7,7 @@ public partial class Mapper
     private partial global::B Map(global::A source)
     {
         var target = new global::B();
-        target.EnsureCapacity(source.Count + target.Count);
+        target.EnsureCapacity(source.Count);
         foreach (var item in source)
         {
             target[item.Key] = MapToListOfD(item.Value);

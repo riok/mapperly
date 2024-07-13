@@ -186,3 +186,5 @@ Riok.Mapperly.Abstractions.MappingTargetAttribute
 Riok.Mapperly.Abstractions.MappingTargetAttribute.MappingTargetAttribute() -> void
 Riok.Mapperly.Abstractions.MapPropertyAttribute.MapPropertyAttribute(string! source, string![]! target) -> void
 Riok.Mapperly.Abstractions.MapPropertyAttribute.MapPropertyAttribute(string![]! source, string! target) -> void
+Riok.Mapperly.Abstractions.MapperAttribute.IncludedConstructors.get -> Riok.Mapperly.Abstractions.MemberVisibility
+Riok.Mapperly.Abstractions.MapperAttribute.IncludedConstructors.set -> void

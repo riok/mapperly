@@ -104,6 +104,9 @@ public record MapperConfiguration
     /// </summary>
     public MemberVisibility? IncludedMembers { get; init; }
 
+    /// <inheritdoc cref="MapperAttribute.IncludedConstructors"/>
+    public MemberVisibility? IncludedConstructors { get; init; }
+
     /// <summary>
     /// Controls the priority of constructors used in mapping.
     /// When <c>true</c>, a parameterless constructor is prioritized over constructors with parameters.

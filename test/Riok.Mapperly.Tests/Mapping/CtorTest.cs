@@ -108,4 +108,29 @@ public class CtorTest
                 """
             );
     }
+
+    [Fact]
+    public Task PrivateCtorCustomClass()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "string",
+            "A",
+            TestSourceBuilderOptions.WithConstructorVisibility(MemberVisibility.All),
+            "class A { private A(string x) {} }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task PrivateCtorCustomClassWithCustomClassParam()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.WithConstructorVisibility(MemberVisibility.All),
+            "class A;",
+            "class B { private B(A source) {} }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
 }

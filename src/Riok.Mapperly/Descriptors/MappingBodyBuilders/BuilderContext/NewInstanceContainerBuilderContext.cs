@@ -17,16 +17,16 @@ public class NewInstanceContainerBuilderContext<T>(MappingBuilderContext builder
         INewInstanceBuilderContext<T>
     where T : INewInstanceObjectMemberMapping, IMemberAssignmentTypeMapping
 {
-    public void AddInitMemberMapping(MemberAssignmentMapping mapping)
-    {
-        Mapping.AddInitMemberMapping(mapping);
-        MappingAdded(mapping.MemberInfo);
-    }
-
     public void AddConstructorParameterMapping(ConstructorParameterMapping mapping)
     {
         Mapping.AddConstructorParameterMapping(mapping);
         MappingAdded(mapping.MemberInfo, true);
+    }
+
+    public void AddInitMemberMapping(MemberAssignmentMapping mapping)
+    {
+        Mapping.AddInitMemberMapping(mapping);
+        MappingAdded(mapping.MemberInfo);
     }
 
     public bool TryMatchInitOnlyMember(IMappableMember targetMember, [NotNullWhen(true)] out MemberMappingInfo? memberInfo)

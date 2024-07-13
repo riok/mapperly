@@ -16,14 +16,16 @@ public static class CtorMappingBuilder
             return null;
 
         // resolve ctors which have the source as single argument
-        var ctorMethod = namedTarget
-            .InstanceConstructors.Where(ctx.SymbolAccessor.IsDirectlyAccessible)
+        var ctor = namedTarget
+            .InstanceConstructors.Where(ctx.SymbolAccessor.IsConstructorAccessible)
             .FirstOrDefault(m =>
                 m.Parameters.Length == 1
                 && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type.NonNullable(), ctx.Source.NonNullable())
                 && ctx.Source.HasSameOrStricterNullability(m.Parameters[0].Type)
             );
+        if (ctor == null)
+            return null;
 
-        return ctorMethod == null ? null : new CtorMapping(ctx.Source, ctx.Target);
+        return new CtorMapping(ctx.Source, ctx.Target, ctx.InstanceConstructors.BuildForConstructor(ctor));
     }
 }

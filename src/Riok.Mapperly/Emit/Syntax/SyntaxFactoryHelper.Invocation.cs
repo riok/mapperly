@@ -74,6 +74,12 @@ public partial struct SyntaxFactoryHelper
         return InvocationExpression(methodAccess).WithArgumentList(ArgumentList(arguments));
     }
 
+    public static ParameterListSyntax ParameterList(IEnumerable<IParameterSymbol> parameters)
+    {
+        var parameterSyntaxes = parameters.Select(Parameter);
+        return SyntaxFactory.ParameterList(CommaSeparatedList(parameterSyntaxes));
+    }
+
     public static ParameterListSyntax ParameterList(bool extensionMethod, IEnumerable<MethodParameter?> parameters)
     {
         var parameterSyntaxes = parameters
@@ -89,6 +95,25 @@ public partial struct SyntaxFactoryHelper
         return Parameter(parameter.Type.FullyQualifiedIdentifierName(), parameter.Name, addThisKeyword);
     }
 
+    private static ParameterSyntax Parameter(IParameterSymbol symbol)
+    {
+        var type = IdentifierName(symbol.Type.WithNullableAnnotation(symbol.NullableAnnotation.Upgrade()).FullyQualifiedIdentifierName())
+            .AddTrailingSpace();
+        var param = SyntaxFactory.Parameter(Identifier(symbol.Name)).WithType(type);
+
+        if (symbol.IsThis)
+        {
+            param = param.WithModifiers(TokenList(TrailingSpacedToken(SyntaxKind.ThisKeyword)));
+        }
+
+        if (symbol.HasExplicitDefaultValue)
+        {
+            param = param.WithDefault(EqualsValueClause(Literal(symbol.ExplicitDefaultValue)));
+        }
+
+        return param;
+    }
+
     public static ParameterSyntax Parameter(string type, string identifier, bool addThisKeyword = false)
     {
         var param = SyntaxFactory.Parameter(Identifier(identifier)).WithType(IdentifierName(type).AddTrailingSpace());
@@ -101,7 +126,13 @@ public partial struct SyntaxFactoryHelper
         return param;
     }
 
-    public static InvocationExpressionSyntax StaticInvocation(string receiverType, string methodName, params ExpressionSyntax[] arguments)
+    public static InvocationExpressionSyntax StaticInvocation(
+        string receiverType,
+        string methodName,
+        params ExpressionSyntax[] arguments
+    ) => StaticInvocation(receiverType, methodName, arguments.Select(Argument).ToArray());
+
+    public static InvocationExpressionSyntax StaticInvocation(string receiverType, string methodName, IEnumerable<ArgumentSyntax> arguments)
     {
         var receiverTypeIdentifier = IdentifierName(receiverType);
         var methodAccess = MemberAccessExpression(

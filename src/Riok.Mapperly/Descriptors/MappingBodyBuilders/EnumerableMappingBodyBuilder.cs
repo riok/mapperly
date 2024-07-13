@@ -25,7 +25,8 @@ internal static class EnumerableMappingBodyBuilder
         var mappingCtx = new MembersContainerBuilderContext<IEnumerableMapping>(ctx, mapping);
         InitContext(mappingCtx);
 
-        if (EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx, mapping.CollectionInfos) is { } ensureCapacity)
+        // include the target count as the target could already include elements
+        if (EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx, mapping.CollectionInfos, true) is { } ensureCapacity)
         {
             mapping.AddEnsureCapacity(ensureCapacity);
         }
@@ -83,9 +84,10 @@ internal static class EnumerableMappingBodyBuilder
         // if no additional parameter was used,
         // the count/capacity is not mapped,
         // try to build an EnsureCapacity statement.
+        // do not include the target count as the instance is just created by the ctor
         if (
             !countIsMapped
-            && EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.BuilderContext, ctx.Mapping.CollectionInfos) is { } ensureCapacity
+            && EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.BuilderContext, ctx.Mapping.CollectionInfos, false) is { } ensureCapacity
         )
         {
             if (ctx.Mapping.CollectionInfos.Source.CountIsKnown)

@@ -1,12 +1,12 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Descriptors.Constructors;
 using Riok.Mapperly.Descriptors.Enumerables;
 using Riok.Mapperly.Descriptors.FormatProviders;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
-using Riok.Mapperly.Descriptors.ObjectFactories;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 
@@ -21,7 +21,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public MappingBuilderContext(
         SimpleMappingBuilderContext parentCtx,
-        ObjectFactoryCollection objectFactories,
+        InstanceConstructorFactory instanceConstructors,
         FormatProviderCollection formatProviders,
         IUserMapping? userMapping,
         TypeMappingKey mappingKey,
@@ -29,7 +29,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     )
         : base(parentCtx, diagnosticLocation ?? userMapping?.Method.GetSyntaxLocation())
     {
-        ObjectFactories = objectFactories;
+        InstanceConstructors = instanceConstructors;
         _formatProviders = formatProviders;
         UserMapping = userMapping;
         MappingKey = mappingKey;
@@ -43,7 +43,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         TypeMappingKey mappingKey,
         bool ignoreDerivedTypes
     )
-        : this(ctx, ctx.ObjectFactories, ctx._formatProviders, userMapping, mappingKey, diagnosticLocation)
+        : this(ctx, ctx.InstanceConstructors, ctx._formatProviders, userMapping, mappingKey, diagnosticLocation)
     {
         if (ignoreDerivedTypes)
         {
@@ -72,7 +72,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// </summary>
     public virtual bool IsExpression => false;
 
-    public ObjectFactoryCollection ObjectFactories { get; }
+    public InstanceConstructorFactory InstanceConstructors { get; }
 
     /// <inheritdoc cref="MappingBuilders.MappingBuilder.NewInstanceMappings"/>
     public IReadOnlyDictionary<TypeMappingKey, INewInstanceMapping> NewInstanceMappings => MappingBuilder.NewInstanceMappings;

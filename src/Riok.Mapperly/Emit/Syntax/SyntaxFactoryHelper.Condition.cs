@@ -80,8 +80,6 @@ public partial struct SyntaxFactoryHelper
 
     public static ExpressionSyntax Or(IEnumerable<ExpressionSyntax?> values) => BinaryExpression(SyntaxKind.LogicalOrExpression, values);
 
-    public static ExpressionSyntax And(params ExpressionSyntax?[] values) => And((IEnumerable<ExpressionSyntax?>)values);
-
     public static ExpressionSyntax And(IEnumerable<ExpressionSyntax?> values) => BinaryExpression(SyntaxKind.LogicalAndExpression, values);
 
     public static ExpressionSyntax Add(ExpressionSyntax one, ExpressionSyntax two) => BinaryExpression(SyntaxKind.AddExpression, one, two);

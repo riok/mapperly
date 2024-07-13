@@ -11,7 +11,7 @@ public static class ReferenceHandlingSyntaxFactoryHelper
 {
     private const string ExistingTargetVariableName = "existingTargetReference";
 
-    public static IfStatementSyntax TryGetReference(TypeMappingBuildContext ctx, INewInstanceMapping mapping)
+    public static IfStatementSyntax TryGetReference(TypeMappingBuildContext ctx, IMapping mapping)
     {
         // GetReference<TSource, TTarget>
         var refHandler = ctx.ReferenceHandler ?? throw new ArgumentException("Reference handler is not set", nameof(ctx));
@@ -36,7 +36,7 @@ public static class ReferenceHandlingSyntaxFactoryHelper
         return ctx.SyntaxFactory.If(invocation, ctx.SyntaxFactory.AddIndentation().Return(IdentifierName(existingTargetVariableName)));
     }
 
-    public static ExpressionSyntax SetReference(INewInstanceMapping mapping, TypeMappingBuildContext ctx, ExpressionSyntax target)
+    public static ExpressionSyntax SetReference(IMapping mapping, TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
         // SetReference<TSource, TTarget>
         var refHandler = ctx.ReferenceHandler ?? throw new ArgumentException("Reference handler is not set", nameof(ctx));

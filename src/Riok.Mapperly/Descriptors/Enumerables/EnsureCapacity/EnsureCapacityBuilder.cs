@@ -10,7 +10,11 @@ public static class EnsureCapacityBuilder
     private const string EnsureCapacityName = "EnsureCapacity";
     private const string TryGetNonEnumeratedCountMethodName = "TryGetNonEnumeratedCount";
 
-    public static EnsureCapacityInfo? TryBuildEnsureCapacity(MappingBuilderContext ctx, CollectionInfos collectionInfos)
+    public static EnsureCapacityInfo? TryBuildEnsureCapacity(
+        MappingBuilderContext ctx,
+        CollectionInfos collectionInfos,
+        bool includeTargetCount
+    )
     {
         var source = collectionInfos.Source;
         var target = collectionInfos.Target;
@@ -22,10 +26,11 @@ public static class EnsureCapacityBuilder
         if (capacityMethod == null)
             return null;
 
+        var targetCount = includeTargetCount ? target.CountMember?.BuildGetter(ctx.UnsafeAccessorContext) : null;
+
         // if source count is known, create a simple EnsureCapacity statement
         if (source.CountIsKnown)
         {
-            var targetCount = target.CountMember?.BuildGetter(ctx.UnsafeAccessorContext);
             var sourceCount = source.CountMember.BuildGetter(ctx.UnsafeAccessorContext);
             return new EnsureCapacityMember(targetCount, sourceCount);
         }
@@ -44,6 +49,6 @@ public static class EnsureCapacityBuilder
             return null;
 
         // if source does not have a count use GetNonEnumeratedCount, calling EnsureCapacity if count is available
-        return new EnsureCapacityNonEnumerated(target.CountMember?.BuildGetter(ctx.UnsafeAccessorContext), nonEnumeratedCountMethod);
+        return new EnsureCapacityNonEnumerated(targetCount, nonEnumeratedCountMethod);
     }
 }

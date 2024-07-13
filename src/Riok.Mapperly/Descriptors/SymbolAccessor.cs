@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
@@ -26,32 +27,55 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         new(SymbolEqualityComparer.Default);
 
     private MemberVisibility _memberVisibility = MemberVisibility.AllAccessible;
+    private MemberVisibility _constructorVisibility = MemberVisibility.AllAccessible;
 
     private Compilation Compilation => compilationContext.Compilation;
 
     internal void SetMemberVisibility(MemberVisibility visibility) => _memberVisibility = visibility;
 
+    internal void SetConstructorVisibility(MemberVisibility visibility) => _constructorVisibility = visibility;
+
     public bool HasDirectlyAccessibleParameterlessConstructor(ITypeSymbol symbol) =>
         symbol is INamedTypeSymbol { IsAbstract: false } namedTypeSymbol
         && namedTypeSymbol.InstanceConstructors.Any(c => c.Parameters.IsDefaultOrEmpty && IsDirectlyAccessible(c));
 
+    public bool HasAccessibleParameterlessConstructor(ITypeSymbol symbol) =>
+        symbol is INamedTypeSymbol { IsAbstract: false } namedTypeSymbol
+        && namedTypeSymbol.InstanceConstructors.Any(x => x.Parameters.IsDefaultOrEmpty && IsConstructorAccessible(x));
+
+    public bool HasAnyAccessibleConstructor(ITypeSymbol symbol) =>
+        symbol is INamedTypeSymbol { IsAbstract: false } namedTypeSymbol
+        && namedTypeSymbol.InstanceConstructors.Any(IsConstructorAccessible);
+
     public bool IsDirectlyAccessible(ISymbol symbol) => Compilation.IsSymbolAccessibleWithin(symbol, mapperSymbol);
 
-    public bool IsAccessible(ISymbol symbol)
+    public bool IsMemberAccessible(ISymbol symbol)
     {
-        if (_memberVisibility.HasFlag(MemberVisibility.Accessible) && !IsDirectlyAccessible(symbol))
+        Debug.Assert(symbol is not IMethodSymbol { MethodKind: MethodKind.Constructor });
+        return IsAccessible(symbol, _memberVisibility);
+    }
+
+    public bool IsConstructorAccessible(IMethodSymbol symbol)
+    {
+        Debug.Assert(symbol.MethodKind == MethodKind.Constructor);
+        return IsAccessible(symbol, _constructorVisibility);
+    }
+
+    private bool IsAccessible(ISymbol symbol, MemberVisibility visibility)
+    {
+        if (visibility.HasFlag(MemberVisibility.Accessible) && !IsDirectlyAccessible(symbol))
             return false;
 
         return symbol.DeclaredAccessibility switch
         {
-            Accessibility.Private => _memberVisibility.HasFlag(MemberVisibility.Private),
+            Accessibility.Private => visibility.HasFlag(MemberVisibility.Private),
             Accessibility.ProtectedAndInternal
-                => _memberVisibility.HasFlag(MemberVisibility.Protected) && _memberVisibility.HasFlag(MemberVisibility.Internal),
-            Accessibility.Protected => _memberVisibility.HasFlag(MemberVisibility.Protected),
-            Accessibility.Internal => _memberVisibility.HasFlag(MemberVisibility.Internal),
+                => visibility.HasFlag(MemberVisibility.Protected) && visibility.HasFlag(MemberVisibility.Internal),
+            Accessibility.Protected => visibility.HasFlag(MemberVisibility.Protected),
+            Accessibility.Internal => visibility.HasFlag(MemberVisibility.Internal),
             Accessibility.ProtectedOrInternal
-                => _memberVisibility.HasFlag(MemberVisibility.Protected) || _memberVisibility.HasFlag(MemberVisibility.Internal),
-            Accessibility.Public => _memberVisibility.HasFlag(MemberVisibility.Public),
+                => visibility.HasFlag(MemberVisibility.Protected) || visibility.HasFlag(MemberVisibility.Internal),
+            Accessibility.Public => visibility.HasFlag(MemberVisibility.Public),
             _ => false,
         };
     }

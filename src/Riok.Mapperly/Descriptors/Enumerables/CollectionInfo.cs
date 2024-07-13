@@ -10,7 +10,7 @@ public record CollectionInfo(
     CollectionType ImplementedTypes,
     ITypeSymbol EnumeratedType,
     IMappableMember? CountMember,
-    bool HasImplicitCollectionAddMethod,
+    string? AddMethodName,
     bool IsImmutableCollectionType
 )
 {

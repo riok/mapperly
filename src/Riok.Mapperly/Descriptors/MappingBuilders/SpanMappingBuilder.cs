@@ -3,7 +3,6 @@ using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Enumerables;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
-using Riok.Mapperly.Descriptors.ObjectFactories;
 using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
@@ -11,7 +10,6 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 public static class SpanMappingBuilder
 {
     private const string ToArrayMethodName = nameof(Enumerable.ToArray);
-    private const string AddMethodName = nameof(ICollection<object>.Add);
 
     public static INewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
@@ -81,17 +79,10 @@ public static class SpanMappingBuilder
         if (ctx.FindOrBuildMapping(source.EnumeratedType, target.EnumeratedType) is not { } elementMapping)
             return null;
 
-        if (target.CollectionType is CollectionType.Stack)
-            return CreateForEach(nameof(Stack<object>.Push));
-
-        if (target.CollectionType is CollectionType.Queue)
-            return CreateForEach(nameof(Queue<object>.Enqueue));
-
-        // create a foreach loop with add calls if source is not an array
-        // and ICollection.Add(T): void is implemented and not explicit
-        // ensures add is not called and immutable types
-        if (target.CollectionType is not CollectionType.Array && target.HasImplicitCollectionAddMethod)
-            return CreateForEach(AddMethodName);
+        if (target.AddMethodName != null)
+        {
+            return new ForEachAddEnumerableExistingTargetMapping(ctx.CollectionInfos, elementMapping, target.AddMethodName);
+        }
 
         // if a mapping could be created for an immutable collection
         // we diagnostic when it is an existing target mapping
@@ -101,11 +92,6 @@ public static class SpanMappingBuilder
         }
 
         return null;
-
-        ForEachAddEnumerableExistingTargetMapping CreateForEach(string methodName)
-        {
-            return new ForEachAddEnumerableExistingTargetMapping(ctx.CollectionInfos, elementMapping, methodName);
-        }
     }
 
     private static INewInstanceMapping? BuildSpanToEnumerable(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
@@ -121,47 +107,23 @@ public static class SpanMappingBuilder
             return BuildSpanToList(ctx, elementMapping);
 
         if (
-            !ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory)
-            && !ctx.SymbolAccessor.HasDirectlyAccessibleParameterlessConstructor(ctx.Target)
+            !ctx.InstanceConstructors.TryBuildObjectFactory(ctx.Source, ctx.Target, out var constructor)
+            && !ctx.SymbolAccessor.HasAccessibleParameterlessConstructor(ctx.Target)
         )
         {
             return MapSpanArrayToEnumerableMethod(ctx);
         }
 
-        if (target.CollectionType is CollectionType.Stack)
-            return CreateForEach(nameof(Stack<object>.Push), objectFactory);
+        if (target.AddMethodName == null)
+            return MapSpanArrayToEnumerableMethod(ctx);
 
-        if (target.CollectionType is CollectionType.Queue)
-            return CreateForEach(nameof(Queue<object>.Enqueue), objectFactory);
-
-        // create a foreach loop with add calls if source is not an array
-        // and ICollection.Add(T): void is implemented and not explicit
-        // ensures add is not called and immutable types
-        if (target.CollectionType is not CollectionType.Array && target.HasImplicitCollectionAddMethod)
-            return CreateForEach(AddMethodName, objectFactory);
-
-        return MapSpanArrayToEnumerableMethod(ctx);
-
-        INewInstanceMapping CreateForEach(string methodName, ObjectFactory? factory)
-        {
-            if (factory != null)
-            {
-                return new ForEachAddEnumerableObjectFactoryMapping(
-                    ctx.CollectionInfos,
-                    elementMapping,
-                    factory,
-                    ctx.Configuration.Mapper.UseReferenceHandling,
-                    methodName
-                );
-            }
-
-            return new ForEachAddEnumerableMapping(
-                ctx.CollectionInfos,
-                elementMapping,
-                ctx.Configuration.Mapper.UseReferenceHandling,
-                methodName
-            );
-        }
+        return new ForEachAddEnumerableMapping(
+            constructor,
+            ctx.CollectionInfos,
+            elementMapping,
+            ctx.Configuration.Mapper.UseReferenceHandling,
+            target.AddMethodName
+        );
     }
 
     private static INewInstanceMapping BuildToArrayOrMap(MappingBuilderContext ctx, INewInstanceMapping elementMapping)

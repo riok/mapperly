@@ -22,25 +22,27 @@ public partial struct SyntaxFactoryHelper
         return SingletonList(SyntaxFactory.AttributeList(SingletonSeparatedList(attribute)).AddTrailingLineFeed(Indentation));
     }
 
-    public SyntaxList<AttributeListSyntax> UnsafeAccessorAttributeList(UnsafeAccessorType type, string name)
+    public SyntaxList<AttributeListSyntax> UnsafeAccessorAttributeList(UnsafeAccessorType type, string? name = null)
     {
         var unsafeAccessType = type switch
         {
             UnsafeAccessorType.Field => "Field",
             UnsafeAccessorType.Method => "Method",
+            UnsafeAccessorType.Constructor => "Constructor",
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, $"Unknown {nameof(UnsafeAccessorType)}"),
         };
 
-        return AttributeList(
-            UnsafeAccessorName,
-            MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, _unsafeAccessorKindName, IdentifierName(unsafeAccessType)),
-            Assignment(IdentifierName(UnsafeAccessorNameArgument), StringLiteral(name))
-        );
+        var kind = MemberAccess(_unsafeAccessorKindName, IdentifierName(unsafeAccessType));
+        if (name == null)
+            return AttributeList(UnsafeAccessorName, kind);
+
+        return AttributeList(UnsafeAccessorName, kind, Assignment(IdentifierName(UnsafeAccessorNameArgument), StringLiteral(name)));
     }
 
     public enum UnsafeAccessorType
     {
         Method,
-        Field
+        Field,
+        Constructor,
     }
 }
