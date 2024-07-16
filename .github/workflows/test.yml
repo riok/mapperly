@@ -33,7 +33,7 @@ jobs:
         if: always()
         with:
           paths: 'test/**/TestResults/**/*.xml'
-      - uses: danielpalme/ReportGenerator-GitHub-Action@5
+      - uses: danielpalme/ReportGenerator-GitHub-Action@v5
         if: always()
         with:
           reports: 'test/**/*cobertura.xml'
