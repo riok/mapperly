@@ -29,10 +29,7 @@ public class ArrayForEachMapping(
         var loopCounterVariableName = ctx.NameBuilder.New(LoopCounterName);
 
         // var target = new T[source.Count];
-        var sourceLengthArrayRank = ArrayRankSpecifier(SingletonSeparatedList(sourceCountAccessor.BuildAccess(ctx.Source)));
-        var targetInitializationValue = CreateArray(
-            ArrayType(FullyQualifiedIdentifier(targetArrayElementType)).WithRankSpecifiers(SingletonList(sourceLengthArrayRank))
-        );
+        var targetInitializationValue = CreateArray(targetArrayElementType, sourceCountAccessor.BuildAccess(ctx.Source));
         yield return ctx.SyntaxFactory.DeclareLocalVariable(targetVariableName, targetInitializationValue);
 
         // var i = 0;

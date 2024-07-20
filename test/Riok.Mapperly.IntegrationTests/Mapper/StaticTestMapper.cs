@@ -26,6 +26,10 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public static partial DateTime DirectDateTime(DateTime dateTime);
 
+        public static partial IReadOnlyList<IReadOnlyList<IReadOnlyCollection<int>>> MapNestedLists(
+            IReadOnlyCollection<IReadOnlyList<IReadOnlyCollection<string>>> lists
+        );
+
         public static partial void MapIdTargetExt([MappingTarget] this IdObject target, IdObjectDto source);
 
         public static partial void MapIdTargetFirst([MappingTarget] IdObject target, IdObjectDto source);

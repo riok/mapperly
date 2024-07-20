@@ -696,4 +696,15 @@ public class EnumerableTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task NestedInterfacedLists()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "IReadOnlyList<IReadOnlyCollection<IReadOnlyList<int>>>",
+            "IReadOnlyList<IReadOnlyCollection<IReadOnlyList<string>>>"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }
