@@ -34,9 +34,6 @@ public class ValueTupleConstructorParameterMapping(IFieldSymbol parameter, ISour
             : argument.WithNameColon(SpacedNameColon(Parameter.Name));
     }
 
-    protected bool Equals(ValueTupleConstructorParameterMapping other) =>
-        Parameter.Equals(other.Parameter, SymbolEqualityComparer.Default) && _sourceValue.Equals(other._sourceValue);
-
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj))
@@ -48,7 +45,8 @@ public class ValueTupleConstructorParameterMapping(IFieldSymbol parameter, ISour
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((ValueTupleConstructorParameterMapping)obj);
+        var other = (ValueTupleConstructorParameterMapping)obj;
+        return Parameter.Equals(other.Parameter, SymbolEqualityComparer.Default) && _sourceValue.Equals(other._sourceValue);
     }
 
     public override int GetHashCode()
@@ -60,10 +58,4 @@ public class ValueTupleConstructorParameterMapping(IFieldSymbol parameter, ISour
             return hashCode;
         }
     }
-
-    public static bool operator ==(ValueTupleConstructorParameterMapping? left, ValueTupleConstructorParameterMapping? right) =>
-        Equals(left, right);
-
-    public static bool operator !=(ValueTupleConstructorParameterMapping? left, ValueTupleConstructorParameterMapping? right) =>
-        !Equals(left, right);
 }

@@ -1,15 +1,15 @@
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
-namespace Riok.Mapperly.Symbols;
+namespace Riok.Mapperly.Symbols.Members;
 
 /// <summary>
 /// Represents a (possibly empty) list of members to access a certain member.
 /// E.g. A.B.C
 /// </summary>
+[DebuggerDisplay("{ToDebugString}")]
 public abstract class MemberPath(ITypeSymbol rootType, IReadOnlyList<IMappableMember> path)
 {
     protected const string MemberAccessSeparator = ".";
@@ -67,35 +67,7 @@ public abstract class MemberPath(ITypeSymbol rootType, IReadOnlyList<IMappableMe
 
     public bool IsAnyObjectPathNullable() => ObjectPath.Any(p => p.IsNullable);
 
-    /// <summary>
-    /// Builds a condition (the resulting expression evaluates to a boolean)
-    /// whether the path is non-null.
-    /// </summary>
-    /// <param name="baseAccess">The base access to access the member or <c>null</c>.</param>
-    /// <returns><c>null</c> if no part of the path is nullable or the condition which needs to be true, that the path cannot be <c>null</c>.</returns>
-    public ExpressionSyntax? BuildNonNullConditionWithoutConditionalAccess(ExpressionSyntax? baseAccess)
-    {
-        var nullablePath = PathWithoutTrailingNonNullable();
-        ExpressionSyntax? condition = null;
-        var access = baseAccess;
-        if (access == null)
-        {
-            access = IdentifierName(nullablePath.First().Name);
-            nullablePath = nullablePath.Skip(1);
-        }
-
-        foreach (var pathPart in nullablePath)
-        {
-            access = MemberAccess(access, pathPart.Name);
-
-            if (!pathPart.IsNullable)
-                continue;
-
-            condition = And(condition, IsNotNull(access));
-        }
-
-        return condition;
-    }
+    public MemberPathGetter BuildGetter(SimpleMappingBuilderContext ctx) => MemberPathGetter.Build(ctx, this);
 
     public static MemberPath Create(ITypeSymbol rootType, IReadOnlyList<IMappableMember> path)
     {
@@ -118,7 +90,8 @@ public abstract class MemberPath(ITypeSymbol rootType, IReadOnlyList<IMappableMe
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((MemberPath)obj);
+        var other = (MemberPath)obj;
+        return RootType.Equals(other.RootType, SymbolEqualityComparer.IncludeNullability) && Path.SequenceEqual(other.Path);
     }
 
     public override int GetHashCode()
@@ -132,12 +105,7 @@ public abstract class MemberPath(ITypeSymbol rootType, IReadOnlyList<IMappableMe
         return hc;
     }
 
-    public static bool operator ==(MemberPath? left, MemberPath? right) => Equals(left, right);
-
-    public static bool operator !=(MemberPath? left, MemberPath? right) => !Equals(left, right);
-
-    private bool Equals(MemberPath other) =>
-        RootType.Equals(other.RootType, SymbolEqualityComparer.IncludeNullability) && Path.SequenceEqual(other.Path);
+    public string ToDebugString() => ToDisplayString();
 
     public abstract string ToDisplayString(bool includeRootType = true, bool includeMemberType = true);
 }

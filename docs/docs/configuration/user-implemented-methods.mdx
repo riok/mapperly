@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 7
 description: Manually implement mappings
 ---
 
@@ -27,7 +27,7 @@ The types of the user-implemented mapping method need to match the types to map 
 
 If there are multiple user-implemented mapping methods suiting the given type-pair, by default, the first one is used.
 This can be customized by using [automatic user-implemented mapping method discovery](#automatic-user-implemented-mapping-method-discovery)
-and [default user-implemented mapping method](#default-user-implemented-mapping-method).
+and [default mapping method](#default-mapping-methods).
 
 ## Automatic user-implemented mapping method discovery
 
@@ -82,11 +82,11 @@ public partial class CarMapper
 }
 ```
 
-## Default user-implemented mapping method
+## Default mapping methods
 
 Whenever Mapperly will need a mapping for a given type-pair,
-it will use the default user-implemented mapping.
-A user-implemented mapping is considered the default mapping for a type-pair
+it will use the default mapping.
+A user-implemented or user-defined mapping is considered the default mapping for a type-pair
 if `Default = true` is set on the `UserMapping` attribute.
 If no user-implemented mapping with `Default = true` exists and `AutoUserMappings` is enabled,
 the first user-implemented mapping which has an unspecified `Default` value is used.

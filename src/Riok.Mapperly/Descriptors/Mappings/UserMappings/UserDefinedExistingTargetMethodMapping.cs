@@ -89,7 +89,7 @@ public class UserDefinedExistingTargetMethodMapping(
     protected override ParameterListSyntax BuildParameterList()
         // needs to include the target parameter
         =>
-        ParameterList(IsExtensionMethod, SourceParameter, TargetParameter, ReferenceHandlerParameter);
+        ParameterList(IsExtensionMethod, [SourceParameter, TargetParameter, ReferenceHandlerParameter, .. AdditionalSourceParameters]);
 
     internal override void EnableReferenceHandling(INamedTypeSymbol iReferenceHandlerType)
     {

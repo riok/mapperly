@@ -5,7 +5,7 @@ using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
@@ -14,11 +14,6 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 /// </summary>
 public static class NewInstanceObjectMemberMappingBodyBuilder
 {
-    public record ConstructorMappingBuilderOptions(
-        IReadOnlyDictionary<string, MemberPath>? AdditionalParameterSourceValues = null,
-        bool? PreferParameterlessConstructor = null
-    );
-
     public static void BuildMappingBody(MappingBuilderContext ctx, NewInstanceObjectMemberMapping mapping)
     {
         var mappingCtx = new NewInstanceBuilderContext<NewInstanceObjectMemberMapping>(ctx, mapping);
@@ -36,13 +31,9 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         mappingCtx.AddDiagnostics();
     }
 
-    /// <summary>
-    /// Tries to build a constructor invocation.
-    /// </summary>
-    /// <returns>A <see cref="HashSet{T}"/> containing all used <see cref="ConstructorMappingBuilderOptions.AdditionalParameterSourceValues"/>.</returns>
-    public static HashSet<string> BuildConstructorMapping(
+    public static IReadOnlyList<ConstructorParameterMapping> BuildConstructorMapping(
         INewInstanceBuilderContext<INewInstanceObjectMemberMapping> ctx,
-        ConstructorMappingBuilderOptions? options = null
+        bool? preferParameterlessConstructor = null
     )
     {
         if (ctx.Mapping.TargetType is not INamedTypeSymbol namedTargetType)
@@ -60,7 +51,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             .OrderByDescending(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
             .ThenBy(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x));
 
-        if (options?.PreferParameterlessConstructor ?? ctx.BuilderContext.Configuration.Mapper.PreferParameterlessConstructors)
+        if (preferParameterlessConstructor ?? ctx.BuilderContext.Configuration.Mapper.PreferParameterlessConstructors)
         {
             ctorCandidates = ctorCandidates.ThenByDescending(x => x.Parameters.Length == 0).ThenByDescending(x => x.Parameters.Length);
         }
@@ -71,15 +62,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
 
         foreach (var ctorCandidate in ctorCandidates)
         {
-            if (
-                !TryBuildConstructorMapping(
-                    ctx,
-                    ctorCandidate,
-                    options,
-                    out var usedAdditionalParameterSourceValues,
-                    out var constructorParameterMappings
-                )
-            )
+            if (!TryBuildConstructorMapping(ctx, ctorCandidate, out var constructorParameterMappings))
             {
                 if (ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(ctorCandidate))
                 {
@@ -98,7 +81,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 ctx.AddConstructorParameterMapping(mapping);
             }
 
-            return usedAdditionalParameterSourceValues;
+            return constructorParameterMappings;
         }
 
         ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoConstructorFound, ctx.BuilderContext.Target);
@@ -156,25 +139,17 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
     private static bool TryBuildConstructorMapping(
         INewInstanceBuilderContext<IMapping> ctx,
         IMethodSymbol ctor,
-        ConstructorMappingBuilderOptions? options,
-        [NotNullWhen(true)] out HashSet<string>? usedAdditionalParameterSourceValues,
         [NotNullWhen(true)] out List<ConstructorParameterMapping>? constructorParameterMappings
     )
     {
         constructorParameterMappings = new List<ConstructorParameterMapping>();
-        usedAdditionalParameterSourceValues = new HashSet<string>();
 
         var skippedOptionalParam = false;
         foreach (var parameter in ctor.Parameters)
         {
             if (
-                !TryMatchParameter(
-                    ctx,
-                    options?.AdditionalParameterSourceValues,
-                    usedAdditionalParameterSourceValues,
-                    parameter,
-                    out var memberMappingInfo
-                ) || !SourceValueBuilder.TryBuildMappedSourceValue(ctx, memberMappingInfo, out var sourceValue)
+                !ctx.TryMatchParameter(parameter, out var memberMappingInfo)
+                || !SourceValueBuilder.TryBuildMappedSourceValue(ctx, memberMappingInfo, out var sourceValue)
             )
             {
                 // expressions do not allow skipping of optional parameters
@@ -190,32 +165,5 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         }
 
         return true;
-    }
-
-    private static bool TryMatchParameter(
-        INewInstanceBuilderContext<IMapping> ctx,
-        IReadOnlyDictionary<string, MemberPath>? additionalParameterMappings,
-        HashSet<string> usedAdditionalParameterSourceValues,
-        IParameterSymbol parameter,
-        [NotNullWhen(true)] out MemberMappingInfo? memberInfo
-    )
-    {
-        if (ctx.TryMatchParameter(parameter, out memberInfo))
-            return true;
-
-        if (additionalParameterMappings?.TryGetValue(parameter.Name, out var sourcePath) == true)
-        {
-            memberInfo = new MemberMappingInfo(
-                sourcePath,
-                new NonEmptyMemberPath(
-                    ctx.Mapping.TargetType,
-                    [new ConstructorParameterMember(parameter, ctx.BuilderContext.SymbolAccessor)]
-                )
-            );
-            usedAdditionalParameterSourceValues.Add(parameter.Name);
-            return true;
-        }
-
-        return false;
     }
 }

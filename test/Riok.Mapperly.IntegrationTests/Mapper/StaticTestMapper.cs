@@ -145,5 +145,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial ConstantValuesDto MapConstantValues(ConstantValuesObject source);
 
         private static int IntValueBuilder() => 2;
+
+        public static partial AdditionalParametersDto MapWithAdditionalParameter(IdObject source, int valueFromParameter);
     }
 }

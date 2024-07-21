@@ -321,4 +321,20 @@ public class ReferenceHandlingTest
             )
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public void DuplicatedReferenceHandlerParameterShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "public partial B Map(A source, [ReferenceHandler] IReferenceHandler refHandler, [ReferenceHandler] IReferenceHandler refHandler1);",
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "record A;",
+            "record b;"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "Map has an unsupported mapping method signature")
+            .HaveAssertedAllDiagnostics();
+    }
 }

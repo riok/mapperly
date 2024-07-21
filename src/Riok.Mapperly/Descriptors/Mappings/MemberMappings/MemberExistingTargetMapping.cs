@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -9,8 +9,8 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// </summary>
 public class MemberExistingTargetMapping(
     IExistingTargetMapping delegateMapping,
-    GetterMemberPath sourcePath,
-    GetterMemberPath targetPath,
+    MemberPathGetter sourcePath,
+    MemberPathGetter targetPath,
     MemberMappingInfo memberInfo
 ) : IMemberAssignmentMapping
 {

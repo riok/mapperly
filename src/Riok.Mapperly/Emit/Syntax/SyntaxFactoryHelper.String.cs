@@ -12,11 +12,8 @@ public partial struct SyntaxFactoryHelper
 {
     private static readonly IdentifierNameSyntax _nameofIdentifier = IdentifierName("nameof");
 
-    private static readonly Regex FormattableStringPlaceholder = new Regex(
-        @"\{(?<placeholder>\d+)\}",
-        RegexOptions.Compiled,
-        TimeSpan.FromMilliseconds(100)
-    );
+    private static readonly Regex _formattableStringPlaceholder =
+        new(@"\{(?<placeholder>\d+)\}", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 
     public static InvocationExpressionSyntax NameOf(ExpressionSyntax expression) => Invocation(_nameofIdentifier, expression);
 
@@ -25,7 +22,7 @@ public partial struct SyntaxFactoryHelper
 
     public static InterpolatedStringExpressionSyntax InterpolatedString(FormattableString str)
     {
-        var matches = FormattableStringPlaceholder.Matches(str.Format);
+        var matches = _formattableStringPlaceholder.Matches(str.Format);
         var contents = new List<InterpolatedStringContentSyntax>();
         var previousIndex = 0;
         foreach (Match match in matches)

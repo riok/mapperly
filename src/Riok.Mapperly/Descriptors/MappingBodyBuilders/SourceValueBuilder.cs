@@ -54,7 +54,7 @@ internal static class SourceValueBuilder
     {
         // always set the member mapped,
         // as other diagnostics are reported if the mapping fails to be built
-        ctx.SetMembersMapped(memberMappingInfo.TargetMember.Path[0].Name);
+        ctx.SetMembersMapped(memberMappingInfo);
 
         if (memberMappingInfo.ValueConfiguration!.Value != null)
             return TryBuildConstantSourceValue(ctx, memberMappingInfo, out sourceValue);

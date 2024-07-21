@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 
-namespace Riok.Mapperly.Symbols;
+namespace Riok.Mapperly.Symbols.Members;
 
 [DebuggerDisplay("{RootType} (root)")]
 public class EmptyMemberPath(ITypeSymbol rootType) : MemberPath(rootType, [])

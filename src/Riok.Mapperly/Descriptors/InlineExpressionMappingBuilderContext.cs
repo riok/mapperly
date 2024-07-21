@@ -127,7 +127,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         // for inline expression mappings.
         // This is not needed for regular mappings as these user defined method mappings
         // are directly built (with KeepUserSymbol) and called by the other mappings.
-        userMapping ??= (MappingBuilder.Find(mappingKey) as IUserMapping);
+        userMapping ??= MappingBuilder.Find(mappingKey) as IUserMapping;
         options &= ~MappingBuildingOptions.KeepUserSymbol;
         return BuildMapping(userMapping, mappingKey, options, diagnosticLocation);
     }

@@ -9,4 +9,4 @@ public record RuntimeTargetTypeMappingMethodParameters(
     MethodParameter Source,
     MethodParameter TargetType,
     MethodParameter? ReferenceHandler
-) : MappingMethodParameters(Source, null, ReferenceHandler);
+) : MappingMethodParameters(Source, null, ReferenceHandler, []);

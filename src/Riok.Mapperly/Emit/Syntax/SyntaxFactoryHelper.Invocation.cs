@@ -74,13 +74,7 @@ public partial struct SyntaxFactoryHelper
         return InvocationExpression(methodAccess).WithArgumentList(ArgumentList(arguments));
     }
 
-    public static TypeParameterListSyntax TypeParameterList(params ITypeParameterSymbol?[] parameters)
-    {
-        var typeParameters = parameters.WhereNotNull().OrderBy(x => x.Ordinal).Select(x => TypeParameter(x.Name));
-        return SyntaxFactory.TypeParameterList(CommaSeparatedList(typeParameters));
-    }
-
-    public static ParameterListSyntax ParameterList(bool extensionMethod, params MethodParameter?[] parameters)
+    public static ParameterListSyntax ParameterList(bool extensionMethod, IEnumerable<MethodParameter?> parameters)
     {
         var parameterSyntaxes = parameters
             .WhereNotNull()
@@ -123,6 +117,12 @@ public partial struct SyntaxFactoryHelper
         var receiver = method.ReceiverType ?? throw new ArgumentException(nameof(method.ReceiverType) + " is null", nameof(method));
         var qualifiedReceiverName = receiver.NonNullable().FullyQualifiedIdentifierName();
         return $"{qualifiedReceiverName}.{method.Name}";
+    }
+
+    public static ArgumentSyntax OutVarArgument(string name)
+    {
+        return Argument(DeclarationExpression(VarIdentifier, SingleVariableDesignation(Identifier(name))))
+            .WithRefOrOutKeyword(TrailingSpacedToken(SyntaxKind.OutKeyword));
     }
 
     private static ArgumentListSyntax ArgumentList(params ExpressionSyntax[] argSyntaxes) =>

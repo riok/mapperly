@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Helpers;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
@@ -11,6 +11,7 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// Contains discovered but unmapped members, ignored members, etc.
 /// </summary>
 /// <param name="unmappedSourceMemberNames">Source member names which are not used in a member mapping yet.</param>
+/// <param name="unmappedAdditionalSourceMemberNames">Additional source member names (additional mapping method parameters) which are not used in a member mapping yet.</param>
 /// <param name="unmappedTargetMemberNames">Target member names which are not used in a member mapping yet.</param>
 /// <param name="targetMemberCaseMapping">A dictionary with all members of the target with a case-insensitive key comparer.</param>
 /// <param name="targetMembers">All known target members.</param>
@@ -19,7 +20,9 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// <param name="ignoredSourceMemberNames">All ignored source members names.</param>
 internal class MembersMappingState(
     HashSet<string> unmappedSourceMemberNames,
+    HashSet<string> unmappedAdditionalSourceMemberNames,
     HashSet<string> unmappedTargetMemberNames,
+    IReadOnlyDictionary<string, IMappableMember> additionalSourceMembers,
     IReadOnlyDictionary<string, string> targetMemberCaseMapping,
     Dictionary<string, IMappableMember> targetMembers,
     Dictionary<string, List<MemberValueMappingConfiguration>> memberValueConfigsByRootTargetName,
@@ -27,10 +30,17 @@ internal class MembersMappingState(
     HashSet<string> ignoredSourceMemberNames
 )
 {
+    private readonly Dictionary<string, IMappableMember> _aliasedSourceMembers = new(StringComparer.OrdinalIgnoreCase);
+
     /// <summary>
     /// All source member names that are not used in a member mapping (yet).
     /// </summary>
     private readonly HashSet<string> _unmappedSourceMemberNames = unmappedSourceMemberNames;
+
+    /// <summary>
+    /// All additional source member names (additional mapping method parameters) that are not used in a member mapping (yet).
+    /// </summary>
+    private readonly HashSet<string> _unmappedAdditionalSourceMemberNames = unmappedAdditionalSourceMemberNames;
 
     /// <summary>
     /// All target member names that are not used in a member mapping (yet).
@@ -44,7 +54,15 @@ internal class MembersMappingState(
     /// </summary>
     public bool HasMemberMapping { get; private set; }
 
+    /// <inheritdoc cref="_unmappedSourceMemberNames"/>
     public IEnumerable<string> UnmappedSourceMemberNames => _unmappedSourceMemberNames;
+
+    /// <inheritdoc cref="_unmappedAdditionalSourceMemberNames"/>
+    public IEnumerable<string> UnmappedAdditionalSourceMemberNames => _unmappedAdditionalSourceMemberNames;
+
+    public IReadOnlyDictionary<string, IMappableMember> AdditionalSourceMembers => additionalSourceMembers;
+
+    public IReadOnlyDictionary<string, IMappableMember> AliasedSourceMembers => _aliasedSourceMembers;
 
     public IEnumerable<MemberMappingConfiguration> UnusedMemberConfigs => memberConfigsByRootTargetName.Values.SelectMany(x => x);
 
@@ -60,6 +78,8 @@ internal class MembersMappingState(
             .WhereNotNull();
     }
 
+    public void TryAddSourceMemberAlias(string alias, IMappableMember member) => _aliasedSourceMembers.TryAdd(alias, member);
+
     public void MappingAdded() => HasMemberMapping = true;
 
     public void MappingAdded(MemberMappingInfo info, bool ignoreTargetCasing)
@@ -68,14 +88,15 @@ internal class MembersMappingState(
         SetMembersMapped(info, ignoreTargetCasing);
     }
 
-    public void IgnoreMembers(string memberName)
+    public void IgnoreMembers(IMappableMember member)
     {
-        SetMembersMapped(memberName);
-        ignoredSourceMemberNames.Add(memberName);
+        _unmappedSourceMemberNames.Remove(member.Name);
+        _unmappedTargetMemberNames.Remove(member.Name);
+        ignoredSourceMemberNames.Add(member.Name);
 
-        if (!HasMemberConfig(memberName))
+        if (!HasMemberConfig(member.Name))
         {
-            targetMembers.Remove(memberName);
+            targetMembers.Remove(member.Name);
         }
     }
 
@@ -91,13 +112,7 @@ internal class MembersMappingState(
         }
     }
 
-    public void SetMembersMapped(string memberName)
-    {
-        _unmappedSourceMemberNames.Remove(memberName);
-        _unmappedTargetMemberNames.Remove(memberName);
-    }
-
-    private void SetMembersMapped(MemberMappingInfo info, bool ignoreTargetCasing)
+    public void SetMembersMapped(MemberMappingInfo info, bool ignoreTargetCasing)
     {
         SetTargetMemberMapped(info.TargetMember.Path[0].Name, ignoreTargetCasing);
 
@@ -165,16 +180,24 @@ internal class MembersMappingState(
         return false;
     }
 
-    private void SetSourceMemberMapped(MemberPath sourcePath)
+    private void SetSourceMemberMapped(SourceMemberPath sourcePath)
     {
-        if (sourcePath.Path.FirstOrDefault() is { } sourceMember)
-        {
-            _unmappedSourceMemberNames.Remove(sourceMember.Name);
-        }
-        else
+        if (sourcePath.MemberPath.Path.FirstOrDefault() is not { } sourceMember)
         {
             // Assume all source members are used when the source object is used itself.
             _unmappedSourceMemberNames.Clear();
+            return;
+        }
+
+        switch (sourcePath.Type)
+        {
+            case SourceMemberType.Member
+            or SourceMemberType.MemberAlias:
+                _unmappedSourceMemberNames.Remove(sourceMember.Name);
+                break;
+            case SourceMemberType.AdditionalMappingMethodParameter:
+                _unmappedAdditionalSourceMemberNames.Remove(sourceMember.Name);
+                break;
         }
     }
 

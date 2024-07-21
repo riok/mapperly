@@ -1,0 +1,72 @@
+---
+sidebar_position: 6
+description: Additional mapping parameters
+---
+
+# Additional mapping parameters
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+A mapping method declaration can have additional parameters.
+Each additional parameter is considered the same as a source member and matched by its case-insensitive name.
+An additional mapping parameter has lower priority than a `MapProperty` mapping,
+but higher than a by-name matched regular member mapping.
+
+<Tabs>
+  <TabItem default label="Declaration" value="declaration">
+    ```csharp
+    [Mapper]
+    public partial class CarMapper
+    {
+      // highlight-start
+      public partial CarDto Map(Car source, string name);
+      // highlight-end
+    }
+    
+    public class Car
+    {
+      public string Brand { get; set; } = string.Empty;
+      public string Model { get; set; } = string.Empty;
+    }
+
+    public class CarDto
+    {
+      public string Brand { get; set; } = string.Empty;
+      public string Model { get; set; } = string.Empty;
+      public string Name { get; set; } = string.Empty;
+    }
+    ```
+
+  </TabItem>
+  <TabItem default label="Generated code" value="generated">
+    ```csharp
+    [Mapper]
+    public partial class CarMapper
+    {
+      // highlight-start
+      public partial CarDto Map(Car source, string name)
+      // highlight-end
+      {
+        var target = new CarDto();
+        target.Brand = source.Brand;
+        target.Model = source.Model;
+        // highlight-start
+        target.Name = name;
+        // highlight-end
+        return target;
+      } 
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+:::info
+Mappings with additional parameters do have some limitions:
+
+- The additional parameters are not passed to nested mappings.
+- A mapping with additional mapping parameters cannot be the default mapping
+  (it is not used by Mapperly when encountering a nested mapping for the given types),
+  see also [default mapping methods](./user-implemented-methods.mdx##default-mapping-methods).
+- Generic and runtime target type mappings do not support additional type parameters.
+  :::

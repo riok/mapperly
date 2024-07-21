@@ -26,10 +26,11 @@ public readonly struct TypeMappingKey(
 
     public TypeMappingKey NonNullable() => new(Source.NonNullable(), Target.NonNullable(), Configuration);
 
-    private bool Equals(TypeMappingKey other) =>
-        _comparer.Equals(Source, other.Source) && _comparer.Equals(Target, other.Target) && Configuration.Equals(other.Configuration);
-
-    public override bool Equals(object? obj) => obj is TypeMappingKey other && Equals(other);
+    public override bool Equals(object? obj) =>
+        obj is TypeMappingKey other
+        && _comparer.Equals(Source, other.Source)
+        && _comparer.Equals(Target, other.Target)
+        && Configuration.Equals(other.Configuration);
 
     public override int GetHashCode()
     {
@@ -41,8 +42,4 @@ public readonly struct TypeMappingKey(
             return hashCode;
         }
     }
-
-    public static bool operator ==(TypeMappingKey left, TypeMappingKey right) => left.Equals(right);
-
-    public static bool operator !=(TypeMappingKey left, TypeMappingKey right) => !left.Equals(right);
 }

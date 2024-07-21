@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors;
 
-namespace Riok.Mapperly.Symbols;
+namespace Riok.Mapperly.Symbols.Members;
 
 internal static class MappableMember
 {

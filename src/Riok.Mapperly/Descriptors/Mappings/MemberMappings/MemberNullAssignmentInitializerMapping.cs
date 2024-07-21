@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -9,9 +9,9 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// A member initializer which initializes null members to new objects.
 /// </summary>
 [DebuggerDisplay("MemberNullAssignmentInitializerMapping({_pathToInitialize} ??= new())")]
-public class MemberNullAssignmentInitializerMapping(SetterMemberPath pathToInitialize) : MemberAssignmentMappingContainer
+public class MemberNullAssignmentInitializerMapping(MemberPathSetter pathToInitialize) : MemberAssignmentMappingContainer
 {
-    private readonly SetterMemberPath _pathToInitialize = pathToInitialize;
+    private readonly MemberPathSetter _pathToInitialize = pathToInitialize;
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
@@ -33,16 +33,9 @@ public class MemberNullAssignmentInitializerMapping(SetterMemberPath pathToIniti
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((MemberNullAssignmentInitializerMapping)obj);
+        var other = (MemberNullAssignmentInitializerMapping)obj;
+        return _pathToInitialize.Equals(other._pathToInitialize);
     }
 
     public override int GetHashCode() => _pathToInitialize.GetHashCode();
-
-    public static bool operator ==(MemberNullAssignmentInitializerMapping? left, MemberNullAssignmentInitializerMapping? right) =>
-        Equals(left, right);
-
-    public static bool operator !=(MemberNullAssignmentInitializerMapping? left, MemberNullAssignmentInitializerMapping? right) =>
-        !Equals(left, right);
-
-    protected bool Equals(MemberNullAssignmentInitializerMapping other) => _pathToInitialize.Equals(other._pathToInitialize);
 }

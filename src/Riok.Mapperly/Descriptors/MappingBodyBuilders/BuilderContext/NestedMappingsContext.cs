@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Riok.Mapperly.Diagnostics;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
@@ -47,7 +47,7 @@ public class NestedMappingsContext
     public bool TryFindNestedSourcePath(
         List<List<string>> pathCandidates,
         bool ignoreCase,
-        [NotNullWhen(true)] out MemberPath? sourceMemberPath
+        [NotNullWhen(true)] out SourceMemberPath? sourceMemberPath
     )
     {
         foreach (var nestedMemberPath in _paths)
@@ -64,7 +64,7 @@ public class NestedMappingsContext
         List<List<string>> pathCandidates,
         bool ignoreCase,
         MemberPath nestedMemberPath,
-        [NotNullWhen(true)] out MemberPath? sourceMemberPath
+        [NotNullWhen(true)] out SourceMemberPath? sourceMemberPath
     )
     {
         if (
@@ -78,7 +78,8 @@ public class NestedMappingsContext
             )
         )
         {
-            sourceMemberPath = new NonEmptyMemberPath(_context.Source, nestedMemberPath.Path.Concat(nestedSourceMemberPath.Path).ToList());
+            var memberPath = new NonEmptyMemberPath(_context.Source, nestedMemberPath.Path.Concat(nestedSourceMemberPath.Path).ToList());
+            sourceMemberPath = new SourceMemberPath(memberPath, SourceMemberType.Member);
             _unusedPaths.Remove(nestedMemberPath);
             return true;
         }

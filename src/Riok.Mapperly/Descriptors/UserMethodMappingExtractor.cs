@@ -131,7 +131,7 @@ public static class UserMethodMappingExtractor
         var userMappingConfig = GetUserMappingConfig(ctx, method, out var hasAttribute);
         var valid = !method.IsGenericMethod && (allowPartial || !method.IsPartialDefinition) && (!isStatic || method.IsStatic);
 
-        if (!valid || !UserMappingMethodParameterExtractor.BuildParameters(ctx, method, out var parameters))
+        if (!valid || !UserMappingMethodParameterExtractor.BuildParameters(ctx, method, false, out var parameters))
         {
             if (hasAttribute)
             {
@@ -180,26 +180,10 @@ public static class UserMethodMappingExtractor
             return null;
         }
 
-        if (
-            !methodSymbol.IsGenericMethod
-            && UserMappingMethodParameterExtractor.BuildRuntimeTargetTypeMappingParameters(
-                ctx,
-                methodSymbol,
-                out var runtimeTargetTypeParams
-            )
-        )
-        {
-            return new UserDefinedNewInstanceRuntimeTargetTypeParameterMapping(
-                methodSymbol,
-                runtimeTargetTypeParams,
-                ctx.Configuration.Mapper.UseReferenceHandling,
-                ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
-                GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams),
-                ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
-            );
-        }
+        if (TryBuildRuntimeTargetTypeMapping(ctx, methodSymbol) is { } userMapping)
+            return userMapping;
 
-        if (!UserMappingMethodParameterExtractor.BuildParameters(ctx, methodSymbol, out var parameters))
+        if (!UserMappingMethodParameterExtractor.BuildParameters(ctx, methodSymbol, true, out var parameters))
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, methodSymbol, methodSymbol.Name);
             return null;
@@ -225,17 +209,58 @@ public static class UserMethodMappingExtractor
                 parameters.Target.Value,
                 parameters.ReferenceHandler,
                 ctx.Configuration.Mapper.UseReferenceHandling
-            );
+            )
+            {
+                AdditionalSourceParameters = parameters.AdditionalParameters,
+            };
         }
 
         var userMappingConfig = GetUserMappingConfig(ctx, methodSymbol, out _);
-        return new UserDefinedNewInstanceMethodMapping(
+        if (userMappingConfig.Default == true && parameters.AdditionalParameters.Count > 0)
+        {
+            ctx.ReportDiagnostic(
+                DiagnosticDescriptors.MappingMethodWithAdditionalParametersCannotBeDefaultMapping,
+                methodSymbol,
+                methodSymbol.Name
+            );
+        }
+
+        var mapping = new UserDefinedNewInstanceMethodMapping(
             methodSymbol,
-            userMappingConfig.Default,
+            parameters.AdditionalParameters.Count == 0 ? userMappingConfig.Default : false,
             parameters.Source,
             parameters.ReferenceHandler,
             ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
             ctx.Configuration.Mapper.UseReferenceHandling
+        )
+        {
+            AdditionalSourceParameters = parameters.AdditionalParameters,
+        };
+        return mapping;
+    }
+
+    private static UserDefinedNewInstanceRuntimeTargetTypeParameterMapping? TryBuildRuntimeTargetTypeMapping(
+        SimpleMappingBuilderContext ctx,
+        IMethodSymbol methodSymbol
+    )
+    {
+        if (methodSymbol.IsGenericMethod)
+            return null;
+
+        if (
+            !UserMappingMethodParameterExtractor.BuildRuntimeTargetTypeMappingParameters(ctx, methodSymbol, out var runtimeTargetTypeParams)
+        )
+        {
+            return null;
+        }
+
+        return new UserDefinedNewInstanceRuntimeTargetTypeParameterMapping(
+            methodSymbol,
+            runtimeTargetTypeParams,
+            ctx.Configuration.Mapper.UseReferenceHandling,
+            ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
+            GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams),
+            ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
         );
     }
 

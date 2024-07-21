@@ -1,5 +1,3 @@
-using Riok.Mapperly.Diagnostics;
-
 namespace Riok.Mapperly.Tests.Mapping;
 
 public class RuntimeTargetTypeMappingTest
@@ -270,37 +268,6 @@ public class RuntimeTargetTypeMappingTest
                 };
                 """
             );
-    }
-
-    [Fact]
-    public void InvalidSignatureAdditionalParameterShouldDiagnostic()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial object Map(A a, Type targetType, string format);",
-            "class A { public string StringValue { get; set; } }"
-        );
-
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature)
-            .HaveAssertedAllDiagnostics();
-    }
-
-    [Fact]
-    public void InvalidSignatureWithReferenceHandlerAdditionalParameterShouldDiagnostic()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial object Map(A a, Type targetType, [ReferenceHandler] IReferenceHandler refHanlder, string format);",
-            TestSourceBuilderOptions.WithReferenceHandling,
-            "class A { public string StringValue { get; set; } }"
-        );
-
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature)
-            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]

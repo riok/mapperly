@@ -250,7 +250,7 @@ public static class EnumerableMappingBuilder
             targetType,
             elementMapping,
             elementMapping.TargetType,
-            sourceCollectionInfo.CountPropertyName!
+            sourceCollectionInfo.CountMember!.BuildGetter(ctx.UnsafeAccessorContext)
         );
     }
 

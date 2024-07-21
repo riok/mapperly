@@ -166,51 +166,6 @@ public class UserMethodTest
     }
 
     [Fact]
-    public void InvalidSignatureReturnTypeAdditionalParameterShouldDiagnostic()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes("partial string ToString(T source, string format);");
-
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "ToString has an unsupported mapping method signature")
-            .HaveAssertedAllDiagnostics();
-    }
-
-    [Fact]
-    public void InvalidSignatureAdditionalParameterShouldDiagnostic()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial void Map(A a, B b, string format);",
-            "class A { public string StringValue { get; set; } }",
-            "class B { public string StringValue { get; set; } }"
-        );
-
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "Map has an unsupported mapping method signature")
-            .HaveAssertedAllDiagnostics();
-    }
-
-    [Fact]
-    public void InvalidSignatureAdditionalParameterWithReferenceHandlingShouldDiagnostic()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "partial void Map(A a, B b, [ReferenceHandler] IReferenceHandler refHandler, string format);",
-            TestSourceBuilderOptions.WithReferenceHandling,
-            "class A { public string StringValue { get; set; } }",
-            "class B { public string StringValue { get; set; } }"
-        );
-
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature)
-            .HaveAssertedAllDiagnostics();
-    }
-
-    [Fact]
     public void InvalidSignatureAsyncShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

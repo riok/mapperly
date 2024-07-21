@@ -32,6 +32,7 @@ public abstract class MethodMapping : ITypeMapping
     };
 
     private readonly ITypeSymbol _returnType;
+    private readonly MethodDeclarationSyntax? _methodDeclarationSyntax;
 
     private string? _methodName;
 
@@ -51,17 +52,17 @@ public abstract class MethodMapping : ITypeMapping
     {
         TargetType = targetType;
         SourceParameter = sourceParameter;
+        Method = method;
         IsExtensionMethod = method.IsExtensionMethod;
         ReferenceHandlerParameter = referenceHandlerParameter;
-        Method = method;
-        MethodDeclarationSyntax = Method?.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
+        _methodDeclarationSyntax = method.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
         _methodName = method.Name;
         _returnType = method.ReturnsVoid ? method.ReturnType : targetType;
     }
 
-    protected IMethodSymbol? Method { get; }
+    public IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; init; } = [];
 
-    protected MethodDeclarationSyntax? MethodDeclarationSyntax { get; }
+    protected IMethodSymbol? Method { get; }
 
     protected bool IsExtensionMethod { get; }
 
@@ -117,15 +118,15 @@ public abstract class MethodMapping : ITypeMapping
     }
 
     protected virtual ParameterListSyntax BuildParameterList() =>
-        ParameterList(IsExtensionMethod, SourceParameter, ReferenceHandlerParameter);
+        ParameterList(IsExtensionMethod, [SourceParameter, ReferenceHandlerParameter, .. AdditionalSourceParameters]);
 
     private IEnumerable<SyntaxToken> BuildModifiers(bool isStatic)
     {
         // if a syntax is referenced the code written by the user copy all modifiers,
         // otherwise only set private and optionally static
-        if (MethodDeclarationSyntax != null)
+        if (_methodDeclarationSyntax != null)
         {
-            return MethodDeclarationSyntax.Modifiers.Select(x => TrailingSpacedToken(x.Kind()));
+            return _methodDeclarationSyntax.Modifiers.Select(x => TrailingSpacedToken(x.Kind()));
         }
 
         return isStatic ? _privateStaticSyntaxToken : _privateSyntaxToken;

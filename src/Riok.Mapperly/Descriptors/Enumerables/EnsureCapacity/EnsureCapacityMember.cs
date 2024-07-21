@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings;
-using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 
@@ -12,15 +12,15 @@ namespace Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 /// target.EnsureCapacity(source.Length + target.Count);
 /// </code>
 /// </remarks>
-public class EnsureCapacityMember(string? targetAccessor, string sourceAccessor) : EnsureCapacityInfo
+public class EnsureCapacityMember(IMemberGetter? targetAccessor, IMemberGetter sourceAccessor) : EnsureCapacityInfo
 {
     public override StatementSyntax Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
         return EnsureCapacityStatement(
             ctx.SyntaxFactory,
             target,
-            MemberAccess(ctx.Source, sourceAccessor),
-            targetAccessor != null ? MemberAccess(target, targetAccessor) : null
+            sourceAccessor.BuildAccess(ctx.Source),
+            targetAccessor?.BuildAccess(target)
         );
     }
 }

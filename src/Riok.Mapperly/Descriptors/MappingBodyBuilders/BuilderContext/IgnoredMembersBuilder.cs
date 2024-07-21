@@ -87,10 +87,7 @@ internal static class IgnoredMembersBuilder
     {
         var type = sourceTarget == MappingSourceTarget.Source ? ctx.Source : ctx.Target;
 
-        return ctx
-            .SymbolAccessor.GetAllAccessibleMappableMembers(type)
-            .Where(x => ctx.SymbolAccessor.HasAttribute<MapperIgnoreAttribute>(x.MemberSymbol))
-            .Select(x => x.Name);
+        return ctx.SymbolAccessor.GetAllAccessibleMappableMembers(type).Where(x => x.IsIgnored).Select(x => x.Name);
     }
 
     private static IEnumerable<string> GetIgnoredObsoleteMembers(MappingBuilderContext ctx, MappingSourceTarget sourceTarget)
@@ -100,13 +97,10 @@ internal static class IgnoredMembersBuilder
             sourceTarget == MappingSourceTarget.Source ? IgnoreObsoleteMembersStrategy.Source : IgnoreObsoleteMembersStrategy.Target;
 
         if (!obsoleteStrategy.HasFlag(strategy))
-            return Enumerable.Empty<string>();
+            return [];
 
         var type = sourceTarget == MappingSourceTarget.Source ? ctx.Source : ctx.Target;
 
-        return ctx
-            .SymbolAccessor.GetAllAccessibleMappableMembers(type)
-            .Where(x => ctx.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x.MemberSymbol))
-            .Select(x => x.Name);
+        return ctx.SymbolAccessor.GetAllAccessibleMappableMembers(type).Where(x => x.IsObsolete).Select(x => x.Name);
     }
 }

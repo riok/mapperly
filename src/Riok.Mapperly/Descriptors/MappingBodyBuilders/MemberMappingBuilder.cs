@@ -6,7 +6,7 @@ using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
@@ -35,9 +35,9 @@ internal static class MemberMappingBuilder
             return false;
         }
 
-        var setterTargetPath = SetterMemberPath.Build(ctx.BuilderContext, memberInfo.TargetMember);
+        var targetPathSetter = memberInfo.TargetMember.BuildSetter(ctx.BuilderContext);
         requiresNullHandling = mappedSourceValue is MappedMemberSourceValue { RequiresSourceNullCheck: true };
-        mapping = new MemberAssignmentMapping(setterTargetPath, mappedSourceValue, memberInfo);
+        mapping = new MemberAssignmentMapping(targetPathSetter, mappedSourceValue, memberInfo);
         return true;
     }
 
@@ -53,8 +53,8 @@ internal static class MemberMappingBuilder
             return false;
         }
 
-        var setterTargetPath = SetterMemberPath.Build(ctx.BuilderContext, memberInfo.TargetMember);
-        mapping = new MemberAssignmentMapping(setterTargetPath, mappedSourceValue, memberInfo);
+        var targetMemberSetter = memberInfo.TargetMember.BuildSetter(ctx.BuilderContext);
+        mapping = new MemberAssignmentMapping(targetMemberSetter, mappedSourceValue, memberInfo);
         return true;
     }
 
@@ -77,7 +77,7 @@ internal static class MemberMappingBuilder
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CouldNotMapMember,
-                sourceMember.ToDisplayString(),
+                sourceMember.MemberPath.ToDisplayString(),
                 targetMember.ToDisplayString()
             );
             sourceValue = null;
@@ -86,17 +86,17 @@ internal static class MemberMappingBuilder
 
         if (codeStyle == CodeStyle.Statement)
         {
-            sourceValue = BuildBlockNullHandlingMapping(ctx, delegateMapping, sourceMember, targetMember);
+            sourceValue = BuildBlockNullHandlingMapping(ctx, delegateMapping, sourceMember.MemberPath, targetMember);
             return true;
         }
 
-        if (!ValidateLoopMapping(ctx, delegateMapping, sourceMember, targetMember))
+        if (!ValidateLoopMapping(ctx, delegateMapping, sourceMember.MemberPath, targetMember))
         {
             sourceValue = null;
             return false;
         }
 
-        sourceValue = BuildInlineNullHandlingMapping(ctx, delegateMapping, sourceMember, targetMember.MemberType);
+        sourceValue = BuildInlineNullHandlingMapping(ctx, delegateMapping, sourceMember.MemberPath, targetMember.MemberType);
         return true;
     }
 
@@ -137,8 +137,6 @@ internal static class MemberMappingBuilder
         ITypeSymbol targetMemberType
     )
     {
-        var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourcePath);
-
         var nullFallback = NullFallbackValue.Default;
         if (!delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyNullable())
         {
@@ -147,7 +145,7 @@ internal static class MemberMappingBuilder
 
         return new NullMappedMemberSourceValue(
             delegateMapping,
-            getterSourcePath,
+            sourcePath.BuildGetter(ctx.BuilderContext),
             targetMemberType,
             nullFallback,
             !ctx.BuilderContext.IsExpression
@@ -161,12 +159,12 @@ internal static class MemberMappingBuilder
         NonEmptyMemberPath targetMember
     )
     {
-        var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourceMember);
+        var sourceGetter = sourceMember.BuildGetter(ctx.BuilderContext);
 
         // no member of the source path is nullable, no null handling needed
         if (!sourceMember.IsAnyNullable())
         {
-            return new MappedMemberSourceValue(delegateMapping, getterSourcePath, false, true);
+            return new MappedMemberSourceValue(delegateMapping, sourceGetter, false, true);
         }
 
         // If null property assignments are allowed,
@@ -178,12 +176,12 @@ internal static class MemberMappingBuilder
             && (delegateMapping.SourceType.IsNullable() || delegateMapping.IsSynthetic && targetMember.Member.IsNullable)
         )
         {
-            return new MappedMemberSourceValue(delegateMapping, getterSourcePath, true, false);
+            return new MappedMemberSourceValue(delegateMapping, sourceGetter, true, false);
         }
 
         // additional null condition check
         // (only map if the source is not null, else may throw depending on settings)
         // via RequiresNullCheck
-        return new MappedMemberSourceValue(delegateMapping, getterSourcePath, false, true);
+        return new MappedMemberSourceValue(delegateMapping, sourceGetter, false, true);
     }
 }

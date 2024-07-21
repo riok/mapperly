@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -10,13 +10,13 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// </summary>
 [DebuggerDisplay("MemberNullDelegateAssignmentMapping({_nullConditionalSourcePath} != null)")]
 public class MemberNullDelegateAssignmentMapping(
-    GetterMemberPath nullConditionalSourcePath,
+    MemberPathGetter nullConditionalSourcePath,
     IMemberAssignmentMappingContainer parent,
     bool needsNullSafeAccess
 ) : MemberAssignmentMappingContainer(parent)
 {
-    private readonly GetterMemberPath _nullConditionalSourcePath = nullConditionalSourcePath;
-    private readonly List<SetterMemberPath> _targetsToSetNull = new();
+    private readonly MemberPathGetter _nullConditionalSourcePath = nullConditionalSourcePath;
+    private readonly List<MemberPathSetter> _targetsToSetNull = new();
     private bool _throwOnSourcePathNull;
 
     public void ThrowOnSourcePathNull()
@@ -30,7 +30,12 @@ public class MemberNullDelegateAssignmentMapping(
         //   target.Value = Map(Source.Name);
         // else
         //   throw ...
-        var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, false, needsNullSafeAccess, true);
+        var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(
+            ctx.Source,
+            addValuePropertyOnNullable: false,
+            nullConditional: needsNullSafeAccess,
+            skipTrailingNonNullable: true
+        );
         var condition = IsNotNull(sourceNullConditionalAccess);
         var conditionCtx = ctx.AddIndentation();
         var trueClause = base.Build(conditionCtx, targetAccess);
@@ -39,7 +44,7 @@ public class MemberNullDelegateAssignmentMapping(
         return new[] { ifExpression };
     }
 
-    public void AddNullMemberAssignment(SetterMemberPath targetPath) => _targetsToSetNull.Add(targetPath);
+    public void AddNullMemberAssignment(MemberPathSetter targetPath) => _targetsToSetNull.Add(targetPath);
 
     public override bool Equals(object? obj)
     {
@@ -58,18 +63,17 @@ public class MemberNullDelegateAssignmentMapping(
 
     public override int GetHashCode() => _nullConditionalSourcePath.GetHashCode();
 
-    public static bool operator ==(MemberNullDelegateAssignmentMapping? left, MemberNullDelegateAssignmentMapping? right) =>
-        Equals(left, right);
-
-    public static bool operator !=(MemberNullDelegateAssignmentMapping? left, MemberNullDelegateAssignmentMapping? right) =>
-        !Equals(left, right);
-
     private IEnumerable<StatementSyntax>? BuildElseClause(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
         if (_throwOnSourcePathNull)
         {
             // throw new ArgumentNullException
-            var nameofSourceAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, false, false, true);
+            var nameofSourceAccess = _nullConditionalSourcePath.BuildAccess(
+                ctx.Source,
+                addValuePropertyOnNullable: false,
+                nullConditional: false,
+                skipTrailingNonNullable: true
+            );
             return new[] { ctx.SyntaxFactory.ExpressionStatement(ThrowArgumentNullException(nameofSourceAccess)) };
         }
 

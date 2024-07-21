@@ -87,5 +87,13 @@ namespace Riok.Mapperly.IntegrationTests
             StaticTestMapper.MapIdTargetFirst(model, new IdObjectDto { IdValue = 20 });
             model.IdValue.Should().Be(20);
         }
+
+        [Fact]
+        public void MapWithAdditionalParameterShouldWork()
+        {
+            var dto = StaticTestMapper.MapWithAdditionalParameter(new IdObject { IdValue = 1 }, 2);
+            dto.IdValue.Should().Be(1);
+            dto.ValueFromParameter.Should().Be(2);
+        }
     }
 }

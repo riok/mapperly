@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
@@ -29,7 +29,8 @@ public class NewValueTupleExpressionBuilderContext<T> : MembersContainerBuilderC
 
     public bool TryMatchTupleElement(IFieldSymbol member, [NotNullWhen(true)] out MemberMappingInfo? memberInfo)
     {
-        if (TryMatchMember(new FieldMember(member, BuilderContext.SymbolAccessor), null, out memberInfo))
+        var fieldMember = new FieldMember(member, BuilderContext.SymbolAccessor);
+        if (TryMatchMember(fieldMember, null, out memberInfo))
             return true;
 
         if (
@@ -37,7 +38,8 @@ public class NewValueTupleExpressionBuilderContext<T> : MembersContainerBuilderC
             && !string.Equals(member.CorrespondingTupleField.Name, member.Name, StringComparison.Ordinal)
         )
         {
-            if (TryMatchMember(new FieldMember(member.CorrespondingTupleField, BuilderContext.SymbolAccessor), null, out memberInfo))
+            var tupleFieldMember = new FieldMember(member.CorrespondingTupleField, BuilderContext.SymbolAccessor);
+            if (TryMatchMember(tupleFieldMember, null, out memberInfo))
                 return true;
         }
 
@@ -54,7 +56,7 @@ public class NewValueTupleExpressionBuilderContext<T> : MembersContainerBuilderC
     protected override bool TryFindSourcePath(
         IReadOnlyList<IReadOnlyList<string>> pathCandidates,
         bool ignoreCase,
-        [NotNullWhen(true)] out MemberPath? sourceMemberPath
+        [NotNullWhen(true)] out SourceMemberPath? sourceMemberPath
     )
     {
         if (base.TryFindSourcePath(pathCandidates, ignoreCase, out sourceMemberPath))
@@ -68,7 +70,7 @@ public class NewValueTupleExpressionBuilderContext<T> : MembersContainerBuilderC
 
     private bool TryFindSecondaryTupleSourceField(
         IReadOnlyList<IReadOnlyList<string>> pathCandidates,
-        [NotNullWhen(true)] out MemberPath? sourceMemberPath
+        [NotNullWhen(true)] out SourceMemberPath? sourcePath
     )
     {
         foreach (var pathParts in pathCandidates)
@@ -79,15 +81,14 @@ public class NewValueTupleExpressionBuilderContext<T> : MembersContainerBuilderC
             var name = pathParts[0];
             if (_secondarySourceNames.TryGetValue(name, out var sourceField))
             {
-                sourceMemberPath = new NonEmptyMemberPath(
-                    Mapping.SourceType,
-                    [new FieldMember(sourceField, BuilderContext.SymbolAccessor)]
-                );
+                var sourceFieldMember = new FieldMember(sourceField, BuilderContext.SymbolAccessor);
+                var sourceMemberPath = new NonEmptyMemberPath(Mapping.SourceType, [sourceFieldMember]);
+                sourcePath = new SourceMemberPath(sourceMemberPath, SourceMemberType.Member);
                 return true;
             }
         }
 
-        sourceMemberPath = null;
+        sourcePath = null;
         return false;
     }
 

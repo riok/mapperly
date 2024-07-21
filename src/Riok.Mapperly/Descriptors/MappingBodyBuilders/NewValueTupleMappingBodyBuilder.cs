@@ -4,6 +4,7 @@ using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
@@ -57,7 +58,7 @@ public static class NewValueTupleMappingBodyBuilder
 
         foreach (var targetMember in targetMembers)
         {
-            var targetField = (IFieldSymbol)targetMember.MemberSymbol;
+            var targetField = ((FieldMember)targetMember).Symbol;
             if (!ctx.TryMatchTupleElement(targetField, out var memberMappingInfo))
             {
                 ctx.BuilderContext.ReportDiagnostic(
