@@ -15,6 +15,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
     where T : IMemberAssignmentTypeMapping
 {
     private readonly Dictionary<MemberPath, MemberNullDelegateAssignmentMapping> _nullDelegateMappings = new();
+    private readonly HashSet<MemberPath> _initializedNullableTargetPaths = new();
 
     public void AddMemberAssignmentMapping(IMemberAssignmentMapping memberMapping) => AddMemberAssignmentMapping(Mapping, memberMapping);
 
@@ -59,16 +60,26 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         AddNullMemberInitializers(container, mapping.MemberInfo.TargetMember);
         container.AddMemberMapping(mapping);
         MappingAdded(mapping.MemberInfo);
+
+        // if the source value is a non-nullable value,
+        // the target should be non-null after this assignment and can be set as initialized.
+        if (!mapping.MemberInfo.IsSourceNullable && mapping.MemberInfo.TargetMember.MemberType.IsNullable())
+        {
+            _initializedNullableTargetPaths.Add(mapping.MemberInfo.TargetMember);
+        }
     }
 
     private void AddNullMemberInitializers(IMemberAssignmentMappingContainer container, MemberPath path)
     {
-        foreach (var nullableTrailPath in path.ObjectPathNullableSubPaths())
+        foreach (var nullablePathList in path.ObjectPathNullableSubPaths())
         {
-            var nullablePath = new NonEmptyMemberPath(path.RootType, nullableTrailPath);
+            var nullablePath = new NonEmptyMemberPath(path.RootType, nullablePathList);
             var type = nullablePath.Member.Type.NonNullable();
 
             if (!nullablePath.Member.CanSet)
+                continue;
+
+            if (!_initializedNullableTargetPaths.Add(nullablePath))
                 continue;
 
             if (!BuilderContext.InstanceConstructors.TryBuild(BuilderContext.Source, type, out var ctor))
@@ -97,31 +108,28 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         if (_nullDelegateMappings.TryGetValue(nullConditionSourcePath, out var mapping))
             return mapping;
 
-        IMemberAssignmentMappingContainer parentMapping = Mapping;
-
-        // try to reuse parent path mappings and wrap inside them
-        // if the parentMapping is the first nullable path, no need to access the path in the condition in a null-safe way.
-        var needsNullSafeAccess = false;
-        foreach (var nullablePath in nullConditionSourcePath.ObjectPathNullableSubPaths().Reverse())
-        {
-            if (
-                _nullDelegateMappings.TryGetValue(
-                    new NonEmptyMemberPath(nullConditionSourcePath.RootType, nullablePath),
-                    out var parentMappingHolder
-                )
-            )
-            {
-                parentMapping = parentMappingHolder;
-                break;
-            }
-
-            needsNullSafeAccess = true;
-        }
-
+        var parentMapping = FindParentNonNullContainer(nullConditionSourcePath, out var needsNullSafeAccess);
         var nullConditionSourcePathGetter = nullConditionSourcePath.BuildGetter(BuilderContext);
         mapping = new MemberNullDelegateAssignmentMapping(nullConditionSourcePathGetter, parentMapping, needsNullSafeAccess);
         _nullDelegateMappings[nullConditionSourcePath] = mapping;
         parentMapping.AddMemberMappingContainer(mapping);
         return mapping;
+    }
+
+    private IMemberAssignmentMappingContainer FindParentNonNullContainer(MemberPath nullConditionSourcePath, out bool needsNullSafeAccess)
+    {
+        // try to reuse parent path mappings and wrap inside them
+        // if the parentMapping is the first nullable path, no need to access the path in the condition in a null-safe way.
+        needsNullSafeAccess = false;
+        foreach (var nullablePathList in nullConditionSourcePath.ObjectPathNullableSubPaths().Reverse())
+        {
+            var nullablePath = new NonEmptyMemberPath(nullConditionSourcePath.RootType, nullablePathList);
+            if (_nullDelegateMappings.TryGetValue(nullablePath, out var parentMappingContainer))
+                return parentMappingContainer;
+
+            needsNullSafeAccess = true;
+        }
+
+        return Mapping;
     }
 }

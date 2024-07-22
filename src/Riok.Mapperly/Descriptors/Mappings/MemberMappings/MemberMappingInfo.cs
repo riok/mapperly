@@ -18,6 +18,8 @@ public record MemberMappingInfo(
     public MemberMappingInfo(NonEmptyMemberPath targetMember, MemberValueMappingConfiguration configuration)
         : this(null, targetMember, configuration) { }
 
+    public bool IsSourceNullable => SourceMember?.MemberPath.IsAnyNullable() ?? ValueConfiguration?.Value?.ConstantValue.IsNull ?? true;
+
     private string DebuggerDisplay =>
         $"{SourceMember?.MemberPath.FullName ?? ValueConfiguration?.DescribeValue()} => {TargetMember.FullName}";
 
