@@ -38,7 +38,7 @@ Make sure the return type exactly matches the target type.
 <Tabs>
     <TabItem value="declaration" label="Declaration" default>
         ```csharp
-        [MapValue(nameof(CarDto.SourceSystem), nameof(GetSourceSystem))]
+        [MapValue(nameof(CarDto.SourceSystem), Use = nameof(GetSourceSystem))]
         public partial CarDto Map(Car car);
 
         string GetSourceSystem() => "C1";
