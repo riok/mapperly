@@ -23,6 +23,12 @@ public record MemberMappingInfo(
     private string DebuggerDisplay =>
         $"{SourceMember?.MemberPath.FullName ?? ValueConfiguration?.DescribeValue()} => {TargetMember.FullName}";
 
+    /// <summary>
+    /// Returns <c>true</c> if the <see cref="SourceMember"/> and <see cref="TargetMember"/>
+    /// were matched automatically by Mapperly without any additional user configuration.
+    /// </summary>
+    public bool IsAutoMatch => Configuration == null && ValueConfiguration == null;
+
     public TypeMappingKey ToTypeMappingKey()
     {
         if (SourceMember == null)

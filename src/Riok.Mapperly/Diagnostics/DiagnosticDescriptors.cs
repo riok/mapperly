@@ -767,6 +767,16 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static readonly DiagnosticDescriptor CannotMapToReadOnlyType =
+        new(
+            "RMG083",
+            "Cannot map to read only type",
+            "Cannot map to read-only type {0}",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Info,
+            true
+        );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT

@@ -90,8 +90,8 @@ public static class MemoryMappingBuilder
         // can only map to Enumerable. Existing types Span, Memory and array are all immutable
         if (!target.ImplementsIEnumerable)
         {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember, ctx.Target);
-            return null;
+            ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyType, ctx.Target);
+            return new NoOpMapping(ctx.Source, ctx.Target);
         }
 
         if (ctx.FindOrBuildMapping(source.EnumeratedType, target.EnumeratedType) is not { } elementMapping)

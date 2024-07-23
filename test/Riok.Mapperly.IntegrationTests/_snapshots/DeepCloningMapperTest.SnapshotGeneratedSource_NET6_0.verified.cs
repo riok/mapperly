@@ -94,13 +94,13 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.MemoryValue = src.MemoryValue.Span.ToArray();
             target.StackValue = new global::System.Collections.Generic.Stack<string>(src.StackValue);
             target.QueueValue = new global::System.Collections.Generic.Queue<string>(src.QueueValue);
-            target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(src.ImmutableArrayValue);
-            target.ImmutableListValue = global::System.Collections.Immutable.ImmutableList.ToImmutableList(src.ImmutableListValue);
-            target.ImmutableQueueValue = global::System.Collections.Immutable.ImmutableQueue.CreateRange(src.ImmutableQueueValue);
-            target.ImmutableStackValue = global::System.Collections.Immutable.ImmutableStack.CreateRange(src.ImmutableStackValue);
-            target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(src.ImmutableSortedSetValue);
-            target.ImmutableDictionaryValue = global::System.Collections.Immutable.ImmutableDictionary.ToImmutableDictionary(src.ImmutableDictionaryValue);
-            target.ImmutableSortedDictionaryValue = global::System.Collections.Immutable.ImmutableSortedDictionary.ToImmutableSortedDictionary(src.ImmutableSortedDictionaryValue);
+            target.ImmutableArrayValue = src.ImmutableArrayValue;
+            target.ImmutableListValue = src.ImmutableListValue;
+            target.ImmutableQueueValue = src.ImmutableQueueValue;
+            target.ImmutableStackValue = src.ImmutableStackValue;
+            target.ImmutableSortedSetValue = src.ImmutableSortedSetValue;
+            target.ImmutableDictionaryValue = src.ImmutableDictionaryValue;
+            target.ImmutableSortedDictionaryValue = src.ImmutableSortedDictionaryValue;
             foreach (var item in src.ExistingISet)
             {
                 target.ExistingISet.Add(item);

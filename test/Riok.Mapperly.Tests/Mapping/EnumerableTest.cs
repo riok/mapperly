@@ -651,10 +651,9 @@ public class EnumerableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyType, "Cannot map to read-only type int[]")
             .HaveAssertedAllDiagnostics()
-            .HaveSingleMethodBody(
+            .HaveMapMethodBody(
                 """
                 var target = new global::B();
                 return target;

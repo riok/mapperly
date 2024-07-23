@@ -96,8 +96,11 @@ public class DictionaryImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
+            .HaveDiagnostics(
+                DiagnosticDescriptors.CannotMapToReadOnlyType,
+                "Cannot map to read-only type System.Collections.Immutable.ImmutableDictionary<string, string>",
+                "Cannot map to read-only type System.Collections.Immutable.ImmutableDictionary<string, string>"
+            )
             .HaveAssertedAllDiagnostics();
     }
 
@@ -114,8 +117,10 @@ public class DictionaryImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.CannotMapToReadOnlyType,
+                "Cannot map to read-only type System.Collections.Immutable.ImmutableSortedDictionary<string, string>"
+            )
             .HaveAssertedAllDiagnostics();
     }
 }

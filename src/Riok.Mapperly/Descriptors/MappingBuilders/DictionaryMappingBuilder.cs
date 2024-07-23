@@ -132,15 +132,15 @@ public static class DictionaryMappingBuilder
         if (!ctx.CollectionInfos.Target.ImplementedTypes.HasFlag(CollectionType.IDictionary))
             return null;
 
-        if (BuildKeyValueMapping(ctx) is not var (keyMapping, valueMapping))
-            return null;
-
         // if target is an immutable dictionary then don't create a foreach loop
         if (ctx.CollectionInfos.Target.ImplementedTypes.HasFlag(CollectionType.IImmutableDictionary))
         {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
-            return null;
+            ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyType, ctx.Target);
+            return new NoOpMapping(ctx.Source, ctx.Target);
         }
+
+        if (BuildKeyValueMapping(ctx) is not var (keyMapping, valueMapping))
+            return null;
 
         return new ForEachSetDictionaryExistingTargetMapping(
             ctx.CollectionInfos,

@@ -69,8 +69,8 @@ public static class SpanMappingBuilder
 
         if (target.IsSpan)
         {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember, ctx.Target);
-            return null;
+            ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyType, ctx.Target);
+            return new NoOpMapping(ctx.Source, ctx.Target);
         }
 
         if (source.IsMemory || target.IsMemory)
@@ -88,7 +88,8 @@ public static class SpanMappingBuilder
         // we diagnostic when it is an existing target mapping
         if (ctx.CollectionInfos.Target.IsImmutableCollectionType)
         {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+            ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyType, ctx.Target);
+            return new NoOpMapping(ctx.Source, ctx.Target);
         }
 
         return null;

@@ -12,9 +12,20 @@ internal static class SymbolExtensions
             SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier
         );
 
+    private static readonly ImmutableHashSet<string> _wellKnownImmutableNamespaces = ImmutableHashSet.Create(
+        "System.Collections.Immutable"
+    );
+
     private static readonly ImmutableHashSet<string> _wellKnownImmutableTypes = ImmutableHashSet.Create(
-        typeof(Uri).FullName!,
-        typeof(Version).FullName!
+        "System.Uri",
+        "System.Version",
+        "System.DateTime",
+        "System.DateTimeOffset",
+        "System.DateOnly",
+        "System.TimeOnly",
+        "System.TimeSpan",
+        "System.DBNull",
+        "System.Void"
     );
 
     internal static Location? GetSyntaxLocation(this ISymbol symbol) =>
@@ -30,8 +41,12 @@ internal static class SymbolExtensions
 
         return namedSymbol.IsUnmanagedType
             || namedSymbol.SpecialType == SpecialType.System_String
-            || IsDelegate(symbol)
-            || _wellKnownImmutableTypes.Contains(namedSymbol.ToDisplayString());
+            || _wellKnownImmutableTypes.Contains(namedSymbol.ToDisplayString())
+            || (
+                namedSymbol.ContainingNamespace != null
+                && _wellKnownImmutableNamespaces.Contains(namedSymbol.ContainingNamespace.ToDisplayString())
+            )
+            || IsDelegate(symbol);
     }
 
     internal static bool IsDelegate(this ISymbol symbol)

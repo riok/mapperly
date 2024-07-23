@@ -587,7 +587,11 @@ public class SpanTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+            .HaveDiagnostic(
+                Riok.Mapperly.Diagnostics.DiagnosticDescriptors.CannotMapToReadOnlyType,
+                "Cannot map to read-only type System.Span<int>"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -597,12 +601,13 @@ public class SpanTest
             "A",
             "B",
             "class A { public int[] Value { get; } }",
-            "class B { public Span<int> Value { get; } }"
+            "class B { public ReadOnlySpan<int> Value { get; } }"
         );
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyType, "Cannot map to read-only type System.ReadOnlySpan<int>")
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -642,7 +647,8 @@ public class SpanTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyType, "Cannot map to read-only type System.Span<int>")
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -653,10 +659,7 @@ public class SpanTest
             "Span<int>",
             TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.Span)
         );
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped);
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics).Should().HaveAssertedAllDiagnostics();
     }
 
     [Fact]
