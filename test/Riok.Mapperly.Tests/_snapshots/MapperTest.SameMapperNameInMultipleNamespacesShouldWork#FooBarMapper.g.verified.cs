@@ -6,6 +6,7 @@ namespace Test.A
     internal partial class FooBarMapper
     {
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         internal partial string FooToBar(string value)
         {
             return value;

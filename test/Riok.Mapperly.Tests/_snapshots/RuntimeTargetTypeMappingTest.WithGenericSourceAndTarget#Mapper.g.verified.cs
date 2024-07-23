@@ -4,6 +4,7 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public partial global::System.Linq.IQueryable<TTarget> Map<TSource, TTarget>(global::System.Linq.IQueryable<TSource> source)
     {
         return source switch
@@ -15,6 +16,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private partial global::System.Linq.IQueryable<global::B> ProjectToB(global::System.Linq.IQueryable<global::A> q)
     {
 #nullable disable
@@ -26,6 +28,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private partial global::System.Linq.IQueryable<global::D> ProjectToD(global::System.Linq.IQueryable<global::C> q)
     {
 #nullable disable

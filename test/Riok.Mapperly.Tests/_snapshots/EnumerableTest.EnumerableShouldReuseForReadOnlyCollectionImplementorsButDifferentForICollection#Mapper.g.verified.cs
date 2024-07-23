@@ -4,6 +4,7 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public partial global::BList Map(global::AList source)
     {
         var target = new global::BList(MapToListOfD(source.Values));
@@ -11,6 +12,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public partial global::BListAgain Map(global::AListAgain source)
     {
         var target = new global::BListAgain(MapToListOfD(source.Values));
@@ -18,6 +20,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public partial global::BReadOnlyCollection Map(global::AList source)
     {
         var target = new global::BReadOnlyCollection(MapToDArray(source.Values));
@@ -25,6 +28,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public partial global::BCustomCollection Map(global::AList source)
     {
         var target = new global::BCustomCollection(MapToCustomCollectionOfD(source.Values));
@@ -32,6 +36,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public partial global::BCollection Map(global::AList source)
     {
         var target = new global::BCollection(MapToListOfD(source.Values));
@@ -39,6 +44,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public partial global::BReadOnlyCollection Map(global::AReadOnlyCollection source)
     {
         var target = new global::BReadOnlyCollection(MapToDArray(source.Values));
@@ -46,6 +52,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public partial global::BCustomCollection Map(global::ACustomReadOnlyCollection source)
     {
         var target = new global::BCustomCollection(MapToCustomCollectionOfD(source.Values));
@@ -53,6 +60,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public partial global::BCollection Map(global::ACollection source)
     {
         var target = new global::BCollection(MapToListOfD1(source.Values));
@@ -60,6 +68,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public partial global::BCustomCollection Map(global::ACustomCollection source)
     {
         var target = new global::BCustomCollection(MapToCustomCollectionOfD1(source.Values));
@@ -67,6 +76,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private global::D MapToD(global::C source)
     {
         var target = new global::D(source.Value);
@@ -74,6 +84,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private global::System.Collections.Generic.List<global::D> MapToListOfD(global::System.Collections.Generic.IReadOnlyCollection<global::C> source)
     {
         var target = new global::System.Collections.Generic.List<global::D>(source.Count);
@@ -85,6 +96,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private global::D[] MapToDArray(global::System.Collections.Generic.IReadOnlyCollection<global::C> source)
     {
         var target = new global::D[source.Count];
@@ -98,6 +110,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private global::CustomCollection<global::D> MapToCustomCollectionOfD(global::System.Collections.Generic.IReadOnlyCollection<global::C> source)
     {
         var target = new global::CustomCollection<global::D>();
@@ -109,6 +122,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private global::System.Collections.Generic.List<global::D> MapToListOfD1(global::System.Collections.Generic.ICollection<global::C> source)
     {
         var target = new global::System.Collections.Generic.List<global::D>(source.Count);
@@ -120,6 +134,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private global::CustomCollection<global::D> MapToCustomCollectionOfD1(global::System.Collections.Generic.ICollection<global::C> source)
     {
         var target = new global::CustomCollection<global::D>();

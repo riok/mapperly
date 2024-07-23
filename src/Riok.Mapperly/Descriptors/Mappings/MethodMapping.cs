@@ -96,7 +96,7 @@ public abstract class MethodMapping : ITypeMapping
         return MethodDeclaration(returnType.AddTrailingSpace(), Identifier(MethodName))
             .WithModifiers(TokenList(BuildModifiers(ctx.IsStatic)))
             .WithParameterList(parameters)
-            .WithAttributeLists(ctx.SyntaxFactory.GeneratedCodeAttributeList())
+            .WithAttributeLists(ctx.SyntaxFactory.GeneratedCodeAttributeList().AddRange(ctx.SyntaxFactory.MethodImplAttributeList()))
             .WithBody(ctx.SyntaxFactory.Block(BuildBody(typeMappingBuildContext)));
     }
 

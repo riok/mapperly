@@ -5,6 +5,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
     public static partial class EnumMapper
     {
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public static partial global::Riok.Mapperly.IntegrationTests.Mapper.Enum2 Map(global::Riok.Mapperly.IntegrationTests.Mapper.Enum1 e)
         {
             return e switch
