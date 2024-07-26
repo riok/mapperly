@@ -66,6 +66,38 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
         return base.VisitMemberAccessExpression(node);
     }
 
+    public override SyntaxNode? VisitCastExpression(CastExpressionSyntax node)
+    {
+        var result = base.VisitCastExpression(node);
+
+        if (result is CastExpressionSyntax typedResult && semanticModel.GetSymbolInfo(node.Type).Symbol is ITypeSymbol namedTypeSymbol)
+        {
+            var fullyQualifiedType = FullyQualifiedIdentifier(namedTypeSymbol);
+
+            return typedResult.WithType(fullyQualifiedType.WithTriviaFrom(typedResult.Type));
+        }
+
+        return result;
+    }
+
+    public override SyntaxNode? VisitBinaryExpression(BinaryExpressionSyntax node)
+    {
+        var result = base.VisitBinaryExpression(node);
+
+        if (
+            result is BinaryExpressionSyntax typedResult
+            && typedResult.Kind() is SyntaxKind.AsExpression
+            && semanticModel.GetSymbolInfo(node.Right).Symbol is ITypeSymbol namedTypeSymbol
+        )
+        {
+            var fullyQualifiedType = FullyQualifiedIdentifier(namedTypeSymbol);
+
+            return typedResult.WithRight(fullyQualifiedType.WithTriviaFrom(typedResult.Right));
+        }
+
+        return result;
+    }
+
     public override SyntaxNode VisitImplicitObjectCreationExpression(ImplicitObjectCreationExpressionSyntax node)
     {
         if (
