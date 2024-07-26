@@ -363,8 +363,8 @@ public class UseStaticMapperTest
     }
 
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [InlineData(true)] // Usually when your IDE runs the source generator (references are other syntax trees)
+    [InlineData(false)] // When compiler produces final assembly (references are compiled assemblies)
     public void UseStaticGenericMapperStaticMethodFromAnotherAssembly(bool asCompilationReference)
     {
         var testDependencySource = TestSourceBuilder.SyntaxTree(
@@ -416,20 +416,39 @@ public class UseStaticMapperTest
             }
             """
         );
-        TestHelper
+        var result = TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics, additionalAssemblies: [testDependencyAssembly])
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline)
-            .HaveMethodBody(
+            .Should();
+
+        if (asCompilationReference)
+        {
+            result.HaveMethodBody(
                 "ProjectToTarget",
                 """
                 #nullable disable
                         return System.Linq.Queryable.Select(source, x => new global::Mapper.Target()
                         {
-                            DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
+                            DateTime = new global::System.DateTimeOffset(x.DateTime, global::System.TimeSpan.Zero),
                         });
                 #nullable enable
                 """
             );
+        }
+        else
+        {
+            result
+                .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline)
+                .HaveMethodBody(
+                    "ProjectToTarget",
+                    """
+                    #nullable disable
+                            return System.Linq.Queryable.Select(source, x => new global::Mapper.Target()
+                            {
+                                DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
+                            });
+                    #nullable enable
+                    """
+                );
+        }
     }
 }
