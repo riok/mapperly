@@ -1,5 +1,6 @@
 #if !ROSLYN4_4_OR_GREATER
 
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
@@ -11,6 +12,16 @@ internal static class SyntaxProvider
 {
     private static readonly SymbolDisplayFormat _fullyQualifiedFormatWithoutGlobal =
         SymbolDisplayFormat.FullyQualifiedFormat.WithGlobalNamespaceStyle(SymbolDisplayGlobalNamespaceStyle.OmittedAsContaining);
+
+    public static IncrementalValueProvider<ImmutableArray<Compilation>> GetNestedCompilations(
+        IncrementalGeneratorInitializationContext context
+    ) =>
+        context
+            .MetadataReferencesProvider.SelectMany(
+                (metadataReference, _) => new[] { (metadataReference as CompilationReference)?.Compilation }.ToImmutableArray()
+            )
+            .WhereNotNull()
+            .Collect();
 
     public static IncrementalValuesProvider<MapperDeclaration> GetMapperDeclarations(IncrementalGeneratorInitializationContext context)
     {

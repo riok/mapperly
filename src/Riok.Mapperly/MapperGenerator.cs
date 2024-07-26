@@ -29,21 +29,14 @@ public class MapperGenerator : IIncrementalGenerator
         );
         context.ReportDiagnostics(compilationDiagnostics);
 
-        var nestedCompilations = context
-            .MetadataReferencesProvider.Select((metadataReference, _) => (metadataReference as CompilationReference)?.Compilation)
-            .Collect();
+        var nestedCompilations = SyntaxProvider.GetNestedCompilations(context);
 
         // build the compilation context
         var compilationContext = context
             .CompilationProvider.Combine(nestedCompilations)
             .Select(
                 static (c, _) =>
-                    new CompilationContext(
-                        c.Left,
-                        new WellKnownTypes(c.Left),
-                        c.Right.OfType<Compilation>().ToImmutableArray(),
-                        new FileNameBuilder()
-                    )
+                    new CompilationContext(c.Left, new WellKnownTypes(c.Left), c.Right.ToImmutableArray(), new FileNameBuilder())
             )
             .WithTrackingName(MapperGeneratorStepNames.BuildCompilationContext);
 
