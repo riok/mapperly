@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -10,13 +10,13 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// (e.g. target.A = source.B or target.A = "fooBar")
 /// </summary>
 [DebuggerDisplay("MemberAssignmentMapping({_sourceValue} => {_targetPath})")]
-public class MemberAssignmentMapping(SetterMemberPath targetPath, ISourceValue sourceValue, MemberMappingInfo memberInfo)
+public class MemberAssignmentMapping(MemberPathSetter targetPath, ISourceValue sourceValue, MemberMappingInfo memberInfo)
     : IMemberAssignmentMapping
 {
     public MemberMappingInfo MemberInfo { get; } = memberInfo;
 
     private readonly ISourceValue _sourceValue = sourceValue;
-    private readonly SetterMemberPath _targetPath = targetPath;
+    private readonly MemberPathSetter _targetPath = targetPath;
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess) =>
         ctx.SyntaxFactory.SingleStatement(BuildExpression(ctx, targetAccess));
@@ -40,17 +40,9 @@ public class MemberAssignmentMapping(SetterMemberPath targetPath, ISourceValue s
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((MemberAssignmentMapping)obj);
+        var other = (MemberAssignmentMapping)obj;
+        return _sourceValue.Equals(other._sourceValue) && _targetPath.Equals(other._targetPath);
     }
 
     public override int GetHashCode() => HashCode.Combine(_sourceValue, _targetPath);
-
-    public static bool operator ==(MemberAssignmentMapping? left, MemberAssignmentMapping? right) => Equals(left, right);
-
-    public static bool operator !=(MemberAssignmentMapping? left, MemberAssignmentMapping? right) => !Equals(left, right);
-
-    protected bool Equals(MemberAssignmentMapping other)
-    {
-        return _sourceValue.Equals(other._sourceValue) && _targetPath.Equals(other._targetPath);
-    }
 }

@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -79,7 +80,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     /// <summary>
     /// Upgrade the nullability of a symbol from <see cref="NullableAnnotation.None"/> to <see cref="NullableAnnotation.Annotated"/>.
-    /// Does not upgrade the nullability of type parameters or array element types.
+    /// Value types are not upgraded.
     /// </summary>
     /// <param name="symbol">The symbol to upgrade.</param>
     /// <returns>The upgraded symbol</returns>
@@ -228,8 +229,34 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     }
 
     internal bool TryFindMemberPath(
+        IReadOnlyDictionary<string, IMappableMember> members,
+        IEnumerable<IReadOnlyList<string>> pathCandidates,
+        bool ignoreCase,
+        [NotNullWhen(true)] out MemberPath? memberPath
+    )
+    {
+        var foundPath = new List<IMappableMember>();
+        foreach (var pathCandidate in pathCandidates)
+        {
+            if (!members.TryGetValue(pathCandidate[0], out var member))
+                continue;
+
+            foundPath.Clear();
+            foundPath.Add(member);
+            if (pathCandidate.Count == 1 || TryFindPath(member.Type, pathCandidate.Skip(1), ignoreCase, foundPath))
+            {
+                memberPath = new NonEmptyMemberPath(member.Type, foundPath);
+                return true;
+            }
+        }
+
+        memberPath = null;
+        return false;
+    }
+
+    internal bool TryFindMemberPath(
         ITypeSymbol type,
-        IEnumerable<IEnumerable<string>> pathCandidates,
+        IEnumerable<IReadOnlyList<string>> pathCandidates,
         IReadOnlyCollection<string> ignoredNames,
         bool ignoreCase,
         [NotNullWhen(true)] out MemberPath? memberPath
@@ -238,11 +265,16 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         var foundPath = new List<IMappableMember>();
         foreach (var pathCandidate in pathCandidates)
         {
+            // fast path for exact case matches
+            if (ignoredNames.Contains(pathCandidate[0]))
+                continue;
+
             // reuse List instead of allocating a new one
             foundPath.Clear();
             if (!TryFindPath(type, pathCandidate, ignoreCase, foundPath))
                 continue;
 
+            // match again to respect ignoreCase parameter
             if (ignoredNames.Contains(foundPath[0].Name))
                 continue;
 
@@ -283,7 +315,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         return true;
     }
 
-    private IMappableMember? GetMappableMember(ITypeSymbol symbol, string name, bool ignoreCase)
+    public IMappableMember? GetMappableMember(ITypeSymbol symbol, string name, bool ignoreCase = false)
     {
         var membersBySymbol = ignoreCase ? _allAccessibleMembersCaseInsensitive : _allAccessibleMembersCaseSensitive;
 

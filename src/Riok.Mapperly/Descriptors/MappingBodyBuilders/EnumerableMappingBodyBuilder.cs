@@ -3,7 +3,6 @@ using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
-using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
@@ -56,7 +55,7 @@ internal static class EnumerableMappingBodyBuilder
 
         foreach (var member in ctx.BuilderContext.SymbolAccessor.GetAllAccessibleMappableMembers(systemType))
         {
-            ctx.IgnoreMembers(member.Name);
+            ctx.IgnoreMembers(member);
         }
     }
 
@@ -64,41 +63,34 @@ internal static class EnumerableMappingBodyBuilder
     {
         // allow source count being mapped to a target constructor parameter
         // named with a well known "count" name
-        var additionalCtorParameterMappings = new Dictionary<string, MemberPath>(3, StringComparer.OrdinalIgnoreCase);
-        if (
-            ctx.Mapping.CollectionInfos.Source.CountIsKnown
-            && ctx.BuilderContext.SymbolAccessor.TryFindMemberPath(
-                ctx.Mapping.SourceType,
-                [ctx.Mapping.CollectionInfos.Source.CountPropertyName],
-                out var sourceCountMemberPath
-            )
-        )
+        if (ctx.Mapping.CollectionInfos.Source.CountIsKnown)
         {
-            additionalCtorParameterMappings[nameof(List<object>.Capacity)] = sourceCountMemberPath;
-            additionalCtorParameterMappings[nameof(List<object>.Count)] = sourceCountMemberPath;
-            additionalCtorParameterMappings[nameof(Array.Length)] = sourceCountMemberPath;
+            ctx.TryAddSourceMemberAlias(nameof(List<object>.Capacity), ctx.Mapping.CollectionInfos.Source.CountMember);
+            ctx.TryAddSourceMemberAlias(nameof(List<object>.Count), ctx.Mapping.CollectionInfos.Source.CountMember);
+            ctx.TryAddSourceMemberAlias(nameof(Array.Length), ctx.Mapping.CollectionInfos.Source.CountMember);
         }
 
         // always prefer parameterized constructor for system collections (to map capacity correctly)
         var targetIsSystemType = ctx.Mapping.TargetType.IsArrayType() || ctx.Mapping.TargetType.IsInRootNamespace(SystemNamespaceName);
+        var ctorParamMappings = NewInstanceObjectMemberMappingBodyBuilder.BuildConstructorMapping(ctx, targetIsSystemType ? false : null);
 
-        var options = new NewInstanceObjectMemberMappingBodyBuilder.ConstructorMappingBuilderOptions(
-            additionalCtorParameterMappings,
-            PreferParameterlessConstructor: targetIsSystemType ? false : null
-        );
-        var usedParameterValues = NewInstanceObjectMemberMappingBodyBuilder.BuildConstructorMapping(ctx, options);
+        var countIsMapped =
+            ctx.BuilderContext.CollectionInfos!.Source.CountIsKnown
+            && ctorParamMappings.Any(m =>
+                Equals(m.MemberInfo.SourceMember?.MemberPath.Member, ctx.Mapping.CollectionInfos.Source.CountMember)
+            );
 
         // if no additional parameter was used,
         // the count/capacity is not mapped,
         // try to build an EnsureCapacity statement.
         if (
-            usedParameterValues.Count == 0
+            !countIsMapped
             && EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.BuilderContext, ctx.Mapping.CollectionInfos) is { } ensureCapacity
         )
         {
-            if (ctx.BuilderContext.CollectionInfos!.Source.CountIsKnown)
+            if (ctx.Mapping.CollectionInfos.Source.CountIsKnown)
             {
-                ctx.SetMembersMapped(ctx.BuilderContext.CollectionInfos.Source.CountPropertyName);
+                ctx.IgnoreMembers(ctx.Mapping.CollectionInfos.Source.CountMember);
             }
 
             ctx.Mapping.AddEnsureCapacity(ensureCapacity);

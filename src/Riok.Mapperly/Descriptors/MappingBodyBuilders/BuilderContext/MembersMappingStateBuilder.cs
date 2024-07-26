@@ -3,6 +3,7 @@ using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
@@ -17,6 +18,8 @@ internal static class MembersMappingStateBuilder
 
         // build all members
         var unmappedSourceMemberNames = GetSourceMemberNames(ctx, mapping);
+        var additionalSourceMembers = GetAdditionalSourceMembers(ctx);
+        var unmappedAdditionalSourceMemberNames = new HashSet<string>(additionalSourceMembers.Keys, StringComparer.Ordinal);
         var targetMembers = GetTargetMembers(ctx, mapping);
 
         // build ignored members
@@ -37,13 +40,27 @@ internal static class MembersMappingStateBuilder
         var unmappedTargetMemberNames = targetMembers.Keys.ToHashSet();
         return new MembersMappingState(
             unmappedSourceMemberNames,
+            unmappedAdditionalSourceMemberNames,
             unmappedTargetMemberNames,
+            additionalSourceMembers,
             targetMemberCaseMapping,
             targetMembers,
             memberValueConfigsByRootTargetName,
             memberConfigsByRootTargetName,
             ignoredSourceMemberNames
         );
+    }
+
+    private static IReadOnlyDictionary<string, IMappableMember> GetAdditionalSourceMembers(MappingBuilderContext ctx)
+    {
+        if (ctx.UserMapping is MethodMapping { AdditionalSourceParameters.Count: > 0 } methodMapping)
+        {
+            return methodMapping
+                .AdditionalSourceParameters.Select<MethodParameter, IMappableMember>(p => new ParameterSourceMember(p))
+                .ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
+        }
+
+        return new Dictionary<string, IMappableMember>();
     }
 
     private static HashSet<string> GetSourceMemberNames(MappingBuilderContext ctx, IMapping mapping)

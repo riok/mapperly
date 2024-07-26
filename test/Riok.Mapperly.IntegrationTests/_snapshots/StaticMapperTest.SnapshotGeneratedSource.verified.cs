@@ -699,6 +699,15 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public static partial global::Riok.Mapperly.IntegrationTests.Dto.AdditionalParametersDto MapWithAdditionalParameter(global::Riok.Mapperly.IntegrationTests.Models.IdObject source, int valueFromParameter)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.AdditionalParametersDto();
+            target.ValueFromParameter = DirectInt(valueFromParameter);
+            target.IdValue = DirectInt(source.IdValue);
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         private static global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto MapToTestObjectNestedDto(global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested source)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto();

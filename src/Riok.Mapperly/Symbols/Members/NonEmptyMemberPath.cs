@@ -1,7 +1,8 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Descriptors;
 
-namespace Riok.Mapperly.Symbols;
+namespace Riok.Mapperly.Symbols.Members;
 
 [DebuggerDisplay("{FullName}")]
 public class NonEmptyMemberPath : MemberPath
@@ -23,6 +24,8 @@ public class NonEmptyMemberPath : MemberPath
     /// </summary>
     public override ITypeSymbol MemberType =>
         IsAnyNullable() ? Member.Type.WithNullableAnnotation(NullableAnnotation.Annotated) : Member.Type;
+
+    public MemberPathSetter BuildSetter(SimpleMappingBuilderContext ctx) => MemberPathSetter.Build(ctx, this);
 
     public override string ToDisplayString(bool includeRootType = true, bool includeMemberType = true)
     {

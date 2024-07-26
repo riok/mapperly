@@ -24,7 +24,11 @@ public static class EnsureCapacityBuilder
 
         // if source count is known, create a simple EnsureCapacity statement
         if (source.CountIsKnown)
-            return new EnsureCapacityMember(target.CountPropertyName, source.CountPropertyName);
+        {
+            var targetCount = target.CountMember?.BuildGetter(ctx.UnsafeAccessorContext);
+            var sourceCount = source.CountMember.BuildGetter(ctx.UnsafeAccessorContext);
+            return new EnsureCapacityMember(targetCount, sourceCount);
+        }
 
         var nonEnumeratedCountMethod = ctx
             .Types.Get(typeof(Enumerable))
@@ -40,6 +44,6 @@ public static class EnsureCapacityBuilder
             return null;
 
         // if source does not have a count use GetNonEnumeratedCount, calling EnsureCapacity if count is available
-        return new EnsureCapacityNonEnumerated(target.CountPropertyName, nonEnumeratedCountMethod);
+        return new EnsureCapacityNonEnumerated(target.CountMember?.BuildGetter(ctx.UnsafeAccessorContext), nonEnumeratedCountMethod);
     }
 }

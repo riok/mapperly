@@ -29,7 +29,10 @@ public class UserDefinedNewInstanceRuntimeTargetTypeParameterMapping(
     )
 {
     protected override ParameterListSyntax BuildParameterList() =>
-        ParameterList(IsExtensionMethod, SourceParameter, parameters.TargetType, ReferenceHandlerParameter);
+        ParameterList(
+            IsExtensionMethod,
+            [SourceParameter, parameters.TargetType, ReferenceHandlerParameter, .. AdditionalSourceParameters]
+        );
 
     protected override ExpressionSyntax BuildTargetType() => IdentifierName(parameters.TargetType.Name);
 }

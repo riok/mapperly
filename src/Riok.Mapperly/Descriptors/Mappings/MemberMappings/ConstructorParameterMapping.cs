@@ -26,11 +26,6 @@ public class ConstructorParameterMapping(
         return _selfOrPreviousIsUnmappedOptional ? arg.WithNameColon(SpacedNameColon(_parameter.Name)) : arg;
     }
 
-    protected bool Equals(ConstructorParameterMapping other) =>
-        _parameter.Equals(other._parameter, SymbolEqualityComparer.Default)
-        && _sourceValue.Equals(other._sourceValue)
-        && _selfOrPreviousIsUnmappedOptional == other._selfOrPreviousIsUnmappedOptional;
-
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj))
@@ -42,7 +37,10 @@ public class ConstructorParameterMapping(
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((ConstructorParameterMapping)obj);
+        var other = (ConstructorParameterMapping)obj;
+        return _parameter.Equals(other._parameter, SymbolEqualityComparer.Default)
+            && _sourceValue.Equals(other._sourceValue)
+            && _selfOrPreviousIsUnmappedOptional == other._selfOrPreviousIsUnmappedOptional;
     }
 
     public override int GetHashCode()
@@ -55,8 +53,4 @@ public class ConstructorParameterMapping(
             return hashCode;
         }
     }
-
-    public static bool operator ==(ConstructorParameterMapping? left, ConstructorParameterMapping? right) => Equals(left, right);
-
-    public static bool operator !=(ConstructorParameterMapping? left, ConstructorParameterMapping? right) => !Equals(left, right);
 }

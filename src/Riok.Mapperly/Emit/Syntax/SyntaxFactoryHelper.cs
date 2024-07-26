@@ -21,6 +21,11 @@ public readonly partial struct SyntaxFactoryHelper
 
     public SyntaxFactoryHelper RemoveIndentation() => new(Indentation - 1);
 
+    public static AssignmentExpressionSyntax Assignment(ExpressionSyntax target, ExpressionSyntax source, bool coalesce)
+    {
+        return coalesce ? CoalesceAssignment(target, source) : Assignment(target, source);
+    }
+
     public static AssignmentExpressionSyntax Assignment(ExpressionSyntax target, ExpressionSyntax source)
     {
         return AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, target, SpacedToken(SyntaxKind.EqualsToken), source);

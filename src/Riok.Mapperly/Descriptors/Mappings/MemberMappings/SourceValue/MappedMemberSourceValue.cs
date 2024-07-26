@@ -1,5 +1,5 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
 
@@ -9,16 +9,22 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
 /// </summary>
 public class MappedMemberSourceValue(
     INewInstanceMapping delegateMapping,
-    GetterMemberPath sourceGetter,
+    MemberPathGetter sourceMember,
     bool nullConditionalAccess,
     bool addValuePropertyOnNullable
 ) : ISourceValue
 {
-    public bool RequiresSourceNullCheck => !nullConditionalAccess && sourceGetter.MemberPath.IsAnyNullable();
+    public bool RequiresSourceNullCheck => !nullConditionalAccess && sourceMember.MemberPath.IsAnyNullable();
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        ctx = ctx.WithSource(sourceGetter.BuildAccess(ctx.Source, addValuePropertyOnNullable, nullConditionalAccess));
+        ctx = ctx.WithSource(
+            sourceMember.BuildAccess(
+                ctx.Source,
+                addValuePropertyOnNullable: addValuePropertyOnNullable,
+                nullConditional: nullConditionalAccess
+            )
+        );
         return delegateMapping.Build(ctx);
     }
 }

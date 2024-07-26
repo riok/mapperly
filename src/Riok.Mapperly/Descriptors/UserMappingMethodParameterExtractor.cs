@@ -12,17 +12,12 @@ internal static class UserMappingMethodParameterExtractor
     public static bool BuildParameters(
         SimpleMappingBuilderContext ctx,
         IMethodSymbol method,
+        bool allowAdditionalParameters,
         [NotNullWhen(true)] out MappingMethodParameters? parameters
     )
     {
-        // the source param is always required
-        var expectedParameterCount = 1;
-
         var refHandlerParameter = FindReferenceHandlerParameter(ctx, method);
-        if (refHandlerParameter.HasValue)
-        {
-            expectedParameterCount++;
-        }
+        var refHandlerParameterOrdinal = refHandlerParameter?.Ordinal ?? -1;
 
         var sourceParameter = FindSourceParameter(ctx, method, refHandlerParameter);
         if (!sourceParameter.HasValue)
@@ -31,23 +26,46 @@ internal static class UserMappingMethodParameterExtractor
             return false;
         }
 
-        var targetParameter = FindTargetParameter(ctx, method, sourceParameter.Value, refHandlerParameter);
-
         // If the method returns void, a target parameter is required
         // if the method doesn't return void, a target parameter is not allowed.
-        if (method.ReturnsVoid == !targetParameter.HasValue)
+        MethodParameter? targetParameter = null;
+        if (method.ReturnsVoid)
+        {
+            targetParameter = FindTargetParameter(ctx, method, sourceParameter.Value, refHandlerParameter);
+            if (!targetParameter.HasValue)
+            {
+                parameters = null;
+                return false;
+            }
+        }
+
+        var targetParameterOrdinal = targetParameter?.Ordinal ?? -1;
+        var additionalParameterSymbols = method
+            .Parameters.Where(p =>
+                p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != targetParameterOrdinal && p.Ordinal != refHandlerParameterOrdinal
+            )
+            .ToList();
+        if (!allowAdditionalParameters && additionalParameterSymbols.Count > 0)
         {
             parameters = null;
             return false;
         }
 
-        if (targetParameter.HasValue)
+        // additional parameters should not be attributed as target or ref handler
+        var hasInvalidAdditionalParameter = additionalParameterSymbols.Exists(p =>
+            p.Type.TypeKind is TypeKind.TypeParameter or TypeKind.Error
+            || ctx.SymbolAccessor.HasAttribute<ReferenceHandlerAttribute>(p)
+            || ctx.SymbolAccessor.HasAttribute<MappingTargetAttribute>(p)
+        );
+        if (hasInvalidAdditionalParameter)
         {
-            expectedParameterCount++;
+            parameters = null;
+            return false;
         }
 
-        parameters = new MappingMethodParameters(sourceParameter.Value, targetParameter, refHandlerParameter);
-        return method.Parameters.Length == expectedParameterCount;
+        var additionalParameters = additionalParameterSymbols.Select(p => ctx.SymbolAccessor.WrapMethodParameter(p)).ToList();
+        parameters = new MappingMethodParameters(sourceParameter.Value, targetParameter, refHandlerParameter, additionalParameters);
+        return true;
     }
 
     public static bool BuildRuntimeTargetTypeMappingParameters(
@@ -64,6 +82,7 @@ internal static class UserMappingMethodParameterExtractor
         }
 
         // the source and target type param is always required
+        // and runtime target type mappings do not support additional parameters
         var expectedParameterCount = 2;
 
         var refHandlerParameter = FindReferenceHandlerParameter(ctx, method);

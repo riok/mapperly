@@ -3,7 +3,7 @@ using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
@@ -58,13 +58,7 @@ public static class ObjectMemberMappingBodyBuilder
         }
 
         // cannot access non public member in initializer
-        if (
-            allowInitOnlyMember
-            && (
-                !ctx.BuilderContext.SymbolAccessor.IsDirectlyAccessible(targetMemberPath.Member.MemberSymbol)
-                || !targetMemberPath.Member.CanSetDirectly
-            )
-        )
+        if (allowInitOnlyMember && !targetMemberPath.Member.CanSetDirectly)
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToReadOnlyMember,
@@ -78,10 +72,7 @@ public static class ObjectMemberMappingBodyBuilder
         // an expressions target member path is only accessible with unsafe access
         if (
             targetMemberPath.ObjectPath.Any(p => !p.CanGet)
-            || (
-                ctx.BuilderContext.IsExpression
-                && targetMemberPath.ObjectPath.Any(p => !ctx.BuilderContext.SymbolAccessor.IsDirectlyAccessible(p.MemberSymbol))
-            )
+            || (ctx.BuilderContext.IsExpression && targetMemberPath.ObjectPath.Any(p => !p.CanGetDirectly))
         )
         {
             ctx.BuilderContext.ReportDiagnostic(
@@ -114,17 +105,14 @@ public static class ObjectMemberMappingBodyBuilder
         if (
             sourceMemberPath != null
             && (
-                sourceMemberPath.Path.Any(p => !p.CanGet)
-                || (
-                    ctx.BuilderContext.IsExpression
-                    && sourceMemberPath.Path.Any(p => !ctx.BuilderContext.SymbolAccessor.IsDirectlyAccessible(p.MemberSymbol))
-                )
+                sourceMemberPath.MemberPath.Path.Any(p => !p.CanGet)
+                || (ctx.BuilderContext.IsExpression && sourceMemberPath.MemberPath.Path.Any(p => !p.CanGetDirectly))
             )
         )
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapFromWriteOnlyMember,
-                sourceMemberPath.ToDisplayString(),
+                sourceMemberPath.MemberPath.ToDisplayString(),
                 targetMemberPath.ToDisplayString()
             );
             return false;
@@ -209,7 +197,7 @@ public static class ObjectMemberMappingBodyBuilder
         if (
             targetMemberPath.Member is { CanSet: true, IsInitOnly: false }
             || !targetMemberPath.Path.All(op => op.CanGet)
-            || !sourceMemberPath.Path.All(op => op.CanGet)
+            || !sourceMemberPath.MemberPath.Path.All(op => op.CanGet)
         )
         {
             return false;
@@ -219,10 +207,14 @@ public static class ObjectMemberMappingBodyBuilder
         if (existingTargetMapping == null)
             return false;
 
-        var getterSourcePath = GetterMemberPath.Build(ctx.BuilderContext, sourceMemberPath);
-        var getterTargetPath = GetterMemberPath.Build(ctx.BuilderContext, targetMemberPath);
-
-        var memberMapping = new MemberExistingTargetMapping(existingTargetMapping, getterSourcePath, getterTargetPath, memberMappingInfo);
+        var sourceMemberGetter = sourceMemberPath.MemberPath.BuildGetter(ctx.BuilderContext);
+        var targetMemberGetter = targetMemberPath.BuildGetter(ctx.BuilderContext);
+        var memberMapping = new MemberExistingTargetMapping(
+            existingTargetMapping,
+            sourceMemberGetter,
+            targetMemberGetter,
+            memberMappingInfo
+        );
         ctx.AddMemberAssignmentMapping(memberMapping);
         return true;
     }

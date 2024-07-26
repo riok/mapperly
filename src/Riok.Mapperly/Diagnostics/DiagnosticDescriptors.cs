@@ -747,6 +747,26 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static readonly DiagnosticDescriptor MappingMethodWithAdditionalParametersCannotBeDefaultMapping =
+        new(
+            "RMG081",
+            "A mapping method with additional parameters cannot be a default mapping",
+            "The mapping method {0} has additional parameters and therefore cannot be a default mapping",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Error,
+            true
+        );
+
+    public static readonly DiagnosticDescriptor AdditionalParameterNotMapped =
+        new(
+            "RMG082",
+            "An additional mapping method parameter is not mapped",
+            "The additional mapping method parameter {0} of the method {1} is not mapped",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Warning,
+            true
+        );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT

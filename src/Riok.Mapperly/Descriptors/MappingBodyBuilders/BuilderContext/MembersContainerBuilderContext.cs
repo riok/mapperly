@@ -1,7 +1,7 @@
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
@@ -32,8 +32,8 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         }
 
         var nullConditionSourcePath = new NonEmptyMemberPath(
-            memberMapping.MemberInfo.SourceMember.RootType,
-            memberMapping.MemberInfo.SourceMember.PathWithoutTrailingNonNullable().ToList()
+            memberMapping.MemberInfo.SourceMember.MemberPath.RootType,
+            memberMapping.MemberInfo.SourceMember.MemberPath.PathWithoutTrailingNonNullable().ToList()
         );
         var container = GetOrCreateNullDelegateMappingForPath(nullConditionSourcePath);
         AddMemberAssignmentMapping(container, memberMapping);
@@ -45,7 +45,8 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
             && memberMapping.MemberInfo.TargetMember.Member.Type.IsNullable()
         )
         {
-            container.AddNullMemberAssignment(SetterMemberPath.Build(BuilderContext, memberMapping.MemberInfo.TargetMember));
+            var targetMemberSetter = memberMapping.MemberInfo.TargetMember.BuildSetter(BuilderContext);
+            container.AddNullMemberAssignment(targetMemberSetter);
         }
         else if (BuilderContext.Configuration.Mapper.ThrowOnPropertyMappingNullMismatch)
         {
@@ -76,18 +77,17 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
                 continue;
             }
 
-            var setterNullablePath = SetterMemberPath.Build(BuilderContext, nullablePath);
-
-            if (setterNullablePath.IsMethod)
+            var nullablePathSetter = nullablePath.BuildSetter(BuilderContext);
+            if (!nullablePathSetter.SupportsCoalesceAssignment)
             {
-                var getterNullablePath = GetterMemberPath.Build(BuilderContext, nullablePath);
+                var nullablePathGetter = nullablePath.BuildGetter(BuilderContext);
                 container.AddMemberMappingContainer(
-                    new MethodMemberNullAssignmentInitializerMapping(setterNullablePath, getterNullablePath)
+                    new MethodMemberNullAssignmentInitializerMapping(nullablePathSetter, nullablePathGetter)
                 );
                 continue;
             }
 
-            container.AddMemberMappingContainer(new MemberNullAssignmentInitializerMapping(setterNullablePath));
+            container.AddMemberMappingContainer(new MemberNullAssignmentInitializerMapping(nullablePathSetter));
         }
     }
 
@@ -118,11 +118,8 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
             needsNullSafeAccess = true;
         }
 
-        mapping = new MemberNullDelegateAssignmentMapping(
-            GetterMemberPath.Build(BuilderContext, nullConditionSourcePath),
-            parentMapping,
-            needsNullSafeAccess
-        );
+        var nullConditionSourcePathGetter = nullConditionSourcePath.BuildGetter(BuilderContext);
+        mapping = new MemberNullDelegateAssignmentMapping(nullConditionSourcePathGetter, parentMapping, needsNullSafeAccess);
         _nullDelegateMappings[nullConditionSourcePath] = mapping;
         parentMapping.AddMemberMappingContainer(mapping);
         return mapping;

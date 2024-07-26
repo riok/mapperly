@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.FormatProviders;
 
@@ -33,7 +33,7 @@ public static class FormatProviderBuilder
         if (memberSymbol == null)
             return null;
 
-        if (!memberSymbol.CanGet || symbol.IsStatic != isStatic || !memberSymbol.Type.Implements(ctx.Types.Get<IFormatProvider>()))
+        if (!memberSymbol.CanGetDirectly || symbol.IsStatic != isStatic || !memberSymbol.Type.Implements(ctx.Types.Get<IFormatProvider>()))
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidFormatProviderSignature, symbol, symbol.Name);
             return null;

@@ -2,7 +2,7 @@ using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Emit.Syntax;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -10,10 +10,10 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// A member initializer which initializes null members to new objects.
 /// </summary>
 [DebuggerDisplay("MemberNullAssignmentInitializerMapping({_targetPathToInitialize} ??= new())")]
-public class MethodMemberNullAssignmentInitializerMapping(SetterMemberPath targetPathToInitialize, GetterMemberPath sourcePathToInitialize)
+public class MethodMemberNullAssignmentInitializerMapping(MemberPathSetter targetPathToInitialize, MemberPathGetter sourcePathToInitialize)
     : MemberAssignmentMappingContainer
 {
-    private readonly SetterMemberPath _targetPathToInitialize = targetPathToInitialize;
+    private readonly MemberPathSetter _targetPathToInitialize = targetPathToInitialize;
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
@@ -39,21 +39,9 @@ public class MethodMemberNullAssignmentInitializerMapping(SetterMemberPath targe
         if (obj.GetType() != GetType())
             return false;
 
-        return Equals((MethodMemberNullAssignmentInitializerMapping)obj);
+        var other = (MethodMemberNullAssignmentInitializerMapping)obj;
+        return _targetPathToInitialize.Equals(other._targetPathToInitialize);
     }
 
     public override int GetHashCode() => _targetPathToInitialize.GetHashCode();
-
-    public static bool operator ==(
-        MethodMemberNullAssignmentInitializerMapping? left,
-        MethodMemberNullAssignmentInitializerMapping? right
-    ) => Equals(left, right);
-
-    public static bool operator !=(
-        MethodMemberNullAssignmentInitializerMapping? left,
-        MethodMemberNullAssignmentInitializerMapping? right
-    ) => !Equals(left, right);
-
-    protected bool Equals(MethodMemberNullAssignmentInitializerMapping other) =>
-        _targetPathToInitialize.Equals(other._targetPathToInitialize);
 }

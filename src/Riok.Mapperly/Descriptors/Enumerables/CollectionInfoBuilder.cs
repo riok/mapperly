@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.Enumerables;
 
@@ -137,7 +138,7 @@ public static class CollectionInfoBuilder
             typeInfo,
             implementedTypes,
             symbolAccessor.UpgradeNullable(enumeratedType),
-            FindCountProperty(symbolAccessor, type, typeInfo),
+            FindCountMember(symbolAccessor, type, typeInfo),
             HasValidAddMethod(wellKnownTypes, type, typeInfo, implementedTypes),
             collectionTypeInfo?.Immutable == true
         );
@@ -218,7 +219,7 @@ public static class CollectionInfoBuilder
         return false;
     }
 
-    private static string? FindCountProperty(SymbolAccessor symbolAccessor, ITypeSymbol t, CollectionType typeInfo)
+    private static IMappableMember? FindCountMember(SymbolAccessor symbolAccessor, ITypeSymbol t, CollectionType typeInfo)
     {
         if (typeInfo is CollectionType.IEnumerable)
             return null;
@@ -231,17 +232,15 @@ public static class CollectionInfoBuilder
                 or CollectionType.Memory
                 or CollectionType.ReadOnlyMemory
         )
-            return "Length";
+        {
+            return symbolAccessor.GetMappableMember(t, "Length");
+        }
 
         if (typeInfo is not CollectionType.None)
-            return "Count";
+            return symbolAccessor.GetMappableMember(t, "Count");
 
-        var member = symbolAccessor
-            .GetAllAccessibleMappableMembers(t)
-            .FirstOrDefault(x =>
-                x.Type.SpecialType == SpecialType.System_Int32 && x.Name is nameof(ICollection<object>.Count) or nameof(Array.Length)
-            );
-        return member?.Name;
+        var member = symbolAccessor.GetMappableMember(t, "Count") ?? symbolAccessor.GetMappableMember(t, "Length");
+        return member?.Type.SpecialType == SpecialType.System_Int32 ? member : null;
     }
 
     private static CollectionTypeInfo? GetCollectionTypeInfo(WellKnownTypes types, ITypeSymbol type)

@@ -10,6 +10,7 @@ internal static class MemberMappingDiagnosticReporter
         AddUnusedTargetMembersDiagnostics(ctx, state);
         AddUnmappedSourceMembersDiagnostics(ctx, state);
         AddUnmappedTargetMembersDiagnostics(ctx, state);
+        AddUnmappedAdditionalSourceMembersDiagnostics(ctx, state);
         AddNoMemberMappedDiagnostic(ctx, state);
     }
 
@@ -46,6 +47,14 @@ internal static class MemberMappingDiagnosticReporter
             {
                 ctx.ReportDiagnostic(DiagnosticDescriptors.SourceMemberNotFound, targetMember.Name, ctx.Target, ctx.Source);
             }
+        }
+    }
+
+    private static void AddUnmappedAdditionalSourceMembersDiagnostics(MappingBuilderContext ctx, MembersMappingState state)
+    {
+        foreach (var name in state.UnmappedAdditionalSourceMemberNames)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.AdditionalParameterNotMapped, name, ctx.UserMapping!.Method.Name);
         }
     }
 

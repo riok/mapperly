@@ -1,3 +1,5 @@
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 public class GenericTest
@@ -722,5 +724,28 @@ public class GenericTest
             "record D(string Value1);"
         );
         return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void AdditionalParameterIsGenericShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial TTarget Map<TSource, TTarget>(TSource source, TSource otherParam);
+
+            private partial B MapToB(A source);
+            private partial D MapToD(C source);
+            """,
+            "record struct A(string Value);",
+            "record struct B(string Value);",
+            "record C(string Value1);",
+            "record D(string Value1);"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "Map has an unsupported mapping method signature")
+            .HaveAssertedAllDiagnostics();
     }
 }

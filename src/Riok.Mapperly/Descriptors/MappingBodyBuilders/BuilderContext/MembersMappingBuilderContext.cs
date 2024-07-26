@@ -5,7 +5,7 @@ using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
@@ -34,14 +34,16 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
 
     public IEnumerable<IMappableMember> EnumerateUnmappedOrConfiguredTargetMembers() => _state.EnumerateUnmappedOrConfiguredTargetMembers();
 
+    public void TryAddSourceMemberAlias(string alias, IMappableMember member) => _state.TryAddSourceMemberAlias(alias, member);
+
     public void SetTargetMemberMapped(IMappableMember targetMember) => _state.SetTargetMemberMapped(targetMember);
 
     protected void SetTargetMemberMapped(string targetMemberName, bool ignoreCase = false) =>
         _state.SetTargetMemberMapped(targetMemberName, ignoreCase);
 
-    public void SetMembersMapped(string memberName) => _state.SetMembersMapped(memberName);
+    public void SetMembersMapped(MemberMappingInfo members) => _state.SetMembersMapped(members, false);
 
-    public void IgnoreMembers(string memberName) => _state.IgnoreMembers(memberName);
+    public void IgnoreMembers(IMappableMember member) => _state.IgnoreMembers(member);
 
     public void ConsumeMemberConfigs(MemberMappingInfo members)
     {
@@ -127,16 +129,47 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
     protected virtual bool TryFindSourcePath(
         IReadOnlyList<IReadOnlyList<string>> pathCandidates,
         bool ignoreCase,
-        [NotNullWhen(true)] out MemberPath? sourceMemberPath
+        [NotNullWhen(true)] out SourceMemberPath? sourcePath
     )
     {
-        return BuilderContext.SymbolAccessor.TryFindMemberPath(
-            Mapping.SourceType,
-            pathCandidates,
-            _state.IgnoredSourceMemberNames,
-            ignoreCase,
-            out sourceMemberPath
-        );
+        // try to match in additional source members
+        if (
+            BuilderContext.SymbolAccessor.TryFindMemberPath(
+                _state.AdditionalSourceMembers,
+                pathCandidates,
+                ignoreCase,
+                out var sourceMemberPath
+            )
+        )
+        {
+            sourcePath = new SourceMemberPath(sourceMemberPath, SourceMemberType.AdditionalMappingMethodParameter);
+            return true;
+        }
+
+        // try to match in aliased source members
+        if (BuilderContext.SymbolAccessor.TryFindMemberPath(_state.AliasedSourceMembers, pathCandidates, ignoreCase, out sourceMemberPath))
+        {
+            sourcePath = new SourceMemberPath(sourceMemberPath, SourceMemberType.MemberAlias);
+            return true;
+        }
+
+        // match against source type members
+        if (
+            BuilderContext.SymbolAccessor.TryFindMemberPath(
+                Mapping.SourceType,
+                pathCandidates,
+                _state.IgnoredSourceMemberNames,
+                ignoreCase,
+                out sourceMemberPath
+            )
+        )
+        {
+            sourcePath = new SourceMemberPath(sourceMemberPath, SourceMemberType.Member);
+            return true;
+        }
+
+        sourcePath = null;
+        return false;
     }
 
     protected bool IsIgnoredSourceMember(string sourceMemberName) => _state.IgnoredSourceMemberNames.Contains(sourceMemberName);
@@ -194,9 +227,9 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
         return new MemberMappingInfo(sourceMemberPath, targetMemberPath, config);
     }
 
-    private bool ResolveMemberConfigSourcePath(MemberMappingConfiguration config, [NotNullWhen(true)] out MemberPath? sourceMemberPath)
+    private bool ResolveMemberConfigSourcePath(MemberMappingConfiguration config, [NotNullWhen(true)] out SourceMemberPath? sourcePath)
     {
-        if (!BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.SourceType, config.Source.Path, out sourceMemberPath))
+        if (!BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.SourceType, config.Source.Path, out var sourceMemberPath))
         {
             BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ConfiguredMappingSourceMemberNotFound,
@@ -207,13 +240,19 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
             // consume this member config and prevent its further usage
             // as it is invalid, and a diagnostic has already been reported
             _state.ConsumeMemberConfig(config);
+            sourcePath = null;
             return false;
         }
 
+        sourcePath = new SourceMemberPath(sourceMemberPath, SourceMemberType.Member);
         return true;
     }
 
-    private bool TryFindSourcePath(string targetMemberName, [NotNullWhen(true)] out MemberPath? sourceMemberPath, bool? ignoreCase = null)
+    private bool TryFindSourcePath(
+        string targetMemberName,
+        [NotNullWhen(true)] out SourceMemberPath? sourceMemberPath,
+        bool? ignoreCase = null
+    )
     {
         ignoreCase ??= BuilderContext.Configuration.Mapper.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
         var pathCandidates = MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMemberName).Select(cs => cs.ToList()).ToList();

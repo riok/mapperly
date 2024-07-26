@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Symbols.Members;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
@@ -15,7 +16,7 @@ public class ArrayForEachMapping(
     ITypeSymbol targetType,
     INewInstanceMapping elementMapping,
     ITypeSymbol targetArrayElementType,
-    string countPropertyName
+    IMemberGetter sourceCountAccessor
 ) : NewInstanceMethodMapping(sourceType, targetType)
 {
     private const string TargetVariableName = "target";
@@ -28,9 +29,7 @@ public class ArrayForEachMapping(
         var loopCounterVariableName = ctx.NameBuilder.New(LoopCounterName);
 
         // var target = new T[source.Count];
-        var sourceLengthArrayRank = ArrayRankSpecifier(
-            SingletonSeparatedList<ExpressionSyntax>(MemberAccess(ctx.Source, countPropertyName))
-        );
+        var sourceLengthArrayRank = ArrayRankSpecifier(SingletonSeparatedList(sourceCountAccessor.BuildAccess(ctx.Source)));
         var targetInitializationValue = CreateArray(
             ArrayType(FullyQualifiedIdentifier(targetArrayElementType)).WithRankSpecifiers(SingletonList(sourceLengthArrayRank))
         );

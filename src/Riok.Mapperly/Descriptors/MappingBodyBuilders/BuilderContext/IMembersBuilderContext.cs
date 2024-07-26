@@ -1,6 +1,6 @@
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
-using Riok.Mapperly.Symbols;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
@@ -15,13 +15,15 @@ public interface IMembersBuilderContext<out T>
 
     MappingBuilderContext BuilderContext { get; }
 
-    void IgnoreMembers(string memberName);
+    void IgnoreMembers(IMappableMember member);
 
-    void SetMembersMapped(string memberName);
+    void SetMembersMapped(MemberMappingInfo members);
 
     void SetTargetMemberMapped(IMappableMember targetMember);
 
     void ConsumeMemberConfigs(MemberMappingInfo members);
+
+    void TryAddSourceMemberAlias(string alias, IMappableMember member);
 
     IEnumerable<IMappableMember> EnumerateUnmappedTargetMembers();
 

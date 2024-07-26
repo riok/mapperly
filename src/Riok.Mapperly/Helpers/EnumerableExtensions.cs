@@ -34,8 +34,8 @@ public static class EnumerableExtensions
 
     public static TAccumulate AggregateWithPrevious<T, TAccumulate>(
         this IEnumerable<T> source,
-        TAccumulate seed,
-        Func<TAccumulate, T?, T, TAccumulate> func
+        TAccumulate? seed,
+        Func<TAccumulate?, T?, T, TAccumulate> func
     )
     {
         var result = seed;
@@ -46,6 +46,6 @@ public static class EnumerableExtensions
             prev = element;
         }
 
-        return result;
+        return result ?? throw new InvalidOperationException("Aggregation was not initialized");
     }
 }

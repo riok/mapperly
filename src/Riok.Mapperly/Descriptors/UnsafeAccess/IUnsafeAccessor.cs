@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Emit;
 
-namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings.UnsafeAccess;
+namespace Riok.Mapperly.Descriptors.UnsafeAccess;
 
 /// <summary>
 /// Represents a method accessor for inaccessible members.
@@ -10,7 +10,5 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings.UnsafeAccess;
 /// </summary>
 public interface IUnsafeAccessor
 {
-    MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx);
-
-    string MethodName { get; }
+    MethodDeclarationSyntax BuildAccessorMethod(SourceEmitterContext ctx);
 }

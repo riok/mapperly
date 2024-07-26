@@ -38,7 +38,7 @@ public static class UnsafeAccessorEmitter
         foreach (var accessor in descriptor.UnsafeAccessors)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            yield return accessor.BuildMethod(ctx);
+            yield return accessor.BuildAccessorMethod(ctx);
         }
     }
 }

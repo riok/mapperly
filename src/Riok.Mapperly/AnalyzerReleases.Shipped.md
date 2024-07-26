@@ -183,6 +183,8 @@ RMG012  | Mapper   | Warning  | Source member was not found for target member
 RMG020  | Mapper   | Warning  | Source member is not mapped to any target member
 RMG037  | Mapper   | Warning  | An enum member could not be found on the source enum
 RMG038  | Mapper   | Warning  | An enum member could not be found on the target enum
+RMG081  | Mapper   | Error    | A mapping method with additional parameters cannot be a default mapping
+RMG082  | Mapper   | Warning  | An additional mapping method parameter is not mapped
 
 ### Removed Rules
 
@@ -192,3 +194,4 @@ RMG017  | Mapper   | Warning  | An init only member can have one configuration a
 RMG026  | Mapper   | Info     | Cannot map from indexed member
 RMG027  | Mapper   | Warning  | A constructor parameter can have one configuration at max
 RMG028  | Mapper   | Warning  | Constructor parameter cannot handle target paths
+

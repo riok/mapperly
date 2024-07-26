@@ -27,7 +27,7 @@ public class MapperGenerationResultAssertions
         if (_notAssertedDiagnostics.Count == 0)
             return this;
 
-        var assertions = _notAssertedDiagnostics.GroupBy(x => x.Descriptor.Id).Select(x => BuildDiagnosticAssertions(x));
+        var assertions = _notAssertedDiagnostics.GroupBy(x => x.Descriptor.Id).Select(BuildDiagnosticAssertions);
         Assert.Fail(
             $"""
             {_notAssertedDiagnostics.Count} not asserted diagnostics found.
@@ -46,7 +46,7 @@ public class MapperGenerationResultAssertions
             .Where(x => x.Value is DiagnosticDescriptor && ((DiagnosticDescriptor)x.Value!).Id.Equals(diagnosticGroup.Key))
             .Select(x => x.Name)
             .Single();
-        var diagnosticDescriptorAccess = $"{nameof(DiagnosticDescriptors)}.{diagnosticDescriptorFieldName}";
+        var diagnosticDescriptorAccess = $"{typeof(DiagnosticDescriptors).FullName}.{diagnosticDescriptorFieldName}";
         if (!diagnosticGroup.Skip(1).Any())
         {
             return $"{nameof(HaveDiagnostic)}({diagnosticDescriptorAccess}, \"{diagnosticGroup.First().GetMessage()}\")";
