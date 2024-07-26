@@ -52,8 +52,4 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\Riok.Mapperly.TestDependency\Riok.Mapperly.TestDependency.csproj" />
-  </ItemGroup>
 </Project>
