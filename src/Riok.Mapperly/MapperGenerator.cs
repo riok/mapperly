@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
@@ -29,25 +30,21 @@ public class MapperGenerator : IIncrementalGenerator
         context.ReportDiagnostics(compilationDiagnostics);
 
         var nestedCompilations = context
-            .MetadataReferencesProvider.Select(
-                (metadataReference, _) =>
-                {
-                    if (metadataReference is CompilationReference compilationReference)
-                    {
-                        return compilationReference;
-                    }
-
-                    return null;
-                }
-            )
-            .Where(compilationReference => compilationReference is not null)
-            .Select((compilationReference, _) => compilationReference!.Compilation)
+            .MetadataReferencesProvider.Select((metadataReference, _) => (metadataReference as CompilationReference)?.Compilation)
             .Collect();
 
         // build the compilation context
         var compilationContext = context
             .CompilationProvider.Combine(nestedCompilations)
-            .Select(static (c, _) => new CompilationContext(c.Left, new WellKnownTypes(c.Left), c.Right, new FileNameBuilder()))
+            .Select(
+                static (c, _) =>
+                    new CompilationContext(
+                        c.Left,
+                        new WellKnownTypes(c.Left),
+                        c.Right.OfType<Compilation>().ToImmutableArray(),
+                        new FileNameBuilder()
+                    )
+            )
             .WithTrackingName(MapperGeneratorStepNames.BuildCompilationContext);
 
         // build the assembly default configurations
