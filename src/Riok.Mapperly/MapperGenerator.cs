@@ -28,9 +28,26 @@ public class MapperGenerator : IIncrementalGenerator
         );
         context.ReportDiagnostics(compilationDiagnostics);
 
+        var nestedCompilations = context
+            .MetadataReferencesProvider.Select(
+                (metadataReference, _) =>
+                {
+                    if (metadataReference is CompilationReference compilationReference)
+                    {
+                        return compilationReference;
+                    }
+
+                    return null;
+                }
+            )
+            .Where(compilationReference => compilationReference is not null)
+            .Select((compilationReference, _) => compilationReference!.Compilation)
+            .Collect();
+
         // build the compilation context
         var compilationContext = context
-            .CompilationProvider.Select(static (c, _) => new CompilationContext(c, new WellKnownTypes(c), new FileNameBuilder()))
+            .CompilationProvider.Combine(nestedCompilations)
+            .Select(static (c, _) => new CompilationContext(c.Left, new WellKnownTypes(c.Left), c.Right, new FileNameBuilder()))
             .WithTrackingName(MapperGeneratorStepNames.BuildCompilationContext);
 
         // build the assembly default configurations
