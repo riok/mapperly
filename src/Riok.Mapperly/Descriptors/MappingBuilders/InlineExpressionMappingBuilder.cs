@@ -31,7 +31,12 @@ public static class InlineExpressionMappingBuilder
             return null;
         }
 
-        var semanticModel = ctx.Compilation.GetSemanticModel(methodSyntax.SyntaxTree);
+        var semanticModel = ctx.GetSemanticModel(methodSyntax.SyntaxTree);
+        if (semanticModel is null)
+        {
+            return null;
+        }
+
         var inlineRewriter = new InlineExpressionRewriter(semanticModel, ctx.FindNewInstanceMapping);
         var bodyExpression = (ExpressionSyntax?)body.Expression.Accept(inlineRewriter);
         if (bodyExpression == null || !inlineRewriter.CanBeInlined)
