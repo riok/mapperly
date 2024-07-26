@@ -362,8 +362,10 @@ public class UseStaticMapperTest
             );
     }
 
-    [Fact]
-    public void UseStaticGenericMapperStaticMethodFromAnotherAssembly()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void UseStaticGenericMapperStaticMethodFromAnotherAssembly(bool asCompilationReference)
     {
         var testDependencySource = TestSourceBuilder.SyntaxTree(
             """
@@ -381,7 +383,11 @@ public class UseStaticMapperTest
             """
         );
 
-        using var testDependencyAssembly = TestHelper.BuildAssembly("Riok.Mapperly.TestDependency", testDependencySource);
+        using var testDependencyAssembly = TestHelper.BuildAssembly(
+            "Riok.Mapperly.TestDependency",
+            asCompilationReference,
+            testDependencySource
+        );
 
         var source = TestSourceBuilder.CSharp(
             """

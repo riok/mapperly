@@ -60,10 +60,13 @@ public static class TestHelper
     public static CSharpCompilation BuildCompilation(params SyntaxTree[] syntaxTrees) =>
         BuildCompilation("Tests", NullableContextOptions.Enable, true, syntaxTrees);
 
-    public static TestAssembly BuildAssembly(string name, params SyntaxTree[] syntaxTrees)
+    public static TestAssembly BuildAssembly(string name, params SyntaxTree[] syntaxTrees) =>
+        BuildAssembly(name, asCompilationReference: false, syntaxTrees);
+
+    public static TestAssembly BuildAssembly(string name, bool asCompilationReference, params SyntaxTree[] syntaxTrees)
     {
         var compilation = BuildCompilation(name, NullableContextOptions.Enable, false, syntaxTrees);
-        return new TestAssembly(compilation);
+        return asCompilationReference ? TestAssembly.CreateAsCompilationReference(compilation) : new TestAssembly(compilation);
     }
 
     public static GeneratorDriver GenerateTracked(Compilation compilation)
