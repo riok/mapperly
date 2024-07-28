@@ -21,7 +21,7 @@ public class QueryableProjectionUserImplementedTest
     }
 
     [Fact]
-    public Task ClassToClassNonInlinedMethod()
+    public Task ClassToClassInlinedSingleStatement()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -30,6 +30,28 @@ public class QueryableProjectionUserImplementedTest
             private D MapToD(C v)
             {
                 return new D { Value = v.Value + "-mapped" };
+            }
+            """,
+            "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public D NestedValue { get; set; } }",
+            "class C { public string Value { get; set; } }",
+            "class D { public string Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ClassToClassNonInlinedMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+
+            private D MapToD(C v)
+            {
+                var dest = new D { Value = v.Value + "-mapped" };
+                return dest;
             }
             """,
             "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",

@@ -25,7 +25,14 @@ public static class InlineExpressionMappingBuilder
         }
 
         var methodSyntax = methodSyntaxRef.GetSyntax();
-        if (methodSyntax is not MethodDeclarationSyntax { ExpressionBody: { } body, ParameterList.Parameters: [var sourceParameter] })
+
+        var bodyExpression = methodSyntax switch
+        {
+            MethodDeclarationSyntax { ExpressionBody: { } body, ParameterList.Parameters: [var sourceParameter1] } => body.Expression,
+            MethodDeclarationSyntax { Body.Statements: [ReturnStatementSyntax singleStatement] } => singleStatement.Expression,
+            _ => null
+        };
+        if (bodyExpression == null)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, mapping.Method);
             return null;
@@ -38,8 +45,14 @@ public static class InlineExpressionMappingBuilder
         }
 
         var inlineRewriter = new InlineExpressionRewriter(semanticModel, ctx.FindNewInstanceMapping);
-        var bodyExpression = (ExpressionSyntax?)body.Expression.Accept(inlineRewriter);
+        bodyExpression = (ExpressionSyntax?)bodyExpression.Accept(inlineRewriter);
         if (bodyExpression == null || !inlineRewriter.CanBeInlined)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, mapping.Method);
+            return null;
+        }
+
+        if (methodSyntax is not MethodDeclarationSyntax { ParameterList.Parameters: [var sourceParameter] })
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, mapping.Method);
             return null;

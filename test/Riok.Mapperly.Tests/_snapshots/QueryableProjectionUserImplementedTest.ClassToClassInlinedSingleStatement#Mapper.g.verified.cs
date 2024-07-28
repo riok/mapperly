@@ -10,7 +10,7 @@ public partial class Mapper
         return System.Linq.Queryable.Select(source, x => new global::B()
         {
             StringValue = x.StringValue,
-            NestedValue = MapToD(x.NestedValue),
+            NestedValue = new global::D { Value = x.NestedValue.Value + "-mapped" },
         });
 #nullable enable
     }
