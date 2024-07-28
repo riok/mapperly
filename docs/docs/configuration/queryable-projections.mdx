@@ -80,7 +80,7 @@ public static partial class CarMapper
 Mapperly tries to inline user-implemented mapping methods.
 For this to work, user-implemented mapping methods need to satisfy certain limitations:
 
-- Only expression-bodied methods can be inlined.
+- Only expression-bodied methods or methods that consist of a single local variable declaration expression can be inlined.
 - The body needs to follow the [expression tree limitations](https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/expression-trees/#limitations).
 - Nested MethodGroups cannot be inlined.
 
