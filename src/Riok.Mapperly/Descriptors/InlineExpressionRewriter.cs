@@ -86,7 +86,7 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
 
         if (
             result is BinaryExpressionSyntax typedResult
-            && typedResult.Kind() is SyntaxKind.AsExpression
+            && typedResult.IsKind(SyntaxKind.AsExpression)
             && semanticModel.GetSymbolInfo(node.Right).Symbol is ITypeSymbol namedTypeSymbol
         )
         {
