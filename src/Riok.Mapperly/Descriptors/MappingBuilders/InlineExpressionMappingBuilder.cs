@@ -25,7 +25,15 @@ public static class InlineExpressionMappingBuilder
         }
 
         var methodSyntax = methodSyntaxRef.GetSyntax();
-        if (methodSyntax is not MethodDeclarationSyntax { ExpressionBody: { } body, ParameterList.Parameters: [var sourceParameter] })
+
+        if (methodSyntax is not MethodDeclarationSyntax { ParameterList.Parameters: [var sourceParameter] } methodDeclaration)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, mapping.Method);
+            return null;
+        }
+
+        var bodyExpression = TryGetBodyExpression(methodDeclaration);
+        if (bodyExpression == null)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, mapping.Method);
             return null;
@@ -38,7 +46,7 @@ public static class InlineExpressionMappingBuilder
         }
 
         var inlineRewriter = new InlineExpressionRewriter(semanticModel, ctx.FindNewInstanceMapping);
-        var bodyExpression = (ExpressionSyntax?)body.Expression.Accept(inlineRewriter);
+        bodyExpression = (ExpressionSyntax?)bodyExpression.Accept(inlineRewriter);
         if (bodyExpression == null || !inlineRewriter.CanBeInlined)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, mapping.Method);
@@ -46,5 +54,31 @@ public static class InlineExpressionMappingBuilder
         }
 
         return new UserImplementedInlinedExpressionMapping(mapping, sourceParameter, inlineRewriter.MappingInvocations, bodyExpression);
+    }
+
+    private static ExpressionSyntax? TryGetBodyExpression(MethodDeclarationSyntax methodDeclaration)
+    {
+        return methodDeclaration switch
+        {
+            // => expression
+            { ExpressionBody: { } body } => body.Expression,
+
+            // { return expression; }
+            { Body.Statements: [ReturnStatementSyntax singleStatement] } => singleStatement.Expression,
+
+            // { var dest = expression; return dest; }
+            {
+                Body.Statements: [
+                    LocalDeclarationStatementSyntax
+                    {
+                        Declaration.Variables: [{ Initializer: { } variableInitializer } variableDeclarator]
+                    },
+                    ReturnStatementSyntax { Expression: IdentifierNameSyntax identifierName }
+                ]
+            } when identifierName.Identifier.Value == variableDeclarator.Identifier.Value
+                => variableInitializer.Value,
+
+            _ => null
+        };
     }
 }
