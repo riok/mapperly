@@ -27,7 +27,9 @@ async function buildApiDocs(): Promise<void> {
 
   // use xmldoc2md to convert the dotnet xml documentation to markdown
   await execPromise('dotnet tool restore');
-  await execPromise(`dotnet xmldoc2md ${dll} ${targetDir}`);
+  await execPromise(
+    `dotnet xmldoc2md ${dll} --member-accessibility-level public --output ${targetDir}`,
+  );
 
   // we instead use the docusaurus generated index
   await rm(join(targetDir, 'index.md'));
@@ -40,6 +42,21 @@ async function buildApiDocs(): Promise<void> {
 
     // this replacement is required due to jsx limitations
     content = content.replace(/<br>/g, '<br />');
+
+    // replace local System.*Attribute with MS docs links
+    // these are generated as local references since source-generated polyfills are used instead of references
+    // but xmldoc2md doesn't include these
+    content = content.replace(
+      /\.\/system\.(.*?)attribute\.md/g,
+      'https://learn.microsoft.com/en-us/dotnet/api/system.$1attribute',
+    );
+
+    // add font matter to specify non-escaped title
+    // as only < and > are the encoded chars, use replace instead of using a decode dependency
+    const title = content.match(/# (.*)/)[1];
+    const unescapedTitle = title.replace('&lt;', '<').replace('&gt;', '>');
+    content = `---\ntitle: ${unescapedTitle}\n---\n\n${content}`;
+
     await writeFile(filePath, content);
   }
 }
