@@ -29,7 +29,7 @@
     <PackageReference Include="Meziantou.Xunit.ParallelTestFramework" Version="2.2.0"/>
     <PackageReference Include="Verify.XUnit" Version="24.2.0" />
     <PackageReference Include="Verify.DiffPlex" Version="3.0.0" />
-    <PackageReference Include="JunitXml.TestLogger" Version="3.1.12" />
+    <PackageReference Include="JunitXml.TestLogger" Version="4.0.254" />
     <PackageReference Include="NSubstitute" Version="5.1.0" />
     <PackageReference Include="NSubstitute.Analyzers.CSharp" Version="1.0.17">
       <PrivateAssets>all</PrivateAssets>
