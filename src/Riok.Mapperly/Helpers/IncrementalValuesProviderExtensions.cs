@@ -22,6 +22,12 @@ internal static partial class IncrementalValuesProviderExtensions
 #nullable enable
     }
 
+    public static IncrementalValuesProvider<TTarget> OfType<TSource, TTarget>(this IncrementalValuesProvider<TSource> source)
+        where TTarget : class
+    {
+        return source.Select((x, _) => x as TTarget).WhereNotNull();
+    }
+
     /// <summary>
     /// Registers an output node into an <see cref="IncrementalGeneratorInitializationContext"/> to output a diagnostic.
     /// </summary>

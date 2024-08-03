@@ -3,6 +3,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly;
@@ -14,8 +15,8 @@ internal static class SyntaxProvider
     )
     {
         return context
-            .MetadataReferencesProvider.Select((metadataReference, _) => (metadataReference as CompilationReference)?.Compilation!)
-            .Where(x => x is not null)
+            .MetadataReferencesProvider.OfType<MetadataReference, CompilationReference>()
+            .Select((x, _) => x.Compilation)
             .Collect();
     }
 

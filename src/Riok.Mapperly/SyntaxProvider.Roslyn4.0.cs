@@ -19,8 +19,8 @@ internal static class SyntaxProvider
     {
         return context
             .GetMetadataReferencesProvider()
-            .SelectMany((metadataReference, _) => new[] { (metadataReference as CompilationReference)?.Compilation }.ToImmutableArray())
-            .WhereNotNull()
+            .OfType<MetadataReference, CompilationReference>()
+            .Select((x, _) => x.Compilation)
             .Collect();
     }
 
