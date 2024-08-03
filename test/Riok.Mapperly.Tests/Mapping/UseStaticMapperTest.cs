@@ -1,3 +1,5 @@
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 public class UseStaticMapperTest
@@ -356,6 +358,109 @@ public class UseStaticMapperTest
                 """
                 var target = new global::B(MapInternal(source.Value));
                 return target;
+                """
+            );
+    }
+
+    private MapperGenerationResultAssertions ExecuteStaticGenericMapperStaticMethodFromAnotherAssemblyCompilation(
+        bool asCompilationReference
+    )
+    {
+        var testDependencySource = TestSourceBuilder.SyntaxTree(
+            """
+            using System;
+            using Riok.Mapperly.Abstractions;
+
+            namespace Riok.Mapperly.TestDependency.Mapper
+            {
+                [Mapper]
+                public static partial class DateTimeMapper
+                {
+                    public static DateTimeOffset MapToDateTimeOffset(DateTime dateTime) => new(dateTime, TimeSpan.Zero);
+                }
+            }
+            """
+        );
+
+        using var testDependencyAssembly = TestHelper.BuildAssembly(
+            "Riok.Mapperly.TestDependency",
+            asCompilationReference,
+            testDependencySource
+        );
+
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using System.Linq;
+            using Riok.Mapperly.Abstractions;
+            using Riok.Mapperly.TestDependency.Mapper;
+
+            [Mapper]
+            [UseStaticMapper(typeof(DateTimeMapper))]
+            public static partial class Mapper
+            {
+                public static partial IQueryable<Target> ProjectToTarget(IQueryable<Source> source);
+
+                public static partial Target MapToTarget(Source source);
+
+                public class Source
+                {
+                    public DateTime DateTime { get; set; }
+                }
+
+                public class Target
+                {
+                    public DateTimeOffset DateTime { get; set; }
+                }
+            }
+            """
+        );
+
+        return TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics, additionalAssemblies: [testDependencyAssembly])
+            .Should();
+    }
+
+    /// <summary>
+    /// This tests a situation when your IDE runs the source generator (references are other syntax trees)
+    /// </summary>
+    [Fact]
+    public void UseStaticGenericMapperStaticMethodFromAnotherAssemblyAsReference()
+    {
+        var result = ExecuteStaticGenericMapperStaticMethodFromAnotherAssemblyCompilation(asCompilationReference: true);
+
+        result.HaveMethodBody(
+            "ProjectToTarget",
+            """
+            #nullable disable
+                    return System.Linq.Queryable.Select(source, x => new global::Mapper.Target()
+                    {
+                        DateTime = new global::System.DateTimeOffset(x.DateTime, global::System.TimeSpan.Zero),
+                    });
+            #nullable enable
+            """
+        );
+    }
+
+    /// <summary>
+    /// This tests a situation when compiler produces final assembly (references are compiled assemblies)
+    /// </summary>
+    [Fact]
+    public void UseStaticGenericMapperStaticMethodFromAnotherAssemblyAsCompiledAssembly()
+    {
+        var result = ExecuteStaticGenericMapperStaticMethodFromAnotherAssemblyCompilation(asCompilationReference: false);
+
+        result
+            .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline)
+            .HaveMethodBody(
+                "ProjectToTarget",
+                """
+                #nullable disable
+                        return System.Linq.Queryable.Select(source, x => new global::Mapper.Target()
+                        {
+                            DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
+                        });
+                #nullable enable
                 """
             );
     }

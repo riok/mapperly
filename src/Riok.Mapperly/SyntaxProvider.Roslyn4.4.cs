@@ -1,13 +1,25 @@
 #if ROSLYN4_4_OR_GREATER
 
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly;
 
 internal static class SyntaxProvider
 {
+    public static IncrementalValueProvider<ImmutableArray<Compilation>> GetNestedCompilations(
+        IncrementalGeneratorInitializationContext context
+    )
+    {
+        return context
+            .MetadataReferencesProvider.OfType<MetadataReference, CompilationReference>()
+            .Select((x, _) => x.Compilation)
+            .Collect();
+    }
+
     public static IncrementalValuesProvider<MapperDeclaration> GetMapperDeclarations(IncrementalGeneratorInitializationContext context)
     {
         return context

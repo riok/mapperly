@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
@@ -28,9 +29,15 @@ public class MapperGenerator : IIncrementalGenerator
         );
         context.ReportDiagnostics(compilationDiagnostics);
 
+        var nestedCompilations = SyntaxProvider.GetNestedCompilations(context);
+
         // build the compilation context
         var compilationContext = context
-            .CompilationProvider.Select(static (c, _) => new CompilationContext(c, new WellKnownTypes(c), new FileNameBuilder()))
+            .CompilationProvider.Combine(nestedCompilations)
+            .Select(
+                static (c, _) =>
+                    new CompilationContext(c.Left, new WellKnownTypes(c.Left), c.Right.ToImmutableArray(), new FileNameBuilder())
+            )
             .WithTrackingName(MapperGeneratorStepNames.BuildCompilationContext);
 
         // build the assembly default configurations

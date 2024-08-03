@@ -75,6 +75,24 @@ public class SimpleMappingBuilderContext(
     /// </summary>
     protected InlinedExpressionMappingCollection InlinedMappings { get; } = inlinedMappings;
 
+    public SemanticModel? GetSemanticModel(SyntaxTree syntaxTree)
+    {
+        if (_compilationContext.Compilation.ContainsSyntaxTree(syntaxTree))
+        {
+            return _compilationContext.Compilation.GetSemanticModel(syntaxTree);
+        }
+
+        foreach (var compilation in _compilationContext.NestedCompilations)
+        {
+            if (compilation.ContainsSyntaxTree(syntaxTree))
+            {
+                return compilation.GetSemanticModel(syntaxTree);
+            }
+        }
+
+        return null;
+    }
+
     public virtual bool IsConversionEnabled(MappingConversionType conversionType) =>
         Configuration.Mapper.EnabledConversions.HasFlag(conversionType);
 

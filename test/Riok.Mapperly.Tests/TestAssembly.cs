@@ -14,6 +14,13 @@ public class TestAssembly : IDisposable
         MetadataReference = MetadataReference.CreateFromStream(_data);
     }
 
+    private TestAssembly(MetadataReference metadataReference)
+    {
+        MetadataReference = metadataReference;
+    }
+
+    internal static TestAssembly CreateAsCompilationReference(Compilation compilation) => new(compilation.ToMetadataReference());
+
     public MetadataReference MetadataReference { get; }
 
     public void Dispose() => _data.Dispose();
