@@ -6,7 +6,10 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::B Map(global::A a)
     {
-        return MapToB(a, new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler());
+        return MapToB(
+            a,
+            new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler()
+        );
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

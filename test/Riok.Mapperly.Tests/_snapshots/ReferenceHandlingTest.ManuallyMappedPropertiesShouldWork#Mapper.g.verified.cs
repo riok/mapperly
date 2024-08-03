@@ -6,13 +6,19 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::B MapToB(global::A source)
     {
-        return MapToB2(source, new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler());
+        return MapToB2(
+            source,
+            new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler()
+        );
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::B MapToB1(global::A source)
     {
-        return MapToB3(source, new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler());
+        return MapToB3(
+            source,
+            new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler()
+        );
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

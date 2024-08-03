@@ -17,5 +17,5 @@ public class GenericTargetObjectFactory(GenericTypeChecker typeChecker, SymbolAc
         typeChecker.CheckTypes((Method.TypeParameters[0], targetTypeToCreate));
 
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
-        GenericInvocation(Method.Name, new[] { NonNullableIdentifier(targetTypeToCreate) });
+        GenericInvocationWithoutIndention(Method.Name, [NonNullableIdentifier(targetTypeToCreate)]);
 }

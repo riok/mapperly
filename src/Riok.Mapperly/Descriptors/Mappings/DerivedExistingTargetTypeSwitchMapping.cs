@@ -66,8 +66,8 @@ public class DerivedExistingTargetTypeSwitchMapping(
         var defaultCaseLabel = DefaultSwitchLabel().AddLeadingLineFeed(sectionCtx.Indentation);
 
         // throw new ArgumentException(msg, nameof(ctx.Source)),
-        var sourceTypeExpr = Invocation(MemberAccess(ctx.Source, GetTypeMethodName));
-        var targetTypeExpr = Invocation(MemberAccess(target, GetTypeMethodName));
+        var sourceTypeExpr = ctx.SyntaxFactory.Invocation(MemberAccess(ctx.Source, GetTypeMethodName));
+        var targetTypeExpr = ctx.SyntaxFactory.Invocation(MemberAccess(target, GetTypeMethodName));
         var statementContext = sectionCtx.AddIndentation();
         var throwExpression = ThrowArgumentExpression(
                 InterpolatedString($"Cannot map {sourceTypeExpr} to {targetTypeExpr} as there is no known derived type mapping"),

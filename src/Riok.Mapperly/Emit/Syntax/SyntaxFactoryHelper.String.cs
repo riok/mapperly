@@ -15,7 +15,8 @@ public partial struct SyntaxFactoryHelper
     private static readonly Regex _formattableStringPlaceholder =
         new(@"\{(?<placeholder>\d+)\}", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
 
-    public static InvocationExpressionSyntax NameOf(ExpressionSyntax expression) => Invocation(_nameofIdentifier, expression);
+    public static InvocationExpressionSyntax NameOf(ExpressionSyntax expression) =>
+        InvocationWithoutIndention(_nameofIdentifier, expression);
 
     public static IdentifierNameSyntax FullyQualifiedIdentifier(ITypeSymbol typeSymbol) =>
         IdentifierName(typeSymbol.FullyQualifiedIdentifierName());

@@ -24,6 +24,6 @@ public class NewValueTupleConstructorMapping(ITypeSymbol sourceType, ITypeSymbol
         // new ValueTuple<T..>(ctorArgs)
         var ctorArgs = _constructorPropertyMappings.Select(x => x.BuildArgument(ctx, emitFieldName: false));
         var typeArguments = TypeArgumentList(((INamedTypeSymbol)TargetType).TypeArguments.Select(NonNullableIdentifier));
-        return CreateGenericInstance(ValueTupleName, typeArguments, ctorArgs);
+        return ctx.SyntaxFactory.CreateGenericInstance(ValueTupleName, typeArguments, ctorArgs);
     }
 }

@@ -13,6 +13,11 @@ public partial struct SyntaxFactoryHelper
         return Token(SyntaxTriviaList.Empty.AddLineFeedAndIndentation(Indentation), kind, SyntaxTriviaList.Empty);
     }
 
+    private SyntaxToken TrailingLineFeedToken(SyntaxKind kind, int indentation)
+    {
+        return Token(SyntaxTriviaList.Empty, kind, SyntaxTriviaList.Empty.AddLineFeedAndIndentation(indentation));
+    }
+
     private SyntaxToken LeadingLineFeedTrailingSpaceToken(SyntaxKind kind)
     {
         return Token(SyntaxTriviaList.Empty.AddLineFeedAndIndentation(Indentation), kind, _spaceTriviaList);

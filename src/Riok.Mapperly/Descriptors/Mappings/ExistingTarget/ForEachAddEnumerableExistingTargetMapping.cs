@@ -38,7 +38,7 @@ public class ForEachAddEnumerableExistingTargetMapping(
         var (loopItemCtx, loopItemVariableName) = ctx.WithNewSource(LoopItemVariableName);
         var convertedSourceItemExpression = elementMapping.Build(loopItemCtx);
         var addMethod = MemberAccess(target, insertMethodName);
-        var body = Invocation(addMethod, convertedSourceItemExpression);
+        var body = ctx.SyntaxFactory.Invocation(addMethod, convertedSourceItemExpression);
         yield return ctx.SyntaxFactory.ForEach(loopItemVariableName, ctx.Source, body);
     }
 }

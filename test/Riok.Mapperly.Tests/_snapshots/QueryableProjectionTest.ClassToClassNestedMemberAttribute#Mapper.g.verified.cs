@@ -7,10 +7,13 @@ public partial class Mapper
     partial global::System.Linq.IQueryable<global::B> Map(global::System.Linq.IQueryable<global::A> source)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(source, x => new global::B()
-        {
-            Id = x.Value.Id,
-        });
+        return System.Linq.Queryable.Select(
+            source,
+            x => new global::B()
+            {
+                Id = x.Value.Id,
+            }
+        );
 #nullable enable
     }
 

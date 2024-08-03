@@ -408,7 +408,11 @@ public class DictionaryTest
             .Should()
             .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
-                "return new global::System.Collections.Generic.Dictionary<int, int>(global::System.Linq.Enumerable.Select(source, x => MapToKeyValuePairOfInt32AndInt32(x)));"
+                """
+                return new global::System.Collections.Generic.Dictionary<int, int>(
+                    global::System.Linq.Enumerable.Select(source, x => MapToKeyValuePairOfInt32AndInt32(x))
+                );
+                """
             );
     }
 

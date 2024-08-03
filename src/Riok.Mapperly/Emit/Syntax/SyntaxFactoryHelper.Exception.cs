@@ -17,16 +17,16 @@ public partial struct SyntaxFactoryHelper
     public static ThrowExpressionSyntax ThrowNullReferenceException(string message) => ThrowNullReferenceException(StringLiteral(message));
 
     private static ThrowExpressionSyntax ThrowNullReferenceException(ExpressionSyntax arg) =>
-        Throw(NullReferenceExceptionClassName, ArgumentList(arg));
+        Throw(NullReferenceExceptionClassName, ArgumentListWithoutIndention([arg]));
 
     public static ThrowExpressionSyntax ThrowArgumentOutOfRangeException(ExpressionSyntax arg, string message) =>
-        Throw(ArgumentOutOfRangeExceptionClassName, ArgumentList(NameOf(arg), arg, StringLiteral(message)));
+        Throw(ArgumentOutOfRangeExceptionClassName, ArgumentListWithoutIndention([NameOf(arg), arg, StringLiteral(message)]));
 
     public static ThrowExpressionSyntax ThrowArgumentNullException(ExpressionSyntax arg) =>
-        Throw(ArgumentNullExceptionClassName, ArgumentList(NameOf(arg)));
+        Throw(ArgumentNullExceptionClassName, ArgumentListWithoutIndention([NameOf(arg)]));
 
     public static ThrowExpressionSyntax ThrowArgumentExpression(ExpressionSyntax message, ExpressionSyntax arg) =>
-        Throw(ArgumentExceptionClassName, ArgumentList(message, NameOf(arg)));
+        Throw(ArgumentExceptionClassName, ArgumentListWithoutIndention([message, NameOf(arg)]));
 
     public ThrowExpressionSyntax ThrowMappingNotImplementedExceptionStatement()
     {

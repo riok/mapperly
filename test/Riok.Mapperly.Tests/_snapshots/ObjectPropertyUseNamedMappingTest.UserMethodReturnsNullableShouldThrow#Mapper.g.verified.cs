@@ -7,7 +7,9 @@ public partial class Mapper
     public partial global::B Map(global::A source)
     {
         var target = new global::B();
-        target.Value = ToC(source.Name ?? throw new System.ArgumentNullException(nameof(source.Name))) ?? throw new System.NullReferenceException("ToC returned null");
+        target.Value = ToC(
+            source.Name ?? throw new System.ArgumentNullException(nameof(source.Name))
+        ) ?? throw new System.NullReferenceException("ToC returned null");
         return target;
     }
 }

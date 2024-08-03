@@ -17,5 +17,5 @@ public class SimpleObjectFactoryWithSource(SymbolAccessor symbolAccessor, IMetho
         && SymbolEqualityComparer.Default.Equals(sourceType, Method.Parameters[0].Type);
 
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
-        Invocation(Method.Name, source);
+        InvocationWithoutIndention(Method.Name, source);
 }

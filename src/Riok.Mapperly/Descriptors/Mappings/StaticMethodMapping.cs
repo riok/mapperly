@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
@@ -9,5 +8,5 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public class StaticMethodMapping(IMethodSymbol method) : NewInstanceMapping(method.Parameters.Single().Type, method.ReturnType)
 {
-    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) => StaticInvocation(method, ctx.Source);
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) => ctx.SyntaxFactory.StaticInvocation(method, ctx.Source);
 }

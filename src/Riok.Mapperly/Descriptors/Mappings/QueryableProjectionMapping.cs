@@ -25,13 +25,11 @@ public class QueryableProjectionMapping(ITypeSymbol sourceType, ITypeSymbol targ
 
         var delegateMappingSyntax = delegateMapping.Build(lambdaCtx);
         var projectionLambda = Lambda(lambdaSourceName, delegateMappingSyntax);
-        var select = StaticInvocation(QueryableReceiverName, SelectMethodName, ctx.Source, projectionLambda);
+        var select = ctx.SyntaxFactory.StaticInvocation(QueryableReceiverName, SelectMethodName, ctx.Source, projectionLambda);
         var returnStatement = ctx.SyntaxFactory.Return(select);
-        return new[]
-        {
-            returnStatement
-                .WithLeadingTrivia(returnStatement.GetLeadingTrivia().Insert(0, ElasticCarriageReturnLineFeed).Insert(1, Nullable(false)))
-                .WithTrailingTrivia(returnStatement.GetTrailingTrivia().Insert(0, ElasticCarriageReturnLineFeed).Insert(1, Nullable(true)))
-        };
+        var leadingTrivia = returnStatement.GetLeadingTrivia().Insert(0, ElasticCarriageReturnLineFeed).Insert(1, Nullable(false));
+        var trailingTrivia = returnStatement.GetTrailingTrivia().Insert(0, ElasticCarriageReturnLineFeed).Insert(1, Nullable(true));
+        returnStatement = returnStatement.WithLeadingTrivia(leadingTrivia).WithTrailingTrivia(trailingTrivia);
+        return [returnStatement];
     }
 }
