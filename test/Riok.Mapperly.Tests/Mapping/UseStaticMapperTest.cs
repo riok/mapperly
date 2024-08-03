@@ -362,10 +362,9 @@ public class UseStaticMapperTest
             );
     }
 
-    [Theory]
-    [InlineData(true)] // Usually when your IDE runs the source generator (references are other syntax trees)
-    [InlineData(false)] // When compiler produces final assembly (references are compiled assemblies)
-    public void UseStaticGenericMapperStaticMethodFromAnotherAssembly(bool asCompilationReference)
+    private MapperGenerationResultAssertions ExecuteStaticGenericMapperStaticMethodFromAnotherAssemblyCompilation(
+        bool asCompilationReference
+    )
     {
         var testDependencySource = TestSourceBuilder.SyntaxTree(
             """
@@ -416,39 +415,47 @@ public class UseStaticMapperTest
             }
             """
         );
-        var result = TestHelper
+
+        return TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics, additionalAssemblies: [testDependencyAssembly])
             .Should();
+    }
 
-        if (asCompilationReference)
-        {
-            result.HaveMethodBody(
+    [Fact]
+    public void UseStaticGenericMapperStaticMethodFromAnotherAssemblyAsReference()
+    {
+        var result = ExecuteStaticGenericMapperStaticMethodFromAnotherAssemblyCompilation(asCompilationReference: true);
+
+        result.HaveMethodBody(
+            "ProjectToTarget",
+            """
+            #nullable disable
+                    return System.Linq.Queryable.Select(source, x => new global::Mapper.Target()
+                    {
+                        DateTime = new global::System.DateTimeOffset(x.DateTime, global::System.TimeSpan.Zero),
+                    });
+            #nullable enable
+            """
+        );
+    }
+
+    [Fact]
+    public void UseStaticGenericMapperStaticMethodFromAnotherAssemblyAsCompiledAssembly()
+    {
+        var result = ExecuteStaticGenericMapperStaticMethodFromAnotherAssemblyCompilation(asCompilationReference: false);
+
+        result
+            .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline)
+            .HaveMethodBody(
                 "ProjectToTarget",
                 """
                 #nullable disable
                         return System.Linq.Queryable.Select(source, x => new global::Mapper.Target()
                         {
-                            DateTime = new global::System.DateTimeOffset(x.DateTime, global::System.TimeSpan.Zero),
+                            DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
                         });
                 #nullable enable
                 """
             );
-        }
-        else
-        {
-            result
-                .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline)
-                .HaveMethodBody(
-                    "ProjectToTarget",
-                    """
-                    #nullable disable
-                            return System.Linq.Queryable.Select(source, x => new global::Mapper.Target()
-                            {
-                                DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
-                            });
-                    #nullable enable
-                    """
-                );
-        }
     }
 }
