@@ -15,12 +15,14 @@ internal static class SyntaxProvider
 
     public static IncrementalValueProvider<ImmutableArray<Compilation>> GetNestedCompilations(
         IncrementalGeneratorInitializationContext context
-    ) =>
-        context
+    )
+    {
+        return context
             .GetMetadataReferencesProvider()
             .SelectMany((metadataReference, _) => new[] { (metadataReference as CompilationReference)?.Compilation }.ToImmutableArray())
             .WhereNotNull()
             .Collect();
+    }
 
     /// <summary>
     /// Workaround to mitigate binary incompatibility introduced in Microsoft.CodeAnalysis=4.2

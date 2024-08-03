@@ -11,11 +11,13 @@ internal static class SyntaxProvider
 {
     public static IncrementalValueProvider<ImmutableArray<Compilation>> GetNestedCompilations(
         IncrementalGeneratorInitializationContext context
-    ) =>
-        context
+    )
+    {
+        return context
             .MetadataReferencesProvider.Select((metadataReference, _) => (metadataReference as CompilationReference)?.Compilation!)
             .Where(x => x is not null)
             .Collect();
+    }
 
     public static IncrementalValuesProvider<MapperDeclaration> GetMapperDeclarations(IncrementalGeneratorInitializationContext context)
     {
