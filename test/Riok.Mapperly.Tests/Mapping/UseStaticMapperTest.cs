@@ -421,6 +421,9 @@ public class UseStaticMapperTest
             .Should();
     }
 
+    /// <summary>
+    /// This tests a situation when your IDE runs the source generator (references are other syntax trees)
+    /// </summary>
     [Fact]
     public void UseStaticGenericMapperStaticMethodFromAnotherAssemblyAsReference()
     {
@@ -439,6 +442,9 @@ public class UseStaticMapperTest
         );
     }
 
+    /// <summary>
+    /// This tests a situation when compiler produces final assembly (references are compiled assemblies)
+    /// </summary>
     [Fact]
     public void UseStaticGenericMapperStaticMethodFromAnotherAssemblyAsCompiledAssembly()
     {
