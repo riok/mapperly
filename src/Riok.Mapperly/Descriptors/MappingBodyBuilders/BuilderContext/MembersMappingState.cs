@@ -75,7 +75,10 @@ internal class MembersMappingState(
             .Concat(memberConfigsByRootTargetName.Keys)
             .Distinct()
             .Select(targetMembers.GetValueOrDefault)
-            .WhereNotNull();
+            .WhereNotNull()
+            // Collect the enumeration since the source may be modified.
+            // For more context see https://github.com/riok/mapperly/issues/1403#issuecomment-2267571805.
+            .ToList();
     }
 
     public void TryAddSourceMemberAlias(string alias, IMappableMember member) => _aliasedSourceMembers.TryAdd(alias, member);
