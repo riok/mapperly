@@ -20,7 +20,7 @@ public class InlineExpressionRewriterTest
     [InlineData("new TestRecord[2].ToString()", true, "new global::TestRecord[2].ToString()")]
     [InlineData("base.ToString()", false)] // CS0831
     [InlineData("(1,2).ToString()", false)] // CS8143
-    [InlineData("((string)source)?.ToString()!", false)] // CS8072
+    [InlineData("((string?)source)?.ToString()!", false)] // CS8072
     [InlineData("source switch { _ => \"fooBar\" }", false)] // CS8514
     [InlineData("throw new Exception()", false)] // CS8188
     [InlineData(

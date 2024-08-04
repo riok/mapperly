@@ -70,7 +70,11 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
     {
         var result = base.VisitCastExpression(node);
 
-        if (result is CastExpressionSyntax typedResult && semanticModel.GetSymbolInfo(node.Type).Symbol is ITypeSymbol namedTypeSymbol)
+        if (
+            CanBeInlined
+            && result is CastExpressionSyntax typedResult
+            && semanticModel.GetSymbolInfo(node.Type).Symbol is ITypeSymbol namedTypeSymbol
+        )
         {
             var fullyQualifiedType = FullyQualifiedIdentifier(namedTypeSymbol);
 
@@ -85,7 +89,8 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
         var result = base.VisitBinaryExpression(node);
 
         if (
-            result is BinaryExpressionSyntax typedResult
+            CanBeInlined
+            && result is BinaryExpressionSyntax typedResult
             && typedResult.IsKind(SyntaxKind.AsExpression)
             && semanticModel.GetSymbolInfo(node.Right).Symbol is ITypeSymbol namedTypeSymbol
         )
