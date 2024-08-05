@@ -63,6 +63,104 @@ public class InlineExpressionRewriterTest
         result.Should().Be(inlinedExpression ?? expression);
     }
 
+    [Fact]
+    public void RewriteExpressionContainingCasting()
+    {
+        var (result, inlineOk) = Rewrite(
+            """
+            using AnotherAssembly;
+
+            public class Test
+            {
+                public bool MapExpression(int value) => ((MyEnum) value & MyEnum.OptionA) > 0;
+            }
+
+            namespace AnotherAssembly {
+                enum MyEnum
+                {
+                    OptionA = 1,
+                    OptionB = 2,
+                }
+            }
+            """
+        );
+
+        inlineOk.Should().BeTrue();
+        result.Should().Be("((global::AnotherAssembly.MyEnum) value & global::AnotherAssembly.MyEnum.OptionA) > 0");
+    }
+
+    [Fact]
+    public void RewriteExpressionContainingBinaryAnd()
+    {
+        var (result, inlineOk) = Rewrite(
+            """
+            using AnotherAssembly;
+
+            public class Test
+            {
+                public bool MapExpression(MyEnum value) => (value & MyEnum.OptionA) > 0;
+            }
+
+            namespace AnotherAssembly {
+                enum MyEnum
+                {
+                    OptionA = 1,
+                    OptionB = 2,
+                }
+            }
+            """
+        );
+
+        inlineOk.Should().BeTrue();
+        result.Should().Be("(value & global::AnotherAssembly.MyEnum.OptionA) > 0");
+    }
+
+    [Fact]
+    public void RewriteExpressionContainingAsStatement()
+    {
+        var (result, inlineOk) = Rewrite(
+            """
+            using AnotherAssembly;
+
+            public class Test
+            {
+                public int MapExpression(A value) => (value as B).Value;
+            }
+
+            namespace AnotherAssembly {
+                record A;
+                record B(int Value) : A;
+            }
+            """
+        );
+
+        inlineOk.Should().BeTrue();
+        result.Should().Be("(value as global::AnotherAssembly.B).Value");
+    }
+
+    [Fact]
+    public void RewriteExpressionContainingAsStatementAndCasting()
+    {
+        var (result, inlineOk) = Rewrite(
+            """
+            using AnotherAssembly;
+
+            public class Test
+            {
+                public string MapExpression(A value) => (string)(object)(value as B).Value;
+            }
+
+            namespace AnotherAssembly {
+                record A;
+                record B(string Value) : A;
+            }
+            """
+        );
+
+        inlineOk.Should().BeTrue();
+        result.Should().Be("(string)(object)(value as global::AnotherAssembly.B).Value");
+    }
+
     private (string Result, bool CanBeInlined) Rewrite([StringSyntax(StringSyntax.CSharp)] string source)
     {
         var compilation = TestHelper.BuildCompilation(source);
