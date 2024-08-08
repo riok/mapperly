@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
 using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Descriptors.Constructors;
 using Riok.Mapperly.Descriptors.ExternalMappings;
 using Riok.Mapperly.Descriptors.FormatProviders;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders;
@@ -43,7 +44,7 @@ public class DescriptorBuilder
         _symbolAccessor = symbolAccessor;
         _types = compilationContext.Types;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
-        _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
+        _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor, _mapperDescriptor.UnsafeAccessorName);
 
         var attributeAccessor = new AttributeDataAccessor(symbolAccessor);
         var configurationReader = new MapperConfigurationReader(
@@ -78,8 +79,9 @@ public class DescriptorBuilder
 
         // ExtractObjectFactories needs to be called after ExtractUserMappings due to configuring mapperDescriptor.Static
         var objectFactories = ExtractObjectFactories();
+        var constructorFactory = new InstanceConstructorFactory(objectFactories, _symbolAccessor, _unsafeAccessorContext);
         var formatProviders = ExtractFormatProviders();
-        EnqueueUserMappings(objectFactories, formatProviders);
+        EnqueueUserMappings(constructorFactory, formatProviders);
         ExtractExternalMappings();
         _mappingBodyBuilder.BuildMappingBodies(cancellationToken);
         AddUserMappingDiagnostics();
@@ -91,24 +93,30 @@ public class DescriptorBuilder
     }
 
     /// <summary>
-    /// If <see cref="MemberVisibility.Accessible"/> is not set and the roslyn version does not have UnsafeAccessors
-    /// then emit a diagnostic and update the <see cref="MemberVisibility"/> for <see cref="SymbolAccessor"/>.
+    /// Sets the member and constructor visibility filter on the <see cref="_symbolAccessor"/> after validation.
+    /// If <see cref="MemberVisibility.Accessible"/> is not set and the compilation does not have UnsafeAccessors,
+    /// emit a diagnostic and update the <see cref="MemberVisibility"/> to include <see cref="MemberVisibility.Accessible"/>.
     /// </summary>
     private void ConfigureMemberVisibility()
     {
         var includedMembers = _builderContext.Configuration.Mapper.IncludedMembers;
+        var includedConstructors = _builderContext.Configuration.Mapper.IncludedConstructors;
 
         if (_types.TryGet(UnsafeAccessorName) != null)
         {
             _symbolAccessor.SetMemberVisibility(includedMembers);
+            _symbolAccessor.SetConstructorVisibility(includedConstructors);
             return;
         }
 
-        if (includedMembers.HasFlag(MemberVisibility.Accessible))
+        if (includedMembers.HasFlag(MemberVisibility.Accessible) && includedConstructors.HasFlag(MemberVisibility.Accessible))
+        {
             return;
+        }
 
         _diagnostics.ReportDiagnostic(DiagnosticDescriptors.UnsafeAccessorNotAvailable);
         _symbolAccessor.SetMemberVisibility(includedMembers | MemberVisibility.Accessible);
+        _symbolAccessor.SetConstructorVisibility(includedConstructors | MemberVisibility.Accessible);
     }
 
     private void ReserveMethodNames()
@@ -156,13 +164,13 @@ public class DescriptorBuilder
         return ObjectFactoryBuilder.ExtractObjectFactories(_builderContext, _mapperDescriptor.Symbol, _mapperDescriptor.Static);
     }
 
-    private void EnqueueUserMappings(ObjectFactoryCollection objectFactories, FormatProviderCollection formatProviders)
+    private void EnqueueUserMappings(InstanceConstructorFactory constructorFactory, FormatProviderCollection formatProviders)
     {
         foreach (var userMapping in _mappings.UserMappings)
         {
             var ctx = new MappingBuilderContext(
                 _builderContext,
-                objectFactories,
+                constructorFactory,
                 formatProviders,
                 userMapping,
                 new TypeMappingKey(userMapping.SourceType, userMapping.TargetType)
@@ -213,7 +221,7 @@ public class DescriptorBuilder
     private void AddAccessorsToDescriptor()
     {
         // add generated accessors to the mapper
-        _mapperDescriptor.AddUnsafeAccessors(_unsafeAccessorContext.UnsafeAccessors);
+        _mapperDescriptor.AddUnsafeAccessors(_unsafeAccessorContext.Accessors);
     }
 
     private void AddUserMapping(IUserMapping mapping, bool ignoreDuplicates, bool named)

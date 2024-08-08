@@ -18,6 +18,7 @@ public record TestSourceBuilderOptions(
     IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy = null,
     RequiredMappingStrategy? RequiredMappingStrategy = null,
     MemberVisibility? IncludedMembers = null,
+    MemberVisibility? IncludedConstructors = null,
     bool Static = false,
     bool PreferParameterlessConstructors = true,
     bool AutoUserMappings = true
@@ -43,6 +44,9 @@ public record TestSourceBuilderOptions(
 
     public static TestSourceBuilderOptions WithMemberVisibility(MemberVisibility memberVisibility) =>
         new(IncludedMembers: memberVisibility);
+
+    public static TestSourceBuilderOptions WithConstructorVisibility(MemberVisibility memberVisibility) =>
+        new(IncludedConstructors: memberVisibility);
 
     public static TestSourceBuilderOptions WithDisabledMappingConversion(params MappingConversionType[] conversionTypes)
     {

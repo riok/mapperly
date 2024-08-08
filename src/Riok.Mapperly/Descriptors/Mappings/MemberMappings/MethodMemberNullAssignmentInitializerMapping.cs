@@ -1,7 +1,6 @@
 using System.Diagnostics;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Emit.Syntax;
+using Riok.Mapperly.Descriptors.Constructors;
 using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -10,22 +9,26 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// A member initializer which initializes null members to new objects.
 /// </summary>
 [DebuggerDisplay("MemberNullAssignmentInitializerMapping({_targetPathToInitialize} ??= new())")]
-public class MethodMemberNullAssignmentInitializerMapping(MemberPathSetter targetPathToInitialize, MemberPathGetter sourcePathToInitialize)
-    : MemberAssignmentMappingContainer
+public class MethodMemberNullAssignmentInitializerMapping(
+    MemberPathSetter targetPathToInitialize,
+    MemberPathGetter sourcePathToInitialize,
+    IInstanceConstructor constructor
+) : MemberAssignmentMappingContainer
 {
     private readonly MemberPathSetter _targetPathToInitialize = targetPathToInitialize;
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
-        // target.Value ?? new()
-        var initializer = SyntaxFactoryHelper.Coalesce(
-            sourcePathToInitialize.BuildAccess(targetAccess),
-            SyntaxFactory.ImplicitObjectCreationExpression()
-        );
+        // new T();
+        var newTarget = constructor.CreateInstance(ctx);
 
-        // target.SetValue(source.Value ?? new());
-        var setTarget = ctx.SyntaxFactory.ExpressionStatement(_targetPathToInitialize.BuildAssignment(targetAccess, initializer));
-        return base.Build(ctx, targetAccess).Prepend(setTarget);
+        // target.Value = new T();
+        var setTarget = _targetPathToInitialize.BuildAssignment(targetAccess, newTarget);
+
+        // if (target.Value == null) target.Value = new T();
+        var setTargetIfNull = ctx.SyntaxFactory.IfNull(sourcePathToInitialize.BuildAccess(targetAccess), setTarget);
+
+        return base.Build(ctx, targetAccess).Prepend(setTargetIfNull);
     }
 
     public override bool Equals(object? obj)

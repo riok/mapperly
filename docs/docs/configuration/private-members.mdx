@@ -1,0 +1,114 @@
+---
+sidebar_position: 14
+description: Private members
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Private members
+
+As of .NET 8.0, Mapperly supports mapping members that are normally inaccessible like `private` or `protected` properties.
+This is made possible by using the [UnsafeAccessorAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.unsafeaccessorattribute) which lets Mapperly access normally inaccessible members with zero overhead while being completely AOT safe.
+
+By default `IncludedMembers` and `IncludedConstructors` is set to `MemberVisibility.AllAccessible` which will configure Mapperly to map members of all accessibility levels as long as they are ordinarily accessible.
+To enable unsafe accessor usage, set `IncludedMembers` and/or `IncludedConstructors` to `MemberVisibility.All`.
+Mapperly will then try to map members of all accessibilities, including ones that are not usually visible to external types.
+
+`IncludedConstructors` can be used separately from `IncludedMembers`.
+This allows you to use inaccessible constructors but only map accessible members or vice versa.
+
+<Tabs>
+  <TabItem value="declaration" label="Declaration" default>
+    ```csharp
+    // highlight-start
+    [Mapper(
+        IncludedMembers = MemberVisibility.All,
+        IncludedConstructors = MemberVisibility.All)]
+    // highlight-end
+    public partial class FruitMapper
+    {
+        public partial FruitDto ToDto(Fruit source);
+    }
+
+    public class Fruit
+    {
+      private bool _isSeeded;
+
+      public string Name { get; set; }
+
+      private int Sweetness { get; set; }
+    }
+
+    public class FruitDto
+    {
+      private FruitDto() {}
+
+      private bool _isSeeded;
+
+      public string Name { get; set; }
+
+      private int Sweetness { get; set; }
+    }
+    ```
+
+  </TabItem>
+  <TabItem label="Generated code" value="generated">
+    Mapperly generates a file scoped class containing an accessor method for each member which cannot be accessed directly.
+    Mapperly then uses these methods to create the instance, get and set the members as needed.
+    Note that this uses zero reflection and is as performant as using an ordinary property or field.
+
+    ```csharp
+    public partial class FruitMapper
+    {
+      private partial global::FruitDto ToDto(global::Fruit source)
+      {
+        var target = UnsafeAccessor.CreateFruitDto();
+        target.GetIsSeeded1() = source.GetIsSeeded();
+        target.Name = source.Name;
+        target.SetSweetness(source.GetSweetness());
+        return target;
+      }
+    }
+
+    static file class UnsafeAccessor
+    {
+      [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Constructor)]
+      public static extern global::FruitDto CreateFruitDto(this global::FruitDto target);
+
+      [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Field, Name = "_isSeeded")]
+      public static extern ref bool GetSeeded(this global::Fruit target);
+
+      [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Field, Name = "_isSeeded")]
+      public static extern ref bool GetSeeded1(this global::FruitDto target);
+
+      [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_Sweetness")]
+      public static extern int GetSweetness(this global::Fruit source);
+
+      [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "set_Sweetness")]
+      public static extern void SetSweetness(this global::FruitDto target, int value);
+    }
+    ```
+
+  </TabItem>
+</Tabs>
+
+## Controlling member accessibility
+
+In addition to mapping inaccessible members,
+`MemberVisbility` can be used to control which members are considered, depending on their accessibility modifier.
+For instance `MemberVisibility.Private | MemberVisibility.Protected` will cause Mapperly to only consider private and protected members,
+generating an unsafe accessor if needed.
+
+`IncludedConstructors` can be used separately from `IncludedMembers`.
+This allows you to use inaccessible constructors but only map accessible members or vice versa.
+
+```csharp
+// highlight-start
+[Mapper(IncludedMembers = MemberVisibility.Private | MemberVisibility.Protected)]
+// highlight-end
+public partial class FruitMapper
+{
+    public partial FruitDto ToDto(Fruit source);
+}
+```

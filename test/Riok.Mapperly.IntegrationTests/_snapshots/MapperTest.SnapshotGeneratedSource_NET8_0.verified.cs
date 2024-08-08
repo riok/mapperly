@@ -70,7 +70,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             if (testObject.NullableUnflatteningIdValue != null)
             {
-                target.NullableUnflattening ??= new();
+                target.NullableUnflattening ??= new global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto();
                 target.NullableUnflattening.IdValue = DirectInt(testObject.NullableUnflatteningIdValue.Value);
             }
             if (testObject.NestedNullable != null)
@@ -420,6 +420,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public partial global::Riok.Mapperly.IntegrationTests.Dto.PrivateCtorDto MapPrivateDto(global::Riok.Mapperly.IntegrationTests.Models.PrivateCtorObject testObject)
+        {
+            var target = UnsafeAccessor.CreatePrivateCtorDto(DirectInt(testObject.GetIntValue()));
+            target.GetStringValue1() = testObject.GetStringValue();
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public partial (string X, string Y) MapAliasedTuple((int X, int Y) source)
         {
             var target = (X: source.X.ToString(_formatDeCh), Y: source.Y.ToString(_formatDeCh));
@@ -598,5 +606,21 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "set_PrivateValue")]
         public static extern void SetPrivateValue1(this global::Riok.Mapperly.IntegrationTests.Models.TestObject target, int value);
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Field, Name = "intValue")]
+        public static extern ref int GetIntValue(this global::Riok.Mapperly.IntegrationTests.Models.PrivateCtorObject target);
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Constructor)]
+        public static extern global::Riok.Mapperly.IntegrationTests.Dto.PrivateCtorDto CreatePrivateCtorDto(int intValue);
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Field, Name = "stringValue")]
+        public static extern ref string GetStringValue(this global::Riok.Mapperly.IntegrationTests.Models.PrivateCtorObject target);
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Field, Name = "stringValue")]
+        public static extern ref string GetStringValue1(this global::Riok.Mapperly.IntegrationTests.Dto.PrivateCtorDto target);
     }
 }

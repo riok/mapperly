@@ -10,8 +10,6 @@ namespace Riok.Mapperly.Emit;
 
 public static class UnsafeAccessorEmitter
 {
-    private const string AccessorClassName = "UnsafeAccessor";
-
     public static MemberDeclarationSyntax BuildUnsafeAccessorClass(
         MapperDescriptor descriptor,
         CancellationToken cancellationToken,
@@ -19,11 +17,10 @@ public static class UnsafeAccessorEmitter
     )
     {
         var accessorCtx = ctx.AddIndentation();
-        var accessorClassName = descriptor.NameBuilder.New(AccessorClassName);
         var accessors = BuildUnsafeAccessors(accessorCtx, descriptor, cancellationToken);
         accessors = accessors.SeparateByLineFeed(accessorCtx.SyntaxFactory.Indentation);
         return ctx.SyntaxFactory.Class(
-            accessorClassName,
+            descriptor.UnsafeAccessorName,
             TokenList(TrailingSpacedToken(SyntaxKind.StaticKeyword), TrailingSpacedToken(SyntaxKind.FileKeyword)),
             List(accessors)
         );

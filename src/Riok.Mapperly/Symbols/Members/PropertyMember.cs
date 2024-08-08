@@ -20,12 +20,12 @@ public class PropertyMember(IPropertySymbol symbol, SymbolAccessor symbolAccesso
     public ITypeSymbol Type { get; } = symbolAccessor.UpgradeNullable(symbol.Type);
     public bool IsNullable => Type.IsNullable();
 
-    public bool CanGet => !Symbol.IsWriteOnly && (Symbol.GetMethod == null || symbolAccessor.IsAccessible(Symbol.GetMethod));
+    public bool CanGet => !Symbol.IsWriteOnly && (Symbol.GetMethod == null || symbolAccessor.IsMemberAccessible(Symbol.GetMethod));
 
     public bool CanGetDirectly =>
         !Symbol.IsWriteOnly && (Symbol.GetMethod == null || symbolAccessor.IsDirectlyAccessible(Symbol.GetMethod));
 
-    public bool CanSet => !Symbol.IsReadOnly && (Symbol.SetMethod == null || symbolAccessor.IsAccessible(Symbol.SetMethod));
+    public bool CanSet => !Symbol.IsReadOnly && (Symbol.SetMethod == null || symbolAccessor.IsMemberAccessible(Symbol.SetMethod));
 
     public bool CanSetDirectly => !Symbol.IsReadOnly && (Symbol.SetMethod == null || symbolAccessor.IsDirectlyAccessible(Symbol.SetMethod));
 

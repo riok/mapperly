@@ -6,7 +6,12 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::A Map(global::System.Collections.Generic.IDictionary<string, int> source)
     {
-        // Could not generate mapping
-        throw new System.NotImplementedException();
+        var target = new global::A();
+        target.EnsureCapacity(source.Count);
+        foreach (var item in source)
+        {
+            target[item.Key] = item.Value;
+        }
+        return target;
     }
 }

@@ -16,37 +16,26 @@ public static class NewInstanceObjectMemberMappingBuilder
         if (ctx.Source.IsDelegate() || ctx.Target.IsDelegate())
             return null;
 
-        if (ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory))
-            return new NewInstanceObjectFactoryMemberMapping(
+        if (ctx.InstanceConstructors.TryBuildObjectFactory(ctx.Source, ctx.Target, out var constructor))
+        {
+            return new NewInstanceObjectMemberMethodMapping(
                 ctx.Source,
                 ctx.Target.NonNullable(),
-                objectFactory,
                 ctx.Configuration.Mapper.UseReferenceHandling
-            );
+            )
+            {
+                Constructor = constructor
+            };
+        }
 
-        if (
-            ctx.Target is not INamedTypeSymbol namedTarget
-            || namedTarget.Constructors.All(x => !ctx.SymbolAccessor.IsDirectlyAccessible(x))
-        )
+        if (!ctx.SymbolAccessor.HasAnyAccessibleConstructor(ctx.Target))
             return null;
 
         if (ctx.Source.IsEnum() || ctx.Target.IsEnum())
             return null;
 
         if (ctx.Target.IsTupleType)
-        {
-            if (!ctx.IsConversionEnabled(MappingConversionType.Tuple))
-                return null;
-
-            // inline expressions don't support tuple expressions so ValueTuple is used instead
-            if (ctx.IsExpression)
-            {
-                return new NewValueTupleConstructorMapping(ctx.Source, ctx.Target);
-            }
-
-            var expectedArgumentCount = (ctx.Target as INamedTypeSymbol)!.TupleElements.Length;
-            return new NewValueTupleExpressionMapping(ctx.Source, ctx.Target, expectedArgumentCount);
-        }
+            return BuildTupleMapping(ctx);
 
         // inline expressions don't support method property mappings
         // and can only map to properties via object initializers.
@@ -64,5 +53,20 @@ public static class NewInstanceObjectMemberMappingBuilder
             return null;
 
         return new ObjectMemberExistingTargetMapping(ctx.Source, ctx.Target);
+    }
+
+    private static INewInstanceMapping? BuildTupleMapping(MappingBuilderContext ctx)
+    {
+        if (!ctx.IsConversionEnabled(MappingConversionType.Tuple))
+            return null;
+
+        // inline expressions don't support tuple expressions so ValueTuple is used instead
+        if (ctx.IsExpression)
+        {
+            return new NewValueTupleConstructorMapping(ctx.Source, ctx.Target);
+        }
+
+        var expectedArgumentCount = (ctx.Target as INamedTypeSymbol)!.TupleElements.Length;
+        return new NewValueTupleExpressionMapping(ctx.Source, ctx.Target, expectedArgumentCount);
     }
 }

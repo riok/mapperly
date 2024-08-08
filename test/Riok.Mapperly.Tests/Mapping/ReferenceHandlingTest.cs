@@ -89,7 +89,10 @@ public class ReferenceHandlingTest
     public Task ObjectFactoryShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[ObjectFactory] B CreateB() => new B();" + "private partial B Map(A a);",
+            """
+            [ObjectFactory] B CreateB() => new B();
+            private partial B Map(A a);
+            """,
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } public C Value { get; set; } }",
             "class B { public B Parent { get; set; } public D Value { get; set; } }",

@@ -15,7 +15,6 @@ public static class EnumerableMappingBuilder
     private const string ToArrayMethodName = "global::System.Linq.Enumerable.ToArray";
     private const string ToListMethodName = "global::System.Linq.Enumerable.ToList";
     private const string ToHashSetMethodName = "ToHashSet";
-    private const string AddMethodName = nameof(ICollection<object>.Add);
 
     private const string ToImmutableArrayMethodName = "global::System.Collections.Immutable.ImmutableArray.ToImmutableArray";
     private const string ToImmutableListMethodName = "global::System.Collections.Immutable.ImmutableList.ToImmutableList";
@@ -79,17 +78,11 @@ public static class EnumerableMappingBuilder
         if (elementMapping == null)
             return null;
 
-        if (ctx.CollectionInfos.Target.CollectionType == CollectionType.Stack)
-            return CreateForEach(nameof(Stack<object>.Push));
-
-        if (ctx.CollectionInfos.Target.CollectionType == CollectionType.Queue)
-            return CreateForEach(nameof(Queue<object>.Enqueue));
-
-        // create a foreach loop with add calls if source is not an array
-        // and has an implicit .Add() method
-        // the implicit check is an easy way to exclude for example immutable types.
-        if (ctx.CollectionInfos.Target.CollectionType != CollectionType.Array && ctx.CollectionInfos.Target.HasImplicitCollectionAddMethod)
-            return CreateForEach(AddMethodName);
+        var addMethodName = ctx.CollectionInfos.Target.AddMethodName;
+        if (addMethodName != null)
+        {
+            return new ForEachAddEnumerableExistingTargetMapping(ctx.CollectionInfos, elementMapping, addMethodName);
+        }
 
         if (ctx.CollectionInfos.Target.IsImmutableCollectionType)
         {
@@ -97,11 +90,6 @@ public static class EnumerableMappingBuilder
         }
 
         return null;
-
-        ForEachAddEnumerableExistingTargetMapping CreateForEach(string methodName)
-        {
-            return new ForEachAddEnumerableExistingTargetMapping(ctx.CollectionInfos, elementMapping, methodName);
-        }
     }
 
     private static NewInstanceMapping? TryBuildCastMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
@@ -195,10 +183,11 @@ public static class EnumerableMappingBuilder
             return new DelegateMapping(ctx.Source, ctx.Target, existingMapping);
 
         return new ForEachAddEnumerableMapping(
+            null,
             collectionInfos,
             elementMapping,
             ctx.Configuration.Mapper.UseReferenceHandling,
-            AddMethodName
+            collectionInfos.Target.AddMethodName!
         );
     }
 
@@ -294,47 +283,32 @@ public static class EnumerableMappingBuilder
 
     private static INewInstanceMapping? BuildCustomTypeMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
-        var hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory);
-
         // create a foreach loop with add calls if source is not an array
         // and has an implicit .Add() method
         // the implicit check is an easy way to exclude for example immutable types.
-        if (
-            ctx.CollectionInfos!.Target.CollectionType == CollectionType.Array
-            || !ctx.CollectionInfos.Target.HasImplicitCollectionAddMethod
-        )
+        if (ctx.CollectionInfos?.Target.AddMethodName == null)
         {
             return null;
         }
 
         // try to reuse an existing mapping
         var collectionInfos = ctx.CollectionInfos;
-        if (!hasObjectFactory)
+        if (!ctx.InstanceConstructors.TryBuildObjectFactory(ctx.Source, ctx.Target, out var constructor))
         {
             collectionInfos = collectionInfos with { Source = BuildCollectionTypeForICollection(ctx, collectionInfos.Source) };
             var existingMapping = ctx.BuildDelegatedMapping(collectionInfos.Source.Type, ctx.Target);
             if (existingMapping != null)
                 return existingMapping;
 
-            hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out objectFactory);
-        }
-
-        if (hasObjectFactory)
-        {
-            return new ForEachAddEnumerableObjectFactoryMapping(
-                collectionInfos,
-                elementMapping,
-                objectFactory!,
-                ctx.Configuration.Mapper.UseReferenceHandling,
-                AddMethodName
-            );
+            ctx.InstanceConstructors.TryBuildObjectFactory(collectionInfos.Source.Type, ctx.Target, out constructor);
         }
 
         return new ForEachAddEnumerableMapping(
+            constructor,
             collectionInfos,
             elementMapping,
             ctx.Configuration.Mapper.UseReferenceHandling,
-            AddMethodName
+            collectionInfos.Target.AddMethodName
         );
     }
 

@@ -5,9 +5,9 @@
       Title: No accessible parameterless constructor found,
       Severity: Error,
       WarningLevel: 0,
-      Location: : (11,4)-(11,76),
+      Location: : (11,4)-(11,75),
       MessageFormat: {0} has no accessible parameterless constructor,
-      Message: C? has no accessible parameterless constructor,
+      Message: C has no accessible parameterless constructor,
       Category: Mapper
     }
   ]

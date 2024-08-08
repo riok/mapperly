@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Descriptors.Constructors;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -36,6 +37,9 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         bool? preferParameterlessConstructor = null
     )
     {
+        if (ctx.Mapping.HasConstructor)
+            return [];
+
         if (ctx.Mapping.TargetType is not INamedTypeSymbol namedTargetType)
         {
             ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoConstructorFound, ctx.BuilderContext.Target);
@@ -47,7 +51,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         // the reverse if preferParameterlessConstructors is false , descending parameter count is prio2 then parameterless ctor
         // ctors annotated with [Obsolete] are considered last unless they have a MapperConstructor attribute set
         var ctorCandidates = namedTargetType
-            .InstanceConstructors.Where(ctor => ctx.BuilderContext.SymbolAccessor.IsDirectlyAccessible(ctor))
+            .InstanceConstructors.Where(ctor => ctx.BuilderContext.SymbolAccessor.IsConstructorAccessible(ctor))
             .OrderByDescending(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<MapperConstructorAttribute>(x))
             .ThenBy(x => ctx.BuilderContext.SymbolAccessor.HasAttribute<ObsoleteAttribute>(x));
 
@@ -76,6 +80,8 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
                 continue;
             }
 
+            ctx.Mapping.Constructor = ctx.BuilderContext.InstanceConstructors.BuildForConstructor(ctorCandidate);
+
             foreach (var mapping in constructorParameterMappings)
             {
                 ctx.AddConstructorParameterMapping(mapping);
@@ -85,6 +91,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         }
 
         ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoConstructorFound, ctx.BuilderContext.Target);
+        ctx.Mapping.Constructor = new InstanceConstructor(namedTargetType);
         return [];
     }
 
@@ -93,6 +100,9 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         bool includeAllMembers = false
     )
     {
+        if (!ctx.Mapping.Constructor.SupportsObjectInitializer)
+            return;
+
         var initOnlyTargetMembers = includeAllMembers
             ? ctx.EnumerateUnmappedTargetMembers().ToArray()
             : ctx.EnumerateUnmappedTargetMembers().Where(x => x.CanOnlySetViaInitializer()).ToArray();

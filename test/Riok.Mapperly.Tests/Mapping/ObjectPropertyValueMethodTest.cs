@@ -62,10 +62,7 @@ public class ObjectPropertyValueMethodTest
             [MapValue("GuidValue", Use = nameof(NewGuid))] partial B Map(A source);
             Guid NewGuid() => Guid.NewGuid();
             """,
-            TestSourceBuilderOptions.Default with
-            {
-                IncludedMembers = MemberVisibility.Private
-            },
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.Private),
             "class A;",
             "class B { private Guid GuidValue { get; set; } }"
         );
@@ -90,10 +87,7 @@ public class ObjectPropertyValueMethodTest
             [MapValue("Nested.Value", Use = nameof(NewGuid))] partial B Map(A source);
             Guid NewGuid() => Guid.NewGuid();
             """,
-            TestSourceBuilderOptions.Default with
-            {
-                IncludedMembers = MemberVisibility.All
-            },
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
             "class A;",
             "class B { private C Nested { get; set; } }",
             "class C { public Guid Value { get; set; } }"

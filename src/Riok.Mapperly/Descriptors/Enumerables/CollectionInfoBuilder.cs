@@ -11,6 +11,7 @@ public static class CollectionInfoBuilder
     private readonly record struct CollectionTypeInfo(
         CollectionType CollectionType,
         Type? ReflectionType = null,
+        string? AddMethodName = null,
         string? TypeFullName = null,
         bool Immutable = false
     )
@@ -32,16 +33,16 @@ public static class CollectionInfoBuilder
     private static readonly IReadOnlyCollection<CollectionTypeInfo> _collectionTypeInfos = new[]
     {
         new CollectionTypeInfo(CollectionType.IEnumerable, typeof(IEnumerable<>)),
-        new CollectionTypeInfo(CollectionType.List, typeof(List<>)),
-        new CollectionTypeInfo(CollectionType.Stack, typeof(Stack<>)),
-        new CollectionTypeInfo(CollectionType.Queue, typeof(Queue<>)),
+        new CollectionTypeInfo(CollectionType.List, typeof(List<>), nameof(List<object>.Add)),
+        new CollectionTypeInfo(CollectionType.Stack, typeof(Stack<>), nameof(Stack<object>.Push)),
+        new CollectionTypeInfo(CollectionType.Queue, typeof(Queue<>), nameof(Queue<object>.Enqueue)),
         new CollectionTypeInfo(CollectionType.IReadOnlyCollection, typeof(IReadOnlyCollection<>)),
-        new CollectionTypeInfo(CollectionType.IList, typeof(IList<>)),
+        new CollectionTypeInfo(CollectionType.IList, typeof(IList<>), nameof(IList<object>.Add)),
         new CollectionTypeInfo(CollectionType.IReadOnlyList, typeof(IReadOnlyList<>)),
-        new CollectionTypeInfo(CollectionType.ICollection, typeof(ICollection<>)),
-        new CollectionTypeInfo(CollectionType.HashSet, typeof(HashSet<>)),
-        new CollectionTypeInfo(CollectionType.SortedSet, typeof(SortedSet<>)),
-        new CollectionTypeInfo(CollectionType.ISet, typeof(ISet<>)),
+        new CollectionTypeInfo(CollectionType.ICollection, typeof(ICollection<>), nameof(ICollection<object>.Add)),
+        new CollectionTypeInfo(CollectionType.HashSet, typeof(HashSet<>), nameof(HashSet<object>.Add)),
+        new CollectionTypeInfo(CollectionType.SortedSet, typeof(SortedSet<>), nameof(SortedSet<object>.Add)),
+        new CollectionTypeInfo(CollectionType.ISet, typeof(ISet<>), nameof(ISet<object>.Add)),
         new CollectionTypeInfo(CollectionType.IReadOnlySet, TypeFullName: "System.Collections.Generic.IReadOnlySet`1"),
         new CollectionTypeInfo(CollectionType.IDictionary, typeof(IDictionary<,>)),
         new CollectionTypeInfo(CollectionType.IReadOnlyDictionary, typeof(IReadOnlyDictionary<,>)),
@@ -139,7 +140,7 @@ public static class CollectionInfoBuilder
             implementedTypes,
             symbolAccessor.UpgradeNullable(enumeratedType),
             FindCountMember(symbolAccessor, type, typeInfo),
-            HasValidAddMethod(wellKnownTypes, type, typeInfo, implementedTypes),
+            GetAddMethodName(wellKnownTypes, type, implementedTypes, collectionTypeInfo),
             collectionTypeInfo?.Immutable == true
         );
     }
@@ -182,21 +183,15 @@ public static class CollectionInfoBuilder
         return null;
     }
 
-    private static bool HasValidAddMethod(WellKnownTypes types, ITypeSymbol t, CollectionType typeInfo, CollectionType implementedTypes)
+    private static string? GetAddMethodName(
+        WellKnownTypes types,
+        ITypeSymbol t,
+        CollectionType implementedTypes,
+        CollectionTypeInfo? collectionTypeInfo
+    )
     {
-        if (
-            typeInfo
-            is CollectionType.ICollection
-                or CollectionType.IList
-                or CollectionType.List
-                or CollectionType.ISet
-                or CollectionType.HashSet
-                or CollectionType.SortedSet
-        )
-            return true;
-
-        if (typeInfo is not CollectionType.None)
-            return false;
+        if (collectionTypeInfo != null)
+            return collectionTypeInfo.Value.AddMethodName;
 
         // has valid add if type implements ICollection and has implicit Add method
         if (
@@ -204,7 +199,7 @@ public static class CollectionInfoBuilder
             && t.HasImplicitGenericImplementation(types.Get(typeof(ICollection<>)), nameof(ICollection<object>.Add))
         )
         {
-            return true;
+            return nameof(ICollection<object>.Add);
         }
 
         // has valid add if type implements ISet and has implicit Add method
@@ -213,10 +208,10 @@ public static class CollectionInfoBuilder
             && t.HasImplicitGenericImplementation(types.Get(typeof(ISet<>)), nameof(ISet<object>.Add))
         )
         {
-            return true;
+            return nameof(ISet<object>.Add);
         }
 
-        return false;
+        return null;
     }
 
     private static IMappableMember? FindCountMember(SymbolAccessor symbolAccessor, ITypeSymbol t, CollectionType typeInfo)

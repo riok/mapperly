@@ -5,6 +5,7 @@ using VerifyXunit;
 using Xunit;
 #if NET8_0_OR_GREATER
 using FluentAssertions;
+using Riok.Mapperly.IntegrationTests.Models;
 #endif
 
 namespace Riok.Mapperly.IntegrationTests
@@ -29,6 +30,15 @@ namespace Riok.Mapperly.IntegrationTests
         }
 
 #if NET8_0_OR_GREATER
+        [Fact]
+        public void RunMappingPrivateCtor()
+        {
+            var source = PrivateCtorObject.CreateObject(11, "fooBar");
+            var target = new TestMapper().MapPrivateDto(source);
+            target.ExposeIntValue().Should().Be(11);
+            target.ExposeStringValue().Should().Be("fooBar");
+        }
+
         [Fact]
         public void RunMappingAliasedTuple()
         {

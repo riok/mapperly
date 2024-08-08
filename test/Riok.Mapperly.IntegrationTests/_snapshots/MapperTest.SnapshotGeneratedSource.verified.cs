@@ -70,7 +70,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             if (testObject.NullableUnflatteningIdValue != null)
             {
-                target.NullableUnflattening ??= new();
+                target.NullableUnflattening ??= new global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto();
                 target.NullableUnflattening.IdValue = DirectInt(testObject.NullableUnflatteningIdValue.Value);
             }
             if (testObject.NestedNullable != null)

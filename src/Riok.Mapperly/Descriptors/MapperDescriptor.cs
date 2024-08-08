@@ -10,6 +10,8 @@ namespace Riok.Mapperly.Descriptors;
 
 public class MapperDescriptor
 {
+    private const string AccessorClassName = "UnsafeAccessor";
+
     private readonly MapperDeclaration _declaration;
     private readonly List<MethodMapping> _methodMappings = new();
     private readonly List<IUnsafeAccessor> _unsafeAccessors = new();
@@ -21,6 +23,7 @@ public class MapperDescriptor
         _declaration = declaration;
         NameBuilder = nameBuilder;
         Name = BuildName(declaration.Symbol);
+        UnsafeAccessorName = nameBuilder.New(AccessorClassName);
 
         if (!Symbol.ContainingNamespace.IsGlobalNamespace)
         {
@@ -31,6 +34,8 @@ public class MapperDescriptor
     public string Name { get; }
 
     public string? Namespace { get; }
+
+    public string UnsafeAccessorName { get; }
 
     public ClassDeclarationSyntax Syntax => _declaration.Syntax;
 

@@ -13,7 +13,7 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 public class GenericTargetObjectFactory(GenericTypeChecker typeChecker, SymbolAccessor symbolAccessor, IMethodSymbol method)
     : ObjectFactory(symbolAccessor, method)
 {
-    public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
+    public override bool CanCreateInstanceOfType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
         typeChecker.CheckTypes((Method.TypeParameters[0], targetTypeToCreate));
 
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>

@@ -14,7 +14,7 @@ public class GenericSourceTargetObjectFactory(
 {
     private readonly int _targetTypeParameterIndex = (sourceTypeParameterIndex + 1) % 2;
 
-    public override bool CanCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
+    public override bool CanCreateInstanceOfType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate) =>
         typeChecker.CheckTypes(
             (Method.TypeParameters[sourceTypeParameterIndex], sourceType),
             (Method.TypeParameters[_targetTypeParameterIndex], targetTypeToCreate)

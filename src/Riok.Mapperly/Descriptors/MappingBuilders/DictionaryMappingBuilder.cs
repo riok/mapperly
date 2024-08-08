@@ -53,42 +53,25 @@ public static class DictionaryMappingBuilder
         INewInstanceMapping valueMapping
     )
     {
-        // the target is not a well known dictionary type
-        // it should have a an object factory or a parameterless public ctor
-        var hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory);
-        if (!hasObjectFactory && !ctx.SymbolAccessor.HasDirectlyAccessibleParameterlessConstructor(ctx.Target))
-        {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.NoParameterlessConstructorFound, ctx.Target);
-            return null;
-        }
-
         if (!ctx.CollectionInfos!.Target.ImplementedTypes.HasFlag(CollectionType.IDictionary))
             return null;
 
         var collectionInfos = ctx.CollectionInfos;
-        if (!hasObjectFactory)
+
+        // the target is not a well known dictionary type
+        // it should have a an object factory or a parameterless public ctor
+        if (!ctx.InstanceConstructors.TryBuildObjectFactory(ctx.Source, ctx.Target, out var constructor))
         {
             collectionInfos = collectionInfos with { Source = BuildCollectionTypeForSourceIDictionary(ctx) };
             var existingMapping = ctx.BuildDelegatedMapping(collectionInfos.Source.Type, ctx.Target);
             if (existingMapping != null)
                 return existingMapping;
 
-            hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out objectFactory);
-        }
-
-        if (hasObjectFactory)
-        {
-            return new ForEachSetDictionaryObjectFactoryMapping(
-                collectionInfos,
-                keyMapping,
-                valueMapping,
-                GetExplicitIndexer(ctx),
-                objectFactory!,
-                ctx.Configuration.Mapper.UseReferenceHandling
-            );
+            ctx.InstanceConstructors.TryBuildObjectFactory(collectionInfos.Source.Type, ctx.Target, out constructor);
         }
 
         return new ForEachSetDictionaryMapping(
+            constructor,
             collectionInfos,
             keyMapping,
             valueMapping,
@@ -110,12 +93,11 @@ public static class DictionaryMappingBuilder
         if (TryGetFromEnumerable(ctx, keyMapping, valueMapping) is { } toDictionary)
             return toDictionary;
 
-        // there might be an object factory for the exact types
-        var hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(ctx.Source, ctx.Target, out var objectFactory);
-
         // use generalized types to reuse generated mappings
         var collectionInfos = ctx.CollectionInfos!;
-        if (!hasObjectFactory)
+
+        // there might be an object factory for the exact types
+        if (!ctx.InstanceConstructors.TryBuildObjectFactory(ctx.Source, ctx.Target, out var constructor))
         {
             collectionInfos = new CollectionInfos(
                 BuildCollectionTypeForSourceIDictionary(ctx),
@@ -126,26 +108,11 @@ public static class DictionaryMappingBuilder
             if (delegateMapping != null)
                 return delegateMapping;
 
-            hasObjectFactory = ctx.ObjectFactories.TryFindObjectFactory(
-                collectionInfos.Source.Type,
-                collectionInfos.Target.Type,
-                out objectFactory
-            );
-        }
-
-        if (hasObjectFactory)
-        {
-            return new ForEachSetDictionaryObjectFactoryMapping(
-                collectionInfos,
-                keyMapping,
-                valueMapping,
-                GetExplicitIndexer(ctx),
-                objectFactory!,
-                ctx.Configuration.Mapper.UseReferenceHandling
-            );
+            ctx.InstanceConstructors.TryBuildObjectFactory(collectionInfos.Source.Type, collectionInfos.Target.Type, out constructor);
         }
 
         return new ForEachSetDictionaryMapping(
+            constructor,
             collectionInfos,
             keyMapping,
             valueMapping,
@@ -216,10 +183,12 @@ public static class DictionaryMappingBuilder
 
         if (fromEnumerableCtor != null)
         {
-            var constructedDictionary = dictionaryType
-                .Construct(keyMapping.TargetType, valueMapping.TargetType)
-                .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
-            return new CtorMapping(ctx.Source, constructedDictionary);
+            var constructedDictionary = (INamedTypeSymbol)
+                dictionaryType
+                    .Construct(keyMapping.TargetType, valueMapping.TargetType)
+                    .WithNullableAnnotation(NullableAnnotation.NotAnnotated);
+            var ctor = ctx.InstanceConstructors.BuildParameterless(constructedDictionary);
+            return new CtorMapping(ctx.Source, constructedDictionary, ctor);
         }
 
         return null;
