@@ -31,8 +31,14 @@ public class MemberPathCandidateBuilderTest
     {
         MemberPathCandidateBuilder
             .BuildMemberPathCandidates(name)
-            .Select(x => string.Join(".", x))
+            .Select(x => x.FullName)
             .Should()
             .BeEquivalentTo(chunks, o => o.WithStrictOrdering());
+    }
+
+    [Fact]
+    public void BuildMemberPathCandidatesWithPascalCaseShouldLimitPermutations()
+    {
+        MemberPathCandidateBuilder.BuildMemberPathCandidates("NOT_A_PASCAL_CASE_STRING").Should().HaveCount(256);
     }
 }

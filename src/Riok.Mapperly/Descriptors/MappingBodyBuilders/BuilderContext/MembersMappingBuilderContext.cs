@@ -127,7 +127,7 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
     ) => _state.TryGetMemberValueConfigs(targetMemberName, ignoreCase, out memberConfigs);
 
     protected virtual bool TryFindSourcePath(
-        IReadOnlyList<IReadOnlyList<string>> pathCandidates,
+        IEnumerable<StringMemberPath> pathCandidates,
         bool ignoreCase,
         [NotNullWhen(true)] out SourceMemberPath? sourcePath
     )
@@ -183,7 +183,7 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
     private MemberMappingInfo? ResolveMemberMappingInfo(MemberValueMappingConfiguration config)
     {
         if (
-            !BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.TargetType, config.Target.Path, out var foundMemberPath)
+            !BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.TargetType, config.Target, out var foundMemberPath)
             || foundMemberPath is not NonEmptyMemberPath targetMemberPath
         )
         {
@@ -205,7 +205,7 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
     private MemberMappingInfo? ResolveMemberMappingInfo(MemberMappingConfiguration config)
     {
         if (
-            !BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.TargetType, config.Target.Path, out var foundMemberPath)
+            !BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.TargetType, config.Target, out var foundMemberPath)
             || foundMemberPath is not NonEmptyMemberPath targetMemberPath
         )
         {
@@ -229,7 +229,7 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
 
     private bool ResolveMemberConfigSourcePath(MemberMappingConfiguration config, [NotNullWhen(true)] out SourceMemberPath? sourcePath)
     {
-        if (!BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.SourceType, config.Source.Path, out var sourceMemberPath))
+        if (!BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.SourceType, config.Source, out var sourceMemberPath))
         {
             BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ConfiguredMappingSourceMemberNotFound,
@@ -255,7 +255,7 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
     )
     {
         ignoreCase ??= BuilderContext.Configuration.Mapper.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
-        var pathCandidates = MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMemberName).Select(cs => cs.ToList()).ToList();
+        var pathCandidates = MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMemberName);
 
         // First, try to find the property on (a sub-path of) the source type itself. (If this is undesired, an Ignore property can be used.)
         if (TryFindSourcePath(pathCandidates, ignoreCase.Value, out sourceMemberPath))
