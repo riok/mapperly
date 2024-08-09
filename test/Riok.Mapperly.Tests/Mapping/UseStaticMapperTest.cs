@@ -433,10 +433,13 @@ public class UseStaticMapperTest
             "ProjectToTarget",
             """
             #nullable disable
-                    return System.Linq.Queryable.Select(source, x => new global::Mapper.Target()
-                    {
-                        DateTime = new global::System.DateTimeOffset(x.DateTime, global::System.TimeSpan.Zero),
-                    });
+                    return System.Linq.Queryable.Select(
+                        source,
+                        x => new global::Mapper.Target()
+                        {
+                            DateTime = new global::System.DateTimeOffset(x.DateTime, global::System.TimeSpan.Zero),
+                        }
+                    );
             #nullable enable
             """
         );
@@ -456,10 +459,13 @@ public class UseStaticMapperTest
                 "ProjectToTarget",
                 """
                 #nullable disable
-                        return System.Linq.Queryable.Select(source, x => new global::Mapper.Target()
-                        {
-                            DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
-                        });
+                        return System.Linq.Queryable.Select(
+                            source,
+                            x => new global::Mapper.Target()
+                            {
+                                DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
+                            }
+                        );
                 #nullable enable
                 """
             );

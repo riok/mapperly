@@ -25,6 +25,6 @@ public class GenericSourceTargetObjectFactory(
         var typeParams = new TypeSyntax[2];
         typeParams[sourceTypeParameterIndex] = NonNullableIdentifier(sourceType);
         typeParams[_targetTypeParameterIndex] = NonNullableIdentifier(targetTypeToCreate);
-        return GenericInvocation(Method.Name, typeParams, source);
+        return GenericInvocationWithoutIndention(Method.Name, typeParams, source);
     }
 }

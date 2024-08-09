@@ -44,7 +44,7 @@ public class UnsafeFieldAccessor(IFieldSymbol symbol, string methodName) : IUnsa
             throw new ArgumentNullException(nameof(baseAccess));
 
         ExpressionSyntax method = nullConditional ? ConditionalAccess(baseAccess, methodName) : MemberAccess(baseAccess, methodName);
-        return Invocation(method);
+        return InvocationWithoutIndention(method);
     }
 
     public ExpressionSyntax BuildAssignment(ExpressionSyntax? baseAccess, ExpressionSyntax valueToAssign, bool coalesceAssignment = false)

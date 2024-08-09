@@ -24,6 +24,6 @@ public abstract class EnsureCapacityInfo
             sum = Add(sourceCount, targetCount);
         }
 
-        return syntaxFactory.ExpressionStatement(Invocation(MemberAccess(target, EnsureCapacityName), sum));
+        return syntaxFactory.ExpressionStatement(syntaxFactory.Invocation(MemberAccess(target, EnsureCapacityName), sum));
     }
 }

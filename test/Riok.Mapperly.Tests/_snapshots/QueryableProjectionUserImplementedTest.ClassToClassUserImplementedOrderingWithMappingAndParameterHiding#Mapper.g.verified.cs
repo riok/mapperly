@@ -7,14 +7,17 @@ public partial class Mapper
     private partial global::System.Linq.IQueryable<global::B> Map(global::System.Linq.IQueryable<global::A> source)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(source, x => new global::B()
-        {
-            StringValue = x.StringValue,
-            NestedValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(global::System.Linq.Enumerable.OrderBy(x.NestedValues, x => x.Value), v => new global::D()
+        return System.Linq.Queryable.Select(
+            source,
+            x => new global::B()
             {
-                Value = v.Value,
-            })),
-        });
+                StringValue = x.StringValue,
+                NestedValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(global::System.Linq.Enumerable.OrderBy(x.NestedValues, x => x.Value), v => new global::D()
+                {
+                    Value = v.Value,
+                })),
+            }
+        );
 #nullable enable
     }
 

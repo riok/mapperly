@@ -79,7 +79,11 @@ public abstract class MethodMapping : ITypeMapping
     public bool IsSynthetic => false;
 
     public virtual ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
-        Invocation(MethodName, SourceParameter.WithArgument(ctx.Source), ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler));
+        ctx.SyntaxFactory.Invocation(
+            MethodName,
+            SourceParameter.WithArgument(ctx.Source),
+            ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+        );
 
     public virtual MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
     {

@@ -14,5 +14,5 @@ public class SimpleObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol me
         SymbolEqualityComparer.Default.Equals(Method.ReturnType, targetTypeToCreate);
 
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
-        Invocation(Method.Name, Array.Empty<ExpressionSyntax>());
+        InvocationWithoutIndention(Method.Name);
 }

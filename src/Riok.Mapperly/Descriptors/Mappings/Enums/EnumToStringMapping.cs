@@ -19,7 +19,7 @@ public class EnumToStringMapping(ITypeSymbol sourceType, ITypeSymbol targetType,
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         // fallback switch arm: _ => source.ToString()
-        var fallbackArm = SwitchArm(DiscardPattern(), Invocation(MemberAccess(ctx.Source, ToStringMethodName)));
+        var fallbackArm = SwitchArm(DiscardPattern(), ctx.SyntaxFactory.Invocation(MemberAccess(ctx.Source, ToStringMethodName)));
 
         // switch for each name to the enum value
         // eg: Enum1.Value1 => "Value1"

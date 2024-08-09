@@ -7,7 +7,10 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial global::Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto ToDto(global::Riok.Mapperly.IntegrationTests.Models.CircularReferenceObject obj)
         {
-            return MapToCircularReferenceDto(obj, new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler());
+            return MapToCircularReferenceDto(
+                obj,
+                new global::Riok.Mapperly.Abstractions.ReferenceHandling.PreserveReferenceHandler()
+            );
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

@@ -52,7 +52,7 @@ public class EnumFromStringSwitchMapping(
 
         // when s.Equals(nameof(source.Value1), StringComparison.OrdinalIgnoreCase)
         var whenClause = SwitchWhen(
-            Invocation(
+            InvocationWithoutIndention(
                 MemberAccess(ignoreCaseSwitchDesignatedVariableName, StringEqualsMethodName),
                 NameOf(typeMemberAccess),
                 IdentifierName(StringComparisonFullName)

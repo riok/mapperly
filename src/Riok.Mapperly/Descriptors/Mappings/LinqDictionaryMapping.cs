@@ -23,7 +23,7 @@ public class LinqDictionaryMapping(
         // if key and value types do not change then use a simple call
         // ie: source.ToImmutableDictionary();
         if (keyMapping.IsSynthetic && valueMapping.IsSynthetic)
-            return Invocation(collectMethod, ctx.Source);
+            return ctx.SyntaxFactory.Invocation(collectMethod, ctx.Source);
 
         // create expressions mapping the key and value and then create the final expression
         // ie: source.ToImmutableDictionary(x => x.Key, x => (int)x.Value);
@@ -35,6 +35,6 @@ public class LinqDictionaryMapping(
         var valueMapExpression = valueMapping.Build(valueLambdaCtx);
         var valueExpression = Lambda(valueLambdaParamName, valueMapExpression);
 
-        return Invocation(collectMethod, ctx.Source, keyExpression, valueExpression);
+        return ctx.SyntaxFactory.Invocation(collectMethod, ctx.Source, keyExpression, valueExpression);
     }
 }

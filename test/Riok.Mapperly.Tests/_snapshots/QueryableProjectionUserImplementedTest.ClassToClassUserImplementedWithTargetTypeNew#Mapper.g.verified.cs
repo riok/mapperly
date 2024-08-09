@@ -7,10 +7,13 @@ public partial class Mapper
     private partial global::System.Linq.IQueryable<global::B> Map(global::System.Linq.IQueryable<global::A> source)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(source, x => new global::B()
-        {
-            Value = new global::System.DateTimeOffset(x.Value, global::System.TimeSpan.Zero),
-        });
+        return System.Linq.Queryable.Select(
+            source,
+            x => new global::B()
+            {
+                Value = new global::System.DateTimeOffset(x.Value, global::System.TimeSpan.Zero),
+            }
+        );
 #nullable enable
     }
 }
