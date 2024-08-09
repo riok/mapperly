@@ -28,6 +28,6 @@ public class UnsafeConstructorAccessor(IMethodSymbol symbol, string className, s
         InitializerExpressionSyntax? initializer = null
     )
     {
-        return StaticInvocation(className, methodName, args);
+        return ctx.SyntaxFactory.StaticInvocation(className, methodName, args);
     }
 }

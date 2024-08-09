@@ -44,6 +44,6 @@ public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string methodName
             throw new ArgumentNullException(nameof(baseAccess));
 
         ExpressionSyntax method = nullConditional ? ConditionalAccess(baseAccess, methodName) : MemberAccess(baseAccess, methodName);
-        return Invocation(method);
+        return InvocationWithoutIndention(method);
     }
 }

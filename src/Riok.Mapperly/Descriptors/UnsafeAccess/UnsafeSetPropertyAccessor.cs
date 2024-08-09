@@ -50,6 +50,6 @@ public class UnsafeSetPropertyAccessor(IPropertySymbol symbol, string methodName
         if (baseAccess == null)
             throw new ArgumentNullException(nameof(baseAccess));
 
-        return Invocation(MemberAccess(baseAccess, methodName), valueToAssign);
+        return InvocationWithoutIndention(MemberAccess(baseAccess, methodName), valueToAssign);
     }
 }

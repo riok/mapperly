@@ -74,7 +74,7 @@ public class MemberNullDelegateAssignmentMapping(
                 nullConditional: false,
                 skipTrailingNonNullable: true
             );
-            return new[] { ctx.SyntaxFactory.ExpressionStatement(ThrowArgumentNullException(nameofSourceAccess)) };
+            return [ctx.SyntaxFactory.ExpressionStatement(ThrowArgumentNullException(nameofSourceAccess))];
         }
 
         // target.A = null;

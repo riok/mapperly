@@ -29,7 +29,7 @@ public static class ReferenceHandlingSyntaxFactoryHelper
             .WithRefOrOutKeyword(TrailingSpacedToken(SyntaxKind.OutKeyword));
 
         // GetReference<TSource, TTarget>(source, out var target)
-        var invocation = Invocation(method, Argument(ctx.Source), targetArgument);
+        var invocation = ctx.SyntaxFactory.Invocation(method, Argument(ctx.Source), targetArgument);
 
         // if (_referenceHandler.GetReference<TSource, TTarget>(source, out var target))
         //   return target;
@@ -46,6 +46,6 @@ public static class ReferenceHandlingSyntaxFactoryHelper
             );
         var method = MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, refHandler, methodName);
 
-        return Invocation(method, ctx.Source, target);
+        return ctx.SyntaxFactory.Invocation(method, ctx.Source, target);
     }
 }

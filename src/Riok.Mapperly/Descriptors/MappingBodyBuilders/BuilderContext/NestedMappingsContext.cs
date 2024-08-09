@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Symbols.Members;
 
@@ -28,7 +29,7 @@ public class NestedMappingsContext
 
         foreach (var nestedMemberConfig in ctx.Configuration.Members.NestedMappings)
         {
-            if (!ctx.SymbolAccessor.TryFindMemberPath(ctx.Source, nestedMemberConfig.Source.Path, out var memberPath))
+            if (!ctx.SymbolAccessor.TryFindMemberPath(ctx.Source, nestedMemberConfig.Source, out var memberPath))
             {
                 ctx.ReportDiagnostic(
                     DiagnosticDescriptors.ConfiguredMappingNestedMemberNotFound,
@@ -45,7 +46,7 @@ public class NestedMappingsContext
     }
 
     public bool TryFindNestedSourcePath(
-        List<List<string>> pathCandidates,
+        IEnumerable<StringMemberPath> pathCandidates,
         bool ignoreCase,
         [NotNullWhen(true)] out SourceMemberPath? sourceMemberPath
     )
@@ -61,7 +62,7 @@ public class NestedMappingsContext
     }
 
     private bool TryFindNestedSourcePath(
-        List<List<string>> pathCandidates,
+        IEnumerable<StringMemberPath> pathCandidates,
         bool ignoreCase,
         MemberPath nestedMemberPath,
         [NotNullWhen(true)] out SourceMemberPath? sourceMemberPath

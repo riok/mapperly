@@ -29,7 +29,7 @@ public class UserImplementedMethodMapping(
         // if the user implemented method is on an interface,
         // we explicitly cast to be able to use the default interface implementation or explicit implementations
         if (Method.ReceiverType?.TypeKind != TypeKind.Interface)
-            return Invocation(
+            return ctx.SyntaxFactory.Invocation(
                 receiver == null ? IdentifierName(Method.Name) : MemberAccess(receiver, Method.Name),
                 sourceParameter.WithArgument(ctx.Source),
                 referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
@@ -40,7 +40,7 @@ public class UserImplementedMethodMapping(
             receiver == null ? ThisExpression() : IdentifierName(receiver)
         );
         var methodExpr = MemberAccess(ParenthesizedExpression(castedReceiver), Method.Name);
-        return Invocation(
+        return ctx.SyntaxFactory.Invocation(
             methodExpr,
             sourceParameter.WithArgument(ctx.Source),
             referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
