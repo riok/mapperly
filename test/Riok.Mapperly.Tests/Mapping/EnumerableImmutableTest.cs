@@ -248,7 +248,10 @@ public class EnumerableImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.CannotMapToReadOnlyType,
+                "Cannot map to read-only type System.Collections.Immutable.ImmutableList<int>"
+            )
             .HaveAssertedAllDiagnostics();
     }
 
@@ -265,7 +268,11 @@ public class EnumerableImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+            .HaveDiagnostic(
+                DiagnosticDescriptors.CannotMapToReadOnlyType,
+                "Cannot map to read-only type System.Collections.Immutable.ImmutableArray<int>"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -281,7 +288,10 @@ public class EnumerableImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.CannotMapToReadOnlyType,
+                "Cannot map to read-only type System.Collections.Immutable.ImmutableHashSet<int>"
+            )
             .HaveAssertedAllDiagnostics();
     }
 
@@ -298,7 +308,10 @@ public class EnumerableImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.CannotMapToReadOnlyType,
+                "Cannot map to read-only type System.Collections.Immutable.ImmutableQueue<int>"
+            )
             .HaveAssertedAllDiagnostics();
     }
 
@@ -315,7 +328,10 @@ public class EnumerableImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.CannotMapToReadOnlyType,
+                "Cannot map to read-only type System.Collections.Immutable.ImmutableStack<int>"
+            )
             .HaveAssertedAllDiagnostics();
     }
 
@@ -332,7 +348,10 @@ public class EnumerableImmutableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.CannotMapToReadOnlyType,
+                "Cannot map to read-only type System.Collections.Immutable.ImmutableSortedSet<int>"
+            )
             .HaveAssertedAllDiagnostics();
     }
 }

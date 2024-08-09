@@ -232,10 +232,7 @@ public class UnsafeAccessorTest
             "class B { public int Value { get; protected set; } }"
         );
 
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics).Should().HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -355,9 +352,6 @@ public class UnsafeAccessorTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
-            .HaveDiagnostic(DiagnosticDescriptors.RequiredMemberNotMapped)
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
             .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """

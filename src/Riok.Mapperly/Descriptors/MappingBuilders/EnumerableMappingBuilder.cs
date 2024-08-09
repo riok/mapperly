@@ -74,6 +74,12 @@ public static class EnumerableMappingBuilder
         if (!ctx.CollectionInfos.Source.ImplementsIEnumerable || !ctx.CollectionInfos.Target.ImplementsIEnumerable)
             return null;
 
+        if (ctx.CollectionInfos.Target.IsImmutableCollectionType || ctx.CollectionInfos.Target.IsArray)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyType, ctx.Target);
+            return new NoOpMapping(ctx.Source, ctx.Target);
+        }
+
         var elementMapping = ctx.FindOrBuildMapping(ctx.CollectionInfos.Source.EnumeratedType, ctx.CollectionInfos.Target.EnumeratedType);
         if (elementMapping == null)
             return null;
@@ -82,11 +88,6 @@ public static class EnumerableMappingBuilder
         if (addMethodName != null)
         {
             return new ForEachAddEnumerableExistingTargetMapping(ctx.CollectionInfos, elementMapping, addMethodName);
-        }
-
-        if (ctx.CollectionInfos.Target.IsImmutableCollectionType)
-        {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
         }
 
         return null;

@@ -49,6 +49,9 @@ public static class NewInstanceObjectMemberMappingBuilder
         if (ctx.Target.SpecialType != SpecialType.None || ctx.Source.SpecialType != SpecialType.None)
             return null;
 
+        if (ctx.Target.IsImmutable())
+            return null;
+
         if (ctx.Source.IsEnum() || ctx.Target.IsEnum())
             return null;
 

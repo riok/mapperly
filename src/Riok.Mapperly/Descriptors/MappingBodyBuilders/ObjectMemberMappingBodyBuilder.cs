@@ -22,6 +22,10 @@ public static class ObjectMemberMappingBodyBuilder
         {
             mappingCtx.SetTargetMemberMapped(initOnlyTargetMember);
         }
+
+        // do not report "no member mapping" for existing target mappings
+        mappingCtx.MappingAdded();
+
         mappingCtx.AddDiagnostics();
     }
 
@@ -49,6 +53,17 @@ public static class ObjectMemberMappingBodyBuilder
         // the target member path is readonly or not accessible
         if (!targetMemberPath.Member.CanSet)
         {
+            // If the mapping is matched automatically without any configuration
+            // mark both members as mapped,
+            // as the "CannotMapToReadOnlyMember" diagnostic should be informative.
+            // Also, an additional diagnostic may not even be expected here:
+            // for example, if the source and target contain the same computed read-only member.
+            if (memberInfo.IsAutoMatch && sourceMemberPath?.Type == SourceMemberType.Member)
+            {
+                ctx.SetMembersMapped(memberInfo);
+                return false;
+            }
+
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.CannotMapToReadOnlyMember,
                 memberInfo.DescribeSource(),

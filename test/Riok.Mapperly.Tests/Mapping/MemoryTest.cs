@@ -328,7 +328,7 @@ public class MemoryTest
     }
 
     [Fact]
-    public void ReadOnlyMemoryToCreatedList()
+    public void ReadOnlyMemoryToExistingList()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -353,7 +353,7 @@ public class MemoryTest
     }
 
     [Fact]
-    public void MemoryToCreatedReadOnlyMemoryShouldDiagnostic()
+    public void MemoryToExistingReadOnlyMemoryShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -364,11 +364,12 @@ public class MemoryTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyType, "Cannot map to read-only type System.ReadOnlyMemory<int>")
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
-    public void MemoryToCreatedMemoryShouldDiagnostic()
+    public void MemoryToExistingMemoryShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -379,11 +380,12 @@ public class MemoryTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyType, "Cannot map to read-only type System.Memory<int>")
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
-    public void SpanToCreatedMemoryShouldDiagnostic()
+    public void SpanToExistingMemoryShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -394,11 +396,12 @@ public class MemoryTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyType, "Cannot map to read-only type System.Memory<int>")
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
-    public void ArrayToCreatedMemoryShouldDiagnostic()
+    public void ArrayToExistingMemoryShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -409,11 +412,12 @@ public class MemoryTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyType, "Cannot map to read-only type System.Memory<int>")
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
-    public void EnumerableToCreatedMemoryShouldDiagnostic()
+    public void EnumerableToExistingMemoryShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -424,7 +428,8 @@ public class MemoryTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember);
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyType, "Cannot map to read-only type System.Memory<int>")
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -438,7 +443,8 @@ public class MemoryTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped);
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyType, "Cannot map to read-only type System.Span<int>")
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]

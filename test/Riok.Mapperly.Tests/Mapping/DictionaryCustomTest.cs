@@ -198,7 +198,13 @@ public class DictionaryCustomTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveDiagnostics(
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member Keys on the mapping source type System.Collections.Generic.IReadOnlyDictionary<string, string> is not mapped to any member on the mapping target type A",
+                "The member Values on the mapping source type System.Collections.Generic.IReadOnlyDictionary<string, string> is not mapped to any member on the mapping target type A",
+                "The member Count on the mapping source type System.Collections.Generic.IReadOnlyDictionary<string, string> is not mapped to any member on the mapping target type A"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """
                 var target = new global::A();

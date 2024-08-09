@@ -1,5 +1,4 @@
 using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
 
@@ -387,7 +386,7 @@ public class DictionaryTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
@@ -397,18 +396,24 @@ public class DictionaryTest
     }
 
     [Fact]
-    public void DictionaryMappingDisabledShouldDiagnostic()
+    public void DictionaryMappingDisabledShouldUseEnumerableMapping()
     {
         var source = TestSourceBuilder.Mapping(
             "Dictionary<long, long>",
             "Dictionary<int, int>",
             TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.Dictionary)
         );
-        TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics).Should().HaveDiagnostics();
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveAssertedAllDiagnostics()
+            .HaveMapMethodBody(
+                "return new global::System.Collections.Generic.Dictionary<int, int>(global::System.Linq.Enumerable.Select(source, x => MapToKeyValuePairOfInt32AndInt32(x)));"
+            );
     }
 
     [Fact]
-    public void DictionaryMappingExistingTargetDisabledShouldDiagnostic()
+    public void DictionaryMappingExistingTargetDisabledShouldIgnore()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -420,8 +425,6 @@ public class DictionaryTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember)
-            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
             .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """

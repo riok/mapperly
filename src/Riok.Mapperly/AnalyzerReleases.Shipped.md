@@ -185,6 +185,7 @@ RMG037  | Mapper   | Warning  | An enum member could not be found on the source 
 RMG038  | Mapper   | Warning  | An enum member could not be found on the target enum
 RMG081  | Mapper   | Error    | A mapping method with additional parameters cannot be a default mapping
 RMG082  | Mapper   | Warning  | An additional mapping method parameter is not mapped
+RMG083  | Mapper   | Info     | Cannot map to read only type
 
 ### Removed Rules
 

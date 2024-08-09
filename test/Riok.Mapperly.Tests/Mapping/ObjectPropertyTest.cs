@@ -107,7 +107,7 @@ public class ObjectPropertyTest
     }
 
     [Fact]
-    public Task ShouldIgnoreReadOnlyPropertyOnTargetWithDiagnostic()
+    public Task ShouldIgnoreReadOnlyPropertyWhenMatchedAutomatically()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -336,34 +336,6 @@ public class ObjectPropertyTest
             "[MapProperty(\"not_found\", nameof(B.StringValue2))] private partial B Map(A source);",
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue2 { get; set; } }"
-        );
-
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task WithPrivateTargetSetterShouldIgnoreAndDiagnostic()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "B",
-            "class A { public string StringValue { get; set; } public int IntValue { get; private set; } }",
-            "class B { public string StringValue { get; private set; } public int IntValue { private get; set; } }"
-        );
-
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task WithPrivateTargetPathGetterShouldIgnoreAndDiagnostic()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "B",
-            "class A { public C NestedValue { private get; set; } public int IntValue { get; private set; } }",
-            "class B { public D NestedValue { get; private set; } public int IntValue { private get; set; } }",
-            "class C { public string StringValue { get; set; } }",
-            "class D { public string StringValue { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);
