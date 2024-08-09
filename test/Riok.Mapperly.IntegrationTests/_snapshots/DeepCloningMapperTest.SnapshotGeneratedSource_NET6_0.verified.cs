@@ -20,6 +20,10 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 IntInitOnlyValue = src.IntInitOnlyValue,
                 RequiredValue = src.RequiredValue,
             };
+            target.IntValue = src.IntValue;
+            target.StringValue = src.StringValue;
+            target.RenamedStringValue = src.RenamedStringValue;
+            target.Flattening = Copy(src.Flattening);
             if (src.NullableFlattening != null)
             {
                 target.NullableFlattening = Copy(src.NullableFlattening);
@@ -28,6 +32,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.NullableFlattening = null;
             }
+            target.UnflatteningIdValue = src.UnflatteningIdValue;
+            target.NullableUnflatteningIdValue = src.NullableUnflatteningIdValue;
             if (src.NestedNullable != null)
             {
                 target.NestedNullable = MapToTestObjectNested(src.NestedNullable);
@@ -52,6 +58,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.NestedMember = null;
             }
+            target.StringNullableTargetNotNullable = src.StringNullableTargetNotNullable;
             if (src.TupleValue != null)
             {
                 target.TupleValue = MapToValueTupleOfStringAndString(src.TupleValue.Value);
@@ -84,21 +91,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.NullableReadOnlyObjectCollection = null;
             }
-            if (src.SubObject != null)
-            {
-                target.SubObject = MapToInheritanceSubObject(src.SubObject);
-            }
-            else
-            {
-                target.SubObject = null;
-            }
-            target.IntValue = src.IntValue;
-            target.StringValue = src.StringValue;
-            target.RenamedStringValue = src.RenamedStringValue;
-            target.Flattening = Copy(src.Flattening);
-            target.UnflatteningIdValue = src.UnflatteningIdValue;
-            target.NullableUnflatteningIdValue = src.NullableUnflatteningIdValue;
-            target.StringNullableTargetNotNullable = src.StringNullableTargetNotNullable;
             target.MemoryValue = src.MemoryValue.Span.ToArray();
             target.StackValue = new global::System.Collections.Generic.Stack<string>(src.StackValue);
             target.QueueValue = new global::System.Collections.Generic.Queue<string>(src.QueueValue);
@@ -137,6 +129,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.EnumRawValue = src.EnumRawValue;
             target.EnumStringValue = src.EnumStringValue;
             target.EnumReverseStringValue = src.EnumReverseStringValue;
+            if (src.SubObject != null)
+            {
+                target.SubObject = MapToInheritanceSubObject(src.SubObject);
+            }
+            else
+            {
+                target.SubObject = null;
+            }
             target.DateTimeValue = src.DateTimeValue;
             target.DateTimeValueTargetDateOnly = src.DateTimeValueTargetDateOnly;
             target.DateTimeValueTargetTimeOnly = src.DateTimeValueTargetTimeOnly;
@@ -157,6 +157,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         private static global::Riok.Mapperly.IntegrationTests.Models.TestObjectNestedMember MapToTestObjectNestedMember(global::Riok.Mapperly.IntegrationTests.Models.TestObjectNestedMember source)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObjectNestedMember();
+            target.NestedMemberId = source.NestedMemberId;
             if (source.NestedMemberObject != null)
             {
                 target.NestedMemberObject = MapToTestObjectNested(source.NestedMemberObject);
@@ -165,7 +166,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.NestedMemberObject = null;
             }
-            target.NestedMemberId = source.NestedMemberId;
             return target;
         }
 

@@ -7,11 +7,11 @@ public partial class Mapper
     public partial global::B Map(global::A source)
     {
         var target = new global::B();
+        target.Value = MapString(source.Value);
         if (source.Value2 != null)
         {
             target.Value2 = source.Value2;
         }
-        target.Value = MapString(source.Value);
         return target;
     }
 }

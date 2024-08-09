@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Symbols.Members;
 
@@ -7,6 +8,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
 /// A mapped source member without any null handling.
 /// (e.g. <c>MapToD(source.A.B)</c> or <c>MapToD(source?.A?.B)</c>).
 /// </summary>
+[DebuggerDisplay("MappedMemberSourceValue({_sourceMember}: {_delegateMapping})")]
 public class MappedMemberSourceValue(
     INewInstanceMapping delegateMapping,
     MemberPathGetter sourceMember,
@@ -14,17 +16,20 @@ public class MappedMemberSourceValue(
     bool addValuePropertyOnNullable
 ) : ISourceValue
 {
-    public bool RequiresSourceNullCheck => !nullConditionalAccess && sourceMember.MemberPath.IsAnyNullable();
+    private readonly MemberPathGetter _sourceMember = sourceMember;
+    private readonly INewInstanceMapping _delegateMapping = delegateMapping;
+
+    public bool RequiresSourceNullCheck => !nullConditionalAccess && _sourceMember.MemberPath.IsAnyNullable();
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         ctx = ctx.WithSource(
-            sourceMember.BuildAccess(
+            _sourceMember.BuildAccess(
                 ctx.Source,
                 addValuePropertyOnNullable: addValuePropertyOnNullable,
                 nullConditional: nullConditionalAccess
             )
         );
-        return delegateMapping.Build(ctx);
+        return _delegateMapping.Build(ctx);
     }
 }

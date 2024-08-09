@@ -82,6 +82,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 IntInitOnlyValue = testObject.IntInitOnlyValue,
                 RequiredValue = testObject.RequiredValue,
             };
+            target.IntValue = testObject.IntValue;
+            target.StringValue = testObject.StringValue;
+            target.RenamedStringValue2 = testObject.RenamedStringValue;
+            target.FlatteningIdValue = testObject.Flattening.IdValue;
+            target.NullableFlatteningIdValue = testObject.NullableFlattening?.IdValue;
             if (testObject.NestedNullable != null)
             {
                 target.NestedNullableIntValue = testObject.NestedNullable.IntValue;
@@ -99,6 +104,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.StringNullableTargetNotNullable = testObject.StringNullableTargetNotNullable;
             }
+            target.SourceTargetSameObjectType = testObject.SourceTargetSameObjectType;
             if (testObject.NullableReadOnlyObjectCollection != null)
             {
                 target.NullableReadOnlyObjectCollection = MapToTestObjectNestedDtoArray(testObject.NullableReadOnlyObjectCollection);
@@ -107,6 +113,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.NullableReadOnlyObjectCollection = null;
             }
+            target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)testObject.EnumValue;
+            target.EnumName = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)testObject.EnumName;
+            target.EnumRawValue = (byte)testObject.EnumRawValue;
+            target.EnumStringValue = MapToString(testObject.EnumStringValue);
+            target.EnumReverseStringValue = MapToTestEnumDtoByName(testObject.EnumReverseStringValue);
             if (testObject.SubObject != null)
             {
                 target.SubObject = MapToInheritanceSubObjectDto(testObject.SubObject);
@@ -115,17 +126,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.SubObject = null;
             }
-            target.IntValue = testObject.IntValue;
-            target.StringValue = testObject.StringValue;
-            target.RenamedStringValue2 = testObject.RenamedStringValue;
-            target.FlatteningIdValue = testObject.Flattening.IdValue;
-            target.NullableFlatteningIdValue = testObject.NullableFlattening?.IdValue;
-            target.SourceTargetSameObjectType = testObject.SourceTargetSameObjectType;
-            target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)testObject.EnumValue;
-            target.EnumName = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)testObject.EnumName;
-            target.EnumRawValue = (byte)testObject.EnumRawValue;
-            target.EnumStringValue = MapToString(testObject.EnumStringValue);
-            target.EnumReverseStringValue = MapToTestEnumDtoByName(testObject.EnumReverseStringValue);
             target.DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(testObject.DateTimeValueTargetDateOnly);
             target.DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(testObject.DateTimeValueTargetTimeOnly);
             target.ManuallyMapped = MapManual(testObject.ManuallyMapped);

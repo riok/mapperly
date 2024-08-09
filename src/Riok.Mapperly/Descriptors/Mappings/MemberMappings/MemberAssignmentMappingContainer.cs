@@ -9,20 +9,18 @@ public abstract class MemberAssignmentMappingContainer(IMemberAssignmentMappingC
 {
     private readonly HashSet<IMemberAssignmentMapping> _delegateMappings = new();
     private readonly HashSet<IMemberAssignmentMappingContainer> _childContainers = new();
+    private readonly List<IAssignmentMappings> _mappings = new();
 
-    public virtual IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
-    {
-        var childContainerStatements = _childContainers.SelectMany(x => x.Build(ctx, targetAccess));
-        var mappings = _delegateMappings.SelectMany(m => m.Build(ctx, targetAccess));
-        return childContainerStatements.Concat(mappings);
-    }
+    public virtual IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess) =>
+        _mappings.SelectMany(x => x.Build(ctx, targetAccess));
 
     public void AddMemberMappingContainer(IMemberAssignmentMappingContainer container)
     {
-        if (!HasMemberMappingContainer(container))
-        {
-            _childContainers.Add(container);
-        }
+        if (HasMemberMappingContainer(container))
+            return;
+
+        _childContainers.Add(container);
+        _mappings.Add(container);
     }
 
     public bool HasMemberMappingContainer(IMemberAssignmentMappingContainer container) =>
@@ -30,10 +28,11 @@ public abstract class MemberAssignmentMappingContainer(IMemberAssignmentMappingC
 
     public void AddMemberMapping(IMemberAssignmentMapping mapping)
     {
-        if (!HasMemberMapping(mapping))
-        {
-            _delegateMappings.Add(mapping);
-        }
+        if (HasMemberMapping(mapping))
+            return;
+
+        _delegateMappings.Add(mapping);
+        _mappings.Add(mapping);
     }
 
     public bool HasMemberMapping(IMemberAssignmentMapping mapping) =>

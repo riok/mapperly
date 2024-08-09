@@ -9,11 +9,11 @@ public partial class Mapper
         var target = new global::B();
         if (source.Nested != null)
         {
+            target.Nested = MapToD(source.Nested);
             if (source.Nested.Value2 != null)
             {
                 target.NestedValue2 = source.Nested.Value2.Value;
             }
-            target.Nested = MapToD(source.Nested);
         }
         return target;
     }
