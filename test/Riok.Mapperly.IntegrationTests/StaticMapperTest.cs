@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Riok.Mapperly.IntegrationTests.Dto;
@@ -35,6 +37,32 @@ namespace Riok.Mapperly.IntegrationTests
             var model = NewTestObj();
             var dto = model.MapToDtoExt();
             return Verifier.Verify(dto);
+        }
+
+        [Fact]
+        public void NestedListsShouldWork()
+        {
+            var l = new List<List<List<string>>>
+            {
+                new()
+                {
+                    new() { "1", "2", "3" }
+                },
+                new()
+                {
+                    new() { "4", "5" },
+                    new() { "6" }
+                }
+            };
+            var mapped = StaticTestMapper.MapNestedLists(l);
+
+            mapped.Should().HaveCount(2);
+            mapped[0].Should().HaveCount(1);
+            mapped[0][0].Should().HaveCount(3);
+            mapped[1].Should().HaveCount(2);
+            mapped[1][0].Should().HaveCount(2);
+            mapped[1][1].Should().HaveCount(1);
+            mapped.SelectMany(x => x).SelectMany(x => x).Should().BeEquivalentTo(Enumerable.Range(1, 6), x => x.WithStrictOrdering());
         }
 
         [Fact]

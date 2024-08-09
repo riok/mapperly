@@ -208,7 +208,7 @@ public static class EnumerableMappingBuilder
 
         // ensure the target is an array and not an interface
         // => mapping can be reused by a delegate mapping for different implementations
-        var targetType = ctx.Target.IsArrayType() ? ctx.Target : ctx.Types.GetArrayType(ctx.CollectionInfos!.Target.EnumeratedType);
+        var targetType = ctx.Target.IsArrayType() ? ctx.Target : ctx.Types.GetArrayType(elementMapping.TargetType);
         var delegatedMapping = ctx.BuildDelegatedMapping(ctx.Source, targetType);
         if (delegatedMapping != null)
             return delegatedMapping;
@@ -229,7 +229,7 @@ public static class EnumerableMappingBuilder
         // and ensure the target is an array and not an interface
         // => mapping can be reused by a delegate mapping for different implementations
         var sourceCollectionInfo = BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source);
-        var targetType = ctx.Target.IsArrayType() ? ctx.Target : ctx.Types.GetArrayType(ctx.CollectionInfos!.Target.EnumeratedType);
+        var targetType = ctx.Target.IsArrayType() ? ctx.Target : ctx.Types.GetArrayType(elementMapping.TargetType);
         var delegatedMapping = ctx.BuildDelegatedMapping(sourceCollectionInfo.Type, targetType);
         if (delegatedMapping != null)
             return delegatedMapping;
@@ -287,9 +287,7 @@ public static class EnumerableMappingBuilder
         // and has an implicit .Add() method
         // the implicit check is an easy way to exclude for example immutable types.
         if (ctx.CollectionInfos?.Target.AddMethodName == null)
-        {
             return null;
-        }
 
         // try to reuse an existing mapping
         var collectionInfos = ctx.CollectionInfos;

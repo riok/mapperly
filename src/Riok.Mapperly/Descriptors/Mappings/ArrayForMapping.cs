@@ -22,12 +22,7 @@ public class ArrayForMapping(
         var loopCounterVariableName = ctx.NameBuilder.New(LoopCounterName);
 
         // var target = new T[source.Length];
-        var sourceLengthArrayRank = ArrayRankSpecifier(
-            SingletonSeparatedList<ExpressionSyntax>(MemberAccess(ctx.Source, ArrayLengthProperty))
-        );
-        var targetInitializationValue = CreateArray(
-            ArrayType(FullyQualifiedIdentifier(targetArrayElementType)).WithRankSpecifiers(SingletonList(sourceLengthArrayRank))
-        );
+        var targetInitializationValue = CreateArray(targetArrayElementType, MemberAccess(ctx.Source, ArrayLengthProperty));
         yield return ctx.SyntaxFactory.DeclareLocalVariable(targetVariableName, targetInitializationValue);
 
         // target[i] = Map(source[i]);
