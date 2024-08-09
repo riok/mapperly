@@ -18,7 +18,7 @@ public class DerivedTypeSwitchMapping(ITypeSymbol sourceType, ITypeSymbol target
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         // _ => throw new ArgumentException(msg, nameof(ctx.Source)),
-        var sourceTypeExpr = Invocation(MemberAccess(ctx.Source, GetTypeMethodName));
+        var sourceTypeExpr = ctx.SyntaxFactory.Invocation(MemberAccess(ctx.Source, GetTypeMethodName));
         var fallbackArm = SwitchArm(
             DiscardPattern(),
             ThrowArgumentExpression(

@@ -22,7 +22,10 @@ public class SourceObjectMethodMapping(
 {
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        var sourceExpression = Invocation(MemberAccess(ctx.Source, methodName), BuildArguments(ctx).WhereNotNull().ToArray());
+        var sourceExpression = ctx.SyntaxFactory.Invocation(
+            MemberAccess(ctx.Source, methodName),
+            BuildArguments(ctx).WhereNotNull().ToArray()
+        );
         return delegateMapping == null ? sourceExpression : delegateMapping.Build(ctx.WithSource(sourceExpression));
     }
 

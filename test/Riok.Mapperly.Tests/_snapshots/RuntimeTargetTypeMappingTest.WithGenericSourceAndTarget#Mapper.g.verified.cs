@@ -18,10 +18,13 @@ public partial class Mapper
     private partial global::System.Linq.IQueryable<global::B> ProjectToB(global::System.Linq.IQueryable<global::A> q)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(q, x => new global::B()
-        {
-            Value = x.Value,
-        });
+        return System.Linq.Queryable.Select(
+            q,
+            x => new global::B()
+            {
+                Value = x.Value,
+            }
+        );
 #nullable enable
     }
 
@@ -29,10 +32,13 @@ public partial class Mapper
     private partial global::System.Linq.IQueryable<global::D> ProjectToD(global::System.Linq.IQueryable<global::C> q)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(q, x => new global::D()
-        {
-            Value2 = x.Value2,
-        });
+        return System.Linq.Queryable.Select(
+            q,
+            x => new global::D()
+            {
+                Value2 = x.Value2,
+            }
+        );
 #nullable enable
     }
 }

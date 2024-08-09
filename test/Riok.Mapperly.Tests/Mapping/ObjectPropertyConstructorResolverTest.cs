@@ -349,7 +349,9 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new global::B(source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested.Value)));
+                var target = new global::B(
+                    source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested.Value))
+                );
                 return target;
                 """
             );
@@ -428,7 +430,9 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new global::B(source.Value ?? throw new System.ArgumentNullException(nameof(source.Value)));
+                var target = new global::B(
+                    source.Value ?? throw new System.ArgumentNullException(nameof(source.Value))
+                );
                 return target;
                 """
             );
@@ -444,7 +448,9 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new global::B(source.Value != null ? (double)source.Value.Value : throw new System.ArgumentNullException(nameof(source.Value.Value)));
+                var target = new global::B(
+                    source.Value != null ? (double)source.Value.Value : throw new System.ArgumentNullException(nameof(source.Value.Value))
+                );
                 return target;
                 """
             );
@@ -460,7 +466,9 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new global::B(source.Nested != null ? (double)source.Nested.Value : throw new System.ArgumentNullException(nameof(source.Nested.Value)));
+                var target = new global::B(
+                    source.Nested != null ? (double)source.Nested.Value : throw new System.ArgumentNullException(nameof(source.Nested.Value))
+                );
                 return target;
                 """
             );
@@ -544,7 +552,9 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new global::B(source.EnumValue != null ? (global::D)source.EnumValue.Value : default(global::D?));
+                var target = new global::B(
+                    source.EnumValue != null ? (global::D)source.EnumValue.Value : default(global::D?)
+                );
                 return target;
                 """
             );
@@ -567,7 +577,9 @@ public class ObjectPropertyConstructorResolverTest
             .Should()
             .HaveMapMethodBody(
                 """
-                var target = new global::B(source.StructValue != null ? MapToD(source.StructValue.Value) : default(global::D?));
+                var target = new global::B(
+                    source.StructValue != null ? MapToD(source.StructValue.Value) : default(global::D?)
+                );
                 return target;
                 """
             );

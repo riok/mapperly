@@ -22,7 +22,7 @@ public class EnumFromStringParseMapping(ITypeSymbol sourceType, ITypeSymbol targ
         // System.Enum.Parse<TargetType>(source, ignoreCase)
         if (genericParseMethodSupported)
         {
-            return GenericInvocation(
+            return ctx.SyntaxFactory.GenericInvocation(
                 EnumClassName,
                 ParseMethodName,
                 new[] { FullyQualifiedIdentifier(TargetType) },
@@ -32,7 +32,7 @@ public class EnumFromStringParseMapping(ITypeSymbol sourceType, ITypeSymbol targ
         }
 
         // (TargetType)System.Enum.Parse(typeof(TargetType), source, ignoreCase)
-        var enumParseInvocation = Invocation(
+        var enumParseInvocation = ctx.SyntaxFactory.Invocation(
             MemberAccess(EnumClassName, ParseMethodName),
             TypeOfExpression(FullyQualifiedIdentifier(TargetType)),
             ctx.Source,

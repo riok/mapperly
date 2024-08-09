@@ -32,6 +32,23 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
             return;
         }
 
+        // set target member to null if null assignments are allowed
+        // and the source is null
+        var setMemberToNull =
+            BuilderContext.Configuration.Mapper.AllowNullPropertyAssignment
+            && memberMapping.MemberInfo.TargetMember.Member.Type.IsNullable();
+
+        // if the member is explicitly set to null,
+        // make sure the parent members are initialized/non-null,
+        // no matter of the null conditional source-path.
+        // otherwise this initialization would only happen
+        // if the source member is not null,
+        // and the null assignment in the else case could fail if the target parent member is not initialized.
+        if (setMemberToNull)
+        {
+            AddNullMemberInitializers(Mapping, memberMapping.MemberInfo.TargetMember);
+        }
+
         var nullConditionSourcePath = new NonEmptyMemberPath(
             memberMapping.MemberInfo.SourceMember.MemberPath.RootType,
             memberMapping.MemberInfo.SourceMember.MemberPath.PathWithoutTrailingNonNullable().ToList()
@@ -41,10 +58,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
 
         // set target member to null if null assignments are allowed
         // and the source is null
-        if (
-            BuilderContext.Configuration.Mapper.AllowNullPropertyAssignment
-            && memberMapping.MemberInfo.TargetMember.Member.Type.IsNullable()
-        )
+        if (setMemberToNull)
         {
             var targetMemberSetter = memberMapping.MemberInfo.TargetMember.BuildSetter(BuilderContext);
             container.AddNullMemberAssignment(targetMemberSetter);

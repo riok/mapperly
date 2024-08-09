@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 using Riok.Mapperly.Symbols.Members;
@@ -254,7 +255,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     internal bool TryFindMemberPath(
         IReadOnlyDictionary<string, IMappableMember> members,
-        IEnumerable<IReadOnlyList<string>> pathCandidates,
+        IEnumerable<StringMemberPath> pathCandidates,
         bool ignoreCase,
         [NotNullWhen(true)] out MemberPath? memberPath
     )
@@ -262,12 +263,12 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         var foundPath = new List<IMappableMember>();
         foreach (var pathCandidate in pathCandidates)
         {
-            if (!members.TryGetValue(pathCandidate[0], out var member))
+            if (!members.TryGetValue(pathCandidate.Path[0], out var member))
                 continue;
 
             foundPath.Clear();
             foundPath.Add(member);
-            if (pathCandidate.Count == 1 || TryFindPath(member.Type, pathCandidate.Skip(1), ignoreCase, foundPath))
+            if (pathCandidate.Path.Count == 1 || TryFindPath(member.Type, pathCandidate.SkipRoot(), ignoreCase, foundPath))
             {
                 memberPath = new NonEmptyMemberPath(member.Type, foundPath);
                 return true;
@@ -280,7 +281,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     internal bool TryFindMemberPath(
         ITypeSymbol type,
-        IEnumerable<IReadOnlyList<string>> pathCandidates,
+        IEnumerable<StringMemberPath> pathCandidates,
         IReadOnlyCollection<string> ignoredNames,
         bool ignoreCase,
         [NotNullWhen(true)] out MemberPath? memberPath
@@ -290,7 +291,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         foreach (var pathCandidate in pathCandidates)
         {
             // fast path for exact case matches
-            if (ignoredNames.Contains(pathCandidate[0]))
+            if (ignoredNames.Contains(pathCandidate.Path[0]))
                 continue;
 
             // reuse List instead of allocating a new one
@@ -310,7 +311,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         return false;
     }
 
-    internal bool TryFindMemberPath(ITypeSymbol type, IReadOnlyCollection<string> path, [NotNullWhen(true)] out MemberPath? memberPath)
+    internal bool TryFindMemberPath(ITypeSymbol type, StringMemberPath path, [NotNullWhen(true)] out MemberPath? memberPath)
     {
         var foundPath = new List<IMappableMember>();
         if (TryFindPath(type, path, false, foundPath))
@@ -323,9 +324,9 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         return false;
     }
 
-    private bool TryFindPath(ITypeSymbol type, IEnumerable<string> path, bool ignoreCase, ICollection<IMappableMember> foundPath)
+    private bool TryFindPath(ITypeSymbol type, StringMemberPath path, bool ignoreCase, ICollection<IMappableMember> foundPath)
     {
-        foreach (var name in path)
+        foreach (var name in path.Path)
         {
             // get T if type is Nullable<T>, prevents Value being treated as a member
             var actualType = type.NonNullableValueType() ?? type;

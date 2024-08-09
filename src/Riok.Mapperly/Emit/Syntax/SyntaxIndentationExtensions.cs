@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Emit.Syntax;
@@ -123,5 +124,58 @@ internal static class SyntaxIndentationExtensions
         );
 
         return trivia.InsertRange(0, triviaToInsert);
+    }
+
+    public static T AddIndentation<T>(this T n)
+        where T : SyntaxNode => IndentationRewriter.Rewrite(n);
+
+    private class IndentationRewriter : CSharpSyntaxRewriter
+    {
+        private static readonly IndentationRewriter _instance = new();
+
+        private IndentationRewriter() { }
+
+        public static T Rewrite<T>(T node)
+            where T : SyntaxNode
+        {
+            return (T)_instance.Visit(node);
+        }
+
+        public override SyntaxTriviaList VisitList(SyntaxTriviaList list)
+        {
+            if (list.Count == 0)
+                return list;
+
+            var idx = -1;
+            var enumerator = list.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                idx++;
+
+                if (!enumerator.Current.IsKind(SyntaxKind.EndOfLineTrivia))
+                    continue;
+
+                var newList = new List<SyntaxTrivia>(list.Count);
+                newList.AddRange(list.Take(idx + 1));
+                newList.Add(_indentation);
+                VisitRemainingList(enumerator, newList);
+                return TriviaList(newList);
+            }
+
+            return list;
+        }
+
+        private static void VisitRemainingList(SyntaxTriviaList.Enumerator enumerator, List<SyntaxTrivia> list)
+        {
+            while (enumerator.MoveNext())
+            {
+                list.Add(enumerator.Current);
+
+                if (enumerator.Current.IsKind(SyntaxKind.EndOfLineTrivia))
+                {
+                    list.Add(_indentation);
+                }
+            }
+        }
     }
 }

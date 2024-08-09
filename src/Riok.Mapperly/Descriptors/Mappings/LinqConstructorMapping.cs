@@ -24,13 +24,13 @@ public class LinqConstructorMapping(
             var (lambdaCtx, lambdaSourceName) = ctx.WithNewScopedSource();
             var sourceMapExpression = elementMapping.Build(lambdaCtx);
             var convertLambda = Lambda(lambdaSourceName, sourceMapExpression);
-            mappedSource = Invocation(selectMethod, ctx.Source, convertLambda);
+            mappedSource = ctx.SyntaxFactory.Invocation(selectMethod, ctx.Source, convertLambda);
         }
         else
         {
             mappedSource = elementMapping.Build(ctx);
         }
 
-        return CreateInstance(TargetType, mappedSource);
+        return ctx.SyntaxFactory.CreateInstance(TargetType, mappedSource);
     }
 }

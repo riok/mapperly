@@ -9,7 +9,7 @@ namespace Riok.Mapperly.Emit.Syntax;
 
 public partial struct SyntaxFactoryHelper
 {
-    public static InvocationExpressionSyntax GenericInvocation(
+    public InvocationExpressionSyntax GenericInvocation(
         string receiver,
         string methodName,
         IEnumerable<TypeSyntax> typeParams,
@@ -20,47 +20,51 @@ public partial struct SyntaxFactoryHelper
         return InvocationExpression(MemberAccess(IdentifierName(receiver), method)).WithArgumentList(ArgumentList(arguments));
     }
 
-    public static InvocationExpressionSyntax GenericInvocation(
+    public static InvocationExpressionSyntax GenericInvocationWithoutIndention(
         string methodName,
         IEnumerable<TypeSyntax> typeParams,
         params ExpressionSyntax[] arguments
     )
     {
         var method = GenericName(methodName).WithTypeArgumentList(TypeArgumentList(typeParams.ToArray()));
-        return InvocationExpression(method).WithArgumentList(ArgumentList(arguments));
+        return InvocationExpression(method).WithArgumentList(ArgumentListWithoutIndention(arguments));
     }
 
-    public static InvocationExpressionSyntax Invocation(string methodName, params MethodArgument?[] arguments) =>
+    public InvocationExpressionSyntax Invocation(string methodName, params MethodArgument?[] arguments) =>
         Invocation(IdentifierName(methodName), arguments);
 
-    public static InvocationExpressionSyntax Invocation(ExpressionSyntax method, params MethodArgument?[] arguments) =>
+    public InvocationExpressionSyntax Invocation(ExpressionSyntax method, params MethodArgument?[] arguments) =>
         Invocation(method, arguments.WhereNotNull().OrderBy(x => x.Parameter.Ordinal).Select(x => x.Argument).ToArray());
 
-    public static InvocationExpressionSyntax Invocation(string methodName, params ExpressionSyntax[] arguments) =>
+    public InvocationExpressionSyntax Invocation(string methodName, params ExpressionSyntax[] arguments) =>
         Invocation(IdentifierName(methodName), arguments);
 
-    public static InvocationExpressionSyntax Invocation(ExpressionSyntax method, params ExpressionSyntax[] arguments)
+    public static InvocationExpressionSyntax InvocationWithoutIndention(string methodName, params ExpressionSyntax[] arguments) =>
+        InvocationWithoutIndention(IdentifierName(methodName), arguments);
+
+    public static InvocationExpressionSyntax InvocationWithoutIndention(ExpressionSyntax method, params ExpressionSyntax[] arguments) =>
+        InvocationExpression(method).WithArgumentList(ArgumentListWithoutIndention(arguments));
+
+    public InvocationExpressionSyntax Invocation(ExpressionSyntax method, params ExpressionSyntax[] arguments) =>
+        InvocationExpression(method).WithArgumentList(ArgumentList(arguments));
+
+    public InvocationExpressionSyntax Invocation(string methodName) => Invocation(IdentifierName(methodName));
+
+    public InvocationExpressionSyntax Invocation(ExpressionSyntax method) => Invocation(method, Array.Empty<ArgumentSyntax>());
+
+    public InvocationExpressionSyntax Invocation(ExpressionSyntax method, params ArgumentSyntax[] arguments)
     {
         return InvocationExpression(method).WithArgumentList(ArgumentList(arguments));
     }
 
-    public static InvocationExpressionSyntax Invocation(string methodName) => Invocation(IdentifierName(methodName));
-
-    public static InvocationExpressionSyntax Invocation(ExpressionSyntax method) => Invocation(method, Array.Empty<ArgumentSyntax>());
-
-    public static InvocationExpressionSyntax Invocation(ExpressionSyntax method, params ArgumentSyntax[] arguments)
-    {
-        return InvocationExpression(method).WithArgumentList(ArgumentList(arguments));
-    }
-
-    public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ExpressionSyntax[] arguments)
+    public InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ExpressionSyntax[] arguments)
     {
         var receiver = method.ReceiverType ?? throw new ArgumentException(nameof(method.ReceiverType) + " is null", nameof(method));
         var qualifiedReceiverName = receiver.NonNullable().FullyQualifiedIdentifierName();
         return StaticInvocation(qualifiedReceiverName, method.Name, arguments);
     }
 
-    public static InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ArgumentSyntax[] arguments)
+    public InvocationExpressionSyntax StaticInvocation(IMethodSymbol method, params ArgumentSyntax[] arguments)
     {
         var receiver = method.ReceiverType ?? throw new ArgumentException(nameof(method.ReceiverType) + " is null", nameof(method));
         var qualifiedReceiverName = receiver.NonNullable().FullyQualifiedIdentifierName();
@@ -126,13 +130,10 @@ public partial struct SyntaxFactoryHelper
         return param;
     }
 
-    public static InvocationExpressionSyntax StaticInvocation(
-        string receiverType,
-        string methodName,
-        params ExpressionSyntax[] arguments
-    ) => StaticInvocation(receiverType, methodName, arguments.Select(Argument).ToArray());
+    public InvocationExpressionSyntax StaticInvocation(string receiverType, string methodName, params ExpressionSyntax[] arguments) =>
+        StaticInvocation(receiverType, methodName, arguments.Select(Argument));
 
-    public static InvocationExpressionSyntax StaticInvocation(string receiverType, string methodName, IEnumerable<ArgumentSyntax> arguments)
+    public InvocationExpressionSyntax StaticInvocation(string receiverType, string methodName, IEnumerable<ArgumentSyntax> arguments)
     {
         var receiverTypeIdentifier = IdentifierName(receiverType);
         var methodAccess = MemberAccessExpression(
@@ -156,17 +157,17 @@ public partial struct SyntaxFactoryHelper
             .WithRefOrOutKeyword(TrailingSpacedToken(SyntaxKind.OutKeyword));
     }
 
-    private static ArgumentListSyntax ArgumentList(params ExpressionSyntax[] argSyntaxes) =>
+    private static ArgumentListSyntax ArgumentListWithoutIndention(IEnumerable<ExpressionSyntax> argSyntaxes) =>
         SyntaxFactory.ArgumentList(CommaSeparatedList(argSyntaxes.Select(Argument)));
+
+    private ArgumentListSyntax ArgumentList(IEnumerable<ExpressionSyntax> argSyntaxes) => ArgumentList(argSyntaxes.Select(Argument));
+
+    private ArgumentListSyntax ArgumentList(IEnumerable<ArgumentSyntax> argSyntaxes) =>
+        SyntaxFactory.ArgumentList(ConditionalCommaLineFeedSeparatedList(argSyntaxes));
 
     public static TypeArgumentListSyntax TypeArgumentList(params TypeSyntax[] argSyntaxes) =>
         SyntaxFactory.TypeArgumentList(CommaSeparatedList(argSyntaxes));
 
     public static TypeArgumentListSyntax TypeArgumentList(IEnumerable<TypeSyntax> argSyntaxes) =>
         SyntaxFactory.TypeArgumentList(CommaSeparatedList(argSyntaxes));
-
-    private static ArgumentListSyntax ArgumentList(params ArgumentSyntax[] args) => SyntaxFactory.ArgumentList(CommaSeparatedList(args));
-
-    private static ArgumentListSyntax ArgumentList(IEnumerable<ArgumentSyntax> args) =>
-        SyntaxFactory.ArgumentList(CommaSeparatedList(args));
 }

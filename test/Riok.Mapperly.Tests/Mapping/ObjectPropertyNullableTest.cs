@@ -519,6 +519,41 @@ public class ObjectPropertyNullableTest
     }
 
     [Fact]
+    public void NullableNestedMembersShouldInitialize()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("Value", "SubValue.Value")]
+            public partial B Map(A a)
+            """,
+            "class A { public C? Value { get; set; } }",
+            "class B { public D? SubValue { get; set; } }",
+            "class C { public int V { get; set; } }",
+            "class D { public E? Value { get; set; } }",
+            "class E { public int V { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.SubValue ??= new global::D();
+                if (a.Value != null)
+                {
+                    target.SubValue.Value = MapToE(a.Value);
+                }
+                else
+                {
+                    target.SubValue.Value = null;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void NullableClassToNullableClassPropertyThrowShouldSetNull()
     {
         var source = TestSourceBuilder.Mapping(

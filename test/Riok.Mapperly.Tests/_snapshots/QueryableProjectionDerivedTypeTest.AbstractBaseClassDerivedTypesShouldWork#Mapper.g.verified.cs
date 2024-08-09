@@ -7,17 +7,20 @@ public partial class Mapper
     private partial global::System.Linq.IQueryable<global::B> Map(global::System.Linq.IQueryable<global::A> source)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(source, x => (global::B)(x is global::ASubType1 ? new global::BSubType1()
-        {
-            Value1 = ((global::ASubType1)x).Value1,
-            BaseValueB = ((global::ASubType1)x).BaseValueA,
-            StringValue = ((global::ASubType1)x).StringValue,
-        } : x is global::ASubType2 ? new global::BSubType2()
-        {
-            Value2 = ((global::ASubType2)x).Value2,
-            BaseValueB = ((global::ASubType2)x).BaseValueA,
-            StringValue = ((global::ASubType2)x).StringValue,
-        } : default));
+        return System.Linq.Queryable.Select(
+            source,
+            x => (global::B)(x is global::ASubType1 ? new global::BSubType1()
+            {
+                Value1 = ((global::ASubType1)x).Value1,
+                BaseValueB = ((global::ASubType1)x).BaseValueA,
+                StringValue = ((global::ASubType1)x).StringValue,
+            } : x is global::ASubType2 ? new global::BSubType2()
+            {
+                Value2 = ((global::ASubType2)x).Value2,
+                BaseValueB = ((global::ASubType2)x).BaseValueA,
+                StringValue = ((global::ASubType2)x).StringValue,
+            } : default)
+        );
 #nullable enable
     }
 
