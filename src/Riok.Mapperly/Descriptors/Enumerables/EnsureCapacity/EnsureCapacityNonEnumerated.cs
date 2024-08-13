@@ -31,7 +31,7 @@ public class EnsureCapacityNonEnumerated(IMemberGetter? targetAccessor, IMethodS
         var enumerableArgument = Argument(ctx.Source);
         var outVarArgument = OutVarArgument(sourceCountName);
 
-        var getNonEnumeratedInvocation = StaticInvocation(getNonEnumeratedMethod, enumerableArgument, outVarArgument);
+        var getNonEnumeratedInvocation = ctx.SyntaxFactory.StaticInvocation(getNonEnumeratedMethod, enumerableArgument, outVarArgument);
         var ensureCapacity = EnsureCapacityStatement(
             ctx.SyntaxFactory.AddIndentation(),
             target,

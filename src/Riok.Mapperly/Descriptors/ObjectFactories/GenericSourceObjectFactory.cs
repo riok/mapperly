@@ -18,5 +18,5 @@ public class GenericSourceObjectFactory(GenericTypeChecker typeChecker, SymbolAc
         && typeChecker.CheckTypes((Method.TypeParameters[0], sourceType));
 
     protected override ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
-        GenericInvocation(Method.Name, [NonNullableIdentifier(sourceType)], source);
+        GenericInvocationWithoutIndention(Method.Name, [NonNullableIdentifier(sourceType)], source);
 }

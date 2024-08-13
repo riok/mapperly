@@ -33,7 +33,7 @@ public class UserImplementedExistingTargetMethodMapping(
         if (Method.ReceiverType?.TypeKind != TypeKind.Interface)
         {
             yield return ctx.SyntaxFactory.ExpressionStatement(
-                Invocation(
+                ctx.SyntaxFactory.Invocation(
                     receiver == null ? IdentifierName(Method.Name) : MemberAccess(receiver, Method.Name),
                     sourceParameter.WithArgument(ctx.Source),
                     targetParameter.WithArgument(target),
@@ -49,7 +49,7 @@ public class UserImplementedExistingTargetMethodMapping(
         );
         var methodExpr = MemberAccess(ParenthesizedExpression(castedThis), Method.Name);
         yield return ctx.SyntaxFactory.ExpressionStatement(
-            Invocation(
+            ctx.SyntaxFactory.Invocation(
                 methodExpr,
                 sourceParameter.WithArgument(ctx.Source),
                 targetParameter.WithArgument(target),

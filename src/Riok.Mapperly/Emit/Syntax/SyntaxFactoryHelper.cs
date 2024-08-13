@@ -8,6 +8,8 @@ namespace Riok.Mapperly.Emit.Syntax;
 // useful to create syntax factories: https://roslynquoter.azurewebsites.net/ and https://sharplab.io/
 public readonly partial struct SyntaxFactoryHelper
 {
+    private const int ConditionalMultilineThreshold = 70;
+
     public static readonly IdentifierNameSyntax VarIdentifier = IdentifierName("var").AddTrailingSpace();
 
     private SyntaxFactoryHelper(int indentation)
@@ -66,6 +68,27 @@ public readonly partial struct SyntaxFactoryHelper
     {
         var sep = TrailingSpacedToken(SyntaxKind.CommaToken);
         var joinedNodes = Join(sep, false, nodes);
+        return SeparatedList<T>(joinedNodes);
+    }
+
+    private SeparatedSyntaxList<T> ConditionalCommaLineFeedSeparatedList<T>(IEnumerable<T> nodes)
+        where T : SyntaxNode
+    {
+        var nodesList = nodes.ToList();
+        SyntaxToken sep;
+        if (nodesList.Sum(x => x.FullSpan.Length) < ConditionalMultilineThreshold)
+        {
+            sep = TrailingSpacedToken(SyntaxKind.CommaToken);
+        }
+        else
+        {
+            sep = TrailingLineFeedToken(SyntaxKind.CommaToken, Indentation + 1);
+            nodesList = nodesList.Select(n => n.AddIndentation()).ToList();
+            nodesList[0] = nodesList[0].AddLeadingLineFeed(Indentation + 1);
+            nodesList[^1] = nodesList[^1].AddTrailingLineFeed(Indentation);
+        }
+
+        var joinedNodes = Join(sep, false, nodesList);
         return SeparatedList<T>(joinedNodes);
     }
 

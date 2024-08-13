@@ -44,7 +44,7 @@ public class UserDefinedExistingTargetMethodMapping(
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
         return ctx.SyntaxFactory.SingleStatement(
-            Invocation(
+            ctx.SyntaxFactory.Invocation(
                 MethodName,
                 SourceParameter.WithArgument(ctx.Source),
                 TargetParameter.WithArgument(target),

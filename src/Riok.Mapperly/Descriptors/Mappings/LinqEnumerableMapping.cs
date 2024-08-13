@@ -25,13 +25,13 @@ public class LinqEnumerableMapping(
             var (lambdaCtx, lambdaSourceName) = ctx.WithNewScopedSource();
             var sourceMapExpression = elementMapping.Build(lambdaCtx);
             var convertLambda = Lambda(lambdaSourceName, sourceMapExpression);
-            mappedSource = Invocation(selectMethod, ctx.Source, convertLambda);
+            mappedSource = ctx.SyntaxFactory.Invocation(selectMethod, ctx.Source, convertLambda);
         }
         else
         {
             mappedSource = elementMapping.Build(ctx);
         }
 
-        return collectMethod == null ? mappedSource : Invocation(collectMethod, mappedSource);
+        return collectMethod == null ? mappedSource : ctx.SyntaxFactory.Invocation(collectMethod, mappedSource);
     }
 }

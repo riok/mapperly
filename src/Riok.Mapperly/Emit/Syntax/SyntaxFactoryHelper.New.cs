@@ -13,7 +13,7 @@ public partial struct SyntaxFactoryHelper
         return CreateObject(type, SyntaxFactory.ArgumentList());
     }
 
-    public static ObjectCreationExpressionSyntax CreateGenericInstance(
+    public ObjectCreationExpressionSyntax CreateGenericInstance(
         string typeName,
         TypeArgumentListSyntax typeArguments,
         IEnumerable<ArgumentSyntax> arguments
@@ -29,16 +29,13 @@ public partial struct SyntaxFactoryHelper
         return CreateObject(type, SyntaxFactory.ArgumentList());
     }
 
-    public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, params ExpressionSyntax[] args)
+    public ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, params ExpressionSyntax[] args)
     {
         var type = NonNullableIdentifier(typeSymbol);
         return CreateObject(type, ArgumentList(args));
     }
 
-    public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, params ArgumentSyntax[] args) =>
-        CreateInstance(typeSymbol, (IEnumerable<ArgumentSyntax>)args);
-
-    public static ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, IEnumerable<ArgumentSyntax> args)
+    public ObjectCreationExpressionSyntax CreateInstance(ITypeSymbol typeSymbol, IEnumerable<ArgumentSyntax> args)
     {
         var type = NonNullableIdentifier(typeSymbol);
         return CreateObject(type, ArgumentList(args));

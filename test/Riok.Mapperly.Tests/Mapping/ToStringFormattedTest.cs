@@ -47,7 +47,11 @@ public class ToStringFormattedTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                var target = new global::B(source.Value.ToString(), source.Value1.ToString("dd.MM.yyyy"), source.Value2.ToString("yyyy-MM-dd"));
+                var target = new global::B(
+                    source.Value.ToString(),
+                    source.Value1.ToString("dd.MM.yyyy"),
+                    source.Value2.ToString("yyyy-MM-dd")
+                );
                 return target;
                 """
             );

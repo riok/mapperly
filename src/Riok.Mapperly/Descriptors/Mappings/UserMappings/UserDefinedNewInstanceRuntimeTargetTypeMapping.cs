@@ -63,7 +63,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
         var targetTypeExpr = BuildTargetType();
 
         // _ => throw new ArgumentException(msg, nameof(ctx.Source)),
-        var sourceType = Invocation(MemberAccess(ctx.Source, GetTypeMethodName));
+        var sourceType = ctx.SyntaxFactory.Invocation(MemberAccess(ctx.Source, GetTypeMethodName));
         var fallbackArm = SwitchArm(
             DiscardPattern(),
             ThrowArgumentExpression(
@@ -92,7 +92,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
     protected virtual ExpressionSyntax? BuildSwitchArmWhenClause(ExpressionSyntax runtimeTargetType, RuntimeTargetTypeMapping mapping)
     {
         // targetType.IsAssignableFrom(typeof(ADto))
-        return Invocation(
+        return InvocationWithoutIndention(
             MemberAccess(runtimeTargetType, IsAssignableFromMethodName),
             TypeOfExpression(FullyQualifiedIdentifier(mapping.Mapping.TargetType.NonNullable()))
         );
