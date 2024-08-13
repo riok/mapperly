@@ -2,12 +2,14 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections;
+using System.Runtime.CompilerServices;
 
 namespace Riok.Mapperly.Helpers;
 
 /// <summary>
 /// Provides an immutable list implementation which implements sequence equality.
 /// </summary>
+[CollectionBuilder(typeof(ImmutableEquatableArray), nameof(ImmutableEquatableArray.Create))]
 public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableArray<T>>, IReadOnlyList<T>
     where T : IEquatable<T>
 {
@@ -19,6 +21,9 @@ public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableAr
     public int Count => _values.Length;
 
     public ImmutableEquatableArray(IEnumerable<T> values)
+        : this(values.ToArray()) { }
+
+    public ImmutableEquatableArray(ReadOnlySpan<T> values)
         : this(values.ToArray()) { }
 
     /// <summary>
@@ -33,7 +38,7 @@ public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableAr
 
     public static ImmutableEquatableArray<T> Empty => _empty ??= new([]);
 
-    public bool Equals(ImmutableEquatableArray<T>? other) => other != null && ((ReadOnlySpan<T>)_values).SequenceEqual(other._values);
+    public bool Equals(ImmutableEquatableArray<T> other) => _values.SequenceEqual(other._values);
 
     public override bool Equals(object? obj) => obj is ImmutableEquatableArray<T> other && Equals(other);
 
@@ -83,5 +88,8 @@ public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableAr
 public static class ImmutableEquatableArray
 {
     public static ImmutableEquatableArray<T> ToImmutableEquatableArray<T>(this IEnumerable<T> values)
+        where T : IEquatable<T> => new(values);
+
+    public static ImmutableEquatableArray<T> Create<T>(ReadOnlySpan<T> values)
         where T : IEquatable<T> => new(values);
 }

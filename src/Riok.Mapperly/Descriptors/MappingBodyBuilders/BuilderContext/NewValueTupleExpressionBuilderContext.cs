@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Symbols.Members;
@@ -54,7 +55,7 @@ public class NewValueTupleExpressionBuilderContext<T> : MembersContainerBuilderC
     }
 
     protected override bool TryFindSourcePath(
-        IReadOnlyList<IReadOnlyList<string>> pathCandidates,
+        IEnumerable<StringMemberPath> pathCandidates,
         bool ignoreCase,
         [NotNullWhen(true)] out SourceMemberPath? sourceMemberPath
     )
@@ -69,16 +70,16 @@ public class NewValueTupleExpressionBuilderContext<T> : MembersContainerBuilderC
     }
 
     private bool TryFindSecondaryTupleSourceField(
-        IReadOnlyList<IReadOnlyList<string>> pathCandidates,
+        IEnumerable<StringMemberPath> pathCandidates,
         [NotNullWhen(true)] out SourceMemberPath? sourcePath
     )
     {
         foreach (var pathParts in pathCandidates)
         {
-            if (pathParts.Count != 1)
+            if (pathParts.Path.Count != 1)
                 continue;
 
-            var name = pathParts[0];
+            var name = pathParts.Path[0];
             if (_secondarySourceNames.TryGetValue(name, out var sourceField))
             {
                 var sourceFieldMember = new FieldMember(sourceField, BuilderContext.SymbolAccessor);
