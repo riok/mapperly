@@ -9,8 +9,8 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
 
     private delegate INewInstanceMapping? BuildMapping(MappingBuilderContext context);
 
-    private static readonly IReadOnlyCollection<BuildMapping> _builders = new BuildMapping[]
-    {
+    private static readonly IReadOnlyCollection<BuildMapping> _builders =
+    [
         UseNamedMappingBuilder.TryBuildMapping,
         NullableMappingBuilder.TryBuildMapping,
         DerivedTypeMappingBuilder.TryBuildMapping,
@@ -31,8 +31,8 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
         DateTimeToTimeOnlyMappingBuilder.TryBuildMapping,
         ExplicitCastMappingBuilder.TryBuildMapping,
         ToStringMappingBuilder.TryBuildMapping,
-        NewInstanceObjectMemberMappingBuilder.TryBuildMapping,
-    };
+        NewInstanceObjectMemberMappingBuilder.TryBuildMapping
+    ];
 
     /// <inheritdoc cref="MappingCollection.NewInstanceMappings"/>
     public IReadOnlyDictionary<TypeMappingKey, INewInstanceMapping> NewInstanceMappings => mappings.NewInstanceMappings;

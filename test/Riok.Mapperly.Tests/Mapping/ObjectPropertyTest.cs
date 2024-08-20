@@ -478,7 +478,7 @@ public class ObjectPropertyTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
+            .HaveDiagnostic(DiagnosticDescriptors.NoConstructorFound, "B has no accessible constructor with mappable arguments")
             .HaveAssertedAllDiagnostics();
     }
 

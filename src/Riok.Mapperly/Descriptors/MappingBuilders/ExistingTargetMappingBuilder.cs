@@ -6,16 +6,16 @@ public class ExistingTargetMappingBuilder(MappingCollection mappings)
 {
     private delegate IExistingTargetMapping? BuildExistingTargetMapping(MappingBuilderContext context);
 
-    private static readonly IReadOnlyCollection<BuildExistingTargetMapping> _builders = new BuildExistingTargetMapping[]
-    {
+    private static readonly IReadOnlyCollection<BuildExistingTargetMapping> _builders =
+    [
         NullableMappingBuilder.TryBuildExistingTargetMapping,
         DerivedTypeMappingBuilder.TryBuildExistingTargetMapping,
         DictionaryMappingBuilder.TryBuildExistingTargetMapping,
         SpanMappingBuilder.TryBuildExistingTargetMapping,
         MemoryMappingBuilder.TryBuildExistingTargetMapping,
         EnumerableMappingBuilder.TryBuildExistingTargetMapping,
-        NewInstanceObjectMemberMappingBuilder.TryBuildExistingTargetMapping,
-    };
+        NewInstanceObjectMemberMappingBuilder.TryBuildExistingTargetMapping
+    ];
 
     public IExistingTargetMapping? Find(TypeMappingKey mappingKey)
     {

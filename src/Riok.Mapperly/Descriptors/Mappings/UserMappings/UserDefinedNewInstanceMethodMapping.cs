@@ -42,7 +42,7 @@ public class UserDefinedNewInstanceMethodMapping(
     {
         if (_delegateMapping == null)
         {
-            return new[] { ctx.SyntaxFactory.ExpressionStatement(ctx.SyntaxFactory.ThrowMappingNotImplementedExceptionStatement()) };
+            return [ctx.SyntaxFactory.ExpressionStatement(ctx.SyntaxFactory.ThrowMappingNotImplementedException())];
         }
 
         if (InternalReferenceHandlingEnabled)

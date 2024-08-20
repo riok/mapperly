@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
+using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
@@ -28,11 +29,14 @@ public static class NewInstanceObjectMemberMappingBuilder
             };
         }
 
-        if (!ctx.SymbolAccessor.HasAnyAccessibleConstructor(ctx.Target))
-            return null;
-
         if (ctx.Source.IsEnum() || ctx.Target.IsEnum())
             return null;
+
+        if (!ctx.SymbolAccessor.HasAnyAccessibleConstructor(ctx.Target))
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.NoConstructorFound, ctx.Target);
+            return new UnimplementedMapping(ctx.Source, ctx.Target);
+        }
 
         if (ctx.Target.IsTupleType)
             return BuildTupleMapping(ctx);
