@@ -26,7 +26,7 @@ A clear and concise description of what the bug is.
 ```
 
 **Environment (please complete the following information):**
-- Mapperly Version: [e.g. 1.0.1]
+- Mapperly Version: [e.g. 1.0.1, be sure to test the latest available version incl. pre-releases]
 - Nullable reference types: [e.g. enabled]
 - .NET Version: [e.g. .NET 6.0.102]
 - Target Framework: [e.g. .net6.0]
