@@ -25,7 +25,7 @@ public class NewValueTupleExpressionMapping(ITypeSymbol sourceType, ITypeSymbol 
         // generate error if constructor argument don't match
         if (_constructorPropertyMappings.Count != argumentCount)
         {
-            return ctx.SyntaxFactory.ThrowMappingNotImplementedExceptionStatement();
+            return ctx.SyntaxFactory.ThrowMappingNotImplementedException();
         }
 
         return base.Build(ctx);
@@ -36,7 +36,7 @@ public class NewValueTupleExpressionMapping(ITypeSymbol sourceType, ITypeSymbol 
         // generate error if constructor argument don't match
         if (_constructorPropertyMappings.Count != argumentCount)
         {
-            yield return ctx.SyntaxFactory.ExpressionStatement(ctx.SyntaxFactory.ThrowMappingNotImplementedExceptionStatement());
+            yield return ctx.SyntaxFactory.ExpressionStatement(ctx.SyntaxFactory.ThrowMappingNotImplementedException());
             yield break;
         }
 

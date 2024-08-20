@@ -57,7 +57,7 @@ public class UserDefinedExistingTargetMethodMapping(
     {
         if (_delegateMapping == null)
         {
-            yield return ThrowStatement(ctx.SyntaxFactory.ThrowMappingNotImplementedExceptionStatement());
+            yield return ctx.SyntaxFactory.ExpressionStatement(ctx.SyntaxFactory.ThrowMappingNotImplementedException());
             yield break;
         }
 

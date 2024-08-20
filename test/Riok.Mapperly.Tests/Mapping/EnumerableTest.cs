@@ -633,7 +633,10 @@ public class EnumerableTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NoConstructorFound,
+                "System.Collections.Generic.IEnumerable<int> has no accessible constructor with mappable arguments"
+            )
             .HaveAssertedAllDiagnostics();
     }
 

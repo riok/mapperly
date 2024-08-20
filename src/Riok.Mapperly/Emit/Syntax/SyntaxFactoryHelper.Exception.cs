@@ -28,7 +28,7 @@ public partial struct SyntaxFactoryHelper
     public static ThrowExpressionSyntax ThrowArgumentExpression(ExpressionSyntax message, ExpressionSyntax arg) =>
         Throw(ArgumentExceptionClassName, ArgumentListWithoutIndention([message, NameOf(arg)]));
 
-    public ThrowExpressionSyntax ThrowMappingNotImplementedExceptionStatement()
+    public ThrowExpressionSyntax ThrowMappingNotImplementedException()
     {
         return Throw(NotImplementedExceptionClassName, SyntaxFactory.ArgumentList()).AddLeadingLineComment(NoMappingComment, Indentation);
     }
