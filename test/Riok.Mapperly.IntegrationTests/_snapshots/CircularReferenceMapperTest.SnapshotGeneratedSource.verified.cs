@@ -5,6 +5,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
     public static partial class CircularReferenceMapper
     {
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public static partial global::Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto ToDto(global::Riok.Mapperly.IntegrationTests.Models.CircularReferenceObject obj)
         {
             return MapToCircularReferenceDto(
@@ -14,6 +15,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         private static global::Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto MapToCircularReferenceDto(global::Riok.Mapperly.IntegrationTests.Models.CircularReferenceObject source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
         {
             if (refHandler.TryGetReference<global::Riok.Mapperly.IntegrationTests.Models.CircularReferenceObject, global::Riok.Mapperly.IntegrationTests.Dto.CircularReferenceDto>(source, out var existingTargetReference))
