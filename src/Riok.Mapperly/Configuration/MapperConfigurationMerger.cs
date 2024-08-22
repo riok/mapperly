@@ -65,6 +65,11 @@ public static class MapperConfigurationMerger
         mapper.AutoUserMappings =
             mapperConfiguration.AutoUserMappings ?? defaultMapperConfiguration.AutoUserMappings ?? mapper.AutoUserMappings;
 
+        mapper.EnableAggressiveInlining =
+            mapperConfiguration.EnableAggressiveInlining
+            ?? defaultMapperConfiguration.EnableAggressiveInlining
+            ?? mapper.EnableAggressiveInlining;
+
         return mapper;
     }
 }

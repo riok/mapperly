@@ -12,7 +12,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 /// Only supports defined enum values and no flags.
 /// </summary>
 public class EnumToStringMapping(ITypeSymbol sourceType, ITypeSymbol targetType, IEnumerable<IFieldSymbol> enumMembers)
-    : NewInstanceMethodMapping(sourceType, targetType)
+    : NewInstanceMethodMapping(sourceType, targetType, enableAggressiveInlining: false)
 {
     private const string ToStringMethodName = nameof(Enum.ToString);
 

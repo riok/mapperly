@@ -188,7 +188,8 @@ public static class EnumerableMappingBuilder
             collectionInfos,
             elementMapping,
             ctx.Configuration.Mapper.UseReferenceHandling,
-            collectionInfos.Target.AddMethodName!
+            collectionInfos.Target.AddMethodName!,
+            ctx.Configuration.Mapper.EnableAggressiveInlining
         );
     }
 
@@ -214,7 +215,13 @@ public static class EnumerableMappingBuilder
         if (delegatedMapping != null)
             return delegatedMapping;
 
-        return new ArrayForMapping(ctx.Source, targetType, elementMapping, elementMapping.TargetType);
+        return new ArrayForMapping(
+            ctx.Source,
+            targetType,
+            elementMapping,
+            elementMapping.TargetType,
+            ctx.Configuration.Mapper.EnableAggressiveInlining
+        );
     }
 
     /// <summary>
@@ -240,7 +247,8 @@ public static class EnumerableMappingBuilder
             targetType,
             elementMapping,
             elementMapping.TargetType,
-            sourceCollectionInfo.CountMember!.BuildGetter(ctx.UnsafeAccessorContext)
+            sourceCollectionInfo.CountMember!.BuildGetter(ctx.UnsafeAccessorContext),
+            ctx.Configuration.Mapper.EnableAggressiveInlining
         );
     }
 
@@ -307,7 +315,8 @@ public static class EnumerableMappingBuilder
             collectionInfos,
             elementMapping,
             ctx.Configuration.Mapper.UseReferenceHandling,
-            collectionInfos.Target.AddMethodName
+            collectionInfos.Target.AddMethodName,
+            ctx.Configuration.Mapper.EnableAggressiveInlining
         );
     }
 

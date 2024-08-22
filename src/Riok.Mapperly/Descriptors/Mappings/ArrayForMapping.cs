@@ -9,8 +9,9 @@ public class ArrayForMapping(
     ITypeSymbol sourceType,
     ITypeSymbol targetType,
     INewInstanceMapping elementMapping,
-    ITypeSymbol targetArrayElementType
-) : NewInstanceMethodMapping(sourceType, targetType)
+    ITypeSymbol targetArrayElementType,
+    bool enableAggressiveInlining
+) : NewInstanceMethodMapping(sourceType, targetType, enableAggressiveInlining)
 {
     private const string TargetVariableName = "target";
     private const string LoopCounterName = "i";

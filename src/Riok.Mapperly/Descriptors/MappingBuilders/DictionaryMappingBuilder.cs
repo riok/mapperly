@@ -76,7 +76,8 @@ public static class DictionaryMappingBuilder
             keyMapping,
             valueMapping,
             GetExplicitIndexer(ctx),
-            ctx.Configuration.Mapper.UseReferenceHandling
+            ctx.Configuration.Mapper.UseReferenceHandling,
+            ctx.Configuration.Mapper.EnableAggressiveInlining
         );
     }
 
@@ -117,7 +118,8 @@ public static class DictionaryMappingBuilder
             keyMapping,
             valueMapping,
             GetExplicitIndexer(ctx),
-            ctx.Configuration.Mapper.UseReferenceHandling
+            ctx.Configuration.Mapper.UseReferenceHandling,
+            ctx.Configuration.Mapper.EnableAggressiveInlining
         );
     }
 

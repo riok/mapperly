@@ -14,8 +14,11 @@ public class UserDefinedNewInstanceMethodMapping(
     MethodParameter sourceParameter,
     MethodParameter? referenceHandlerParameter,
     ITypeSymbol targetType,
-    bool enableReferenceHandling
-) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), INewInstanceUserMapping
+    bool enableReferenceHandling,
+    bool enableAggressiveInlining
+)
+    : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetType, enableAggressiveInlining),
+        INewInstanceUserMapping
 {
     private INewInstanceMapping? _delegateMapping;
 

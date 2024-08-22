@@ -11,9 +11,12 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// mapping properties via ctor, not by assigning.
 /// <seealso cref="NewInstanceObjectMemberMethodMapping"/>
 /// </summary>
-public class NewValueTupleExpressionMapping(ITypeSymbol sourceType, ITypeSymbol targetType, int argumentCount)
-    : ObjectMemberMethodMapping(sourceType, targetType),
-        INewValueTupleMapping
+public class NewValueTupleExpressionMapping(
+    ITypeSymbol sourceType,
+    ITypeSymbol targetType,
+    int argumentCount,
+    bool enableAggressiveInlining
+) : ObjectMemberMethodMapping(sourceType, targetType, enableAggressiveInlining), INewValueTupleMapping
 {
     private const string TargetVariableName = "target";
     private readonly HashSet<ValueTupleConstructorParameterMapping> _constructorPropertyMappings = new();

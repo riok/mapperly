@@ -20,8 +20,11 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
     ITypeSymbol targetType,
     bool enableReferenceHandling,
     NullFallbackValue? nullArm,
-    ITypeSymbol objectType
-) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), INewInstanceUserMapping
+    ITypeSymbol objectType,
+    bool enableAggressiveInlining
+)
+    : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetType, enableAggressiveInlining),
+        INewInstanceUserMapping
 {
     private const string IsAssignableFromMethodName = nameof(Type.IsAssignableFrom);
     private const string GetTypeMethodName = nameof(GetType);

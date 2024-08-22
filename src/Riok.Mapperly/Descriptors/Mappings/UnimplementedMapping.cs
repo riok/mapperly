@@ -5,7 +5,7 @@ using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 namespace Riok.Mapperly.Descriptors.Mappings;
 
 public class UnimplementedMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-    : MethodMapping(sourceType, targetType),
+    : MethodMapping(sourceType, targetType, enableAggressiveInlining: false),
         IExistingTargetMapping,
         INewInstanceMapping
 {

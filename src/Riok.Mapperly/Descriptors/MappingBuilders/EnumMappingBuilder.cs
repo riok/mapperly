@@ -98,7 +98,8 @@ public static class EnumMappingBuilder
             ctx.Source,
             ctx.Target,
             differentValueExplicitEnumMappings,
-            new EnumFallbackValueMapping(ctx.Source, ctx.Target, castFallbackMapping)
+            new EnumFallbackValueMapping(ctx.Source, ctx.Target, castFallbackMapping),
+            ctx.Configuration.Mapper.EnableAggressiveInlining
         );
     }
 
@@ -114,7 +115,13 @@ public static class EnumMappingBuilder
             ctx.ReportDiagnostic(DiagnosticDescriptors.EnumNameMappingNoOverlappingValuesFound, ctx.Source, ctx.Target);
         }
 
-        return new EnumNameMapping(ctx.Source, ctx.Target, enumMemberMappings.MemberMappings, fallbackMapping);
+        return new EnumNameMapping(
+            ctx.Source,
+            ctx.Target,
+            enumMemberMappings.MemberMappings,
+            fallbackMapping,
+            ctx.Configuration.Mapper.EnableAggressiveInlining
+        );
     }
 
     private static EnumMemberMappings BuildEnumMemberMappings<T>(

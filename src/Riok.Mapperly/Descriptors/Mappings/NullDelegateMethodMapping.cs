@@ -13,8 +13,9 @@ public class NullDelegateMethodMapping(
     ITypeSymbol nullableSourceType,
     ITypeSymbol nullableTargetType,
     MethodMapping delegateMapping,
-    NullFallbackValue nullFallbackValue
-) : NewInstanceMethodMapping(nullableSourceType, nullableTargetType)
+    NullFallbackValue nullFallbackValue,
+    bool enableAggressiveInlining
+) : NewInstanceMethodMapping(nullableSourceType, nullableTargetType, enableAggressiveInlining)
 {
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {

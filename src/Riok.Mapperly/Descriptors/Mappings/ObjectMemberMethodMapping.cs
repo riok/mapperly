@@ -9,8 +9,8 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// A mapping from type to another by mapping each property.
 /// A <see cref="MethodMapping"/> implementation of <see cref="IMemberAssignmentTypeMapping"/>.
 /// </summary>
-public abstract class ObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-    : NewInstanceMethodMapping(sourceType, targetType),
+public abstract class ObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, bool enableAggressiveInlining)
+    : NewInstanceMethodMapping(sourceType, targetType, enableAggressiveInlining),
         IMemberAssignmentTypeMapping
 {
     private readonly ObjectMemberExistingTargetMapping _mapping = new(sourceType, targetType);

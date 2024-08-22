@@ -17,8 +17,11 @@ public class UserDefinedExistingTargetMethodMapping(
     MethodParameter sourceParameter,
     MethodParameter targetParameter,
     MethodParameter? referenceHandlerParameter,
-    bool enableReferenceHandling
-) : MethodMapping(method, sourceParameter, referenceHandlerParameter, targetParameter.Type), IExistingTargetUserMapping
+    bool enableReferenceHandling,
+    bool enableAggressiveInlining
+)
+    : MethodMapping(method, sourceParameter, referenceHandlerParameter, targetParameter.Type, enableAggressiveInlining),
+        IExistingTargetUserMapping
 {
     private IExistingTargetMapping? _delegateMapping;
 

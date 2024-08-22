@@ -16,8 +16,9 @@ public class ArrayForEachMapping(
     ITypeSymbol targetType,
     INewInstanceMapping elementMapping,
     ITypeSymbol targetArrayElementType,
-    IMemberGetter sourceCountAccessor
-) : NewInstanceMethodMapping(sourceType, targetType)
+    IMemberGetter sourceCountAccessor,
+    bool enableAggressiveInlining
+) : NewInstanceMethodMapping(sourceType, targetType, enableAggressiveInlining)
 {
     private const string TargetVariableName = "target";
     private const string LoopItemVariableName = "item";

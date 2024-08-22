@@ -19,9 +19,10 @@ public class ForEachAddEnumerableMapping : NewInstanceObjectMemberMethodMapping,
         CollectionInfos collectionInfos,
         INewInstanceMapping elementMapping,
         bool enableReferenceHandling,
-        string insertMethodName
+        string insertMethodName,
+        bool enableAggressiveInlining
     )
-        : base(collectionInfos.Source.Type, collectionInfos.Target.Type, enableReferenceHandling)
+        : base(collectionInfos.Source.Type, collectionInfos.Target.Type, enableReferenceHandling, enableAggressiveInlining)
     {
         _existingTargetMapping = new(collectionInfos, elementMapping, insertMethodName);
         if (constructor != null)

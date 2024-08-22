@@ -118,4 +118,10 @@ public record MapperConfiguration
     /// Whether to consider non-partial methods in a mapper as user implemented mapping methods.
     /// </summary>
     public bool? AutoUserMappings { get; init; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether add <c>[MethodImpl(MethodImplOptions.AggressiveInlining)]</c> attribute to generated mapping methods.
+    /// Defaults to <see langword="true"/>.
+    /// </summary>
+    public bool? EnableAggressiveInlining { get; set; }
 }

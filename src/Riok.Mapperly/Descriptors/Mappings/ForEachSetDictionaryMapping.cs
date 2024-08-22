@@ -21,9 +21,10 @@ public class ForEachSetDictionaryMapping : NewInstanceObjectMemberMethodMapping,
         INewInstanceMapping keyMapping,
         INewInstanceMapping valueMapping,
         INamedTypeSymbol? explicitCast,
-        bool enableReferenceHandling
+        bool enableReferenceHandling,
+        bool enableAggressiveInlining
     )
-        : base(collectionInfos.Source.Type, collectionInfos.Target.Type, enableReferenceHandling)
+        : base(collectionInfos.Source.Type, collectionInfos.Target.Type, enableReferenceHandling, enableAggressiveInlining)
     {
         _existingTargetMapping = new(collectionInfos, keyMapping, valueMapping, explicitCast);
         if (constructor != null)

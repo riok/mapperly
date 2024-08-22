@@ -4,7 +4,9 @@ using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
 
-public class NoOpMapping(ITypeSymbol sourceType, ITypeSymbol targetType) : MethodMapping(sourceType, targetType), IExistingTargetMapping
+public class NoOpMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    : MethodMapping(sourceType, targetType, enableAggressiveInlining: false),
+        IExistingTargetMapping
 {
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx) => [];
 

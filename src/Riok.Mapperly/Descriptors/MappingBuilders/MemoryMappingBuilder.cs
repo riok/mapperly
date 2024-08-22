@@ -138,7 +138,8 @@ public static class MemoryMappingBuilder
                 ctx.Source,
                 ctx.Types.GetArrayType(elementMapping.TargetType),
                 elementMapping,
-                elementMapping.TargetType
+                elementMapping.TargetType,
+                ctx.Configuration.Mapper.EnableAggressiveInlining
             );
 
         return new CastMapping(ctx.Source, ctx.Target);

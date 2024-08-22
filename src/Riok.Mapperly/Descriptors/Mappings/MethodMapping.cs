@@ -33,21 +33,24 @@ public abstract class MethodMapping : ITypeMapping
 
     private readonly ITypeSymbol _returnType;
     private readonly MethodDeclarationSyntax? _methodDeclarationSyntax;
+    private readonly bool _enableAggressiveInlining;
 
     private string? _methodName;
 
-    protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, bool enableAggressiveInlining)
     {
         TargetType = targetType;
         SourceParameter = new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType);
         _returnType = targetType;
+        _enableAggressiveInlining = enableAggressiveInlining;
     }
 
     protected MethodMapping(
         IMethodSymbol method,
         MethodParameter sourceParameter,
         MethodParameter? referenceHandlerParameter,
-        ITypeSymbol targetType
+        ITypeSymbol targetType,
+        bool enableAggressiveInlining
     )
     {
         TargetType = targetType;
@@ -58,6 +61,7 @@ public abstract class MethodMapping : ITypeMapping
         _methodDeclarationSyntax = method.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
         _methodName = method.Name;
         _returnType = method.ReturnsVoid ? method.ReturnType : targetType;
+        _enableAggressiveInlining = enableAggressiveInlining;
     }
 
     public IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; init; } = [];
@@ -101,7 +105,10 @@ public abstract class MethodMapping : ITypeMapping
         return MethodDeclaration(returnType.AddTrailingSpace(), Identifier(MethodName))
             .WithModifiers(TokenList(BuildModifiers(ctx.IsStatic)))
             .WithParameterList(parameters)
-            .WithAttributeLists(ctx.SyntaxFactory.GeneratedCodeAttributeList())
+            .WithAttributeLists(
+                ctx.SyntaxFactory.GeneratedCodeAttributeList()
+                    .AddRange(_enableAggressiveInlining ? ctx.SyntaxFactory.MethodImplAttributeList() : [])
+            )
             .WithBody(ctx.SyntaxFactory.Block(BuildBody(typeMappingBuildContext)));
     }
 

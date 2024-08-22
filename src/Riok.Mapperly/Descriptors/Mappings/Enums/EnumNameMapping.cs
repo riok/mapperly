@@ -14,8 +14,9 @@ public class EnumNameMapping(
     ITypeSymbol source,
     ITypeSymbol target,
     IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> enumMemberMappings,
-    EnumFallbackValueMapping fallback
-) : NewInstanceMethodMapping(source, target)
+    EnumFallbackValueMapping fallback,
+    bool enableAggressiveInlining
+) : NewInstanceMethodMapping(source, target, enableAggressiveInlining)
 {
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {

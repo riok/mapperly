@@ -188,3 +188,5 @@ Riok.Mapperly.Abstractions.MapPropertyAttribute.MapPropertyAttribute(string! sou
 Riok.Mapperly.Abstractions.MapPropertyAttribute.MapPropertyAttribute(string![]! source, string! target) -> void
 Riok.Mapperly.Abstractions.MapperAttribute.IncludedConstructors.get -> Riok.Mapperly.Abstractions.MemberVisibility
 Riok.Mapperly.Abstractions.MapperAttribute.IncludedConstructors.set -> void
+Riok.Mapperly.Abstractions.MapperAttribute.EnableAggressiveInlining.get -> bool
+Riok.Mapperly.Abstractions.MapperAttribute.EnableAggressiveInlining.set -> void

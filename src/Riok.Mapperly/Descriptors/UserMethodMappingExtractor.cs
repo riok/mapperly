@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
@@ -197,7 +198,8 @@ public static class UserMethodMappingExtractor
                 ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
                 ctx.Configuration.Mapper.UseReferenceHandling,
                 GetTypeSwitchNullArm(methodSymbol, parameters),
-                ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
+                ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated),
+                IsAllowedAggressiveInlining(ctx, methodSymbol)
             );
         }
 
@@ -208,7 +210,8 @@ public static class UserMethodMappingExtractor
                 parameters.Source,
                 parameters.Target.Value,
                 parameters.ReferenceHandler,
-                ctx.Configuration.Mapper.UseReferenceHandling
+                ctx.Configuration.Mapper.UseReferenceHandling,
+                IsAllowedAggressiveInlining(ctx, methodSymbol)
             )
             {
                 AdditionalSourceParameters = parameters.AdditionalParameters,
@@ -225,18 +228,24 @@ public static class UserMethodMappingExtractor
             );
         }
 
-        var mapping = new UserDefinedNewInstanceMethodMapping(
+        return new UserDefinedNewInstanceMethodMapping(
             methodSymbol,
             parameters.AdditionalParameters.Count == 0 ? userMappingConfig.Default : false,
             parameters.Source,
             parameters.ReferenceHandler,
             ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
-            ctx.Configuration.Mapper.UseReferenceHandling
+            ctx.Configuration.Mapper.UseReferenceHandling,
+            IsAllowedAggressiveInlining(ctx, methodSymbol)
         )
         {
             AdditionalSourceParameters = parameters.AdditionalParameters,
         };
-        return mapping;
+    }
+
+    private static bool IsAllowedAggressiveInlining(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol)
+    {
+        var hasMethodImpleAttribute = ctx.SymbolAccessor.HasAttribute<MethodImplAttribute>(methodSymbol);
+        return !hasMethodImpleAttribute && ctx.Configuration.Mapper.EnableAggressiveInlining;
     }
 
     private static UserDefinedNewInstanceRuntimeTargetTypeParameterMapping? TryBuildRuntimeTargetTypeMapping(
@@ -260,7 +269,8 @@ public static class UserMethodMappingExtractor
             ctx.Configuration.Mapper.UseReferenceHandling,
             ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
             GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams),
-            ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
+            ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated),
+            IsAllowedAggressiveInlining(ctx, methodSymbol)
         );
     }
 

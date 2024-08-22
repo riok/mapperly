@@ -5,14 +5,15 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 
 public abstract class NewInstanceMethodMapping : MethodMapping, INewInstanceMapping
 {
-    protected NewInstanceMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
-        : base(sourceType, targetType) { }
+    protected NewInstanceMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, bool enableAggressiveInlining)
+        : base(sourceType, targetType, enableAggressiveInlining) { }
 
     protected NewInstanceMethodMapping(
         IMethodSymbol method,
         MethodParameter sourceParameter,
         MethodParameter? referenceHandlerParameter,
-        ITypeSymbol targetType
+        ITypeSymbol targetType,
+        bool enableAggressiveInlining
     )
-        : base(method, sourceParameter, referenceHandlerParameter, targetType) { }
+        : base(method, sourceParameter, referenceHandlerParameter, targetType, enableAggressiveInlining) { }
 }

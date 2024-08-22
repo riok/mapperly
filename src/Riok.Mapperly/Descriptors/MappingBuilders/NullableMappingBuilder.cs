@@ -43,7 +43,14 @@ public static class NullableMappingBuilder
         var nullFallback = ctx.GetNullFallbackValue();
         return mapping switch
         {
-            NewInstanceMethodMapping methodMapping => new NullDelegateMethodMapping(ctx.Source, ctx.Target, methodMapping, nullFallback),
+            NewInstanceMethodMapping methodMapping
+                => new NullDelegateMethodMapping(
+                    ctx.Source,
+                    ctx.Target,
+                    methodMapping,
+                    nullFallback,
+                    ctx.Configuration.Mapper.EnableAggressiveInlining
+                ),
             _ => new NullDelegateMapping(ctx.Source, ctx.Target, mapping, nullFallback),
         };
     }

@@ -123,14 +123,21 @@ public static class SpanMappingBuilder
             ctx.CollectionInfos,
             elementMapping,
             ctx.Configuration.Mapper.UseReferenceHandling,
-            target.AddMethodName
+            target.AddMethodName,
+            ctx.Configuration.Mapper.EnableAggressiveInlining
         );
     }
 
     private static INewInstanceMapping BuildToArrayOrMap(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
         if (!elementMapping.IsSynthetic)
-            return new ArrayForMapping(ctx.Source, ctx.Target, elementMapping, elementMapping.TargetType);
+            return new ArrayForMapping(
+                ctx.Source,
+                ctx.Target,
+                elementMapping,
+                elementMapping.TargetType,
+                ctx.Configuration.Mapper.EnableAggressiveInlining
+            );
 
         return new SourceObjectMethodMapping(ctx.Source, ctx.Target, ToArrayMethodName);
     }

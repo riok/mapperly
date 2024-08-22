@@ -10,9 +10,12 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// An object mapping creating the target instance via a new() call,
 /// mapping properties via ctor, object initializer and by assigning.
 /// </summary>
-public class NewInstanceObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, bool enableReferenceHandling)
-    : ObjectMemberMethodMapping(sourceType, targetType),
-        INewInstanceObjectMemberMapping
+public class NewInstanceObjectMemberMethodMapping(
+    ITypeSymbol sourceType,
+    ITypeSymbol targetType,
+    bool enableReferenceHandling,
+    bool enableAggressiveInlining
+) : ObjectMemberMethodMapping(sourceType, targetType, enableAggressiveInlining), INewInstanceObjectMemberMapping
 {
     private const string TargetVariableName = "target";
 

@@ -125,4 +125,10 @@ public class MapperAttribute : Attribute
     /// partial methods are discovered.
     /// </summary>
     public bool AutoUserMappings { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether add <c>[MethodImpl(MethodImplOptions.AggressiveInlining)]</c> attribute to generated mapping methods.
+    /// Defaults to <see langword="true"/>.
+    /// </summary>
+    public bool EnableAggressiveInlining { get; set; } = true;
 }

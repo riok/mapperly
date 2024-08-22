@@ -40,6 +40,13 @@ public partial struct SyntaxFactoryHelper
     public static LiteralExpressionSyntax FloatLiteral(float content) =>
         LiteralExpression(SyntaxKind.NumericLiteralExpression, SyntaxFactory.Literal(content));
 
+    public static MemberAccessExpressionSyntax EnumLiteral(Enum @enum) =>
+        MemberAccessExpression(
+            SyntaxKind.SimpleMemberAccessExpression,
+            IdentifierName($"global::{@enum.GetType().FullName}"),
+            IdentifierName(@enum.ToString())
+        );
+
     public static LiteralExpressionSyntax Literal(object? obj)
     {
         return obj switch

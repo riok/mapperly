@@ -22,7 +22,8 @@ public static class NewInstanceObjectMemberMappingBuilder
             return new NewInstanceObjectMemberMethodMapping(
                 ctx.Source,
                 ctx.Target.NonNullable(),
-                ctx.Configuration.Mapper.UseReferenceHandling
+                ctx.Configuration.Mapper.UseReferenceHandling,
+                ctx.Configuration.Mapper.EnableAggressiveInlining
             )
             {
                 Constructor = constructor
@@ -45,7 +46,12 @@ public static class NewInstanceObjectMemberMappingBuilder
         // and can only map to properties via object initializers.
         return ctx.IsExpression
             ? new NewInstanceObjectMemberMapping(ctx.Source, ctx.Target.NonNullable())
-            : new NewInstanceObjectMemberMethodMapping(ctx.Source, ctx.Target.NonNullable(), ctx.Configuration.Mapper.UseReferenceHandling);
+            : new NewInstanceObjectMemberMethodMapping(
+                ctx.Source,
+                ctx.Target.NonNullable(),
+                ctx.Configuration.Mapper.UseReferenceHandling,
+                ctx.Configuration.Mapper.EnableAggressiveInlining
+            );
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
@@ -74,6 +80,11 @@ public static class NewInstanceObjectMemberMappingBuilder
         }
 
         var expectedArgumentCount = (ctx.Target as INamedTypeSymbol)!.TupleElements.Length;
-        return new NewValueTupleExpressionMapping(ctx.Source, ctx.Target, expectedArgumentCount);
+        return new NewValueTupleExpressionMapping(
+            ctx.Source,
+            ctx.Target,
+            expectedArgumentCount,
+            ctx.Configuration.Mapper.EnableAggressiveInlining
+        );
     }
 }
