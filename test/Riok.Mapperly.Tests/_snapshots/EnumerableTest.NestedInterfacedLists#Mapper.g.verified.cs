@@ -4,6 +4,7 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private partial global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.IReadOnlyList<string>>> Map(global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.IReadOnlyList<int>>> source)
     {
         var target = new string[source.Count][][];
@@ -17,6 +18,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private string[] MapToStringArray(global::System.Collections.Generic.IReadOnlyCollection<int> source)
     {
         var target = new string[source.Count];
@@ -30,6 +32,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private string[][] MapToStringArrayArray(global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.IReadOnlyList<int>> source)
     {
         var target = new string[source.Count][];

@@ -4,6 +4,7 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public partial global::System.Linq.IQueryable<global::B> Map(global::System.Linq.IQueryable<global::A> source)
     {
 #nullable disable
@@ -12,6 +13,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public partial global::System.Linq.IQueryable<global::D> Map(global::System.Linq.IQueryable<global::C> source)
     {
 #nullable disable
@@ -20,6 +22,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private partial global::B Map(global::A source)
     {
         var target = new global::B(DefaultStringMapping(source.StringValue), ModifyString(source.StringValue1), ModifyString2(source.StringValue2));
@@ -27,6 +30,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private partial global::D Map(global::C source)
     {
         var target = new global::D(DefaultStringMapping(source.StringValue), ModifyString(source.StringValue1), ModifyString2(source.StringValue2));

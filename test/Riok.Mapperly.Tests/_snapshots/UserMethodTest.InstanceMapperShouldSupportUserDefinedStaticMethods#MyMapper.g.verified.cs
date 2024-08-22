@@ -4,6 +4,7 @@
 public partial class MyMapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public partial global::B Map(global::A s)
     {
         var target = new global::B(MapInt(s.Value));

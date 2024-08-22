@@ -4,6 +4,7 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private partial global::System.Collections.Generic.IEnumerable<TTarget> Map<TSource, TTarget>(global::System.Collections.Generic.IEnumerable<TSource> source)
     {
         return source switch
@@ -15,12 +16,14 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private partial global::System.Collections.Generic.IEnumerable<global::B> MapToB(global::System.Collections.Generic.IEnumerable<global::A> source)
     {
         return global::System.Linq.Enumerable.Select(source, x => MapToB1(x));
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private partial global::System.Collections.Generic.List<global::D> MapToD(global::System.Collections.Generic.IReadOnlyCollection<global::C> source)
     {
         var target = new global::System.Collections.Generic.List<global::D>(source.Count);
@@ -32,6 +35,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private global::B MapToB1(global::A source)
     {
         var target = new global::B();
@@ -40,6 +44,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private global::D MapToD1(global::C source)
     {
         var target = new global::D(source.Value1);

@@ -8,6 +8,7 @@ public partial class CarFeature
         public partial class CarMapper
         {
             [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+            [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
             public partial int ToInt(double value)
             {
                 return (int)value;

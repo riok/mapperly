@@ -4,6 +4,7 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private partial ((int, int D) C, int) Map(((int F, int G), string B) source)
     {
         var target = (C: MapToValueTupleOfInt32AndInt32(source.Item1), int.Parse(source.B));
@@ -12,6 +13,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private (int, int D) MapToValueTupleOfInt32AndInt32((int F, int G) source)
     {
         var target = (source.F, D: source.G);

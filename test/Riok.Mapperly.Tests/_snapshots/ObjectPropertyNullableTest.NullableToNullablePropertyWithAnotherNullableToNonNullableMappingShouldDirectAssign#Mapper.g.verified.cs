@@ -4,6 +4,7 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public static partial global::ADest? Map(global::A? source)
     {
         if (source == null)
@@ -13,6 +14,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public static partial global::BDest MapToDestinationB(global::B source)
     {
         var target = new global::BDest(MapToListOfInt32(source.Prop));
@@ -20,6 +22,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     private static global::System.Collections.Generic.List<int> MapToListOfInt32(global::System.Collections.Generic.IReadOnlyCollection<int?> source)
     {
         var target = new global::System.Collections.Generic.List<int>(source.Count);
