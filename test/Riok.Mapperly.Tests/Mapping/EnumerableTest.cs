@@ -673,7 +673,7 @@ public class EnumerableTest
             public partial BListAgain Map(AListAgain source);
             public partial BReadOnlyCollection Map(AList source);
             public partial BCustomCollection Map(AList source);
-            public partial BCollection Map(AList source);g
+            public partial BCollection Map(AList source);
             public partial BReadOnlyCollection Map(AReadOnlyCollection source);
             public partial BCustomCollection Map(ACustomReadOnlyCollection source);
             public partial BCollection Map(ACollection source);
