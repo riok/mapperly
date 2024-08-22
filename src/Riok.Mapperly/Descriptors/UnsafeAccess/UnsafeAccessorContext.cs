@@ -6,7 +6,12 @@ using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.UnsafeAccess;
 
-public class UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor symbolAccessor, string className)
+public class UnsafeAccessorContext(
+    UniqueNameBuilder nameBuilder,
+    SymbolAccessor symbolAccessor,
+    string className,
+    bool enableAggressiveInlining
+)
 {
     private readonly List<IUnsafeAccessor> _unsafeAccessors = new();
     private readonly Dictionary<UnsafeAccessorKey, IUnsafeAccessor> _unsafeAccessorsBySymbol = new();
@@ -19,7 +24,7 @@ public class UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor
         return GetOrBuild(
             UnsafeAccessorType.SetProperty,
             member.Symbol,
-            static (m, _, methodName) => new UnsafeSetPropertyAccessor(m, methodName)
+            (m, _, methodName) => new UnsafeSetPropertyAccessor(m, methodName, enableAggressiveInlining)
         );
     }
 
@@ -28,13 +33,17 @@ public class UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor
         return GetOrBuild(
             UnsafeAccessorType.GetProperty,
             member.Symbol,
-            static (m, _, methodName) => new UnsafeGetPropertyAccessor(m, methodName)
+            (m, _, methodName) => new UnsafeGetPropertyAccessor(m, methodName, enableAggressiveInlining)
         );
     }
 
     public UnsafeFieldAccessor GetOrBuildFieldGetter(FieldMember member)
     {
-        return GetOrBuild(UnsafeAccessorType.GetField, member.Symbol, static (m, _, methodName) => new UnsafeFieldAccessor(m, methodName));
+        return GetOrBuild(
+            UnsafeAccessorType.GetField,
+            member.Symbol, /*static*/
+            (m, _, methodName) => new UnsafeFieldAccessor(m, methodName, enableAggressiveInlining)
+        );
     }
 
     public UnsafeConstructorAccessor GetOrBuildConstructor(IMethodSymbol ctorSymbol)
@@ -42,7 +51,7 @@ public class UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor
         return GetOrBuild(
             UnsafeAccessorType.Constructor,
             ctorSymbol,
-            static (s, className, methodName) => new UnsafeConstructorAccessor(s, className, methodName)
+            (s, className, methodName) => new UnsafeConstructorAccessor(s, className, methodName, enableAggressiveInlining)
         );
     }
 

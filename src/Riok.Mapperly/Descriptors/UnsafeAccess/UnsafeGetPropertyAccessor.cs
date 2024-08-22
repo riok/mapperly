@@ -16,7 +16,9 @@ namespace Riok.Mapperly.Descriptors.UnsafeAccess;
 /// public extern static int GetValue(this global::MyClass source);
 /// </code>
 /// </summary>
-public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string methodName) : IUnsafeAccessor, IMemberGetter
+public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string methodName, bool enableAggressiveInlining)
+    : IUnsafeAccessor,
+        IMemberGetter
 {
     private const string DefaultSourceParameterName = "source";
 
@@ -29,6 +31,9 @@ public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string methodName
 
         var parameters = ParameterList(CommaSeparatedList(source));
         var attributeList = ctx.SyntaxFactory.UnsafeAccessorAttributeList(UnsafeAccessorType.Method, $"get_{symbol.Name}");
+        if (enableAggressiveInlining)
+            attributeList = attributeList.AddRange(ctx.SyntaxFactory.MethodImplAttributeList());
+
         return PublicStaticExternMethod(
             ctx,
             IdentifierName(symbol.Type.FullyQualifiedIdentifierName()).AddTrailingSpace(),

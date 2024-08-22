@@ -17,7 +17,9 @@ namespace Riok.Mapperly.Descriptors.UnsafeAccess;
 /// public extern static void SetValue(this global::MyClass source, int value);
 /// </code>
 /// </summary>
-public class UnsafeSetPropertyAccessor(IPropertySymbol symbol, string methodName) : IUnsafeAccessor, IMemberSetter
+public class UnsafeSetPropertyAccessor(IPropertySymbol symbol, string methodName, bool enableAggressiveInlining)
+    : IUnsafeAccessor,
+        IMemberSetter
 {
     private const string DefaultTargetParameterName = "target";
     private const string DefaultValueParameterName = "value";
@@ -35,6 +37,8 @@ public class UnsafeSetPropertyAccessor(IPropertySymbol symbol, string methodName
 
         var parameters = ParameterList(CommaSeparatedList(target, targetValue));
         var attributeList = ctx.SyntaxFactory.UnsafeAccessorAttributeList(UnsafeAccessorType.Method, $"set_{symbol.Name}");
+        if (enableAggressiveInlining)
+            attributeList = attributeList.AddRange(ctx.SyntaxFactory.MethodImplAttributeList());
 
         return PublicStaticExternMethod(
             ctx,

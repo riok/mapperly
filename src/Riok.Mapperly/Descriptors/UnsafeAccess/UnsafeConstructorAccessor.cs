@@ -10,7 +10,9 @@ using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.UnsafeAccess;
 
-public class UnsafeConstructorAccessor(IMethodSymbol symbol, string className, string methodName) : IUnsafeAccessor, IInstanceConstructor
+public class UnsafeConstructorAccessor(IMethodSymbol symbol, string className, string methodName, bool enableAggressiveInlining)
+    : IUnsafeAccessor,
+        IInstanceConstructor
 {
     public bool SupportsObjectInitializer => false;
 
@@ -19,6 +21,8 @@ public class UnsafeConstructorAccessor(IMethodSymbol symbol, string className, s
         var typeToCreate = IdentifierName(symbol.ContainingType.FullyQualifiedIdentifierName()).AddTrailingSpace();
         var parameters = ParameterList(symbol.Parameters);
         var attributeList = ctx.SyntaxFactory.UnsafeAccessorAttributeList(UnsafeAccessorType.Constructor);
+        if (enableAggressiveInlining)
+            attributeList = attributeList.AddRange(ctx.SyntaxFactory.MethodImplAttributeList());
         return PublicStaticExternMethod(ctx, typeToCreate, methodName, parameters, attributeList);
     }
 

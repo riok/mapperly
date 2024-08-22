@@ -44,7 +44,7 @@ public class DescriptorBuilder
         _symbolAccessor = symbolAccessor;
         _types = compilationContext.Types;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
-        _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor, _mapperDescriptor.UnsafeAccessorName);
+        _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
 
         var attributeAccessor = new AttributeDataAccessor(symbolAccessor);
         var configurationReader = new MapperConfigurationReader(
@@ -53,7 +53,13 @@ public class DescriptorBuilder
             mapperDeclaration.Symbol,
             defaultMapperConfiguration
         );
-        _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
+
+        _unsafeAccessorContext = new UnsafeAccessorContext(
+            _methodNameBuilder,
+            symbolAccessor,
+            _mapperDescriptor.UnsafeAccessorName,
+            configurationReader.MapperConfiguration.Mapper.EnableAggressiveInlining
+        );
 
         _builderContext = new SimpleMappingBuilderContext(
             compilationContext,

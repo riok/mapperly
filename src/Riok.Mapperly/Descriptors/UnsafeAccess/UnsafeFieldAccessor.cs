@@ -17,7 +17,10 @@ namespace Riok.Mapperly.Descriptors.UnsafeAccess;
 /// public extern static int GetValue(this global::MyClass source);
 /// </code>
 /// </summary>
-public class UnsafeFieldAccessor(IFieldSymbol symbol, string methodName) : IUnsafeAccessor, IMemberSetter, IMemberGetter
+public class UnsafeFieldAccessor(IFieldSymbol symbol, string methodName, bool enableAggressiveInlining)
+    : IUnsafeAccessor,
+        IMemberSetter,
+        IMemberGetter
 {
     private const string DefaultTargetParameterName = "target";
 
@@ -32,6 +35,8 @@ public class UnsafeFieldAccessor(IFieldSymbol symbol, string methodName) : IUnsa
 
         var parameters = ParameterList(CommaSeparatedList(target));
         var attributeList = ctx.SyntaxFactory.UnsafeAccessorAttributeList(UnsafeAccessorType.Field, symbol.Name);
+        if (enableAggressiveInlining)
+            attributeList = attributeList.AddRange(ctx.SyntaxFactory.MethodImplAttributeList());
         var returnType = RefType(IdentifierName(symbol.Type.FullyQualifiedIdentifierName()).AddTrailingSpace())
             .WithRefKeyword(Token(TriviaList(), SyntaxKind.RefKeyword, TriviaList(Space)));
 
