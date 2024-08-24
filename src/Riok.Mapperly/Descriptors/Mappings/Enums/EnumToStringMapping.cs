@@ -11,8 +11,12 @@ namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 /// Uses a switch expression for performance reasons (in comparison to <see cref="Enum.ToString()"/>).
 /// Only supports defined enum values and no flags.
 /// </summary>
-public class EnumToStringMapping(ITypeSymbol sourceType, ITypeSymbol targetType, IEnumerable<IFieldSymbol> enumMembers)
-    : NewInstanceMethodMapping(sourceType, targetType, enableAggressiveInlining: false)
+public class EnumToStringMapping(
+    ITypeSymbol sourceType,
+    ITypeSymbol targetType,
+    IEnumerable<IFieldSymbol> enumMembers,
+    bool enableAggressiveInlining
+) : NewInstanceMethodMapping(sourceType, targetType, enableAggressiveInlining)
 {
     private const string ToStringMethodName = nameof(Enum.ToString);
 

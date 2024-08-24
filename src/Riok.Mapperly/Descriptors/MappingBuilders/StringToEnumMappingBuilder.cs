@@ -44,7 +44,14 @@ public static class StringToEnumMappingBuilder
             members = members.Where(x => fallbackMapping.FallbackMember.ConstantValue?.Equals(x.ConstantValue) != true);
         }
 
-        return new EnumFromStringSwitchMapping(ctx.Source, ctx.Target, members, ctx.Configuration.Enum.IgnoreCase, fallbackMapping);
+        return new EnumFromStringSwitchMapping(
+            ctx.Source,
+            ctx.Target,
+            members,
+            ctx.Configuration.Enum.IgnoreCase,
+            fallbackMapping,
+            ctx.Configuration.Mapper.EnableAggressiveInlining
+        );
     }
 
     private static EnumFallbackValueMapping BuildFallbackParseMapping(MappingBuilderContext ctx, bool genericEnumParseMethodSupported)

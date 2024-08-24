@@ -25,7 +25,7 @@ public static class QueryableMappingBuilder
             ctx.ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingsDoNotSupportReferenceHandling);
         }
 
-        return new QueryableProjectionMapping(ctx.Source, ctx.Target, mapping);
+        return new QueryableProjectionMapping(ctx.Source, ctx.Target, mapping, ctx.Configuration.Mapper.EnableAggressiveInlining);
     }
 
     private static bool TryBuildMappingKey(MappingBuilderContext ctx, out TypeMappingKey mappingKey)

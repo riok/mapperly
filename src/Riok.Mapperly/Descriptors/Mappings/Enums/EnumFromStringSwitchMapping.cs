@@ -17,8 +17,9 @@ public class EnumFromStringSwitchMapping(
     ITypeSymbol targetType,
     IEnumerable<IFieldSymbol> enumMembers,
     bool ignoreCase,
-    EnumFallbackValueMapping fallbackMapping
-) : NewInstanceMethodMapping(sourceType, targetType, enableAggressiveInlining: false)
+    EnumFallbackValueMapping fallbackMapping,
+    bool enableAggressiveInlining
+) : NewInstanceMethodMapping(sourceType, targetType, enableAggressiveInlining)
 {
     private const string IgnoreCaseSwitchDesignatedVariableName = "s";
     private const string StringEqualsMethodName = nameof(string.Equals);

@@ -9,8 +9,12 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// A projections queryable mapping
 /// to map from one generic <see cref="IQueryable{T}"/> to another.
 /// </summary>
-public class QueryableProjectionMapping(ITypeSymbol sourceType, ITypeSymbol targetType, INewInstanceMapping delegateMapping)
-    : NewInstanceMethodMapping(sourceType, targetType, enableAggressiveInlining: false)
+public class QueryableProjectionMapping(
+    ITypeSymbol sourceType,
+    ITypeSymbol targetType,
+    INewInstanceMapping delegateMapping,
+    bool enableAggressiveInlining
+) : NewInstanceMethodMapping(sourceType, targetType, enableAggressiveInlining)
 {
     private const string QueryableReceiverName = "System.Linq.Queryable";
     private const string SelectMethodName = nameof(Queryable.Select);

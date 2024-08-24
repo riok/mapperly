@@ -5,6 +5,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
     public static partial class UseExternalMapperFromAnotherAssembly
     {
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public static partial global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Mapper.UseExternalMapperFromAnotherAssembly.Target> ProjectToTarget(global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Mapper.UseExternalMapperFromAnotherAssembly.Source> source)
         {
 #nullable disable
@@ -16,6 +17,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        [global::System.Runtime.CompilerServices.MethodImpl(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public static partial global::Riok.Mapperly.IntegrationTests.Mapper.UseExternalMapperFromAnotherAssembly.Target MapToTarget(global::Riok.Mapperly.IntegrationTests.Mapper.UseExternalMapperFromAnotherAssembly.Source source)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Mapper.UseExternalMapperFromAnotherAssembly.Target();
