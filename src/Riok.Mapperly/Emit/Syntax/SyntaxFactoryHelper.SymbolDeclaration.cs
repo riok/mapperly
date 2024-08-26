@@ -28,4 +28,27 @@ public partial struct SyntaxFactoryHelper
             .WithAttributeLists(isPartial ? new SyntaxList<AttributeListSyntax>() : GeneratedCodeAttributeList())
             .AddLeadingLineFeed(Indentation);
     }
+
+    public TypeDeclarationSyntax TypeDeclaration(TypeDeclarationSyntax syntax, SyntaxList<MemberDeclarationSyntax> members)
+    {
+        var name = Identifier(syntax.Identifier.ValueText);
+        TypeDeclarationSyntax type = syntax switch
+        {
+            ClassDeclarationSyntax => ClassDeclaration(name),
+            StructDeclarationSyntax => StructDeclaration(name),
+            InterfaceDeclarationSyntax => InterfaceDeclaration(name),
+            RecordDeclarationSyntax => RecordDeclaration(Token(SyntaxKind.RecordKeyword), name),
+            _ => throw new NotSupportedException("Unsupported type declaration syntax.")
+        };
+
+        var isPartial = syntax.Modifiers.Any(kind => kind.IsKind(SyntaxKind.PartialKeyword));
+        return type.WithModifiers(syntax.Modifiers)
+            .WithMembers(members)
+            .WithoutTrivia()
+            .WithKeyword(TrailingSpacedToken(syntax.Keyword.Kind()))
+            .WithOpenBraceToken(LeadingLineFeedToken(SyntaxKind.OpenBraceToken))
+            .WithCloseBraceToken(LeadingLineFeedToken(SyntaxKind.CloseBraceToken))
+            .WithAttributeLists(isPartial ? new SyntaxList<AttributeListSyntax>() : GeneratedCodeAttributeList())
+            .AddLeadingLineFeed(Indentation);
+    }
 }
