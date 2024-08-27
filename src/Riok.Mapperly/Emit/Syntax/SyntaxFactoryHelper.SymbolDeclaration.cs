@@ -38,7 +38,7 @@ public partial struct SyntaxFactoryHelper
             StructDeclarationSyntax => StructDeclaration(name),
             InterfaceDeclarationSyntax => InterfaceDeclaration(name),
             RecordDeclarationSyntax => RecordDeclaration(Token(SyntaxKind.RecordKeyword), name),
-            _ => throw new NotSupportedException("Unsupported type declaration syntax.")
+            _ => throw new NotSupportedException($"Unsupported type declaration syntax {syntax.GetType().Name}.")
         };
 
         var isPartial = syntax.Modifiers.Any(kind => kind.IsKind(SyntaxKind.PartialKeyword));
