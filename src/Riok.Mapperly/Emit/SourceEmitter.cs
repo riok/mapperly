@@ -64,12 +64,10 @@ public static class SourceEmitter
         var containingType = symbol.ContainingType;
         while (containingType != null)
         {
-            if (containingType.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not ClassDeclarationSyntax containingTypeSyntax)
+            if (containingType.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is not TypeDeclarationSyntax containingTypeSyntax)
                 break;
 
-            members = SingletonList<MemberDeclarationSyntax>(
-                ctx.SyntaxFactory.Class(containingType.Name, containingTypeSyntax.Modifiers, members)
-            );
+            members = SingletonList<MemberDeclarationSyntax>(ctx.SyntaxFactory.TypeDeclaration(containingTypeSyntax, members));
             ctx = ctx.RemoveIndentation();
             containingType = containingType.ContainingType;
         }
