@@ -7,9 +7,9 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// </summary>
 public abstract class MemberAssignmentMappingContainer(IMemberAssignmentMappingContainer? parent = null) : IMemberAssignmentMappingContainer
 {
-    private readonly HashSet<IMemberAssignmentMapping> _delegateMappings = new();
-    private readonly HashSet<IMemberAssignmentMappingContainer> _childContainers = new();
-    private readonly List<IAssignmentMappings> _mappings = new();
+    private readonly HashSet<IMemberAssignmentMapping> _delegateMappings = [];
+    private readonly HashSet<IMemberAssignmentMappingContainer> _childContainers = [];
+    private readonly List<IAssignmentMappings> _mappings = [];
 
     public virtual IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess) =>
         _mappings.SelectMany(x => x.Build(ctx, targetAccess));

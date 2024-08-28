@@ -16,7 +16,7 @@ public class NewValueTupleExpressionMapping(ITypeSymbol sourceType, ITypeSymbol 
         INewValueTupleMapping
 {
     private const string TargetVariableName = "target";
-    private readonly HashSet<ValueTupleConstructorParameterMapping> _constructorPropertyMappings = new();
+    private readonly HashSet<ValueTupleConstructorParameterMapping> _constructorPropertyMappings = [];
 
     public void AddConstructorParameterMapping(ValueTupleConstructorParameterMapping mapping) => _constructorPropertyMappings.Add(mapping);
 

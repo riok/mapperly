@@ -16,7 +16,7 @@ public class MemberNullDelegateAssignmentMapping(
 ) : MemberAssignmentMappingContainer(parent)
 {
     private readonly MemberPathGetter _nullConditionalSourcePath = nullConditionalSourcePath;
-    private readonly List<MemberPathSetter> _targetsToSetNull = new();
+    private readonly List<MemberPathSetter> _targetsToSetNull = [];
     private bool _throwOnSourcePathNull;
 
     public void ThrowOnSourcePathNull()
@@ -41,7 +41,7 @@ public class MemberNullDelegateAssignmentMapping(
         var trueClause = base.Build(conditionCtx, targetAccess);
         var elseClause = BuildElseClause(conditionCtx, targetAccess);
         var ifExpression = ctx.SyntaxFactory.If(condition, trueClause, elseClause);
-        return new[] { ifExpression };
+        return [ifExpression];
     }
 
     public void AddNullMemberAssignment(MemberPathSetter targetPath) => _targetsToSetNull.Add(targetPath);

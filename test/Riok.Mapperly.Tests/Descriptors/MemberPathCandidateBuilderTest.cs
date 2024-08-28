@@ -24,7 +24,7 @@ public class MemberPathCandidateBuilderTest
             "MyValueId.Num",
             "My.ValueId.Num",
             "MyValue.Id.Num",
-            "My.Value.Id.Num"
+            "My.Value.Id.Num",
         }
     )]
     public void BuildMemberPathCandidatesShouldWork(string name, string[] chunks)

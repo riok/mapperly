@@ -47,7 +47,7 @@ public static class NewValueTupleMappingBodyBuilder
         out List<ValueTupleConstructorParameterMapping> constructorParameterMappings
     )
     {
-        constructorParameterMappings = new List<ValueTupleConstructorParameterMapping>();
+        constructorParameterMappings = [];
 
         var targetMembers = ctx.EnumerateUnmappedTargetMembers().ToList();
 

@@ -374,7 +374,7 @@ public static class EnumerableMappingBuilder
             CollectionType.ImmutableQueue or CollectionType.IImmutableQueue => CreateRangeQueueMethodName,
             CollectionType.ImmutableStack or CollectionType.IImmutableStack => CreateRangeStackMethodName,
             CollectionType.ImmutableSortedSet => ToImmutableSortedSetMethodName,
-            _ => null
+            _ => null,
         };
     }
 
@@ -388,11 +388,10 @@ public static class EnumerableMappingBuilder
         if (ctx.HasUserSymbol)
             return info;
 
-        CollectionType? collectionType = info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyCollection)
-            ? CollectionType.IReadOnlyCollection
-            : info.ImplementedTypes.HasFlag(CollectionType.ICollection)
-                ? CollectionType.ICollection
-                : null;
+        CollectionType? collectionType =
+            info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyCollection) ? CollectionType.IReadOnlyCollection
+            : info.ImplementedTypes.HasFlag(CollectionType.ICollection) ? CollectionType.ICollection
+            : null;
 
         return collectionType == null ? info : CollectionInfoBuilder.BuildGenericCollectionInfo(ctx, collectionType.Value, info);
     }

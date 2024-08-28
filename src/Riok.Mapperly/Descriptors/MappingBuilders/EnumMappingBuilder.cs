@@ -35,8 +35,8 @@ public static class EnumMappingBuilder
         return ctx.Configuration.Enum.Strategy switch
         {
             EnumMappingStrategy.ByName when ctx.IsExpression => BuildCastMappingAndDiagnostic(ctx),
-            EnumMappingStrategy.ByValue when ctx is { IsExpression: true, Configuration.Enum.HasExplicitConfigurations: true }
-                => BuildCastMappingAndDiagnostic(ctx),
+            EnumMappingStrategy.ByValue when ctx is { IsExpression: true, Configuration.Enum.HasExplicitConfigurations: true } =>
+                BuildCastMappingAndDiagnostic(ctx),
             EnumMappingStrategy.ByValueCheckDefined when ctx.IsExpression => BuildCastMappingAndDiagnostic(ctx),
             EnumMappingStrategy.ByName => BuildNameMapping(ctx),
             EnumMappingStrategy.ByValueCheckDefined => BuildEnumToEnumCastMapping(ctx, checkTargetDefined: true),

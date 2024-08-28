@@ -129,18 +129,19 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     {
         return arg.Kind switch
         {
-            _ when (targetType == typeof(AttributeValue?) || targetType == typeof(AttributeValue)) && syntax != null
-                => new AttributeValue(arg, syntax.Expression),
+            _ when (targetType == typeof(AttributeValue?) || targetType == typeof(AttributeValue)) && syntax != null => new AttributeValue(
+                arg,
+                syntax.Expression
+            ),
             _ when arg.IsNull => null,
             _ when targetType == typeof(StringMemberPath) => CreateMemberPath(arg, syntax),
             TypedConstantKind.Enum => GetEnumValue(arg, targetType),
             TypedConstantKind.Array => BuildArrayValue(arg, targetType),
             TypedConstantKind.Primitive => arg.Value,
             TypedConstantKind.Type when targetType == typeof(ITypeSymbol) => arg.Value,
-            _
-                => throw new ArgumentOutOfRangeException(
-                    $"{nameof(AttributeDataAccessor)} does not support constructor arguments of kind {arg.Kind.ToString()} or cannot convert it to {targetType}"
-                ),
+            _ => throw new ArgumentOutOfRangeException(
+                $"{nameof(AttributeDataAccessor)} does not support constructor arguments of kind {arg.Kind.ToString()} or cannot convert it to {targetType}"
+            ),
         };
     }
 

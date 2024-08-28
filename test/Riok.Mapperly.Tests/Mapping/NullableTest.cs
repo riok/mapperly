@@ -69,7 +69,7 @@ public class NullableTest
             "B",
             TestSourceBuilderOptions.Default with
             {
-                ThrowOnMappingNullMismatch = false
+                ThrowOnMappingNullMismatch = false,
             },
             "class A { }",
             "class B { }"
@@ -96,7 +96,7 @@ public class NullableTest
             "B",
             TestSourceBuilderOptions.Default with
             {
-                ThrowOnMappingNullMismatch = false
+                ThrowOnMappingNullMismatch = false,
             },
             "class B { protected B(){} public static B Parse(string v) => new B(); }"
         );
@@ -111,7 +111,7 @@ public class NullableTest
             "string",
             TestSourceBuilderOptions.Default with
             {
-                ThrowOnMappingNullMismatch = false
+                ThrowOnMappingNullMismatch = false,
             },
             "class A { }"
         );
@@ -127,7 +127,7 @@ public class NullableTest
             "DateTime",
             TestSourceBuilderOptions.Default with
             {
-                ThrowOnMappingNullMismatch = false
+                ThrowOnMappingNullMismatch = false,
             }
         );
 

@@ -152,7 +152,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         [NotNullWhen(true)] out List<ConstructorParameterMapping>? constructorParameterMappings
     )
     {
-        constructorParameterMappings = new List<ConstructorParameterMapping>();
+        constructorParameterMappings = [];
 
         var skippedOptionalParam = false;
         foreach (var parameter in ctor.Parameters)

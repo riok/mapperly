@@ -28,7 +28,7 @@ public class QueryableProjectionEnumTest
             "System.Linq.IQueryable<B>",
             TestSourceBuilderOptions.Default with
             {
-                EnumMappingStrategy = EnumMappingStrategy.ByName
+                EnumMappingStrategy = EnumMappingStrategy.ByName,
             },
             "class A { public C Value { get; set; } }",
             "class B { public D Value { get; set; } }",
@@ -58,7 +58,7 @@ public class QueryableProjectionEnumTest
             """,
             TestSourceBuilderOptions.Default with
             {
-                EnumMappingStrategy = EnumMappingStrategy.ByValue
+                EnumMappingStrategy = EnumMappingStrategy.ByValue,
             },
             "class A { public C Value { get; set; } }",
             "class B { public D Value { get; set; } }",

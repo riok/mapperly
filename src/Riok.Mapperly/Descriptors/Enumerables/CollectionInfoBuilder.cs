@@ -30,8 +30,8 @@ public static class CollectionInfoBuilder
 
     private static readonly CollectionTypeInfo _collectionTypeInfoArray = new(CollectionType.Array);
 
-    private static readonly IReadOnlyCollection<CollectionTypeInfo> _collectionTypeInfos = new[]
-    {
+    private static readonly IReadOnlyCollection<CollectionTypeInfo> _collectionTypeInfos =
+    [
         new CollectionTypeInfo(CollectionType.IEnumerable, typeof(IEnumerable<>)),
         new CollectionTypeInfo(CollectionType.List, typeof(List<>), nameof(List<object>.Add)),
         new CollectionTypeInfo(CollectionType.Stack, typeof(Stack<>), nameof(Stack<object>.Push)),
@@ -64,7 +64,7 @@ public static class CollectionInfoBuilder
         new CollectionTypeInfo(CollectionType.ReadOnlySpan, typeof(ReadOnlySpan<>)),
         new CollectionTypeInfo(CollectionType.Memory, typeof(Memory<>)),
         new CollectionTypeInfo(CollectionType.ReadOnlyMemory, typeof(ReadOnlyMemory<>)),
-    };
+    ];
 
     private static readonly IReadOnlyDictionary<CollectionType, Type> _collectionClrTypeByType = _collectionTypeInfos
         .Where(x => x.ReflectionType != null)
@@ -267,128 +267,115 @@ public static class CollectionInfoBuilder
         // when collectionType is None then manually check for implemented types with IterateImplementedTypes
         return collectionType switch
         {
-            CollectionType.Array
-                => CollectionType.Array
-                    | CollectionType.IList
-                    | CollectionType.IReadOnlyList
-                    | CollectionType.ICollection
-                    | CollectionType.IReadOnlyCollection
-                    | CollectionType.IEnumerable,
+            CollectionType.Array => CollectionType.Array
+                | CollectionType.IList
+                | CollectionType.IReadOnlyList
+                | CollectionType.ICollection
+                | CollectionType.IReadOnlyCollection
+                | CollectionType.IEnumerable,
             CollectionType.IEnumerable => CollectionType.IEnumerable,
-            CollectionType.List
-                => CollectionType.List
-                    | CollectionType.IList
-                    | CollectionType.IReadOnlyList
-                    | CollectionType.ICollection
-                    | CollectionType.IReadOnlyCollection
-                    | CollectionType.IEnumerable,
+            CollectionType.List => CollectionType.List
+                | CollectionType.IList
+                | CollectionType.IReadOnlyList
+                | CollectionType.ICollection
+                | CollectionType.IReadOnlyCollection
+                | CollectionType.IEnumerable,
             CollectionType.Stack => CollectionType.Stack | CollectionType.IReadOnlyCollection | CollectionType.IEnumerable,
             CollectionType.Queue => CollectionType.Queue | CollectionType.IReadOnlyCollection | CollectionType.IEnumerable,
             CollectionType.IReadOnlyCollection => CollectionType.IReadOnlyCollection | CollectionType.IEnumerable,
             CollectionType.IList => CollectionType.IList | CollectionType.ICollection | CollectionType.IEnumerable,
             CollectionType.IReadOnlyList => CollectionType.IReadOnlyList | CollectionType.IReadOnlyCollection | CollectionType.IEnumerable,
             CollectionType.ICollection => CollectionType.ICollection | CollectionType.IEnumerable,
-            CollectionType.HashSet
-                => CollectionType.HashSet
-                    | CollectionType.ISet
-                    | CollectionType.IReadOnlySet
-                    | CollectionType.ICollection
-                    | CollectionType.IReadOnlyCollection
-                    | CollectionType.IEnumerable,
-            CollectionType.SortedSet
-                => CollectionType.SortedSet
-                    | CollectionType.ISet
-                    | CollectionType.IReadOnlySet
-                    | CollectionType.ICollection
-                    | CollectionType.IReadOnlyCollection
-                    | CollectionType.IEnumerable,
+            CollectionType.HashSet => CollectionType.HashSet
+                | CollectionType.ISet
+                | CollectionType.IReadOnlySet
+                | CollectionType.ICollection
+                | CollectionType.IReadOnlyCollection
+                | CollectionType.IEnumerable,
+            CollectionType.SortedSet => CollectionType.SortedSet
+                | CollectionType.ISet
+                | CollectionType.IReadOnlySet
+                | CollectionType.ICollection
+                | CollectionType.IReadOnlyCollection
+                | CollectionType.IEnumerable,
             CollectionType.ISet => CollectionType.ISet | CollectionType.ICollection | CollectionType.IEnumerable,
             CollectionType.IReadOnlySet => CollectionType.IReadOnlySet | CollectionType.IReadOnlyCollection | CollectionType.IEnumerable,
             CollectionType.IDictionary => CollectionType.IDictionary | CollectionType.ICollection | CollectionType.IEnumerable,
-            CollectionType.IReadOnlyDictionary
-                => CollectionType.IReadOnlyDictionary | CollectionType.IReadOnlyCollection | CollectionType.IEnumerable,
-            CollectionType.Dictionary
-                => CollectionType.Dictionary
-                    | CollectionType.IDictionary
-                    | CollectionType.IReadOnlyDictionary
-                    | CollectionType.ICollection
-                    | CollectionType.IReadOnlyCollection
-                    | CollectionType.IEnumerable,
+            CollectionType.IReadOnlyDictionary => CollectionType.IReadOnlyDictionary
+                | CollectionType.IReadOnlyCollection
+                | CollectionType.IEnumerable,
+            CollectionType.Dictionary => CollectionType.Dictionary
+                | CollectionType.IDictionary
+                | CollectionType.IReadOnlyDictionary
+                | CollectionType.ICollection
+                | CollectionType.IReadOnlyCollection
+                | CollectionType.IEnumerable,
 
-            CollectionType.ImmutableArray
-                => CollectionType.ImmutableArray
-                    | CollectionType.IImmutableList
-                    | CollectionType.IList
-                    | CollectionType.IReadOnlyList
-                    | CollectionType.ICollection
-                    | CollectionType.IReadOnlyCollection
-                    | CollectionType.IEnumerable,
-            CollectionType.ImmutableList
-                => CollectionType.ImmutableList
-                    | CollectionType.IImmutableList
-                    | CollectionType.IList
-                    | CollectionType.IReadOnlyList
-                    | CollectionType.ICollection
-                    | CollectionType.IReadOnlyCollection
-                    | CollectionType.IEnumerable,
-            CollectionType.IImmutableList
-                => CollectionType.IImmutableList
-                    | CollectionType.IReadOnlyList
-                    | CollectionType.IReadOnlyCollection
-                    | CollectionType.IEnumerable,
-            CollectionType.ImmutableHashSet
-                => CollectionType.ImmutableHashSet
-                    | CollectionType.IImmutableSet
-                    | CollectionType.IReadOnlySet
-                    | CollectionType.ISet
-                    | CollectionType.ICollection
-                    | CollectionType.IReadOnlyCollection
-                    | CollectionType.IEnumerable,
+            CollectionType.ImmutableArray => CollectionType.ImmutableArray
+                | CollectionType.IImmutableList
+                | CollectionType.IList
+                | CollectionType.IReadOnlyList
+                | CollectionType.ICollection
+                | CollectionType.IReadOnlyCollection
+                | CollectionType.IEnumerable,
+            CollectionType.ImmutableList => CollectionType.ImmutableList
+                | CollectionType.IImmutableList
+                | CollectionType.IList
+                | CollectionType.IReadOnlyList
+                | CollectionType.ICollection
+                | CollectionType.IReadOnlyCollection
+                | CollectionType.IEnumerable,
+            CollectionType.IImmutableList => CollectionType.IImmutableList
+                | CollectionType.IReadOnlyList
+                | CollectionType.IReadOnlyCollection
+                | CollectionType.IEnumerable,
+            CollectionType.ImmutableHashSet => CollectionType.ImmutableHashSet
+                | CollectionType.IImmutableSet
+                | CollectionType.IReadOnlySet
+                | CollectionType.ISet
+                | CollectionType.ICollection
+                | CollectionType.IReadOnlyCollection
+                | CollectionType.IEnumerable,
             CollectionType.IImmutableSet => CollectionType.IImmutableSet | CollectionType.IReadOnlyCollection | CollectionType.IEnumerable,
-            CollectionType.ImmutableSortedSet
-                => CollectionType.ImmutableSortedSet
-                    | CollectionType.IImmutableSet
-                    | CollectionType.IList
-                    | CollectionType.IReadOnlyList
-                    | CollectionType.ISet
-                    | CollectionType.IReadOnlySet
-                    | CollectionType.ICollection
-                    | CollectionType.IReadOnlyCollection
-                    | CollectionType.IEnumerable,
+            CollectionType.ImmutableSortedSet => CollectionType.ImmutableSortedSet
+                | CollectionType.IImmutableSet
+                | CollectionType.IList
+                | CollectionType.IReadOnlyList
+                | CollectionType.ISet
+                | CollectionType.IReadOnlySet
+                | CollectionType.ICollection
+                | CollectionType.IReadOnlyCollection
+                | CollectionType.IEnumerable,
             CollectionType.ImmutableQueue => CollectionType.ImmutableQueue | CollectionType.IImmutableQueue | CollectionType.IEnumerable,
             CollectionType.IImmutableQueue => CollectionType.IImmutableQueue | CollectionType.IEnumerable,
             CollectionType.ImmutableStack => CollectionType.ImmutableStack | CollectionType.IImmutableStack | CollectionType.IEnumerable,
             CollectionType.IImmutableStack => CollectionType.IImmutableStack | CollectionType.IEnumerable,
-            CollectionType.ImmutableDictionary
-                => CollectionType.ImmutableDictionary
-                    | CollectionType.IImmutableDictionary
-                    | CollectionType.IDictionary
-                    | CollectionType.IReadOnlyDictionary
-                    | CollectionType.ICollection
-                    | CollectionType.IReadOnlyCollection
-                    | CollectionType.IEnumerable,
-            CollectionType.IImmutableDictionary
-                => CollectionType.IImmutableDictionary
-                    | CollectionType.IReadOnlyDictionary
-                    | CollectionType.IReadOnlyCollection
-                    | CollectionType.IEnumerable,
-            CollectionType.ImmutableSortedDictionary
-                => CollectionType.ImmutableSortedDictionary
-                    | CollectionType.IImmutableDictionary
-                    | CollectionType.IReadOnlyDictionary
-                    | CollectionType.IReadOnlyCollection
-                    | CollectionType.IEnumerable,
+            CollectionType.ImmutableDictionary => CollectionType.ImmutableDictionary
+                | CollectionType.IImmutableDictionary
+                | CollectionType.IDictionary
+                | CollectionType.IReadOnlyDictionary
+                | CollectionType.ICollection
+                | CollectionType.IReadOnlyCollection
+                | CollectionType.IEnumerable,
+            CollectionType.IImmutableDictionary => CollectionType.IImmutableDictionary
+                | CollectionType.IReadOnlyDictionary
+                | CollectionType.IReadOnlyCollection
+                | CollectionType.IEnumerable,
+            CollectionType.ImmutableSortedDictionary => CollectionType.ImmutableSortedDictionary
+                | CollectionType.IImmutableDictionary
+                | CollectionType.IReadOnlyDictionary
+                | CollectionType.IReadOnlyCollection
+                | CollectionType.IEnumerable,
             CollectionType.Span => CollectionType.Span,
             CollectionType.ReadOnlySpan => CollectionType.ReadOnlySpan,
             CollectionType.Memory => CollectionType.Memory,
             CollectionType.ReadOnlyMemory => CollectionType.ReadOnlyMemory,
 
             // check for if the type is a string, returning IEnumerable
-            CollectionType.None when type.SpecialType == SpecialType.System_String
-                => CollectionType.IEnumerable,
+            CollectionType.None when type.SpecialType == SpecialType.System_String => CollectionType.IEnumerable,
 
             // fallback for CollectionType.None, manually checking for known implemented types
-            _ => IterateImplementedTypes(type, types)
+            _ => IterateImplementedTypes(type, types),
         };
 
         static CollectionType IterateImplementedTypes(ITypeSymbol type, WellKnownTypes types)

@@ -13,5 +13,5 @@ public enum PropertyNameMappingStrategy
     /// <summary>
     /// Matches a property by its name in case insensitive manner.
     /// </summary>
-    CaseInsensitive
+    CaseInsensitive,
 }

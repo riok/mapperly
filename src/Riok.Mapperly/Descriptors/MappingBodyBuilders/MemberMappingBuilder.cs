@@ -18,7 +18,7 @@ internal static class MemberMappingBuilder
     public enum CodeStyle
     {
         Expression,
-        Statement
+        Statement,
     }
 
     public static bool TryBuildContainerAssignment(

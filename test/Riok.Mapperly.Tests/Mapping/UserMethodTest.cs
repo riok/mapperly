@@ -718,7 +718,7 @@ public class UserMethodTest
             "B",
             TestSourceBuilderOptions.WithBaseClass("BaseMapper") with
             {
-                AutoUserMappings = false
+                AutoUserMappings = false,
             },
             """
             [Mapper]
@@ -743,7 +743,7 @@ public class UserMethodTest
             "B",
             TestSourceBuilderOptions.WithBaseClass("IBaseMapper") with
             {
-                AutoUserMappings = false
+                AutoUserMappings = false,
             },
             """
             public interface IBaseMapper

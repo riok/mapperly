@@ -76,7 +76,7 @@ public class QueryableProjectionNullableTest
             TestSourceBuilderOptions.Default with
             {
                 AllowNullPropertyAssignment = false,
-                ThrowOnPropertyMappingNullMismatch = true
+                ThrowOnPropertyMappingNullMismatch = true,
             },
             "class A { public string? StringValue { get; set; } }",
             "class B { public string? StringValue { get; set; } }"

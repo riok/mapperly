@@ -23,13 +23,13 @@ public class MethodNameBuilder : UniqueNameBuilder
         return t switch
         {
             IArrayTypeSymbol arrType => BuildTypeMethodName(arrType.ElementType) + ArrayTypeNameSuffix,
-            INamedTypeSymbol { TypeArguments.Length: 1 } genericT
-                => genericT.Name + GenericTypeNameSeparator + genericT.TypeArguments[0].Name,
-            INamedTypeSymbol { TypeArguments.Length: > 1 } genericT
-                => genericT.Name
-                    + GenericTypeNameSeparator
-                    + string.Join(TypeArgumentSeparator, genericT.TypeArguments.Take(MaxTypeArguments).Select(static x => x.Name)),
-            _ => t.Name
+            INamedTypeSymbol { TypeArguments.Length: 1 } genericT => genericT.Name
+                + GenericTypeNameSeparator
+                + genericT.TypeArguments[0].Name,
+            INamedTypeSymbol { TypeArguments.Length: > 1 } genericT => genericT.Name
+                + GenericTypeNameSeparator
+                + string.Join(TypeArgumentSeparator, genericT.TypeArguments.Take(MaxTypeArguments).Select(static x => x.Name)),
+            _ => t.Name,
         };
     }
 }

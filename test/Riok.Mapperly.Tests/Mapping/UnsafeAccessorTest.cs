@@ -190,7 +190,7 @@ public class UnsafeAccessorTest
             TestSourceBuilderOptions.Default with
             {
                 IncludedMembers = MemberVisibility.All,
-                IncludedConstructors = MemberVisibility.All
+                IncludedConstructors = MemberVisibility.All,
             },
             "class A { public string MyValueId { get; set; } public string MyValueId2 { get; set; } }",
             "class B { private C? Value { get; set; } }",

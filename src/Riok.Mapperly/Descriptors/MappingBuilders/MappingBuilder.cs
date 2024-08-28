@@ -5,7 +5,7 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapperDeclaration)
 {
-    private readonly HashSet<string> _resolvedMappingNames = new();
+    private readonly HashSet<string> _resolvedMappingNames = [];
 
     private delegate INewInstanceMapping? BuildMapping(MappingBuilderContext context);
 
@@ -31,7 +31,7 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
         DateTimeToTimeOnlyMappingBuilder.TryBuildMapping,
         ExplicitCastMappingBuilder.TryBuildMapping,
         ToStringMappingBuilder.TryBuildMapping,
-        NewInstanceObjectMemberMappingBuilder.TryBuildMapping
+        NewInstanceObjectMemberMappingBuilder.TryBuildMapping,
     ];
 
     /// <inheritdoc cref="MappingCollection.NewInstanceMappings"/>

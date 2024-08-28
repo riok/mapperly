@@ -155,7 +155,7 @@ public class ObjectPropertyValueTest
             """[MapValue("_stringValue", "fooBar")] partial B Map(A source);""",
             TestSourceBuilderOptions.Default with
             {
-                IncludedMembers = MemberVisibility.Private
+                IncludedMembers = MemberVisibility.Private,
             },
             "class A;",
             "class B { private string _stringValue; }"

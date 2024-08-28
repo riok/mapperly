@@ -17,8 +17,8 @@ public class NewInstanceObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeS
     private const string TargetVariableName = "target";
 
     private IInstanceConstructor? _constructor;
-    private readonly HashSet<ConstructorParameterMapping> _constructorMemberMappings = new();
-    private readonly HashSet<MemberAssignmentMapping> _initMemberMappings = new();
+    private readonly HashSet<ConstructorParameterMapping> _constructorMemberMappings = [];
+    private readonly HashSet<MemberAssignmentMapping> _initMemberMappings = [];
 
     public IInstanceConstructor Constructor
     {

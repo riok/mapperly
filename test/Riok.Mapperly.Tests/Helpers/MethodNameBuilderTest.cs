@@ -33,6 +33,6 @@ public class MethodNameBuilderTest
         public MockedMethodMapping(ITypeSymbol t)
             : base(t, t) { }
 
-        public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx) => Enumerable.Empty<StatementSyntax>();
+        public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx) => [];
     }
 }

@@ -46,13 +46,13 @@ namespace Riok.Mapperly.IntegrationTests
             {
                 new()
                 {
-                    new() { "1", "2", "3" }
+                    new() { "1", "2", "3" },
                 },
                 new()
                 {
                     new() { "4", "5" },
-                    new() { "6" }
-                }
+                    new() { "6" },
+                },
             };
             var mapped = StaticTestMapper.MapNestedLists(l);
 

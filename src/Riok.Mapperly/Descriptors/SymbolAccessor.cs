@@ -70,12 +70,12 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         return symbol.DeclaredAccessibility switch
         {
             Accessibility.Private => visibility.HasFlag(MemberVisibility.Private),
-            Accessibility.ProtectedAndInternal
-                => visibility.HasFlag(MemberVisibility.Protected) && visibility.HasFlag(MemberVisibility.Internal),
+            Accessibility.ProtectedAndInternal => visibility.HasFlag(MemberVisibility.Protected)
+                && visibility.HasFlag(MemberVisibility.Internal),
             Accessibility.Protected => visibility.HasFlag(MemberVisibility.Protected),
             Accessibility.Internal => visibility.HasFlag(MemberVisibility.Internal),
-            Accessibility.ProtectedOrInternal
-                => visibility.HasFlag(MemberVisibility.Protected) || visibility.HasFlag(MemberVisibility.Internal),
+            Accessibility.ProtectedOrInternal => visibility.HasFlag(MemberVisibility.Protected)
+                || visibility.HasFlag(MemberVisibility.Internal),
             Accessibility.Public => visibility.HasFlag(MemberVisibility.Public),
             _ => false,
         };

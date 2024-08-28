@@ -55,7 +55,7 @@ public partial struct SyntaxFactoryHelper
             decimal d => DecimalLiteral(d),
             double d => DoubleLiteral(d),
             float f => FloatLiteral(f),
-            _ => throw new ArgumentOutOfRangeException(nameof(obj), obj, "Unsupported literal type " + obj.GetType())
+            _ => throw new ArgumentOutOfRangeException(nameof(obj), obj, "Unsupported literal type " + obj.GetType()),
         };
     }
 }

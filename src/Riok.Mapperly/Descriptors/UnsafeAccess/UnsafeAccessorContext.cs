@@ -8,7 +8,7 @@ namespace Riok.Mapperly.Descriptors.UnsafeAccess;
 
 public class UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor symbolAccessor, string className)
 {
-    private readonly List<IUnsafeAccessor> _unsafeAccessors = new();
+    private readonly List<IUnsafeAccessor> _unsafeAccessors = [];
     private readonly Dictionary<UnsafeAccessorKey, IUnsafeAccessor> _unsafeAccessorsBySymbol = new();
     private readonly UniqueNameBuilder _nameBuilder = nameBuilder.NewScope();
 
@@ -63,7 +63,7 @@ public class UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor
             UnsafeAccessorType.GetProperty or UnsafeAccessorType.GetField => BuildExtensionMethodName("Get", symbol),
             UnsafeAccessorType.SetProperty => BuildExtensionMethodName("Set", symbol),
             UnsafeAccessorType.Constructor => _nameBuilder.New("Create" + symbol.ContainingType.Name),
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Unknown type")
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Unknown type"),
         };
         return CacheAccessor(key, factory(symbol, className, methodName));
     }

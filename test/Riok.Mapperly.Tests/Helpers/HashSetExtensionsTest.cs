@@ -8,7 +8,7 @@ public class HashSetExtensionsTest
     public void AddRangeShouldAddAllItems()
     {
         var h = new HashSet<int> { 1, 2, 3 };
-        h.AddRange(new[] { 3, 4, 5, 5 });
-        h.Should().Contain(new[] { 1, 2, 3, 4, 5 });
+        h.AddRange([3, 4, 5, 5]);
+        h.Should().Contain([1, 2, 3, 4, 5]);
     }
 }

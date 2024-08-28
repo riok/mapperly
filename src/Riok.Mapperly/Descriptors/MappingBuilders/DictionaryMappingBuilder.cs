@@ -217,11 +217,20 @@ public static class DictionaryMappingBuilder
     {
         return ctx.CollectionInfos!.Target.CollectionType switch
         {
-            CollectionType.ImmutableSortedDictionary
-                => new LinqDictionaryMapping(ctx.Source, ctx.Target, ToImmutableSortedDictionaryMethodName, keyMapping, valueMapping),
-            CollectionType.ImmutableDictionary
-            or CollectionType.IImmutableDictionary
-                => new LinqDictionaryMapping(ctx.Source, ctx.Target, ToImmutableDictionaryMethodName, keyMapping, valueMapping),
+            CollectionType.ImmutableSortedDictionary => new LinqDictionaryMapping(
+                ctx.Source,
+                ctx.Target,
+                ToImmutableSortedDictionaryMethodName,
+                keyMapping,
+                valueMapping
+            ),
+            CollectionType.ImmutableDictionary or CollectionType.IImmutableDictionary => new LinqDictionaryMapping(
+                ctx.Source,
+                ctx.Target,
+                ToImmutableDictionaryMethodName,
+                keyMapping,
+                valueMapping
+            ),
 
             _ => null,
         };
@@ -236,11 +245,10 @@ public static class DictionaryMappingBuilder
         if (ctx.HasUserSymbol)
             return info;
 
-        CollectionType? dictionaryType = info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyDictionary)
-            ? CollectionType.IReadOnlyDictionary
-            : info.ImplementedTypes.HasFlag(CollectionType.IDictionary)
-                ? CollectionType.IDictionary
-                : null;
+        CollectionType? dictionaryType =
+            info.ImplementedTypes.HasFlag(CollectionType.IReadOnlyDictionary) ? CollectionType.IReadOnlyDictionary
+            : info.ImplementedTypes.HasFlag(CollectionType.IDictionary) ? CollectionType.IDictionary
+            : null;
 
         return dictionaryType == null
             ? info

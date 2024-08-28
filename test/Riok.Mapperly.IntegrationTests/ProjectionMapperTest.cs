@@ -105,7 +105,7 @@ namespace Riok.Mapperly.IntegrationTests
                 StringValue = "fooBar3",
                 IgnoredStringValue = "fooBar4",
                 NullableFlattening = new IdObject { IdValue = 20 },
-                SubObject = new InheritanceSubObject { BaseIntValue = 10, SubIntValue = 20, },
+                SubObject = new InheritanceSubObject { BaseIntValue = 10, SubIntValue = 20 },
                 RecursiveObject = new TestObjectProjection
                 {
                     RequiredValue = -1,

@@ -13,8 +13,8 @@ public class MapperDescriptor
     private const string AccessorClassName = "UnsafeAccessor";
 
     private readonly MapperDeclaration _declaration;
-    private readonly List<MethodMapping> _methodMappings = new();
-    private readonly List<IUnsafeAccessor> _unsafeAccessors = new();
+    private readonly List<MethodMapping> _methodMappings = [];
+    private readonly List<IUnsafeAccessor> _unsafeAccessors = [];
 
     public bool Static { get; set; }
 

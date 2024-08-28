@@ -6,7 +6,7 @@ namespace Riok.Mapperly.Diagnostics;
 
 public class DiagnosticCollection(Location defaultLocation) : IReadOnlyCollection<Diagnostic>
 {
-    private readonly List<Diagnostic> _diagnostics = new();
+    private readonly List<Diagnostic> _diagnostics = [];
 
     public IEnumerator<Diagnostic> GetEnumerator() => _diagnostics.GetEnumerator();
 

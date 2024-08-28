@@ -73,12 +73,11 @@ public static class InlineExpressionMappingBuilder
                     {
                         Declaration.Variables: [{ Initializer: { } variableInitializer } variableDeclarator]
                     },
-                    ReturnStatementSyntax { Expression: IdentifierNameSyntax identifierName }
+                    ReturnStatementSyntax { Expression: IdentifierNameSyntax identifierName },
                 ]
-            } when identifierName.Identifier.Value == variableDeclarator.Identifier.Value
-                => variableInitializer.Value,
+            } when identifierName.Identifier.Value == variableDeclarator.Identifier.Value => variableInitializer.Value,
 
-            _ => null
+            _ => null,
         };
     }
 }

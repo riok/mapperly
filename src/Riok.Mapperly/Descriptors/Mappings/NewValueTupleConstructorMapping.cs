@@ -15,7 +15,7 @@ public class NewValueTupleConstructorMapping(ITypeSymbol sourceType, ITypeSymbol
         INewValueTupleMapping
 {
     private const string ValueTupleName = "global::System.ValueTuple";
-    private readonly HashSet<ValueTupleConstructorParameterMapping> _constructorPropertyMappings = new();
+    private readonly HashSet<ValueTupleConstructorParameterMapping> _constructorPropertyMappings = [];
 
     public void AddConstructorParameterMapping(ValueTupleConstructorParameterMapping mapping) => _constructorPropertyMappings.Add(mapping);
 

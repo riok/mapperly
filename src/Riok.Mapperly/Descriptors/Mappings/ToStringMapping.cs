@@ -25,15 +25,11 @@ public class ToStringMapping(
 {
     protected override IEnumerable<ExpressionSyntax?> BuildArguments(TypeMappingBuildContext ctx)
     {
-        yield return stringFormat != null
-            ? StringLiteral(stringFormat)
-            : simpleInvocation
-                ? null
-                : NullLiteral();
-        yield return formatProviderName != null
-            ? IdentifierName(formatProviderName)
-            : simpleInvocation
-                ? null
-                : NullLiteral();
+        yield return stringFormat != null ? StringLiteral(stringFormat)
+        : simpleInvocation ? null
+        : NullLiteral();
+        yield return formatProviderName != null ? IdentifierName(formatProviderName)
+        : simpleInvocation ? null
+        : NullLiteral();
     }
 }
