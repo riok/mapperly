@@ -25,7 +25,7 @@ public class EnumFromStringParseMapping(ITypeSymbol sourceType, ITypeSymbol targ
             return ctx.SyntaxFactory.GenericInvocation(
                 EnumClassName,
                 ParseMethodName,
-                new[] { FullyQualifiedIdentifier(TargetType) },
+                [FullyQualifiedIdentifier(TargetType)],
                 ctx.Source,
                 BooleanLiteral(ignoreCase)
             );

@@ -15,7 +15,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
     where T : IMemberAssignmentTypeMapping
 {
     private readonly Dictionary<MemberPath, MemberNullDelegateAssignmentMapping> _nullDelegateMappings = new();
-    private readonly HashSet<MemberPath> _initializedNullableTargetPaths = new();
+    private readonly HashSet<MemberPath> _initializedNullableTargetPaths = [];
 
     public void AddMemberAssignmentMapping(IMemberAssignmentMapping memberMapping) => AddMemberAssignmentMapping(Mapping, memberMapping);
 

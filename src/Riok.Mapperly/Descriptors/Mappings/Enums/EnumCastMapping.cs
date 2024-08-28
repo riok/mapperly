@@ -32,7 +32,7 @@ public class EnumCastMapping(
         /// <summary>
         /// It is checked if the casted value is a defined flags combination of the target enum.
         /// </summary>
-        Flags
+        Flags,
     }
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
@@ -51,16 +51,14 @@ public class EnumCastMapping(
         return checkDefinedMode switch
         {
             // (TargetEnum)v is TargetEnum.A or TargetEnum.B or ...
-            CheckDefinedMode.Value
-                => IsPattern(convertedSourceValue, OrPattern(allEnumMembers)),
+            CheckDefinedMode.Value => IsPattern(convertedSourceValue, OrPattern(allEnumMembers)),
 
             // (TargetEnum)v == ((TargetEnum)v & (TargetEnum.A | TargetEnum.B | ...))
-            CheckDefinedMode.Flags
-                => Equal(
-                    convertedSourceValue,
-                    ParenthesizedExpression(BitwiseAnd(convertedSourceValue, ParenthesizedExpression(BitwiseOr(allEnumMembers))))
-                ),
-            _ => throw new ArgumentOutOfRangeException($"{nameof(checkDefinedMode)} has an unknown value {checkDefinedMode}")
+            CheckDefinedMode.Flags => Equal(
+                convertedSourceValue,
+                ParenthesizedExpression(BitwiseAnd(convertedSourceValue, ParenthesizedExpression(BitwiseOr(allEnumMembers))))
+            ),
+            _ => throw new ArgumentOutOfRangeException($"{nameof(checkDefinedMode)} has an unknown value {checkDefinedMode}"),
         };
     }
 }

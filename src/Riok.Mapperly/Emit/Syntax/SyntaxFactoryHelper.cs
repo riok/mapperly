@@ -43,14 +43,12 @@ public readonly partial struct SyntaxFactoryHelper
 
     private StatementSyntax BlockIfNotReturnOrThrow(StatementSyntax statement)
     {
-        return statement.IsKind(SyntaxKind.ReturnStatement) || statement.IsKind(SyntaxKind.ThrowStatement)
-            ? statement
-            : Block(new[] { statement });
+        return statement.IsKind(SyntaxKind.ReturnStatement) || statement.IsKind(SyntaxKind.ThrowStatement) ? statement : Block([statement]);
     }
 
     private BlockSyntax Block(IEnumerable<ExpressionSyntax> statements) => Block(statements.Select(AddIndentation().ExpressionStatement));
 
-    public IReadOnlyCollection<StatementSyntax> SingleStatement(ExpressionSyntax expression) => new[] { ExpressionStatement(expression) };
+    public IReadOnlyCollection<StatementSyntax> SingleStatement(ExpressionSyntax expression) => [ExpressionStatement(expression)];
 
     public ExpressionStatementSyntax ExpressionStatement(ExpressionSyntax expression) =>
         SyntaxFactory.ExpressionStatement(expression).AddLeadingLineFeed(Indentation);

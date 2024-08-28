@@ -81,7 +81,7 @@ public class ObjectVisibilityTest
         var source = TestSourceBuilder.Mapping("A.A", "B", "class B { internal string Value { get; set; } }");
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics, new[] { aAssembly })
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics, [aAssembly])
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)
             .HaveAssertedAllDiagnostics()
@@ -112,7 +112,7 @@ public class ObjectVisibilityTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics, new[] { aAssembly })
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics, [aAssembly])
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)
             .HaveAssertedAllDiagnostics()
@@ -146,7 +146,7 @@ public class ObjectVisibilityTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.Default, new[] { aAssembly })
+            .GenerateMapper(source, TestHelperOptions.Default, [aAssembly])
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -179,7 +179,7 @@ public class ObjectVisibilityTest
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.Default, new[] { aAssembly })
+            .GenerateMapper(source, TestHelperOptions.Default, [aAssembly])
             .Should()
             .HaveSingleMethodBody(
                 """

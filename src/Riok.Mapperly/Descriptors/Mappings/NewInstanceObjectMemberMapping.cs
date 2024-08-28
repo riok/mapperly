@@ -15,8 +15,8 @@ public class NewInstanceObjectMemberMapping(ITypeSymbol sourceType, ITypeSymbol 
         INewInstanceObjectMemberMapping
 {
     private IInstanceConstructor? _constructor;
-    private readonly HashSet<ConstructorParameterMapping> _constructorMemberMappings = new();
-    private readonly HashSet<MemberAssignmentMapping> _initMemberMappings = new();
+    private readonly HashSet<ConstructorParameterMapping> _constructorMemberMappings = [];
+    private readonly HashSet<MemberAssignmentMapping> _initMemberMappings = [];
 
     public IInstanceConstructor Constructor
     {

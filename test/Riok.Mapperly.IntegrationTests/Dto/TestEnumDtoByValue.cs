@@ -4,6 +4,6 @@ namespace Riok.Mapperly.IntegrationTests.Dto
     {
         DtoValue1 = 10,
         DtoValue2 = 20,
-        DtoValue3 = 30
+        DtoValue3 = 30,
     }
 }

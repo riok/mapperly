@@ -86,7 +86,7 @@ public class ObjectPropertyInitPropertyTest
             "B",
             TestSourceBuilderOptions.Default with
             {
-                ThrowOnMappingNullMismatch = false
+                ThrowOnMappingNullMismatch = false,
             },
             "class A { public string? Value { get; init; } }",
             "class B { public string Value { get; init; } }"

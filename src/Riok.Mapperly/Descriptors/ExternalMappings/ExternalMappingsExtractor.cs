@@ -42,12 +42,12 @@ internal static class ExternalMappingsExtractor
         };
 
         if (type == null)
-            return Enumerable.Empty<IUserMapping>();
+            return [];
 
         if (nullableAnnotation != NullableAnnotation.Annotated)
             return UserMethodMappingExtractor.ExtractUserImplementedMappings(ctx, type, name, isStatic: false, isExternal: true);
 
         ctx.ReportDiagnostic(DiagnosticDescriptors.ExternalMapperMemberCannotBeNullable, symbol, symbol.ToDisplayString());
-        return Enumerable.Empty<IUserMapping>();
+        return [];
     }
 }

@@ -94,7 +94,7 @@ public class DictionaryTest
             "Dictionary<string, int>",
             TestSourceBuilderOptions.Default with
             {
-                ThrowOnMappingNullMismatch = false
+                ThrowOnMappingNullMismatch = false,
             }
         );
         TestHelper

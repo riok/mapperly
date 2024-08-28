@@ -30,15 +30,15 @@ public record TestHelperOptions(
 
     public static readonly TestHelperOptions DisabledNullable = Default with { NullableOption = NullableContextOptions.Disable };
 
-    public static readonly TestHelperOptions AllowDiagnostics = Default with { AllowedDiagnosticSeverities = null, };
+    public static readonly TestHelperOptions AllowDiagnostics = Default with { AllowedDiagnosticSeverities = null };
 
     /// <summary>
     /// Includes all ignored diagnostics.
     /// </summary>
-    public static readonly TestHelperOptions AllowAndIncludeAllDiagnostics = AllowDiagnostics with { IgnoredDiagnostics = null, };
+    public static readonly TestHelperOptions AllowAndIncludeAllDiagnostics = AllowDiagnostics with { IgnoredDiagnostics = null };
 
     public static readonly TestHelperOptions AllowInfoDiagnostics = Default with
     {
-        AllowedDiagnosticSeverities = new HashSet<DiagnosticSeverity> { DiagnosticSeverity.Hidden, DiagnosticSeverity.Info }
+        AllowedDiagnosticSeverities = new HashSet<DiagnosticSeverity> { DiagnosticSeverity.Hidden, DiagnosticSeverity.Info },
     };
 }

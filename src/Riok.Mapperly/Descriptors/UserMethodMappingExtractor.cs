@@ -277,11 +277,9 @@ public static class UserMethodMappingExtractor
         // for the source type we assume a nullable by default
         var targetCanBeNull = targetType is ITypeParameterSymbol tpsTarget ? tpsTarget.IsNullable() ?? false : targetType.IsNullable();
         var sourceCanBeNull = sourceType is ITypeParameterSymbol tpsSource ? tpsSource.IsNullable() ?? true : sourceType.IsNullable();
-        return !sourceCanBeNull
-            ? null
-            : targetCanBeNull
-                ? NullFallbackValue.Default
-                : NullFallbackValue.ThrowArgumentNullException;
+        return !sourceCanBeNull ? null
+            : targetCanBeNull ? NullFallbackValue.Default
+            : NullFallbackValue.ThrowArgumentNullException;
     }
 
     private static UserMappingConfiguration GetUserMappingConfig(

@@ -10,7 +10,7 @@ public class EnumerableExtensionsTest
         new int?[] { 1, null, null, 2, 3, 4, null }
             .WhereNotNull()
             .Should()
-            .BeEquivalentTo(new[] { 1, 2, 3, 4 }, o => o.WithStrictOrdering());
+            .BeEquivalentTo([1, 2, 3, 4], o => o.WithStrictOrdering());
     }
 
     [Fact]
@@ -19,7 +19,7 @@ public class EnumerableExtensionsTest
         new[] { "a", "b", "c", null, "d", null, null, "e" }
             .WhereNotNull()
             .Should()
-            .BeEquivalentTo(new[] { "a", "b", "c", "d", "e" }, o => o.WithStrictOrdering());
+            .BeEquivalentTo(["a", "b", "c", "d", "e"], o => o.WithStrictOrdering());
     }
 
     [Fact]

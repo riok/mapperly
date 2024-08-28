@@ -203,17 +203,16 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         return mapping switch
         {
             // inline existing mapping
-            UserImplementedMethodMapping implementedMapping
-                => InlineExpressionMappingBuilder.TryBuildMapping(this, implementedMapping) ?? implementedMapping,
+            UserImplementedMethodMapping implementedMapping => InlineExpressionMappingBuilder.TryBuildMapping(this, implementedMapping)
+                ?? implementedMapping,
 
             // build an inlined version
-            IUserMapping userMapping
-                => BuildMapping(
-                    userMapping,
-                    new TypeMappingKey(userMapping),
-                    MappingBuildingOptions.Default,
-                    userMapping.Method.GetSyntaxLocation()
-                ) ?? mapping,
+            IUserMapping userMapping => BuildMapping(
+                userMapping,
+                new TypeMappingKey(userMapping),
+                MappingBuildingOptions.Default,
+                userMapping.Method.GetSyntaxLocation()
+            ) ?? mapping,
 
             _ => mapping,
         };

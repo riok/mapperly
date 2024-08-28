@@ -13,7 +13,7 @@ public class MapperGenerationResultAssertions
     public MapperGenerationResultAssertions(MapperGenerationResult mapper)
     {
         _mapper = mapper;
-        _notAssertedDiagnostics = new HashSet<Diagnostic>(_mapper.Diagnostics);
+        _notAssertedDiagnostics = [.. _mapper.Diagnostics];
     }
 
     public MapperGenerationResultAssertions HaveDiagnostics()

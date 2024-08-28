@@ -105,7 +105,7 @@ public static class NullableSymbolExtensions
         {
             INamedTypeSymbol namedTypeSymbol when namedTypeSymbol.TypeArguments.Any(x => !x.IsNullableUpgraded()) => false,
             IArrayTypeSymbol arrayTypeSymbol when !arrayTypeSymbol.ElementType.IsNullableUpgraded() => false,
-            _ => true
+            _ => true,
         };
     }
 

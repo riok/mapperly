@@ -386,7 +386,7 @@ public class ObjectPropertyConstructorResolverTest
             "B",
             TestSourceBuilderOptions.Default with
             {
-                ThrowOnMappingNullMismatch = false
+                ThrowOnMappingNullMismatch = false,
             },
             "record A(C? Nested);",
             "record B(string NestedValue);",

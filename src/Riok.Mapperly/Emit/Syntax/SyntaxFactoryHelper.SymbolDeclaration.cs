@@ -25,7 +25,7 @@ public partial struct SyntaxFactoryHelper
             .WithKeyword(TrailingSpacedToken(SyntaxKind.ClassKeyword))
             .WithOpenBraceToken(LeadingLineFeedToken(SyntaxKind.OpenBraceToken))
             .WithCloseBraceToken(LeadingLineFeedToken(SyntaxKind.CloseBraceToken))
-            .WithAttributeLists(isPartial ? new SyntaxList<AttributeListSyntax>() : GeneratedCodeAttributeList())
+            .WithAttributeLists(isPartial ? [] : GeneratedCodeAttributeList())
             .AddLeadingLineFeed(Indentation);
     }
 
@@ -38,7 +38,7 @@ public partial struct SyntaxFactoryHelper
             StructDeclarationSyntax => StructDeclaration(name),
             InterfaceDeclarationSyntax => InterfaceDeclaration(name),
             RecordDeclarationSyntax => RecordDeclaration(Token(SyntaxKind.RecordKeyword), name),
-            _ => throw new NotSupportedException($"Unsupported type declaration syntax {syntax.GetType().Name}.")
+            _ => throw new NotSupportedException($"Unsupported type declaration syntax {syntax.GetType().Name}."),
         };
 
         var isPartial = syntax.Modifiers.Any(kind => kind.IsKind(SyntaxKind.PartialKeyword));
@@ -48,7 +48,7 @@ public partial struct SyntaxFactoryHelper
             .WithKeyword(TrailingSpacedToken(syntax.Keyword.Kind()))
             .WithOpenBraceToken(LeadingLineFeedToken(SyntaxKind.OpenBraceToken))
             .WithCloseBraceToken(LeadingLineFeedToken(SyntaxKind.CloseBraceToken))
-            .WithAttributeLists(isPartial ? new SyntaxList<AttributeListSyntax>() : GeneratedCodeAttributeList())
+            .WithAttributeLists(isPartial ? [] : GeneratedCodeAttributeList())
             .AddLeadingLineFeed(Indentation);
     }
 }

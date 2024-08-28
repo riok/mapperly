@@ -59,7 +59,7 @@ public class ObjectPropertyNullableTest
             "B",
             TestSourceBuilderOptions.Default with
             {
-                AllowNullPropertyAssignment = false
+                AllowNullPropertyAssignment = false,
             },
             "class A { public int? Value { get; set; } }",
             "class B { public int Value { get; set; } }"
@@ -89,7 +89,7 @@ public class ObjectPropertyNullableTest
             TestSourceBuilderOptions.Default with
             {
                 AllowNullPropertyAssignment = false,
-                ThrowOnPropertyMappingNullMismatch = true
+                ThrowOnPropertyMappingNullMismatch = true,
             },
             "class A { public int? Value { get; set; } }",
             "class B { public int Value { get; set; } }"
@@ -196,7 +196,7 @@ public class ObjectPropertyNullableTest
             "B",
             TestSourceBuilderOptions.Default with
             {
-                AllowNullPropertyAssignment = false
+                AllowNullPropertyAssignment = false,
             },
             "class A { public string? Value { get; set; } }",
             "class B { public string? Value { get; set; } }"
@@ -226,7 +226,7 @@ public class ObjectPropertyNullableTest
             TestSourceBuilderOptions.Default with
             {
                 AllowNullPropertyAssignment = false,
-                ThrowOnPropertyMappingNullMismatch = true
+                ThrowOnPropertyMappingNullMismatch = true,
             },
             "class A { public string? Value { get; set; } }",
             "class B { public string? Value { get; set; } }"
@@ -337,7 +337,7 @@ public class ObjectPropertyNullableTest
             "B",
             TestSourceBuilderOptions.Default with
             {
-                AllowNullPropertyAssignment = false
+                AllowNullPropertyAssignment = false,
             },
             "class A { public C? Value { get; set; } }",
             "class B { public D? Value { get; set; } }",
@@ -369,7 +369,7 @@ public class ObjectPropertyNullableTest
             TestSourceBuilderOptions.Default with
             {
                 AllowNullPropertyAssignment = false,
-                ThrowOnPropertyMappingNullMismatch = true
+                ThrowOnPropertyMappingNullMismatch = true,
             },
             "class A { public C? Value { get; set; } }",
             "class B { public D? Value { get; set; } }",
@@ -491,7 +491,7 @@ public class ObjectPropertyNullableTest
             "B",
             TestSourceBuilderOptions.Default with
             {
-                ThrowOnPropertyMappingNullMismatch = true
+                ThrowOnPropertyMappingNullMismatch = true,
             },
             "class A { public C? Value { get; set; } }",
             "class B { public D Value { get; set; } }",
@@ -561,7 +561,7 @@ public class ObjectPropertyNullableTest
             "B",
             TestSourceBuilderOptions.Default with
             {
-                ThrowOnPropertyMappingNullMismatch = true
+                ThrowOnPropertyMappingNullMismatch = true,
             },
             "class A { public C? Value { get; set; } }",
             "class B { public D? Value { get; set; } }",
@@ -603,7 +603,7 @@ public class ObjectPropertyNullableTest
             """,
             TestSourceBuilderOptions.Default with
             {
-                ThrowOnPropertyMappingNullMismatch = true
+                ThrowOnPropertyMappingNullMismatch = true,
             },
             "class A { public C? Value { get; set; } }",
             "class B { public D? Value { get; set; } public string ValueFlattened { get; set; } }",

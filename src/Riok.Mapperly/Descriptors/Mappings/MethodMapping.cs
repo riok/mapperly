@@ -23,13 +23,13 @@ public abstract class MethodMapping : ITypeMapping
     private const int SourceParameterIndex = 0;
     private const int ReferenceHandlerParameterIndex = 1;
 
-    private static readonly IEnumerable<SyntaxToken> _privateSyntaxToken = new[] { TrailingSpacedToken(SyntaxKind.PrivateKeyword) };
+    private static readonly IEnumerable<SyntaxToken> _privateSyntaxToken = [TrailingSpacedToken(SyntaxKind.PrivateKeyword)];
 
-    private static readonly IEnumerable<SyntaxToken> _privateStaticSyntaxToken = new[]
-    {
+    private static readonly IEnumerable<SyntaxToken> _privateStaticSyntaxToken =
+    [
         TrailingSpacedToken(SyntaxKind.PrivateKeyword),
         TrailingSpacedToken(SyntaxKind.StaticKeyword),
-    };
+    ];
 
     private readonly ITypeSymbol _returnType;
     private readonly MethodDeclarationSyntax? _methodDeclarationSyntax;

@@ -80,9 +80,9 @@ namespace Riok.Mapperly.IntegrationTests
                 FlagsEnumValue = TestFlagsEnum.V1 | TestFlagsEnum.V4,
                 IntInitOnlyValue = 3,
                 RequiredValue = 4,
-                NestedNullable = new TestObjectNested { IntValue = 100, },
+                NestedNullable = new TestObjectNested { IntValue = 100 },
                 StringValue = "fooBar",
-                SubObject = new InheritanceSubObject { BaseIntValue = 1, SubIntValue = 2, },
+                SubObject = new InheritanceSubObject { BaseIntValue = 1, SubIntValue = 2 },
                 EnumRawValue = TestEnum.Value20,
                 EnumStringValue = TestEnum.Value30,
                 DateTimeValue = new DateTime(2020, 1, 3, 15, 10, 5, DateTimeKind.Utc),
@@ -100,7 +100,7 @@ namespace Riok.Mapperly.IntegrationTests
                 NestedMember = new()
                 {
                     NestedMemberId = 12,
-                    NestedMemberObject = new() { IntValue = 22 }
+                    NestedMemberObject = new() { IntValue = 22 },
                 },
                 TupleValue = ("10", "20"),
                 RecursiveObject = new(5)
@@ -122,8 +122,8 @@ namespace Riok.Mapperly.IntegrationTests
                     NestedMember = new()
                     {
                         NestedMemberId = 123,
-                        NestedMemberObject = new() { IntValue = 223 }
-                    }
+                        NestedMemberObject = new() { IntValue = 223 },
+                    },
                 },
                 MemoryValue = new[] { "1", "2", "3" },
                 StackValue = new Stack<string>(new[] { "1", "2", "3" }),
@@ -138,26 +138,26 @@ namespace Riok.Mapperly.IntegrationTests
                 {
                     { "1", "1" },
                     { "2", "2" },
-                    { "3", "3" }
+                    { "3", "3" },
                 }.ToImmutableDictionary(),
                 ImmutableSortedDictionaryValue = new Dictionary<string, string>()
                 {
                     { "1", "1" },
                     { "2", "2" },
-                    { "3", "3" }
+                    { "3", "3" },
                 }.ToImmutableSortedDictionary(),
-                ExistingISet = { "1", "2", "3", },
-                ExistingHashSet = { "1", "2", "3", },
-                ExistingSortedSet = { "1", "2", "3", },
-                ExistingList = { "1", "2", "3", },
-                ISet = new HashSet<string> { "1", "2", "3", },
+                ExistingISet = { "1", "2", "3" },
+                ExistingHashSet = { "1", "2", "3" },
+                ExistingSortedSet = { "1", "2", "3" },
+                ExistingList = { "1", "2", "3" },
+                ISet = new HashSet<string> { "1", "2", "3" },
 #if NET5_0_OR_GREATER
-                IReadOnlySet = new HashSet<string> { "1", "2", "3", },
+                IReadOnlySet = new HashSet<string> { "1", "2", "3" },
 #endif
-                HashSet = new HashSet<string> { "1", "2", "3", },
-                SortedSet = new SortedSet<string> { "1", "2", "3", },
+                HashSet = new HashSet<string> { "1", "2", "3" },
+                SortedSet = new SortedSet<string> { "1", "2", "3" },
                 SumComponent1 = 32,
-                SumComponent2 = 64
+                SumComponent2 = 64,
             };
         }
 

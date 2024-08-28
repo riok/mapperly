@@ -26,13 +26,11 @@ public class NullDelegateExistingTargetMapping(
 
         // if body is empty don't generate an if statement
         if (body.Length == 0)
-        {
-            return Enumerable.Empty<StatementSyntax>();
-        }
+            return [];
 
         // if (source != null && target != null) { body }
         var condition = IfNoneNull((SourceType, ctx.Source), (TargetType, target));
         var ifStatement = ctx.SyntaxFactory.If(condition, body);
-        return new[] { ifStatement };
+        return [ifStatement];
     }
 }

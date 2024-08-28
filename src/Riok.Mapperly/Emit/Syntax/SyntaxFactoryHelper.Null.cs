@@ -37,15 +37,15 @@ public partial struct SyntaxFactoryHelper
             NullFallbackValue.Default => DefaultLiteral(),
             NullFallbackValue.EmptyString => StringLiteral(string.Empty),
             NullFallbackValue.CreateInstance => CreateInstance(t),
-            _ when argument is ElementAccessExpressionSyntax memberAccess
-                => ThrowNullReferenceException(
-                    InterpolatedString(
-                        $"Sequence {NameOf(memberAccess.Expression)}, contained a null value at index {memberAccess.ArgumentList.Arguments[0].Expression}."
-                    )
-                ),
+            _ when argument is ElementAccessExpressionSyntax memberAccess => ThrowNullReferenceException(
+                InterpolatedString(
+                    $"Sequence {NameOf(memberAccess.Expression)}, contained a null value at index {memberAccess.ArgumentList.Arguments[0].Expression}."
+                )
+            ),
             _ when argument is MemberAccessExpressionSyntax or SimpleNameSyntax => ThrowArgumentNullException(argument),
-            _ when argument is InvocationExpressionSyntax invocation
-                => ThrowNullReferenceException(StringLiteral(invocation.Expression + " returned null")),
+            _ when argument is InvocationExpressionSyntax invocation => ThrowNullReferenceException(
+                StringLiteral(invocation.Expression + " returned null")
+            ),
             _ => ThrowNullReferenceException(StringLiteral(argument + " is null")),
         };
     }

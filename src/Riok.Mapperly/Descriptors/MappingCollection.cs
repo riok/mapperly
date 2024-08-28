@@ -15,7 +15,7 @@ public class MappingCollection
     /// to keep track of the registration order and generate the members in the same order as they are registered
     /// (the user defined order).
     /// </summary>
-    private readonly List<MethodMapping> _methodMappings = new();
+    private readonly List<MethodMapping> _methodMappings = [];
 
     /// <summary>
     /// A list of all user mappings.
@@ -24,7 +24,7 @@ public class MappingCollection
     /// This is kept outside of <see cref="MappingCollectionInstance{T,TUserMapping}"/>
     /// to keep track of the registration order and generate the members in the same order as they are registered.
     /// </summary>
-    private readonly List<IUserMapping> _userMappings = new();
+    private readonly List<IUserMapping> _userMappings = [];
 
     /// <summary>
     /// Queue of mappings which don't have the body built yet
@@ -80,11 +80,17 @@ public class MappingCollection
 
         return userMapping switch
         {
-            INewInstanceUserMapping newInstanceMapping
-                => _newInstanceMappings.AddUserMapping(newInstanceMapping, userMapping.Default, name),
-            IExistingTargetUserMapping existingTargetMapping
-                => _existingTargetMappings.AddUserMapping(existingTargetMapping, userMapping.Default, name),
-            _ => throw new ArgumentOutOfRangeException(nameof(userMapping), userMapping.GetType().FullName + " mappings are not supported")
+            INewInstanceUserMapping newInstanceMapping => _newInstanceMappings.AddUserMapping(
+                newInstanceMapping,
+                userMapping.Default,
+                name
+            ),
+            IExistingTargetUserMapping existingTargetMapping => _existingTargetMappings.AddUserMapping(
+                existingTargetMapping,
+                userMapping.Default,
+                name
+            ),
+            _ => throw new ArgumentOutOfRangeException(nameof(userMapping), userMapping.GetType().FullName + " mappings are not supported"),
         };
     }
 
@@ -149,12 +155,12 @@ public class MappingCollection
         /// <summary>
         /// Duplicated mapping names.
         /// </summary>
-        private readonly HashSet<string> _duplicatedMappingNames = new();
+        private readonly HashSet<string> _duplicatedMappingNames = [];
 
         /// <summary>
         /// All mapping type keys which for which an explicit default mapping is configured.
         /// </summary>
-        private readonly HashSet<TypeMappingKey> _explicitDefaultMappingKeys = new();
+        private readonly HashSet<TypeMappingKey> _explicitDefaultMappingKeys = [];
 
         /// <summary>
         /// Contains the duplicated user implemented mappings
@@ -165,12 +171,12 @@ public class MappingCollection
         /// <summary>
         /// All mapping keys for which <see cref="Find(TypeMappingKey)"/> was called and returned a non-null result.
         /// </summary>
-        private readonly HashSet<TypeMappingKey> _usedMappingKeys = new();
+        private readonly HashSet<TypeMappingKey> _usedMappingKeys = [];
 
         /// <summary>
         /// All mappings for which <see cref="FindNamed"/> was called and returned a non-null result.
         /// </summary>
-        private readonly HashSet<TUserMapping> _referencedNamedMappings = new();
+        private readonly HashSet<TUserMapping> _referencedNamedMappings = [];
 
         /// <inheritdoc cref="_defaultMappings"/>
         public IReadOnlyDictionary<TypeMappingKey, T> DefaultMappings => _defaultMappings;
@@ -249,7 +255,7 @@ public class MappingCollection
 
                 // no default value specified
                 // add it if none exists yet
-                null => TryAddUserMappingAsDefault(mapping)
+                null => TryAddUserMappingAsDefault(mapping),
             };
         }
 

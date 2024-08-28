@@ -201,7 +201,7 @@ public class EnumTest
             "E2",
             TestSourceBuilderOptions.Default with
             {
-                EnumMappingStrategy = EnumMappingStrategy.ByName
+                EnumMappingStrategy = EnumMappingStrategy.ByName,
             },
             "enum E1 {A, B, C}",
             "enum E2 {A = 100, B, C}"
@@ -430,7 +430,7 @@ public class EnumTest
             "B",
             TestSourceBuilderOptions.Default with
             {
-                EnumMappingStrategy = enumMappingStrategy
+                EnumMappingStrategy = enumMappingStrategy,
             },
             "class A { public C Value { get; set; } }",
             "class B { public D Value { get; set; } }",
@@ -456,7 +456,7 @@ public class EnumTest
             TestSourceBuilderOptions.Default with
             {
                 EnumMappingStrategy = EnumMappingStrategy.ByName,
-                EnumMappingIgnoreCase = true
+                EnumMappingIgnoreCase = true,
             },
             "class A { public C Value { get; set; } }",
             "class B { public D Value { get; set; } }",

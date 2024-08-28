@@ -10,7 +10,7 @@ public class Car
 
     public Manufacturer? Manufacturer { get; set; }
 
-    public List<Tire> Tires { get; } = new List<Tire>();
+    public List<Tire> Tires { get; } = [];
 }
 
 public enum CarColor

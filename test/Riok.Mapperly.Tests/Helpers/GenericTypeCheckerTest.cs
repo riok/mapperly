@@ -271,7 +271,7 @@ public class GenericTypeCheckerTest
             {{types}}
             """
         );
-        var compilation = TestHelper.BuildCompilation(source, TestHelperOptions.Default with { NullableOption = nullableOptions, });
+        var compilation = TestHelper.BuildCompilation(source, TestHelperOptions.Default with { NullableOption = nullableOptions });
         var nodes = compilation.SyntaxTrees.Single().GetRoot().DescendantNodes();
         var classNode = nodes.OfType<ClassDeclarationSyntax>().Single(x => x.Identifier.Text == "Mapper");
         var methodNode = nodes.OfType<MethodDeclarationSyntax>().Single(x => x.Identifier.Text == "Test");
@@ -295,7 +295,7 @@ public class GenericTypeCheckerTest
             );
 
             var targetMethodTypeSymbol = methodSymbol.ReturnsVoid ? methodSymbol.Parameters[1].Type : methodSymbol.ReturnType;
-            parametersAndArguments = [(methodSymbol.Parameters[0].Type, sourceSymbol), (targetMethodTypeSymbol, targetSymbol),];
+            parametersAndArguments = [(methodSymbol.Parameters[0].Type, sourceSymbol), (targetMethodTypeSymbol, targetSymbol)];
         }
 
         return typeChecker.InferAndCheckTypes(methodSymbol.TypeParameters, parametersAndArguments);

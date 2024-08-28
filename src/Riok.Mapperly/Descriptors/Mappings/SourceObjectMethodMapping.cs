@@ -29,5 +29,5 @@ public class SourceObjectMethodMapping(
         return delegateMapping == null ? sourceExpression : delegateMapping.Build(ctx.WithSource(sourceExpression));
     }
 
-    protected virtual IEnumerable<ExpressionSyntax?> BuildArguments(TypeMappingBuildContext ctx) => Enumerable.Empty<ExpressionSyntax?>();
+    protected virtual IEnumerable<ExpressionSyntax?> BuildArguments(TypeMappingBuildContext ctx) => [];
 }

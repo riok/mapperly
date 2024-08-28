@@ -25,7 +25,7 @@ public static class NewInstanceObjectMemberMappingBuilder
                 ctx.Configuration.Mapper.UseReferenceHandling
             )
             {
-                Constructor = constructor
+                Constructor = constructor,
             };
         }
 

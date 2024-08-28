@@ -24,27 +24,45 @@ public static class ToStringMappingBuilder
         return (stringFormat, formatProvider, formatProviderIsDefault) switch
         {
             // ToString(string, IFormatProvider)
-            (not null, not null, _) when HasToStringMethod(ctx, true, true)
-                => new ToStringMapping(ctx.Source, ctx.Target, stringFormat, formatProvider.Name),
+            (not null, not null, _) when HasToStringMethod(ctx, true, true) => new ToStringMapping(
+                ctx.Source,
+                ctx.Target,
+                stringFormat,
+                formatProvider.Name
+            ),
 
             // ToString(string)
-            (not null, not null, true) when HasToStringMethod(ctx, true, false)
-                => new ToStringMapping(ctx.Source, ctx.Target, stringFormat),
+            (not null, not null, true) when HasToStringMethod(ctx, true, false) => new ToStringMapping(
+                ctx.Source,
+                ctx.Target,
+                stringFormat
+            ),
 
             // ToString(string)
             (not null, null, _) when HasToStringMethod(ctx, true, false) => new ToStringMapping(ctx.Source, ctx.Target, stringFormat),
 
             // ToString(string, null)
-            (not null, null, _) when HasToStringMethodWithNullableParameter(ctx, 1)
-                => new ToStringMapping(ctx.Source, ctx.Target, stringFormat, simpleInvocation: false),
+            (not null, null, _) when HasToStringMethodWithNullableParameter(ctx, 1) => new ToStringMapping(
+                ctx.Source,
+                ctx.Target,
+                stringFormat,
+                simpleInvocation: false
+            ),
 
             // ToString(IFormatProvider)
-            (null, not null, _) when HasToStringMethod(ctx, false, true)
-                => new ToStringMapping(ctx.Source, ctx.Target, formatProviderName: formatProvider.Name),
+            (null, not null, _) when HasToStringMethod(ctx, false, true) => new ToStringMapping(
+                ctx.Source,
+                ctx.Target,
+                formatProviderName: formatProvider.Name
+            ),
 
             // ToString(null, IFormatProvider)
-            (null, not null, _) when HasToStringMethodWithNullableParameter(ctx, 0)
-                => new ToStringMapping(ctx.Source, ctx.Target, formatProviderName: formatProvider.Name, simpleInvocation: false),
+            (null, not null, _) when HasToStringMethodWithNullableParameter(ctx, 0) => new ToStringMapping(
+                ctx.Source,
+                ctx.Target,
+                formatProviderName: formatProvider.Name,
+                simpleInvocation: false
+            ),
 
             // ToString()
             (null, not null, true) => new ToStringMapping(ctx.Source, ctx.Target),
@@ -90,14 +108,12 @@ public static class ToStringMappingBuilder
 
         return (stringFormatParam, formatProviderParam) switch
         {
-            (true, true)
-                => method.Parameters.Length == 2
-                    && method.Parameters[0].Type.SpecialType == SpecialType.System_String
-                    && SymbolEqualityComparer.Default.Equals(method.Parameters[1].Type, ctx.Types.Get<IFormatProvider>()),
+            (true, true) => method.Parameters.Length == 2
+                && method.Parameters[0].Type.SpecialType == SpecialType.System_String
+                && SymbolEqualityComparer.Default.Equals(method.Parameters[1].Type, ctx.Types.Get<IFormatProvider>()),
             (true, false) => method.Parameters is [{ Type.SpecialType: SpecialType.System_String }],
-            (false, true)
-                => method.Parameters.Length == 1
-                    && SymbolEqualityComparer.Default.Equals(method.Parameters[0].Type, ctx.Types.Get<IFormatProvider>()),
+            (false, true) => method.Parameters.Length == 1
+                && SymbolEqualityComparer.Default.Equals(method.Parameters[0].Type, ctx.Types.Get<IFormatProvider>()),
             _ => false,
         };
     }

@@ -60,9 +60,9 @@ public class UserImplementedInlinedExpressionMapping(
     {
         return node switch
         {
-            SimpleLambdaExpressionSyntax simpleLambda => new[] { simpleLambda.Parameter.Identifier },
+            SimpleLambdaExpressionSyntax simpleLambda => [simpleLambda.Parameter.Identifier],
             ParenthesizedLambdaExpressionSyntax lambda => lambda.ParameterList.Parameters.Select(p => p.Identifier),
-            _ => Enumerable.Empty<SyntaxToken>()
+            _ => [],
         };
     }
 }

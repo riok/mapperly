@@ -24,5 +24,5 @@ public enum RequiredMappingStrategy
     /// <summary>
     /// Warnings are emitted for unmapped target members but not for source members.
     /// </summary>
-    Target = 1 << 1
+    Target = 1 << 1,
 }

@@ -39,7 +39,7 @@ public static class TestHelper
             ?.GetRoot();
         var methods = ExtractAllMethods(syntaxRoot).Select(x => new GeneratedMethod(x)).ToDictionary(x => x.Name);
 
-        var ignoredDiagnosticDescriptorIds = options.IgnoredDiagnostics?.Select(x => x.Id).ToHashSet() ?? new HashSet<string>();
+        var ignoredDiagnosticDescriptorIds = options.IgnoredDiagnostics?.Select(x => x.Id).ToHashSet() ?? [];
         var filteredDiagnostics = result.Diagnostics.Where(x => !ignoredDiagnosticDescriptorIds.Contains(x.Descriptor.Id)).ToList();
         var groupedDiagnostics = filteredDiagnostics
             .GroupBy(x => x.Descriptor.Id)
@@ -73,10 +73,7 @@ public static class TestHelper
     {
         var generator = new MapperGenerator();
 
-        var driver = CSharpGeneratorDriver.Create(
-            new[] { generator.AsSourceGenerator() },
-            driverOptions: _enableIncrementalTrackingDriverOptions
-        );
+        var driver = CSharpGeneratorDriver.Create([generator.AsSourceGenerator()], driverOptions: _enableIncrementalTrackingDriverOptions);
         return driver.RunGenerators(compilation);
     }
 

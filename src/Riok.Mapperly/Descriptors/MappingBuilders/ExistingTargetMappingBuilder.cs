@@ -14,7 +14,7 @@ public class ExistingTargetMappingBuilder(MappingCollection mappings)
         SpanMappingBuilder.TryBuildExistingTargetMapping,
         MemoryMappingBuilder.TryBuildExistingTargetMapping,
         EnumerableMappingBuilder.TryBuildExistingTargetMapping,
-        NewInstanceObjectMemberMappingBuilder.TryBuildExistingTargetMapping
+        NewInstanceObjectMemberMappingBuilder.TryBuildExistingTargetMapping,
     ];
 
     public IExistingTargetMapping? Find(TypeMappingKey mappingKey)

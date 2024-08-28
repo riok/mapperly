@@ -71,7 +71,7 @@ public class SourceGeneratorBenchmarks
 
         var generator = new MapperGenerator().AsSourceGenerator();
 
-        var driver = CSharpGeneratorDriver.Create(new[] { generator }, parseOptions: (CSharpParseOptions)project.ParseOptions!);
+        var driver = CSharpGeneratorDriver.Create([generator], parseOptions: (CSharpParseOptions)project.ParseOptions!);
 
         return (compilation, driver);
     }

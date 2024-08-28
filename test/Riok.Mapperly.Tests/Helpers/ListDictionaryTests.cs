@@ -9,12 +9,12 @@ public class ListDictionaryTests
     {
         var l = new ListDictionary<int, int>();
         l.Add(1, 1);
-        l.GetOrEmpty(1).Should().BeEquivalentTo(new[] { 1 }, x => x.WithStrictOrdering());
+        l.GetOrEmpty(1).Should().BeEquivalentTo([1], x => x.WithStrictOrdering());
         l.Add(1, 2);
-        l.GetOrEmpty(1).Should().BeEquivalentTo(new[] { 1, 2 }, x => x.WithStrictOrdering());
+        l.GetOrEmpty(1).Should().BeEquivalentTo([1, 2], x => x.WithStrictOrdering());
         l.Add(2, 3);
-        l.GetOrEmpty(1).Should().BeEquivalentTo(new[] { 1, 2 }, x => x.WithStrictOrdering());
-        l.GetOrEmpty(2).Should().BeEquivalentTo(new[] { 3 }, x => x.WithStrictOrdering());
+        l.GetOrEmpty(1).Should().BeEquivalentTo([1, 2], x => x.WithStrictOrdering());
+        l.GetOrEmpty(2).Should().BeEquivalentTo([3], x => x.WithStrictOrdering());
     }
 
     [Fact]

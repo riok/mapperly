@@ -9,7 +9,7 @@ public class DictionaryExtensionsTest
     [Fact]
     public void RemoveShouldReturnTrueWhenKeyWasRemoved()
     {
-        var d = new Dictionary<string, int> { ["a"] = 10, ["b"] = 20, };
+        var d = new Dictionary<string, int> { ["a"] = 10, ["b"] = 20 };
         DictionaryExtensions.Remove(d, "a", out var value).Should().BeTrue();
         value.Should().Be(10);
     }
@@ -17,7 +17,7 @@ public class DictionaryExtensionsTest
     [Fact]
     public void RemoveShouldReturnFalseWhenKeyWasNotRemoved()
     {
-        var d = new Dictionary<string, int> { ["a"] = 10, ["b"] = 20, };
+        var d = new Dictionary<string, int> { ["a"] = 10, ["b"] = 20 };
         DictionaryExtensions.Remove(d, "c", out var value).Should().BeFalse();
         value.Should().Be(0);
     }
@@ -29,16 +29,16 @@ public class DictionaryExtensionsTest
         {
             ["a"] = 10,
             ["b"] = 20,
-            ["c"] = 30
+            ["c"] = 30,
         };
-        d.RemoveRange(new[] { "a", "c" });
+        d.RemoveRange(["a", "c"]);
         d.Keys.Should().BeEquivalentTo("b");
     }
 
     [Fact]
     public void TryAddShouldNotAddExistingKey()
     {
-        var d = new Dictionary<string, int> { ["a"] = 10, };
+        var d = new Dictionary<string, int> { ["a"] = 10 };
 
         d.TryAdd("a", 20).Should().BeFalse();
 
@@ -48,7 +48,7 @@ public class DictionaryExtensionsTest
     [Fact]
     public void TryAddShouldAddNewKey()
     {
-        var d = new Dictionary<string, int> { ["a"] = 10, };
+        var d = new Dictionary<string, int> { ["a"] = 10 };
 
         d.TryAdd("b", 20).Should().BeTrue();
 

@@ -26,7 +26,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
     private const string IsAssignableFromMethodName = nameof(Type.IsAssignableFrom);
     private const string GetTypeMethodName = nameof(GetType);
 
-    private readonly List<RuntimeTargetTypeMapping> _mappings = new();
+    private readonly List<RuntimeTargetTypeMapping> _mappings = [];
 
     public new IMethodSymbol Method { get; } = method;
 
