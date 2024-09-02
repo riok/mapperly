@@ -186,6 +186,7 @@ RMG038  | Mapper   | Warning  | An enum member could not be found on the target 
 RMG081  | Mapper   | Error    | A mapping method with additional parameters cannot be a default mapping
 RMG082  | Mapper   | Warning  | An additional mapping method parameter is not mapped
 RMG083  | Mapper   | Info     | Cannot map to read only type
+RMG084  | Mapper   | Error    | Multiple mappings are configured for the same source string
 
 ### Removed Rules
 
@@ -195,4 +196,3 @@ RMG017  | Mapper   | Warning  | An init only member can have one configuration a
 RMG026  | Mapper   | Info     | Cannot map from indexed member
 RMG027  | Mapper   | Warning  | A constructor parameter can have one configuration at max
 RMG028  | Mapper   | Warning  | Constructor parameter cannot handle target paths
-

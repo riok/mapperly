@@ -227,6 +227,12 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     internal IEnumerable<IFieldSymbol> GetAllFields(ITypeSymbol symbol) => GetAllMembers(symbol).OfType<IFieldSymbol>();
 
+    internal IFieldSymbol? GetEnumField(TypedConstant constant) =>
+        constant.Type is { } type ? GetAllFields(type).FirstOrDefault(fs => fs.ConstantValue?.Equals(constant.Value) is true) : null;
+
+    internal HashSet<IFieldSymbol> GetFieldsExcept(ITypeSymbol symbol, ISet<IFieldSymbol> ignoredMembers) =>
+        GetAllFields(symbol).Where(x => !ignoredMembers.Remove(x)).ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
+
     internal IReadOnlyCollection<ISymbol> GetAllMembers(ITypeSymbol symbol)
     {
         if (_allMembers.TryGetValue(symbol, out var members))

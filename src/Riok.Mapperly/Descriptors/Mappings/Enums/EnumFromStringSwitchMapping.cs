@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Emit.Syntax;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -17,7 +18,8 @@ public class EnumFromStringSwitchMapping(
     ITypeSymbol targetType,
     IEnumerable<IFieldSymbol> enumMembers,
     bool ignoreCase,
-    EnumFallbackValueMapping fallbackMapping
+    EnumFallbackValueMapping fallbackMapping,
+    IReadOnlyDictionary<IFieldSymbol, HashSet<ExpressionSyntax>> explicitMappings
 ) : NewInstanceMethodMapping(sourceType, targetType)
 {
     private const string IgnoreCaseSwitchDesignatedVariableName = "s";
@@ -27,7 +29,7 @@ public class EnumFromStringSwitchMapping(
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         // switch for each name to the enum value
-        var arms = ignoreCase ? BuildArmsIgnoreCase(ctx) : enumMembers.Select(BuildArm);
+        var arms = ignoreCase ? BuildArmsIgnoreCase(ctx) : BuildArms();
         arms = arms.Append(fallbackMapping.BuildDiscardArm(ctx));
 
         var switchExpr = ctx.SyntaxFactory.Switch(ctx.Source, arms);
@@ -37,24 +39,43 @@ public class EnumFromStringSwitchMapping(
     private IEnumerable<SwitchExpressionArmSyntax> BuildArmsIgnoreCase(TypeMappingBuildContext ctx)
     {
         var ignoreCaseSwitchDesignatedVariableName = ctx.NameBuilder.New(IgnoreCaseSwitchDesignatedVariableName);
-        return enumMembers.Select(f => BuildArmIgnoreCase(ignoreCaseSwitchDesignatedVariableName, f));
+        foreach (var field in enumMembers)
+        {
+            // source.Value1
+            var typeMemberAccess = MemberAccess(field.ContainingType.NonNullable().FullyQualifiedIdentifierName(), field.Name);
+            if (explicitMappings.TryGetValue(field, out var sourceExpressions))
+            {
+                // add switch arm for each source string
+                foreach (var sourceExpression in sourceExpressions)
+                {
+                    yield return BuildArmIgnoreCase(ignoreCaseSwitchDesignatedVariableName, typeMemberAccess, sourceExpression);
+                }
+            }
+            else
+            {
+                yield return BuildArmIgnoreCase(ignoreCaseSwitchDesignatedVariableName, typeMemberAccess, NameOf(typeMemberAccess));
+            }
+        }
     }
 
-    private SwitchExpressionArmSyntax BuildArmIgnoreCase(string ignoreCaseSwitchDesignatedVariableName, IFieldSymbol field)
+    private static SwitchExpressionArmSyntax BuildArmIgnoreCase(
+        string ignoreCaseSwitchDesignatedVariableName,
+        MemberAccessExpressionSyntax typeMemberAccess,
+        ExpressionSyntax stringExpression
+    )
     {
         // { } s
         var pattern = RecursivePattern()
             .WithPropertyPatternClause(PropertyPatternClause().AddTrailingSpace())
             .WithDesignation(SingleVariableDesignation(Identifier(ignoreCaseSwitchDesignatedVariableName)));
 
-        // source.Value1
-        var typeMemberAccess = MemberAccess(field.ContainingType.NonNullable().FullyQualifiedIdentifierName(), field.Name);
-
         // when s.Equals(nameof(source.Value1), StringComparison.OrdinalIgnoreCase)
+        // or (if explicit mapping exists)
+        // when s.Equals("VALUE-1", StringComparison.OrdinalIgnoreCase)
         var whenClause = SwitchWhen(
             InvocationWithoutIndention(
                 MemberAccess(ignoreCaseSwitchDesignatedVariableName, StringEqualsMethodName),
-                NameOf(typeMemberAccess),
+                stringExpression,
                 IdentifierName(StringComparisonFullName)
             )
         );
@@ -63,11 +84,27 @@ public class EnumFromStringSwitchMapping(
         return SwitchArm(pattern, typeMemberAccess).WithWhenClause(whenClause);
     }
 
-    private SwitchExpressionArmSyntax BuildArm(IFieldSymbol field)
+    private IEnumerable<SwitchExpressionArmSyntax> BuildArms()
     {
-        // nameof(source.Value1) => source.Value1;
-        var typeMemberAccess = MemberAccess(FullyQualifiedIdentifier(field.ContainingType), field.Name);
-        var pattern = ConstantPattern(NameOf(typeMemberAccess));
-        return SwitchArm(pattern, typeMemberAccess);
+        foreach (var field in enumMembers)
+        {
+            // source.Value1
+            var typeMemberAccess = MemberAccess(field.ContainingType.NonNullable().FullyQualifiedIdentifierName(), field.Name);
+            if (explicitMappings.TryGetValue(field, out var sourceExpressions))
+            {
+                // add switch arm for each source string
+                foreach (var sourceExpression in sourceExpressions)
+                {
+                    yield return BuildArm(typeMemberAccess, sourceExpression);
+                }
+            }
+            else
+            {
+                yield return BuildArm(typeMemberAccess, NameOf(typeMemberAccess));
+            }
+        }
     }
+
+    private static SwitchExpressionArmSyntax BuildArm(MemberAccessExpressionSyntax typeMemberAccess, ExpressionSyntax patternSyntax) =>
+        SwitchArm(ConstantPattern(patternSyntax), typeMemberAccess);
 }

@@ -26,7 +26,7 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
         CtorMappingBuilder.TryBuildMapping,
         StringToEnumMappingBuilder.TryBuildMapping,
         EnumToStringMappingBuilder.TryBuildMapping,
-        EnumMappingBuilder.TryBuildMapping,
+        EnumToEnumMappingBuilder.TryBuildMapping,
         DateTimeToDateOnlyMappingBuilder.TryBuildMapping,
         DateTimeToTimeOnlyMappingBuilder.TryBuildMapping,
         ExplicitCastMappingBuilder.TryBuildMapping,
