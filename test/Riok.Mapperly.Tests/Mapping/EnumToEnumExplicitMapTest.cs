@@ -100,7 +100,14 @@ public class EnumToEnumExplicitMapTest
             .HaveDiagnostic(
                 DiagnosticDescriptors.EnumSourceValueDuplicated,
                 "Enum source value E2.e is specified multiple times, a source enum value may only be specified once"
-            );
+            )
+            .HaveDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member d (103) on E2 not found on target enum E1")
+            .HaveDiagnostics(
+                DiagnosticDescriptors.TargetEnumValueNotMapped,
+                "Enum member D (3) on E1 not found on source enum E2",
+                "Enum member F (6) on E1 not found on source enum E2"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]

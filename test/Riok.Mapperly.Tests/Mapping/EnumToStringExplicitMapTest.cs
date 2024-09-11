@@ -88,7 +88,8 @@ public class EnumToStringExplicitMapTest
             .HaveDiagnostic(
                 DiagnosticDescriptors.EnumSourceValueDuplicated,
                 "Enum source value E.e is specified multiple times, a source enum value may only be specified once"
-            );
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]

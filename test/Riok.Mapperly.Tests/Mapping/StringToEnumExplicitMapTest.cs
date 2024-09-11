@@ -89,7 +89,8 @@ public class StringToEnumExplicitMapTest
             .HaveDiagnostic(
                 DiagnosticDescriptors.StringSourceValueDuplicated,
                 "String source value \"str-e\" is specified multiple times, a source string value may only be specified once"
-            );
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
