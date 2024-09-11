@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.Enums;
@@ -102,19 +101,23 @@ public static class StringToEnumMappingBuilder
     {
         var explicitMappings = new Dictionary<IFieldSymbol, HashSet<ExpressionSyntax>>(SymbolTypeEqualityComparer.FieldDefault);
         var checkedSources = new HashSet<object?>();
+        var targetFields = ctx.SymbolAccessor.GetEnumFields(ctx.Target);
         foreach (var (source, target) in ctx.Configuration.Enum.ExplicitMappings)
         {
-            var targetField = ctx.SymbolAccessor.GetEnumField(target.ConstantValue)!;
-
             if (!SymbolEqualityComparer.Default.Equals(target.ConstantValue.Type, ctx.Target))
             {
                 ctx.ReportDiagnostic(
                     DiagnosticDescriptors.TargetEnumValueDoesNotMatchTargetEnumType,
-                    targetField,
+                    target.Expression.ToFullString(),
                     target.ConstantValue.Value ?? 0,
                     target.ConstantValue.Type?.ToDisplayString() ?? "unknown",
                     ctx.Target
                 );
+                continue;
+            }
+
+            if (!targetFields.TryGetValue(target.ConstantValue.Value!, out var targetField))
+            {
                 continue;
             }
 
@@ -126,6 +129,7 @@ public static class StringToEnumMappingBuilder
                     ctx.Source,
                     ctx.Target
                 );
+                continue;
             }
 
             if (explicitMappings.TryGetValue(targetField, out var sources))

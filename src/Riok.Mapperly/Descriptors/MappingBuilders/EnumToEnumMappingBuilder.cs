@@ -192,6 +192,8 @@ public static class EnumToEnumMappingBuilder
     private static IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> BuildExplicitValueMappings(MappingBuilderContext ctx)
     {
         var explicitMappings = new Dictionary<IFieldSymbol, IFieldSymbol>(SymbolEqualityComparer.Default);
+        var sourceFields = ctx.SymbolAccessor.GetEnumFields(ctx.Source);
+        var targetFields = ctx.SymbolAccessor.GetEnumFields(ctx.Target);
         foreach (var (source, target) in ctx.Configuration.Enum.ExplicitMappings)
         {
             if (source.ConstantValue.Kind is not TypedConstantKind.Enum)
@@ -216,15 +218,12 @@ public static class EnumToEnumMappingBuilder
                 continue;
             }
 
-            var sourceField = ctx.SymbolAccessor.GetEnumField(source.ConstantValue)!;
-            var targetField = ctx.SymbolAccessor.GetEnumField(target.ConstantValue)!;
-
             if (!SymbolEqualityComparer.Default.Equals(source.ConstantValue.Type, ctx.Source))
             {
                 ctx.ReportDiagnostic(
                     DiagnosticDescriptors.SourceEnumValueDoesNotMatchSourceEnumType,
-                    sourceField,
-                    source.ConstantValue.Value ?? 0,
+                    target.Expression.ToFullString(),
+                    target.ConstantValue.Value ?? 0,
                     target.ConstantValue.Type?.ToDisplayString() ?? "unknown",
                     ctx.Source
                 );
@@ -235,21 +234,25 @@ public static class EnumToEnumMappingBuilder
             {
                 ctx.ReportDiagnostic(
                     DiagnosticDescriptors.TargetEnumValueDoesNotMatchTargetEnumType,
-                    targetField,
-                    target.ConstantValue.Value ?? 0,
-                    target.ConstantValue.Type?.ToDisplayString() ?? "unknown",
+                    source.Expression.ToFullString(),
+                    source.ConstantValue.Value ?? 0,
+                    source.ConstantValue.Type?.ToDisplayString() ?? "unknown",
                     ctx.Target
                 );
                 continue;
             }
 
-            if (explicitMappings.ContainsKey(sourceField))
+            if (
+                !sourceFields.TryGetValue(source.ConstantValue.Value!, out var sourceField)
+                || !targetFields.TryGetValue(target.ConstantValue.Value!, out var targetField)
+            )
+            {
+                continue;
+            }
+
+            if (!explicitMappings.TryAdd(sourceField, targetField))
             {
                 ctx.ReportDiagnostic(DiagnosticDescriptors.EnumSourceValueDuplicated, sourceField, ctx.Source, ctx.Target);
-            }
-            else
-            {
-                explicitMappings.Add(sourceField, targetField);
             }
         }
 

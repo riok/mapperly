@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.Enums;
@@ -37,19 +36,23 @@ public static class EnumToStringMappingBuilder
     private static IReadOnlyDictionary<IFieldSymbol, ExpressionSyntax> BuildExplicitValueMappings(MappingBuilderContext ctx)
     {
         var explicitMappings = new Dictionary<IFieldSymbol, ExpressionSyntax>(SymbolEqualityComparer.Default);
+        var sourceFields = ctx.SymbolAccessor.GetEnumFields(ctx.Source);
         foreach (var (source, target) in ctx.Configuration.Enum.ExplicitMappings)
         {
-            var sourceField = ctx.SymbolAccessor.GetEnumField(source.ConstantValue)!;
-
             if (!SymbolEqualityComparer.Default.Equals(source.ConstantValue.Type, ctx.Source))
             {
                 ctx.ReportDiagnostic(
                     DiagnosticDescriptors.SourceEnumValueDoesNotMatchSourceEnumType,
-                    sourceField,
+                    source.Expression.ToFullString(),
                     source.ConstantValue.Value ?? 0,
                     source.ConstantValue.Type?.ToDisplayString() ?? "unknown",
                     ctx.Source
                 );
+                continue;
+            }
+
+            if (!sourceFields.TryGetValue(source.ConstantValue.Value!, out var sourceField))
+            {
                 continue;
             }
 

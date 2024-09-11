@@ -80,7 +80,7 @@ public class StringToEnumExplicitMapTest
                     nameof(global::E.C) => global::E.C,
                     nameof(global::E.d) => global::E.d,
                     "str-e" => global::E.e,
-                    "str-e" => global::E.E,
+                    nameof(global::E.E) => global::E.E,
                     nameof(global::E.f) => global::E.f,
                     _ => System.Enum.Parse<global::E>(source, false),
                 };
