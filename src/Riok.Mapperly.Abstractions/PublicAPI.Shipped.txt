@@ -15,8 +15,6 @@ Riok.Mapperly.Abstractions.MapEnumAttribute.MapEnumAttribute(Riok.Mapperly.Abstr
 Riok.Mapperly.Abstractions.MapEnumAttribute.Strategy.get -> Riok.Mapperly.Abstractions.EnumMappingStrategy
 Riok.Mapperly.Abstractions.MapEnumValueAttribute
 Riok.Mapperly.Abstractions.MapEnumValueAttribute.MapEnumValueAttribute(object! source, object! target) -> void
-Riok.Mapperly.Abstractions.MapEnumValueAttribute.Source.get -> System.Enum!
-Riok.Mapperly.Abstractions.MapEnumValueAttribute.Target.get -> System.Enum!
 Riok.Mapperly.Abstractions.MapperAttribute
 Riok.Mapperly.Abstractions.MapperAttribute.EnabledConversions.get -> Riok.Mapperly.Abstractions.MappingConversionType
 Riok.Mapperly.Abstractions.MapperAttribute.EnabledConversions.set -> void
@@ -188,3 +186,5 @@ Riok.Mapperly.Abstractions.MapPropertyAttribute.MapPropertyAttribute(string! sou
 Riok.Mapperly.Abstractions.MapPropertyAttribute.MapPropertyAttribute(string![]! source, string! target) -> void
 Riok.Mapperly.Abstractions.MapperAttribute.IncludedConstructors.get -> Riok.Mapperly.Abstractions.MemberVisibility
 Riok.Mapperly.Abstractions.MapperAttribute.IncludedConstructors.set -> void
+Riok.Mapperly.Abstractions.MapEnumValueAttribute.Source.get -> object!
+Riok.Mapperly.Abstractions.MapEnumValueAttribute.Target.get -> object!

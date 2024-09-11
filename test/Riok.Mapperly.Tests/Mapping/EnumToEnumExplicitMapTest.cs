@@ -2,7 +2,7 @@ using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
 
-public class EnumExplicitMapTest
+public class EnumToEnumExplicitMapTest
 {
     [Fact]
     public void EnumByNameWithExplicitValue()
@@ -100,11 +100,66 @@ public class EnumExplicitMapTest
             .HaveDiagnostic(
                 DiagnosticDescriptors.EnumSourceValueDuplicated,
                 "Enum source value E2.e is specified multiple times, a source enum value may only be specified once"
-            );
+            )
+            .HaveDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member d (103) on E2 not found on target enum E1")
+            .HaveDiagnostics(
+                DiagnosticDescriptors.TargetEnumValueNotMapped,
+                "Enum member D (3) on E1 not found on source enum E2",
+                "Enum member F (6) on E1 not found on source enum E2"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void EnumByNameWithExplicitValueSourceTypeMismatch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnumValue(\"A\", E1.A), MapEnum(EnumMappingStrategy.ByName)] public partial E1 ToE1(E2 source);",
+            "public enum E1 {A}",
+            "public enum E2 {A}"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    global::E2.A => global::E1.A,
+                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
+                };
+                """
+            )
+            .HaveDiagnostic(DiagnosticDescriptors.MapValueTypeMismatch, "Cannot assign constant value \"A\" of type string to E2")
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
     public void EnumByNameWithExplicitValueTargetTypeMismatch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnumValue(E2.A, \"A\"), MapEnum(EnumMappingStrategy.ByName)] public partial E1 ToE1(E2 source);",
+            "public enum E1 {A}",
+            "public enum E2 {A}"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    global::E2.A => global::E1.A,
+                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
+                };
+                """
+            )
+            .HaveDiagnostic(DiagnosticDescriptors.MapValueTypeMismatch, "Cannot assign constant value \"A\" of type string to E1")
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void EnumByNameWithExplicitValueTargetEnumTypeMismatch()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapEnumValue(E2.A, E2.A), MapEnum(EnumMappingStrategy.ByName)] public partial E1 ToE1(E2 source);",
@@ -131,7 +186,7 @@ public class EnumExplicitMapTest
     }
 
     [Fact]
-    public void EnumByNameWithExplicitValueSourceTypeMismatch()
+    public void EnumByNameWithExplicitValueSourceEnumTypeMismatch()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapEnumValue(E1.A, E1.A), MapEnum(EnumMappingStrategy.ByName)] public partial E1 ToE1(E2 source);",

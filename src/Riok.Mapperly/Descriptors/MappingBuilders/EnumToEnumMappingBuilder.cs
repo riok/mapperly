@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.Enums;
 using Riok.Mapperly.Diagnostics;
@@ -7,7 +8,7 @@ using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
-public static class EnumMappingBuilder
+public static class EnumToEnumMappingBuilder
 {
     public static INewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
@@ -134,16 +135,8 @@ public static class EnumMappingBuilder
         var explicitMappings = ignoreExplicitAndIgnoredMappings
             ? new Dictionary<IFieldSymbol, IFieldSymbol>(SymbolEqualityComparer.Default)
             : BuildExplicitValueMappings(ctx);
-        var sourceMembers = ctx
-            .Source.GetMembers()
-            .OfType<IFieldSymbol>()
-            .Where(x => !ignoredSourceMembers.Remove(x))
-            .ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
-        var targetMembers = ctx
-            .Target.GetMembers()
-            .OfType<IFieldSymbol>()
-            .Where(x => !ignoredTargetMembers.Remove(x))
-            .ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
+        var sourceMembers = ctx.SymbolAccessor.GetFieldsExcept(ctx.Source, ignoredSourceMembers);
+        var targetMembers = ctx.SymbolAccessor.GetFieldsExcept(ctx.Target, ignoredTargetMembers);
 
         var targetMembersByProperty = propertyComparer
             .Select(pc => targetMembers.DistinctBy(propertySelector, pc).ToDictionary(propertySelector, x => x, pc))
@@ -170,96 +163,11 @@ public static class EnumMappingBuilder
             mappedTargetMembers.Add(targetMember);
         }
 
-        AddUnmappedMembersDiagnostics(ctx, mappings, mappedTargetMembers, sourceMembers, targetMembers);
-        AddUnmatchedIgnoredMembers(ctx, ignoredSourceMembers, ignoredTargetMembers);
+        EnumMappingDiagnosticReporter.AddUnmappedSourceMembersDiagnostics(ctx, mappings.Keys.ToHashSet(), sourceMembers);
+        EnumMappingDiagnosticReporter.AddUnmappedTargetMembersDiagnostics(ctx, mappedTargetMembers, targetMembers);
+        EnumMappingDiagnosticReporter.AddUnmatchedSourceIgnoredMembers(ctx, ignoredSourceMembers);
+        EnumMappingDiagnosticReporter.AddUnmatchedTargetIgnoredMembers(ctx, ignoredTargetMembers);
         return new EnumMemberMappings(mappings, explicitMappings, targetMembers);
-    }
-
-    private static void AddUnmatchedIgnoredMembers(
-        MappingBuilderContext ctx,
-        ISet<IFieldSymbol> ignoredUnmatchedSourceMembers,
-        ISet<IFieldSymbol> ignoredUnmatchedTargetMembers
-    )
-    {
-        foreach (var member in ignoredUnmatchedSourceMembers)
-        {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.IgnoredEnumSourceMemberNotFound,
-                member.Name,
-                member.ConstantValue!,
-                ctx.Source,
-                ctx.Target
-            );
-        }
-
-        foreach (var member in ignoredUnmatchedTargetMembers)
-        {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.IgnoredEnumTargetMemberNotFound,
-                member.Name,
-                member.ConstantValue!,
-                ctx.Source,
-                ctx.Target
-            );
-        }
-    }
-
-    private static void AddUnmappedMembersDiagnostics(
-        MappingBuilderContext ctx,
-        IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> mappings,
-        ISet<IFieldSymbol> mappedTargetMembers,
-        IEnumerable<IFieldSymbol> sourceMembers,
-        IEnumerable<IFieldSymbol> targetMembers
-    )
-    {
-        AddUnmappedSourceMembersDiagnostics(ctx, mappings, sourceMembers);
-        AddUnmappedTargetMembersDiagnostics(ctx, mappedTargetMembers, targetMembers);
-    }
-
-    private static void AddUnmappedTargetMembersDiagnostics(
-        MappingBuilderContext ctx,
-        ISet<IFieldSymbol> mappedTargetMembers,
-        IEnumerable<IFieldSymbol> targetMembers
-    )
-    {
-        if (!ctx.Configuration.Enum.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target))
-            return;
-
-        var missingTargetMembers = targetMembers.Where(field =>
-            !mappedTargetMembers.Contains(field) && ctx.Configuration.Enum.FallbackValue?.ConstantValue?.Equals(field.ConstantValue) != true
-        );
-        foreach (var member in missingTargetMembers)
-        {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.TargetEnumValueNotMapped,
-                member.Name,
-                member.ConstantValue!,
-                ctx.Target,
-                ctx.Source
-            );
-        }
-    }
-
-    private static void AddUnmappedSourceMembersDiagnostics(
-        MappingBuilderContext ctx,
-        IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> mappings,
-        IEnumerable<IFieldSymbol> sourceMembers
-    )
-    {
-        if (!ctx.Configuration.Enum.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Source))
-            return;
-
-        var missingSourceMembers = sourceMembers.Where(field => !mappings.ContainsKey(field));
-        foreach (var member in missingSourceMembers)
-        {
-            ctx.ReportDiagnostic(
-                DiagnosticDescriptors.SourceEnumValueNotMapped,
-                member.Name,
-                member.ConstantValue!,
-                ctx.Source,
-                ctx.Target
-            );
-        }
     }
 
     private static EnumFallbackValueMapping BuildFallbackMapping(MappingBuilderContext ctx)
@@ -283,44 +191,72 @@ public static class EnumMappingBuilder
 
     private static IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> BuildExplicitValueMappings(MappingBuilderContext ctx)
     {
-        var targetFieldsByExplicitValue = new Dictionary<IFieldSymbol, IFieldSymbol>(SymbolEqualityComparer.Default);
+        var explicitMappings = new Dictionary<IFieldSymbol, IFieldSymbol>(SymbolEqualityComparer.Default);
+        var sourceFields = ctx.SymbolAccessor.GetEnumFields(ctx.Source);
+        var targetFields = ctx.SymbolAccessor.GetEnumFields(ctx.Target);
         foreach (var (source, target) in ctx.Configuration.Enum.ExplicitMappings)
         {
-            if (!SymbolEqualityComparer.Default.Equals(source.Type, ctx.Source))
+            if (source.ConstantValue.Kind is not TypedConstantKind.Enum)
             {
                 ctx.ReportDiagnostic(
-                    DiagnosticDescriptors.SourceEnumValueDoesNotMatchSourceEnumType,
-                    source,
-                    source.ConstantValue ?? 0,
-                    source.Type,
+                    DiagnosticDescriptors.MapValueTypeMismatch,
+                    source.Expression.ToFullString(),
+                    source.ConstantValue.Type?.ToDisplayString() ?? "unknown",
                     ctx.Source
                 );
                 continue;
             }
 
-            if (!SymbolEqualityComparer.Default.Equals(target.Type, ctx.Target))
+            if (target.ConstantValue.Kind is not TypedConstantKind.Enum)
             {
                 ctx.ReportDiagnostic(
-                    DiagnosticDescriptors.TargetEnumValueDoesNotMatchTargetEnumType,
-                    target,
-                    target.ConstantValue ?? 0,
-                    target.Type,
+                    DiagnosticDescriptors.MapValueTypeMismatch,
+                    target.Expression.ToFullString(),
+                    target.ConstantValue.Type?.ToDisplayString() ?? "unknown",
                     ctx.Target
                 );
                 continue;
             }
 
-            if (targetFieldsByExplicitValue.ContainsKey(source))
+            if (!SymbolEqualityComparer.Default.Equals(source.ConstantValue.Type, ctx.Source))
             {
-                ctx.ReportDiagnostic(DiagnosticDescriptors.EnumSourceValueDuplicated, source, ctx.Source, ctx.Target);
+                ctx.ReportDiagnostic(
+                    DiagnosticDescriptors.SourceEnumValueDoesNotMatchSourceEnumType,
+                    target.Expression.ToFullString(),
+                    target.ConstantValue.Value ?? 0,
+                    target.ConstantValue.Type?.ToDisplayString() ?? "unknown",
+                    ctx.Source
+                );
+                continue;
             }
-            else
+
+            if (!SymbolEqualityComparer.Default.Equals(target.ConstantValue.Type, ctx.Target))
             {
-                targetFieldsByExplicitValue.Add(source, target);
+                ctx.ReportDiagnostic(
+                    DiagnosticDescriptors.TargetEnumValueDoesNotMatchTargetEnumType,
+                    source.Expression.ToFullString(),
+                    source.ConstantValue.Value ?? 0,
+                    source.ConstantValue.Type?.ToDisplayString() ?? "unknown",
+                    ctx.Target
+                );
+                continue;
+            }
+
+            if (
+                !sourceFields.TryGetValue(source.ConstantValue.Value!, out var sourceField)
+                || !targetFields.TryGetValue(target.ConstantValue.Value!, out var targetField)
+            )
+            {
+                continue;
+            }
+
+            if (!explicitMappings.TryAdd(sourceField, targetField))
+            {
+                ctx.ReportDiagnostic(DiagnosticDescriptors.EnumSourceValueDuplicated, sourceField, ctx.Source, ctx.Target);
             }
         }
 
-        return targetFieldsByExplicitValue;
+        return explicitMappings;
     }
 
     private record EnumMemberMappings(

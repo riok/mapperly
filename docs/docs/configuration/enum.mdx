@@ -59,7 +59,7 @@ The `IgnoreCase` property allows to opt in for case insensitive mappings (defaul
 ## Manually mapped enum values
 
 To explicitly map enum values the `MapEnumValueAttibute` can be used.
-Attribute is only valid on mapping methods with enums as parameters.
+Attribute is only valid on enum-to-enum, enum-to-string and string-to-enum mappings.
 
 ```csharp
 [Mapper]
@@ -70,6 +70,16 @@ public partial class CarMapper
     [MapEnumValue(CarFeature.AWD, CarFeatureDto.AllWheelDrive)]
     // highlight-end
     public partial CarFeatureDto MapFeature(CarFeature feature);
+
+    // highlight-start
+    [MapEnumValue("AWD", CarFeatureDto.AllWheelDrive)]
+    // highlight-end
+    public partial CarFeatureDto MapFeatureFromString(string feature);
+
+    // highlight-start
+    [MapEnumValue(CarFeatureDto.AllWheelDrive, "AWD")]
+    // highlight-end
+    public partial string MapFeatureToString(CarFeatureDto feature);
 }
 ```
 
@@ -80,7 +90,7 @@ This is especially useful when applying [strict enum mappings](#strict-enum-mapp
 
 ```csharp
 [Mapper]
-public partial class CarMapper
+public partial class FruitMapper
 {
     // highlight-start
     [MapperIgnoreSourceValue(Fruit.Apple)]

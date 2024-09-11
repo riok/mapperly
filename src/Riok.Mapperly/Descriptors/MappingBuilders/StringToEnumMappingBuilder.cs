@@ -1,5 +1,7 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.Enums;
 using Riok.Mapperly.Diagnostics;
@@ -33,6 +35,17 @@ public static class StringToEnumMappingBuilder
             );
         }
 
+        return BuildEnumFromStringSwitchMapping(ctx, genericEnumParseMethodSupported);
+    }
+
+    private static EnumFromStringSwitchMapping BuildEnumFromStringSwitchMapping(
+        MappingBuilderContext ctx,
+        bool genericEnumParseMethodSupported
+    )
+    {
+        var ignoredTargetMembers = ctx.Configuration.Enum.IgnoredTargetMembers.ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
+        var explicitMappings = BuildExplicitValueMappings(ctx);
+
         // from string => use an optimized method of Enum.Parse which would use slow reflection
         // however we currently don't support all features of Enum.Parse yet (ex. flags)
         // therefore we use Enum.Parse as fallback.
@@ -44,7 +57,15 @@ public static class StringToEnumMappingBuilder
             members = members.Where(x => fallbackMapping.FallbackMember.ConstantValue?.Equals(x.ConstantValue) != true);
         }
 
-        return new EnumFromStringSwitchMapping(ctx.Source, ctx.Target, members, ctx.Configuration.Enum.IgnoreCase, fallbackMapping);
+        EnumMappingDiagnosticReporter.AddUnmatchedTargetIgnoredMembers(ctx, ignoredTargetMembers);
+        return new EnumFromStringSwitchMapping(
+            ctx.Source,
+            ctx.Target,
+            members,
+            ctx.Configuration.Enum.IgnoreCase,
+            fallbackMapping,
+            explicitMappings
+        );
     }
 
     private static EnumFallbackValueMapping BuildFallbackParseMapping(MappingBuilderContext ctx, bool genericEnumParseMethodSupported)
@@ -74,5 +95,53 @@ public static class StringToEnumMappingBuilder
             ctx.Target,
             new EnumFromStringParseMapping(ctx.Source, ctx.Target, genericEnumParseMethodSupported, ctx.Configuration.Enum.IgnoreCase)
         );
+    }
+
+    private static IReadOnlyDictionary<IFieldSymbol, HashSet<ExpressionSyntax>> BuildExplicitValueMappings(MappingBuilderContext ctx)
+    {
+        var explicitMappings = new Dictionary<IFieldSymbol, HashSet<ExpressionSyntax>>(SymbolTypeEqualityComparer.FieldDefault);
+        var checkedSources = new HashSet<object?>();
+        var targetFields = ctx.SymbolAccessor.GetEnumFields(ctx.Target);
+        foreach (var (source, target) in ctx.Configuration.Enum.ExplicitMappings)
+        {
+            if (!SymbolEqualityComparer.Default.Equals(target.ConstantValue.Type, ctx.Target))
+            {
+                ctx.ReportDiagnostic(
+                    DiagnosticDescriptors.TargetEnumValueDoesNotMatchTargetEnumType,
+                    target.Expression.ToFullString(),
+                    target.ConstantValue.Value ?? 0,
+                    target.ConstantValue.Type?.ToDisplayString() ?? "unknown",
+                    ctx.Target
+                );
+                continue;
+            }
+
+            if (!targetFields.TryGetValue(target.ConstantValue.Value!, out var targetField))
+            {
+                continue;
+            }
+
+            if (!checkedSources.Add(source.ConstantValue.Value))
+            {
+                ctx.ReportDiagnostic(
+                    DiagnosticDescriptors.StringSourceValueDuplicated,
+                    source.Expression.ToFullString(),
+                    ctx.Source,
+                    ctx.Target
+                );
+                continue;
+            }
+
+            if (explicitMappings.TryGetValue(targetField, out var sources))
+            {
+                sources.Add(source.Expression);
+            }
+            else
+            {
+                explicitMappings.Add(targetField, [source.Expression]);
+            }
+        }
+
+        return explicitMappings;
     }
 }

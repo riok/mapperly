@@ -777,6 +777,16 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static readonly DiagnosticDescriptor StringSourceValueDuplicated =
+        new(
+            "RMG084",
+            "String source value is specified multiple times, a source string value may only be specified once",
+            "String source value {0} is specified multiple times, a source string value may only be specified once",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Error,
+            true
+        );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT
