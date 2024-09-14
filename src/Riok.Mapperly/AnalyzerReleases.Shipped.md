@@ -187,6 +187,7 @@ RMG081  | Mapper   | Error    | A mapping method with additional parameters cann
 RMG082  | Mapper   | Warning  | An additional mapping method parameter is not mapped
 RMG083  | Mapper   | Info     | Cannot map to read only type
 RMG084  | Mapper   | Error    | Multiple mappings are configured for the same source string
+RMG085  | Mapper   | Error    | Invalid usage of Fallback value
 
 ### Removed Rules
 

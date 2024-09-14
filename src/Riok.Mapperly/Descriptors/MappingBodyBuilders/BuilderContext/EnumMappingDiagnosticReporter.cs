@@ -49,8 +49,9 @@ internal static class EnumMappingDiagnosticReporter
         if (!ctx.Configuration.Enum.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target))
             return;
 
+        var fallbackValue = ctx.Configuration.Enum.FallbackValue?.ConstantValue.Value;
         var missingTargetMembers = targetMembers.Where(field =>
-            !mappings.Contains(field) && ctx.Configuration.Enum.FallbackValue?.ConstantValue?.Equals(field.ConstantValue) != true
+            !mappings.Contains(field) && fallbackValue?.Equals(field.ConstantValue) is not true
         );
         foreach (var member in missingTargetMembers)
         {

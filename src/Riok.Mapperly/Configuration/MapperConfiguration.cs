@@ -118,4 +118,10 @@ public record MapperConfiguration
     /// Whether to consider non-partial methods in a mapper as user implemented mapping methods.
     /// </summary>
     public bool? AutoUserMappings { get; init; }
+
+    /// <summary>
+    /// The default enum naming strategy.
+    /// Can be overwritten on specific enums via mapping method configurations.
+    /// </summary>
+    public EnumNamingStrategy? EnumNamingStrategy { get; init; }
 }

@@ -1,10 +1,14 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.Enums;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
@@ -68,7 +72,7 @@ public static class EnumToEnumMappingBuilder
             EqualityComparer<object>.Default
         );
         var fallbackMapping = BuildFallbackMapping(ctx);
-        if (fallbackMapping.FallbackMember != null && !checkTargetDefined)
+        if (fallbackMapping.FallbackExpression is not null && !checkTargetDefined)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.EnumFallbackValueRequiresByValueCheckDefinedStrategy);
             checkTargetDefined = true;
@@ -173,17 +177,31 @@ public static class EnumToEnumMappingBuilder
     private static EnumFallbackValueMapping BuildFallbackMapping(MappingBuilderContext ctx)
     {
         var fallbackValue = ctx.Configuration.Enum.FallbackValue;
-        if (fallbackValue == null)
+        if (fallbackValue is null)
+        {
             return new EnumFallbackValueMapping(ctx.Source, ctx.Target);
+        }
 
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target, fallbackValue.Type))
-            return new EnumFallbackValueMapping(ctx.Source, ctx.Target, fallbackMember: fallbackValue);
+        if (fallbackValue is not { Expression: MemberAccessExpressionSyntax memberAccessExpression })
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidFallbackValue, fallbackValue.Value.Expression.ToFullString());
+            return new EnumFallbackValueMapping(ctx.Source, ctx.Target);
+        }
+
+        var fallbackExpression = MemberAccessExpression(
+            SyntaxKind.SimpleMemberAccessExpression,
+            FullyQualifiedIdentifier(ctx.Target),
+            memberAccessExpression.Name
+        );
+
+        if (SymbolEqualityComparer.Default.Equals(ctx.Target, fallbackValue.Value.ConstantValue.Type))
+            return new EnumFallbackValueMapping(ctx.Source, ctx.Target, fallbackExpression: fallbackExpression);
 
         ctx.ReportDiagnostic(
             DiagnosticDescriptors.EnumFallbackValueTypeDoesNotMatchTargetEnumType,
             fallbackValue,
-            fallbackValue.ConstantValue ?? 0,
-            fallbackValue.Type,
+            fallbackValue.Value.ConstantValue.Value ?? 0,
+            fallbackValue.Value.ConstantValue.Type?.Name ?? "unknown",
             ctx.Target
         );
         return new EnumFallbackValueMapping(ctx.Source, ctx.Target);

@@ -65,6 +65,9 @@ public static class MapperConfigurationMerger
         mapper.AutoUserMappings =
             mapperConfiguration.AutoUserMappings ?? defaultMapperConfiguration.AutoUserMappings ?? mapper.AutoUserMappings;
 
+        mapper.EnumNamingStrategy =
+            mapperConfiguration.EnumNamingStrategy ?? defaultMapperConfiguration.EnumNamingStrategy ?? mapper.EnumNamingStrategy;
+
         return mapper;
     }
 }

@@ -13,21 +13,21 @@ public class EnumFallbackValueMapping(
     ITypeSymbol source,
     ITypeSymbol target,
     INewInstanceMapping? fallbackMapping = null,
-    IFieldSymbol? fallbackMember = null
+    ExpressionSyntax? fallbackExpression = null
 ) : NewInstanceMapping(source, target)
 {
-    public IFieldSymbol? FallbackMember { get; } = fallbackMember;
+    public ExpressionSyntax? FallbackExpression { get; } = fallbackExpression;
 
     public SwitchExpressionArmSyntax BuildDiscardArm(TypeMappingBuildContext ctx) => SwitchArm(DiscardPattern(), Build(ctx));
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        if (fallbackMapping != null)
+        if (fallbackMapping is not null)
             return fallbackMapping.Build(ctx);
 
-        if (FallbackMember == null)
+        if (FallbackExpression is null)
             return ThrowArgumentOutOfRangeException(ctx.Source, $"The value of enum {SourceType.Name} is not supported");
 
-        return MemberAccess(FullyQualifiedIdentifier(TargetType), FallbackMember.Name);
+        return FallbackExpression;
     }
 }

@@ -188,3 +188,15 @@ Riok.Mapperly.Abstractions.MapperAttribute.IncludedConstructors.get -> Riok.Mapp
 Riok.Mapperly.Abstractions.MapperAttribute.IncludedConstructors.set -> void
 Riok.Mapperly.Abstractions.MapEnumValueAttribute.Source.get -> object!
 Riok.Mapperly.Abstractions.MapEnumValueAttribute.Target.get -> object!
+Riok.Mapperly.Abstractions.EnumNamingStrategy
+Riok.Mapperly.Abstractions.EnumNamingStrategy.MemberName = 0 -> Riok.Mapperly.Abstractions.EnumNamingStrategy
+Riok.Mapperly.Abstractions.EnumNamingStrategy.CamelCase = 1 -> Riok.Mapperly.Abstractions.EnumNamingStrategy
+Riok.Mapperly.Abstractions.EnumNamingStrategy.PascalCase = 2 -> Riok.Mapperly.Abstractions.EnumNamingStrategy
+Riok.Mapperly.Abstractions.EnumNamingStrategy.SnakeCase = 3 -> Riok.Mapperly.Abstractions.EnumNamingStrategy
+Riok.Mapperly.Abstractions.EnumNamingStrategy.UpperSnakeCase = 4 -> Riok.Mapperly.Abstractions.EnumNamingStrategy
+Riok.Mapperly.Abstractions.EnumNamingStrategy.KebabCase = 5 -> Riok.Mapperly.Abstractions.EnumNamingStrategy
+Riok.Mapperly.Abstractions.EnumNamingStrategy.UpperKebabCase = 6 -> Riok.Mapperly.Abstractions.EnumNamingStrategy
+Riok.Mapperly.Abstractions.MapEnumAttribute.NamingStrategy.get -> Riok.Mapperly.Abstractions.EnumNamingStrategy
+Riok.Mapperly.Abstractions.MapEnumAttribute.NamingStrategy.set -> void
+Riok.Mapperly.Abstractions.MapperAttribute.EnumNamingStrategy.get -> Riok.Mapperly.Abstractions.EnumNamingStrategy
+Riok.Mapperly.Abstractions.MapperAttribute.EnumNamingStrategy.set -> void
