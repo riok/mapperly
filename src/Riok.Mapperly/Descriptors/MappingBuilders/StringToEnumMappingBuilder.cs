@@ -46,19 +46,11 @@ public static class StringToEnumMappingBuilder
         bool genericEnumParseMethodSupported
     )
     {
-        var fallbackMapping = BuildFallbackParseMapping(ctx, genericEnumParseMethodSupported, out var fallbackMember);
-        var enumMemberMappings = BuildEnumMemberMappings(ctx, fallbackMember);
         // from string => use an optimized method of Enum.Parse which would use slow reflection
         // however we currently don't support all features of Enum.Parse yet (ex. flags)
         // therefore we use Enum.Parse as fallback.
-        if (fallbackMember is not null)
-        {
-            // no need to explicitly map fallback value
-            enumMemberMappings = enumMemberMappings.Where(m =>
-                !m.TargetSyntax.ToString().Equals(fallbackMember.Name, StringComparison.Ordinal)
-            );
-        }
-
+        var fallbackMapping = BuildFallbackParseMapping(ctx, genericEnumParseMethodSupported, out var fallbackMember);
+        var enumMemberMappings = BuildEnumMemberMappings(ctx, fallbackMember);
         return new EnumFromStringSwitchMapping(
             ctx.Source,
             ctx.Target,
@@ -70,8 +62,6 @@ public static class StringToEnumMappingBuilder
 
     private static IEnumerable<EnumMemberMapping> BuildEnumMemberMappings(MappingBuilderContext ctx, IFieldSymbol? fallbackMember)
     {
-        var namingStrategy = ctx.Configuration.Enum.NamingStrategy;
-
         var ignoredTargetMembers = ctx.Configuration.Enum.IgnoredTargetMembers.ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
         EnumMappingDiagnosticReporter.AddUnmatchedTargetIgnoredMembers(ctx, ignoredTargetMembers);
         if (fallbackMember is not null)
@@ -81,23 +71,37 @@ public static class StringToEnumMappingBuilder
 
         var targetFields = ctx.SymbolAccessor.GetFieldsExcept(ctx.Target, ignoredTargetMembers);
         var explicitValueMappings = BuildExplicitValueMappings(ctx);
+        var processedSources = new HashSet<object?>();
 
         foreach (var targetField in targetFields)
         {
             // source.Value1
             var targetSyntax = MemberAccess(FullyQualifiedIdentifier(ctx.Target), targetField.Name);
 
-            if (explicitValueMappings.TryGetValue(targetField, out var explicitMappings))
+            if (explicitValueMappings.TryGetValue(targetField, out var sourceNames))
             {
-                foreach (var explicitMapping in explicitMappings)
+                foreach (var sourceName in sourceNames)
                 {
+                    if (!processedSources.Add(sourceName))
+                    {
+                        ctx.ReportDiagnostic(DiagnosticDescriptors.EnumStringSourceValueDuplicated, sourceName, ctx.Source, ctx.Target);
+                        continue;
+                    }
+
                     // "explicit_value1" => source.Value1
-                    yield return new EnumMemberMapping(explicitMapping, targetSyntax);
+                    yield return new EnumMemberMapping(StringLiteral(sourceName), targetSyntax);
                 }
                 continue;
             }
 
-            if (namingStrategy is EnumNamingStrategy.MemberName)
+            var name = EnumMappingBuilder.GetMemberName(ctx, targetField);
+            if (!processedSources.Add(name))
+            {
+                ctx.ReportDiagnostic(DiagnosticDescriptors.EnumStringSourceValueDuplicated, name, ctx.Source, ctx.Target);
+                continue;
+            }
+
+            if (ctx.Configuration.Enum.NamingStrategy == EnumNamingStrategy.MemberName)
             {
                 // nameof(source.Value1)
                 yield return new EnumMemberMapping(NameOf(targetSyntax), targetSyntax);
@@ -105,7 +109,6 @@ public static class StringToEnumMappingBuilder
             }
 
             // "value1"
-            var name = targetField.GetName(namingStrategy);
             yield return new EnumMemberMapping(StringLiteral(name), targetSyntax);
         }
     }
@@ -129,7 +132,23 @@ public static class StringToEnumMappingBuilder
 
         if (fallbackValue is not { Expression: MemberAccessExpressionSyntax memberAccessExpression })
         {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidFallbackValue, fallbackValue.Value.Expression.ToFullString());
+            ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidEnumMappingFallbackValue, fallbackValue.Value.Expression.ToFullString());
+            return new EnumFallbackValueMapping(
+                ctx.Source,
+                ctx.Target,
+                new EnumFromStringParseMapping(ctx.Source, ctx.Target, genericEnumParseMethodSupported, ctx.Configuration.Enum.IgnoreCase)
+            );
+        }
+
+        if (!SymbolEqualityComparer.Default.Equals(ctx.Target, fallbackValue.Value.ConstantValue.Type))
+        {
+            ctx.ReportDiagnostic(
+                DiagnosticDescriptors.EnumFallbackValueTypeDoesNotMatchTargetEnumType,
+                fallbackValue,
+                fallbackValue.Value.ConstantValue.Value ?? 0,
+                fallbackValue.Value.ConstantValue.Type?.Name ?? "unknown",
+                ctx.Target
+            );
             return new EnumFallbackValueMapping(
                 ctx.Source,
                 ctx.Target,
@@ -142,35 +161,20 @@ public static class StringToEnumMappingBuilder
             FullyQualifiedIdentifier(ctx.Target),
             memberAccessExpression.Name
         );
-
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target, fallbackValue.Value.ConstantValue.Type))
-        {
-            fallbackMember = ctx.SymbolAccessor.GetField(ctx.Target, memberAccessExpression.Name.Identifier.Text);
-            return new EnumFallbackValueMapping(ctx.Source, ctx.Target, fallbackExpression: fallbackExpression);
-        }
-
-        ctx.ReportDiagnostic(
-            DiagnosticDescriptors.EnumFallbackValueTypeDoesNotMatchTargetEnumType,
-            fallbackValue,
-            fallbackValue.Value.ConstantValue.Value ?? 0,
-            fallbackValue.Value.ConstantValue.Type?.Name ?? "unknown",
-            ctx.Target
-        );
-        return new EnumFallbackValueMapping(
-            ctx.Source,
-            ctx.Target,
-            new EnumFromStringParseMapping(ctx.Source, ctx.Target, genericEnumParseMethodSupported, ctx.Configuration.Enum.IgnoreCase)
-        );
+        fallbackMember = ctx.SymbolAccessor.GetField(ctx.Target, memberAccessExpression.Name.Identifier.Text);
+        return new EnumFallbackValueMapping(ctx.Source, ctx.Target, fallbackExpression: fallbackExpression);
     }
 
-    private static IReadOnlyDictionary<IFieldSymbol, HashSet<ExpressionSyntax>> BuildExplicitValueMappings(MappingBuilderContext ctx)
+    private static IReadOnlyDictionary<IFieldSymbol, HashSet<string>> BuildExplicitValueMappings(MappingBuilderContext ctx)
     {
-        var explicitMappings = new Dictionary<IFieldSymbol, HashSet<ExpressionSyntax>>(SymbolTypeEqualityComparer.FieldDefault);
-        var checkedSources = new HashSet<object?>();
-        var targetFields = ctx.SymbolAccessor.GetEnumFields(ctx.Target);
+        var explicitMappings = new Dictionary<IFieldSymbol, HashSet<string>>(SymbolTypeEqualityComparer.FieldDefault);
+        var targetFields = ctx.SymbolAccessor.GetEnumFieldsByValue(ctx.Target);
         foreach (var (source, target) in ctx.Configuration.Enum.ExplicitMappings)
         {
-            if (!SymbolEqualityComparer.Default.Equals(target.ConstantValue.Type, ctx.Target))
+            if (
+                !SymbolEqualityComparer.Default.Equals(target.ConstantValue.Type, ctx.Target)
+                || !targetFields.TryGetValue(target.ConstantValue.Value!, out var targetField)
+            )
             {
                 ctx.ReportDiagnostic(
                     DiagnosticDescriptors.TargetEnumValueDoesNotMatchTargetEnumType,
@@ -182,29 +186,19 @@ public static class StringToEnumMappingBuilder
                 continue;
             }
 
-            if (!targetFields.TryGetValue(target.ConstantValue.Value!, out var targetField))
+            if (source.ConstantValue.Value is not string sourceString)
             {
-                continue;
-            }
-
-            if (!checkedSources.Add(source.ConstantValue.Value))
-            {
-                ctx.ReportDiagnostic(
-                    DiagnosticDescriptors.StringSourceValueDuplicated,
-                    source.Expression.ToFullString(),
-                    ctx.Source,
-                    ctx.Target
-                );
+                ctx.ReportDiagnostic(DiagnosticDescriptors.EnumExplicitMappingSourceNotString);
                 continue;
             }
 
             if (explicitMappings.TryGetValue(targetField, out var sources))
             {
-                sources.Add(source.Expression);
+                sources.Add(sourceString);
             }
             else
             {
-                explicitMappings.Add(targetField, [source.Expression]);
+                explicitMappings.Add(targetField, [sourceString]);
             }
         }
 

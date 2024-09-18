@@ -200,3 +200,5 @@ Riok.Mapperly.Abstractions.MapEnumAttribute.NamingStrategy.get -> Riok.Mapperly.
 Riok.Mapperly.Abstractions.MapEnumAttribute.NamingStrategy.set -> void
 Riok.Mapperly.Abstractions.MapperAttribute.EnumNamingStrategy.get -> Riok.Mapperly.Abstractions.EnumNamingStrategy
 Riok.Mapperly.Abstractions.MapperAttribute.EnumNamingStrategy.set -> void
+Riok.Mapperly.Abstractions.EnumNamingStrategy.ComponentModelDescriptionAttribute = 7 -> Riok.Mapperly.Abstractions.EnumNamingStrategy
+Riok.Mapperly.Abstractions.EnumNamingStrategy.SerializationEnumMemberAttribute = 8 -> Riok.Mapperly.Abstractions.EnumNamingStrategy

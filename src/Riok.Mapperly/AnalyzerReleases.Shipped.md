@@ -187,7 +187,10 @@ RMG081  | Mapper   | Error    | A mapping method with additional parameters cann
 RMG082  | Mapper   | Warning  | An additional mapping method parameter is not mapped
 RMG083  | Mapper   | Info     | Cannot map to read only type
 RMG084  | Mapper   | Error    | Multiple mappings are configured for the same source string
-RMG085  | Mapper   | Error    | Invalid usage of Fallback value
+RMG085  | Mapper   | Error    | Invalid usage of fallback value
+RMG086  | Mapper   | Error    | The source of the explicit mapping from a string to an enum is not of type string
+RMG087  | Mapper   | Error    | The target of the explicit mapping from an enum to a string is not of type string
+RMG088  | Mapper   | Info     | The attribute to build the name of the enum member is missing
 
 ### Removed Rules
 

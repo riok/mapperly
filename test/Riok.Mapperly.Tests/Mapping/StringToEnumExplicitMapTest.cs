@@ -80,15 +80,14 @@ public class StringToEnumExplicitMapTest
                     nameof(global::E.C) => global::E.C,
                     nameof(global::E.d) => global::E.d,
                     "str-e" => global::E.e,
-                    nameof(global::E.E) => global::E.E,
                     nameof(global::E.f) => global::E.f,
                     _ => System.Enum.Parse<global::E>(source, false),
                 };
                 """
             )
             .HaveDiagnostic(
-                DiagnosticDescriptors.StringSourceValueDuplicated,
-                "String source value \"str-e\" is specified multiple times, a source string value may only be specified once"
+                DiagnosticDescriptors.EnumStringSourceValueDuplicated,
+                "String source value str-e is specified multiple times, a source string value may only be specified once"
             )
             .HaveAssertedAllDiagnostics();
     }
@@ -122,6 +121,39 @@ public class StringToEnumExplicitMapTest
             .HaveDiagnostic(
                 DiagnosticDescriptors.TargetEnumValueDoesNotMatchTargetEnumType,
                 "Enum member E2.A (0) on E2 does not match type of target enum E1"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void EnumToStringWithExplicitValueTargetTypeMismatch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnumValue(E1.A, E1.A))] public partial E1 FromStr(string source);",
+            "public enum E1 {A = 100, B, C, d, e, E, f}",
+            "public enum E2 {A}"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    nameof(global::E1.A) => global::E1.A,
+                    nameof(global::E1.B) => global::E1.B,
+                    nameof(global::E1.C) => global::E1.C,
+                    nameof(global::E1.d) => global::E1.d,
+                    nameof(global::E1.e) => global::E1.e,
+                    nameof(global::E1.E) => global::E1.E,
+                    nameof(global::E1.f) => global::E1.f,
+                    _ => System.Enum.Parse<global::E1>(source, false),
+                };
+                """
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.EnumExplicitMappingSourceNotString,
+                "The source of the explicit mapping from a string to an enum is not of type string"
             )
             .HaveAssertedAllDiagnostics();
     }

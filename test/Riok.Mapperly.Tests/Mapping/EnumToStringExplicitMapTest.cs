@@ -124,4 +124,37 @@ public class EnumToStringExplicitMapTest
             )
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public void EnumToStringWithExplicitValueTargetTypeMismatch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnumValue(E1.A, E1.A))] public partial string ToStr(E1 source);",
+            "public enum E1 {A = 100, B, C, d, e, E, f}",
+            "public enum E2 {A}"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    global::E1.A => nameof(global::E1.A),
+                    global::E1.B => nameof(global::E1.B),
+                    global::E1.C => nameof(global::E1.C),
+                    global::E1.d => nameof(global::E1.d),
+                    global::E1.e => nameof(global::E1.e),
+                    global::E1.E => nameof(global::E1.E),
+                    global::E1.f => nameof(global::E1.f),
+                    _ => source.ToString(),
+                };
+                """
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.EnumExplicitMappingTargetNotString,
+                "The target of the explicit mapping from an enum to a string is not of type string"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
 }

@@ -127,7 +127,7 @@ public class MapperAttribute : Attribute
     public bool AutoUserMappings { get; set; } = true;
 
     /// <summary>
-    /// The default enum naming strategy.
+    /// Defines the strategy to use when mapping an enum from/to string.
     /// Can be overwritten on specific enums via mapping method configurations.
     /// </summary>
     public EnumNamingStrategy EnumNamingStrategy { get; set; } = EnumNamingStrategy.MemberName;

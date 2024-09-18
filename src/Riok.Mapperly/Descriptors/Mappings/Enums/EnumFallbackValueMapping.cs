@@ -25,9 +25,9 @@ public class EnumFallbackValueMapping(
         if (fallbackMapping is not null)
             return fallbackMapping.Build(ctx);
 
-        if (FallbackExpression is null)
-            return ThrowArgumentOutOfRangeException(ctx.Source, $"The value of enum {SourceType.Name} is not supported");
+        if (FallbackExpression is not null)
+            return FallbackExpression;
 
-        return FallbackExpression;
+        return ThrowArgumentOutOfRangeException(ctx.Source, $"The value of enum {SourceType.Name} is not supported");
     }
 }

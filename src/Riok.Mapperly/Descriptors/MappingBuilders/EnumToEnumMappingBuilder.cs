@@ -184,7 +184,19 @@ public static class EnumToEnumMappingBuilder
 
         if (fallbackValue is not { Expression: MemberAccessExpressionSyntax memberAccessExpression })
         {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidFallbackValue, fallbackValue.Value.Expression.ToFullString());
+            ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidEnumMappingFallbackValue, fallbackValue.Value.Expression.ToFullString());
+            return new EnumFallbackValueMapping(ctx.Source, ctx.Target);
+        }
+
+        if (!SymbolEqualityComparer.Default.Equals(ctx.Target, fallbackValue.Value.ConstantValue.Type))
+        {
+            ctx.ReportDiagnostic(
+                DiagnosticDescriptors.EnumFallbackValueTypeDoesNotMatchTargetEnumType,
+                fallbackValue,
+                fallbackValue.Value.ConstantValue.Value ?? 0,
+                fallbackValue.Value.ConstantValue.Type?.Name ?? "unknown",
+                ctx.Target
+            );
             return new EnumFallbackValueMapping(ctx.Source, ctx.Target);
         }
 
@@ -193,25 +205,14 @@ public static class EnumToEnumMappingBuilder
             FullyQualifiedIdentifier(ctx.Target),
             memberAccessExpression.Name
         );
-
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target, fallbackValue.Value.ConstantValue.Type))
-            return new EnumFallbackValueMapping(ctx.Source, ctx.Target, fallbackExpression: fallbackExpression);
-
-        ctx.ReportDiagnostic(
-            DiagnosticDescriptors.EnumFallbackValueTypeDoesNotMatchTargetEnumType,
-            fallbackValue,
-            fallbackValue.Value.ConstantValue.Value ?? 0,
-            fallbackValue.Value.ConstantValue.Type?.Name ?? "unknown",
-            ctx.Target
-        );
-        return new EnumFallbackValueMapping(ctx.Source, ctx.Target);
+        return new EnumFallbackValueMapping(ctx.Source, ctx.Target, fallbackExpression: fallbackExpression);
     }
 
     private static IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> BuildExplicitValueMappings(MappingBuilderContext ctx)
     {
         var explicitMappings = new Dictionary<IFieldSymbol, IFieldSymbol>(SymbolEqualityComparer.Default);
-        var sourceFields = ctx.SymbolAccessor.GetEnumFields(ctx.Source);
-        var targetFields = ctx.SymbolAccessor.GetEnumFields(ctx.Target);
+        var sourceFields = ctx.SymbolAccessor.GetEnumFieldsByValue(ctx.Source);
+        var targetFields = ctx.SymbolAccessor.GetEnumFieldsByValue(ctx.Target);
         foreach (var (source, target) in ctx.Configuration.Enum.ExplicitMappings)
         {
             if (source.ConstantValue.Kind is not TypedConstantKind.Enum)

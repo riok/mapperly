@@ -1,3 +1,6 @@
+using System.ComponentModel;
+using System.Runtime.Serialization;
+
 namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
@@ -39,4 +42,16 @@ public enum EnumNamingStrategy
     /// Matches enum values using UPPER-KEBAB-CASE.
     /// </summary>
     UpperKebabCase,
+
+    /// <summary>
+    /// Matches enum values using <see cref="DescriptionAttribute.Description"/>
+    /// or <see cref="MemberName"/> if the attribute is not present on the enum member.
+    /// </summary>
+    ComponentModelDescriptionAttribute,
+
+    /// <summary>
+    /// Matches enum values using <see cref="EnumMemberAttribute.Value"/>
+    /// or <see cref="MemberName"/> if the attribute is not present on the enum member.
+    /// </summary>
+    SerializationEnumMemberAttribute,
 }
