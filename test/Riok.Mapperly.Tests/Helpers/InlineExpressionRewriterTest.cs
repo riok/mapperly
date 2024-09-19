@@ -161,6 +161,29 @@ public class InlineExpressionRewriterTest
         result.Should().Be("(string)(object)(value as global::AnotherAssembly.B).Value");
     }
 
+    [Fact]
+    public void RewriteExpressionContainingMethodCallWithGenericArgument()
+    {
+        var (result, inlineOk) = Rewrite(
+            """
+            using AnotherAssembly;
+            using System;
+
+            public class Test
+            {
+                public IReadOnlyCollection<A> MapExpression(A value) => Array.Empty<A>();
+            }
+
+            namespace AnotherAssembly {
+                record A;
+            }
+            """
+        );
+
+        inlineOk.Should().BeTrue();
+        result.Should().Be("global::System.Array.Empty<global::AnotherAssembly.A>()");
+    }
+
     private (string Result, bool CanBeInlined) Rewrite([StringSyntax(StringSyntax.CSharp)] string source)
     {
         var compilation = TestHelper.BuildCompilation(source);
