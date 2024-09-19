@@ -229,7 +229,11 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
     private static InvocationExpressionSyntax VisitStaticMethodInvocation(InvocationExpressionSyntax node, IMethodSymbol methodSymbol)
     {
         var receiverType = FullyQualifiedIdentifier(methodSymbol.ReceiverType!);
-        var expression = MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, receiverType, IdentifierName(methodSymbol.Name));
+        SimpleNameSyntax method = methodSymbol.TypeArguments is { Length: > 0 } typeArguments
+            ? GenericName(methodSymbol.Name)
+                .WithTypeArgumentList(TypeArgumentList(SeparatedList<TypeSyntax>(typeArguments.Select(FullyQualifiedIdentifier))))
+            : IdentifierName(methodSymbol.Name);
+        var expression = MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, receiverType, method);
         return node.WithExpression(expression);
     }
 
