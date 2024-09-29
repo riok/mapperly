@@ -62,15 +62,17 @@ Enum from/to strings mappings can be customized by setting the enum naming strat
 You can specify the naming strategy using `NamingStrategy` in `MapEnumAttribute` or `EnumNamingStrategy` in `MapperAttribute` and `MapperDefaultsAttribute`.
 Available naming strategies:
 
-| Name           | Description                                     |
-| -------------- | ----------------------------------------------- |
-| MemberName     | Matches enum values using their name. (default) |
-| CamelCase      | Matches enum values using camelCase.            |
-| PascalCase     | Matches enum values using PascalCase.           |
-| SnakeCase      | Matches enum values using snake_case.           |
-| UpperSnakeCase | Matches enum values using UPPER_SNAKE_CASE.     |
-| KebabCase      | Matches enum values using kebab-case.           |
-| UpperKebabCase | Matches enum values using UPPER-KEBAB-CASE.     |
+| Name                               | Description                                                                                                                                                                                 |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MemberName                         | Matches enum values using their name. (default)                                                                                                                                             |
+| CamelCase                          | Matches enum values using camelCase.                                                                                                                                                        |
+| PascalCase                         | Matches enum values using PascalCase.                                                                                                                                                       |
+| SnakeCase                          | Matches enum values using snake_case.                                                                                                                                                       |
+| UpperSnakeCase                     | Matches enum values using UPPER_SNAKE_CASE.                                                                                                                                                 |
+| KebabCase                          | Matches enum values using kebab-case.                                                                                                                                                       |
+| UpperKebabCase                     | Matches enum values using UPPER-KEBAB-CASE.                                                                                                                                                 |
+| ComponentModelDescriptionAttribute | Matches enum values using the `Description` property of the `System.ComponentModel.DescriptionAttribute`. If the attribute is not present or the property is null, the member name is used. |
+| SerializationEnumMemberAttribute   | Matches enum values using the `Value` property of the `System.Runtime.Serialization.EnumMemberAttribute`. If the attribute is not present or the property is null, the member name is used. |
 
 Note that explicit enum mappings (`MapEnumValue`) and fallback values (`FallbackValue` in `MapEnum`)
 are not affected by naming strategies.

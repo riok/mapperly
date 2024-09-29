@@ -1,3 +1,5 @@
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 public class EnumNamingStrategyTest
@@ -10,7 +12,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -38,7 +40,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -66,7 +68,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -94,7 +96,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -122,7 +124,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -150,7 +152,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -178,7 +180,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -199,6 +201,85 @@ public class EnumNamingStrategyTest
     }
 
     [Fact]
+    public void EnumToStringWithComponentModelDescriptionAttributeNamingStrategy()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByName, NamingStrategy = EnumNamingStrategy.ComponentModelDescriptionAttribute)] public partial string ToStr(E source);",
+            """
+            public enum E
+            {
+                [System.ComponentModel.Description("A1")] A,
+                [System.ComponentModel.Description("")] B,
+                [System.ComponentModel.Description] C,
+                D,
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    global::E.A => "A1",
+                    global::E.B => "",
+                    global::E.C => "C",
+                    global::E.D => "D",
+                    _ => source.ToString(),
+                };
+                """
+            )
+            .HaveDiagnostics(
+                DiagnosticDescriptors.EnumNamingAttributeMissing,
+                "The DescriptionAttribute to build the name of the enum member C (2) is missing",
+                "The DescriptionAttribute to build the name of the enum member D (3) is missing"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void EnumToStringWithSerializationEnumMemberAttributeNamingStrategy()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByName, NamingStrategy = EnumNamingStrategy.SerializationEnumMemberAttribute)] public partial string ToStr(E source);",
+            """
+            public enum E
+            {
+                [System.Runtime.Serialization.EnumMember(Value = "A1")] A,
+                [System.Runtime.Serialization.EnumMember(Value = "")] B,
+                [System.Runtime.Serialization.EnumMember(Value = null)] C,
+                [System.Runtime.Serialization.EnumMember)] D,
+                E,
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    global::E.A => "A1",
+                    global::E.B => "",
+                    global::E.C => "C",
+                    global::E.D => "D",
+                    global::E.E => "E",
+                    _ => source.ToString(),
+                };
+                """
+            )
+            .HaveDiagnostics(
+                DiagnosticDescriptors.EnumNamingAttributeMissing,
+                "The EnumMemberAttribute to build the name of the enum member C (2) is missing",
+                "The EnumMemberAttribute to build the name of the enum member D (3) is missing",
+                "The EnumMemberAttribute to build the name of the enum member E (4) is missing"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
     public void EnumFromStringWithMemberNameNamingStrategy()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -206,7 +287,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -234,7 +315,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -262,7 +343,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -290,7 +371,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -318,7 +399,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -346,7 +427,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -374,7 +455,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -395,6 +476,85 @@ public class EnumNamingStrategyTest
     }
 
     [Fact]
+    public void EnumFromStringWithComponentModelDescriptionAttributeNamingStrategy()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByName, NamingStrategy = EnumNamingStrategy.ComponentModelDescriptionAttribute)] public partial E ToEnum(string source);",
+            """
+            public enum E
+            {
+                [System.ComponentModel.Description("A1")] A,
+                [System.ComponentModel.Description("")] B,
+                [System.ComponentModel.Description] C,
+                D,
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    "A1" => global::E.A,
+                    "" => global::E.B,
+                    "C" => global::E.C,
+                    "D" => global::E.D,
+                    _ => System.Enum.Parse<global::E>(source, false),
+                };
+                """
+            )
+            .HaveDiagnostics(
+                DiagnosticDescriptors.EnumNamingAttributeMissing,
+                "The DescriptionAttribute to build the name of the enum member C (2) is missing",
+                "The DescriptionAttribute to build the name of the enum member D (3) is missing"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void EnumFromStringWithSerializationEnumMemberAttributeNamingStrategy()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByName, NamingStrategy = EnumNamingStrategy.SerializationEnumMemberAttribute)] public partial E ToEnum(string source);",
+            """
+            public enum E
+            {
+                [System.Runtime.Serialization.EnumMember(Value = "A1")] A,
+                [System.Runtime.Serialization.EnumMember(Value = "")] B,
+                [System.Runtime.Serialization.EnumMember(Value = null)] C,
+                [System.Runtime.Serialization.EnumMember)] D,
+                E,
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    "A1" => global::E.A,
+                    "" => global::E.B,
+                    "C" => global::E.C,
+                    "D" => global::E.D,
+                    "E" => global::E.E,
+                    _ => System.Enum.Parse<global::E>(source, false),
+                };
+                """
+            )
+            .HaveDiagnostics(
+                DiagnosticDescriptors.EnumNamingAttributeMissing,
+                "The EnumMemberAttribute to build the name of the enum member C (2) is missing",
+                "The EnumMemberAttribute to build the name of the enum member D (3) is missing",
+                "The EnumMemberAttribute to build the name of the enum member E (4) is missing"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
     public void EnumToStringWithFallbackValue()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -402,7 +562,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -430,7 +590,7 @@ public class EnumNamingStrategyTest
             "public enum E {Abc, BcD, C1D, DEf, EFG, FG1, Gh1, Hi_J}"
         );
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
                 """
@@ -447,5 +607,43 @@ public class EnumNamingStrategyTest
                 };
                 """
             );
+    }
+
+    [Fact]
+    public void EnumFromStringWithAttributeNamingStrategyAndDuplicatedName()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByName, NamingStrategy = EnumNamingStrategy.ComponentModelDescriptionAttribute)] public partial E ToEnum(string source);",
+            """
+            public enum E
+            {
+                [System.ComponentModel.Description("A1")] A,
+                [System.ComponentModel.Description("A1")] B,
+                C,
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    "A1" => global::E.A,
+                    "C" => global::E.C,
+                    _ => System.Enum.Parse<global::E>(source, false),
+                };
+                """
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.EnumStringSourceValueDuplicated,
+                "String source value A1 is specified multiple times, a source string value may only be specified once"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.EnumNamingAttributeMissing,
+                "The DescriptionAttribute to build the name of the enum member C (2) is missing"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 }

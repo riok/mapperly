@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
@@ -29,21 +28,11 @@ public static class EnumToStringMappingBuilder
     {
         var fallbackMapping = BuildFallbackMapping(ctx, out var fallbackStringValue);
         var enumMemberMappings = BuildEnumMemberMappings(ctx, fallbackStringValue);
-
-        if (fallbackStringValue is not null)
-        {
-            enumMemberMappings = enumMemberMappings.Where(m =>
-                !m.TargetSyntax.ToString().Equals(fallbackStringValue, StringComparison.Ordinal)
-            );
-        }
-
         return new EnumToStringMapping(ctx.Source, ctx.Target, enumMemberMappings, fallbackMapping);
     }
 
     private static IEnumerable<EnumMemberMapping> BuildEnumMemberMappings(MappingBuilderContext ctx, string? fallbackStringValue)
     {
-        var namingStrategy = ctx.Configuration.Enum.NamingStrategy;
-
         var ignoredSourceMembers = ctx.Configuration.Enum.IgnoredSourceMembers.ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
         EnumMappingDiagnosticReporter.AddUnmatchedSourceIgnoredMembers(ctx, ignoredSourceMembers);
 
@@ -54,37 +43,45 @@ public static class EnumToStringMappingBuilder
         {
             // source.Value1
             var sourceSyntax = MemberAccess(FullyQualifiedIdentifier(ctx.Source), sourceField.Name);
+            if (explicitValueMappings.TryGetValue(sourceField, out var memberName))
+            {
+                if (string.Equals(fallbackStringValue, memberName, StringComparison.Ordinal))
+                    continue;
 
-            var name = sourceField.GetName(namingStrategy);
+                // "explicit_value1"
+                yield return new EnumMemberMapping(sourceSyntax, StringLiteral(memberName));
+                continue;
+            }
+
+            var name = EnumMappingBuilder.GetMemberName(ctx, sourceField);
             if (string.Equals(name, fallbackStringValue, StringComparison.Ordinal))
                 continue;
 
-            if (explicitValueMappings.TryGetValue(sourceField, out var explicitMapping))
+            if (ctx.Configuration.Enum.NamingStrategy == EnumNamingStrategy.MemberName)
             {
-                // "explicit_value1"
-                yield return new EnumMemberMapping(sourceSyntax, explicitMapping);
+                // nameof(source.Value1)
+                yield return new EnumMemberMapping(sourceSyntax, NameOf(sourceSyntax));
                 continue;
             }
 
-            if (namingStrategy is not EnumNamingStrategy.MemberName)
-            {
-                // "value1"
-                yield return new EnumMemberMapping(sourceSyntax, StringLiteral(name));
-                continue;
-            }
-
-            // nameof(source.Value1)
-            yield return new EnumMemberMapping(sourceSyntax, NameOf(sourceSyntax));
+            // "value1"
+            yield return new EnumMemberMapping(sourceSyntax, StringLiteral(name));
         }
     }
 
-    private static IReadOnlyDictionary<IFieldSymbol, ExpressionSyntax> BuildExplicitValueMappings(MappingBuilderContext ctx)
+    private static IReadOnlyDictionary<IFieldSymbol, string> BuildExplicitValueMappings(MappingBuilderContext ctx)
     {
-        var explicitMappings = new Dictionary<IFieldSymbol, ExpressionSyntax>(SymbolEqualityComparer.Default);
-        var sourceFields = ctx.SymbolAccessor.GetEnumFields(ctx.Source);
+        var explicitMappings = new Dictionary<IFieldSymbol, string>(SymbolEqualityComparer.Default);
+        if (!ctx.Configuration.Enum.HasExplicitConfigurations)
+            return explicitMappings;
+
+        var sourceFields = ctx.SymbolAccessor.GetEnumFieldsByValue(ctx.Source);
         foreach (var (source, target) in ctx.Configuration.Enum.ExplicitMappings)
         {
-            if (!SymbolEqualityComparer.Default.Equals(source.ConstantValue.Type, ctx.Source))
+            if (
+                !SymbolEqualityComparer.Default.Equals(source.ConstantValue.Type, ctx.Source)
+                || !sourceFields.TryGetValue(source.ConstantValue.Value!, out var sourceField)
+            )
             {
                 ctx.ReportDiagnostic(
                     DiagnosticDescriptors.SourceEnumValueDoesNotMatchSourceEnumType,
@@ -96,12 +93,13 @@ public static class EnumToStringMappingBuilder
                 continue;
             }
 
-            if (!sourceFields.TryGetValue(source.ConstantValue.Value!, out var sourceField))
+            if (target.ConstantValue.Value is not string targetStringValue)
             {
+                ctx.ReportDiagnostic(DiagnosticDescriptors.EnumExplicitMappingTargetNotString);
                 continue;
             }
 
-            if (!explicitMappings.TryAdd(sourceField, target.Expression))
+            if (!explicitMappings.TryAdd(sourceField, targetStringValue))
             {
                 ctx.ReportDiagnostic(DiagnosticDescriptors.EnumSourceValueDuplicated, sourceField, ctx.Source, ctx.Target);
             }
@@ -121,7 +119,7 @@ public static class EnumToStringMappingBuilder
 
         if (fallbackValue.Value.ConstantValue.Value is not string fallbackString)
         {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidFallbackValue, fallbackValue.Value.Expression.ToFullString());
+            ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidEnumMappingFallbackValue, fallbackValue.Value.Expression.ToFullString());
             return new EnumFallbackValueMapping(ctx.Source, ctx.Target, new ToStringMapping(ctx.Source, ctx.Target));
         }
 

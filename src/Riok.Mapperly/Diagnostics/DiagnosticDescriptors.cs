@@ -777,7 +777,7 @@ public static class DiagnosticDescriptors
             true
         );
 
-    public static readonly DiagnosticDescriptor StringSourceValueDuplicated =
+    public static readonly DiagnosticDescriptor EnumStringSourceValueDuplicated =
         new(
             "RMG084",
             "String source value is specified multiple times, a source string value may only be specified once",
@@ -787,13 +787,43 @@ public static class DiagnosticDescriptors
             true
         );
 
-    public static readonly DiagnosticDescriptor InvalidFallbackValue =
+    public static readonly DiagnosticDescriptor InvalidEnumMappingFallbackValue =
         new(
             "RMG085",
-            "Invalid usage of Fallback value",
+            "Invalid usage of fallback value",
             "Fallback value '{0}' is invalid in the this mapping",
             DiagnosticCategories.Mapper,
             DiagnosticSeverity.Error,
+            true
+        );
+
+    public static readonly DiagnosticDescriptor EnumExplicitMappingSourceNotString =
+        new(
+            "RMG086",
+            "The source of the explicit mapping from a string to an enum is not of type string",
+            "The source of the explicit mapping from a string to an enum is not of type string",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Error,
+            true
+        );
+
+    public static readonly DiagnosticDescriptor EnumExplicitMappingTargetNotString =
+        new(
+            "RMG087",
+            "The target of the explicit mapping from an enum to a string is not of type string",
+            "The target of the explicit mapping from an enum to a string is not of type string",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Error,
+            true
+        );
+
+    public static readonly DiagnosticDescriptor EnumNamingAttributeMissing =
+        new(
+            "RMG088",
+            "The attribute to build the name of the enum member is missing",
+            "The {0} to build the name of the enum member {1} ({2}) is missing",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Info,
             true
         );
 
