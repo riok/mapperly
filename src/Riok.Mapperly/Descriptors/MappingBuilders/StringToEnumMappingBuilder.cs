@@ -46,15 +46,15 @@ public static class StringToEnumMappingBuilder
         bool genericEnumParseMethodSupported
     )
     {
-        var enumMemberMappings = BuildEnumMemberMappings(ctx);
+        var fallbackMapping = BuildFallbackParseMapping(ctx, genericEnumParseMethodSupported, out var fallbackMember);
+        var enumMemberMappings = BuildEnumMemberMappings(ctx, fallbackMember);
         // from string => use an optimized method of Enum.Parse which would use slow reflection
         // however we currently don't support all features of Enum.Parse yet (ex. flags)
         // therefore we use Enum.Parse as fallback.
-        var fallbackMapping = BuildFallbackParseMapping(ctx, genericEnumParseMethodSupported);
-        if (fallbackMapping.FallbackExpression is MemberAccessExpressionSyntax fallbackMember)
+        if (fallbackMapping.FallbackExpression is MemberAccessExpressionSyntax fallbackMember2)
         {
             // no need to explicitly map fallback value
-            enumMemberMappings = enumMemberMappings.Where(IsNotEquivalentTo(fallbackMember));
+            enumMemberMappings = enumMemberMappings.Where(IsNotEquivalentTo(fallbackMember2));
         }
 
         return new EnumFromStringSwitchMapping(
@@ -66,23 +66,26 @@ public static class StringToEnumMappingBuilder
         );
     }
 
-    private static IEnumerable<EnumMemberMapping> BuildEnumMemberMappings(MappingBuilderContext ctx)
+    private static IEnumerable<EnumMemberMapping> BuildEnumMemberMappings(MappingBuilderContext ctx, IFieldSymbol? fallbackMember)
     {
         var namingStrategy = ctx.Configuration.Enum.NamingStrategy;
 
         var ignoredTargetMembers = ctx.Configuration.Enum.IgnoredTargetMembers.ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
         EnumMappingDiagnosticReporter.AddUnmatchedTargetIgnoredMembers(ctx, ignoredTargetMembers);
+        if (fallbackMember is not null)
+        {
+            ignoredTargetMembers.Add(fallbackMember);
+        }
 
-        var fields = ctx.SymbolAccessor.GetFieldsExcept(ctx.Target, ignoredTargetMembers);
+        var targetFields = ctx.SymbolAccessor.GetFieldsExcept(ctx.Target, ignoredTargetMembers);
         var explicitValueMappings = BuildExplicitValueMappings(ctx);
-        var customNameMappings = ctx.BuildCustomNameStrategyMappings(ctx.Target);
 
-        foreach (var field in fields)
+        foreach (var targetField in targetFields)
         {
             // source.Value1
-            var targetSyntax = MemberAccess(FullyQualifiedIdentifier(ctx.Target), field.Name);
+            var targetSyntax = MemberAccess(FullyQualifiedIdentifier(ctx.Target), targetField.Name);
 
-            if (explicitValueMappings.TryGetValue(field, out var explicitMappings))
+            if (explicitValueMappings.TryGetValue(targetField, out var explicitMappings))
             {
                 foreach (var explicitMapping in explicitMappings)
                 {
@@ -92,25 +95,26 @@ public static class StringToEnumMappingBuilder
                 continue;
             }
 
-            ExpressionSyntax sourceSyntax;
-            if (namingStrategy is not EnumNamingStrategy.MemberName && customNameMappings.TryGetValue(field, out var customNameMapping))
-            {
-                // "value1"
-                sourceSyntax = StringLiteral(customNameMapping);
-            }
-            else
+            if (namingStrategy is EnumNamingStrategy.MemberName)
             {
                 // nameof(source.Value1)
-                sourceSyntax = NameOf(targetSyntax);
+                yield return new EnumMemberMapping(NameOf(targetSyntax), targetSyntax);
+                continue;
             }
 
-            // nameof(source.Value1) => source.Value1
-            yield return new EnumMemberMapping(sourceSyntax, targetSyntax);
+            // "value1"
+            var name = targetField.GetName(namingStrategy);
+            yield return new EnumMemberMapping(StringLiteral(name), targetSyntax);
         }
     }
 
-    private static EnumFallbackValueMapping BuildFallbackParseMapping(MappingBuilderContext ctx, bool genericEnumParseMethodSupported)
+    private static EnumFallbackValueMapping BuildFallbackParseMapping(
+        MappingBuilderContext ctx,
+        bool genericEnumParseMethodSupported,
+        out IFieldSymbol? fallbackMember
+    )
     {
+        fallbackMember = null;
         var fallbackValue = ctx.Configuration.Enum.FallbackValue;
         if (fallbackValue is null)
         {
@@ -138,7 +142,10 @@ public static class StringToEnumMappingBuilder
         );
 
         if (SymbolEqualityComparer.Default.Equals(ctx.Target, fallbackValue.Value.ConstantValue.Type))
+        {
+            fallbackMember = ctx.SymbolAccessor.GetField(ctx.Target, memberAccessExpression.Name.Identifier.Text);
             return new EnumFallbackValueMapping(ctx.Source, ctx.Target, fallbackExpression: fallbackExpression);
+        }
 
         ctx.ReportDiagnostic(
             DiagnosticDescriptors.EnumFallbackValueTypeDoesNotMatchTargetEnumType,

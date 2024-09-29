@@ -227,6 +227,9 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     internal IEnumerable<IFieldSymbol> GetAllFields(ITypeSymbol symbol) => GetAllMembers(symbol).OfType<IFieldSymbol>();
 
+    internal IFieldSymbol? GetField(ITypeSymbol symbol, string name) =>
+        GetAllFields(symbol).FirstOrDefault(t => string.Equals(t.Name, name, StringComparison.Ordinal));
+
     internal Dictionary<object, IFieldSymbol> GetEnumFields(ITypeSymbol symbol) =>
         GetAllFields(symbol).ToDictionary(f => f.ConstantValue!, f => f);
 
