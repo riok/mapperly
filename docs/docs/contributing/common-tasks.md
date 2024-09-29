@@ -5,7 +5,7 @@ description: Step by step guides for common tasks one may encounter when contrib
 
 # Common tasks
 
-This page provides to-do lists for some common tasks one may encounter while contributing to Mapperly.
+This page provides todo lists for some common tasks one may encounter while contributing to Mapperly.
 
 ## New diagnostic
 
@@ -25,9 +25,9 @@ as it is generated automatically on the basis of the `AnalyzerReleases.Shipped.m
 
 ## New public API
 
-If new public API surface is introduced in `Riok.Mapperly.Abstractions`,
-add the new API to the `PublicAPI.Shipped.txt` file directly.
-Mapperly does not use the `PublicAPI.Unshipped.txt` file.
+If new public API surface is introduced in `Riok.Mapperly.Abstractions` or existing API surface is modified,
+the `PublicApiTest` snapshot test needs to be updated.  
+See also [VerifyTests](./tests.md#verifytests).
 
 ## Add support for a new roslyn version
 
