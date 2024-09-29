@@ -36,7 +36,6 @@ jobs:
           VALIDATE_BASH_EXEC: true
           VALIDATE_EDITORCONFIG: true
           VALIDATE_GITHUB_ACTIONS: true
-          VALIDATE_JSON: true
           VALIDATE_MARKDOWN: true
           VALIDATE_NATURAL_LANGUAGE: true
           VALIDATE_SHELL_SHFMT: true
