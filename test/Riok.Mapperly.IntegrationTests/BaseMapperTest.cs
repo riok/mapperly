@@ -195,7 +195,9 @@ namespace Riok.Mapperly.IntegrationTests
 
         private static Versions GetCurrentVersion()
         {
-#if NET8_0_OR_GREATER
+#if NET9_0_OR_GREATER
+            return Versions.NET9_0;
+#elif NET8_0_OR_GREATER
             return Versions.NET8_0;
 #elif NET7_0_OR_GREATER
             return Versions.NET7_0;

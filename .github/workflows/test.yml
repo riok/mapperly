@@ -89,6 +89,7 @@ jobs:
       fail-fast: false
       matrix:
         dotnet:
+          - '9.0'
           - '8.0'
           - '7.0'
           - '6.0'

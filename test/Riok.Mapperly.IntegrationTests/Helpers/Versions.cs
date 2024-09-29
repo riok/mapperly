@@ -9,5 +9,6 @@ namespace Riok.Mapperly.IntegrationTests.Helpers
         NET6_0 = 1 << 1,
         NET7_0 = 1 << 2,
         NET8_0 = 1 << 3,
+        NET9_0 = 1 << 4,
     }
 }
