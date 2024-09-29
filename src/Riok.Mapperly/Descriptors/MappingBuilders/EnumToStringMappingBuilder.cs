@@ -30,9 +30,11 @@ public static class EnumToStringMappingBuilder
         var fallbackMapping = BuildFallbackMapping(ctx, out var fallbackStringValue);
         var enumMemberMappings = BuildEnumMemberMappings(ctx, fallbackStringValue);
 
-        if (fallbackMapping.FallbackExpression is LiteralExpressionSyntax fallbackLiteral)
+        if (fallbackStringValue is not null)
         {
-            enumMemberMappings = enumMemberMappings.Where(IsNotEquivalentTo(fallbackLiteral));
+            enumMemberMappings = enumMemberMappings.Where(m =>
+                !m.TargetSyntax.ToString().Equals(fallbackStringValue, StringComparison.Ordinal)
+            );
         }
 
         return new EnumToStringMapping(ctx.Source, ctx.Target, enumMemberMappings, fallbackMapping);
@@ -126,11 +128,4 @@ public static class EnumToStringMappingBuilder
         fallbackStringValue = fallbackString;
         return new EnumFallbackValueMapping(ctx.Source, ctx.Target, fallbackExpression: StringLiteral(fallbackString));
     }
-
-    private static Func<EnumMemberMapping, bool> IsNotEquivalentTo(LiteralExpressionSyntax fallbackLiteral) =>
-        mapping =>
-            !(
-                mapping.TargetSyntax is LiteralExpressionSyntax targetLiteral
-                && fallbackLiteral.ToString().Equals(targetLiteral.ToString(), StringComparison.Ordinal)
-            );
 }

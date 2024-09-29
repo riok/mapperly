@@ -51,10 +51,12 @@ public static class StringToEnumMappingBuilder
         // from string => use an optimized method of Enum.Parse which would use slow reflection
         // however we currently don't support all features of Enum.Parse yet (ex. flags)
         // therefore we use Enum.Parse as fallback.
-        if (fallbackMapping.FallbackExpression is MemberAccessExpressionSyntax fallbackMember2)
+        if (fallbackMember is not null)
         {
             // no need to explicitly map fallback value
-            enumMemberMappings = enumMemberMappings.Where(IsNotEquivalentTo(fallbackMember2));
+            enumMemberMappings = enumMemberMappings.Where(m =>
+                !m.TargetSyntax.ToString().Equals(fallbackMember.Name, StringComparison.Ordinal)
+            );
         }
 
         return new EnumFromStringSwitchMapping(
@@ -208,12 +210,4 @@ public static class StringToEnumMappingBuilder
 
         return explicitMappings;
     }
-
-    private static Func<EnumMemberMapping, bool> IsNotEquivalentTo(MemberAccessExpressionSyntax fallbackMember) =>
-        mapping =>
-            !(
-                mapping.TargetSyntax is MemberAccessExpressionSyntax targetMember
-                && fallbackMember.Expression.IsEquivalentTo(targetMember.Expression)
-                && fallbackMember.Name.ToString().Equals(targetMember.Name.ToString(), StringComparison.Ordinal)
-            );
 }
