@@ -6,6 +6,7 @@ using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.Enums;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
@@ -26,11 +27,55 @@ public static class EnumToStringMappingBuilder
 
     private static EnumToStringMapping BuildEnumToStringMapping(MappingBuilderContext ctx)
     {
-        var ignoredSourceMembers = ctx.Configuration.Enum.IgnoredSourceMembers.ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
-        var explicitMappings = BuildExplicitValueMappings(ctx);
+        var fallbackMapping = BuildFallbackMapping(ctx, out var fallbackStringValue);
+        var enumMemberMappings = BuildEnumMemberMappings(ctx, fallbackStringValue);
 
+        if (fallbackStringValue is not null)
+        {
+            enumMemberMappings = enumMemberMappings.Where(m =>
+                !m.TargetSyntax.ToString().Equals(fallbackStringValue, StringComparison.Ordinal)
+            );
+        }
+
+        return new EnumToStringMapping(ctx.Source, ctx.Target, enumMemberMappings, fallbackMapping);
+    }
+
+    private static IEnumerable<EnumMemberMapping> BuildEnumMemberMappings(MappingBuilderContext ctx, string? fallbackStringValue)
+    {
+        var namingStrategy = ctx.Configuration.Enum.NamingStrategy;
+
+        var ignoredSourceMembers = ctx.Configuration.Enum.IgnoredSourceMembers.ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
         EnumMappingDiagnosticReporter.AddUnmatchedSourceIgnoredMembers(ctx, ignoredSourceMembers);
-        return new EnumToStringMapping(ctx.Source, ctx.Target, ctx.SymbolAccessor.GetAllFields(ctx.Source), explicitMappings);
+
+        var sourceFields = ctx.SymbolAccessor.GetFieldsExcept(ctx.Source, ignoredSourceMembers);
+        var explicitValueMappings = BuildExplicitValueMappings(ctx);
+
+        foreach (var sourceField in sourceFields)
+        {
+            // source.Value1
+            var sourceSyntax = MemberAccess(FullyQualifiedIdentifier(ctx.Source), sourceField.Name);
+
+            var name = sourceField.GetName(namingStrategy);
+            if (string.Equals(name, fallbackStringValue, StringComparison.Ordinal))
+                continue;
+
+            if (explicitValueMappings.TryGetValue(sourceField, out var explicitMapping))
+            {
+                // "explicit_value1"
+                yield return new EnumMemberMapping(sourceSyntax, explicitMapping);
+                continue;
+            }
+
+            if (namingStrategy is not EnumNamingStrategy.MemberName)
+            {
+                // "value1"
+                yield return new EnumMemberMapping(sourceSyntax, StringLiteral(name));
+                continue;
+            }
+
+            // nameof(source.Value1)
+            yield return new EnumMemberMapping(sourceSyntax, NameOf(sourceSyntax));
+        }
     }
 
     private static IReadOnlyDictionary<IFieldSymbol, ExpressionSyntax> BuildExplicitValueMappings(MappingBuilderContext ctx)
@@ -63,5 +108,24 @@ public static class EnumToStringMappingBuilder
         }
 
         return explicitMappings;
+    }
+
+    private static EnumFallbackValueMapping BuildFallbackMapping(MappingBuilderContext ctx, out string? fallbackStringValue)
+    {
+        fallbackStringValue = null;
+        var fallbackValue = ctx.Configuration.Enum.FallbackValue;
+        if (fallbackValue is null)
+        {
+            return new EnumFallbackValueMapping(ctx.Source, ctx.Target, new ToStringMapping(ctx.Source, ctx.Target));
+        }
+
+        if (fallbackValue.Value.ConstantValue.Value is not string fallbackString)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidFallbackValue, fallbackValue.Value.Expression.ToFullString());
+            return new EnumFallbackValueMapping(ctx.Source, ctx.Target, new ToStringMapping(ctx.Source, ctx.Target));
+        }
+
+        fallbackStringValue = fallbackString;
+        return new EnumFallbackValueMapping(ctx.Source, ctx.Target, fallbackExpression: StringLiteral(fallbackString));
     }
 }

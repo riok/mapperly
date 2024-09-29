@@ -125,4 +125,10 @@ public class MapperAttribute : Attribute
     /// partial methods are discovered.
     /// </summary>
     public bool AutoUserMappings { get; set; } = true;
+
+    /// <summary>
+    /// The default enum naming strategy.
+    /// Can be overwritten on specific enums via mapping method configurations.
+    /// </summary>
+    public EnumNamingStrategy EnumNamingStrategy { get; set; } = EnumNamingStrategy.MemberName;
 }

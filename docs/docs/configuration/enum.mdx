@@ -56,10 +56,67 @@ The `IgnoreCase` property allows to opt in for case insensitive mappings (defaul
   </TabItem>
 </Tabs>
 
+## Enum from/to string naming strategies
+
+Enum from/to strings mappings can be customized by setting the enum naming strategy to be used.
+You can specify the naming strategy using `NamingStrategy` in `MapEnumAttribute` or `EnumNamingStrategy` in `MapperAttribute` and `MapperDefaultsAttribute`.
+Available naming strategies:
+
+| Name           | Description                                     |
+| -------------- | ----------------------------------------------- |
+| MemberName     | Matches enum values using their name. (default) |
+| CamelCase      | Matches enum values using camelCase.            |
+| PascalCase     | Matches enum values using PascalCase.           |
+| SnakeCase      | Matches enum values using snake_case.           |
+| UpperSnakeCase | Matches enum values using UPPER_SNAKE_CASE.     |
+| KebabCase      | Matches enum values using kebab-case.           |
+| UpperKebabCase | Matches enum values using UPPER-KEBAB-CASE.     |
+
+Note that explicit enum mappings (`MapEnumValue`) and fallback values (`FallbackValue` in `MapEnum`)
+are not affected by naming strategies.
+
+<Tabs>
+    <TabItem value="global" label="Global (mapper level)" default>
+
+        Applied to all enums mapped inside this mapper.
+
+        ```csharp
+        // highlight-start
+        [Mapper(EnumNamingStrategy = EnumNamingStrategy.SnakeCase)]
+        // highlight-end
+        public partial class CarMapper
+        {
+            ...
+        }
+        ```
+
+    </TabItem>
+    <TabItem value="enum" label="Enum (mapping method level)">
+
+        Applied to the specific enum mapped by this method.
+        Attribute is only valid on mapping method with enums as parameters.
+
+        ```csharp
+        [Mapper]
+        public partial class CarMapper
+        {
+            // highlight-start
+            [MapEnum(EnumMappingStrategy.ByName, NamingStrategy = EnumNamingStrategy.SnakeCase)]
+            // highlight-end
+            public partial CarMakeDto MapMake(CarMake make);
+        }
+        ```
+
+    </TabItem>
+
+</Tabs>
+
 ## Manually mapped enum values
 
 To explicitly map enum values the `MapEnumValueAttibute` can be used.
 Attribute is only valid on enum-to-enum, enum-to-string and string-to-enum mappings.
+
+Explicit enum mappings are not affected by enum naming strategies.
 
 ```csharp
 [Mapper]
@@ -106,6 +163,7 @@ To map to a fallback value instead of throwing when encountering an unknown valu
 the `FallbackValue` property on the `MapEnum` attribute can be used.
 
 `FallbackValue` is supported by `ByName` and `ByValueCheckDefined`.
+`FallbackValue` is not affected by enum naming strategies.
 
 ```csharp
 [Mapper]

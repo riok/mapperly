@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
@@ -6,6 +7,8 @@ using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.Enums;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
@@ -43,35 +46,79 @@ public static class StringToEnumMappingBuilder
         bool genericEnumParseMethodSupported
     )
     {
-        var ignoredTargetMembers = ctx.Configuration.Enum.IgnoredTargetMembers.ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
-        var explicitMappings = BuildExplicitValueMappings(ctx);
-
+        var fallbackMapping = BuildFallbackParseMapping(ctx, genericEnumParseMethodSupported, out var fallbackMember);
+        var enumMemberMappings = BuildEnumMemberMappings(ctx, fallbackMember);
         // from string => use an optimized method of Enum.Parse which would use slow reflection
         // however we currently don't support all features of Enum.Parse yet (ex. flags)
         // therefore we use Enum.Parse as fallback.
-        var fallbackMapping = BuildFallbackParseMapping(ctx, genericEnumParseMethodSupported);
-        var members = ctx.SymbolAccessor.GetAllFields(ctx.Target);
-        if (fallbackMapping.FallbackMember != null)
+        if (fallbackMember is not null)
         {
             // no need to explicitly map fallback value
-            members = members.Where(x => fallbackMapping.FallbackMember.ConstantValue?.Equals(x.ConstantValue) != true);
+            enumMemberMappings = enumMemberMappings.Where(m =>
+                !m.TargetSyntax.ToString().Equals(fallbackMember.Name, StringComparison.Ordinal)
+            );
         }
 
-        EnumMappingDiagnosticReporter.AddUnmatchedTargetIgnoredMembers(ctx, ignoredTargetMembers);
         return new EnumFromStringSwitchMapping(
             ctx.Source,
             ctx.Target,
-            members,
             ctx.Configuration.Enum.IgnoreCase,
-            fallbackMapping,
-            explicitMappings
+            enumMemberMappings,
+            fallbackMapping
         );
     }
 
-    private static EnumFallbackValueMapping BuildFallbackParseMapping(MappingBuilderContext ctx, bool genericEnumParseMethodSupported)
+    private static IEnumerable<EnumMemberMapping> BuildEnumMemberMappings(MappingBuilderContext ctx, IFieldSymbol? fallbackMember)
     {
+        var namingStrategy = ctx.Configuration.Enum.NamingStrategy;
+
+        var ignoredTargetMembers = ctx.Configuration.Enum.IgnoredTargetMembers.ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
+        EnumMappingDiagnosticReporter.AddUnmatchedTargetIgnoredMembers(ctx, ignoredTargetMembers);
+        if (fallbackMember is not null)
+        {
+            ignoredTargetMembers.Add(fallbackMember);
+        }
+
+        var targetFields = ctx.SymbolAccessor.GetFieldsExcept(ctx.Target, ignoredTargetMembers);
+        var explicitValueMappings = BuildExplicitValueMappings(ctx);
+
+        foreach (var targetField in targetFields)
+        {
+            // source.Value1
+            var targetSyntax = MemberAccess(FullyQualifiedIdentifier(ctx.Target), targetField.Name);
+
+            if (explicitValueMappings.TryGetValue(targetField, out var explicitMappings))
+            {
+                foreach (var explicitMapping in explicitMappings)
+                {
+                    // "explicit_value1" => source.Value1
+                    yield return new EnumMemberMapping(explicitMapping, targetSyntax);
+                }
+                continue;
+            }
+
+            if (namingStrategy is EnumNamingStrategy.MemberName)
+            {
+                // nameof(source.Value1)
+                yield return new EnumMemberMapping(NameOf(targetSyntax), targetSyntax);
+                continue;
+            }
+
+            // "value1"
+            var name = targetField.GetName(namingStrategy);
+            yield return new EnumMemberMapping(StringLiteral(name), targetSyntax);
+        }
+    }
+
+    private static EnumFallbackValueMapping BuildFallbackParseMapping(
+        MappingBuilderContext ctx,
+        bool genericEnumParseMethodSupported,
+        out IFieldSymbol? fallbackMember
+    )
+    {
+        fallbackMember = null;
         var fallbackValue = ctx.Configuration.Enum.FallbackValue;
-        if (fallbackValue == null)
+        if (fallbackValue is null)
         {
             return new EnumFallbackValueMapping(
                 ctx.Source,
@@ -80,14 +127,33 @@ public static class StringToEnumMappingBuilder
             );
         }
 
-        if (SymbolEqualityComparer.Default.Equals(ctx.Target, fallbackValue.Type))
-            return new EnumFallbackValueMapping(ctx.Source, ctx.Target, fallbackMember: fallbackValue);
+        if (fallbackValue is not { Expression: MemberAccessExpressionSyntax memberAccessExpression })
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidFallbackValue, fallbackValue.Value.Expression.ToFullString());
+            return new EnumFallbackValueMapping(
+                ctx.Source,
+                ctx.Target,
+                new EnumFromStringParseMapping(ctx.Source, ctx.Target, genericEnumParseMethodSupported, ctx.Configuration.Enum.IgnoreCase)
+            );
+        }
+
+        var fallbackExpression = MemberAccessExpression(
+            SyntaxKind.SimpleMemberAccessExpression,
+            FullyQualifiedIdentifier(ctx.Target),
+            memberAccessExpression.Name
+        );
+
+        if (SymbolEqualityComparer.Default.Equals(ctx.Target, fallbackValue.Value.ConstantValue.Type))
+        {
+            fallbackMember = ctx.SymbolAccessor.GetField(ctx.Target, memberAccessExpression.Name.Identifier.Text);
+            return new EnumFallbackValueMapping(ctx.Source, ctx.Target, fallbackExpression: fallbackExpression);
+        }
 
         ctx.ReportDiagnostic(
             DiagnosticDescriptors.EnumFallbackValueTypeDoesNotMatchTargetEnumType,
             fallbackValue,
-            fallbackValue.ConstantValue ?? 0,
-            fallbackValue.Type,
+            fallbackValue.Value.ConstantValue.Value ?? 0,
+            fallbackValue.Value.ConstantValue.Type?.Name ?? "unknown",
             ctx.Target
         );
         return new EnumFallbackValueMapping(

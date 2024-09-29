@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 
 namespace Riok.Mapperly.Configuration;
@@ -10,7 +9,7 @@ namespace Riok.Mapperly.Configuration;
 public class EnumConfiguration(EnumMappingStrategy strategy)
 {
     /// <summary>
-    /// The strategy to be used to map enums.
+    /// The strategy to be used to map enums to enums.
     /// </summary>
     public EnumMappingStrategy Strategy { get; } = strategy;
 
@@ -22,5 +21,10 @@ public class EnumConfiguration(EnumMappingStrategy strategy)
     /// <summary>
     /// The fallback value if an enum cannot be mapped, used instead of throwing.
     /// </summary>
-    public IFieldSymbol? FallbackValue { get; set; }
+    public AttributeValue? FallbackValue { get; set; }
+
+    /// <summary>
+    /// The strategy to be used to map enums from/to strings.
+    /// </summary>
+    public EnumNamingStrategy NamingStrategy { get; set; }
 }

@@ -131,4 +131,51 @@ public class EnumFallbackValueTest
                 """
             );
     }
+
+    [Fact]
+    public void EnumToStringFallbackValueShouldSwitch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByName, FallbackValue = \"_unknown\")] partial string ToE1(E1 source);",
+            "enum E1 {Unknown = -1, A, B, C}"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    global::E1.Unknown => nameof(global::E1.Unknown),
+                    global::E1.A => nameof(global::E1.A),
+                    global::E1.B => nameof(global::E1.B),
+                    global::E1.C => nameof(global::E1.C),
+                    _ => "_unknown",
+                };
+                """
+            );
+    }
+
+    [Fact]
+    public void EnumToStringWithNamingStrategyFallbackValueShouldSwitch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByName, NamingStrategy = EnumNamingStrategy.CamelCase, FallbackValue = \"unknown\")] partial string ToE1(E1 source);",
+            "enum E1 {Unknown = -1, A, B, C}"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    global::E1.A => "a",
+                    global::E1.B => "b",
+                    global::E1.C => "c",
+                    _ => "unknown",
+                };
+                """
+            );
+    }
 }

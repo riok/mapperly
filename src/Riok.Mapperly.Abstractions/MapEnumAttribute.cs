@@ -19,7 +19,7 @@ public sealed class MapEnumAttribute : Attribute
     }
 
     /// <summary>
-    /// The strategy to be used to map enums.
+    /// The strategy to be used to map enums to enums.
     /// </summary>
     public EnumMappingStrategy Strategy { get; }
 
@@ -32,4 +32,9 @@ public sealed class MapEnumAttribute : Attribute
     /// The fallback value if an enum cannot be mapped, used instead of throwing.
     /// </summary>
     public object? FallbackValue { get; set; }
+
+    /// <summary>
+    /// The strategy to be used to map enums from/to strings.
+    /// </summary>
+    public EnumNamingStrategy NamingStrategy { get; set; }
 }

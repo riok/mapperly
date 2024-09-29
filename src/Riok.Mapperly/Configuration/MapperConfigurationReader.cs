@@ -33,7 +33,8 @@ public class MapperConfigurationReader
                 [],
                 [],
                 [],
-                mapper.RequiredMappingStrategy
+                mapper.RequiredMappingStrategy,
+                mapper.EnumNamingStrategy
             ),
             new MembersMappingConfiguration([], [], [], [], [], mapper.IgnoreObsoleteMembersStrategy, mapper.RequiredMappingStrategy),
             []
@@ -162,7 +163,8 @@ public class MapperConfigurationReader
             ignoredSources,
             ignoredTargets,
             explicitMappings,
-            requiredMapping ?? MapperConfiguration.Enum.RequiredMappingStrategy
+            requiredMapping ?? MapperConfiguration.Enum.RequiredMappingStrategy,
+            configData?.NamingStrategy ?? MapperConfiguration.Enum.NamingStrategy
         );
     }
 }

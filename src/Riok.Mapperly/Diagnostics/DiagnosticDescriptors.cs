@@ -787,6 +787,16 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static readonly DiagnosticDescriptor InvalidFallbackValue =
+        new(
+            "RMG085",
+            "Invalid usage of Fallback value",
+            "Fallback value '{0}' is invalid in the this mapping",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Error,
+            true
+        );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT
