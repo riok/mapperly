@@ -189,6 +189,7 @@ indent_size = 2
 # Shell scripts
 [*.sh]
 end_of_line = lf
+
 [*.{cmd,bat}]
 end_of_line = crlf
 
@@ -225,3 +226,6 @@ indent_style = unset
 insert_final_newline = false
 tab_width = unset
 trim_trailing_whitespace = false
+
+[docs/static/_headers]
+indent_size = 2
