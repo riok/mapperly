@@ -18,7 +18,7 @@ public static class ObjectMemberMappingBodyBuilder
         BuildMappingBody(mappingCtx);
 
         // init only members should not result in unmapped diagnostics for existing target mappings
-        foreach (var initOnlyTargetMember in mappingCtx.EnumerateUnmappedTargetMembers().Where(x => x.IsInitOnly))
+        foreach (var initOnlyTargetMember in mappingCtx.EnumerateUnmappedTargetMembers().Where(x => x.IsInitOnly).ToArray())
         {
             mappingCtx.SetTargetMemberMapped(initOnlyTargetMember);
         }
