@@ -1,3 +1,3 @@
 namespace Riok.Mapperly.Configuration;
 
-public record NestedMembersMappingConfiguration(StringMemberPath Source);
+public record NestedMembersMappingConfiguration(IMemberPathConfiguration Source);

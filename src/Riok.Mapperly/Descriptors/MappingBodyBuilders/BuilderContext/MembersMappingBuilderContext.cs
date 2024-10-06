@@ -269,7 +269,7 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
     {
         if (TryGetMemberConfigs(targetMember.Name, false, out var memberConfigs))
         {
-            var memberConfig = memberConfigs.FirstOrDefault(x => x.Target.Path.Count == 1);
+            var memberConfig = memberConfigs.FirstOrDefault(x => x.Target.PathCount == 1);
             if (memberConfig != null && ResolveMemberConfigSourcePath(memberConfig, out var sourceMember))
             {
                 return new MemberMappingInfo(sourceMember, new NonEmptyMemberPath(BuilderContext.Target, [targetMember]), memberConfig);
@@ -278,7 +278,7 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
 
         if (ignoreCase && TryGetMemberConfigs(targetMember.Name, true, out memberConfigs))
         {
-            var memberConfig = memberConfigs.FirstOrDefault(x => x.Target.Path.Count == 1);
+            var memberConfig = memberConfigs.FirstOrDefault(x => x.Target.PathCount == 1);
             if (memberConfig != null && ResolveMemberConfigSourcePath(memberConfig, out var sourceMember))
             {
                 return new MemberMappingInfo(sourceMember, new NonEmptyMemberPath(BuilderContext.Target, [targetMember]), memberConfig);
@@ -318,7 +318,7 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
     {
         if (TryGetMemberValueConfigs(targetMember.Name, false, out var memberValueConfigs))
         {
-            var memberValueConfig = memberValueConfigs.FirstOrDefault(x => x.Target.Path.Count == 1);
+            var memberValueConfig = memberValueConfigs.FirstOrDefault(x => x.Target.PathCount == 1);
             if (memberValueConfig != null)
             {
                 return new MemberMappingInfo(new NonEmptyMemberPath(BuilderContext.Target, [targetMember]), memberValueConfig);
@@ -327,7 +327,7 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
 
         if (ignoreCase && TryGetMemberValueConfigs(targetMember.Name, true, out memberValueConfigs))
         {
-            var memberValueConfig = memberValueConfigs.FirstOrDefault(x => x.Target.Path.Count == 1);
+            var memberValueConfig = memberValueConfigs.FirstOrDefault(x => x.Target.PathCount == 1);
             if (memberValueConfig != null)
             {
                 return new MemberMappingInfo(new NonEmptyMemberPath(BuilderContext.Target, [targetMember]), memberValueConfig);

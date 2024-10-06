@@ -1,0 +1,22 @@
+namespace Riok.Mapperly.Configuration;
+
+/// <summary>
+/// A user-configured member path.
+/// </summary>
+public interface IMemberPathConfiguration
+{
+    /// <summary>
+    /// The name of the root member.
+    /// </summary>
+    string RootName { get; }
+
+    /// <summary>
+    /// The full name e.g. A.B.C
+    /// </summary>
+    string FullName { get; }
+
+    /// <summary>
+    /// The number of path segments in this path.
+    /// </summary>
+    int PathCount { get; }
+}
