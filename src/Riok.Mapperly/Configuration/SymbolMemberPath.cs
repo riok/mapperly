@@ -1,0 +1,17 @@
+using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Helpers;
+
+namespace Riok.Mapperly.Configuration;
+
+public record SymbolMemberPath(ImmutableEquatableArray<ISymbol> Path) : IMemberPathConfiguration
+{
+    private string? _fullName;
+
+    public string RootName => Path[0].Name;
+    public string FullName => _fullName ??= string.Join(MemberPathConstants.MemberAccessSeparatorString, Path.Select(x => x.Name));
+    public int PathCount => Path.Count;
+
+    public override string ToString() => FullName;
+
+    public StringMemberPath ToStringMemberPath() => new(Path.Select(x => x.Name));
+}

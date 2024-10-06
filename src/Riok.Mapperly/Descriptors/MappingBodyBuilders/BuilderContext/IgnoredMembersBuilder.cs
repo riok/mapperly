@@ -73,7 +73,7 @@ internal static class IgnoredMembersBuilder
 
         foreach (var member in unmatchedMembers)
         {
-            if (member.Contains(StringMemberPath.MemberAccessSeparator, StringComparison.Ordinal))
+            if (member.Contains(MemberPathConstants.MemberAccessSeparator, StringComparison.Ordinal))
             {
                 ctx.ReportDiagnostic(nestedDiagnostic, member, type);
                 continue;

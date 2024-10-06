@@ -4,12 +4,12 @@ using Riok.Mapperly.Descriptors;
 namespace Riok.Mapperly.Configuration;
 
 [DebuggerDisplay("{Source} => {Target}")]
-public record MemberMappingConfiguration(StringMemberPath Source, StringMemberPath Target) : HasSyntaxReference
+public record MemberMappingConfiguration(IMemberPathConfiguration Source, IMemberPathConfiguration Target) : HasSyntaxReference
 {
     /// <summary>
     /// Used to adapt from <see cref="Abstractions.MapPropertyFromSourceAttribute"/>
     /// </summary>
-    public MemberMappingConfiguration(StringMemberPath Target)
+    public MemberMappingConfiguration(IMemberPathConfiguration Target)
         : this(Source: StringMemberPath.Empty, Target) { }
 
     public string? StringFormat { get; set; }

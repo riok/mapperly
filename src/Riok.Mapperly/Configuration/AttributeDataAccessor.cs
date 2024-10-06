@@ -1,6 +1,7 @@
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
 
@@ -52,11 +53,11 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         var attrDatas = symbolAccessor.GetAttributes<TAttribute>(symbol);
         foreach (var attrData in attrDatas)
         {
-            yield return Access<TAttribute, TData>(attrData);
+            yield return Access<TAttribute, TData>(attrData, symbolAccessor);
         }
     }
 
-    internal static TData Access<TAttribute, TData>(AttributeData attrData)
+    internal static TData Access<TAttribute, TData>(AttributeData attrData, SymbolAccessor? symbolAccessor = null)
         where TAttribute : Attribute
         where TData : notnull
     {
@@ -68,7 +69,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             (IReadOnlyList<AttributeArgumentSyntax>?)syntax?.ArgumentList?.Arguments
             ?? new AttributeArgumentSyntax[attrData.ConstructorArguments.Length + attrData.NamedArguments.Length];
         var typeArguments = (IReadOnlyCollection<ITypeSymbol>?)attrData.AttributeClass?.TypeArguments ?? [];
-        var attr = Create<TData>(typeArguments, attrData.ConstructorArguments, syntaxArguments);
+        var attr = Create<TData>(typeArguments, attrData.ConstructorArguments, syntaxArguments, symbolAccessor);
 
         var syntaxIndex = attrData.ConstructorArguments.Length;
         var propertiesByName = dataType.GetProperties().GroupBy(x => x.Name).ToDictionary(x => x.Key, x => x.First());
@@ -77,7 +78,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             if (!propertiesByName.TryGetValue(namedArgument.Key, out var prop))
                 throw new InvalidOperationException($"Could not get property {namedArgument.Key} of attribute {attrType.FullName}");
 
-            var value = BuildArgumentValue(namedArgument.Value, prop.PropertyType, syntaxArguments[syntaxIndex]);
+            var value = BuildArgumentValue(namedArgument.Value, prop.PropertyType, syntaxArguments[syntaxIndex], symbolAccessor);
             prop.SetValue(attr, value);
             syntaxIndex++;
         }
@@ -93,7 +94,8 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     private static TData Create<TData>(
         IReadOnlyCollection<ITypeSymbol> typeArguments,
         IReadOnlyCollection<TypedConstant> constructorArguments,
-        IReadOnlyList<AttributeArgumentSyntax> argumentSyntax
+        IReadOnlyList<AttributeArgumentSyntax> argumentSyntax,
+        SymbolAccessor? symbolAccessor
     )
         where TData : notnull
     {
@@ -110,7 +112,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
                 continue;
 
             var constructorArgumentValues = constructorArguments.Select(
-                (arg, i) => BuildArgumentValue(arg, parameters[i + typeArguments.Count].ParameterType, argumentSyntax[i])
+                (arg, i) => BuildArgumentValue(arg, parameters[i + typeArguments.Count].ParameterType, argumentSyntax[i], symbolAccessor)
             );
             var constructorTypeAndValueArguments = typeArguments.Concat(constructorArgumentValues).ToArray();
             if (!ValidateParameterTypes(constructorTypeAndValueArguments, parameters))
@@ -125,7 +127,12 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         );
     }
 
-    private static object? BuildArgumentValue(TypedConstant arg, Type targetType, AttributeArgumentSyntax? syntax)
+    private static object? BuildArgumentValue(
+        TypedConstant arg,
+        Type targetType,
+        AttributeArgumentSyntax? syntax,
+        SymbolAccessor? symbolAccessor
+    )
     {
         return arg.Kind switch
         {
@@ -134,9 +141,9 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
                 syntax.Expression
             ),
             _ when arg.IsNull => null,
-            _ when targetType == typeof(StringMemberPath) => CreateMemberPath(arg, syntax),
+            _ when targetType == typeof(IMemberPathConfiguration) => CreateMemberPath(arg, syntax, symbolAccessor),
             TypedConstantKind.Enum => GetEnumValue(arg, targetType),
-            TypedConstantKind.Array => BuildArrayValue(arg, targetType),
+            TypedConstantKind.Array => BuildArrayValue(arg, targetType, symbolAccessor),
             TypedConstantKind.Primitive => arg.Value,
             TypedConstantKind.Type when targetType == typeof(ITypeSymbol) => arg.Value,
             _ => throw new ArgumentOutOfRangeException(
@@ -145,12 +152,21 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         };
     }
 
-    private static StringMemberPath CreateMemberPath(TypedConstant arg, AttributeArgumentSyntax? syntax)
+    private static IMemberPathConfiguration CreateMemberPath(
+        TypedConstant arg,
+        AttributeArgumentSyntax? syntax,
+        SymbolAccessor? symbolAccessor
+    )
     {
+        if (symbolAccessor == null)
+        {
+            throw new ArgumentNullException(nameof(symbolAccessor), "The symbol accessor cannot be null when resolving member paths");
+        }
+
         if (arg.Kind == TypedConstantKind.Array)
         {
             var values = arg
-                .Values.Select(x => (string?)BuildArgumentValue(x, typeof(string), null))
+                .Values.Select(x => (string?)BuildArgumentValue(x, typeof(string), null, symbolAccessor))
                 .WhereNotNull()
                 .ToImmutableEquatableArray();
             return new StringMemberPath(values);
@@ -166,35 +182,60 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
                 } invocationExpressionSyntax
         )
         {
-            var argMemberPathStr = invocationExpressionSyntax.ArgumentList.Arguments[0].ToFullString();
-
-            // @ prefix opts-in to full nameof
-            if (argMemberPathStr.Length > 0 && argMemberPathStr[0] == FullNameOfPrefix)
-            {
-                var argMemberPath = argMemberPathStr
-                    .TrimStart(FullNameOfPrefix)
-                    .Split(StringMemberPath.MemberAccessSeparator)
-                    .Skip(1)
-                    .ToImmutableEquatableArray();
-                return new StringMemberPath(argMemberPath);
-            }
+            return CreateNameOfMemberPath(invocationExpressionSyntax, symbolAccessor);
         }
 
         if (arg is { Kind: TypedConstantKind.Primitive, Value: string v })
         {
-            return new StringMemberPath(v.Split(StringMemberPath.MemberAccessSeparator).ToImmutableEquatableArray());
+            return new StringMemberPath(v.Split(MemberPathConstants.MemberAccessSeparator).ToImmutableEquatableArray());
         }
 
         throw new InvalidOperationException($"Cannot create {nameof(StringMemberPath)} from {arg.Kind}");
     }
 
-    private static object?[] BuildArrayValue(TypedConstant arg, Type targetType)
+    private static IMemberPathConfiguration CreateNameOfMemberPath(InvocationExpressionSyntax nameofSyntax, SymbolAccessor symbolAccessor)
+    {
+        var argMemberPathStr = nameofSyntax.ArgumentList.Arguments[0].ToFullString();
+
+        // @ prefix opts-in to full nameof
+        var fullNameOf = argMemberPathStr[0] == FullNameOfPrefix;
+
+        var nameOfOperation = symbolAccessor.GetOperation(nameofSyntax) as INameOfOperation;
+        var memberRefOperation = nameOfOperation?.GetFirstChildOperation() as IMemberReferenceOperation;
+        if (memberRefOperation == null)
+        {
+            // fall back to old skip-first-segment approach
+            // to ensure backwards compability.
+            var argMemberPath = argMemberPathStr
+                .TrimStart(FullNameOfPrefix)
+                .Split(MemberPathConstants.MemberAccessSeparator)
+                .Skip(1)
+                .ToImmutableEquatableArray();
+            return new StringMemberPath(argMemberPath);
+        }
+
+        var memberPath = new List<ISymbol>();
+        while (memberRefOperation != null)
+        {
+            memberPath.Add(memberRefOperation.Member);
+            memberRefOperation = memberRefOperation.GetFirstChildOperation() as IMemberReferenceOperation;
+
+            // if not fullNameOf only consider the last member path segment
+            if (!fullNameOf && memberPath.Count > 1)
+                break;
+        }
+
+        memberPath.Reverse();
+        return new SymbolMemberPath(memberPath.ToImmutableEquatableArray());
+    }
+
+    private static object?[] BuildArrayValue(TypedConstant arg, Type targetType, SymbolAccessor? symbolAccessor)
     {
         if (!targetType.IsGenericType || targetType.GetGenericTypeDefinition() != typeof(IReadOnlyCollection<>))
             throw new InvalidOperationException($"{nameof(IReadOnlyCollection<object>)} is the only supported array type");
 
         var elementTargetType = targetType.GetGenericArguments()[0];
-        return arg.Values.Select(x => BuildArgumentValue(x, elementTargetType, null)).ToArray();
+        return arg.Values.Select(x => BuildArgumentValue(x, elementTargetType, null, symbolAccessor)).ToArray();
     }
 
     private static object? GetEnumValue(TypedConstant arg, Type targetType)

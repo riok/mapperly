@@ -18,6 +18,9 @@ public class PropertyMember(IPropertySymbol symbol, SymbolAccessor symbolAccesso
         IMemberGetter
 {
     public ITypeSymbol Type { get; } = symbolAccessor.UpgradeNullable(symbol.Type);
+
+    public INamedTypeSymbol? ContainingType { get; } = symbol.ContainingType;
+
     public bool IsNullable => Type.IsNullable();
 
     public bool CanGet => !Symbol.IsWriteOnly && (Symbol.GetMethod == null || symbolAccessor.IsMemberAccessible(Symbol.GetMethod));
