@@ -320,6 +320,40 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         return false;
     }
 
+    internal bool TryFindMemberPath(ITypeSymbol type, IMemberPathConfiguration path, [NotNullWhen(true)] out MemberPath? memberPath)
+    {
+        if (path is StringMemberPath stringMemberPath)
+            return TryFindMemberPath(type, stringMemberPath, out memberPath);
+
+        // resolve from symbol member path
+        // if it is not possible to resolve by direct symbols
+        // the string path is tried to ensure backwards compatibility
+        // (e.g. when the A.MyValue is referenced,
+        // but instead B.MyValue is the correct one,
+        // with the string representation it doesn't matter, it is just MyValue).
+        var symbolMemberPath = (SymbolMemberPath)path;
+        var memberPathSegments = new List<IMappableMember>(symbolMemberPath.PathCount);
+        foreach (var pathSegment in symbolMemberPath.Path)
+        {
+            if (MappableMember.Create(this, pathSegment) is { } mappableMember)
+            {
+                memberPathSegments.Add(mappableMember);
+                continue;
+            }
+
+            return TryFindMemberPath(type, symbolMemberPath.ToStringMemberPath(), out memberPath);
+        }
+
+        var nameOfRefType = memberPathSegments[0].ContainingType;
+        if (nameOfRefType == null || !CanAssign(type, nameOfRefType))
+        {
+            return TryFindMemberPath(type, symbolMemberPath.ToStringMemberPath(), out memberPath);
+        }
+
+        memberPath = new NonEmptyMemberPath(type, memberPathSegments);
+        return true;
+    }
+
     internal bool TryFindMemberPath(ITypeSymbol type, StringMemberPath path, [NotNullWhen(true)] out MemberPath? memberPath)
     {
         var foundPath = new List<IMappableMember>();
@@ -362,6 +396,8 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
             .ToDictionary(x => x.Key, x => x.First(), comparer);
         return symbolMembers.GetValueOrDefault(name);
     }
+
+    public IOperation? GetOperation(SyntaxNode node) => compilationContext.GetSemanticModel(node.SyntaxTree)?.GetOperation(node);
 
     private ImmutableArray<AttributeData> GetAttributesCore(ISymbol symbol)
     {

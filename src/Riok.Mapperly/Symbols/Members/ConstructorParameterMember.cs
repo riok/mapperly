@@ -20,6 +20,7 @@ public class ConstructorParameterMember(IParameterSymbol symbol, SymbolAccessor 
         IMemberGetter
 {
     public ITypeSymbol Type { get; } = accessor.UpgradeNullable(symbol.Type);
+    public INamedTypeSymbol ContainingType { get; } = symbol.ContainingType;
     public bool IsNullable => Symbol.NullableAnnotation.IsNullable();
     public bool CanGet => false;
     public bool CanGetDirectly => false;

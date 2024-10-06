@@ -204,15 +204,15 @@ internal class MembersMappingState(
         }
     }
 
-    private void ConsumeMemberConfig<T>(T config, StringMemberPath targetPath, Dictionary<string, List<T>> configsByRootName)
+    private void ConsumeMemberConfig<T>(T config, IMemberPathConfiguration targetPath, Dictionary<string, List<T>> configsByRootName)
     {
-        if (!configsByRootName.TryGetValue(targetPath.Path[0], out var configs))
+        if (!configsByRootName.TryGetValue(targetPath.RootName, out var configs))
             return;
 
         configs.Remove(config);
         if (configs.Count == 0)
         {
-            configsByRootName.Remove(targetPath.Path[0]);
+            configsByRootName.Remove(targetPath.RootName);
         }
     }
 

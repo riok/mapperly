@@ -6,7 +6,7 @@ description: Flatten properties and fields
 # Flattening and unflattening
 
 It is pretty common to flatten objects during mapping, eg. `Car.Make.Id => CarDto.MakeId`.
-Mapperly tries to figure out flattenings automatically by making use of the pascal case C# notation.
+Mapperly tries to figure out flattenings automatically by making use of the PascalCase C# notation.
 If Mapperly can't resolve the target or source property correctly, it is possible to manually configure it by applying the `MapPropertyAttribute`
 by either using the source and target property path names as arrays or using a dot separated property access path string
 
@@ -52,9 +52,9 @@ If multiple `MapNestedProperties` are defined that contain members that match to
 In such a case it is therefore recommended to define the expected property mapping explicitly using a `MapProperty` attribute.
 :::
 
-## Experimental full `nameof`
+## Full `nameof`
 
-Mapperly supports an experimental "fullnameof".
+Mapperly supports a "fullnameof".
 It can be used to configure property paths using `nameof`.
 Opt-in is done by prefixing the path with `@`.
 
@@ -63,11 +63,4 @@ Opt-in is done by prefixing the path with `@`.
 partial CarDto Map(Car car);
 ```
 
-`@nameof(Car.Make.Id)` will result in the property path `Make.Id`.
-The first part of the property path is stripped.
-Make sure these property paths start with the type of the property and not with a namespace or a property.
-
-:::warning
-This is an experimental API.
-Its API surface is not subject to semantic releases and may break in any release.
-:::
+`nameof(@Car.Make.Id)` will result in the property path `Make.Id`.

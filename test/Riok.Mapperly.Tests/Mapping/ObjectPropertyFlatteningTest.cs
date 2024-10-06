@@ -8,8 +8,75 @@ public class ObjectPropertyFlatteningTest
     public void ManualFlattenedPropertyWithFullNameOfSource()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty(nameof(@C.Value.Id), nameof(B.MyValueId))] partial B Map(A source);",
+            "[MapProperty(nameof(@A.Value.Id), nameof(B.MyValueId))] partial B Map(A source);",
             "class A { public C Value { get; set; } }",
+            "class B { public string MyValueId { get; set; } }",
+            "class C { public string Id { get; set; }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.MyValueId = source.Value.Id;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ManualFlattenedPropertyWithFullNameOfSourceAndWrongType()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(nameof(@D.Value.Id), nameof(D.MyValueId))] partial B Map(A source);",
+            "class A { public C Value { get; set; } }",
+            "class B { public string MyValueId { get; set; } }",
+            "class C { public string Id { get; set; }",
+            "class D { public string? MyValueId { get; set; } public C? Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.MyValueId = source.Value.Id;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ManualFlattenedPropertyWithFullNameOfNamespacedSource()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(nameof(@My.A.Value.Id), nameof(B.MyValueId))] partial B Map(My.A source);",
+            "namespace My { class A { public C Value { get; set; } } } ",
+            "class B { public string MyValueId { get; set; } }",
+            "class C { public string Id { get; set; }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.MyValueId = source.Value.Id;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ManualFlattenedPropertyWithFullNameOfNestedSource()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(nameof(@My.Nested.A.Value.Id), nameof(B.MyValueId))] partial B Map(My.Nested.A source);",
+            "namespace My { public class Nested { public class A { public C Value { get; set; } } } }",
             "class B { public string MyValueId { get; set; } }",
             "class C { public string Id { get; set; }"
         );
@@ -373,7 +440,7 @@ public class ObjectPropertyFlatteningTest
     public void ManualUnflattenedPropertyWithFullNameOfTarget()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            "[MapProperty(nameof(C.MyValueId), nameof(@B.Value.Id))] partial B Map(A source);",
+            "[MapProperty(nameof(A.MyValueId), nameof(@B.Value.Id))] partial B Map(A source);",
             "class A { public string MyValueId { get; set; }  }",
             "class B { public C Value { get; set; } }",
             "class C { public string Id { get; set; }"
@@ -417,7 +484,7 @@ public class ObjectPropertyFlatteningTest
     public void ManualUnflattenedPropertyInterpolatedFullNameOfTarget()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            """[MapProperty(nameof(C.MyValueId), $"{nameof(B.Value)}.{nameof(B.Value.Id)}")] partial B Map(A source);""",
+            """[MapProperty(nameof(A.MyValueId), $"{nameof(B.Value)}.{nameof(B.Value.Id)}")] partial B Map(A source);""",
             "class A { public string MyValueId { get; set; }  }",
             "class B { public C Value { get; set; } }",
             "class C { public string Id { get; set; }"
