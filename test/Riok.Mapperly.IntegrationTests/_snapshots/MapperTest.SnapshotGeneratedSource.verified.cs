@@ -179,6 +179,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.ExistingSortedSet.Add(ParseableInt(item2));
             }
+            target.ExistingList.Capacity = testObject.ExistingList.Count + target.ExistingList.Count;
             foreach (var item3 in testObject.ExistingList)
             {
                 target.ExistingList.Add(ParseableInt(item3));
@@ -315,6 +316,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.ExistingSortedSet.Add(item2.ToString(_formatDeCh));
             }
+            target.ExistingList.Capacity = dto.ExistingList.Count + target.ExistingList.Count;
             foreach (var item3 in dto.ExistingList)
             {
                 target.ExistingList.Add(item3.ToString(_formatDeCh));
@@ -451,6 +453,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.ExistingSortedSet.Add(ParseableInt(item2));
             }
+            target.ExistingList.Capacity = source.ExistingList.Count + target.ExistingList.Count;
             foreach (var item3 in source.ExistingList)
             {
                 target.ExistingList.Add(ParseableInt(item3));

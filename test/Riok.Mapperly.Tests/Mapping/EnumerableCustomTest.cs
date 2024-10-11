@@ -149,7 +149,7 @@ public class EnumerableCustomTest
             "A",
             "B",
             "class A : IReadOnlyCollection<string> { public int Value { get; } public int Count { get; } }",
-            "class B : ICollection<int> { public B(int value) {} public void EnsureCapacity(int count) {} public void Add(int item) {} }"
+            "class B : ICollection<int> { public B(int value) {} public int Capacity { get; set; } public void Add(int item) {} }"
         );
         TestHelper
             .GenerateMapper(source)
@@ -157,10 +157,60 @@ public class EnumerableCustomTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(source.Value);
-                target.EnsureCapacity(source.Count);
+                target.Capacity = source.Count;
                 foreach (var item in source)
                 {
                     target.Add(int.Parse(item));
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void EnumerableToCustomCollectionWithCapacityMember()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "IEnumerable<int>",
+            "A",
+            "class A : ICollection<int> { public int Capacity { get; set; } public void Add(int item) {} }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                if (global::System.Linq.Enumerable.TryGetNonEnumeratedCount(source, out var sourceCount))
+                {
+                    target.Capacity = sourceCount;
+                }
+                foreach (var item in source)
+                {
+                    target.Add(item);
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void EnumerableToCustomCollectionWithReadOnlyCapacityMember()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "IEnumerable<int>",
+            "A",
+            "class A : ICollection<int> { public int Capacity { get; } public void Add(int item) {} }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                foreach (var item in source)
+                {
+                    target.Add(item);
                 }
                 return target;
                 """

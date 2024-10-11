@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Enumerables;
-using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
+using Riok.Mapperly.Descriptors.Enumerables.Capacity;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
@@ -23,11 +23,11 @@ public class ForEachSetDictionaryExistingTargetMapping(
     private const string KeyPropertyName = nameof(KeyValuePair<object, object>.Key);
     private const string ValuePropertyName = nameof(KeyValuePair<object, object>.Value);
 
-    private EnsureCapacityInfo? _ensureCapacityInfo;
+    private ICapacitySetter? _capacitySetter;
 
     public CollectionInfos CollectionInfos => collectionInfos;
 
-    public void AddEnsureCapacity(EnsureCapacityInfo ensureCapacityInfo) => _ensureCapacityInfo = ensureCapacityInfo;
+    public void AddCapacitySetter(ICapacitySetter capacitySetter) => _capacitySetter = capacitySetter;
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
@@ -47,9 +47,9 @@ public class ForEachSetDictionaryExistingTargetMapping(
             yield return ctx.SyntaxFactory.DeclareLocalVariable(castedVariable, cast);
         }
 
-        if (_ensureCapacityInfo != null)
+        if (_capacitySetter != null)
         {
-            yield return _ensureCapacityInfo.Build(ctx, target);
+            yield return _capacitySetter.Build(ctx, target);
         }
 
         var loopItemVariableName = ctx.NameBuilder.New(LoopItemVariableName);

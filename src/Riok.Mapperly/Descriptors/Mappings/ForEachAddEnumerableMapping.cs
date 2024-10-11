@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Constructors;
 using Riok.Mapperly.Descriptors.Enumerables;
-using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
+using Riok.Mapperly.Descriptors.Enumerables.Capacity;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
@@ -32,7 +32,7 @@ public class ForEachAddEnumerableMapping : NewInstanceObjectMemberMethodMapping,
 
     public CollectionInfos CollectionInfos => _existingTargetMapping.CollectionInfos;
 
-    public void AddEnsureCapacity(EnsureCapacityInfo ensureCapacityInfo) => _existingTargetMapping.AddEnsureCapacity(ensureCapacityInfo);
+    public void AddCapacitySetter(ICapacitySetter capacitySetter) => _existingTargetMapping.AddCapacitySetter(capacitySetter);
 
     protected override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {

@@ -113,6 +113,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.ExistingSortedSet.Add(item2);
             }
+            target.ExistingList.Capacity = src.ExistingList.Count + target.ExistingList.Count;
             foreach (var item3 in src.ExistingList)
             {
                 target.ExistingList.Add(item3);
