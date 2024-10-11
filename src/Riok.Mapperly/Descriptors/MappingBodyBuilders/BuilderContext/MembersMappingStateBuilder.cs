@@ -12,7 +12,7 @@ internal static class MembersMappingStateBuilder
     public static MembersMappingState Build(MappingBuilderContext ctx, IMapping mapping)
     {
         // build configurations
-        var configuredTargetMembers = new HashSet<StringMemberPath>();
+        var configuredTargetMembers = new HashSet<IMemberPathConfiguration>();
         var memberValueConfigsByRootTargetName = BuildMemberValueConfigurations(ctx, mapping, configuredTargetMembers);
         var memberConfigsByRootTargetName = BuildMemberConfigurations(ctx, mapping, configuredTargetMembers);
 
@@ -76,18 +76,18 @@ internal static class MembersMappingStateBuilder
     private static Dictionary<string, List<MemberValueMappingConfiguration>> BuildMemberValueConfigurations(
         MappingBuilderContext ctx,
         IMapping mapping,
-        HashSet<StringMemberPath> configuredTargetMembers
+        HashSet<IMemberPathConfiguration> configuredTargetMembers
     )
     {
         return GetUniqueTargetConfigurations(ctx, mapping, configuredTargetMembers, ctx.Configuration.Members.ValueMappings, x => x.Target)
-            .GroupBy(x => x.Target.Path[0])
+            .GroupBy(x => x.Target.RootName)
             .ToDictionary(x => x.Key, x => x.ToList());
     }
 
     private static Dictionary<string, List<MemberMappingConfiguration>> BuildMemberConfigurations(
         MappingBuilderContext ctx,
         IMapping mapping,
-        HashSet<StringMemberPath> configuredTargetMembers
+        HashSet<IMemberPathConfiguration> configuredTargetMembers
     )
     {
         // order by target path count as objects with less path depth should be mapped first
@@ -99,16 +99,16 @@ internal static class MembersMappingStateBuilder
                 ctx.Configuration.Members.ExplicitMappings,
                 x => x.Target
             )
-            .GroupBy(x => x.Target.Path[0])
-            .ToDictionary(x => x.Key, x => x.OrderBy(cfg => cfg.Target.Path.Count).ToList());
+            .GroupBy(x => x.Target.RootName)
+            .ToDictionary(x => x.Key, x => x.OrderBy(cfg => cfg.Target.PathCount).ToList());
     }
 
     private static IEnumerable<T> GetUniqueTargetConfigurations<T>(
         MappingBuilderContext ctx,
         IMapping mapping,
-        HashSet<StringMemberPath> configuredTargetMembers,
+        HashSet<IMemberPathConfiguration> configuredTargetMembers,
         IEnumerable<T> configs,
-        Func<T, StringMemberPath> targetPathSelector
+        Func<T, IMemberPathConfiguration> targetPathSelector
     )
     {
         foreach (var config in configs)

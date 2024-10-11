@@ -13,6 +13,8 @@ public interface IMappableMember
 
     ITypeSymbol Type { get; }
 
+    INamedTypeSymbol? ContainingType { get; }
+
     bool IsNullable { get; }
 
     /// <summary>

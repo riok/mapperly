@@ -3,12 +3,12 @@ using System.Diagnostics;
 namespace Riok.Mapperly.Configuration;
 
 [DebuggerDisplay("{Target}: {DescribeValue()}")]
-public record MemberValueMappingConfiguration(StringMemberPath Target, AttributeValue? Value) : HasSyntaxReference
+public record MemberValueMappingConfiguration(IMemberPathConfiguration Target, AttributeValue? Value) : HasSyntaxReference
 {
     /// <summary>
     /// Constructor used by <see cref="AttributeDataAccessor"/>.
     /// </summary>
-    public MemberValueMappingConfiguration(StringMemberPath target)
+    public MemberValueMappingConfiguration(IMemberPathConfiguration target)
         : this(target, null) { }
 
     public string? Use { get; set; }
