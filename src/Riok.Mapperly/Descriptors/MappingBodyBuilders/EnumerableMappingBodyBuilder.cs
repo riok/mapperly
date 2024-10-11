@@ -1,5 +1,5 @@
 using Microsoft.CodeAnalysis;
-using Riok.Mapperly.Descriptors.Enumerables.EnsureCapacity;
+using Riok.Mapperly.Descriptors.Enumerables.Capacity;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
@@ -9,6 +9,13 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 internal static class EnumerableMappingBodyBuilder
 {
     private const string SystemNamespaceName = "System";
+
+    private static readonly IReadOnlyCollection<string> _sourceCountAlias =
+    [
+        nameof(Array.Length),
+        nameof(List<object>.Count),
+        nameof(List<object>.Capacity),
+    ];
 
     public static void BuildMappingBody(MappingBuilderContext ctx, INewInstanceEnumerableMapping mapping)
     {
@@ -26,9 +33,14 @@ internal static class EnumerableMappingBodyBuilder
         InitContext(mappingCtx);
 
         // include the target count as the target could already include elements
-        if (EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx, mapping.CollectionInfos, true) is { } ensureCapacity)
+        if (CapacitySetterBuilder.TryBuildCapacitySetter(ctx, mapping.CollectionInfos, true) is { } capacitySetter)
         {
-            mapping.AddEnsureCapacity(ensureCapacity);
+            if (capacitySetter.CapacityTargetMember != null)
+            {
+                mappingCtx.IgnoreMembers(capacitySetter.CapacityTargetMember);
+            }
+
+            mapping.AddCapacitySetter(capacitySetter);
         }
 
         ObjectMemberMappingBodyBuilder.BuildMappingBody(mappingCtx);
@@ -47,7 +59,7 @@ internal static class EnumerableMappingBodyBuilder
     private static void IgnoreSystemMembers<T>(IMembersBuilderContext<T> ctx, ITypeSymbol type)
         where T : IMapping
     {
-        // ignore all members of collection classes of the System.Private.CoreLib assembly or of arrays
+        // ignore all members of collection classes of the System.Private.CoreLib assembly
         // as these are considered mapped by the enumerable mapping itself
         // these members can still be mapped with an explicit configuration.
         var systemType = type.WalkTypeHierarchy().FirstOrDefault(x => x.IsArrayType() || x.IsInRootNamespace(SystemNamespaceName));
@@ -66,9 +78,10 @@ internal static class EnumerableMappingBodyBuilder
         // named with a well known "count" name
         if (ctx.Mapping.CollectionInfos.Source.CountIsKnown)
         {
-            ctx.TryAddSourceMemberAlias(nameof(List<object>.Capacity), ctx.Mapping.CollectionInfos.Source.CountMember);
-            ctx.TryAddSourceMemberAlias(nameof(List<object>.Count), ctx.Mapping.CollectionInfos.Source.CountMember);
-            ctx.TryAddSourceMemberAlias(nameof(Array.Length), ctx.Mapping.CollectionInfos.Source.CountMember);
+            foreach (var countAlias in _sourceCountAlias)
+            {
+                ctx.TryAddSourceMemberAlias(countAlias, ctx.Mapping.CollectionInfos.Source.CountMember);
+            }
         }
 
         // always prefer parameterized constructor for system collections (to map capacity correctly)
@@ -87,7 +100,7 @@ internal static class EnumerableMappingBodyBuilder
         // do not include the target count as the instance is just created by the ctor
         if (
             !countIsMapped
-            && EnsureCapacityBuilder.TryBuildEnsureCapacity(ctx.BuilderContext, ctx.Mapping.CollectionInfos, false) is { } ensureCapacity
+            && CapacitySetterBuilder.TryBuildCapacitySetter(ctx.BuilderContext, ctx.Mapping.CollectionInfos, false) is { } capacitySetter
         )
         {
             if (ctx.Mapping.CollectionInfos.Source.CountIsKnown)
@@ -95,7 +108,12 @@ internal static class EnumerableMappingBodyBuilder
                 ctx.IgnoreMembers(ctx.Mapping.CollectionInfos.Source.CountMember);
             }
 
-            ctx.Mapping.AddEnsureCapacity(ensureCapacity);
+            if (capacitySetter.CapacityTargetMember != null)
+            {
+                ctx.IgnoreMembers(capacitySetter.CapacityTargetMember);
+            }
+
+            ctx.Mapping.AddCapacitySetter(capacitySetter);
         }
     }
 }
