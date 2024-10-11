@@ -94,6 +94,10 @@ async function createConfig() {
               sidebarId: 'contributing',
             },
             {
+              type: 'custom-coffeeNavbarItem',
+              position: 'right',
+            },
+            {
               type: 'custom-versionsNavbarItem',
               position: 'right',
             },
