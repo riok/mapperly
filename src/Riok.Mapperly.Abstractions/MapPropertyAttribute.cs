@@ -50,7 +50,6 @@ public sealed class MapPropertyAttribute : Attribute
     /// </summary>
     /// <param name="source">The path of the source property. The use of `nameof()` is encouraged.</param>
     /// <param name="target">The path of the target property. The use of `nameof()` is encouraged.</param>
-    [Obsolete("Use MapPropertyAttribute(string[], string) or MapPropertyAttribute(string, string[]) instead.")]
     public MapPropertyAttribute(string[] source, string[] target)
     {
         Source = source;

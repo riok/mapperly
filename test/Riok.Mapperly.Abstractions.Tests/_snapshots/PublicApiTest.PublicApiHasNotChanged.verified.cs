@@ -82,8 +82,6 @@ namespace Riok.Mapperly.Abstractions
         public MapPropertyAttribute(string source, string target) { }
         public MapPropertyAttribute(string[] source, string target) { }
         public MapPropertyAttribute(string source, string[] target) { }
-        [System.Obsolete("Use MapPropertyAttribute(string[], string) or MapPropertyAttribute(string, string" +
-            "[]) instead.")]
         public MapPropertyAttribute(string[] source, string[] target) { }
         public string? FormatProvider { get; set; }
         public System.Collections.Generic.IReadOnlyCollection<string> Source { get; }
