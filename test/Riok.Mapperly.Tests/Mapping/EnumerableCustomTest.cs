@@ -381,4 +381,57 @@ public class EnumerableCustomTest
                 """
             );
     }
+
+    [Fact]
+    public void CustomCollectionToGetOnlyICollection()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public C Value { get; } }",
+            "class B { public ICollection<int> Value { get; } }",
+            "class C : IEnumerable<int> { public int Capacity { get; } public int Count { get; } }"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowAndIncludeAllDiagnostics)
+            .Should()
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                foreach (var item in source.Value)
+                {
+                    target.Value.Add(item);
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void CustomCollectionToGetOnlyList()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public C Value { get; } }",
+            "class B { public List<int> Value { get; } }",
+            "class C : IEnumerable<int> { public int Capacity { get; } public int Count { get; } }"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowAndIncludeAllDiagnostics)
+            .Should()
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value.EnsureCapacity(source.Value.Count + target.Value.Count);
+                foreach (var item in source.Value)
+                {
+                    target.Value.Add(item);
+                }
+                return target;
+                """
+            );
+    }
 }

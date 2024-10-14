@@ -16,6 +16,7 @@ public interface IMembersBuilderContext<out T>
     MappingBuilderContext BuilderContext { get; }
 
     void IgnoreMembers(IMappableMember member);
+    void IgnoreMembers(string memberName);
 
     void SetMembersMapped(MemberMappingInfo members);
 

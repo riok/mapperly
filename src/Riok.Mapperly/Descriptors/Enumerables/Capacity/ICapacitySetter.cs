@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings;
-using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.Enumerables.Capacity;
 
@@ -9,7 +8,5 @@ namespace Riok.Mapperly.Descriptors.Enumerables.Capacity;
 /// </summary>
 public interface ICapacitySetter
 {
-    IMappableMember? CapacityTargetMember { get; }
-
     StatementSyntax Build(TypeMappingBuildContext ctx, ExpressionSyntax target);
 }

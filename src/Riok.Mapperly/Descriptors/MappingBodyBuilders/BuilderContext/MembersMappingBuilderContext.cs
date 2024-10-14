@@ -45,6 +45,8 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
 
     public void IgnoreMembers(IMappableMember member) => _state.IgnoreMembers(member);
 
+    public void IgnoreMembers(string memberName) => _state.IgnoreMembers(memberName);
+
     public void ConsumeMemberConfigs(MemberMappingInfo members)
     {
         if (members.Configuration != null)

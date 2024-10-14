@@ -238,11 +238,11 @@ internal static class SymbolExtensions
     internal static bool IsInRootNamespace(this ISymbol symbol, string ns)
     {
         var namespaceSymbol = symbol.ContainingNamespace;
-        while (namespaceSymbol.ContainingNamespace is { IsGlobalNamespace: false })
+        while (namespaceSymbol?.ContainingNamespace is { IsGlobalNamespace: false })
         {
             namespaceSymbol = namespaceSymbol.ContainingNamespace;
         }
 
-        return string.Equals(namespaceSymbol.Name, ns, StringComparison.Ordinal);
+        return namespaceSymbol != null && string.Equals(namespaceSymbol.Name, ns, StringComparison.Ordinal);
     }
 }

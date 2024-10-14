@@ -9,6 +9,7 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 internal static class EnumerableMappingBodyBuilder
 {
     private const string SystemNamespaceName = "System";
+    private const string CapacityMemberName = "Capacity";
 
     private static readonly IReadOnlyCollection<string> _sourceCountAlias =
     [
@@ -35,12 +36,12 @@ internal static class EnumerableMappingBodyBuilder
         // include the target count as the target could already include elements
         if (CapacitySetterBuilder.TryBuildCapacitySetter(ctx, mapping.CollectionInfos, true) is { } capacitySetter)
         {
-            if (capacitySetter.CapacityTargetMember != null)
-            {
-                mappingCtx.IgnoreMembers(capacitySetter.CapacityTargetMember);
-            }
-
+            mappingCtx.IgnoreMembers(CapacityMemberName);
             mapping.AddCapacitySetter(capacitySetter);
+        }
+        else
+        {
+            IgnoreCapacityIfSystemType(mappingCtx);
         }
 
         ObjectMemberMappingBodyBuilder.BuildMappingBody(mappingCtx);
@@ -69,6 +70,15 @@ internal static class EnumerableMappingBodyBuilder
         foreach (var member in ctx.BuilderContext.SymbolAccessor.GetAllAccessibleMappableMembers(systemType))
         {
             ctx.IgnoreMembers(member);
+        }
+    }
+
+    private static void IgnoreCapacityIfSystemType<T>(IMembersBuilderContext<T> ctx)
+        where T : IEnumerableMapping
+    {
+        if (ctx.Mapping.SourceType.IsInRootNamespace(SystemNamespaceName) || ctx.Mapping.TargetType.IsInRootNamespace(SystemNamespaceName))
+        {
+            ctx.IgnoreMembers(CapacityMemberName);
         }
     }
 
@@ -108,12 +118,12 @@ internal static class EnumerableMappingBodyBuilder
                 ctx.IgnoreMembers(ctx.Mapping.CollectionInfos.Source.CountMember);
             }
 
-            if (capacitySetter.CapacityTargetMember != null)
-            {
-                ctx.IgnoreMembers(capacitySetter.CapacityTargetMember);
-            }
-
+            ctx.IgnoreMembers(CapacityMemberName);
             ctx.Mapping.AddCapacitySetter(capacitySetter);
+        }
+        else
+        {
+            IgnoreCapacityIfSystemType(ctx);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace Riok.Mapperly.Descriptors.Enumerables.Capacity;
 /// <summary>
 /// Ensures the capacity of a collection by calling `EnsureCapacity(int)`
 /// </summary>
-internal class EnsureCapacityMethodSetter : ICapacityMemberSetter
+internal class EnsureCapacityMethodSetter : IMemberSetter
 {
     public static readonly EnsureCapacityMethodSetter Instance = new();
 
@@ -16,8 +16,6 @@ internal class EnsureCapacityMethodSetter : ICapacityMemberSetter
     private EnsureCapacityMethodSetter() { }
 
     public bool SupportsCoalesceAssignment => false;
-
-    public IMappableMember? TargetCapacity => null;
 
     public ExpressionSyntax BuildAssignment(ExpressionSyntax? baseAccess, ExpressionSyntax valueToAssign, bool coalesceAssignment = false)
     {
