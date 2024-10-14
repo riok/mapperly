@@ -114,7 +114,9 @@ internal static class SourceValueBuilder
             return true;
         }
 
-        if (!SymbolEqualityComparer.Default.Equals(value.ConstantValue.Type, memberMappingInfo.TargetMember.MemberType))
+        // use non-nullable target type to allow non-null value type assignments
+        // to nullable value types
+        if (!SymbolEqualityComparer.Default.Equals(value.ConstantValue.Type, memberMappingInfo.TargetMember.MemberType.NonNullable()))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.MapValueTypeMismatch,
@@ -135,7 +137,7 @@ internal static class SourceValueBuilder
                 // expand enum member access to fully qualified identifier
                 // use simple member name approach instead of slower visitor pattern on the expression
                 var enumMemberName = ((MemberAccessExpressionSyntax)value.Expression).Name.Identifier.Text;
-                var enumTypeFullName = FullyQualifiedIdentifier(memberMappingInfo.TargetMember.MemberType);
+                var enumTypeFullName = FullyQualifiedIdentifier(memberMappingInfo.TargetMember.MemberType.NonNullable());
                 sourceValue = new ConstantSourceValue(MemberAccess(enumTypeFullName, enumMemberName));
                 return true;
             case TypedConstantKind.Type:
@@ -179,8 +181,10 @@ internal static class SourceValueBuilder
             return false;
         }
 
+        // use non-nullable target type to allow non-null value type assignments
+        // to nullable value types
         var methodCandidates = namedMethodCandidates.Where(x =>
-            SymbolEqualityComparer.Default.Equals(x.ReturnType, memberMappingInfo.TargetMember.MemberType)
+            SymbolEqualityComparer.Default.Equals(x.ReturnType, memberMappingInfo.TargetMember.MemberType.NonNullable())
         );
 
         if (!memberMappingInfo.TargetMember.Member.IsNullable)
