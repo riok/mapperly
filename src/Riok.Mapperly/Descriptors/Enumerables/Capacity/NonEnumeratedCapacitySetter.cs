@@ -18,15 +18,10 @@ namespace Riok.Mapperly.Descriptors.Enumerables.Capacity;
 ///     target.EnsureCapacity(sourceCount + target.Count);
 /// </code>
 /// </remarks>
-public class NonEnumeratedCapacitySetter(
-    ICapacityMemberSetter capacitySetter,
-    IMemberGetter? targetAccessor,
-    IMethodSymbol getNonEnumeratedMethod
-) : ICapacitySetter
+public class NonEnumeratedCapacitySetter(IMemberSetter capacitySetter, IMemberGetter? targetAccessor, IMethodSymbol getNonEnumeratedMethod)
+    : ICapacitySetter
 {
     private const string SourceCountVariableName = "sourceCount";
-
-    public IMappableMember? CapacityTargetMember => capacitySetter.TargetCapacity;
 
     public StatementSyntax Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {

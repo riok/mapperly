@@ -15,11 +15,9 @@ namespace Riok.Mapperly.Descriptors.Enumerables.Capacity;
 /// target.Capacity = source.Length + target.Count;
 /// </code>
 /// </remarks>
-public class SimpleCapacitySetter(ICapacityMemberSetter capacitySetter, IMemberGetter? targetAccessor, IMemberGetter sourceAccessor)
+public class SimpleCapacitySetter(IMemberSetter capacitySetter, IMemberGetter? targetAccessor, IMemberGetter sourceAccessor)
     : ICapacitySetter
 {
-    public IMappableMember? CapacityTargetMember => capacitySetter.TargetCapacity;
-
     public StatementSyntax Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
         var count = sourceAccessor.BuildAccess(ctx.Source);

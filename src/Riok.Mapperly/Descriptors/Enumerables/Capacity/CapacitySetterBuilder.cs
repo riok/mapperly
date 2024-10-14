@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.Enumerables.Capacity;
 
@@ -48,7 +49,7 @@ public static class CapacitySetterBuilder
         return new NonEnumeratedCapacitySetter(capacitySetter, targetCount, nonEnumeratedCountMethod);
     }
 
-    private static ICapacityMemberSetter? BuildCapacitySetter(MappingBuilderContext ctx, CollectionInfo target)
+    private static IMemberSetter? BuildCapacitySetter(MappingBuilderContext ctx, CollectionInfo target)
     {
         var ensureCapacityMethod = ctx
             .SymbolAccessor.GetAllMethods(target.Type, EnsureCapacityMethodSetter.EnsureCapacityMethodName)
@@ -58,7 +59,7 @@ public static class CapacitySetterBuilder
 
         var member = ctx.SymbolAccessor.GetMappableMember(target.Type, CapacityMemberName);
         if (member is { CanSetDirectly: true, IsInitOnly: false, Type.SpecialType: SpecialType.System_Int32 })
-            return CapacityMemberSetter.Build(ctx, member);
+            return member.BuildSetter(ctx.UnsafeAccessorContext);
 
         return null;
     }

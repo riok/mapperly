@@ -91,15 +91,17 @@ internal class MembersMappingState(
         SetMembersMapped(info, ignoreTargetCasing);
     }
 
-    public void IgnoreMembers(IMappableMember member)
-    {
-        _unmappedSourceMemberNames.Remove(member.Name);
-        _unmappedTargetMemberNames.Remove(member.Name);
-        ignoredSourceMemberNames.Add(member.Name);
+    public void IgnoreMembers(IMappableMember member) => IgnoreMembers(member.Name);
 
-        if (!HasMemberConfig(member.Name))
+    public void IgnoreMembers(string name)
+    {
+        _unmappedSourceMemberNames.Remove(name);
+        _unmappedTargetMemberNames.Remove(name);
+        ignoredSourceMemberNames.Add(name);
+
+        if (!HasMemberConfig(name))
         {
-            targetMembers.Remove(member.Name);
+            targetMembers.Remove(name);
         }
     }
 
