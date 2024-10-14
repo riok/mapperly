@@ -163,6 +163,56 @@ public class ObjectPropertyValueMethodTest
     }
 
     [Fact]
+    public void MethodReturnTypeNonNullableToNullable()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("Value", Use = nameof(BuildC))] partial B Map(A source);
+            C BuildC() => new C();
+            """,
+            "class A;",
+            "class B { public C? Value { get; set; } }",
+            "class C;"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = BuildC();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MethodReturnValueTypeNonNullableToNullable()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("Value", Use = nameof(BuildC))] partial B Map(A source);
+            C BuildC() => C.C1;
+            """,
+            "class A;",
+            "class B { public C? Value { get; set; } }",
+            "enum C { C1 };"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = BuildC();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void MethodReturnTypeInDisabledNullableContext()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

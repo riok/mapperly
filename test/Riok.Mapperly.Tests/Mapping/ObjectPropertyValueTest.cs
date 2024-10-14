@@ -531,6 +531,27 @@ public class ObjectPropertyValueTest
     }
 
     [Fact]
+    public void IntToNullableValueProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """[MapValue("IntValue", 1)] partial B Map(A source);""",
+            "class A;",
+            "class B { public int? IntValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.IntValue = 1;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void ExplicitNullToNullableValueProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -646,6 +667,30 @@ public class ObjectPropertyValueTest
                 """
                 var target = new global::B();
                 target.Value = 10;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void EnumToNestedNullableProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """[MapValue("Nested.Value", E.E1)] partial B Map(A source);""",
+            "class A;",
+            "class B { public C? Nested { get; set; } }",
+            "class C { public E? Value { get; set; } }",
+            "enum E { E1 }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Nested ??= new global::C();
+                target.Nested.Value = global::E.E1;
                 return target;
                 """
             );
