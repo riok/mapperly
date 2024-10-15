@@ -595,6 +595,121 @@ public class ObjectPropertyValueTest
     }
 
     [Fact]
+    public void EnumToNullableProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """[MapValue("EnumValue", E1.Value2)] partial B Map(A source);""",
+            "class A;",
+            "enum E1 { Value1, Value2 }",
+            "class B { public E1? EnumValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.EnumValue = global::E1.Value2;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void DefaultToEnumProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """[MapValue("EnumValue", default)] partial B Map(A source);""",
+            "class A;",
+            "enum E1 { Value1, Value2 }",
+            "class B { public E1 EnumValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.EnumValue = default;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullToEnumPropertyShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """[MapValue("EnumValue", null)] partial B Map(A source);""",
+            "class A;",
+            "enum E1 { Value1, Value2 }",
+            "class B { public E1 EnumValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowAndIncludeAllDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.CannotMapValueNullToNonNullable,
+                "Cannot assign null to non-nullable member B.EnumValue of type E1"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.EnumValue = default;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullToEnumNullableProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """[MapValue("EnumValue", null)] partial B Map(A source);""",
+            "class A;",
+            "enum E1 { Value1, Value2 }",
+            "class B { public E1? EnumValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.EnumValue = null;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void DefaultToEnumNullableProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """[MapValue("EnumValue", default)] partial B Map(A source);""",
+            "class A;",
+            "enum E1 { Value1, Value2 }",
+            "class B { public E1? EnumValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.EnumValue = default;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void NamespacedEnumToProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -643,6 +758,30 @@ public class ObjectPropertyValueTest
     }
 
     [Fact]
+    public void EnumToNestedNullableProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """[MapValue("Nested.Value", E.E1)] partial B Map(A source);""",
+            "class A;",
+            "class B { public C? Nested { get; set; } }",
+            "class C { public E? Value { get; set; } }",
+            "enum E { E1 }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Nested ??= new global::C();
+                target.Nested.Value = global::E.E1;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void MapValueDuplicateForSameTargetMemberShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -667,30 +806,6 @@ public class ObjectPropertyValueTest
                 """
                 var target = new global::B();
                 target.Value = 10;
-                return target;
-                """
-            );
-    }
-
-    [Fact]
-    public void EnumToNestedNullableProperty()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            """[MapValue("Nested.Value", E.E1)] partial B Map(A source);""",
-            "class A;",
-            "class B { public C? Nested { get; set; } }",
-            "class C { public E? Value { get; set; } }",
-            "enum E { E1 }"
-        );
-
-        TestHelper
-            .GenerateMapper(source)
-            .Should()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::B();
-                target.Nested ??= new global::C();
-                target.Nested.Value = global::E.E1;
                 return target;
                 """
             );

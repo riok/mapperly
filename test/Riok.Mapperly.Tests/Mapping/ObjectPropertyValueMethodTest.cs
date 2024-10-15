@@ -134,7 +134,7 @@ public class ObjectPropertyValueMethodTest
     }
 
     [Fact]
-    public void MethodReturnTypeNullMismatchShouldDiagnostic()
+    public void MethodReturnTypeNullableToNonNullableShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -188,16 +188,16 @@ public class ObjectPropertyValueMethodTest
     }
 
     [Fact]
-    public void MethodReturnValueTypeNonNullableToNullable()
+    public void MethodReturnValueTypeNullableToNullable()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapValue("Value", Use = nameof(BuildC))] partial B Map(A source);
-            C BuildC() => C.C1;
+            C? BuildC() => C.C1;
             """,
             "class A;",
             "class B { public C? Value { get; set; } }",
-            "enum C { C1 };"
+            "enum C { C1 }"
         );
 
         TestHelper
@@ -207,6 +207,61 @@ public class ObjectPropertyValueMethodTest
                 """
                 var target = new global::B();
                 target.Value = BuildC();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MethodReturnValueTypeNonNullableToNullable()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("Value", Use = nameof(BuildC))] partial B Map(A source);
+            C BuildC() => C.C1;
+            """,
+            "class A;",
+            "class B { public C? Value { get; set; } }",
+            "enum C { C1 }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = BuildC();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MethodReturnValueTypeNullableToNonNullableShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("Value", Use = nameof(BuildC))] partial B Map(A source);
+            System.Nullable<C> BuildC() => C.C1;
+            """,
+            "class A;",
+            "class B { public C Value { get; set; } }",
+            "enum C { C1 }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowAndIncludeAllDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.MapValueMethodTypeMismatch,
+                "Cannot assign method return type C? of BuildC() to B.Value of type C"
+            )
+            .HaveDiagnostic(DiagnosticDescriptors.NoMemberMappings, "No members are mapped in the object mapping from A to B")
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
                 return target;
                 """
             );

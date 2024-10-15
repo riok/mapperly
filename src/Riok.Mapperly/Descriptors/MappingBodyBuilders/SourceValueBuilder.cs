@@ -181,10 +181,11 @@ internal static class SourceValueBuilder
             return false;
         }
 
-        // use non-nullable target type to allow non-null value type assignments
+        // use non-nullable to allow non-null value type assignments
         // to nullable value types
+        // nullable is checked with nullable annotation
         var methodCandidates = namedMethodCandidates.Where(x =>
-            SymbolEqualityComparer.Default.Equals(x.ReturnType, memberMappingInfo.TargetMember.MemberType.NonNullable())
+            SymbolEqualityComparer.Default.Equals(x.ReturnType.NonNullable(), memberMappingInfo.TargetMember.MemberType.NonNullable())
         );
 
         if (!memberMappingInfo.TargetMember.Member.IsNullable)
