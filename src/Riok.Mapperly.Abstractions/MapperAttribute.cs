@@ -22,6 +22,12 @@ public class MapperAttribute : Attribute
     public EnumMappingStrategy EnumMappingStrategy { get; set; } = EnumMappingStrategy.ByValue;
 
     /// <summary>
+    /// Defines the strategy to use when mapping an enum from/to string.
+    /// Can be overwritten on specific enums via mapping method configurations.
+    /// </summary>
+    public EnumNamingStrategy EnumNamingStrategy { get; set; } = EnumNamingStrategy.MemberName;
+
+    /// <summary>
     /// Whether the case should be ignored for enum mappings.
     /// </summary>
     public bool EnumMappingIgnoreCase { get; set; }
@@ -125,10 +131,4 @@ public class MapperAttribute : Attribute
     /// partial methods are discovered.
     /// </summary>
     public bool AutoUserMappings { get; set; } = true;
-
-    /// <summary>
-    /// Defines the strategy to use when mapping an enum from/to string.
-    /// Can be overwritten on specific enums via mapping method configurations.
-    /// </summary>
-    public EnumNamingStrategy EnumNamingStrategy { get; set; } = EnumNamingStrategy.MemberName;
 }
