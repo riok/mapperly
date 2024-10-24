@@ -26,11 +26,12 @@ public class PropertyMember(IPropertySymbol symbol, SymbolAccessor symbolAccesso
     public bool CanGet => !Symbol.IsWriteOnly && (Symbol.GetMethod == null || symbolAccessor.IsMemberAccessible(Symbol.GetMethod));
 
     public bool CanGetDirectly =>
-        !Symbol.IsWriteOnly && (Symbol.GetMethod == null || symbolAccessor.IsDirectlyAccessible(Symbol.GetMethod));
+        Symbol is { IsWriteOnly: false, GetMethod: not null } && symbolAccessor.IsDirectlyAccessible(Symbol.GetMethod);
 
-    public bool CanSet => !Symbol.IsReadOnly && (Symbol.SetMethod == null || symbolAccessor.IsMemberAccessible(Symbol.SetMethod));
+    public bool CanSet => Symbol is { IsReadOnly: false, SetMethod: not null } && symbolAccessor.IsMemberAccessible(Symbol.SetMethod);
 
-    public bool CanSetDirectly => !Symbol.IsReadOnly && (Symbol.SetMethod == null || symbolAccessor.IsDirectlyAccessible(Symbol.SetMethod));
+    public bool CanSetDirectly =>
+        Symbol is { IsReadOnly: false, SetMethod: not null } && symbolAccessor.IsDirectlyAccessible(Symbol.SetMethod);
 
     public bool IsInitOnly => Symbol.SetMethod?.IsInitOnly == true;
 
