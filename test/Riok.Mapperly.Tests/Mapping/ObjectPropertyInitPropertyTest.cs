@@ -443,4 +443,35 @@ public class ObjectPropertyInitPropertyTest
                 """
             );
     }
+
+    [Fact]
+    public void InheritedInitOnlyPropertyWithNoSetterOverrideShouldBeNotBeMapped()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            """
+            public record A(Guid Value);
+
+            public abstract record BBase
+            {
+                public virtual Guid Value { get; init; }
+            }
+
+            public record B : BBase
+            {
+                public override Guid Value => Guid.Empty;
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                return target;
+                """
+            );
+    }
 }
