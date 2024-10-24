@@ -6,7 +6,7 @@ namespace Riok.Mapperly.Emit.Syntax;
 
 public partial struct SyntaxFactoryHelper
 {
-    private const string NoMappingComment = "// Could not generate mapping";
+    private const string NoMappingMessage = "Mapperly: Could not generate mapping";
 
     private const string ArgumentOutOfRangeExceptionClassName = "System.ArgumentOutOfRangeException";
     private const string ArgumentNullExceptionClassName = "System.ArgumentNullException";
@@ -30,7 +30,7 @@ public partial struct SyntaxFactoryHelper
 
     public ThrowExpressionSyntax ThrowMappingNotImplementedException()
     {
-        return Throw(NotImplementedExceptionClassName, SyntaxFactory.ArgumentList()).AddLeadingLineComment(NoMappingComment, Indentation);
+        return Throw(NotImplementedExceptionClassName, ArgumentListWithoutIndention([StringLiteral(NoMappingMessage)]));
     }
 
     private ThrowStatementSyntax ThrowStatement(ExpressionSyntax? expression = null)

@@ -380,8 +380,7 @@ public class ValueTupleTest
             .HaveDiagnostic(DiagnosticDescriptors.NoConstructorFound)
             .HaveSingleMethodBody(
                 """
-                // Could not generate mapping
-                throw new System.NotImplementedException();
+                throw new System.NotImplementedException("Mapperly: Could not generate mapping");
                 """
             );
     }
@@ -407,8 +406,7 @@ public class ValueTupleTest
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
-                // Could not generate mapping
-                throw new System.NotImplementedException();
+                throw new System.NotImplementedException("Mapperly: Could not generate mapping");
                 """
             );
     }
@@ -431,8 +429,7 @@ public class ValueTupleTest
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
-                // Could not generate mapping
-                throw new System.NotImplementedException();
+                throw new System.NotImplementedException("Mapperly: Could not generate mapping");
                 """
             );
     }
@@ -699,8 +696,7 @@ public class ValueTupleTest
             .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
             .HaveSingleMethodBody(
                 """
-                // Could not generate mapping
-                throw new System.NotImplementedException();
+                throw new System.NotImplementedException("Mapperly: Could not generate mapping");
                 """
             );
     }
@@ -716,8 +712,7 @@ public class ValueTupleTest
             .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)
             .HaveSingleMethodBody(
                 """
-                // Could not generate mapping
-                throw new System.NotImplementedException();
+                throw new System.NotImplementedException("Mapperly: Could not generate mapping");
                 """
             );
     }
