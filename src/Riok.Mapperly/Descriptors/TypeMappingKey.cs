@@ -26,6 +26,8 @@ public readonly struct TypeMappingKey(
 
     public TypeMappingKey NonNullable() => new(Source.NonNullable(), Target.NonNullable(), Configuration);
 
+    public TypeMappingKey TargetNonNullable() => new(Source, Target.NonNullable(), Configuration);
+
     public override bool Equals(object? obj) =>
         obj is TypeMappingKey other
         && _comparer.Equals(Source, other.Source)

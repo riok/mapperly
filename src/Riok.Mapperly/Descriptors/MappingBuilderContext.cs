@@ -154,7 +154,9 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null
     )
     {
-        return FindMapping(mappingKey) ?? BuildMapping(mappingKey, options, diagnosticLocation);
+        return FindMapping(mappingKey)
+            ?? FindMapping(mappingKey.TargetNonNullable())
+            ?? BuildMapping(mappingKey, options, diagnosticLocation);
     }
 
     /// <summary>

@@ -899,4 +899,33 @@ public class ObjectPropertyNullableTest
                 """
             );
     }
+
+    [Fact]
+    public Task MixedNullableContextsWithDerivedTypesShouldWork()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapDerivedType<A, B>]
+            public partial BBase Map(ABase src);
+            """,
+            """
+            #nullable disable
+            public abstract record BBase
+            {
+                public List<BBase> Objects { get; init; } = [];
+            }
+
+            public record B : BBase;
+
+            #nullable enable
+            public abstract record ABase
+            {
+                public List<ABase> Objects { get; init; } = [];
+            }
+
+            public record A: ABase;
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
 }
