@@ -5,7 +5,7 @@ set -Eeuo pipefail
 # pack a nupkg for each roslyn version that is supported by Mapperly
 # and merge them together into one nupkg
 
-roslyn_versions=('4.0' '4.4' '4.5' '4.7')
+roslyn_versions=('4.0' '4.4' '4.5' '4.7' '4.11')
 
 RELEASE_VERSION=${RELEASE_VERSION:-"0.0.1-dev.$(date +%s)"}
 RELEASE_NOTES=${RELEASE_NOTES:-''}
