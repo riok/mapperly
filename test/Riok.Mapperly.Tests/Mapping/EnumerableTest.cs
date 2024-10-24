@@ -709,4 +709,18 @@ public class EnumerableTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task NullableElementMappingWithPrivateConstructorShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public IEnumerable<int> Value { get; } }",
+            "class B { public List<C?> Value { get; set; } }",
+            "class C { private C() {} }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

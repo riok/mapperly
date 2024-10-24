@@ -10,15 +10,6 @@ internal static class SyntaxIndentationExtensions
     private static readonly SyntaxTrivia _indentation = ElasticWhitespace("    ");
     private static readonly ConcurrentDictionary<int, SyntaxTrivia[]> _indentationLineFeedSyntaxTriviaCache = new();
 
-    public static TSyntax AddLeadingLineComment<TSyntax>(this TSyntax syntax, string comment, int indentation)
-        where TSyntax : SyntaxNode
-    {
-        var trivia = syntax.GetLeadingTrivia();
-        trivia = trivia.AddLineFeedAndIndentation(indentation);
-        trivia = trivia.Insert(0, Comment(comment));
-        return syntax.WithLeadingTrivia(trivia);
-    }
-
     public static IEnumerable<TSyntax> SeparateByLineFeed<TSyntax>(this IEnumerable<TSyntax> syntax, int indentation)
         where TSyntax : SyntaxNode
     {

@@ -10,7 +10,9 @@ public class UnimplementedMapping(ITypeSymbol sourceType, ITypeSymbol targetType
         INewInstanceMapping
 {
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx) =>
-        [ctx.SyntaxFactory.ExpressionStatement(ctx.SyntaxFactory.ThrowMappingNotImplementedException())];
+        [ctx.SyntaxFactory.ExpressionStatement(Build(ctx))];
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target) => BuildBody(ctx);
+
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) => ctx.SyntaxFactory.ThrowMappingNotImplementedException();
 }
