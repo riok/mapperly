@@ -4,7 +4,7 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Frame-Options: Deny
   Referrer-Policy: no-referrer
-  Content-Security-Policy: upgrade-insecure-requests; block-all-mixed-content; report-uri https://riok.report-uri.com/r/d/csp/enforce; default-src 'self'; script-src 'self' 'sha256-O8zYuOjyuzUZDv3fub7DKfAs5TEd1dG+fz+hCSCFmQA=' 'sha256-pBkmluod9Ko4GzDfbWgKM/wxzujFXUdGVOePkwOQT+c='; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://img.shields.io/; object-src 'none'; frame-ancestors 'none'
+  Content-Security-Policy: upgrade-insecure-requests; block-all-mixed-content; report-uri https://riok.report-uri.com/r/d/csp/enforce; default-src 'self'; script-src 'self' 'sha256-O8zYuOjyuzUZDv3fub7DKfAs5TEd1dG+fz+hCSCFmQA=' 'sha256-pBkmluod9Ko4GzDfbWgKM/wxzujFXUdGVOePkwOQT+c=' https://*.cloudflareinsights.com https://cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://img.shields.io/; object-src 'none'; frame-ancestors 'none'
   Cross-Origin-Opener-Policy: same-origin
   Permissions-Policy: accelerometer=(), ambient-light-sensor=(), autoplay=(), camera=(), display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=()
 
