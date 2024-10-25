@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
 
@@ -77,6 +78,20 @@ public abstract class MemberPath(ITypeSymbol rootType, IReadOnlyList<IMappableMe
         }
 
         return new NonEmptyMemberPath(rootType, path);
+    }
+
+    public bool Equals(IMemberPathConfiguration path)
+    {
+        if (path.PathCount != Path.Count)
+            return false;
+
+        foreach (var (pathSegment1, pathSegment2) in Path.Zip(path.MemberNames))
+        {
+            if (!string.Equals(pathSegment1.Name, pathSegment2, StringComparison.Ordinal))
+                return false;
+        }
+
+        return true;
     }
 
     public override bool Equals(object? obj)

@@ -23,6 +23,7 @@ public interface IMembersBuilderContext<out T>
     void SetTargetMemberMapped(IMappableMember targetMember);
 
     void ConsumeMemberConfigs(MemberMappingInfo members);
+    bool HasDuplicatedMemberConfig(NonEmptyMemberPath targetMemberPath);
 
     void TryAddSourceMemberAlias(string alias, IMappableMember member);
 

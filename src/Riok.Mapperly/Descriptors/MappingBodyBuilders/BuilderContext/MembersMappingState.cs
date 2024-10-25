@@ -27,6 +27,7 @@ internal class MembersMappingState(
     Dictionary<string, IMappableMember> targetMembers,
     Dictionary<string, List<MemberValueMappingConfiguration>> memberValueConfigsByRootTargetName,
     Dictionary<string, List<MemberMappingConfiguration>> memberConfigsByRootTargetName,
+    Dictionary<string, List<IMemberPathConfiguration>> configuredTargetMembersByRootName,
     HashSet<string> ignoredSourceMemberNames
 )
 {
@@ -103,6 +104,14 @@ internal class MembersMappingState(
         {
             targetMembers.Remove(name);
         }
+    }
+
+    public bool HasDuplicatedMemberConfig(NonEmptyMemberPath targetMemberPath)
+    {
+        if (!configuredTargetMembersByRootName.TryGetValue(targetMemberPath.RootName, out var configs))
+            return false;
+
+        return configs.Where(targetMemberPath.Equals).Skip(1).Any();
     }
 
     public void SetTargetMemberMapped(IMappableMember targetMember) => SetTargetMemberMapped(targetMember.Name);

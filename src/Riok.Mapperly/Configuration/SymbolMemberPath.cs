@@ -12,8 +12,9 @@ public record SymbolMemberPath(ImmutableEquatableArray<ISymbol> Path) : IMemberP
     private string? _fullName;
 
     public string RootName => Path[0].Name;
-    public string FullName => _fullName ??= string.Join(MemberPathConstants.MemberAccessSeparatorString, Path.Select(x => x.Name));
+    public string FullName => _fullName ??= string.Join(MemberPathConstants.MemberAccessSeparatorString, MemberNames);
     public int PathCount => Path.Count;
+    public IEnumerable<string> MemberNames => Path.Select(x => x.Name);
 
     public override string ToString() => FullName;
 

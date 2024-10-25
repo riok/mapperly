@@ -9,8 +9,20 @@ namespace Riok.Mapperly.Helpers;
 public class ListDictionary<TKey, TValue>
     where TKey : notnull
 {
-    private readonly IReadOnlyList<TValue> _empty = [];
-    private readonly Dictionary<TKey, List<TValue>> _data = new();
+    private static readonly IReadOnlyList<TValue> _empty = [];
+    private readonly Dictionary<TKey, List<TValue>> _data;
+
+    public ListDictionary()
+    {
+        _data = new Dictionary<TKey, List<TValue>>();
+    }
+
+    public ListDictionary(int capacity)
+    {
+        _data = new Dictionary<TKey, List<TValue>>(capacity);
+    }
+
+    public Dictionary<TKey, List<TValue>> AsDictionary() => _data;
 
     public IReadOnlyList<TValue> GetOrEmpty(TKey key) => _data.GetValueOrDefault(key) ?? _empty;
 

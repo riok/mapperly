@@ -16,6 +16,11 @@ public interface IMemberPathConfiguration
     string FullName { get; }
 
     /// <summary>
+    /// The member names of the path / each segment, e.g. [A,B,C]
+    /// </summary>
+    IEnumerable<string> MemberNames { get; }
+
+    /// <summary>
     /// The number of path segments in this path.
     /// </summary>
     int PathCount { get; }

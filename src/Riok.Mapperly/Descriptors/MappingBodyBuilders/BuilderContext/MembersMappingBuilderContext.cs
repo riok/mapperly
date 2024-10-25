@@ -60,6 +60,8 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
         }
     }
 
+    public bool HasDuplicatedMemberConfig(NonEmptyMemberPath targetMemberPath) => _state.HasDuplicatedMemberConfig(targetMemberPath);
+
     public void MappingAdded() => _state.MappingAdded();
 
     protected void MappingAdded(MemberMappingInfo info, bool ignoreTargetCasing = false) => _state.MappingAdded(info, ignoreTargetCasing);
