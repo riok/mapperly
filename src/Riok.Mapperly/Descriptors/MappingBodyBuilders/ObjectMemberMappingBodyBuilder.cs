@@ -107,11 +107,22 @@ public static class ObjectMemberMappingBodyBuilder
         var noInitOnlyPath = allowInitOnlyMember ? targetMemberPath.ObjectPath : targetMemberPath.Path;
         if (noInitOnlyPath.Any(p => p.IsInitOnly))
         {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.CannotMapToInitOnlyMemberPath,
-                memberInfo.DescribeSource(),
-                targetMemberPath.ToDisplayString(includeMemberType: false)
-            );
+            if (ctx.HasDuplicatedMemberConfig(targetMemberPath))
+            {
+                ctx.BuilderContext.ReportDiagnostic(
+                    DiagnosticDescriptors.MultipleConfigurationsForTargetMember,
+                    ctx.Mapping.TargetType.ToDisplayString(),
+                    targetMemberPath.ToDisplayString(includeMemberType: false, includeRootType: false)
+                );
+            }
+            else
+            {
+                ctx.BuilderContext.ReportDiagnostic(
+                    DiagnosticDescriptors.CannotMapToInitOnlyMemberPath,
+                    memberInfo.DescribeSource(),
+                    targetMemberPath.ToDisplayString(includeMemberType: false)
+                );
+            }
             return false;
         }
 

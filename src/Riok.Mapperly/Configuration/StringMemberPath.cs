@@ -12,6 +12,7 @@ public readonly record struct StringMemberPath(ImmutableEquatableArray<string> P
     public string RootName => Path[0];
     public string FullName => string.Join(MemberPathConstants.MemberAccessSeparatorString, Path);
     public int PathCount => Path.Count;
+    public IEnumerable<string> MemberNames => Path;
 
     public override string ToString() => FullName;
 

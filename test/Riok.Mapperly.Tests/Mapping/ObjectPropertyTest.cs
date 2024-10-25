@@ -177,30 +177,36 @@ public class ObjectPropertyTest
     }
 
     [Fact]
-    public void WithManualMappedPropertyDuplicated()
+    public void WithManualMappedPropertyDuplicatedAndNullFilter()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [MapProperty(nameof(A.StringValue), nameof(B.StringValue2)]
-            [MapProperty(nameof(A.StringValue), nameof(B.StringValue2)]
+            [MapProperty(nameof(A.StringValue1), nameof(B.StringValue)]
+            [MapProperty(nameof(A.StringValue2), nameof(B.StringValue)]
             partial B Map(A source);
             """,
-            "class A { public string StringValue { get; set; } }",
-            "class B { public string StringValue2 { get; set; } }"
+            TestSourceBuilderOptions.Default with
+            {
+                AllowNullPropertyAssignment = false,
+            },
+            "class A { public string? StringValue1 { get; set; } public string? StringValue2 { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
         );
 
         TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .GenerateMapper(source)
             .Should()
-            .HaveDiagnostic(
-                DiagnosticDescriptors.MultipleConfigurationsForTargetMember,
-                "Multiple mappings are configured for the same target member B.StringValue2"
-            )
-            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                target.StringValue2 = source.StringValue;
+                if (source.StringValue1 != null)
+                {
+                    target.StringValue = source.StringValue1;
+                }
+                if (source.StringValue2 != null)
+                {
+                    target.StringValue = source.StringValue2;
+                }
                 return target;
                 """
             );

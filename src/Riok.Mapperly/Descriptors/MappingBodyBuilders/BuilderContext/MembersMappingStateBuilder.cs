@@ -12,9 +12,23 @@ internal static class MembersMappingStateBuilder
     public static MembersMappingState Build(MappingBuilderContext ctx, IMapping mapping)
     {
         // build configurations
-        var configuredTargetMembers = new HashSet<IMemberPathConfiguration>();
-        var memberValueConfigsByRootTargetName = BuildMemberValueConfigurations(ctx, mapping, configuredTargetMembers);
-        var memberConfigsByRootTargetName = BuildMemberConfigurations(ctx, mapping, configuredTargetMembers);
+        // duplicated configurations are filtered inside the MapValue configurations
+        // if a MapProperty configuration references a target member which is already configured
+        // via MapValue it is also filtered & reported
+        var valueMappingConfiguredTargetPaths = new HashSet<string>();
+        var configuredTargetMembersByRootName = new ListDictionary<string, IMemberPathConfiguration>();
+        var memberValueConfigsByRootTargetName = BuildMemberValueConfigurations(
+            ctx,
+            mapping,
+            valueMappingConfiguredTargetPaths,
+            configuredTargetMembersByRootName
+        );
+        var memberConfigsByRootTargetName = BuildMemberConfigurations(
+            ctx,
+            mapping,
+            valueMappingConfiguredTargetPaths,
+            configuredTargetMembersByRootName
+        );
 
         // build all members
         var unmappedSourceMemberNames = GetSourceMemberNames(ctx, mapping);
@@ -47,6 +61,7 @@ internal static class MembersMappingStateBuilder
             targetMembers,
             memberValueConfigsByRootTargetName,
             memberConfigsByRootTargetName,
+            configuredTargetMembersByRootName.AsDictionary(),
             ignoredSourceMemberNames
         );
     }
@@ -76,55 +91,58 @@ internal static class MembersMappingStateBuilder
     private static Dictionary<string, List<MemberValueMappingConfiguration>> BuildMemberValueConfigurations(
         MappingBuilderContext ctx,
         IMapping mapping,
-        HashSet<IMemberPathConfiguration> configuredTargetMembers
+        HashSet<string> configuredTargetPaths,
+        ListDictionary<string, IMemberPathConfiguration> configuredTargetMembersByRootName
     )
     {
-        return GetUniqueTargetConfigurations(ctx, mapping, configuredTargetMembers, ctx.Configuration.Members.ValueMappings, x => x.Target)
-            .GroupBy(x => x.Target.RootName)
-            .ToDictionary(x => x.Key, x => x.ToList());
-    }
-
-    private static Dictionary<string, List<MemberMappingConfiguration>> BuildMemberConfigurations(
-        MappingBuilderContext ctx,
-        IMapping mapping,
-        HashSet<IMemberPathConfiguration> configuredTargetMembers
-    )
-    {
-        // order by target path count as objects with less path depth should be mapped first
-        // to prevent NREs in the generated code
-        return GetUniqueTargetConfigurations(
-                ctx,
-                mapping,
-                configuredTargetMembers,
-                ctx.Configuration.Members.ExplicitMappings,
-                x => x.Target
-            )
-            .GroupBy(x => x.Target.RootName)
-            .ToDictionary(x => x.Key, x => x.OrderBy(cfg => cfg.Target.PathCount).ToList());
-    }
-
-    private static IEnumerable<T> GetUniqueTargetConfigurations<T>(
-        MappingBuilderContext ctx,
-        IMapping mapping,
-        HashSet<IMemberPathConfiguration> configuredTargetMembers,
-        IEnumerable<T> configs,
-        Func<T, IMemberPathConfiguration> targetPathSelector
-    )
-    {
-        foreach (var config in configs)
+        var byTargetRootName = new ListDictionary<string, MemberValueMappingConfiguration>(ctx.Configuration.Members.ValueMappings.Count);
+        foreach (var config in ctx.Configuration.Members.ValueMappings)
         {
-            var targetPath = targetPathSelector(config);
-            if (configuredTargetMembers.Add(targetPath))
+            configuredTargetMembersByRootName.Add(config.Target.RootName, config.Target);
+            if (configuredTargetPaths.Add(config.Target.FullName))
             {
-                yield return config;
+                byTargetRootName.Add(config.Target.RootName, config);
                 continue;
             }
 
             ctx.ReportDiagnostic(
                 DiagnosticDescriptors.MultipleConfigurationsForTargetMember,
                 mapping.TargetType.ToDisplayString(),
-                targetPath.FullName
+                config.Target.FullName
             );
         }
+
+        return byTargetRootName.AsDictionary();
+    }
+
+    private static Dictionary<string, List<MemberMappingConfiguration>> BuildMemberConfigurations(
+        MappingBuilderContext ctx,
+        IMapping mapping,
+        HashSet<string> valueConfiguredTargetPaths,
+        ListDictionary<string, IMemberPathConfiguration> configuredTargetMembersByRootName
+    )
+    {
+        // order by target path count as objects with less path depth should be mapped first
+        // to prevent NREs in the generated code
+        var result = new ListDictionary<string, MemberMappingConfiguration>();
+        foreach (var config in ctx.Configuration.Members.ExplicitMappings.OrderBy(cfg => cfg.Target.PathCount))
+        {
+            // if MapValue is already configured for this target member
+            // no additional MapProperty is allowed => diagnostic duplicate config.
+            if (valueConfiguredTargetPaths.Contains(config.Target.FullName))
+            {
+                ctx.ReportDiagnostic(
+                    DiagnosticDescriptors.MultipleConfigurationsForTargetMember,
+                    mapping.TargetType.ToDisplayString(),
+                    config.Target.FullName
+                );
+                continue;
+            }
+
+            configuredTargetMembersByRootName.Add(config.Target.RootName, config.Target);
+            result.Add(config.Target.RootName, config);
+        }
+
+        return result.AsDictionary();
     }
 }
