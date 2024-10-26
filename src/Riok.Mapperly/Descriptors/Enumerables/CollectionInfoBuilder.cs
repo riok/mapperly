@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Helpers;
@@ -30,6 +29,8 @@ public static class CollectionInfoBuilder
 
     private static readonly CollectionTypeInfo _collectionTypeInfoArray = new(CollectionType.Array);
 
+    // types which may not be available on the target compiler platform
+    // are referenced via their full name instead of the reflection type
     private static readonly IReadOnlyCollection<CollectionTypeInfo> _collectionTypeInfos =
     [
         new CollectionTypeInfo(CollectionType.IEnumerable, typeof(IEnumerable<>)),
@@ -47,23 +48,67 @@ public static class CollectionInfoBuilder
         new CollectionTypeInfo(CollectionType.IDictionary, typeof(IDictionary<,>)),
         new CollectionTypeInfo(CollectionType.IReadOnlyDictionary, typeof(IReadOnlyDictionary<,>)),
         new CollectionTypeInfo(CollectionType.Dictionary, typeof(Dictionary<,>)),
-        new CollectionTypeInfo(CollectionType.ImmutableArray, typeof(ImmutableArray<>), Immutable: true),
-        new CollectionTypeInfo(CollectionType.ImmutableList, typeof(ImmutableList<>), Immutable: true),
-        new CollectionTypeInfo(CollectionType.IImmutableList, typeof(IImmutableList<>), Immutable: true),
-        new CollectionTypeInfo(CollectionType.ImmutableHashSet, typeof(ImmutableHashSet<>), Immutable: true),
-        new CollectionTypeInfo(CollectionType.IImmutableSet, typeof(IImmutableSet<>), Immutable: true),
-        new CollectionTypeInfo(CollectionType.ImmutableSortedSet, typeof(ImmutableSortedSet<>), Immutable: true),
-        new CollectionTypeInfo(CollectionType.ImmutableQueue, typeof(ImmutableQueue<>), Immutable: true),
-        new CollectionTypeInfo(CollectionType.IImmutableQueue, typeof(IImmutableQueue<>), Immutable: true),
-        new CollectionTypeInfo(CollectionType.ImmutableStack, typeof(ImmutableStack<>), Immutable: true),
-        new CollectionTypeInfo(CollectionType.IImmutableStack, typeof(IImmutableStack<>), Immutable: true),
-        new CollectionTypeInfo(CollectionType.IImmutableDictionary, typeof(IImmutableDictionary<,>), Immutable: true),
-        new CollectionTypeInfo(CollectionType.ImmutableDictionary, typeof(ImmutableDictionary<,>), Immutable: true),
-        new CollectionTypeInfo(CollectionType.ImmutableSortedDictionary, typeof(ImmutableSortedDictionary<,>), Immutable: true),
-        new CollectionTypeInfo(CollectionType.Span, typeof(Span<>)),
-        new CollectionTypeInfo(CollectionType.ReadOnlySpan, typeof(ReadOnlySpan<>)),
-        new CollectionTypeInfo(CollectionType.Memory, typeof(Memory<>)),
-        new CollectionTypeInfo(CollectionType.ReadOnlyMemory, typeof(ReadOnlyMemory<>)),
+        new CollectionTypeInfo(
+            CollectionType.ImmutableArray,
+            TypeFullName: "System.Collections.Immutable.ImmutableArray`1",
+            Immutable: true
+        ),
+        new CollectionTypeInfo(CollectionType.ImmutableList, TypeFullName: "System.Collections.Immutable.ImmutableList`1", Immutable: true),
+        new CollectionTypeInfo(
+            CollectionType.IImmutableList,
+            TypeFullName: "System.Collections.Immutable.IImmutableList`1",
+            Immutable: true
+        ),
+        new CollectionTypeInfo(
+            CollectionType.ImmutableHashSet,
+            TypeFullName: "System.Collections.Immutable.ImmutableHashSet`1",
+            Immutable: true
+        ),
+        new CollectionTypeInfo(CollectionType.IImmutableSet, TypeFullName: "System.Collections.Immutable.IImmutableSet`1", Immutable: true),
+        new CollectionTypeInfo(
+            CollectionType.ImmutableSortedSet,
+            TypeFullName: "System.Collections.Immutable.ImmutableSortedSet`1",
+            Immutable: true
+        ),
+        new CollectionTypeInfo(
+            CollectionType.ImmutableQueue,
+            TypeFullName: "System.Collections.Immutable.ImmutableQueue`1",
+            Immutable: true
+        ),
+        new CollectionTypeInfo(
+            CollectionType.IImmutableQueue,
+            TypeFullName: "System.Collections.Immutable.IImmutableQueue`1",
+            Immutable: true
+        ),
+        new CollectionTypeInfo(
+            CollectionType.ImmutableStack,
+            TypeFullName: "System.Collections.Immutable.ImmutableStack`1",
+            Immutable: true
+        ),
+        new CollectionTypeInfo(
+            CollectionType.IImmutableStack,
+            TypeFullName: "System.Collections.Immutable.IImmutableStack`1",
+            Immutable: true
+        ),
+        new CollectionTypeInfo(
+            CollectionType.IImmutableDictionary,
+            TypeFullName: "System.Collections.Immutable.IImmutableDictionary`2",
+            Immutable: true
+        ),
+        new CollectionTypeInfo(
+            CollectionType.ImmutableDictionary,
+            TypeFullName: "System.Collections.Immutable.ImmutableDictionary`2",
+            Immutable: true
+        ),
+        new CollectionTypeInfo(
+            CollectionType.ImmutableSortedDictionary,
+            TypeFullName: "System.Collections.Immutable.ImmutableSortedDictionary`2",
+            Immutable: true
+        ),
+        new CollectionTypeInfo(CollectionType.Span, TypeFullName: "System.Span`1"),
+        new CollectionTypeInfo(CollectionType.ReadOnlySpan, TypeFullName: "System.ReadOnlySpan`1"),
+        new CollectionTypeInfo(CollectionType.Memory, TypeFullName: "System.Memory`1"),
+        new CollectionTypeInfo(CollectionType.ReadOnlyMemory, TypeFullName: "System.ReadOnlyMemory`1"),
     ];
 
     private static readonly IReadOnlyDictionary<CollectionType, Type> _collectionClrTypeByType = _collectionTypeInfos
