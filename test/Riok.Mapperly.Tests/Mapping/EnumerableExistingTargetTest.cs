@@ -128,4 +128,16 @@ public class EnumerableExistingTargetTest
                 """
             );
     }
+
+    [Fact]
+    public Task MapArrayToReadOnlyArrayShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public int[] Values { get; set; } public int IntValue { get; } }",
+            "class B { public int[] Values { get; } public int IntValue { set; } }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
 }

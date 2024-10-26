@@ -1,0 +1,14 @@
+﻿{
+  Diagnostics: [
+    {
+      Id: RMG083,
+      Title: Cannot map to read only type,
+      Severity: Info,
+      WarningLevel: 1,
+      Location: : (11,4)-(11,36),
+      MessageFormat: Cannot map to read-only type {0},
+      Message: Cannot map to read-only type int[],
+      Category: Mapper
+    }
+  ]
+}
