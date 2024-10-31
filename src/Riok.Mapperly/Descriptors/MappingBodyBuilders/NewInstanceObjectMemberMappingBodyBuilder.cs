@@ -20,7 +20,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         var mappingCtx = new NewInstanceBuilderContext<NewInstanceObjectMemberMapping>(ctx, mapping);
         BuildConstructorMapping(mappingCtx);
         BuildInitMemberMappings(mappingCtx, true);
-        mappingCtx.AddDiagnostics();
+        mappingCtx.AddDiagnostics(true);
     }
 
     public static void BuildMappingBody(MappingBuilderContext ctx, NewInstanceObjectMemberMethodMapping mapping)
@@ -29,7 +29,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         BuildConstructorMapping(mappingCtx);
         BuildInitMemberMappings(mappingCtx);
         ObjectMemberMappingBodyBuilder.BuildMappingBody(mappingCtx);
-        mappingCtx.AddDiagnostics();
+        mappingCtx.AddDiagnostics(true);
     }
 
     public static IReadOnlyList<ConstructorParameterMapping> BuildConstructorMapping(

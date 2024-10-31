@@ -168,4 +168,27 @@ public class ObjectPropertyExistingInstanceTest
                 """
             );
     }
+
+    [Fact]
+    public Task UnmappedRequiredPropertyShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "public partial void Update(A source, B target);",
+            """
+            public class A
+            {
+                public required string Value { get; set; }
+                public required string OtherValue { get; set; }
+            }
+            """,
+            """
+            public class B
+            {
+                public required string Value2 { get; set; }
+                public required string OtherValue { get; set; }
+            }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
 }

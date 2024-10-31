@@ -24,9 +24,9 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
 
     public T Mapping { get; } = mapping;
 
-    public void AddDiagnostics()
+    public void AddDiagnostics(bool requiredMembersNeedToBeMapped)
     {
-        MemberMappingDiagnosticReporter.ReportDiagnostics(BuilderContext, _state);
+        MemberMappingDiagnosticReporter.ReportDiagnostics(BuilderContext, _state, requiredMembersNeedToBeMapped);
         _nestedMappingsContext.ReportDiagnostics();
     }
 

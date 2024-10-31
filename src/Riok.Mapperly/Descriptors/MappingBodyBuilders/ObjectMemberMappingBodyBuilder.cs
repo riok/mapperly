@@ -26,7 +26,7 @@ public static class ObjectMemberMappingBodyBuilder
         // do not report "no member mapping" for existing target mappings
         mappingCtx.MappingAdded();
 
-        mappingCtx.AddDiagnostics();
+        mappingCtx.AddDiagnostics(false);
     }
 
     public static void BuildMappingBody(IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx)
