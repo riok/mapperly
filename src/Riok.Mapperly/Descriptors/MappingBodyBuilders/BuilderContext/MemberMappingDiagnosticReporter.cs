@@ -5,11 +5,11 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
 internal static class MemberMappingDiagnosticReporter
 {
-    public static void ReportDiagnostics(MappingBuilderContext ctx, MembersMappingState state)
+    public static void ReportDiagnostics(MappingBuilderContext ctx, MembersMappingState state, bool requiredMembersNeedToBeMapped)
     {
         AddUnusedTargetMembersDiagnostics(ctx, state);
         AddUnmappedSourceMembersDiagnostics(ctx, state);
-        AddUnmappedTargetMembersDiagnostics(ctx, state);
+        AddUnmappedTargetMembersDiagnostics(ctx, state, requiredMembersNeedToBeMapped);
         AddUnmappedAdditionalSourceMembersDiagnostics(ctx, state);
         AddNoMemberMappedDiagnostic(ctx, state);
     }
@@ -33,11 +33,15 @@ internal static class MemberMappingDiagnosticReporter
         }
     }
 
-    private static void AddUnmappedTargetMembersDiagnostics(MappingBuilderContext ctx, MembersMappingState state)
+    private static void AddUnmappedTargetMembersDiagnostics(
+        MappingBuilderContext ctx,
+        MembersMappingState state,
+        bool requiredMembersNeedToBeMapped
+    )
     {
         foreach (var targetMember in state.EnumerateUnmappedTargetMembers())
         {
-            if (targetMember.IsRequired)
+            if (targetMember.IsRequired && requiredMembersNeedToBeMapped)
             {
                 ctx.ReportDiagnostic(DiagnosticDescriptors.RequiredMemberNotMapped, targetMember.Name, ctx.Target, ctx.Source);
                 continue;

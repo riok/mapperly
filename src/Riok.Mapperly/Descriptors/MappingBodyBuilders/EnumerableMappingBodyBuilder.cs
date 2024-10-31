@@ -25,7 +25,7 @@ internal static class EnumerableMappingBodyBuilder
         BuildConstructorMapping(mappingCtx);
         NewInstanceObjectMemberMappingBodyBuilder.BuildInitMemberMappings(mappingCtx);
         ObjectMemberMappingBodyBuilder.BuildMappingBody(mappingCtx);
-        mappingCtx.AddDiagnostics();
+        mappingCtx.AddDiagnostics(true);
     }
 
     public static void BuildMappingBody(MappingBuilderContext ctx, IEnumerableMapping mapping)
@@ -45,7 +45,7 @@ internal static class EnumerableMappingBodyBuilder
         }
 
         ObjectMemberMappingBodyBuilder.BuildMappingBody(mappingCtx);
-        mappingCtx.AddDiagnostics();
+        mappingCtx.AddDiagnostics(false);
     }
 
     private static void InitContext<T>(MembersMappingBuilderContext<T> ctx)
