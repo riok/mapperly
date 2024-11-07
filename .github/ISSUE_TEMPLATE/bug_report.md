@@ -6,12 +6,20 @@ labels: 'bug'
 assignees: ''
 ---
 
+**Please do the checklist before filing an issue:**
+- [ ] I have read the [documentation](https://mapperly.riok.app), including the [FAQ](https://mapperly.riok.app/docs/getting-started/faq/)
+- [ ] I can reproduce the bug using the latest prerelease version
+- [ ] I have searched existing [discussion](https://github.com/riok/mapperly/discussions) and [issue](https://github.com/riok/mapperly/issues) to avoid duplicates
+
+<!-- Feel free to remove sections of this template that do not apply including the checklist at the top. -->
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
 **Declaration code**
 ```csharp
 // Relevant code of the Mapperly definition and all relevant classes
+// or link to a GH Repro
 ```
 
 **Actual relevant generated code**
@@ -25,8 +33,11 @@ A clear and concise description of what the bug is.
 // The generated code how you expect it to look like
 ```
 
+**Reported relevant diagnostics**
+* RMGXXX: ...
+
 **Environment (please complete the following information):**
-- Mapperly Version: [e.g. 1.0.1, be sure to test the latest available version incl. pre-releases]
+- Mapperly Version: [e.g. 1.0.1]
 - Nullable reference types: [e.g. enabled]
 - .NET Version: [e.g. .NET 6.0.102]
 - Target Framework: [e.g. .net6.0]
