@@ -6,6 +6,20 @@ namespace Riok.Mapperly.Tests.Mapping;
 public class EnumRequiredMappingTest
 {
     [Fact]
+    public void MapperAttributeRequiredMappingNoneWithUnmappedMembersShouldNotDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "E1",
+            "E2",
+            TestSourceBuilderOptions.WithRequiredMappingStrategy(RequiredMappingStrategy.None),
+            "enum E1 { V1, V2, V3 }",
+            "enum E2 { V1 = 1, V2 = 2, V4 = 4 }"
+        );
+
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E2)source;");
+    }
+
+    [Fact]
     public void MapperAttributeRequiredMappingSourceWithUnmappedMember()
     {
         var source = TestSourceBuilder.Mapping(
