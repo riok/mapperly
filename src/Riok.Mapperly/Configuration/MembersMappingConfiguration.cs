@@ -10,7 +10,8 @@ public record MembersMappingConfiguration(
     IReadOnlyCollection<MemberMappingConfiguration> ExplicitMappings,
     IReadOnlyCollection<NestedMembersMappingConfiguration> NestedMappings,
     IgnoreObsoleteMembersStrategy IgnoreObsoleteMembersStrategy,
-    RequiredMappingStrategy RequiredMappingStrategy
+    RequiredMappingStrategy RequiredMappingStrategy,
+    RequiredEnumMappingStrategy RequiredEnumMappingStrategy
 )
 {
     public IEnumerable<string> GetMembersWithExplicitConfigurations(MappingSourceTarget sourceTarget)

@@ -94,6 +94,7 @@ public static class TestSourceBuilder
             Attribute(options.EnumMappingIgnoreCase),
             Attribute(options.IgnoreObsoleteMembersStrategy),
             Attribute(options.RequiredMappingStrategy),
+            Attribute(options.RequiredEnumMappingStrategy),
             Attribute(options.IncludedMembers),
             Attribute(options.IncludedConstructors),
             Attribute(options.PreferParameterlessConstructors),

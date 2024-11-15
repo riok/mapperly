@@ -102,6 +102,12 @@ public class MapperAttribute : Attribute
     public RequiredMappingStrategy RequiredMappingStrategy { get; set; } = RequiredMappingStrategy.Both;
 
     /// <summary>
+    /// Defines the strategy used when emitting warnings for unmapped enum members.
+    /// By default this is <see cref="RequiredEnumMappingStrategy.Inherit"/>, inheriting the strategy from <see cref="RequiredMappingStrategy"/>.
+    /// </summary>
+    public RequiredEnumMappingStrategy RequiredEnumMappingStrategy { get; set; } = RequiredEnumMappingStrategy.Inherit;
+
+    /// <summary>
     /// Determines the access level of members that Mapperly will map.
     /// </summary>
     public MemberVisibility IncludedMembers { get; set; } = MemberVisibility.AllAccessible;

@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
@@ -45,6 +46,9 @@ internal static class EnumMappingDiagnosticReporter
         IEnumerable<IFieldSymbol> targetMembers
     )
     {
+        if (!ctx.Configuration.Enum.GetRequiredEnumMemberMappingStrategy().HasFlag(RequiredMappingStrategy.Target))
+            return;
+
         var fallbackValue = ctx.Configuration.Enum.FallbackValue?.ConstantValue.Value;
         var missingTargetMembers = targetMembers.Where(field =>
             !mappings.Contains(field) && fallbackValue?.Equals(field.ConstantValue) is not true
@@ -67,6 +71,9 @@ internal static class EnumMappingDiagnosticReporter
         IEnumerable<IFieldSymbol> sourceMembers
     )
     {
+        if (!ctx.Configuration.Enum.GetRequiredEnumMemberMappingStrategy().HasFlag(RequiredMappingStrategy.Source))
+            return;
+
         var missingSourceMembers = sourceMembers.Where(field => !mappings.Contains(field));
         foreach (var member in missingSourceMembers)
         {
