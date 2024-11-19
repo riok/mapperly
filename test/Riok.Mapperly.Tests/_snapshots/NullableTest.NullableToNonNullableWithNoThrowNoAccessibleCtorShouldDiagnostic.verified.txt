@@ -1,14 +1,23 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG002,
-      Title: No accessible parameterless constructor found,
-      Severity: Error,
-      WarningLevel: 0,
-      Location: : (11,4)-(11,42),
-      MessageFormat: {0} has no accessible parameterless constructor,
+      Location: /*
+{
+    private partial B Map(string? source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,42),
       Message: B has no accessible parameterless constructor,
-      Category: Mapper
+      Severity: Error,
+      Descriptor: {
+        Id: RMG002,
+        Title: No accessible parameterless constructor found,
+        MessageFormat: {0} has no accessible parameterless constructor,
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

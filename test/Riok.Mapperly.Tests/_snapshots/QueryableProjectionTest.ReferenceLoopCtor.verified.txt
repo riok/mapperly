@@ -1,34 +1,63 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG031,
-      Title: Reference loop detected while mapping to a constructor parameter,
-      Severity: Warning,
-      WarningLevel: 1,
-      Location: : (11,4)-(11,84),
-      MessageFormat: Reference loop detected while mapping from {0} to the constructor parameter {2} of {1}, consider ignoring this member or mark another constructor as mapping constructor,
+      Location: /*
+{
+    private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,84),
       Message: Reference loop detected while mapping from A.Parent to the constructor parameter parent of B, consider ignoring this member or mark another constructor as mapping constructor,
-      Category: Mapper
-    },
-    {
-      Id: RMG013,
-      Title: No accessible constructor with mappable arguments found,
-      Severity: Error,
-      WarningLevel: 0,
-      Location: : (11,4)-(11,84),
-      MessageFormat: {0} has no accessible constructor with mappable arguments,
-      Message: B has no accessible constructor with mappable arguments,
-      Category: Mapper
-    },
-    {
-      Id: RMG020,
-      Title: Source member is not mapped to any target member,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,84),
-      MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
+      Descriptor: {
+        Id: RMG031,
+        Title: Reference loop detected while mapping to a constructor parameter,
+        MessageFormat: Reference loop detected while mapping from {0} to the constructor parameter {2} of {1}, consider ignoring this member or mark another constructor as mapping constructor,
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,84),
+      Message: B has no accessible constructor with mappable arguments,
+      Severity: Error,
+      Descriptor: {
+        Id: RMG013,
+        Title: No accessible constructor with mappable arguments found,
+        MessageFormat: {0} has no accessible constructor with mappable arguments,
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,84),
       Message: The member Parent on the mapping source type A is not mapped to any member on the mapping target type B,
-      Category: Mapper
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG020,
+        Title: Source member is not mapped to any target member,
+        MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

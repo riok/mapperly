@@ -1,14 +1,24 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG069,
-      Title: Runtime target type or generic type mapping does not match any mappings,
+      Location: /*
+{
+    private partial TTarget Map<TSource, TTarget, TUnknown>(TSource source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*/
+ : (11,4)-(11,76),
+      Message: Runtime target type or generic type mapping does not match any mappings,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,76),
-      MessageFormat: Runtime target type or generic type mapping does not match any mappings,
-      Message: Runtime target type or generic type mapping does not match any mappings,
-      Category: Mapper
+      Descriptor: {
+        Id: RMG069,
+        Title: Runtime target type or generic type mapping does not match any mappings,
+        MessageFormat: Runtime target type or generic type mapping does not match any mappings,
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

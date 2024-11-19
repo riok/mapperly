@@ -1,14 +1,25 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG001,
-      Title: Has an unsupported mapping method signature,
-      Severity: Error,
-      WarningLevel: 0,
-      Location: : (11,4)-(12,47),
-      MessageFormat: {0} has an unsupported mapping method signature,
+      Location: /*
+{
+    [UserMapping]
+    ^^^^^^^^^^^^^
+public static void NotAMappingMethod2(int s) {}
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial B Map(A s);
+*/
+ : (11,4)-(12,47),
       Message: NotAMappingMethod2 has an unsupported mapping method signature,
-      Category: Mapper
+      Severity: Error,
+      Descriptor: {
+        Id: RMG001,
+        Title: Has an unsupported mapping method signature,
+        MessageFormat: {0} has an unsupported mapping method signature,
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

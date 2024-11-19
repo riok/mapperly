@@ -1,34 +1,63 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG030,
-      Title: Reference loop detected while mapping to an init only member,
-      Severity: Error,
-      WarningLevel: 0,
-      Location: : (11,4)-(11,84),
-      MessageFormat: Reference loop detected while mapping from {0} to the init only member {1}, consider ignoring this member,
+      Location: /*
+{
+    private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,84),
       Message: Reference loop detected while mapping from A.Parent to the init only member B.Parent, consider ignoring this member,
-      Category: Mapper
+      Severity: Error,
+      Descriptor: {
+        Id: RMG030,
+        Title: Reference loop detected while mapping to an init only member,
+        MessageFormat: Reference loop detected while mapping from {0} to the init only member {1}, consider ignoring this member,
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
     },
     {
-      Id: RMG020,
-      Title: Source member is not mapped to any target member,
-      Severity: Warning,
-      WarningLevel: 1,
-      Location: : (11,4)-(11,84),
-      MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
+      Location: /*
+{
+    private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,84),
       Message: The member Parent on the mapping source type A is not mapped to any member on the mapping target type B,
-      Category: Mapper
-    },
-    {
-      Id: RMG012,
-      Title: Source member was not found for target member,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,84),
-      MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
+      Descriptor: {
+        Id: RMG020,
+        Title: Source member is not mapped to any target member,
+        MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,84),
       Message: The member Parent on the mapping target type B was not found on the mapping source type A,
-      Category: Mapper
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG012,
+        Title: Source member was not found for target member,
+        MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

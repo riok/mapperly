@@ -1,14 +1,23 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG013,
-      Title: No accessible constructor with mappable arguments found,
-      Severity: Error,
-      WarningLevel: 0,
-      Location: : (11,4)-(11,36),
-      MessageFormat: {0} has no accessible constructor with mappable arguments,
+      Location: /*
+{
+    private partial B Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,36),
       Message: B has no accessible constructor with mappable arguments,
-      Category: Mapper
+      Severity: Error,
+      Descriptor: {
+        Id: RMG013,
+        Title: No accessible constructor with mappable arguments found,
+        MessageFormat: {0} has no accessible constructor with mappable arguments,
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }
