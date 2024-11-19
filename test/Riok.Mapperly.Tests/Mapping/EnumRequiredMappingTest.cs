@@ -6,20 +6,6 @@ namespace Riok.Mapperly.Tests.Mapping;
 public class EnumRequiredMappingTest
 {
     [Fact]
-    public void MapperAttributeRequiredEnumMappingInheritAndRequiredMappingNoneWithUnmappedMembersShouldNotDiagnostic()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "E1",
-            "E2",
-            TestSourceBuilderOptions.WithRequiredEnumMappingStrategy(RequiredEnumMappingStrategy.Inherit, RequiredMappingStrategy.None),
-            "enum E1 { V1, V2, V3 }",
-            "enum E2 { V1 = 1, V2 = 2, V4 = 4 }"
-        );
-
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E2)source;");
-    }
-
-    [Fact]
     public void MapperAttributeRequiredMappingNoneWithUnmappedMembersShouldNotDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
@@ -39,26 +25,7 @@ public class EnumRequiredMappingTest
         var source = TestSourceBuilder.Mapping(
             "E1",
             "E2",
-            TestSourceBuilderOptions.WithRequiredEnumMappingStrategy(RequiredEnumMappingStrategy.Source, RequiredMappingStrategy.None),
-            "enum E1 { V1, V2, V3 }",
-            "enum E2 { V1, V2 }"
-        );
-
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member V3 (2) on E1 not found on target enum E2")
-            .HaveAssertedAllDiagnostics()
-            .HaveSingleMethodBody("return (global::E2)source;");
-    }
-
-    [Fact]
-    public void MapperAttributeRequiredEnumMappingInheritAndRequiredMappingSourceWithUnmappedMember()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "E1",
-            "E2",
-            TestSourceBuilderOptions.WithRequiredEnumMappingStrategy(RequiredEnumMappingStrategy.Inherit, RequiredMappingStrategy.Source),
+            TestSourceBuilderOptions.WithRequiredEnumMappingStrategy(RequiredMappingStrategy.Source, RequiredMappingStrategy.None),
             "enum E1 { V1, V2, V3 }",
             "enum E2 { V1, V2 }"
         );
@@ -128,26 +95,7 @@ public class EnumRequiredMappingTest
         var source = TestSourceBuilder.Mapping(
             "E1",
             "E2",
-            TestSourceBuilderOptions.WithRequiredEnumMappingStrategy(RequiredEnumMappingStrategy.Target, RequiredMappingStrategy.None),
-            "enum E1 { V1, V2 }",
-            "enum E2 { V1, V2, V3 }"
-        );
-
-        TestHelper
-            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
-            .Should()
-            .HaveDiagnostic(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member V3 (2) on E2 not found on source enum E1")
-            .HaveAssertedAllDiagnostics()
-            .HaveSingleMethodBody("return (global::E2)source;");
-    }
-
-    [Fact]
-    public void MapperAttributeRequiredEnumMappingInheritAndRequiredMappingTargetWithUnmappedMember()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "E1",
-            "E2",
-            TestSourceBuilderOptions.WithRequiredEnumMappingStrategy(RequiredEnumMappingStrategy.Inherit, RequiredMappingStrategy.Target),
+            TestSourceBuilderOptions.WithRequiredEnumMappingStrategy(RequiredMappingStrategy.Target, RequiredMappingStrategy.None),
             "enum E1 { V1, V2 }",
             "enum E2 { V1, V2, V3 }"
         );

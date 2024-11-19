@@ -17,7 +17,7 @@ public record TestSourceBuilderOptions(
     bool? EnumMappingIgnoreCase = null,
     IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy = null,
     RequiredMappingStrategy? RequiredMappingStrategy = null,
-    RequiredEnumMappingStrategy? RequiredEnumMappingStrategy = null,
+    RequiredMappingStrategy? RequiredEnumMappingStrategy = null,
     MemberVisibility? IncludedMembers = null,
     MemberVisibility? IncludedConstructors = null,
     bool Static = false,
@@ -44,7 +44,7 @@ public record TestSourceBuilderOptions(
         new(RequiredMappingStrategy: requiredMappingStrategy);
 
     public static TestSourceBuilderOptions WithRequiredEnumMappingStrategy(
-        RequiredEnumMappingStrategy requiredEnumMappingStrategy,
+        RequiredMappingStrategy requiredEnumMappingStrategy,
         RequiredMappingStrategy requiredMappingStrategy
     ) => new(RequiredEnumMappingStrategy: requiredEnumMappingStrategy, RequiredMappingStrategy: requiredMappingStrategy);
 

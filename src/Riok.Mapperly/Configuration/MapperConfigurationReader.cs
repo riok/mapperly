@@ -37,16 +37,7 @@ public class MapperConfigurationReader
                 mapper.RequiredEnumMappingStrategy,
                 mapper.EnumNamingStrategy
             ),
-            new MembersMappingConfiguration(
-                [],
-                [],
-                [],
-                [],
-                [],
-                mapper.IgnoreObsoleteMembersStrategy,
-                mapper.RequiredMappingStrategy,
-                mapper.RequiredEnumMappingStrategy
-            ),
+            new MembersMappingConfiguration([], [], [], [], [], mapper.IgnoreObsoleteMembersStrategy, mapper.RequiredMappingStrategy),
             []
         );
     }
@@ -136,8 +127,7 @@ public class MapperConfigurationReader
             memberConfigurations,
             nestedMembersConfigurations,
             ignoreObsolete ?? MapperConfiguration.Members.IgnoreObsoleteMembersStrategy,
-            requiredMapping ?? MapperConfiguration.Members.RequiredMappingStrategy,
-            MapperConfiguration.Members.RequiredEnumMappingStrategy
+            requiredMapping ?? MapperConfiguration.Members.RequiredMappingStrategy
         );
     }
 
@@ -175,9 +165,7 @@ public class MapperConfigurationReader
             ignoredTargets,
             explicitMappings,
             requiredMapping ?? MapperConfiguration.Enum.RequiredMappingStrategy,
-            requiredMapping is not null
-                ? (RequiredEnumMappingStrategy)requiredMapping
-                : MapperConfiguration.Enum.RequiredEnumMappingStrategy,
+            requiredMapping ?? MapperConfiguration.Enum.RequiredEnumMappingStrategy,
             configData?.NamingStrategy ?? MapperConfiguration.Enum.NamingStrategy
         );
     }

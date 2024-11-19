@@ -46,7 +46,7 @@ internal static class EnumMappingDiagnosticReporter
         IEnumerable<IFieldSymbol> targetMembers
     )
     {
-        if (!ctx.Configuration.Enum.GetRequiredEnumMemberMappingStrategy().HasFlag(RequiredMappingStrategy.Target))
+        if (!ctx.Configuration.Enum.RequiredEnumMappingStrategy.HasFlag(RequiredMappingStrategy.Target))
             return;
 
         var fallbackValue = ctx.Configuration.Enum.FallbackValue?.ConstantValue.Value;
@@ -71,7 +71,7 @@ internal static class EnumMappingDiagnosticReporter
         IEnumerable<IFieldSymbol> sourceMembers
     )
     {
-        if (!ctx.Configuration.Enum.GetRequiredEnumMemberMappingStrategy().HasFlag(RequiredMappingStrategy.Source))
+        if (!ctx.Configuration.Enum.RequiredEnumMappingStrategy.HasFlag(RequiredMappingStrategy.Source))
             return;
 
         var missingSourceMembers = sourceMembers.Where(field => !mappings.Contains(field));

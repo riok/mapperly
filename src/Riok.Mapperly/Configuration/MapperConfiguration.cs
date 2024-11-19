@@ -103,7 +103,7 @@ public record MapperConfiguration
     /// Defines the strategy used when emitting warnings for unmapped enum members.
     /// By default this is <see cref="RequiredEnumMappingStrategy.Inherit"/>, inheriting the strategy from <see cref="RequiredMappingStrategy"/>.
     /// </summary>
-    public RequiredEnumMappingStrategy? RequiredEnumMappingStrategy { get; init; }
+    public RequiredMappingStrategy? RequiredEnumMappingStrategy { get; init; }
 
     /// <summary>
     /// Determines the access level of members that Mapperly will map.
