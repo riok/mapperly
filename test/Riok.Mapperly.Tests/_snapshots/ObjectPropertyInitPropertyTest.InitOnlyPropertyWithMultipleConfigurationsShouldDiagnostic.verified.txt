@@ -1,24 +1,43 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG074,
-      Title: Multiple mappings are configured for the same target member,
-      Severity: Error,
-      WarningLevel: 0,
-      Location: : (11,4)-(11,126),
-      MessageFormat: Multiple mappings are configured for the same target member {0}.{1},
+      Location: /*
+{
+    [MapProperty("StringValue2", "StringValue")] [MapProperty("StringValue3", "StringValue")] private partial B Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,126),
       Message: Multiple mappings are configured for the same target member B.StringValue,
-      Category: Mapper
+      Severity: Error,
+      Descriptor: {
+        Id: RMG074,
+        Title: Multiple mappings are configured for the same target member,
+        MessageFormat: Multiple mappings are configured for the same target member {0}.{1},
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
     },
     {
-      Id: RMG020,
-      Title: Source member is not mapped to any target member,
+      Location: /*
+{
+    [MapProperty("StringValue2", "StringValue")] [MapProperty("StringValue3", "StringValue")] private partial B Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,126),
+      Message: The member StringValue3 on the mapping source type A is not mapped to any member on the mapping target type B,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,126),
-      MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
-      Message: The member StringValue3 on the mapping source type A is not mapped to any member on the mapping target type B,
-      Category: Mapper
+      Descriptor: {
+        Id: RMG020,
+        Title: Source member is not mapped to any target member,
+        MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

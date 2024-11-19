@@ -1,14 +1,24 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG020,
-      Title: Source member is not mapped to any target member,
+      Location: /*
+{
+    private partial B Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,36),
+      Message: The member IntValue on the mapping source type A is not mapped to any member on the mapping target type B,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,36),
-      MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
-      Message: The member IntValue on the mapping source type A is not mapped to any member on the mapping target type B,
-      Category: Mapper
+      Descriptor: {
+        Id: RMG020,
+        Title: Source member is not mapped to any target member,
+        MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

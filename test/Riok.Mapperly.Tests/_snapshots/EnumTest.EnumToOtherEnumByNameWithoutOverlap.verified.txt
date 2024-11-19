@@ -1,74 +1,144 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG038,
-      Title: An enum member could not be found on the target enum,
-      Severity: Warning,
-      WarningLevel: 1,
-      Location: : (11,4)-(11,77),
-      MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
+      Location: /*
+{
+    [MapEnum(EnumMappingStrategy.ByName)] private partial E2 ToE1(E1 source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,77),
       Message: Enum member A (0) on E1 not found on target enum E2,
-      Category: Mapper
-    },
-    {
-      Id: RMG038,
-      Title: An enum member could not be found on the target enum,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,77),
-      MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
+      Descriptor: {
+        Id: RMG038,
+        Title: An enum member could not be found on the target enum,
+        MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    [MapEnum(EnumMappingStrategy.ByName)] private partial E2 ToE1(E1 source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,77),
       Message: Enum member B (1) on E1 not found on target enum E2,
-      Category: Mapper
-    },
-    {
-      Id: RMG038,
-      Title: An enum member could not be found on the target enum,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,77),
-      MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
+      Descriptor: {
+        Id: RMG038,
+        Title: An enum member could not be found on the target enum,
+        MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    [MapEnum(EnumMappingStrategy.ByName)] private partial E2 ToE1(E1 source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,77),
       Message: Enum member C (2) on E1 not found on target enum E2,
-      Category: Mapper
-    },
-    {
-      Id: RMG037,
-      Title: An enum member could not be found on the source enum,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,77),
-      MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
+      Descriptor: {
+        Id: RMG038,
+        Title: An enum member could not be found on the target enum,
+        MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    [MapEnum(EnumMappingStrategy.ByName)] private partial E2 ToE1(E1 source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,77),
       Message: Enum member D (0) on E2 not found on source enum E1,
-      Category: Mapper
-    },
-    {
-      Id: RMG037,
-      Title: An enum member could not be found on the source enum,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,77),
-      MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
+      Descriptor: {
+        Id: RMG037,
+        Title: An enum member could not be found on the source enum,
+        MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    [MapEnum(EnumMappingStrategy.ByName)] private partial E2 ToE1(E1 source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,77),
       Message: Enum member E (1) on E2 not found on source enum E1,
-      Category: Mapper
-    },
-    {
-      Id: RMG037,
-      Title: An enum member could not be found on the source enum,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,77),
-      MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
+      Descriptor: {
+        Id: RMG037,
+        Title: An enum member could not be found on the source enum,
+        MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    [MapEnum(EnumMappingStrategy.ByName)] private partial E2 ToE1(E1 source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,77),
       Message: Enum member F (2) on E2 not found on source enum E1,
-      Category: Mapper
-    },
-    {
-      Id: RMG003,
-      Title: No overlapping enum members found,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,77),
-      MessageFormat: {0} and {1} don't have overlapping enum member names, mapping will therefore always result in an exception,
+      Descriptor: {
+        Id: RMG037,
+        Title: An enum member could not be found on the source enum,
+        MessageFormat: Enum member {0} ({1}) on {2} not found on source enum {3},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    [MapEnum(EnumMappingStrategy.ByName)] private partial E2 ToE1(E1 source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,77),
       Message: E1 and E2 don't have overlapping enum member names, mapping will therefore always result in an exception,
-      Category: Mapper
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG003,
+        Title: No overlapping enum members found,
+        MessageFormat: {0} and {1} don't have overlapping enum member names, mapping will therefore always result in an exception,
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }
