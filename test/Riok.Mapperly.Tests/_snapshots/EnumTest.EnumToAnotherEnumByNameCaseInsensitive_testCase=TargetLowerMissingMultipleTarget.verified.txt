@@ -1,24 +1,44 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG038,
-      Title: An enum member could not be found on the target enum,
+      Location: /*
+{
+    private partial B Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,36),
+      Message: Enum member Value5 (0) on C not found on target enum D,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,36),
-      MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
-      Message: Enum member Value5 (0) on C not found on target enum D,
-      Category: Mapper
+      Descriptor: {
+        Id: RMG038,
+        Title: An enum member could not be found on the target enum,
+        MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
     },
     {
-      Id: RMG038,
-      Title: An enum member could not be found on the target enum,
+      Location: /*
+{
+    private partial B Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,36),
+      Message: Enum member Value7 (2) on C not found on target enum D,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,36),
-      MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
-      Message: Enum member Value7 (2) on C not found on target enum D,
-      Category: Mapper
+      Descriptor: {
+        Id: RMG038,
+        Title: An enum member could not be found on the target enum,
+        MessageFormat: Enum member {0} ({1}) on {2} not found on target enum {3},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

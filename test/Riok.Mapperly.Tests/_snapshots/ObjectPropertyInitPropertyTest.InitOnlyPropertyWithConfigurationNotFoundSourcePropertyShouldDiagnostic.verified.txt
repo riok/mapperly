@@ -1,14 +1,23 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG006,
-      Title: Mapping source member not found,
-      Severity: Error,
-      WarningLevel: 0,
-      Location: : (11,4)-(11,81),
-      MessageFormat: Specified member {0} on source type {1} was not found,
+      Location: /*
+{
+    [MapProperty("StringValue2", "StringValue")] private partial B Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,81),
       Message: Specified member StringValue2 on source type A was not found,
-      Category: Mapper
+      Severity: Error,
+      Descriptor: {
+        Id: RMG006,
+        Title: Mapping source member not found,
+        MessageFormat: Specified member {0} on source type {1} was not found,
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

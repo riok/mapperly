@@ -1,14 +1,24 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG083,
-      Title: Cannot map to read only type,
+      Location: /*
+{
+    private partial B Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,36),
+      Message: Cannot map to read-only type int[],
       Severity: Info,
       WarningLevel: 1,
-      Location: : (11,4)-(11,36),
-      MessageFormat: Cannot map to read-only type {0},
-      Message: Cannot map to read-only type int[],
-      Category: Mapper
+      Descriptor: {
+        Id: RMG083,
+        Title: Cannot map to read only type,
+        MessageFormat: Cannot map to read-only type {0},
+        Category: Mapper,
+        DefaultSeverity: Info,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

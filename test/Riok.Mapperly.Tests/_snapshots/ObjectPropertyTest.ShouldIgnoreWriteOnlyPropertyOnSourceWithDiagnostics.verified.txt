@@ -1,34 +1,64 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG010,
-      Title: Cannot map from write only member,
+      Location: /*
+{
+    private partial B Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,36),
+      Message: Cannot map from write only member A.StringValue2 of type string to member B.StringValue2 of type string,
       Severity: Info,
       WarningLevel: 1,
-      Location: : (11,4)-(11,36),
-      MessageFormat: Cannot map from write only member {0} to member {1},
-      Message: Cannot map from write only member A.StringValue2 of type string to member B.StringValue2 of type string,
-      Category: Mapper
+      Descriptor: {
+        Id: RMG010,
+        Title: Cannot map from write only member,
+        MessageFormat: Cannot map from write only member {0} to member {1},
+        Category: Mapper,
+        DefaultSeverity: Info,
+        IsEnabledByDefault: true
+      }
     },
     {
-      Id: RMG020,
-      Title: Source member is not mapped to any target member,
-      Severity: Warning,
-      WarningLevel: 1,
-      Location: : (11,4)-(11,36),
-      MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
+      Location: /*
+{
+    private partial B Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,36),
       Message: The member StringValue2 on the mapping source type A is not mapped to any member on the mapping target type B,
-      Category: Mapper
-    },
-    {
-      Id: RMG012,
-      Title: Source member was not found for target member,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (11,4)-(11,36),
-      MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
+      Descriptor: {
+        Id: RMG020,
+        Title: Source member is not mapped to any target member,
+        MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    private partial B Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,36),
       Message: The member StringValue2 on the mapping target type B was not found on the mapping source type A,
-      Category: Mapper
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG012,
+        Title: Source member was not found for target member,
+        MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

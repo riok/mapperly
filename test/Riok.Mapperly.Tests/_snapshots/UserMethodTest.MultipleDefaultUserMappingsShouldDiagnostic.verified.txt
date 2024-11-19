@@ -1,14 +1,25 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG059,
-      Title: Multiple default user mappings found, only one is allowed,
-      Severity: Error,
-      WarningLevel: 0,
-      Location: : (14,0)-(15,47),
-      MessageFormat: Multiple default user mappings for the mapping from {0} to {1} found, only one is allowed,
+      Location: /*
+
+[UserMapping(Default = true)]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public static int IntMapping2(int x) => x + 20;
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*/
+ : (14,0)-(15,47),
       Message: Multiple default user mappings for the mapping from int to int found, only one is allowed,
-      Category: Mapper
+      Severity: Error,
+      Descriptor: {
+        Id: RMG059,
+        Title: Multiple default user mappings found, only one is allowed,
+        MessageFormat: Multiple default user mappings for the mapping from {0} to {1} found, only one is allowed,
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

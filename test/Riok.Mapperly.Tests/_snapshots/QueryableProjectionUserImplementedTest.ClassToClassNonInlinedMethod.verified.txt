@@ -1,14 +1,24 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG068,
-      Title: Cannot inline user implemented queryable expression mapping,
+      Location: /*
+{
+    private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*/
+ : (11,4)-(11,84),
+      Message: Cannot inline user implemented queryable expression mapping,
       Severity: Info,
       WarningLevel: 1,
-      Location: : (11,4)-(11,84),
-      MessageFormat: Cannot inline user implemented queryable expression mapping,
-      Message: Cannot inline user implemented queryable expression mapping,
-      Category: Mapper
+      Descriptor: {
+        Id: RMG068,
+        Title: Cannot inline user implemented queryable expression mapping,
+        MessageFormat: Cannot inline user implemented queryable expression mapping,
+        Category: Mapper,
+        DefaultSeverity: Info,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }

@@ -1,24 +1,45 @@
 ﻿{
   Diagnostics: [
     {
-      Id: RMG081,
-      Title: A mapping method with additional parameters cannot be a default mapping,
-      Severity: Error,
-      WarningLevel: 0,
-      Location: : (11,4)-(12,32),
-      MessageFormat: The mapping method {0} has additional parameters and therefore cannot be a default mapping,
+      Location: /*
+{
+    [UserMapping(Default = true)]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+partial B Map(A src, int value);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+partial E MapNested(D src);
+*/
+ : (11,4)-(12,32),
       Message: The mapping method Map has additional parameters and therefore cannot be a default mapping,
-      Category: Mapper
+      Severity: Error,
+      Descriptor: {
+        Id: RMG081,
+        Title: A mapping method with additional parameters cannot be a default mapping,
+        MessageFormat: The mapping method {0} has additional parameters and therefore cannot be a default mapping,
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
     },
     {
-      Id: RMG012,
-      Title: Source member was not found for target member,
+      Location: /*
+partial B Map(A src, int value);
+partial E MapNested(D src);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (13,0)-(13,27),
+      Message: The member Value on the mapping target type B was not found on the mapping source type A,
       Severity: Warning,
       WarningLevel: 1,
-      Location: : (13,0)-(13,27),
-      MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
-      Message: The member Value on the mapping target type B was not found on the mapping source type A,
-      Category: Mapper
+      Descriptor: {
+        Id: RMG012,
+        Title: Source member was not found for target member,
+        MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
     }
   ]
 }
