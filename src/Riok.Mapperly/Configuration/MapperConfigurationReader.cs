@@ -33,7 +33,6 @@ public class MapperConfigurationReader
                 [],
                 [],
                 [],
-                mapper.RequiredMappingStrategy,
                 mapper.RequiredEnumMappingStrategy,
                 mapper.EnumNamingStrategy
             ),
@@ -165,7 +164,6 @@ public class MapperConfigurationReader
             ignoredTargets,
             explicitMappings,
             requiredMapping ?? MapperConfiguration.Enum.RequiredMappingStrategy,
-            requiredMapping ?? MapperConfiguration.Enum.RequiredEnumMappingStrategy,
             configData?.NamingStrategy ?? MapperConfiguration.Enum.NamingStrategy
         );
     }

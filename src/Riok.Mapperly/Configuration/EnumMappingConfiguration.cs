@@ -11,7 +11,6 @@ public record EnumMappingConfiguration(
     IReadOnlyCollection<IFieldSymbol> IgnoredTargetMembers,
     IReadOnlyCollection<EnumValueMappingConfiguration> ExplicitMappings,
     RequiredMappingStrategy RequiredMappingStrategy,
-    RequiredMappingStrategy RequiredEnumMappingStrategy,
     EnumNamingStrategy NamingStrategy
 )
 {
