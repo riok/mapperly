@@ -17,6 +17,7 @@ public record TestSourceBuilderOptions(
     bool? EnumMappingIgnoreCase = null,
     IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy = null,
     RequiredMappingStrategy? RequiredMappingStrategy = null,
+    RequiredMappingStrategy? RequiredEnumMappingStrategy = null,
     MemberVisibility? IncludedMembers = null,
     MemberVisibility? IncludedConstructors = null,
     bool Static = false,
@@ -41,6 +42,11 @@ public record TestSourceBuilderOptions(
 
     public static TestSourceBuilderOptions WithRequiredMappingStrategy(RequiredMappingStrategy requiredMappingStrategy) =>
         new(RequiredMappingStrategy: requiredMappingStrategy);
+
+    public static TestSourceBuilderOptions WithRequiredEnumMappingStrategy(
+        RequiredMappingStrategy requiredEnumMappingStrategy,
+        RequiredMappingStrategy requiredMappingStrategy
+    ) => new(RequiredEnumMappingStrategy: requiredEnumMappingStrategy, RequiredMappingStrategy: requiredMappingStrategy);
 
     public static TestSourceBuilderOptions WithMemberVisibility(MemberVisibility memberVisibility) =>
         new(IncludedMembers: memberVisibility);

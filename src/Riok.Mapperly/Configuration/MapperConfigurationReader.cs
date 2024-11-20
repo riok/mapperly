@@ -33,7 +33,7 @@ public class MapperConfigurationReader
                 [],
                 [],
                 [],
-                mapper.RequiredMappingStrategy,
+                mapper.RequiredEnumMappingStrategy,
                 mapper.EnumNamingStrategy
             ),
             new MembersMappingConfiguration([], [], [], [], [], mapper.IgnoreObsoleteMembersStrategy, mapper.RequiredMappingStrategy),

@@ -51,6 +51,13 @@ public static class MapperConfigurationMerger
             ?? defaultMapperConfiguration.RequiredMappingStrategy
             ?? mapper.RequiredMappingStrategy;
 
+        mapper.RequiredEnumMappingStrategy =
+            mapperConfiguration.RequiredEnumMappingStrategy
+            ?? defaultMapperConfiguration.RequiredEnumMappingStrategy
+            ?? mapperConfiguration.RequiredMappingStrategy
+            ?? defaultMapperConfiguration.RequiredMappingStrategy
+            ?? mapper.RequiredMappingStrategy;
+
         mapper.IncludedMembers =
             mapperConfiguration.IncludedMembers ?? defaultMapperConfiguration.IncludedMembers ?? mapper.IncludedMembers;
 

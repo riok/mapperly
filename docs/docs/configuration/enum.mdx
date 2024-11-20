@@ -182,18 +182,18 @@ public partial class CarMapper
 
 By default Mapperly emits diagnostics with a severity of warning if there are unmapped source or target enum members.
 To enforce strict enum member mappings on only either the source or the target,
-the `RequiredMappingStrategy` can be used.
+the `RequiredEnumMappingStrategy` can be used. By default this property will inherit the value from `RequiredMappingStrategy`.
 
 <Tabs>
     <TabItem value="global" label="Global (mapper level)" default>
     
-        Sets the `RequiredMappingStrategy` for all methods within the mapper,
+        Sets the `RequiredEnumMappingStrategy` for all methods within the mapper,
         by default it is `Both` requiring all members to be mapped.
         This can be overriden by individual mapping methods using `MapperRequiredMappingAttribute`.
     
         ```csharp
         // highlight-start
-        [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Source)]
+        [Mapper(RequiredEnumMappingStrategy = RequiredMappingStrategy.Source)]
         // highlight-end
         public partial class CarMapper
         {
