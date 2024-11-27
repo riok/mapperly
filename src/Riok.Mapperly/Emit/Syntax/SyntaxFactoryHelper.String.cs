@@ -12,8 +12,11 @@ public partial struct SyntaxFactoryHelper
 {
     private static readonly IdentifierNameSyntax _nameofIdentifier = IdentifierName("nameof");
 
-    private static readonly Regex _formattableStringPlaceholder =
-        new(@"\{(?<placeholder>\d+)\}", RegexOptions.Compiled, TimeSpan.FromMilliseconds(100));
+    private static readonly Regex _formattableStringPlaceholder = new(
+        @"\{(?<placeholder>\d+)\}",
+        RegexOptions.Compiled,
+        TimeSpan.FromMilliseconds(100)
+    );
 
     public static InvocationExpressionSyntax NameOf(ExpressionSyntax expression) =>
         InvocationWithoutIndention(_nameofIdentifier, expression);

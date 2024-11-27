@@ -18,15 +18,14 @@ public record TestHelperOptions(
     string GeneratedTreeFileName = $"{TestSourceBuilderOptions.DefaultMapperClassName}.g.cs"
 )
 {
-    public static readonly TestHelperOptions Default =
-        new(
-            AllowedDiagnosticSeverities: new HashSet<DiagnosticSeverity>(),
-            IgnoredDiagnostics: new HashSet<DiagnosticDescriptor>
-            {
-                // ignore NoMemberMappings as a lot of tests use this for simplicity
-                DiagnosticDescriptors.NoMemberMappings,
-            }
-        );
+    public static readonly TestHelperOptions Default = new(
+        AllowedDiagnosticSeverities: new HashSet<DiagnosticSeverity>(),
+        IgnoredDiagnostics: new HashSet<DiagnosticDescriptor>
+        {
+            // ignore NoMemberMappings as a lot of tests use this for simplicity
+            DiagnosticDescriptors.NoMemberMappings,
+        }
+    );
 
     public static readonly TestHelperOptions DisabledNullable = Default with { NullableOption = NullableContextOptions.Disable };
 
