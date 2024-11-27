@@ -20,12 +20,15 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     private readonly ConditionalWeakTable<ITypeSymbol, ITypeSymbol> _originalNullableTypes = new();
     private readonly Dictionary<ISymbol, ImmutableArray<AttributeData>> _attributes = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<ISymbol>> _allMembers = new(SymbolEqualityComparer.Default);
-    private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<IMappableMember>> _allAccessibleMembers =
-        new(SymbolEqualityComparer.Default);
-    private readonly Dictionary<ITypeSymbol, IReadOnlyDictionary<string, IMappableMember>> _allAccessibleMembersCaseInsensitive =
-        new(SymbolEqualityComparer.Default);
-    private readonly Dictionary<ITypeSymbol, IReadOnlyDictionary<string, IMappableMember>> _allAccessibleMembersCaseSensitive =
-        new(SymbolEqualityComparer.Default);
+    private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<IMappableMember>> _allAccessibleMembers = new(
+        SymbolEqualityComparer.Default
+    );
+    private readonly Dictionary<ITypeSymbol, IReadOnlyDictionary<string, IMappableMember>> _allAccessibleMembersCaseInsensitive = new(
+        SymbolEqualityComparer.Default
+    );
+    private readonly Dictionary<ITypeSymbol, IReadOnlyDictionary<string, IMappableMember>> _allAccessibleMembersCaseSensitive = new(
+        SymbolEqualityComparer.Default
+    );
 
     private MemberVisibility _memberVisibility = MemberVisibility.AllAccessible;
     private MemberVisibility _constructorVisibility = MemberVisibility.AllAccessible;

@@ -8,8 +8,10 @@ namespace Riok.Mapperly.Tests;
 
 public static class TestHelper
 {
-    private static readonly GeneratorDriverOptions _enableIncrementalTrackingDriverOptions =
-        new(IncrementalGeneratorOutputKind.None, trackIncrementalGeneratorSteps: true);
+    private static readonly GeneratorDriverOptions _enableIncrementalTrackingDriverOptions = new(
+        IncrementalGeneratorOutputKind.None,
+        trackIncrementalGeneratorSteps: true
+    );
 
     public static Task<VerifyResult> VerifyGenerator(string source, TestHelperOptions? options = null, params object?[] args)
     {

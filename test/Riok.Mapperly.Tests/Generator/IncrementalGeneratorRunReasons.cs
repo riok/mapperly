@@ -9,17 +9,20 @@ internal record IncrementalGeneratorRunReasons(
     IncrementalStepRunReason ReportDiagnosticsStep
 )
 {
-    public static readonly IncrementalGeneratorRunReasons New =
-        new(IncrementalStepRunReason.New, IncrementalStepRunReason.New, IncrementalStepRunReason.New, IncrementalStepRunReason.New);
+    public static readonly IncrementalGeneratorRunReasons New = new(
+        IncrementalStepRunReason.New,
+        IncrementalStepRunReason.New,
+        IncrementalStepRunReason.New,
+        IncrementalStepRunReason.New
+    );
 
-    public static readonly IncrementalGeneratorRunReasons Cached =
-        new(
-            // compilation step should always be modified as each time a new compilation is passed
-            IncrementalStepRunReason.Modified,
-            IncrementalStepRunReason.Unchanged,
-            IncrementalStepRunReason.Cached,
-            IncrementalStepRunReason.Cached
-        );
+    public static readonly IncrementalGeneratorRunReasons Cached = new(
+        // compilation step should always be modified as each time a new compilation is passed
+        IncrementalStepRunReason.Modified,
+        IncrementalStepRunReason.Unchanged,
+        IncrementalStepRunReason.Cached,
+        IncrementalStepRunReason.Cached
+    );
 
     public static readonly IncrementalGeneratorRunReasons Modified = Cached with
     {

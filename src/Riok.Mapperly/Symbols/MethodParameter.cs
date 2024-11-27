@@ -5,11 +5,10 @@ namespace Riok.Mapperly.Symbols;
 
 public readonly record struct MethodParameter(int Ordinal, string Name, ITypeSymbol Type)
 {
-    private static readonly SymbolDisplayFormat _parameterNameFormat =
-        new(
-            parameterOptions: SymbolDisplayParameterOptions.IncludeName,
-            miscellaneousOptions: SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers
-        );
+    private static readonly SymbolDisplayFormat _parameterNameFormat = new(
+        parameterOptions: SymbolDisplayParameterOptions.IncludeName,
+        miscellaneousOptions: SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers
+    );
 
     public MethodParameter(IParameterSymbol symbol, ITypeSymbol parameterType)
         : this(symbol.Ordinal, symbol.ToDisplayString(_parameterNameFormat), parameterType) { }

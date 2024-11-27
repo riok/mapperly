@@ -6,8 +6,10 @@ namespace Riok.Mapperly.Tests.Mapping;
 
 public class ObjectNestedPropertyTest
 {
-    private static readonly TestHelperOptions _ignoreNestedMemberNotUsed =
-        new() { IgnoredDiagnostics = new HashSet<DiagnosticDescriptor> { DiagnosticDescriptors.NestedMemberNotUsed } };
+    private static readonly TestHelperOptions _ignoreNestedMemberNotUsed = new()
+    {
+        IgnoredDiagnostics = new HashSet<DiagnosticDescriptor> { DiagnosticDescriptors.NestedMemberNotUsed },
+    };
 
     [Fact]
     public void NestedPropertyWithMemberNameOfSource()
