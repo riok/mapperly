@@ -73,6 +73,7 @@ internal static class MemberMappingBuilder
 
         var sourceMember = memberMappingInfo.SourceMember!;
         var targetMember = memberMappingInfo.TargetMember;
+
         if (delegateMapping == null)
         {
             ctx.BuilderContext.ReportDiagnostic(
@@ -82,6 +83,22 @@ internal static class MemberMappingBuilder
             );
             sourceValue = null;
             return false;
+        }
+
+        var memberTargetNullable = memberMappingInfo.TargetMember.MemberType.IsNullable();
+        var delegateTargetNullable = delegateMapping.TargetType.IsNullable();
+        var memberSourceNullable = memberMappingInfo.IsSourceNullable;
+        var delegateSourceNullable = delegateMapping.SourceType.IsNullable();
+
+        if (memberSourceNullable && !memberTargetNullable && !(delegateSourceNullable && !delegateTargetNullable))
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                sourceMember.MemberPath.FullName,
+                sourceMember.MemberPath.RootType.ToDisplayString(),
+                targetMember.FullName,
+                targetMember.RootType.ToDisplayString()
+            );
         }
 
         if (codeStyle == CodeStyle.Statement)

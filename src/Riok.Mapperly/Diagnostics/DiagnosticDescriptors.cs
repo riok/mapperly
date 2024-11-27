@@ -827,6 +827,26 @@ public static class DiagnosticDescriptors
             true
         );
 
+    public static readonly DiagnosticDescriptor NullableSourceValueToNonNullableTargetValue =
+        new(
+            "RMG089",
+            "Mapping nullable source to non-nullable target member",
+            "Mapping the nullable source property {0} of {1} to the target property {2} of {3} which is not nullable",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Info,
+            true
+        );
+
+    public static readonly DiagnosticDescriptor NullableSourceTypeToNonNullableTargetType =
+        new(
+            "RMG090",
+            "Mapping nullable source type to non-nullable target type",
+            "Mapping the nullable source of type {0} to target of type {1} which is not nullable",
+            DiagnosticCategories.Mapper,
+            DiagnosticSeverity.Info,
+            true
+        );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT

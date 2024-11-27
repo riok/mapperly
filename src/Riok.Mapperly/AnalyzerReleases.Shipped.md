@@ -191,6 +191,8 @@ RMG085  | Mapper   | Error    | Invalid usage of fallback value
 RMG086  | Mapper   | Error    | The source of the explicit mapping from a string to an enum is not of type string
 RMG087  | Mapper   | Error    | The target of the explicit mapping from an enum to a string is not of type string
 RMG088  | Mapper   | Info     | The attribute to build the name of the enum member is missing
+RMG089  | Mapper   | Info     | Mapping nullable source to non-nullable target member
+RMG090  | Mapper   | Info     | Mapping nullable source type to non-nullable target type
 
 ### Removed Rules
 

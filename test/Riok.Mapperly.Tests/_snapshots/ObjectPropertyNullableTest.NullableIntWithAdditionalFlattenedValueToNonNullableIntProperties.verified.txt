@@ -8,6 +8,66 @@
 }
 */
  : (11,4)-(11,36),
+      Message: Mapping the nullable source property Nested of A to the target property Nested of B which is not nullable,
+      Severity: Info,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG089,
+        Title: Mapping nullable source to non-nullable target member,
+        MessageFormat: Mapping the nullable source property {0} of {1} to the target property {2} of {3} which is not nullable,
+        Category: Mapper,
+        DefaultSeverity: Info,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    private partial B Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,36),
+      Message: Mapping the nullable source property Nested.Value2 of A to the target property NestedValue2 of B which is not nullable,
+      Severity: Info,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG089,
+        Title: Mapping nullable source to non-nullable target member,
+        MessageFormat: Mapping the nullable source property {0} of {1} to the target property {2} of {3} which is not nullable,
+        Category: Mapper,
+        DefaultSeverity: Info,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    private partial B Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,36),
+      Message: Mapping the nullable source property Value1 of C to the target property Value1 of D which is not nullable,
+      Severity: Info,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG089,
+        Title: Mapping nullable source to non-nullable target member,
+        MessageFormat: Mapping the nullable source property {0} of {1} to the target property {2} of {3} which is not nullable,
+        Category: Mapper,
+        DefaultSeverity: Info,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    private partial B Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,36),
       Message: The member Value2 on the mapping source type C is not mapped to any member on the mapping target type D,
       Severity: Warning,
       WarningLevel: 1,

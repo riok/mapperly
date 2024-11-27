@@ -1,3 +1,5 @@
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 public class EnumerableDeepCloningTest
@@ -34,8 +36,13 @@ public class EnumerableDeepCloningTest
     {
         var source = TestSourceBuilder.Mapping("int?[]", "int[]", TestSourceBuilderOptions.WithDeepCloning);
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type int? to target of type int which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new int[source.Length];

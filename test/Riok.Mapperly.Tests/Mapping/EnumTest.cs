@@ -229,8 +229,13 @@ public class EnumTest
         var source = TestSourceBuilder.Mapping("E1?", "E2", "enum E1 {A, B, C}", "enum E2 {A, B, C}");
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type E1? to target of type E2 which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 "return source == null ? throw new System.ArgumentNullException(nameof(source)) : (global::E2)source.Value;"
             );

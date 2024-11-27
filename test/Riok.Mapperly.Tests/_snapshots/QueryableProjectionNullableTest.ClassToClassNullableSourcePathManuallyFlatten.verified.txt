@@ -1,0 +1,44 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+    public partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> q);
+[MapProperty("Nested.Nested2.Value3", "NestedValue4")] private partial B Map(A source);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (12,0)-(12,87),
+      Message: Mapping the nullable source property Nested.Nested2.Value3 of A to the target property NestedValue4 of B which is not nullable,
+      Severity: Info,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG089,
+        Title: Mapping nullable source to non-nullable target member,
+        MessageFormat: Mapping the nullable source property {0} of {1} to the target property {2} of {3} which is not nullable,
+        Category: Mapper,
+        DefaultSeverity: Info,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+    public partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> q);
+[MapProperty("Nested.Nested2.Value3", "NestedValue4")] private partial B Map(A source);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (12,0)-(12,87),
+      Message: Mapping the nullable source property Nested.Nested2.Value3 of A to the target property NestedValue4 of B which is not nullable,
+      Severity: Info,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG089,
+        Title: Mapping nullable source to non-nullable target member,
+        MessageFormat: Mapping the nullable source property {0} of {1} to the target property {2} of {3} which is not nullable,
+        Category: Mapper,
+        DefaultSeverity: Info,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+{
+    partial B Map(A src, int? value);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,37),
+      Message: Mapping the nullable source property value of int? to the target property Value of B which is not nullable,
+      Severity: Info,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG089,
+        Title: Mapping nullable source to non-nullable target member,
+        MessageFormat: Mapping the nullable source property {0} of {1} to the target property {2} of {3} which is not nullable,
+        Category: Mapper,
+        DefaultSeverity: Info,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}
