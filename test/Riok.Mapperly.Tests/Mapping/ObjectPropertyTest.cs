@@ -194,8 +194,17 @@ public class ObjectPropertyTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property StringValue1 of A to the target property StringValue of B which is not nullable"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property StringValue2 of A to the target property StringValue of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
@@ -321,6 +330,26 @@ public class ObjectPropertyTest
         );
 
         return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void NullableToNonNullablePropertyShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string? StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property StringValue of A to the target property StringValue of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]

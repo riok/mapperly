@@ -1,4 +1,5 @@
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
 
@@ -72,8 +73,13 @@ public class DictionaryTest
     {
         var source = TestSourceBuilder.Mapping("Dictionary<string, int?>", "Dictionary<string, int>");
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type int? to target of type int which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::System.Collections.Generic.Dictionary<string, int>(source.Count);
@@ -98,8 +104,13 @@ public class DictionaryTest
             }
         );
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type int? to target of type int which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::System.Collections.Generic.Dictionary<string, int>(source.Count);

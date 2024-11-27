@@ -62,8 +62,13 @@ public class UserMethodAdditionalParametersTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property value of int? to the target property Value of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """
                 var target = new global::B()
@@ -152,8 +157,13 @@ public class UserMethodAdditionalParametersTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property nested.Value of C? to the target property NestedValue of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """
                 var target = new global::B()

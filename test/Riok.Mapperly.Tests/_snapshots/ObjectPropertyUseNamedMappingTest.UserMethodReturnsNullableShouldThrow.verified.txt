@@ -1,0 +1,44 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+{
+    [MapProperty("Name", "Value", Use = nameof(ToC))]
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial B Map(A source);
+*/
+ : (11,5)-(11,52),
+      Message: Mapping the nullable source of type string? to target of type string which is not nullable,
+      Severity: Info,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG090,
+        Title: Mapping nullable source type to non-nullable target type,
+        MessageFormat: Mapping the nullable source of type {0} to target of type {1} which is not nullable,
+        Category: Mapper,
+        DefaultSeverity: Info,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    [MapProperty("Name", "Value", Use = nameof(ToC))]
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial B Map(A source);
+*/
+ : (11,5)-(11,52),
+      Message: Mapping the nullable source of type C? to target of type C which is not nullable,
+      Severity: Info,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG090,
+        Title: Mapping nullable source type to non-nullable target type,
+        MessageFormat: Mapping the nullable source of type {0} to target of type {1} which is not nullable,
+        Category: Mapper,
+        DefaultSeverity: Info,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

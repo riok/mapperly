@@ -1,0 +1,24 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+{
+    private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,84),
+      Message: Mapping the nullable source property StringValue of A to the target property StringValue of B which is not nullable,
+      Severity: Info,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG089,
+        Title: Mapping nullable source to non-nullable target member,
+        MessageFormat: Mapping the nullable source property {0} of {1} to the target property {2} of {3} which is not nullable,
+        Category: Mapper,
+        DefaultSeverity: Info,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

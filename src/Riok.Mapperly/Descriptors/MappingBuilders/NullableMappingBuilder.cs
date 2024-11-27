@@ -1,5 +1,6 @@
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
+using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
@@ -12,6 +13,7 @@ public static class NullableMappingBuilder
             return null;
 
         var delegateMapping = ctx.BuildMapping(mappingKey, MappingBuildingOptions.KeepUserSymbol);
+
         return delegateMapping == null ? null : BuildNullDelegateMapping(ctx, delegateMapping);
     }
 
@@ -35,12 +37,19 @@ public static class NullableMappingBuilder
         }
 
         mappingKey = new TypeMappingKey(sourceNonNullable ?? ctx.Source, targetNonNullable ?? ctx.Target);
+
+        if (sourceIsNullable && !targetIsNullable)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType, ctx.Source, ctx.Target);
+        }
+
         return true;
     }
 
     private static INewInstanceMapping BuildNullDelegateMapping(MappingBuilderContext ctx, INewInstanceMapping mapping)
     {
         var nullFallback = ctx.GetNullFallbackValue();
+
         return mapping switch
         {
             NewInstanceMethodMapping methodMapping => new NullDelegateMethodMapping(ctx.Source, ctx.Target, methodMapping, nullFallback),

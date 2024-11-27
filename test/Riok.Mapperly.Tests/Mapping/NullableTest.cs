@@ -1,3 +1,5 @@
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 public class NullableTest
@@ -8,8 +10,13 @@ public class NullableTest
         var source = TestSourceBuilder.Mapping("A?", "B", "class A { }", "class B { }");
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type A? to target of type B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 if (source == null)
@@ -76,8 +83,13 @@ public class NullableTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type A? to target of type B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 if (source == null)
@@ -116,7 +128,15 @@ public class NullableTest
             "class A { }"
         );
 
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source == null ? \"\" : source.ToString();");
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type A? to target of type string which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody("return source == null ? \"\" : source.ToString();");
     }
 
     [Fact]
@@ -131,7 +151,15 @@ public class NullableTest
             }
         );
 
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source == null ? default : source.Value;");
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type System.DateTime? to target of type System.DateTime which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody("return source == null ? default : source.Value;");
     }
 
     [Fact]

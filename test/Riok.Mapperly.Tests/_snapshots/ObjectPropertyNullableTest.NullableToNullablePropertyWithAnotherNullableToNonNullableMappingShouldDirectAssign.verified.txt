@@ -1,0 +1,24 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+    public static partial ADest? Map(A? source);
+public static partial BDest MapToDestinationB(B source);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (12,0)-(12,56),
+      Message: Mapping the nullable source of type int? to target of type int which is not nullable,
+      Severity: Info,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG090,
+        Title: Mapping nullable source type to non-nullable target type,
+        MessageFormat: Mapping the nullable source of type {0} to target of type {1} which is not nullable,
+        Category: Mapper,
+        DefaultSeverity: Info,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

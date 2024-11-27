@@ -195,8 +195,13 @@ public class ObjectPropertyFromSourceTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type A? to target of type B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 if (source == null)
