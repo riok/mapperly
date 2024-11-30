@@ -47,6 +47,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public partial byte[] ConvertWithInstanceMethod(global::System.Guid id)
+        {
+            return id.ToByteArray();
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public partial global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto> MapAllDtos(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> objects)
         {
             return global::System.Linq.Enumerable.Select(objects, x => MapToDto(x));
@@ -213,6 +219,35 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             target.DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(testObject.DateTimeValueTargetDateOnly);
             target.DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(testObject.DateTimeValueTargetTimeOnly);
+            target.ToByteArrayWithInstanceMethod = ConvertWithInstanceMethod(testObject.ToByteArrayWithInstanceMethod);
+            if (testObject.WithCreateMethod != null)
+            {
+                target.WithCreateMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToInt32(testObject.WithCreateMethod);
+            }
+            if (testObject.WithCreateFromMethod != null)
+            {
+                target.WithCreateFromMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToByte(testObject.WithCreateFromMethod);
+            }
+            if (testObject.WithFromSingleMethod != null)
+            {
+                target.WithFromSingleMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToSingle(testObject.WithFromSingleMethod);
+            }
+            if (testObject.WithCreateParamsMethod != null)
+            {
+                target.WithCreateParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToDouble(testObject.WithCreateParamsMethod);
+            }
+            if (testObject.WithCreateFromParamsMethod != null)
+            {
+                target.WithCreateFromParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToUInt32(testObject.WithCreateFromParamsMethod);
+            }
+            if (testObject.WithFromShortParamsMethod != null)
+            {
+                target.WithFromShortParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToInt16(testObject.WithFromShortParamsMethod);
+            }
+            if (testObject.WithToDecimalMethod != null)
+            {
+                target.WithToDecimalMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToDecimal(testObject.WithToDecimalMethod);
+            }
             target.FormattedIntValue = testObject.IntValue.ToString("C", _formatDeCh);
             target.FormattedDateValue = testObject.DateTimeValue.ToString("D", _formatEnUs);
             target.SetPrivateValue(DirectInt(testObject.GetPrivateValue()));
@@ -353,6 +388,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.SubObject = null;
             }
+            target.ToByteArrayWithInstanceMethod = new global::System.Guid(dto.ToByteArrayWithInstanceMethod);
+            target.WithCreateMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.Create(dto.WithCreateMethod);
+            target.WithCreateFromMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.CreateFrom(dto.WithCreateFromMethod);
+            target.WithFromSingleMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.FromSingle(dto.WithFromSingleMethod);
+            target.WithCreateParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.Create(dto.WithCreateParamsMethod);
+            target.WithCreateFromParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.CreateFrom(dto.WithCreateFromParamsMethod);
+            target.WithFromShortParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.FromInt16(dto.WithFromShortParamsMethod);
+            target.WithToDecimalMethod = MapToConvertWithStaticMethodObject(dto.WithToDecimalMethod);
             target.SetPrivateValue1(DirectInt(dto.GetPrivateValue1()));
             return target;
         }
@@ -497,6 +540,35 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             target.DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(source.DateTimeValueTargetDateOnly);
             target.DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(source.DateTimeValueTargetTimeOnly);
+            target.ToByteArrayWithInstanceMethod = ConvertWithInstanceMethod(source.ToByteArrayWithInstanceMethod);
+            if (source.WithCreateMethod != null)
+            {
+                target.WithCreateMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToInt32(source.WithCreateMethod);
+            }
+            if (source.WithCreateFromMethod != null)
+            {
+                target.WithCreateFromMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToByte(source.WithCreateFromMethod);
+            }
+            if (source.WithFromSingleMethod != null)
+            {
+                target.WithFromSingleMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToSingle(source.WithFromSingleMethod);
+            }
+            if (source.WithCreateParamsMethod != null)
+            {
+                target.WithCreateParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToDouble(source.WithCreateParamsMethod);
+            }
+            if (source.WithCreateFromParamsMethod != null)
+            {
+                target.WithCreateFromParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToUInt32(source.WithCreateFromParamsMethod);
+            }
+            if (source.WithFromShortParamsMethod != null)
+            {
+                target.WithFromShortParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToInt16(source.WithFromShortParamsMethod);
+            }
+            if (source.WithToDecimalMethod != null)
+            {
+                target.WithToDecimalMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToDecimal(source.WithToDecimalMethod);
+            }
             target.SetPrivateValue(DirectInt(source.GetPrivateValue()));
         }
 
@@ -683,6 +755,13 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             var target = new global::Riok.Mapperly.IntegrationTests.Models.InheritanceSubObject();
             target.SubIntValue = DirectInt(source.SubIntValue);
             target.BaseIntValue = DirectInt(source.BaseIntValue);
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject MapToConvertWithStaticMethodObject(decimal source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject();
             return target;
         }
     }

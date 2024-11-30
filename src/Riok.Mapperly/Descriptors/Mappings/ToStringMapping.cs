@@ -12,8 +12,8 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// target = source.ToString();
 /// </code>
 /// <param name="simpleInvocation">
-/// When true, <c>null</c> parameters are not emitted,
-/// when false, <c>null</c> parameters are emitted as <c>null</c> literals..</param>
+/// When <see langword="true"/>, <see langword="null"/> parameters are not emitted,
+/// when <see langword="false"/>, <see langword="null"/> parameters are emitted as <see langword="null"/> literals.</param>
 /// </summary>
 public class ToStringMapping(
     ITypeSymbol sourceType,

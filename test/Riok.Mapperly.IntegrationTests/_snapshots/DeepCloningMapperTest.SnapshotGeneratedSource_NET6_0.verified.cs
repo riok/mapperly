@@ -140,6 +140,63 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.DateTimeValue = src.DateTimeValue;
             target.DateTimeValueTargetDateOnly = src.DateTimeValueTargetDateOnly;
             target.DateTimeValueTargetTimeOnly = src.DateTimeValueTargetTimeOnly;
+            target.ToByteArrayWithInstanceMethod = src.ToByteArrayWithInstanceMethod;
+            if (src.WithCreateMethod != null)
+            {
+                target.WithCreateMethod = MapToConvertWithStaticMethodObject(src.WithCreateMethod);
+            }
+            else
+            {
+                target.WithCreateMethod = null;
+            }
+            if (src.WithCreateFromMethod != null)
+            {
+                target.WithCreateFromMethod = MapToConvertWithStaticMethodObject(src.WithCreateFromMethod);
+            }
+            else
+            {
+                target.WithCreateFromMethod = null;
+            }
+            if (src.WithFromSingleMethod != null)
+            {
+                target.WithFromSingleMethod = MapToConvertWithStaticMethodObject(src.WithFromSingleMethod);
+            }
+            else
+            {
+                target.WithFromSingleMethod = null;
+            }
+            if (src.WithCreateParamsMethod != null)
+            {
+                target.WithCreateParamsMethod = MapToConvertWithStaticMethodObject(src.WithCreateParamsMethod);
+            }
+            else
+            {
+                target.WithCreateParamsMethod = null;
+            }
+            if (src.WithCreateFromParamsMethod != null)
+            {
+                target.WithCreateFromParamsMethod = MapToConvertWithStaticMethodObject(src.WithCreateFromParamsMethod);
+            }
+            else
+            {
+                target.WithCreateFromParamsMethod = null;
+            }
+            if (src.WithFromShortParamsMethod != null)
+            {
+                target.WithFromShortParamsMethod = MapToConvertWithStaticMethodObject(src.WithFromShortParamsMethod);
+            }
+            else
+            {
+                target.WithFromShortParamsMethod = null;
+            }
+            if (src.WithToDecimalMethod != null)
+            {
+                target.WithToDecimalMethod = MapToConvertWithStaticMethodObject(src.WithToDecimalMethod);
+            }
+            else
+            {
+                target.WithToDecimalMethod = null;
+            }
             target.SumComponent1 = src.SumComponent1;
             target.SumComponent2 = src.SumComponent2;
             return target;
@@ -195,6 +252,13 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             var target = new global::Riok.Mapperly.IntegrationTests.Models.InheritanceSubObject();
             target.SubIntValue = source.SubIntValue;
             target.BaseIntValue = source.BaseIntValue;
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject MapToConvertWithStaticMethodObject(global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject();
             return target;
         }
     }

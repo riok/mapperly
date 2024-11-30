@@ -280,11 +280,11 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
             foundPath.Clear();
             foundPath.Add(member);
-            if (pathCandidate.Path.Count == 1 || TryFindPath(member.Type, pathCandidate.SkipRoot(), ignoreCase, foundPath))
-            {
-                memberPath = new NonEmptyMemberPath(member.Type, foundPath);
-                return true;
-            }
+            if (pathCandidate.Path.Count != 1 && !TryFindPath(member.Type, pathCandidate.SkipRoot(), ignoreCase, foundPath))
+                continue;
+
+            memberPath = new NonEmptyMemberPath(member.Type, foundPath);
+            return true;
         }
 
         memberPath = null;
@@ -368,6 +368,85 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
         memberPath = null;
         return false;
+    }
+
+    /// <summary>
+    ///     Checks that the specified method returns a type that can be assigned to the specified result type,
+    ///     and that the specified arguments can be passed to the method.
+    ///     The check takes into account the possibility of assignment to a method with an argument marked with the <see langword="params"/> keyword
+    /// </summary>
+    /// <param name="method">Method for validate</param>
+    /// <param name="returnType">Target return type</param>
+    /// <param name="argTypes">Target method arguments</param>
+    /// <returns></returns>
+    internal bool ValidateSignature(IMethodSymbol method, ITypeSymbol returnType, params ITypeSymbol[] argTypes)
+    {
+        if (!CanAssign(method.ReturnType, returnType))
+        {
+            return false;
+        }
+
+        for (var i = 0; i < method.Parameters.Length; i++)
+        {
+            if (method.Parameters[i] is not { IsParams: true } isParamsParameter)
+            {
+                if (!CanAssign(argTypes[i], method.Parameters[i].Type))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                // see https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/method-parameters#params-modifier
+
+                ITypeSymbol elementType;
+
+                if (
+                    isParamsParameter.Type.AllInterfaces.FirstOrDefault(x =>
+                        x.OriginalDefinition.SpecialType is SpecialType.System_Collections_Generic_IEnumerable_T
+                    ) is
+                    { } iEnumerableInterface
+                )
+                {
+                    // for assignable to IEnumerable<T>
+                    elementType = iEnumerableInterface.TypeArguments.First();
+                }
+                else
+                {
+                    // for Span<T> and ReadOnlySpan<T>
+                    elementType = ((INamedTypeSymbol)method.Parameters[i].Type).TypeArguments.First();
+                }
+
+                var argsToEnd = new Span<ITypeSymbol>(argTypes, i, argTypes.Length);
+
+                // for empty args aka Call(params X[]) as Call()
+                if (argsToEnd.IsEmpty)
+                {
+                    continue;
+                }
+
+                //for single args aka Call(X[]) or Call(X)
+                if (argsToEnd.Length == 1)
+                {
+                    if (!CanAssign(argsToEnd[0], method.Parameters[i].Type) && !CanAssign(argsToEnd[0], elementType))
+                    {
+                        return false;
+                    }
+                    continue;
+                }
+
+                // for multiple args
+                foreach (var typeSymbol in argsToEnd)
+                {
+                    if (!CanAssign(typeSymbol, elementType))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     private bool TryFindPath(ITypeSymbol type, StringMemberPath path, bool ignoreCase, ICollection<IMappableMember> foundPath)
