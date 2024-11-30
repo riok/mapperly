@@ -220,6 +220,10 @@ namespace Riok.Mapperly.Abstractions
         Memory = 16384,
         Tuple = 32768,
         EnumUnderlyingType = 65536,
+        ToTargetMethod = 131072,
+        AllToTargetMethods = 131088,
+        StaticConvertMethods = 262144,
+        AllStaticMethods = 262912,
         All = -1,
     }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]

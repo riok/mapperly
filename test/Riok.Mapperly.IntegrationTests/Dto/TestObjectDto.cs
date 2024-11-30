@@ -131,6 +131,22 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         public TimeOnly DateTimeValueTargetTimeOnly { get; set; }
 
+        public byte[] ToByteArrayWithInstanceMethod { get; set; }
+
+        public int WithCreateMethod { get; set; }
+
+        public byte WithCreateFromMethod { get; set; }
+
+        public float WithFromSingleMethod { get; set; }
+
+        public double WithCreateParamsMethod { get; set; }
+
+        public uint WithCreateFromParamsMethod { get; set; }
+
+        public short WithFromShortParamsMethod { get; set; }
+
+        public decimal WithToDecimalMethod { get; set; }
+
         public string FormattedIntValue { get; set; } = string.Empty;
 
         public string FormattedDateValue { get; set; } = string.Empty;

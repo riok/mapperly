@@ -30,7 +30,7 @@ public enum MappingConversionType
 
     /// <summary>
     /// If the source type is a <see cref="string"/>,
-    /// uses a a static visible method named `Parse` on the target type
+    /// uses a static visible method named `Parse` on the target type
     /// with a return type equal to the target type and a string as single parameter.
     /// </summary>
     ParseMethod = 1 << 3,
@@ -64,26 +64,26 @@ public enum MappingConversionType
 
     /// <summary>
     /// If the source is a <see cref="DateTime"/>
-    /// and the target is a DateOnly
+    /// and the target is a <c>DateOnly</c>
     /// uses the `FromDateTime` method on the target type with the source as single parameter.
     /// </summary>
     DateTimeToDateOnly = 1 << 8,
 
     /// <summary>
     /// If the source is a <see cref="DateTime"/>
-    /// and the target is a TimeOnly
+    /// and the target is a <c>TimeOnly</c>
     /// uses the `FromDateTime` method on the target type with the source as single parameter.
     /// </summary>
     DateTimeToTimeOnly = 1 << 9,
 
     /// <summary>
-    /// If the source and the target is a <see cref="IQueryable{T}"/>.
+    /// If the source and the target are a <see cref="IQueryable{T}"/>.
     /// Only uses object initializers and inlines the mapping code.
     /// </summary>
     Queryable = 1 << 10,
 
     /// <summary>
-    /// If the source and the target is an <see cref="IEnumerable{T}"/>
+    /// If the source and the target are an <see cref="IEnumerable{T}"/>
     /// Maps each element individually.
     /// </summary>
     Enumerable = 1 << 11,
@@ -115,9 +115,37 @@ public enum MappingConversionType
     Tuple = 1 << 15,
 
     /// <summary>
-    /// Allow using the underlying type of an enum to map from or to an enum type.
+    /// Allow using the underlying type of enum to map from or to an enum type.
     /// </summary>
     EnumUnderlyingType = 1 << 16,
+
+    /// <summary>
+    /// If the source type contains a `ToTarget` method other than `ToString`, use it
+    /// </summary>
+    ToTargetMethod = 1 << 17,
+
+    /// <summary>
+    /// Combination of <see cref="ToStringMethod"/> and <see cref="ToTargetMethod"/>
+    /// </summary>
+    AllToTargetMethods = ToStringMethod | ToTargetMethod,
+
+    /// <summary>
+    /// If the source type contains a static `ToTarget` method
+    /// or the target type contains a static methods
+    /// `Create(TSource)`,
+    /// `CreateFrom(TSource)`
+    /// `From(TSource)`
+    /// `FromTSource(TSource)`
+    /// or similar methods with <langword>params</langword> keyword, use it.
+    /// The exception is <see cref="DateTime"/> conversions,
+    /// which are enabled by separate options (<seealso cref="DateTimeToTimeOnly"/>, <seealso cref="DateTimeToDateOnly"/>).
+    /// </summary>
+    StaticConvertMethods = 1 << 18,
+
+    /// <summary>
+    /// Combination of <see cref="DateTimeToDateOnly"/>, <see cref="DateTimeToTimeOnly"/> and <see cref="StaticConvertMethods"/>
+    /// </summary>
+    AllStaticMethods = DateTimeToDateOnly | DateTimeToTimeOnly | StaticConvertMethods,
 
     /// <summary>
     /// Enables all supported conversions.
