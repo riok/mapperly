@@ -28,7 +28,7 @@
     "prism-react-renderer": "2.4.0",
     "raw-loader": "4.0.2",
     "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react-dom": "18.3.1",
     "path-to-regexp": "8.2.0"
   },
   "devDependencies": {
