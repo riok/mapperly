@@ -21,7 +21,7 @@
     "@docusaurus/core": "3.6.3",
     "@docusaurus/plugin-ideal-image": "3.6.3",
     "@docusaurus/preset-classic": "3.6.3",
-    "@easyops-cn/docusaurus-search-local": "0.45.0",
+    "@easyops-cn/docusaurus-search-local": "0.46.1",
     "@mdx-js/react": "3.0.1",
     "clsx": "2.1.0",
     "docusaurus-plugin-sass": "0.2.5",
