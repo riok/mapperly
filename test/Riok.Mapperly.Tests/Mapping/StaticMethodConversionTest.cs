@@ -3004,4 +3004,3 @@ public class StaticMethodConversionTest
             .HaveAssertedAllDiagnostics();
     }
 }
-// class A<T> where T: struct { public static List<T?> ToList(A<T> source) => []; }
