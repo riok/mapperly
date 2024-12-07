@@ -117,6 +117,27 @@ public class QueryableProjectionTest
     }
 
     [Fact]
+    public Task RecordToRecordManualMappingWithGlobalTypeArgsInInliningMappingMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial IQueryable<B> ProjectAToB(IQueryable<A> query);
+
+            public DateTimeOffset MapDateTimeToDateTimeOffset(DateTime value) => 
+            value != DateTime.MinValue ? new DateTimeOffset(DateTime.SpecifyKind(value, DateTimeKind.Utc)) : DateTimeOffset.MinValue;
+            """,
+            """
+            public sealed record A(string Name, DateTime ChangedOn);
+            """,
+            """
+            public sealed record B(string Name, DateTimeOffset ChangedOn);
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task RecordToRecordManualListMapping()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
