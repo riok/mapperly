@@ -123,15 +123,11 @@ public class QueryableProjectionTest
             """
             public partial IQueryable<B> ProjectAToB(IQueryable<A> query);
 
-            public DateTimeOffset MapDateTimeToDateTimeOffset(DateTime value) => 
-            value != DateTime.MinValue ? new DateTimeOffset(DateTime.SpecifyKind(value, DateTimeKind.Utc)) : DateTimeOffset.MinValue;
+            public DateTimeOffset MapDateTimeToDateTimeOffset(DateTime value) =>
+                value != DateTime.MinValue ? new DateTimeOffset(DateTime.SpecifyKind(value, DateTimeKind.Utc)) : DateTimeOffset.MinValue;
             """,
-            """
-            public sealed record A(string Name, DateTime ChangedOn);
-            """,
-            """
-            public sealed record B(string Name, DateTimeOffset ChangedOn);
-            """
+            "public sealed record A(string Name, DateTime ChangedOn);",
+            "public sealed record B(string Name, DateTimeOffset ChangedOn);"
         );
 
         return TestHelper.VerifyGenerator(source);

@@ -11,7 +11,7 @@ public partial class Mapper
             query,
             x => new global::B(
                 x.Name,
-                x.ChangedOn != global::System.DateTime.MinValue ? new global::System.DateTimeOffset(global::System.DateTime.SpecifyKind(x.ChangedOn, global::System.DateTimeKind.Utc)) : global::System.DateTimeOffset.MinValue
+                    x.ChangedOn != global::System.DateTime.MinValue ? new global::System.DateTimeOffset(global::System.DateTime.SpecifyKind(x.ChangedOn, global::System.DateTimeKind.Utc)) : global::System.DateTimeOffset.MinValue
             )
         );
 #nullable enable
