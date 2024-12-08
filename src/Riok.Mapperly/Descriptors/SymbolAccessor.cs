@@ -143,7 +143,10 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
             case INamedTypeSymbol { TypeArguments.Length: > 0 } namedSymbol:
                 var upgradedTypeArguments = namedSymbol.TypeArguments.Select(UpgradeNullable).ToImmutableArray();
                 upgradedSymbol = namedSymbol
-                    .ConstructedFrom.Construct(upgradedTypeArguments, [.. upgradedTypeArguments.Select(ta => ta.NullableAnnotation)])
+                    .ConstructedFrom.Construct(
+                        upgradedTypeArguments,
+                        upgradedTypeArguments.Select(ta => ta.NullableAnnotation).ToImmutableArray()
+                    )
                     .WithNullableAnnotation(NullableAnnotation.Annotated);
                 break;
 
