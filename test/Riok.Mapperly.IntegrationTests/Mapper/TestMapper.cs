@@ -51,7 +51,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public partial DateTime DirectDateTime(DateTime dateTime);
 
+#if NET5_0_OR_GREATER
         public partial byte[] ConvertWithInstanceMethod(Guid id);
+#endif
 
         public partial IEnumerable<TestObjectDto> MapAllDtos(IEnumerable<TestObject> objects);
 
