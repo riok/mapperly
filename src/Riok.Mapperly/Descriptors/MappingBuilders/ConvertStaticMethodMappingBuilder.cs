@@ -52,21 +52,12 @@ public static class ConvertStaticMethodMappingBuilder
 
     private static bool IsConversionEnabled(MappingBuilderContext ctx)
     {
-        //checks for backward compatibility
-        if (IsDateTimeToDateOnlyConversion(ctx))
-        {
-            if (!ctx.IsConversionEnabled(MappingConversionType.DateTimeToDateOnly))
-                return false;
-        }
-        else if (IsDateTimeToTimeOnlyConversion(ctx))
-        {
-            if (!ctx.IsConversionEnabled(MappingConversionType.DateTimeToTimeOnly))
-                return false;
-        }
-        else if (!ctx.IsConversionEnabled(MappingConversionType.StaticConvertMethods))
-            return false;
-
-        return true;
+        //checks DateTime type for backward compatibility
+        return ctx.IsConversionEnabled(
+            IsDateTimeToDateOnlyConversion(ctx) ? MappingConversionType.DateTimeToDateOnly
+            : IsDateTimeToTimeOnlyConversion(ctx) ? MappingConversionType.DateTimeToTimeOnly
+            : MappingConversionType.StaticConvertMethods
+        );
     }
 
     private static bool IsDateTimeToDateOnlyConversion(MappingBuilderContext ctx)
@@ -95,8 +86,7 @@ public static class ConvertStaticMethodMappingBuilder
         bool targetIsNullable
     )
     {
-        // Get all methods with a single parameter whose type is suitable for assignment to the source type,
-        // group them by name,
+        // Get all methods with a single parameter whose type is suitable for assignment to the source type, group them by name,
         // and convert them to a dictionary whose key is the method name.
         // The keys in the dictionary are compared case-insensitively to handle possible `Uint` vs `UInt` cases, etc.
         var allMethodCandidates = allMethods
@@ -109,18 +99,15 @@ public static class ConvertStaticMethodMappingBuilder
             if (!allMethodCandidates.TryGetValue(methodName, out var candidates))
                 continue;
 
-            if (!targetIsNullable)
+            if (targetIsNullable)
             {
-                var method = candidates.Find(x => symbolAccessor.ValidateSignature(x, nonNullableTargetType, sourceType));
-                if (method != null)
-                    return new StaticMethodMapping(method);
+                continue;
             }
-            else // currently this branch is never executed because `targetType` is never null. See https://github.com/riok/mapperly/issues/1614
-            {
-                var method = candidates.Find(x => symbolAccessor.ValidateSignature(x, targetType, sourceType));
-                if (method != null)
-                    return new StaticMethodMapping(method);
-            }
+
+            var method = candidates.Find(x => symbolAccessor.ValidateSignature(x, nonNullableTargetType, sourceType));
+
+            if (method != null)
+                return new StaticMethodMapping(method);
         }
 
         return null;
@@ -128,41 +115,36 @@ public static class ConvertStaticMethodMappingBuilder
 
     private static IEnumerable<string> GetTargetStaticMethodNames(MappingBuilderContext ctx)
     {
-        const string create = "Create";
-        const string from = "From";
-        const string array = "Array";
-
         if (ctx.Source.IsArrayType(out var arrayType))
         {
-            yield return $"{create}{from}{arrayType.ElementType.Name}{array}";
-            yield return $"{from}{arrayType.ElementType.Name}{array}";
+            yield return $"CreateFrom{arrayType.ElementType.Name}Array";
+            yield return $"From{arrayType.ElementType.Name}Array";
 
             if (!arrayType.ElementType.HasKeyword(out var keywordName))
                 yield break;
 
-            yield return $"{create}{from}{keywordName}{array}";
+            yield return $"CreateFrom{keywordName}Array";
 
-            yield return $"{from}{keywordName}{array}";
+            yield return $"From{keywordName}Array";
 
-            yield return $"{from}{array}";
-            yield return $"{create}{from}{array}";
-            yield return $"{create}{from}";
-            yield return create;
+            yield return "FromArray";
+            yield return "CreateFromArray";
+            yield return "CreateFrom";
+            yield return "Create";
+            yield break;
         }
-        else
+
+        yield return $"CreateFrom{ctx.Source.Name}";
+        yield return $"From{ctx.Source.Name}";
+
+        if (ctx.Source.HasKeyword(out var sourceKeyword))
         {
-            yield return $"{create}{from}{ctx.Source.Name}";
-            yield return $"{from}{ctx.Source.Name}";
-
-            if (ctx.Source.HasKeyword(out var sourceKeyword))
-            {
-                yield return $"{create}{from}{sourceKeyword}";
-                yield return $"{from}{sourceKeyword}";
-            }
-
-            yield return $"{create}{from}";
-            yield return create;
+            yield return $"CreateFrom{sourceKeyword}";
+            yield return $"From{sourceKeyword}";
         }
+
+        yield return "CreateFrom";
+        yield return "Create";
     }
 
     private static IEnumerable<string> GetSourceStaticMethodNames(MappingBuilderContext ctx)

@@ -35,6 +35,11 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     private Compilation Compilation => compilationContext.Compilation;
 
+    private readonly Lazy<INamedTypeSymbol> _lazyEnumerableType = new(
+        () => compilationContext.Compilation.GetSpecialType(SpecialType.System_Collections_Generic_IEnumerable_T)
+    );
+    private INamedTypeSymbol EnumerableTypeSymbol => _lazyEnumerableType.Value;
+
     internal void SetMemberVisibility(MemberVisibility visibility) => _memberVisibility = visibility;
 
     internal void SetConstructorVisibility(MemberVisibility visibility) => _constructorVisibility = visibility;
@@ -138,10 +143,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
             case INamedTypeSymbol { TypeArguments.Length: > 0 } namedSymbol:
                 var upgradedTypeArguments = namedSymbol.TypeArguments.Select(UpgradeNullable).ToImmutableArray();
                 upgradedSymbol = namedSymbol
-                    .ConstructedFrom.Construct(
-                        upgradedTypeArguments,
-                        upgradedTypeArguments.Select(ta => ta.NullableAnnotation).ToImmutableArray()
-                    )
+                    .ConstructedFrom.Construct(upgradedTypeArguments, [.. upgradedTypeArguments.Select(ta => ta.NullableAnnotation)])
                     .WithNullableAnnotation(NullableAnnotation.Annotated);
                 break;
 
@@ -381,12 +383,9 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     /// <returns></returns>
     internal bool ValidateSignature(IMethodSymbol method, ITypeSymbol returnType, params ITypeSymbol[] argTypes)
     {
-        if (!CanAssign(method.ReturnType, returnType))
-        {
-            return false;
-        }
+        return CanAssign(method.ReturnType, returnType) && Enumerable.Range(0, method.Parameters.Length).All(IsValidParameter);
 
-        for (var i = 0; i < method.Parameters.Length; i++)
+        bool IsValidParameter(int i)
         {
             if (method.Parameters[i] is not { IsParams: true } isParamsParameter)
             {
@@ -399,40 +398,24 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
             {
                 // see https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/method-parameters#params-modifier
 
-                ITypeSymbol elementType;
-
-                if (
-                    isParamsParameter.Type.AllInterfaces.FirstOrDefault(x =>
-                        x.OriginalDefinition.SpecialType is SpecialType.System_Collections_Generic_IEnumerable_T
-                    ) is
-                    { } iEnumerableInterface
-                )
-                {
-                    // for assignable to IEnumerable<T>
-                    elementType = iEnumerableInterface.TypeArguments.First();
-                }
-                else
-                {
-                    // for Span<T> and ReadOnlySpan<T>
-                    elementType = ((INamedTypeSymbol)method.Parameters[i].Type).TypeArguments.First();
-                }
-
-                var argsToEnd = new Span<ITypeSymbol>(argTypes, i, argTypes.Length);
+                var argsToEnd = argTypes.AsSpan(i);
 
                 // for empty args aka Call(params X[]) as Call()
                 if (argsToEnd.IsEmpty)
                 {
-                    continue;
+                    return true;
                 }
 
-                //for single args aka Call(X[]) or Call(X)
+                var elementType = isParamsParameter.Type.ImplementsGeneric(EnumerableTypeSymbol, out var impl)
+                    // for assignable to IEnumerable<T>
+                    ? impl.TypeArguments.First()
+                    // for Span<T> and ReadOnlySpan<T>
+                    : ((INamedTypeSymbol)method.Parameters[i].Type).TypeArguments.First();
+
+                //for single arg aka Call(X[]) or Call(X)
                 if (argsToEnd.Length == 1)
                 {
-                    if (!CanAssign(argsToEnd[0], method.Parameters[i].Type) && !CanAssign(argsToEnd[0], elementType))
-                    {
-                        return false;
-                    }
-                    continue;
+                    return CanAssign(argsToEnd[0], method.Parameters[i].Type) || CanAssign(argsToEnd[0], elementType);
                 }
 
                 // for multiple args
@@ -444,9 +427,9 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
                     }
                 }
             }
-        }
 
-        return true;
+            return true;
+        }
     }
 
     private bool TryFindPath(ITypeSymbol type, StringMemberPath path, bool ignoreCase, ICollection<IMappableMember> foundPath)
