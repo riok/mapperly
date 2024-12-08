@@ -131,7 +131,9 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         public TimeOnly DateTimeValueTargetTimeOnly { get; set; }
 
+#if NET5_0_OR_GREATER
         public byte[]? ToByteArrayWithInstanceMethod { get; set; }
+#endif
 
         public int WithCreateMethod { get; set; }
 

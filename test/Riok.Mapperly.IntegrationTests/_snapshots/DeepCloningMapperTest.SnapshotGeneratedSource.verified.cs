@@ -138,6 +138,62 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.DateTimeValue = src.DateTimeValue;
             target.DateTimeValueTargetDateOnly = src.DateTimeValueTargetDateOnly;
             target.DateTimeValueTargetTimeOnly = src.DateTimeValueTargetTimeOnly;
+            if (src.WithCreateMethod != null)
+            {
+                target.WithCreateMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithCreateMethod);
+            }
+            else
+            {
+                target.WithCreateMethod = null;
+            }
+            if (src.WithCreateFromMethod != null)
+            {
+                target.WithCreateFromMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithCreateFromMethod);
+            }
+            else
+            {
+                target.WithCreateFromMethod = null;
+            }
+            if (src.WithFromSingleMethod != null)
+            {
+                target.WithFromSingleMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithFromSingleMethod);
+            }
+            else
+            {
+                target.WithFromSingleMethod = null;
+            }
+            if (src.WithCreateParamsMethod != null)
+            {
+                target.WithCreateParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithCreateParamsMethod);
+            }
+            else
+            {
+                target.WithCreateParamsMethod = null;
+            }
+            if (src.WithCreateFromParamsMethod != null)
+            {
+                target.WithCreateFromParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithCreateFromParamsMethod);
+            }
+            else
+            {
+                target.WithCreateFromParamsMethod = null;
+            }
+            if (src.WithFromShortParamsMethod != null)
+            {
+                target.WithFromShortParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithFromShortParamsMethod);
+            }
+            else
+            {
+                target.WithFromShortParamsMethod = null;
+            }
+            if (src.WithToDecimalMethod != null)
+            {
+                target.WithToDecimalMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithToDecimalMethod);
+            }
+            else
+            {
+                target.WithToDecimalMethod = null;
+            }
             target.SumComponent1 = src.SumComponent1;
             target.SumComponent2 = src.SumComponent2;
             return target;

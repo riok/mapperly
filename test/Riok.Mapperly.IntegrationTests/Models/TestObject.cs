@@ -124,7 +124,9 @@ namespace Riok.Mapperly.IntegrationTests.Models
 
         public DateTime DateTimeValueTargetTimeOnly { get; set; }
 
+#if NET5_0_OR_GREATER
         public Guid ToByteArrayWithInstanceMethod { get; set; }
+#endif
 
         public ConvertWithStaticMethodObject? WithCreateMethod { get; set; }
 
