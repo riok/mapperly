@@ -395,7 +395,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.WithCreateParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.Create(dto.WithCreateParamsMethod);
             target.WithCreateFromParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.CreateFrom(dto.WithCreateFromParamsMethod);
             target.WithFromShortParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.FromInt16(dto.WithFromShortParamsMethod);
-            target.WithToDecimalMethod = MapToConvertWithStaticMethodObject(dto.WithToDecimalMethod);
+            target.WithToDecimalMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.CreateFromDecimal(dto.WithToDecimalMethod);
             target.SetPrivateValue1(DirectInt(dto.GetPrivateValue1()));
             return target;
         }
@@ -755,13 +755,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             var target = new global::Riok.Mapperly.IntegrationTests.Models.InheritanceSubObject();
             target.SubIntValue = DirectInt(source.SubIntValue);
             target.BaseIntValue = DirectInt(source.BaseIntValue);
-            return target;
-        }
-
-        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        private global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject MapToConvertWithStaticMethodObject(decimal source)
-        {
-            var target = new global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject();
             return target;
         }
     }

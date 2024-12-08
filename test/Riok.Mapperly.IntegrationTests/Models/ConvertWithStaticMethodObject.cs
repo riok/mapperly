@@ -6,6 +6,11 @@ namespace Riok.Mapperly.IntegrationTests.Models
     {
         public int Value { get; private set; }
 
+        public static ConvertWithStaticMethodObject ToConvertWithStaticMethodObject(ConvertWithStaticMethodObject value)
+        {
+            return new ConvertWithStaticMethodObject { Value = value.Value };
+        }
+
         public static ConvertWithStaticMethodObject Create(int value)
         {
             return new ConvertWithStaticMethodObject { Value = value };
@@ -14,6 +19,11 @@ namespace Riok.Mapperly.IntegrationTests.Models
         public static ConvertWithStaticMethodObject CreateFrom(byte value)
         {
             return new ConvertWithStaticMethodObject { Value = value };
+        }
+
+        public static ConvertWithStaticMethodObject CreateFromDecimal(decimal value)
+        {
+            return new ConvertWithStaticMethodObject { Value = Convert.ToInt32(value) };
         }
 
         public static ConvertWithStaticMethodObject FromSingle(float value)

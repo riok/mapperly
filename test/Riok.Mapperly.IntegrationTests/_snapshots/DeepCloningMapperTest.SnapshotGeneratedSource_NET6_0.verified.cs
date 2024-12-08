@@ -143,7 +143,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.ToByteArrayWithInstanceMethod = src.ToByteArrayWithInstanceMethod;
             if (src.WithCreateMethod != null)
             {
-                target.WithCreateMethod = MapToConvertWithStaticMethodObject(src.WithCreateMethod);
+                target.WithCreateMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithCreateMethod);
             }
             else
             {
@@ -151,7 +151,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             if (src.WithCreateFromMethod != null)
             {
-                target.WithCreateFromMethod = MapToConvertWithStaticMethodObject(src.WithCreateFromMethod);
+                target.WithCreateFromMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithCreateFromMethod);
             }
             else
             {
@@ -159,7 +159,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             if (src.WithFromSingleMethod != null)
             {
-                target.WithFromSingleMethod = MapToConvertWithStaticMethodObject(src.WithFromSingleMethod);
+                target.WithFromSingleMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithFromSingleMethod);
             }
             else
             {
@@ -167,7 +167,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             if (src.WithCreateParamsMethod != null)
             {
-                target.WithCreateParamsMethod = MapToConvertWithStaticMethodObject(src.WithCreateParamsMethod);
+                target.WithCreateParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithCreateParamsMethod);
             }
             else
             {
@@ -175,7 +175,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             if (src.WithCreateFromParamsMethod != null)
             {
-                target.WithCreateFromParamsMethod = MapToConvertWithStaticMethodObject(src.WithCreateFromParamsMethod);
+                target.WithCreateFromParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithCreateFromParamsMethod);
             }
             else
             {
@@ -183,7 +183,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             if (src.WithFromShortParamsMethod != null)
             {
-                target.WithFromShortParamsMethod = MapToConvertWithStaticMethodObject(src.WithFromShortParamsMethod);
+                target.WithFromShortParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithFromShortParamsMethod);
             }
             else
             {
@@ -191,7 +191,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             if (src.WithToDecimalMethod != null)
             {
-                target.WithToDecimalMethod = MapToConvertWithStaticMethodObject(src.WithToDecimalMethod);
+                target.WithToDecimalMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithToDecimalMethod);
             }
             else
             {
@@ -252,13 +252,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             var target = new global::Riok.Mapperly.IntegrationTests.Models.InheritanceSubObject();
             target.SubIntValue = source.SubIntValue;
             target.BaseIntValue = source.BaseIntValue;
-            return target;
-        }
-
-        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        private static global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject MapToConvertWithStaticMethodObject(global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject source)
-        {
-            var target = new global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject();
             return target;
         }
     }

@@ -184,13 +184,27 @@
   DateTimeValueTargetDateOnly: 2020-01-03 15:10:05 Utc,
   DateTimeValueTargetTimeOnly: 2020-01-03 15:10:05 Utc,
   ToByteArrayWithInstanceMethod: Guid_1,
-  WithCreateMethod: {},
-  WithCreateFromMethod: {},
-  WithFromSingleMethod: {},
-  WithCreateParamsMethod: {},
-  WithCreateFromParamsMethod: {},
-  WithFromShortParamsMethod: {},
-  WithToDecimalMethod: {},
+  WithCreateMethod: {
+    Value: 10
+  },
+  WithCreateFromMethod: {
+    Value: 20
+  },
+  WithFromSingleMethod: {
+    Value: 30
+  },
+  WithCreateParamsMethod: {
+    Value: 40
+  },
+  WithCreateFromParamsMethod: {
+    Value: 50
+  },
+  WithFromShortParamsMethod: {
+    Value: 60
+  },
+  WithToDecimalMethod: {
+    Value: 70
+  },
   ExposePrivateValue: 18,
   SumComponent1: 32,
   SumComponent2: 64
