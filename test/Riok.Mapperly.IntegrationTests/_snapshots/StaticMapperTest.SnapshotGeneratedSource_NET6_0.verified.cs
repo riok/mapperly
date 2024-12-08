@@ -562,7 +562,10 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.SubObject = null;
             }
-            target.ToByteArrayWithInstanceMethod = new global::System.Guid(dto.ToByteArrayWithInstanceMethod);
+            if (dto.ToByteArrayWithInstanceMethod != null)
+            {
+                target.ToByteArrayWithInstanceMethod = new global::System.Guid(dto.ToByteArrayWithInstanceMethod);
+            }
             target.WithCreateMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.Create(dto.WithCreateMethod);
             target.WithCreateFromMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.CreateFrom(dto.WithCreateFromMethod);
             target.WithFromSingleMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.FromSingle(dto.WithFromSingleMethod);
