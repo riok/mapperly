@@ -27,10 +27,10 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
         StringToEnumMappingBuilder.TryBuildMapping,
         EnumToStringMappingBuilder.TryBuildMapping,
         EnumToEnumMappingBuilder.TryBuildMapping,
-        DateTimeToDateOnlyMappingBuilder.TryBuildMapping,
-        DateTimeToTimeOnlyMappingBuilder.TryBuildMapping,
         ExplicitCastMappingBuilder.TryBuildMapping,
         ToStringMappingBuilder.TryBuildMapping,
+        ConvertInstanceMethodMappingBuilder.TryBuildMapping,
+        ConvertStaticMethodMappingBuilder.TryBuildMapping,
         NewInstanceObjectMemberMappingBuilder.TryBuildMapping,
     ];
 

@@ -245,4 +245,24 @@ internal static class SymbolExtensions
 
         return namespaceSymbol != null && string.Equals(namespaceSymbol.Name, ns, StringComparison.Ordinal);
     }
+
+    /// <summary>
+    ///     Returns the keyword if the type can be named by it.
+    ///     For example, <see langword="uint"/> for symbol with special type <see cref="SpecialType.System_UInt32"/>
+    ///     or <see langword="bool"/> for symbol with special type <see cref="SpecialType.System_Boolean"/>
+    /// </summary>
+    /// <param name="typeSymbol">The type</param>
+    /// <param name="keywordName">The keyword</param>
+    /// <returns><see langword="true"/> if the type can be named by keyword, otherwise <see langword="false"/></returns>
+    internal static bool HasKeyword(this ITypeSymbol typeSymbol, [NotNullWhen(true)] out string? keywordName)
+    {
+        if (typeSymbol.SpecialType is >= SpecialType.System_Boolean and <= SpecialType.System_String)
+        {
+            keywordName = typeSymbol.ToDisplayString();
+            return true;
+        }
+
+        keywordName = null;
+        return false;
+    }
 }

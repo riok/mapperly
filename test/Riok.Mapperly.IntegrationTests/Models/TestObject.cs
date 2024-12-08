@@ -124,11 +124,28 @@ namespace Riok.Mapperly.IntegrationTests.Models
 
         public DateTime DateTimeValueTargetTimeOnly { get; set; }
 
+        public Guid ToByteArrayWithInstanceMethod { get; set; }
+
+        public ConvertWithStaticMethodObject? WithCreateMethod { get; set; }
+
+        public ConvertWithStaticMethodObject? WithCreateFromMethod { get; set; }
+
+        public ConvertWithStaticMethodObject? WithFromSingleMethod { get; set; }
+
+        public ConvertWithStaticMethodObject? WithCreateParamsMethod { get; set; }
+
+        public ConvertWithStaticMethodObject? WithCreateFromParamsMethod { get; set; }
+
+        public ConvertWithStaticMethodObject? WithFromShortParamsMethod { get; set; }
+
+        public ConvertWithStaticMethodObject? WithToDecimalMethod { get; set; }
+
         public int ExposePrivateValue => PrivateValue;
 
         private int PrivateValue { get; set; }
 
         public int SumComponent1 { get; set; }
+
         public int SumComponent2 { get; set; }
     }
 }
