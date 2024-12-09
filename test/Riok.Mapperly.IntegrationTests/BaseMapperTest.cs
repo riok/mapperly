@@ -88,6 +88,16 @@ namespace Riok.Mapperly.IntegrationTests
                 DateTimeValue = new DateTime(2020, 1, 3, 15, 10, 5, DateTimeKind.Utc),
                 DateTimeValueTargetDateOnly = new DateTime(2020, 1, 3, 15, 10, 5, DateTimeKind.Utc),
                 DateTimeValueTargetTimeOnly = new DateTime(2020, 1, 3, 15, 10, 5, DateTimeKind.Utc),
+#if NET5_0_OR_GREATER
+                ToByteArrayWithInstanceMethod = new Guid(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+#endif
+                WithCreateMethod = ConvertWithStaticMethodObject.Create(10),
+                WithCreateFromMethod = ConvertWithStaticMethodObject.Create(20),
+                WithFromSingleMethod = ConvertWithStaticMethodObject.Create(30),
+                WithCreateParamsMethod = ConvertWithStaticMethodObject.Create(40),
+                WithCreateFromParamsMethod = ConvertWithStaticMethodObject.Create(50),
+                WithFromShortParamsMethod = ConvertWithStaticMethodObject.Create(60),
+                WithToDecimalMethod = ConvertWithStaticMethodObject.Create(70),
                 IgnoredStringValue = "ignored",
                 RenamedStringValue = "fooBar2",
                 StringNullableTargetNotNullable = "fooBar3",

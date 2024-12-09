@@ -22,18 +22,14 @@ public static class ParseMappingBuilder
         var parseMethodCandidates = ctx
             .SymbolAccessor.GetAllMethods(nonNullableTarget, ParseMethodName)
             .Where(m =>
-                m.IsStatic
-                && !m.ReturnsVoid
-                && !m.IsAsync
-                && m.Parameters.Length == 1
+                m is { IsStatic: true, ReturnsVoid: false, IsAsync: false, Parameters.Length: 1 }
                 && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type, ctx.Source)
             )
             .ToList();
 
         // try to find parse method with equal nullability return type
-        var parseMethod = parseMethodCandidates.FirstOrDefault(x =>
-            SymbolEqualityComparer.IncludeNullability.Equals(x.ReturnType, ctx.Target)
-        );
+        var parseMethod = parseMethodCandidates.Find(x => SymbolEqualityComparer.IncludeNullability.Equals(x.ReturnType, ctx.Target));
+
         if (parseMethod != null)
             return new StaticMethodMapping(parseMethod);
 

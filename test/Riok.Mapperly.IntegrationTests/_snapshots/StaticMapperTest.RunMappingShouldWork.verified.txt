@@ -187,6 +187,13 @@
   },
   DateTimeValueTargetDateOnly: 2020-01-03,
   DateTimeValueTargetTimeOnly: 3:10 PM,
+  WithCreateMethod: 10,
+  WithCreateFromMethod: 20,
+  WithFromSingleMethod: 30.0,
+  WithCreateParamsMethod: 40.0,
+  WithCreateFromParamsMethod: 50,
+  WithFromShortParamsMethod: 60,
+  WithToDecimalMethod: 70.0,
   FormattedIntValue: ,
   FormattedDateValue: ,
   ExposePrivateValue: 28

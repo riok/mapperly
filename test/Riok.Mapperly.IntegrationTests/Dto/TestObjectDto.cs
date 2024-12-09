@@ -99,9 +99,9 @@ namespace Riok.Mapperly.IntegrationTests.Dto
         public IReadOnlySet<int> IReadOnlySet { get; set; } = new HashSet<int>();
 #endif
 
-        public HashSet<int> HashSet { get; set; } = new HashSet<int>();
+        public HashSet<int> HashSet { get; set; } = new();
 
-        public SortedSet<int> SortedSet { get; set; } = new SortedSet<int>();
+        public SortedSet<int> SortedSet { get; set; } = new();
 
         public TestEnumDtoByValue EnumValue { get; set; }
 
@@ -130,6 +130,24 @@ namespace Riok.Mapperly.IntegrationTests.Dto
         public DateOnly DateTimeValueTargetDateOnly { get; set; }
 
         public TimeOnly DateTimeValueTargetTimeOnly { get; set; }
+
+#if NET5_0_OR_GREATER
+        public byte[]? ToByteArrayWithInstanceMethod { get; set; }
+#endif
+
+        public int WithCreateMethod { get; set; }
+
+        public byte WithCreateFromMethod { get; set; }
+
+        public float WithFromSingleMethod { get; set; }
+
+        public double WithCreateParamsMethod { get; set; }
+
+        public uint WithCreateFromParamsMethod { get; set; }
+
+        public short WithFromShortParamsMethod { get; set; }
+
+        public decimal WithToDecimalMethod { get; set; }
 
         public string FormattedIntValue { get; set; } = string.Empty;
 
