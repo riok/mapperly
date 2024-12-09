@@ -24,7 +24,7 @@
     "@easyops-cn/docusaurus-search-local": "0.46.1",
     "@mdx-js/react": "3.0.1",
     "clsx": "2.1.0",
-    "docusaurus-plugin-sass": "0.2.5",
+    "docusaurus-plugin-sass": "0.2.6",
     "prism-react-renderer": "2.4.0",
     "raw-loader": "4.0.2",
     "react": "18.2.0",
