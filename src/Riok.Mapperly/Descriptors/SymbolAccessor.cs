@@ -392,42 +392,37 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         {
             if (method.Parameters[i] is not { IsParams: true } isParamsParameter)
             {
-                if (!CanAssign(argTypes[i], method.Parameters[i].Type))
+                return CanAssign(argTypes[i], method.Parameters[i].Type);
+            }
+
+            // see https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/method-parameters#params-modifier
+
+            var argsToEnd = argTypes.AsSpan(i);
+
+            // for empty args aka Call(params X[]) as Call()
+            if (argsToEnd.IsEmpty)
+            {
+                return true;
+            }
+
+            var elementType = isParamsParameter.Type.ImplementsGeneric(EnumerableTypeSymbol, out var impl)
+                // for assignable to IEnumerable<T>
+                ? impl.TypeArguments.First()
+                // for Span<T> and ReadOnlySpan<T>
+                : ((INamedTypeSymbol)method.Parameters[i].Type).TypeArguments.First();
+
+            //for single arg aka Call(X[]) or Call(X)
+            if (argsToEnd.Length == 1)
+            {
+                return CanAssign(argsToEnd[0], method.Parameters[i].Type) || CanAssign(argsToEnd[0], elementType);
+            }
+
+            // for multiple args
+            foreach (var typeSymbol in argsToEnd)
+            {
+                if (!CanAssign(typeSymbol, elementType))
                 {
                     return false;
-                }
-            }
-            else
-            {
-                // see https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/method-parameters#params-modifier
-
-                var argsToEnd = argTypes.AsSpan(i);
-
-                // for empty args aka Call(params X[]) as Call()
-                if (argsToEnd.IsEmpty)
-                {
-                    return true;
-                }
-
-                var elementType = isParamsParameter.Type.ImplementsGeneric(EnumerableTypeSymbol, out var impl)
-                    // for assignable to IEnumerable<T>
-                    ? impl.TypeArguments.First()
-                    // for Span<T> and ReadOnlySpan<T>
-                    : ((INamedTypeSymbol)method.Parameters[i].Type).TypeArguments.First();
-
-                //for single arg aka Call(X[]) or Call(X)
-                if (argsToEnd.Length == 1)
-                {
-                    return CanAssign(argsToEnd[0], method.Parameters[i].Type) || CanAssign(argsToEnd[0], elementType);
-                }
-
-                // for multiple args
-                foreach (var typeSymbol in argsToEnd)
-                {
-                    if (!CanAssign(typeSymbol, elementType))
-                    {
-                        return false;
-                    }
                 }
             }
 
