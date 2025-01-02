@@ -15,7 +15,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
     where T : IMemberAssignmentTypeMapping
 {
     private readonly Dictionary<MemberPath, MemberNullDelegateAssignmentMapping> _nullDelegateMappings = new();
-    private readonly HashSet<MemberPath> _initializedNullableTargetPaths = [];
+    private readonly HashSet<(IMemberAssignmentMappingContainer, MemberPath)> _initializedNullableTargetPaths = [];
 
     public void AddMemberAssignmentMapping(IMemberAssignmentMapping memberMapping) => AddMemberAssignmentMapping(Mapping, memberMapping);
 
@@ -79,7 +79,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         // the target should be non-null after this assignment and can be set as initialized.
         if (!mapping.MemberInfo.IsSourceNullable && mapping.MemberInfo.TargetMember.MemberType.IsNullable())
         {
-            _initializedNullableTargetPaths.Add(mapping.MemberInfo.TargetMember);
+            _initializedNullableTargetPaths.Add((container, mapping.MemberInfo.TargetMember));
         }
     }
 
@@ -93,7 +93,10 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
             if (!nullablePath.Member.CanSet)
                 continue;
 
-            if (!_initializedNullableTargetPaths.Add(nullablePath))
+            if (_initializedNullableTargetPaths.Contains((Mapping, nullablePath)))
+                continue;
+
+            if (!_initializedNullableTargetPaths.Add((container, nullablePath)))
                 continue;
 
             if (!BuilderContext.InstanceConstructors.TryBuild(BuilderContext.Source, type, out var ctor))
