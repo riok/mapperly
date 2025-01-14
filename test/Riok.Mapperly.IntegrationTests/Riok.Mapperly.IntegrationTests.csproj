@@ -34,8 +34,8 @@
 
   <!-- ef core tests should only run on newer .NET versions -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.19" Condition="'$(TargetFramework)' == 'net7.0'" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" Condition="'$(TargetFramework)' == 'net8.0'" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" Condition="'$(TargetFramework)' == 'net7.0'" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" Condition="'$(TargetFramework)' == 'net8.0'" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" Condition="'$(TargetFramework)' == 'net9.0'" />
   </ItemGroup>
 
@@ -47,7 +47,7 @@
   <!-- cannot use source generated polyfills since they require language version 11 -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
     <PackageReference Include="System.Collections.Immutable" Version="9.0.0" />
-    <PackageReference Include="Portable.System.DateTimeOnly" Version="8.0.2" />
+    <PackageReference Include="Portable.System.DateTimeOnly" Version="9.0.0" />
     <PackageReference Include="IsExternalInit" Version="1.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
