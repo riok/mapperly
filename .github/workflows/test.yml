@@ -77,7 +77,6 @@ jobs:
           name: mapperly-nupkg
           path: artifacts
       - run: dotnet meziantou.validate-nuget-package ./artifacts/*.nupkg
-      - run: dotnet validate package local ./artifacts/*.nupkg
   integration-test:
     needs: package
     runs-on: ubuntu-latest

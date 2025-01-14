@@ -8,12 +8,6 @@
         "xmldoc2md"
       ]
     },
-    "dotnet-validate": {
-      "version": "0.0.1-preview.304",
-      "commands": [
-        "dotnet-validate"
-      ]
-    },
     "meziantou.framework.nugetpackagevalidation.tool": {
       "version": "1.0.17",
       "commands": [
