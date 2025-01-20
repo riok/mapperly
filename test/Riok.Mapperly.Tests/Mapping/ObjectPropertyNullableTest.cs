@@ -589,6 +589,81 @@ public class ObjectPropertyNullableTest
     }
 
     [Fact]
+    public void NullableNestedMembersShouldInitializeWithNoNullAssignment()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("NullableValue1", "V.NullableValue1")]
+            [MapProperty("NullableValue2", "V.NullableValue2")]
+            public partial B Map(A a)
+            """,
+            TestSourceBuilderOptions.Default with
+            {
+                AllowNullPropertyAssignment = false,
+            },
+            "class A { public int? NullableValue1 { get; set; } public int? NullableValue2 { get; set; } }",
+            "class B { public C? V { get; set; } }",
+            "class C { public int? NullableValue1 { get; set; } public int? NullableValue2 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                if (a.NullableValue1 != null)
+                {
+                    target.V ??= new global::C();
+                    target.V.NullableValue1 = a.NullableValue1.Value;
+                }
+                if (a.NullableValue2 != null)
+                {
+                    target.V ??= new global::C();
+                    target.V.NullableValue2 = a.NullableValue2.Value;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableNestedMembersShouldInitializeWithNoNullAssignmentOutsideContainer()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("NullableValue1", "V.NullableValue1")]
+            [MapProperty("Value2", "V.Value2")]
+            public partial B Map(A a)
+            """,
+            TestSourceBuilderOptions.Default with
+            {
+                AllowNullPropertyAssignment = false,
+            },
+            "class A { public int? NullableValue1 { get; set; } public int Value2 { get; set; } }",
+            "class B { public C? V { get; set; } }",
+            "class C { public int? NullableValue1 { get; set; } public int? Value2 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                if (a.NullableValue1 != null)
+                {
+                    target.V ??= new global::C();
+                    target.V.NullableValue1 = a.NullableValue1.Value;
+                }
+                target.V ??= new global::C();
+                target.V.Value2 = a.Value2;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void NullableClassToNullableClassPropertyThrowShouldSetNull()
     {
         var source = TestSourceBuilder.Mapping(
