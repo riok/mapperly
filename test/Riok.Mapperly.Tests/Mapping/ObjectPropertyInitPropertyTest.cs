@@ -489,4 +489,36 @@ public class ObjectPropertyInitPropertyTest
                 """
             );
     }
+
+    [Fact]
+    public void InitOnlyPropertyWithSourceRequiredMappingShouldOnlyDiagnosticForRequired()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapperRequiredMapping(RequiredMappingStrategy.Source)]
+            partial B Map(A source);
+            """,
+            """
+            public record A(int Value);
+            public class B { public int Value { get; init; } public required int Value2 { get; init; } public int Value3 { get; init; } }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B()
+                {
+                    Value = source.Value,
+                };
+                return target;
+                """
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.RequiredMemberNotMapped,
+                "Required member Value2 on mapping target type B was not found on the mapping source type A"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
 }
