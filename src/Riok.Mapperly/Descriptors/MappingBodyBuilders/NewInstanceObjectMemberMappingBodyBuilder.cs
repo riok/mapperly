@@ -117,12 +117,18 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             // set the member mapped as it is an init only member
             // diagnostics are already reported
             // and no further mapping attempts should be undertaken
-            ctx.BuilderContext.ReportDiagnostic(
-                targetMember.IsRequired ? DiagnosticDescriptors.RequiredMemberNotMapped : DiagnosticDescriptors.SourceMemberNotFound,
-                targetMember.Name,
-                ctx.Mapping.TargetType,
-                ctx.Mapping.SourceType
-            );
+            if (
+                targetMember.IsRequired
+                || ctx.BuilderContext.Configuration.Members.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target)
+            )
+            {
+                ctx.BuilderContext.ReportDiagnostic(
+                    targetMember.IsRequired ? DiagnosticDescriptors.RequiredMemberNotMapped : DiagnosticDescriptors.SourceMemberNotFound,
+                    targetMember.Name,
+                    ctx.Mapping.TargetType,
+                    ctx.Mapping.SourceType
+                );
+            }
             ctx.SetTargetMemberMapped(targetMember);
         }
     }
