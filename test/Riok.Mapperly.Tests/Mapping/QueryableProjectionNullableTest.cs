@@ -115,6 +115,7 @@ public class QueryableProjectionNullableTest
     [Fact]
     public Task NestedPropertyWithDeepCloneable()
     {
+        // deep cloneable should be ignored.
         // see https://github.com/riok/mapperly/issues/1710
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """

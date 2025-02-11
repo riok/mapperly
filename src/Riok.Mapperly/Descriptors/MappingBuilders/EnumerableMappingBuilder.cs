@@ -98,7 +98,7 @@ public static class EnumerableMappingBuilder
         // cannot cast if the method mapping is synthetic, deep clone is enabled or target is an unknown collection
         if (
             !elementMapping.IsSynthetic
-            || ctx.Configuration.Mapper.UseDeepCloning
+            || ctx.Configuration.UseDeepCloning
             || ctx.CollectionInfos!.Target.CollectionType == CollectionType.None
         )
         {
@@ -202,7 +202,7 @@ public static class EnumerableMappingBuilder
         // use a for loop mapping otherwise.
         if (elementMapping.IsSynthetic)
         {
-            return ctx.Configuration.Mapper.UseDeepCloning
+            return ctx.Configuration.UseDeepCloning
                 ? new ArrayCloneMapping(ctx.Source, ctx.Target)
                 : new CastMapping(ctx.Source, ctx.Target);
         }
@@ -320,7 +320,7 @@ public static class EnumerableMappingBuilder
         // if the target is an IEnumerable<T> don't collect at all
         // except deep cloning is enabled.
         var targetIsIEnumerable = ctx.CollectionInfos!.Target.CollectionType == CollectionType.IEnumerable;
-        if (targetIsIEnumerable && !ctx.Configuration.Mapper.UseDeepCloning)
+        if (targetIsIEnumerable && !ctx.Configuration.UseDeepCloning)
             return (true, null);
 
         // if the target is IReadOnlyCollection<T> or IEnumerable<T>

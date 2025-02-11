@@ -23,7 +23,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         FormatProviderCollection formatProviders,
         IUserMapping? userMapping,
         TypeMappingKey mappingKey,
-        Location? diagnosticLocation = null
+        Location? diagnosticLocation = null,
+        bool supportsDeepCloning = true
     )
         : base(parentCtx, diagnosticLocation ?? userMapping?.Method.GetSyntaxLocation())
     {
@@ -31,7 +32,10 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         _formatProviders = formatProviders;
         UserMapping = userMapping;
         MappingKey = mappingKey;
-        Configuration = ReadConfiguration(new MappingConfigurationReference(UserSymbol, mappingKey.Source, mappingKey.Target));
+        Configuration = ReadConfiguration(
+            new MappingConfigurationReference(UserSymbol, mappingKey.Source, mappingKey.Target),
+            supportsDeepCloning
+        );
     }
 
     protected MappingBuilderContext(
@@ -39,9 +43,18 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         IUserMapping? userMapping,
         Location? diagnosticLocation,
         TypeMappingKey mappingKey,
-        bool ignoreDerivedTypes
+        bool ignoreDerivedTypes,
+        bool supportsDeepCloning = true
     )
-        : this(ctx, ctx.InstanceConstructors, ctx._formatProviders, userMapping, mappingKey, diagnosticLocation)
+        : this(
+            ctx,
+            ctx.InstanceConstructors,
+            ctx._formatProviders,
+            userMapping,
+            mappingKey,
+            diagnosticLocation,
+            supportsDeepCloning: supportsDeepCloning
+        )
     {
         if (ignoreDerivedTypes)
         {
