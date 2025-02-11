@@ -10,7 +10,7 @@ namespace Riok.Mapperly.Symbols.Members;
 /// Represents a (possibly empty) list of members to access a certain member.
 /// E.g. A.B.C
 /// </summary>
-[DebuggerDisplay("{ToDebugString}")]
+[DebuggerDisplay("{ToDebugString()}")]
 public abstract class MemberPath(ITypeSymbol rootType, IReadOnlyList<IMappableMember> path)
 {
     protected const string MemberAccessSeparator = ".";

@@ -17,8 +17,12 @@ public class UserImplementedInlinedExpressionMapping(
     ParameterSyntax sourceParameter,
     IReadOnlyDictionary<SyntaxAnnotation, INewInstanceMapping> mappingInvocations,
     ExpressionSyntax mappingBody
-) : NewInstanceMapping(userMapping.SourceType, userMapping.TargetType), INewInstanceMapping
+) : NewInstanceMapping(userMapping.SourceType, userMapping.TargetType), INewInstanceUserMapping
 {
+    public IMethodSymbol Method => userMapping.Method;
+    public bool? Default => userMapping.Default;
+    public bool IsExternal => userMapping.IsExternal;
+
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         var body = InlineUserMappings(ctx, mappingBody);

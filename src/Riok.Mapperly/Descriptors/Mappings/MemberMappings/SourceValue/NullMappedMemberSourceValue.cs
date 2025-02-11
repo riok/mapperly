@@ -26,9 +26,17 @@ public class NullMappedMemberSourceValue(
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        // the source type of the delegate mapping is nullable or the source path is not nullable
-        // build mapping with null conditional access
-        if (_delegateMapping.SourceType.IsNullable() || !_sourceGetter.MemberPath.IsAnyNullable())
+        // if the source is not nullable, return it directly.
+        if (!_sourceGetter.MemberPath.IsAnyNullable())
+        {
+            ctx = ctx.WithSource(_sourceGetter.BuildAccess(ctx.Source));
+            return _delegateMapping.Build(ctx);
+        }
+
+        // if null conditional is allowed and the delegate mapping allows null source types,
+        // use null conditional access.
+        // => Map(source?.Value)
+        if (_delegateMapping.SourceType.IsNullable() && useNullConditionalAccess)
         {
             ctx = ctx.WithSource(_sourceGetter.BuildAccess(ctx.Source, nullConditional: true));
             return _delegateMapping.Build(ctx);
