@@ -13,9 +13,7 @@ public partial class Mapper
             source,
             x => new global::B()
             {
-                Value0 = x.Nested != null && x.Nested.Value0 != null ? global::System.Linq.Enumerable.ToArray(
-                    global::System.Linq.Enumerable.Select(x.Nested.Value0, x1 => x1 == null ? default : x1)
-                ) : default,
+                Value0 = x.Nested != null && x.Nested.Value0 != null ? x.Nested.Value0 : default,
                 Value = x.Nested != null && x.Nested.Value != null ? x.Nested.Value : default,
             }
         );

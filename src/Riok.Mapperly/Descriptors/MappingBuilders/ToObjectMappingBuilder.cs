@@ -15,7 +15,7 @@ public static class ToObjectMappingBuilder
         if (ctx.Target.SpecialType != SpecialType.System_Object)
             return null;
 
-        if (!ctx.Configuration.Mapper.UseDeepCloning)
+        if (!ctx.Configuration.UseDeepCloning)
             return new CastMapping(ctx.Source, ctx.Target);
 
         if (ctx.Source.SpecialType == SpecialType.System_Object)
