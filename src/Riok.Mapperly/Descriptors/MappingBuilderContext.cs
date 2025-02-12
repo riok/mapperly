@@ -16,8 +16,6 @@ namespace Riok.Mapperly.Descriptors;
 public class MappingBuilderContext : SimpleMappingBuilderContext
 {
     private readonly FormatProviderCollection _formatProviders;
-    private CollectionInfos? _collectionInfos;
-    private DictionaryInfos? _dictionaryInfos;
 
     public MappingBuilderContext(
         SimpleMappingBuilderContext parentCtx,
@@ -57,9 +55,9 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     public ITypeSymbol Target => MappingKey.Target;
 
-    public CollectionInfos? CollectionInfos => _collectionInfos ??= CollectionInfoBuilder.Build(Types, SymbolAccessor, Source, Target);
+    public CollectionInfos? CollectionInfos => field ??= CollectionInfoBuilder.Build(Types, SymbolAccessor, Source, Target);
 
-    public DictionaryInfos? DictionaryInfos => _dictionaryInfos ??= DictionaryInfoBuilder.Build(Types, CollectionInfos);
+    public DictionaryInfos? DictionaryInfos => field ??= DictionaryInfoBuilder.Build(Types, CollectionInfos);
 
     public IUserMapping? UserMapping { get; }
 
@@ -162,7 +160,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <summary>
     /// Finds or builds a mapping (<seealso cref="FindOrBuildMapping(Riok.Mapperly.Descriptors.TypeMappingKey,Riok.Mapperly.Descriptors.MappingBuildingOptions,Location)"/>).
     /// Before a new mapping is built existing mappings are tried to be found by the following priorities:
-    /// 1. exact match
+    /// 1. user mapping with exact type match
     /// 2. ignoring the nullability of the source and the target (needs to be handled by the caller of this method)
     /// If no mapping can be found a new mapping is built with the source and the target as non-nullables.
     /// </summary>
@@ -176,7 +174,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null
     )
     {
-        if (FindMapping(key) is { } mapping)
+        if (FindMapping(key) is INewInstanceUserMapping mapping)
             return mapping;
 
         // if a user mapping is referenced

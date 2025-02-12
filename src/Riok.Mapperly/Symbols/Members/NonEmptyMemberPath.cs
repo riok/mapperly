@@ -1,10 +1,8 @@
-using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors;
 
 namespace Riok.Mapperly.Symbols.Members;
 
-[DebuggerDisplay("{FullName}")]
 public class NonEmptyMemberPath : MemberPath
 {
     public NonEmptyMemberPath(ITypeSymbol rootType, IReadOnlyList<IMappableMember> path)
