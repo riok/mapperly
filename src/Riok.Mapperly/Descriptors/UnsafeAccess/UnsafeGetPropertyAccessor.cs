@@ -28,13 +28,13 @@ public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string methodName
         var source = Parameter(symbol.ContainingType.FullyQualifiedIdentifierName(), sourceName, true);
 
         var parameters = ParameterList(CommaSeparatedList(source));
-        var attributeList = ctx.SyntaxFactory.UnsafeAccessorAttributeList(UnsafeAccessorType.Method, $"get_{symbol.Name}");
+        var attribute = ctx.SyntaxFactory.UnsafeAccessorAttribute(UnsafeAccessorType.Method, $"get_{symbol.Name}");
         return PublicStaticExternMethod(
             ctx,
             IdentifierName(symbol.Type.FullyQualifiedIdentifierName()).AddTrailingSpace(),
             methodName,
             parameters,
-            attributeList
+            [attribute]
         );
     }
 

@@ -21,15 +21,12 @@ public static class ConvertStaticMethodMappingBuilder
             allTargetMethods,
             GetTargetStaticMethodNames(ctx),
             ctx.Source,
-            ctx.Target,
             nonNullableTarget,
             targetIsNullable
         );
 
         if (mapping is not null)
-        {
             return mapping;
-        }
 
         var allSourceMethods = ctx.SymbolAccessor.GetAllMethods(ctx.Source);
 
@@ -44,7 +41,6 @@ public static class ConvertStaticMethodMappingBuilder
             allSourceMethods.ToList(),
             GetSourceStaticMethodNames(ctx),
             ctx.Source,
-            ctx.Target,
             nonNullableTarget,
             targetIsNullable
         );
@@ -81,7 +77,6 @@ public static class ConvertStaticMethodMappingBuilder
         List<IMethodSymbol> allMethods,
         IEnumerable<string> methodNames,
         ITypeSymbol sourceType,
-        ITypeSymbol targetType,
         ITypeSymbol nonNullableTargetType,
         bool targetIsNullable
     )

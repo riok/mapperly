@@ -100,6 +100,24 @@ public class DerivedTypeTest
     }
 
     [Fact]
+    public Task NullableDisabledExistingMethodShouldBeUsed()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapDerivedType<A, ADto>]
+            public partial BaseDto Map(Base src);
+
+            public partial ADto MapA(A src);
+            """,
+            "class A(int value) : Base { public int Value { get; set; } }",
+            "class ADto(int value) : BaseDto;",
+            "class Base;",
+            "class BaseDto;"
+        );
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
+
+    [Fact]
     public Task WithObjectShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBody(

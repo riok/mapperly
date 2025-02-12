@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -13,16 +12,7 @@ public partial struct SyntaxFactoryHelper
 
     private static readonly IdentifierNameSyntax _unsafeAccessorKindName = IdentifierName(UnsafeAccessorKindName);
 
-    public SyntaxList<AttributeListSyntax> AttributeList(string name, params ExpressionSyntax[] arguments)
-    {
-        var args = CommaSeparatedList(arguments.Select(AttributeArgument));
-
-        var attribute = Attribute(IdentifierName(name)).WithArgumentList(AttributeArgumentList(args));
-
-        return SingletonList(SyntaxFactory.AttributeList(SingletonSeparatedList(attribute)).AddTrailingLineFeed(Indentation));
-    }
-
-    public SyntaxList<AttributeListSyntax> UnsafeAccessorAttributeList(UnsafeAccessorType type, string? name = null)
+    public AttributeListSyntax UnsafeAccessorAttribute(UnsafeAccessorType type, string? name = null)
     {
         var unsafeAccessType = type switch
         {
@@ -34,9 +24,21 @@ public partial struct SyntaxFactoryHelper
 
         var kind = MemberAccess(_unsafeAccessorKindName, IdentifierName(unsafeAccessType));
         if (name == null)
-            return AttributeList(UnsafeAccessorName, kind);
+            return Attribute(UnsafeAccessorName, kind);
 
-        return AttributeList(UnsafeAccessorName, kind, Assignment(IdentifierName(UnsafeAccessorNameArgument), StringLiteral(name)));
+        return Attribute(UnsafeAccessorName, kind, Assignment(IdentifierName(UnsafeAccessorNameArgument), StringLiteral(name)));
+    }
+
+    private AttributeListSyntax Attribute(string name, params ExpressionSyntax[] arguments)
+    {
+        var args = CommaSeparatedList(arguments.Select(AttributeArgument));
+        var attribute = SyntaxFactory.Attribute(IdentifierName(name));
+        if (args.Count > 0)
+        {
+            attribute = attribute.WithArgumentList(AttributeArgumentList(args));
+        }
+
+        return AttributeList(SingletonSeparatedList(attribute)).AddTrailingLineFeed(Indentation);
     }
 
     public enum UnsafeAccessorType

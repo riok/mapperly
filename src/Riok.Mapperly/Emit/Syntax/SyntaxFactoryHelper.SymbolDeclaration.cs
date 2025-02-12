@@ -25,7 +25,7 @@ public partial struct SyntaxFactoryHelper
             .WithKeyword(TrailingSpacedToken(SyntaxKind.ClassKeyword))
             .WithOpenBraceToken(LeadingLineFeedToken(SyntaxKind.OpenBraceToken))
             .WithCloseBraceToken(LeadingLineFeedToken(SyntaxKind.CloseBraceToken))
-            .WithAttributeLists(isPartial ? [] : GeneratedCodeAttributeList())
+            .WithAttributeLists(isPartial ? [] : [GeneratedCodeAttribute()])
             .AddLeadingLineFeed(Indentation);
     }
 
@@ -48,7 +48,7 @@ public partial struct SyntaxFactoryHelper
             .WithKeyword(TrailingSpacedToken(syntax.Keyword.Kind()))
             .WithOpenBraceToken(LeadingLineFeedToken(SyntaxKind.OpenBraceToken))
             .WithCloseBraceToken(LeadingLineFeedToken(SyntaxKind.CloseBraceToken))
-            .WithAttributeLists(isPartial ? [] : GeneratedCodeAttributeList())
+            .WithAttributeLists(isPartial ? [] : [GeneratedCodeAttribute()])
             .AddLeadingLineFeed(Indentation);
     }
 }

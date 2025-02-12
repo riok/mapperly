@@ -15,7 +15,8 @@ public class MapperConfigurationReader
         AttributeDataAccessor dataAccessor,
         WellKnownTypes types,
         ISymbol mapperSymbol,
-        MapperConfiguration defaultMapperConfiguration
+        MapperConfiguration defaultMapperConfiguration,
+        SupportedFeatures supportedFeatures
     )
     {
         _dataAccessor = dataAccessor;
@@ -38,7 +39,8 @@ public class MapperConfigurationReader
             ),
             new MembersMappingConfiguration([], [], [], [], [], mapper.IgnoreObsoleteMembersStrategy, mapper.RequiredMappingStrategy),
             [],
-            mapper.UseDeepCloning
+            mapper.UseDeepCloning,
+            supportedFeatures
         );
     }
 
@@ -61,7 +63,8 @@ public class MapperConfigurationReader
             enumConfig,
             membersConfig,
             derivedTypesConfig,
-            supportsDeepCloning && MapperConfiguration.Mapper.UseDeepCloning
+            supportsDeepCloning && MapperConfiguration.Mapper.UseDeepCloning,
+            MapperConfiguration.SupportedFeatures
         );
     }
 

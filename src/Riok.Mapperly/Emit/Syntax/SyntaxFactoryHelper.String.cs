@@ -21,6 +21,11 @@ public partial struct SyntaxFactoryHelper
     public static InvocationExpressionSyntax NameOf(ExpressionSyntax expression) =>
         InvocationWithoutIndention(_nameofIdentifier, expression);
 
+    private ExpressionSyntax ParameterNameOfOrStringLiteral(ExpressionSyntax expression)
+    {
+        return supportedFeatures.NameOfParameter ? NameOf(expression) : StringLiteral(expression.ToFullString());
+    }
+
     public static IdentifierNameSyntax FullyQualifiedIdentifier(ITypeSymbol typeSymbol) =>
         IdentifierName(typeSymbol.FullyQualifiedIdentifierName());
 

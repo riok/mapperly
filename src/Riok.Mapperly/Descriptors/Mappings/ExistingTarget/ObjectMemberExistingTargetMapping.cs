@@ -19,4 +19,6 @@ public class ObjectMemberExistingTargetMapping(ITypeSymbol sourceType, ITypeSymb
     public ITypeSymbol TargetType { get; } = targetType;
 
     public bool IsSynthetic => false;
+
+    public IEnumerable<TypeMappingKey> BuildAdditionalMappingKeys(TypeMappingConfiguration config) => [];
 }

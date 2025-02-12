@@ -12,6 +12,8 @@ public class WellKnownTypes(Compilation compilation)
 
     public INamedTypeSymbol? TimeOnly => TryGet("System.TimeOnly");
 
+    public INamedTypeSymbol? NotNullIfNotNullAttribute => TryGet("System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute");
+
     public ITypeSymbol GetArrayType(ITypeSymbol type) =>
         compilation.CreateArrayTypeSymbol(type, elementNullableAnnotation: type.NullableAnnotation).NonNullable();
 

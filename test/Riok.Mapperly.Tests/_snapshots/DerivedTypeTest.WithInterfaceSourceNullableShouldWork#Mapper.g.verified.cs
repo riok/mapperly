@@ -6,7 +6,9 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::B Map(global::A? src)
     {
-        return src == null ? throw new System.ArgumentNullException(nameof(src)) : src switch
+        if (src == null)
+            throw new System.ArgumentNullException(nameof(src));
+        return src switch
         {
             global::AImpl1 x => MapToBImpl1(x),
             global::AImpl2 x => MapToBImpl2(x),

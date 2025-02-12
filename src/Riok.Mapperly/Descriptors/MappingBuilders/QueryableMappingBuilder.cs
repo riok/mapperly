@@ -35,7 +35,7 @@ public static class QueryableMappingBuilder
             ctx.ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingsDoNotSupportReferenceHandling);
         }
 
-        return new QueryableProjectionMapping(ctx.Source, ctx.Target, mapping);
+        return new QueryableProjectionMapping(ctx.Source, ctx.Target, mapping, ctx.Configuration.SupportedFeatures.NullableAttributes);
     }
 
     private static TypeMappingKey TryBuildMappingKey(MappingBuilderContext ctx, ITypeSymbol sourceType, ITypeSymbol targetType)

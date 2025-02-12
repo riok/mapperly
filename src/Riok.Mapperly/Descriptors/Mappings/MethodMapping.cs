@@ -78,6 +78,8 @@ public abstract class MethodMapping : ITypeMapping
 
     public bool IsSynthetic => false;
 
+    public virtual IEnumerable<TypeMappingKey> BuildAdditionalMappingKeys(TypeMappingConfiguration config) => [];
+
     public virtual ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
         ctx.SyntaxFactory.Invocation(
             MethodName,
@@ -91,7 +93,7 @@ public abstract class MethodMapping : ITypeMapping
             SourceParameter.Name,
             ReferenceHandlerParameter?.Name,
             ctx.NameBuilder.NewScope(),
-            ctx.SyntaxFactory.AddIndentation()
+            ctx.SyntaxFactory
         );
 
         var parameters = BuildParameterList();
@@ -101,8 +103,8 @@ public abstract class MethodMapping : ITypeMapping
         return MethodDeclaration(returnType.AddTrailingSpace(), Identifier(MethodName))
             .WithModifiers(TokenList(BuildModifiers(ctx.IsStatic)))
             .WithParameterList(parameters)
-            .WithAttributeLists(ctx.SyntaxFactory.GeneratedCodeAttributeList())
-            .WithBody(ctx.SyntaxFactory.Block(BuildBody(typeMappingBuildContext)));
+            .WithAttributeLists(BuildAttributes(typeMappingBuildContext))
+            .WithBody(ctx.SyntaxFactory.Block(BuildBody(typeMappingBuildContext.AddIndentation())));
     }
 
     public abstract IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx);
@@ -120,6 +122,9 @@ public abstract class MethodMapping : ITypeMapping
             iReferenceHandlerType
         );
     }
+
+    protected internal virtual SyntaxList<AttributeListSyntax> BuildAttributes(TypeMappingBuildContext ctx) =>
+        SingletonList(ctx.SyntaxFactory.GeneratedCodeAttribute());
 
     protected virtual ParameterListSyntax BuildParameterList() =>
         ParameterList(IsExtensionMethod, [SourceParameter, ReferenceHandlerParameter, .. AdditionalSourceParameters]);

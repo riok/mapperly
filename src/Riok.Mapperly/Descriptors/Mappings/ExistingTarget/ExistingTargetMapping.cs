@@ -26,5 +26,7 @@ public abstract class ExistingTargetMapping : IExistingTargetMapping
 
     public virtual bool IsSynthetic => false;
 
+    public IEnumerable<TypeMappingKey> BuildAdditionalMappingKeys(TypeMappingConfiguration config) => [];
+
     public abstract IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target);
 }

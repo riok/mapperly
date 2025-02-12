@@ -31,11 +31,11 @@ public class UnsafeFieldAccessor(IFieldSymbol symbol, string methodName) : IUnsa
         var target = Parameter(symbol.ContainingType.FullyQualifiedIdentifierName(), targetName, true);
 
         var parameters = ParameterList(CommaSeparatedList(target));
-        var attributeList = ctx.SyntaxFactory.UnsafeAccessorAttributeList(UnsafeAccessorType.Field, symbol.Name);
+        var attribute = ctx.SyntaxFactory.UnsafeAccessorAttribute(UnsafeAccessorType.Field, symbol.Name);
         var returnType = RefType(IdentifierName(symbol.Type.FullyQualifiedIdentifierName()).AddTrailingSpace())
             .WithRefKeyword(Token(TriviaList(), SyntaxKind.RefKeyword, TriviaList(Space)));
 
-        return PublicStaticExternMethod(ctx, returnType, methodName, parameters, attributeList);
+        return PublicStaticExternMethod(ctx, returnType, methodName, parameters, [attribute]);
     }
 
     public ExpressionSyntax BuildAccess(ExpressionSyntax? baseAccess, bool nullConditional = false)

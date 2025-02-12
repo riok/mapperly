@@ -10,5 +10,7 @@ public class NoOpMapping(ITypeSymbol sourceType, ITypeSymbol targetType) : IExis
     public ITypeSymbol TargetType => targetType;
     public bool IsSynthetic => true;
 
+    public IEnumerable<TypeMappingKey> BuildAdditionalMappingKeys(TypeMappingConfiguration config) => [];
+
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target) => [];
 }

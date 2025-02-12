@@ -35,23 +35,41 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     public IEnumerable<TAttribute> Access<TAttribute>(ISymbol symbol)
         where TAttribute : Attribute => Access<TAttribute, TAttribute>(symbol);
 
+    public IEnumerable<TAttribute> TryAccess<TAttribute>(IEnumerable<AttributeData> data)
+        where TAttribute : Attribute => TryAccess<TAttribute, TAttribute>(data);
+
+    public IEnumerable<TData> Access<TAttribute, TData>(ISymbol symbol)
+        where TAttribute : Attribute
+        where TData : notnull
+    {
+        var attrDatas = symbolAccessor.GetAttributes<TAttribute>(symbol);
+        return Access<TAttribute, TData>(attrDatas);
+    }
+
+    public IEnumerable<TData> TryAccess<TAttribute, TData>(IEnumerable<AttributeData> attributes)
+        where TAttribute : Attribute
+        where TData : notnull
+    {
+        var attrDatas = symbolAccessor.TryGetAttributes<TAttribute>(attributes);
+        return attrDatas.Select(a => Access<TAttribute, TData>(a));
+    }
+
     /// <summary>
     /// Reads the attribute data and sets it on a newly created instance of <see cref="TData"/>.
     /// If <see cref="TAttribute"/> has n type parameters,
     /// <see cref="TData"/> needs to have an accessible ctor with the parameters 0 to n-1 to be of type <see cref="ITypeSymbol"/>.
     /// <see cref="TData"/> needs to have exactly the same constructors as <see cref="TAttribute"/> with additional type arguments.
     /// </summary>
-    /// <param name="symbol">The symbol on which the attributes should be read.</param>
+    /// <param name="attributes">The attributes data.</param>
     /// <typeparam name="TAttribute">The type of the attribute.</typeparam>
     /// <typeparam name="TData">The type of the data class. If no type parameters are involved, this is usually the same as <see cref="TAttribute"/>.</typeparam>
     /// <returns>The attribute data.</returns>
     /// <exception cref="InvalidOperationException">If a property or ctor argument of <see cref="TData"/> could not be read on the attribute.</exception>
-    public IEnumerable<TData> Access<TAttribute, TData>(ISymbol symbol)
+    public IEnumerable<TData> Access<TAttribute, TData>(IEnumerable<AttributeData> attributes)
         where TAttribute : Attribute
         where TData : notnull
     {
-        var attrDatas = symbolAccessor.GetAttributes<TAttribute>(symbol);
-        foreach (var attrData in attrDatas)
+        foreach (var attrData in symbolAccessor.GetAttributes<TAttribute>(attributes))
         {
             yield return Access<TAttribute, TData>(attrData, symbolAccessor);
         }

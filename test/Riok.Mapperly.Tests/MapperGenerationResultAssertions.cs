@@ -161,7 +161,8 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions HaveMethodBody(string methodName, [StringSyntax(StringSyntax.CSharp)] string mapperMethodBody)
     {
-        _mapper.Methods[methodName].Body.Should().Be(mapperMethodBody.ReplaceLineEndings().Trim(), $"Method: {methodName}");
+        var body = _mapper.Methods[methodName].Body;
+        body.Should().Be(mapperMethodBody.ReplaceLineEndings().Trim(), $"Method: {methodName}");
         return this;
     }
 

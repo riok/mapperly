@@ -18,10 +18,11 @@ public class MapperDescriptor
 
     public bool Static { get; set; }
 
-    public MapperDescriptor(MapperDeclaration declaration, UniqueNameBuilder nameBuilder)
+    public MapperDescriptor(MapperDeclaration declaration, UniqueNameBuilder nameBuilder, SupportedFeatures supportedFeatures)
     {
         _declaration = declaration;
         NameBuilder = nameBuilder;
+        SupportedFeatures = supportedFeatures;
         Name = BuildName(declaration.Symbol);
         UnsafeAccessorName = nameBuilder.New(AccessorClassName);
 
@@ -30,6 +31,8 @@ public class MapperDescriptor
             Namespace = Symbol.ContainingNamespace.ToDisplayString();
         }
     }
+
+    public SupportedFeatures SupportedFeatures { get; }
 
     public string Name { get; }
 

@@ -1,27 +1,31 @@
+using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Emit.Syntax;
 
 // useful to create syntax factories: https://roslynquoter.azurewebsites.net/ and https://sharplab.io/
-public readonly partial struct SyntaxFactoryHelper
+[StructLayout(LayoutKind.Auto)]
+public readonly partial struct SyntaxFactoryHelper(SupportedFeatures supportedFeatures)
 {
     private const int ConditionalMultilineThreshold = 70;
 
     public static readonly IdentifierNameSyntax VarIdentifier = IdentifierName("var").AddTrailingSpace();
 
-    private SyntaxFactoryHelper(int indentation)
+    private SyntaxFactoryHelper(int indentation, SupportedFeatures supportedFeatures)
+        : this(supportedFeatures)
     {
         Indentation = indentation;
     }
 
     public int Indentation { get; }
 
-    public SyntaxFactoryHelper AddIndentation() => new(Indentation + 1);
+    public SyntaxFactoryHelper AddIndentation() => new(Indentation + 1, supportedFeatures);
 
-    public SyntaxFactoryHelper RemoveIndentation() => new(Indentation - 1);
+    public SyntaxFactoryHelper RemoveIndentation() => new(Indentation - 1, supportedFeatures);
 
     public static AssignmentExpressionSyntax Assignment(ExpressionSyntax target, ExpressionSyntax source, bool coalesce)
     {

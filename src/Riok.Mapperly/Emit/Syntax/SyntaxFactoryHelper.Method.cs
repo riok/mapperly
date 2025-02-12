@@ -12,9 +12,10 @@ public partial struct SyntaxFactoryHelper
         TypeSyntax returnType,
         string methodName,
         ParameterListSyntax parameterList,
-        SyntaxList<AttributeListSyntax> attributeList
+        SyntaxList<AttributeListSyntax> attributes
     )
     {
+        attributes = attributes.Insert(0, ctx.SyntaxFactory.GeneratedCodeAttribute());
         return MethodDeclaration(returnType, Identifier(methodName))
             .WithModifiers(
                 TokenList(
@@ -24,7 +25,7 @@ public partial struct SyntaxFactoryHelper
                 )
             )
             .WithParameterList(parameterList)
-            .WithAttributeLists(ctx.SyntaxFactory.GeneratedCodeAttributeList().AddRange(attributeList))
+            .WithAttributeLists(attributes)
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
     }
 }

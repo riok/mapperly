@@ -13,9 +13,38 @@ public class NullDelegateMethodMapping(
     ITypeSymbol nullableSourceType,
     ITypeSymbol nullableTargetType,
     MethodMapping delegateMapping,
-    NullFallbackValue nullFallbackValue
+    NullFallbackValue nullFallbackValue,
+    bool nullableAttributesSupported
 ) : NewInstanceMethodMapping(nullableSourceType, nullableTargetType)
 {
+    public override IEnumerable<TypeMappingKey> BuildAdditionalMappingKeys(TypeMappingConfiguration config)
+    {
+        // if the fallback value is not nullable,
+        // this mapping never returns null.
+        // add the following mapping keys:
+        // null => null (added by default)
+        // null => non-null
+        // non-null => non-null
+        if (!nullFallbackValue.IsNullable(TargetType))
+        {
+            yield return new TypeMappingKey(SourceType, TargetType.NonNullable(), config);
+            yield return new TypeMappingKey(SourceType.NonNullable(), TargetType.NonNullable(), config);
+            yield break;
+        }
+
+        // this mapping never returns null for non-null input values
+        // and is guarded with [return: NotNullIfNotNull]
+        // therefore this mapping can also be used as mapping for non-null values.
+        yield return new TypeMappingKey(delegateMapping, config);
+    }
+
+    protected internal override SyntaxList<AttributeListSyntax> BuildAttributes(TypeMappingBuildContext ctx)
+    {
+        return !nullableAttributesSupported || !TargetType.IsNullable() || !nullFallbackValue.IsNullable(TargetType)
+            ? base.BuildAttributes(ctx)
+            : base.BuildAttributes(ctx).Add(ctx.SyntaxFactory.ReturnNotNullIfNotNullAttribute(ctx.Source));
+    }
+
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         var body = delegateMapping.BuildBody(ctx);

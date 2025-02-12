@@ -79,7 +79,7 @@ public static class TestHelper
         return driver.RunGenerators(compilation);
     }
 
-    public static Compilation BuildCompilation([StringSyntax(StringSyntax.CSharp)] string source, TestHelperOptions? options)
+    public static CSharpCompilation BuildCompilation([StringSyntax(StringSyntax.CSharp)] string source, TestHelperOptions? options)
     {
         options ??= TestHelperOptions.Default;
         var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default.WithLanguageVersion(options.LanguageVersion));
