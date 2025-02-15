@@ -22,6 +22,11 @@ public class ExistingTargetMappingBuilder(MappingCollection mappings)
         return mappings.FindExistingInstanceMapping(mappingKey);
     }
 
+    public IExistingTargetMapping? FindNamed(string name, out bool ambiguousName)
+    {
+        return mappings.FindExistingInstanceNamedMapping(name, out ambiguousName);
+    }
+
     public IExistingTargetMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
     {
         foreach (var mappingBuilder in _builders)
