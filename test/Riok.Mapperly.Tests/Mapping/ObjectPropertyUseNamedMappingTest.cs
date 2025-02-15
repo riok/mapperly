@@ -411,4 +411,100 @@ public class ObjectPropertyUseNamedMappingTest
         );
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task UserDefinedExistingTargetMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = "MapValue")]
+            public partial void Map(A source, B target);
+            private partial void MapValue(C source, D target);
+            """,
+            """
+            public class A
+            {
+                public C Value { get; set; }
+            }
+            """,
+            """
+            public class B
+            {
+                public D Value { get; set; }
+            }
+            """,
+            """
+            public class C
+            {
+                public string StringValue { get; set; }
+            }
+            """,
+            """
+            public class D
+            {
+                public string StringValue { get; set; }
+            }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task UserImplementedExistingTargetMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Values), nameof(B.Values), Use = "MapValues")]
+            public partial void Map(A source, B target);
+            private void MapValues(List<string> source, List<string> target) { }
+            """,
+            """
+            public class A
+            {
+                public List<string> Values { get; set; }
+            }
+            """,
+            """
+            public class B
+            {
+                public List<string> Values { get; set; }
+            }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldUseReferencedMappingOnSelectedPropertiesWithExistingInstance()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Values1), nameof(B.Values1), Use = nameof(MapV1)]
+            [MapProperty(nameof(A.Values2), nameof(B.Values2), Use = nameof(MapV2)]
+            public partial B Map(A source);
+
+            [UserMapping(Default = true)]
+            private void DefaultMapping(List<string> source, List<string> target) {}
+            private void MapV1(List<string> source, List<string> target) {}
+            private void MapV2(List<string> source, List<string> target) {}
+            """,
+            """
+            class A
+            {
+                public List<string> Values { get; } = [];
+                public List<string> Values1 { get; } = [];
+                public List<string> Values2 { get; } = [];
+            }
+            """,
+            """
+            class B
+            {
+                public List<string> Values { get; } = [];
+                public List<string> Values1 { get; } = [];
+                public List<string> Values2 { get; } = [];
+            }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
 }

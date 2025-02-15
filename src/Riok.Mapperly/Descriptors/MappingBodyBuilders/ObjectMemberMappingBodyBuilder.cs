@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Symbols.Members;
@@ -217,19 +218,28 @@ public static class ObjectMemberMappingBodyBuilder
         var sourceMemberPath = memberMappingInfo.SourceMember;
         var targetMemberPath = memberMappingInfo.TargetMember;
 
-        // if the member is readonly
-        // and the target and source path is readable,
-        // we try to create an existing target mapping
-        if (
-            targetMemberPath.Member is { CanSet: true, IsInitOnly: false }
-            || !targetMemberPath.Path.All(op => op.CanGet)
-            || !sourceMemberPath.MemberPath.Path.All(op => op.CanGet)
-        )
+        IExistingTargetMapping? existingTargetMapping;
+        if (memberMappingInfo.Configuration?.Use is not null)
         {
-            return false;
+            existingTargetMapping = ctx.BuilderContext.FindExistingTargetNamedMapping(memberMappingInfo.Configuration.Use);
+        }
+        else
+        {
+            // if the member is readonly
+            // and the target and source path is readable,
+            // we try to create an existing target mapping
+            if (
+                targetMemberPath.Member is { CanSet: true, IsInitOnly: false }
+                || !targetMemberPath.Path.All(op => op.CanGet)
+                || !sourceMemberPath.MemberPath.Path.All(op => op.CanGet)
+            )
+            {
+                return false;
+            }
+
+            existingTargetMapping = ctx.BuilderContext.FindOrBuildExistingTargetMapping(memberMappingInfo.ToTypeMappingKey());
         }
 
-        var existingTargetMapping = ctx.BuilderContext.FindOrBuildExistingTargetMapping(memberMappingInfo.ToTypeMappingKey());
         if (existingTargetMapping == null)
             return false;
 
