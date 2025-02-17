@@ -1,0 +1,7 @@
+﻿{
+  StringValue: foo,
+  IntValue: 11,
+  Nested: {
+    V: 10
+  }
+}

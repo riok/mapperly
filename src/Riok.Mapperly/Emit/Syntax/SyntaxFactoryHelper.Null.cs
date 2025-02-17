@@ -19,9 +19,19 @@ public partial struct SyntaxFactoryHelper
         );
     }
 
-    public static SyntaxTrivia Nullable(bool enabled)
+    public static SyntaxTrivia Nullable(bool enabled, bool annotationsOnly = false)
     {
-        return Trivia(NullableDirectiveTrivia(LeadingSpacedToken(enabled ? SyntaxKind.EnableKeyword : SyntaxKind.DisableKeyword), true));
+        var nullableDirective = NullableDirectiveTrivia(
+            LeadingSpacedToken(enabled ? SyntaxKind.EnableKeyword : SyntaxKind.DisableKeyword),
+            true
+        );
+
+        if (annotationsOnly)
+        {
+            nullableDirective = nullableDirective.WithTargetToken(LeadingSpacedToken(SyntaxKind.AnnotationsKeyword));
+        }
+
+        return Trivia(nullableDirective);
     }
 
     public static BinaryExpressionSyntax Coalesce(ExpressionSyntax expr, ExpressionSyntax coalesceExpr) =>

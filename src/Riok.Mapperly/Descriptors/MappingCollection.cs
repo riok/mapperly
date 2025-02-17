@@ -234,9 +234,11 @@ public class MappingCollection
         public MappingCollectionAddResult TryAddAsDefault(T mapping, TypeMappingConfiguration config)
         {
             var mappingKey = new TypeMappingKey(mapping, config);
-            return _defaultMappings.TryAdd(mappingKey, mapping)
+            var result = _defaultMappings.TryAdd(mappingKey, mapping)
                 ? MappingCollectionAddResult.Added
                 : MappingCollectionAddResult.NotAddedDuplicated;
+            AddAdditionalMappings(mapping, config);
+            return result;
         }
 
         public MappingCollectionAddResult AddUserMapping(TUserMapping mapping, bool? isDefault, string? name)
@@ -291,7 +293,16 @@ public class MappingCollection
 
             _duplicatedNonDefaultUserMappings.Remove(mappingKey);
             _defaultMappings[mappingKey] = mapping;
+            AddAdditionalMappings(mapping, TypeMappingConfiguration.Default);
             return MappingCollectionAddResult.Added;
+        }
+
+        private void AddAdditionalMappings(T mapping, TypeMappingConfiguration config)
+        {
+            foreach (var additionalKey in mapping.BuildAdditionalMappingKeys(config))
+            {
+                _defaultMappings.TryAdd(additionalKey, mapping);
+            }
         }
     }
 }

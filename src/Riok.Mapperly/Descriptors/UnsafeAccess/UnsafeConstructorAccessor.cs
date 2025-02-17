@@ -18,8 +18,8 @@ public class UnsafeConstructorAccessor(IMethodSymbol symbol, string className, s
     {
         var typeToCreate = IdentifierName(symbol.ContainingType.FullyQualifiedIdentifierName()).AddTrailingSpace();
         var parameters = ParameterList(symbol.Parameters);
-        var attributeList = ctx.SyntaxFactory.UnsafeAccessorAttributeList(UnsafeAccessorType.Constructor);
-        return PublicStaticExternMethod(ctx, typeToCreate, methodName, parameters, attributeList);
+        var attribute = ctx.SyntaxFactory.UnsafeAccessorAttribute(UnsafeAccessorType.Constructor);
+        return PublicStaticExternMethod(ctx, typeToCreate, methodName, parameters, [attribute]);
     }
 
     public ExpressionSyntax CreateInstance(

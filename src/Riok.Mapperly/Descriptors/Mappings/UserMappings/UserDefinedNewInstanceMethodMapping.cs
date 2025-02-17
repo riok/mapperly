@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
+using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
@@ -21,6 +22,8 @@ public class UserDefinedNewInstanceMethodMapping(
 
     public new IMethodSymbol Method { get; } = method;
 
+    private MethodMapping? DelegateMethodMapping => _delegateMapping as MethodMapping;
+
     public bool? Default { get; } = isDefault;
 
     public bool IsExternal => false;
@@ -32,6 +35,18 @@ public class UserDefinedNewInstanceMethodMapping(
     public bool InternalReferenceHandlingEnabled => enableReferenceHandling && ReferenceHandlerParameter == null;
 
     public void SetDelegateMapping(INewInstanceMapping mapping) => _delegateMapping = mapping;
+
+    public override IEnumerable<TypeMappingKey> BuildAdditionalMappingKeys(TypeMappingConfiguration config)
+    {
+        // null is never returned if the source value is not null
+        if (TargetType.IsNullable())
+        {
+            yield return new TypeMappingKey(SourceType.NonNullable(), TargetType.NonNullable(), config);
+        }
+    }
+
+    protected internal override SyntaxList<AttributeListSyntax> BuildAttributes(TypeMappingBuildContext ctx) =>
+        DelegateMethodMapping?.BuildAttributes(ctx) ?? base.BuildAttributes(ctx);
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
@@ -67,10 +82,7 @@ public class UserDefinedNewInstanceMethodMapping(
             return [ctx.SyntaxFactory.Return(_delegateMapping.Build(ctx))];
         }
 
-        if (_delegateMapping is MethodMapping delegateMethodMapping)
-            return delegateMethodMapping.BuildBody(ctx);
-
-        return [ctx.SyntaxFactory.Return(_delegateMapping.Build(ctx))];
+        return DelegateMethodMapping?.BuildBody(ctx) ?? [ctx.SyntaxFactory.Return(_delegateMapping.Build(ctx))];
     }
 
     internal override void EnableReferenceHandling(INamedTypeSymbol iReferenceHandlerType)

@@ -11,9 +11,9 @@ namespace Riok.Mapperly.Emit;
 public static class UnsafeAccessorEmitter
 {
     public static MemberDeclarationSyntax BuildUnsafeAccessorClass(
+        SourceEmitterContext ctx,
         MapperDescriptor descriptor,
-        CancellationToken cancellationToken,
-        SourceEmitterContext ctx
+        CancellationToken cancellationToken
     )
     {
         var accessorCtx = ctx.AddIndentation();

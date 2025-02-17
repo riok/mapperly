@@ -40,7 +40,8 @@ public class DescriptorBuilder
         MapperConfiguration defaultMapperConfiguration
     )
     {
-        _mapperDescriptor = new MapperDescriptor(mapperDeclaration, _methodNameBuilder);
+        var supportedFeatures = SupportedFeatures.Build(compilationContext.Types, symbolAccessor, compilationContext.ParseLanguageVersion);
+        _mapperDescriptor = new MapperDescriptor(mapperDeclaration, _methodNameBuilder, supportedFeatures);
         _symbolAccessor = symbolAccessor;
         _types = compilationContext.Types;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
@@ -51,7 +52,8 @@ public class DescriptorBuilder
             attributeAccessor,
             _types,
             mapperDeclaration.Symbol,
-            defaultMapperConfiguration
+            defaultMapperConfiguration,
+            supportedFeatures
         );
         _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
 

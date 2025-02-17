@@ -4,9 +4,12 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [return: global::System.Diagnostics.CodeAnalysis.NotNullIfNotNull(nameof(src))]
     public partial global::B? Map(global::A? src)
     {
-        return src == null ? default : src switch
+        if (src == null)
+            return default;
+        return src switch
         {
             global::AImpl1 x => MapToBImpl1(x),
             global::AImpl2 x => MapToBImpl2(x),

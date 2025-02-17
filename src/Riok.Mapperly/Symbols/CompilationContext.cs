@@ -1,12 +1,14 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Symbols;
 
 public sealed record CompilationContext(
-    Compilation Compilation,
+    CSharpCompilation Compilation,
+    LanguageVersion ParseLanguageVersion,
     WellKnownTypes Types,
     ImmutableArray<Compilation> NestedCompilations,
     FileNameBuilder FileNameBuilder

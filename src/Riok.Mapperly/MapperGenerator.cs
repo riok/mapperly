@@ -34,9 +34,19 @@ public class MapperGenerator : IIncrementalGenerator
         // build the compilation context
         var compilationContext = context
             .CompilationProvider.Combine(nestedCompilations)
+            .Combine(context.ParseOptionsProvider)
             .Select(
                 static (c, _) =>
-                    new CompilationContext(c.Left, new WellKnownTypes(c.Left), c.Right.ToImmutableArray(), new FileNameBuilder())
+                {
+                    var ((compilation, nestedCompilations), parseOptions) = c;
+                    return new CompilationContext(
+                        (CSharpCompilation)compilation,
+                        ((CSharpParseOptions)parseOptions).LanguageVersion,
+                        new WellKnownTypes(compilation),
+                        nestedCompilations.ToImmutableArray(),
+                        new FileNameBuilder()
+                    );
+                }
             )
             .WithTrackingName(MapperGeneratorStepNames.BuildCompilationContext);
 
@@ -116,12 +126,23 @@ public class MapperGenerator : IIncrementalGenerator
 
     private static IEnumerable<Diagnostic> BuildCompilationDiagnostics(Compilation compilation)
     {
-        if (compilation is CSharpCompilation { LanguageVersion: < LanguageVersion.CSharp9 } cSharpCompilation)
+        if (compilation is not CSharpCompilation csCompilation)
         {
             yield return Diagnostic.Create(
                 DiagnosticDescriptors.LanguageVersionNotSupported,
                 null,
-                cSharpCompilation.LanguageVersion.ToDisplayString(),
+                "<not a valid C# version>",
+                LanguageVersion.CSharp9.ToDisplayString()
+            );
+            yield break;
+        }
+
+        if (csCompilation.LanguageVersion < LanguageVersion.CSharp9)
+        {
+            yield return Diagnostic.Create(
+                DiagnosticDescriptors.LanguageVersionNotSupported,
+                null,
+                csCompilation.LanguageVersion.ToDisplayString(),
                 LanguageVersion.CSharp9.ToDisplayString()
             );
         }

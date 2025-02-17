@@ -11,7 +11,7 @@ public readonly struct TypeMappingKey(
     ITypeSymbol target,
     TypeMappingConfiguration? config = null,
     bool includeNullability = true
-)
+) : IEquatable<TypeMappingKey>
 {
     private static readonly IEqualityComparer<ISymbol?> _comparer = SymbolEqualityComparer.IncludeNullability;
 
@@ -28,11 +28,10 @@ public readonly struct TypeMappingKey(
 
     public TypeMappingKey TargetNonNullable() => new(Source, Target.NonNullable(), Configuration);
 
-    public override bool Equals(object? obj) =>
-        obj is TypeMappingKey other
-        && _comparer.Equals(Source, other.Source)
-        && _comparer.Equals(Target, other.Target)
-        && Configuration.Equals(other.Configuration);
+    public override bool Equals(object? obj) => obj is TypeMappingKey other && Equals(other);
+
+    public bool Equals(TypeMappingKey other) =>
+        _comparer.Equals(Source, other.Source) && _comparer.Equals(Target, other.Target) && Configuration.Equals(other.Configuration);
 
     public override int GetHashCode()
     {

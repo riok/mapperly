@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
@@ -133,12 +134,11 @@ public static class UserMethodMappingExtractor
 
         if (!valid || !UserMappingMethodParameterExtractor.BuildParameters(ctx, method, false, out var parameters))
         {
-            if (hasAttribute)
-            {
-                var name = receiver == null ? method.Name : receiver + method.Name;
-                ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, method, name);
-            }
+            if (!hasAttribute)
+                return null;
 
+            var name = receiver == null ? method.Name : receiver + method.Name;
+            ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, method, name);
             return null;
         }
 
@@ -158,15 +158,38 @@ public static class UserMethodMappingExtractor
             );
         }
 
+        var (targetType, targetTypeNullability) = BuildTargetType(ctx, method, parameters.Source.Name);
         return new UserImplementedMethodMapping(
             receiver,
             method,
             userMappingConfig.Default,
             parameters.Source,
-            ctx.SymbolAccessor.UpgradeNullable(method.ReturnType),
+            targetType,
             parameters.ReferenceHandler,
-            isExternal
+            isExternal,
+            targetTypeNullability
         );
+    }
+
+    private static (ITypeSymbol, UserImplementedMethodMapping.TargetNullability) BuildTargetType(
+        SimpleMappingBuilderContext ctx,
+        IMethodSymbol method,
+        string sourceParameterName
+    )
+    {
+        var targetType = ctx.SymbolAccessor.UpgradeNullable(method.ReturnType);
+        if (!targetType.IsNullable() || ctx.SymbolAccessor.TryHasAttribute<NotNullAttribute>(method.GetReturnTypeAttributes()))
+        {
+            return (targetType, UserImplementedMethodMapping.TargetNullability.NeverNull);
+        }
+
+        var targetNotNullIfSourceNotNull = ctx
+            .AttributeAccessor.TryAccess<NotNullIfNotNullAttribute>(method.GetReturnTypeAttributes())
+            .Any(attr => string.Equals(attr.ParameterName, sourceParameterName, StringComparison.Ordinal));
+        var nullability = targetNotNullIfSourceNotNull
+            ? UserImplementedMethodMapping.TargetNullability.NotNullIfSourceNotNull
+            : UserImplementedMethodMapping.TargetNullability.Nullable;
+        return (targetType, nullability);
     }
 
     private static IUserMapping? BuildUserDefinedMapping(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol)

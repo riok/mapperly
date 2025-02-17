@@ -9,8 +9,12 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// A projections queryable mapping
 /// to map from one generic <see cref="IQueryable{T}"/> to another.
 /// </summary>
-public class QueryableProjectionMapping(ITypeSymbol sourceType, ITypeSymbol targetType, INewInstanceMapping delegateMapping)
-    : NewInstanceMethodMapping(sourceType, targetType)
+public class QueryableProjectionMapping(
+    ITypeSymbol sourceType,
+    ITypeSymbol targetType,
+    INewInstanceMapping delegateMapping,
+    bool supportsNullableAttributes
+) : NewInstanceMethodMapping(sourceType, targetType)
 {
     private const string QueryableReceiverName = "System.Linq.Queryable";
     private const string SelectMethodName = nameof(Queryable.Select);
@@ -28,7 +32,10 @@ public class QueryableProjectionMapping(ITypeSymbol sourceType, ITypeSymbol targ
         var select = ctx.SyntaxFactory.StaticInvocation(QueryableReceiverName, SelectMethodName, ctx.Source, projectionLambda);
         var returnStatement = ctx.SyntaxFactory.Return(select);
         var leadingTrivia = returnStatement.GetLeadingTrivia().Insert(0, ElasticCarriageReturnLineFeed).Insert(1, Nullable(false));
-        var trailingTrivia = returnStatement.GetTrailingTrivia().Insert(0, ElasticCarriageReturnLineFeed).Insert(1, Nullable(true));
+        var trailingTrivia = returnStatement
+            .GetTrailingTrivia()
+            .Insert(0, ElasticCarriageReturnLineFeed)
+            .Insert(1, Nullable(true, !supportsNullableAttributes));
         returnStatement = returnStatement.WithLeadingTrivia(leadingTrivia).WithTrailingTrivia(trailingTrivia);
         return [returnStatement];
     }

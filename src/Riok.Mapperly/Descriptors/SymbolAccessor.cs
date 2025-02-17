@@ -196,15 +196,24 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     }
 
     internal IEnumerable<AttributeData> GetAttributes<T>(ISymbol symbol)
+        where T : Attribute => GetAttributes<T>(GetAttributesCore(symbol));
+
+    internal IEnumerable<AttributeData> TryGetAttributes<T>(IEnumerable<AttributeData> attributes)
         where T : Attribute
     {
-        var attributes = GetAttributesCore(symbol);
-        if (attributes.IsEmpty)
-        {
-            yield break;
-        }
+        var attributeSymbol = compilationContext.Types.TryGet(typeof(T).FullName ?? "<unknown>");
+        return attributeSymbol == null ? [] : GetAttributes(attributeSymbol, attributes);
+    }
 
+    internal IEnumerable<AttributeData> GetAttributes<T>(IEnumerable<AttributeData> attributes)
+        where T : Attribute
+    {
         var attributeSymbol = compilationContext.Types.Get<T>();
+        return GetAttributes(attributeSymbol, attributes);
+    }
+
+    internal IEnumerable<AttributeData> GetAttributes(ITypeSymbol attributeSymbol, IEnumerable<AttributeData> attributes)
+    {
         foreach (var attr in attributes)
         {
             if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass?.ConstructedFrom ?? attr.AttributeClass, attributeSymbol))
@@ -227,6 +236,9 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     internal bool HasAttribute<T>(ISymbol symbol)
         where T : Attribute => GetAttributes<T>(symbol).Any();
+
+    internal bool TryHasAttribute<T>(IEnumerable<AttributeData> symbol)
+        where T : Attribute => TryGetAttributes<T>(symbol).Any();
 
     internal IEnumerable<IMethodSymbol> GetAllMethods(ITypeSymbol symbol) => GetAllMembers(symbol).OfType<IMethodSymbol>();
 

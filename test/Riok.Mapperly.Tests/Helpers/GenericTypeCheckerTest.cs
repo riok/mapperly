@@ -277,7 +277,13 @@ public class GenericTypeCheckerTest
         var methodNode = nodes.OfType<MethodDeclarationSyntax>().Single(x => x.Identifier.Text == "Test");
         var model = compilation.GetSemanticModel(classNode.SyntaxTree);
         var mapperSymbol = model.GetDeclaredSymbol(classNode) ?? throw new NullReferenceException();
-        var compilationContext = new CompilationContext(compilation, new WellKnownTypes(compilation), [], new FileNameBuilder());
+        var compilationContext = new CompilationContext(
+            compilation,
+            LanguageVersion.Default,
+            new WellKnownTypes(compilation),
+            [],
+            new FileNameBuilder()
+        );
         var symbolAccessor = new SymbolAccessor(compilationContext, mapperSymbol);
         var typeChecker = new GenericTypeChecker(symbolAccessor, compilationContext.Types);
 

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
+using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using VerifyXunit;
 using Xunit;
@@ -9,6 +10,7 @@ namespace Riok.Mapperly.IntegrationTests
     public class NestedMapperRecordTest : BaseMapperTest
     {
         [Fact]
+        [VersionedSnapshot(Versions.NET6_0)]
         public Task SnapshotGeneratedSource()
         {
             var path = GetGeneratedMapperFilePath(

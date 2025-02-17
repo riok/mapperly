@@ -13,7 +13,6 @@ public static class NullableMappingBuilder
             return null;
 
         var delegateMapping = ctx.BuildMapping(mappingKey, MappingBuildingOptions.KeepUserSymbol);
-
         return delegateMapping == null ? null : BuildNullDelegateMapping(ctx, delegateMapping);
     }
 
@@ -52,7 +51,13 @@ public static class NullableMappingBuilder
 
         return mapping switch
         {
-            NewInstanceMethodMapping methodMapping => new NullDelegateMethodMapping(ctx.Source, ctx.Target, methodMapping, nullFallback),
+            NewInstanceMethodMapping methodMapping => new NullDelegateMethodMapping(
+                ctx.Source,
+                ctx.Target,
+                methodMapping,
+                nullFallback,
+                ctx.Configuration.SupportedFeatures.NullableAttributes
+            ),
             _ => new NullDelegateMapping(ctx.Source, ctx.Target, mapping, nullFallback),
         };
     }

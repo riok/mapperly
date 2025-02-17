@@ -320,6 +320,66 @@ public class ObjectPropertyTest
     }
 
     [Fact]
+    public void ShouldUseNotNullIfNotNullUserImplementedMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial B Map(A source);
+
+            [UserMapping(Default = true)]
+            [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull("source")]
+            private D? UserImplementedMap(C? source) => source == null ? null : new D();
+            """,
+            "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public D NestedValue { get; set; } }",
+            "class C;",
+            "class D;"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.StringValue = source.StringValue;
+                target.NestedValue = UserImplementedMap(source.NestedValue);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ShouldUseNotNullUserImplementedMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial B Map(A source);
+
+            [UserMapping(Default = true)]
+            [return: System.Diagnostics.CodeAnalysis.NotNull]
+            private D? UserImplementedMap(C? source) => new D();
+            """,
+            "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public D NestedValue { get; set; } }",
+            "class C;",
+            "class D;"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.StringValue = source.StringValue;
+                target.NestedValue = UserImplementedMap(source.NestedValue);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public Task WithUnmappablePropertyShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(

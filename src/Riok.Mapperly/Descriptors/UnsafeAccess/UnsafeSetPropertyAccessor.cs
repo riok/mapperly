@@ -34,14 +34,14 @@ public class UnsafeSetPropertyAccessor(IPropertySymbol symbol, string methodName
         var targetValue = Parameter(symbol.Type.FullyQualifiedIdentifierName(), valueName);
 
         var parameters = ParameterList(CommaSeparatedList(target, targetValue));
-        var attributeList = ctx.SyntaxFactory.UnsafeAccessorAttributeList(UnsafeAccessorType.Method, $"set_{symbol.Name}");
+        var attribute = ctx.SyntaxFactory.UnsafeAccessorAttribute(UnsafeAccessorType.Method, $"set_{symbol.Name}");
 
         return PublicStaticExternMethod(
             ctx,
             PredefinedType(Token(SyntaxKind.VoidKeyword)).AddTrailingSpace(),
             methodName,
             parameters,
-            attributeList
+            [attribute]
         );
     }
 

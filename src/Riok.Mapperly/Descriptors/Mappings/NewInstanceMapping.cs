@@ -25,5 +25,7 @@ public abstract class NewInstanceMapping : INewInstanceMapping
     /// <inheritdoc cref="INewInstanceMapping.IsSynthetic"/>
     public virtual bool IsSynthetic => false;
 
+    public virtual IEnumerable<TypeMappingKey> BuildAdditionalMappingKeys(TypeMappingConfiguration config) => [];
+
     public abstract ExpressionSyntax Build(TypeMappingBuildContext ctx);
 }

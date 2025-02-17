@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using FluentAssertions;
+using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using VerifyXunit;
 using Xunit;
@@ -9,6 +10,7 @@ namespace Riok.Mapperly.IntegrationTests
     public class DerivedMapperTest : BaseMapperTest
     {
         [Fact]
+        [VersionedSnapshot(Versions.NET6_0)]
         public Task SnapshotGeneratedSourceBaseMapper()
         {
             var path = GetGeneratedMapperFilePath(nameof(BaseMapper));
@@ -16,6 +18,7 @@ namespace Riok.Mapperly.IntegrationTests
         }
 
         [Fact]
+        [VersionedSnapshot(Versions.NET6_0)]
         public Task SnapshotGeneratedSourceDerivedMapper()
         {
             var path = GetGeneratedMapperFilePath(nameof(DerivedMapper));
@@ -23,6 +26,7 @@ namespace Riok.Mapperly.IntegrationTests
         }
 
         [Fact]
+        [VersionedSnapshot(Versions.NET6_0)]
         public Task SnapshotGeneratedSourceDerivedMapper2()
         {
             var path = GetGeneratedMapperFilePath(nameof(DerivedMapper2));
