@@ -475,6 +475,88 @@ public class ObjectPropertyUseNamedMappingTest
     }
 
     [Fact]
+    public Task UserImplementedExistingTargetMappingWithDifferentSourceType()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = "MapValues")]
+            public partial void Map(A source, B target);
+            private void MapValues(F source, D target) {}
+            """,
+            """
+            public class A
+            {
+                public C Value { get; set; }
+            }
+            """,
+            """
+            public class C
+            {
+                public List<string> Values { get; set; }
+            }
+            """,
+            """
+            public class B
+            {
+                public D Value { get; set; }
+            }
+            public class F
+            {
+                public List<string> Values { get; set; }
+            }
+            """,
+            """
+            public class D
+            {
+                public List<string> Values { get; set; }
+            }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task UserImplementedExistingTargetMappingWithDifferentTargetType()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = "MapValues")]
+            public partial void Map(A source, B target);
+            private void MapValues(C source, F target) {}
+            """,
+            """
+            public class A
+            {
+                public C Value { get; set; }
+            }
+            """,
+            """
+            public class C
+            {
+                public List<string> Values { get; set; }
+            }
+            """,
+            """
+            public class B
+            {
+                public D Value { get; set; }
+            }
+            public class F
+            {
+                public List<string> Values { get; set; }
+            }
+            """,
+            """
+            public class D
+            {
+                public List<string> Values { get; set; }
+            }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ShouldUseReferencedMappingOnSelectedPropertiesWithExistingInstance()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
