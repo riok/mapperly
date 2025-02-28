@@ -65,6 +65,9 @@ public class MappingCollection
 
     public IExistingTargetMapping? FindExistingInstanceMapping(TypeMappingKey mappingKey) => _existingTargetMappings.Find(mappingKey);
 
+    public IExistingTargetMapping? FindExistingInstanceNamedMapping(string name, out bool ambiguousName) =>
+        _existingTargetMappings.FindNamed(name, out ambiguousName);
+
     public IEnumerable<(IMapping, MappingBuilderContext)> DequeueMappingsToBuildBody() => _mappingsToBuildBody.DequeueAll();
 
     public void EnqueueToBuildBody(ITypeMapping mapping, MappingBuilderContext ctx) => _mappingsToBuildBody.Enqueue((mapping, ctx));

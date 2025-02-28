@@ -255,6 +255,17 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         return ExistingTargetMappingBuilder.Find(mappingKey) ?? BuildExistingTargetMapping(mappingKey, options);
     }
 
+    public virtual IExistingTargetMapping? FindExistingTargetNamedMapping(string mappingName)
+    {
+        var mapping = ExistingTargetMappingBuilder.FindNamed(mappingName, out bool ambiguousName);
+        if (ambiguousName)
+        {
+            ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingAmbiguous, mappingName);
+        }
+
+        return mapping;
+    }
+
     /// <summary>
     /// Tries to build an existing target instance mapping.
     /// If no mapping is possible for the provided types,

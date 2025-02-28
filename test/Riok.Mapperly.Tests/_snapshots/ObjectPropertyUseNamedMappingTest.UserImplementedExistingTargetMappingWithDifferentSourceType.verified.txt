@@ -1,0 +1,26 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+{
+    [MapProperty(nameof(A.Value), nameof(B.Value), Use = "MapValues")]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial void Map(A source, B target);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+private void MapValues(F source, D target) {}
+*/
+ : (11,4)-(12,44),
+      Message: The source type F of the referenced mapping MapValues does not match the expected type C,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG072,
+        Title: The source type of the referenced mapping does not match,
+        MessageFormat: The source type {1} of the referenced mapping {0} does not match the expected type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}
