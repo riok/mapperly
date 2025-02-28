@@ -515,4 +515,21 @@ public class EnumTest
             .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public Task EnumArrayToOtherEnumArrayByValueCheckDefinedShouldWork()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "E1[]",
+            "E2[]",
+            TestSourceBuilderOptions.Default with
+            {
+                EnumMappingStrategy = EnumMappingStrategy.ByValueCheckDefined,
+            },
+            "enum E1 {A = 20, B = 30, C = 10}",
+            "enum E2 {A = 10, B = 20, C = 30}"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

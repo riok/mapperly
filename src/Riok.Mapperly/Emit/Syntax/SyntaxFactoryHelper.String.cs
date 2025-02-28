@@ -18,8 +18,15 @@ public partial struct SyntaxFactoryHelper
         TimeSpan.FromMilliseconds(100)
     );
 
-    public static InvocationExpressionSyntax NameOf(ExpressionSyntax expression) =>
-        InvocationWithoutIndention(_nameofIdentifier, expression);
+    public static InvocationExpressionSyntax NameOf(ExpressionSyntax expression)
+    {
+        while (expression is ElementAccessExpressionSyntax elementAccess)
+        {
+            expression = elementAccess.Expression;
+        }
+
+        return InvocationWithoutIndention(_nameofIdentifier, expression);
+    }
 
     private ExpressionSyntax ParameterNameOfOrStringLiteral(ExpressionSyntax expression)
     {
