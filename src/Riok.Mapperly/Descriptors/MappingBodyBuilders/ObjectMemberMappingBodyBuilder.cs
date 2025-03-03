@@ -1,8 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
-using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Symbols.Members;
@@ -219,113 +217,32 @@ public static class ObjectMemberMappingBodyBuilder
         if (memberMappingInfo.SourceMember is null)
             return false;
 
-        if (memberMappingInfo.Configuration?.Use is null)
+        if (memberMappingInfo.Configuration is null || memberMappingInfo.Configuration.Use is null)
             return false;
 
-        var use = memberMappingInfo.Configuration.Use;
-        var existingTargetMapping = ctx.BuilderContext.FindExistingTargetNamedMapping(use);
+        // check if named mapping defined as existing target mapping.
+        // it could be defined as new instance mapping.
+        var namedExistingTargetMapping = ctx.BuilderContext.FindExistingTargetNamedMapping(memberMappingInfo.Configuration.Use);
+        if (namedExistingTargetMapping is null)
+            return false;
+
+        var existingTargetMapping = ctx.BuilderContext.FindOrBuildExistingTargetMapping(memberMappingInfo.ToTypeMappingKey());
         if (existingTargetMapping is null)
             return false;
 
-        var sourceMemberPath = memberMappingInfo.SourceMember.MemberPath;
+        var sourceMemberPath = memberMappingInfo.SourceMember;
         var targetMemberPath = memberMappingInfo.TargetMember;
 
-        var differentSourceType = !SymbolEqualityComparer.IncludeNullability.Equals(
-            sourceMemberPath.MemberType,
-            existingTargetMapping.SourceType
-        );
-        var differentTargetType = !SymbolEqualityComparer.IncludeNullability.Equals(
-            targetMemberPath.MemberType,
-            existingTargetMapping.TargetType
-        );
-
-        if (!differentSourceType && !differentTargetType)
-        {
-            var sourceMemberGetter = sourceMemberPath.BuildGetter(ctx.BuilderContext);
-            var targetMemberGetter = targetMemberPath.BuildGetter(ctx.BuilderContext);
-
-            var memberMapping = new MemberExistingTargetMapping(
-                existingTargetMapping,
-                sourceMemberGetter,
-                targetMemberGetter,
-                memberMappingInfo
-            );
-            ctx.AddMemberAssignmentMapping(memberMapping);
-            return true;
-        }
-
-        if (differentSourceType)
-        {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.ReferencedMappingSourceTypeMismatch,
-                use,
-                existingTargetMapping.SourceType.ToDisplayString(),
-                sourceMemberPath.MemberType.ToDisplayString()
-            );
-        }
-
-        if (differentTargetType)
-        {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.ReferencedMappingTargetTypeMismatch,
-                use,
-                existingTargetMapping.TargetType.ToDisplayString(),
-                targetMemberPath.MemberType.ToDisplayString()
-            );
-        }
-
-        return TryAddCompositeExistingTargetMapping(ctx, existingTargetMapping, memberMappingInfo);
-    }
-
-    private static bool TryAddCompositeExistingTargetMapping(
-        IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
-        IExistingTargetMapping existingTargetMapping,
-        MemberMappingInfo memberMappingInfo
-    )
-    {
-        if (memberMappingInfo.SourceMember is null)
-            return false;
-
-        var sourceMemberPath = memberMappingInfo.SourceMember.MemberPath;
-        var targetMemberPath = memberMappingInfo.TargetMember;
-
-        var sourceMemberGetter = sourceMemberPath.BuildGetter(ctx.BuilderContext);
+        var sourceMemberGetter = sourceMemberPath.MemberPath.BuildGetter(ctx.BuilderContext);
         var targetMemberGetter = targetMemberPath.BuildGetter(ctx.BuilderContext);
 
-        var sourceMapping = ctx.BuilderContext.FindOrBuildMapping(sourceMemberPath.MemberType, existingTargetMapping.SourceType);
-        if (sourceMapping == null)
-        {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.CouldNotCreateMapping,
-                sourceMemberPath.MemberType,
-                existingTargetMapping.SourceType
-            );
-
-            return true;
-        }
-
-        var targetMapping = ctx.BuilderContext.FindOrBuildMapping(targetMemberPath.MemberType, existingTargetMapping.TargetType);
-        if (targetMapping == null)
-        {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.CouldNotCreateMapping,
-                targetMemberPath.MemberType.ToDisplayString(),
-                existingTargetMapping.TargetType.ToDisplayString()
-            );
-
-            return true;
-        }
-
-        ctx.AddMemberAssignmentMapping(
-            new CompositeMemberExistingTargetMapping(
-                existingTargetMapping,
-                sourceMapping,
-                sourceMemberGetter,
-                targetMapping,
-                targetMemberGetter,
-                memberMappingInfo
-            )
+        var memberMapping = new MemberExistingTargetMapping(
+            existingTargetMapping,
+            sourceMemberGetter,
+            targetMemberGetter,
+            memberMappingInfo
         );
+        ctx.AddMemberAssignmentMapping(memberMapping);
         return true;
     }
 

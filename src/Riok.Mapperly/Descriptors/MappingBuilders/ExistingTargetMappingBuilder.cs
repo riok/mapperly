@@ -8,6 +8,7 @@ public class ExistingTargetMappingBuilder(MappingCollection mappings)
 
     private static readonly IReadOnlyCollection<BuildExistingTargetMapping> _builders =
     [
+        UseNamedMappingBuilder.TryBuildExistingTargetMapping,
         NullableMappingBuilder.TryBuildExistingTargetMapping,
         DerivedTypeMappingBuilder.TryBuildExistingTargetMapping,
         DictionaryMappingBuilder.TryBuildExistingTargetMapping,
