@@ -40,7 +40,7 @@
     "hast-util-to-html": "9.0.5",
     "marked": "11.2.0",
     "prettier": "3.5.2",
-    "stylelint": "16.14.1",
+    "stylelint": "16.15.0",
     "stylelint-config-standard": "37.0.0",
     "ts-node": "10.9.2",
     "typescript": "5.4.5",
