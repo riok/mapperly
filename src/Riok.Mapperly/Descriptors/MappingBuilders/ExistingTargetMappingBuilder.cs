@@ -8,6 +8,7 @@ public class ExistingTargetMappingBuilder(MappingCollection mappings)
 
     private static readonly IReadOnlyCollection<BuildExistingTargetMapping> _builders =
     [
+        UseNamedMappingBuilder.TryBuildExistingTargetMapping,
         NullableMappingBuilder.TryBuildExistingTargetMapping,
         DerivedTypeMappingBuilder.TryBuildExistingTargetMapping,
         DictionaryMappingBuilder.TryBuildExistingTargetMapping,
@@ -20,6 +21,11 @@ public class ExistingTargetMappingBuilder(MappingCollection mappings)
     public IExistingTargetMapping? Find(TypeMappingKey mappingKey)
     {
         return mappings.FindExistingInstanceMapping(mappingKey);
+    }
+
+    public IExistingTargetMapping? FindNamed(string name, out bool ambiguousName)
+    {
+        return mappings.FindExistingInstanceNamedMapping(name, out ambiguousName);
     }
 
     public IExistingTargetMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)

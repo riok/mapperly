@@ -186,6 +186,9 @@ public static class ObjectMemberMappingBodyBuilder
         // even if a mapping validation fails
         ctx.ConsumeMemberConfigs(memberMappingInfo);
 
+        if (TryAddNamedExistingTargetMapping(ctx, memberMappingInfo))
+            return;
+
         if (TryAddExistingTargetMapping(ctx, memberMappingInfo))
             return;
 
@@ -203,6 +206,44 @@ public static class ObjectMemberMappingBodyBuilder
         {
             ctx.AddMemberAssignmentMapping(mapping);
         }
+    }
+
+    private static bool TryAddNamedExistingTargetMapping(
+        IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
+        MemberMappingInfo memberMappingInfo
+    )
+    {
+        // can only map with an existing target from a source member
+        if (memberMappingInfo.SourceMember is null)
+            return false;
+
+        if (memberMappingInfo.Configuration is null || memberMappingInfo.Configuration.Use is null)
+            return false;
+
+        // check if named mapping defined as existing target mapping.
+        // it could be defined as new instance mapping.
+        var namedExistingTargetMapping = ctx.BuilderContext.FindExistingTargetNamedMapping(memberMappingInfo.Configuration.Use);
+        if (namedExistingTargetMapping is null)
+            return false;
+
+        var existingTargetMapping = ctx.BuilderContext.FindOrBuildExistingTargetMapping(memberMappingInfo.ToTypeMappingKey());
+        if (existingTargetMapping is null)
+            return false;
+
+        var sourceMemberPath = memberMappingInfo.SourceMember;
+        var targetMemberPath = memberMappingInfo.TargetMember;
+
+        var sourceMemberGetter = sourceMemberPath.MemberPath.BuildGetter(ctx.BuilderContext);
+        var targetMemberGetter = targetMemberPath.BuildGetter(ctx.BuilderContext);
+
+        var memberMapping = new MemberExistingTargetMapping(
+            existingTargetMapping,
+            sourceMemberGetter,
+            targetMemberGetter,
+            memberMappingInfo
+        );
+        ctx.AddMemberAssignmentMapping(memberMapping);
+        return true;
     }
 
     private static bool TryAddExistingTargetMapping(
