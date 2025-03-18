@@ -186,9 +186,6 @@ public static class ObjectMemberMappingBodyBuilder
         // even if a mapping validation fails
         ctx.ConsumeMemberConfigs(memberMappingInfo);
 
-        if (TryAddNamedExistingTargetMapping(ctx, memberMappingInfo))
-            return;
-
         if (TryAddExistingTargetMapping(ctx, memberMappingInfo))
             return;
 
@@ -208,44 +205,6 @@ public static class ObjectMemberMappingBodyBuilder
         }
     }
 
-    private static bool TryAddNamedExistingTargetMapping(
-        IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
-        MemberMappingInfo memberMappingInfo
-    )
-    {
-        // can only map with an existing target from a source member
-        if (memberMappingInfo.SourceMember is null)
-            return false;
-
-        if (memberMappingInfo.Configuration is null || memberMappingInfo.Configuration.Use is null)
-            return false;
-
-        // check if named mapping defined as existing target mapping.
-        // it could be defined as new instance mapping.
-        var namedExistingTargetMapping = ctx.BuilderContext.FindExistingTargetNamedMapping(memberMappingInfo.Configuration.Use);
-        if (namedExistingTargetMapping is null)
-            return false;
-
-        var existingTargetMapping = ctx.BuilderContext.FindOrBuildExistingTargetMapping(memberMappingInfo.ToTypeMappingKey());
-        if (existingTargetMapping is null)
-            return false;
-
-        var sourceMemberPath = memberMappingInfo.SourceMember;
-        var targetMemberPath = memberMappingInfo.TargetMember;
-
-        var sourceMemberGetter = sourceMemberPath.MemberPath.BuildGetter(ctx.BuilderContext);
-        var targetMemberGetter = targetMemberPath.BuildGetter(ctx.BuilderContext);
-
-        var memberMapping = new MemberExistingTargetMapping(
-            existingTargetMapping,
-            sourceMemberGetter,
-            targetMemberGetter,
-            memberMappingInfo
-        );
-        ctx.AddMemberAssignmentMapping(memberMapping);
-        return true;
-    }
-
     private static bool TryAddExistingTargetMapping(
         IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
         MemberMappingInfo memberMappingInfo
@@ -258,13 +217,17 @@ public static class ObjectMemberMappingBodyBuilder
         var sourceMemberPath = memberMappingInfo.SourceMember;
         var targetMemberPath = memberMappingInfo.TargetMember;
 
+        // if a named existing target mapping exists, we are always good.
         // if the member is readonly
         // and the target and source path is readable,
-        // we try to create an existing target mapping
+        // we also try to create an existing target mapping
         if (
-            targetMemberPath.Member is { CanSet: true, IsInitOnly: false }
-            || !targetMemberPath.Path.All(op => op.CanGet)
-            || !sourceMemberPath.MemberPath.Path.All(op => op.CanGet)
+            !HasExistingTargetNamedMapping(ctx, memberMappingInfo)
+            && (
+                targetMemberPath.Member is { CanSet: true, IsInitOnly: false }
+                || !targetMemberPath.Path.All(op => op.CanGet)
+                || !sourceMemberPath.MemberPath.Path.All(op => op.CanGet)
+            )
         )
         {
             return false;
@@ -283,6 +246,22 @@ public static class ObjectMemberMappingBodyBuilder
             memberMappingInfo
         );
         ctx.AddMemberAssignmentMapping(memberMapping);
+        return true;
+    }
+
+    private static bool HasExistingTargetNamedMapping(
+        IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
+        MemberMappingInfo memberMappingInfo
+    )
+    {
+        if (memberMappingInfo.Configuration?.Use is null)
+            return false;
+
+        // check if named mapping defined as existing target mapping.
+        // it could be defined as new instance mapping.
+        var namedExistingTargetMapping = ctx.BuilderContext.FindExistingTargetNamedMapping(memberMappingInfo.Configuration.Use);
+        if (namedExistingTargetMapping is null)
+            return false;
         return true;
     }
 }

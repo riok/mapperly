@@ -557,6 +557,40 @@ public class ObjectPropertyUseNamedMappingTest
     }
 
     [Fact]
+    public Task UserImplementedExistingTargetWithDisabledAutoUserMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value1), nameof(B.Value1), Use = nameof(ModifyValue)]
+            [MapProperty(nameof(A.Value2), nameof(B.Value2), Use = nameof(ModifyValue2)]
+            private partial B Map(A source);
+
+            private void ModifyValue(Value source, Value target) {}
+            private void ModifyValue2(Value source, Value target) {}
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "class Value { public int V {get;set;} }",
+            """
+            class A
+            {
+                public Value Value { get; set; }
+                public Value Value1 { get; set; }
+                public Value Value2 { get; set; }
+            }
+            """,
+            """
+            class B
+            {
+                public Value Value { get; set; }
+                public Value Value1 { get; set; }
+                public Value Value2 { get; set; }
+            }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ShouldUseReferencedMappingOnSelectedPropertiesWithExistingInstance()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

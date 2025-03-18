@@ -255,9 +255,15 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         return ExistingTargetMappingBuilder.Find(mappingKey) ?? BuildExistingTargetMapping(mappingKey, options);
     }
 
-    public virtual IExistingTargetMapping? FindExistingTargetNamedMapping(string mappingName)
+    /// <summary>
+    /// Tries to find an existing mapping with the provided name.
+    /// If none is found, <c>null</c> is returned.
+    /// </summary>
+    /// <param name="mappingName">The name of the mapping.</param>
+    /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
+    public IExistingTargetMapping? FindExistingTargetNamedMapping(string mappingName)
     {
-        var mapping = ExistingTargetMappingBuilder.FindNamed(mappingName, out bool ambiguousName);
+        var mapping = ExistingTargetMappingBuilder.FindOrResolveNamed(this, mappingName, out var ambiguousName);
         if (ambiguousName)
         {
             ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingAmbiguous, mappingName);
