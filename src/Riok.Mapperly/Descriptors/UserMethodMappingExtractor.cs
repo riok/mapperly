@@ -56,15 +56,13 @@ public static class UserMethodMappingExtractor
         SimpleMappingBuilderContext ctx,
         ITypeSymbol mapperSymbol,
         string name
-    )
-    {
-        return mapperSymbol
-            .GetMembers(name)
-            .OfType<IMethodSymbol>()
-            .Where(m => IsMappingMethodCandidate(ctx, m, requireAttribute: false))
-            .Select(m => BuildUserImplementedMapping(ctx, m, null, allowPartial: true, isStatic: mapperSymbol.IsStatic, isExternal: false))
-            .OfType<INewInstanceUserMapping>();
-    }
+    ) => ExtractNamedUserImplementedMappings<INewInstanceUserMapping>(ctx, mapperSymbol, name);
+
+    internal static IEnumerable<IExistingTargetUserMapping> ExtractNamedUserImplementedExistingInstanceMappings(
+        SimpleMappingBuilderContext ctx,
+        ITypeSymbol mapperSymbol,
+        string name
+    ) => ExtractNamedUserImplementedMappings<IExistingTargetUserMapping>(ctx, mapperSymbol, name);
 
     internal static IEnumerable<IUserMapping> ExtractUserImplementedMappings(
         SimpleMappingBuilderContext ctx,
@@ -314,5 +312,19 @@ public static class UserMethodMappingExtractor
         var userMappingAttr = ctx.AttributeAccessor.AccessFirstOrDefault<UserMappingAttribute, UserMappingConfiguration>(method);
         hasAttribute = userMappingAttr != null;
         return userMappingAttr ?? new UserMappingConfiguration();
+    }
+
+    private static IEnumerable<T> ExtractNamedUserImplementedMappings<T>(
+        SimpleMappingBuilderContext ctx,
+        ITypeSymbol mapperSymbol,
+        string name
+    )
+    {
+        return mapperSymbol
+            .GetMembers(name)
+            .OfType<IMethodSymbol>()
+            .Where(m => IsMappingMethodCandidate(ctx, m, requireAttribute: false))
+            .Select(m => BuildUserImplementedMapping(ctx, m, null, allowPartial: true, isStatic: mapperSymbol.IsStatic, isExternal: false))
+            .OfType<T>();
     }
 }

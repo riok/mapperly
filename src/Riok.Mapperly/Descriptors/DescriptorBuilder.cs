@@ -67,7 +67,7 @@ public class DescriptorBuilder
             _unsafeAccessorContext,
             _diagnostics,
             new MappingBuilder(_mappings, mapperDeclaration),
-            new ExistingTargetMappingBuilder(_mappings),
+            new ExistingTargetMappingBuilder(_mappings, mapperDeclaration),
             _inlineMappings,
             mapperDeclaration.Syntax.GetLocation()
         );

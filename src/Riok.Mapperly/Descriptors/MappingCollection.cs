@@ -134,6 +134,23 @@ public class MappingCollection
         _newInstanceMappings.AddNamedUserMapping(name, mapping);
     }
 
+    public void AddNamedExistingInstanceUserMappings(string name, IEnumerable<IExistingTargetUserMapping> mappings)
+    {
+        foreach (var mapping in mappings)
+        {
+            AddNamedExistingInstanceUserMapping(name, mapping);
+        }
+    }
+
+    public void AddNamedExistingInstanceUserMapping(string name, IExistingTargetUserMapping mapping)
+    {
+        Debug.Assert(
+            mapping.Default != true,
+            $"Cannot add a named mapping ({name}, {mapping.Method.Name}) after the initial discovery which is a default mapping"
+        );
+        _existingTargetMappings.AddNamedUserMapping(name, mapping);
+    }
+
     private class MappingCollectionInstance<T, TUserMapping>
         where T : ITypeMapping
         where TUserMapping : T, IUserMapping
