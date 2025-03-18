@@ -256,6 +256,23 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     }
 
     /// <summary>
+    /// Tries to find an existing mapping with the provided name.
+    /// If none is found, <c>null</c> is returned.
+    /// </summary>
+    /// <param name="mappingName">The name of the mapping.</param>
+    /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
+    public IExistingTargetMapping? FindExistingTargetNamedMapping(string mappingName)
+    {
+        var mapping = ExistingTargetMappingBuilder.FindOrResolveNamed(this, mappingName, out var ambiguousName);
+        if (ambiguousName)
+        {
+            ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingAmbiguous, mappingName);
+        }
+
+        return mapping;
+    }
+
+    /// <summary>
     /// Tries to build an existing target instance mapping.
     /// If no mapping is possible for the provided types,
     /// <c>null</c> is returned.

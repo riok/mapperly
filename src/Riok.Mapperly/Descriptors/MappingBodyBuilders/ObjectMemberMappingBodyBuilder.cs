@@ -217,13 +217,17 @@ public static class ObjectMemberMappingBodyBuilder
         var sourceMemberPath = memberMappingInfo.SourceMember;
         var targetMemberPath = memberMappingInfo.TargetMember;
 
+        // if a named existing target mapping exists, we are always good.
         // if the member is readonly
         // and the target and source path is readable,
-        // we try to create an existing target mapping
+        // we also try to create an existing target mapping
         if (
-            targetMemberPath.Member is { CanSet: true, IsInitOnly: false }
-            || !targetMemberPath.Path.All(op => op.CanGet)
-            || !sourceMemberPath.MemberPath.Path.All(op => op.CanGet)
+            !HasExistingTargetNamedMapping(ctx, memberMappingInfo)
+            && (
+                targetMemberPath.Member is { CanSet: true, IsInitOnly: false }
+                || !targetMemberPath.Path.All(op => op.CanGet)
+                || !sourceMemberPath.MemberPath.Path.All(op => op.CanGet)
+            )
         )
         {
             return false;
@@ -243,5 +247,19 @@ public static class ObjectMemberMappingBodyBuilder
         );
         ctx.AddMemberAssignmentMapping(memberMapping);
         return true;
+    }
+
+    private static bool HasExistingTargetNamedMapping(
+        IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
+        MemberMappingInfo memberMappingInfo
+    )
+    {
+        if (memberMappingInfo.Configuration?.Use is null)
+            return false;
+
+        // check if named mapping defined as existing target mapping.
+        // it could be defined as new instance mapping.
+        var mapping = ctx.BuilderContext.FindExistingTargetNamedMapping(memberMappingInfo.Configuration.Use);
+        return mapping != null;
     }
 }
