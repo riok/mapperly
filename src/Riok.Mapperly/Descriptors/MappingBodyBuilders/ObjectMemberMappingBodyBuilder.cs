@@ -259,9 +259,7 @@ public static class ObjectMemberMappingBodyBuilder
 
         // check if named mapping defined as existing target mapping.
         // it could be defined as new instance mapping.
-        var namedExistingTargetMapping = ctx.BuilderContext.FindExistingTargetNamedMapping(memberMappingInfo.Configuration.Use);
-        if (namedExistingTargetMapping is null)
-            return false;
-        return true;
+        var mapping = ctx.BuilderContext.FindExistingTargetNamedMapping(memberMappingInfo.Configuration.Use);
+        return mapping != null;
     }
 }
