@@ -35,7 +35,7 @@ public class UnsafeFieldAccessor(IFieldSymbol symbol, string methodName) : IUnsa
         var returnType = RefType(IdentifierName(symbol.Type.FullyQualifiedIdentifierName()).AddTrailingSpace())
             .WithRefKeyword(Token(TriviaList(), SyntaxKind.RefKeyword, TriviaList(Space)));
 
-        return PublicStaticExternMethod(ctx, returnType, methodName, parameters, [attribute]);
+        return ctx.SyntaxFactory.PublicStaticExternMethod(returnType, methodName, parameters, [attribute]);
     }
 
     public ExpressionSyntax BuildAccess(ExpressionSyntax? baseAccess, bool nullConditional = false)
