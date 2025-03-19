@@ -36,8 +36,7 @@ public class UnsafeSetPropertyAccessor(IPropertySymbol symbol, string methodName
         var parameters = ParameterList(CommaSeparatedList(target, targetValue));
         var attribute = ctx.SyntaxFactory.UnsafeAccessorAttribute(UnsafeAccessorType.Method, $"set_{symbol.Name}");
 
-        return PublicStaticExternMethod(
-            ctx,
+        return ctx.SyntaxFactory.PublicStaticExternMethod(
             PredefinedType(Token(SyntaxKind.VoidKeyword)).AddTrailingSpace(),
             methodName,
             parameters,

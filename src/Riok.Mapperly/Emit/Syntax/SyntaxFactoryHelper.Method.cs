@@ -7,15 +7,14 @@ namespace Riok.Mapperly.Emit.Syntax;
 
 public partial struct SyntaxFactoryHelper
 {
-    public static MethodDeclarationSyntax PublicStaticExternMethod(
-        SourceEmitterContext ctx,
+    public MethodDeclarationSyntax PublicStaticExternMethod(
         TypeSyntax returnType,
         string methodName,
         ParameterListSyntax parameterList,
         SyntaxList<AttributeListSyntax> attributes
     )
     {
-        attributes = attributes.Insert(0, ctx.SyntaxFactory.GeneratedCodeAttribute());
+        attributes = attributes.Insert(0, GeneratedCodeAttribute());
         return MethodDeclaration(returnType, Identifier(methodName))
             .WithModifiers(
                 TokenList(
