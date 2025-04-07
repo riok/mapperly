@@ -40,6 +40,35 @@ public class EnumerableExistingTargetTest
     }
 
     [Fact]
+    public void EnumerableToExistingNullableValueTypeCustomCollection()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial void Map(A src, B target);",
+            "record A(C? Values);",
+            "class B { public List<int>? Values { get; } }",
+            "struct C : IEnumerable<int> { public void Add(int value) {} }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                if (src.Values != null && target.Values != null)
+                {
+                    if (global::System.Linq.Enumerable.TryGetNonEnumeratedCount(src.Values.Value, out var sourceCount))
+                    {
+                        target.Values.EnsureCapacity(sourceCount + target.Values.Count);
+                    }
+                    foreach (var item in src.Values.Value)
+                    {
+                        target.Values.Add(item);
+                    }
+                }
+                """
+            );
+    }
+
+    [Fact]
     public Task MapToExistingCollectionShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
