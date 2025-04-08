@@ -153,6 +153,13 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
         if (semanticModel.GetSymbolInfo(node).Symbol is not IMethodSymbol methodSymbol)
             return base.VisitInvocationExpression(node);
 
+        node = methodSymbol switch
+        {
+            { IsExtensionMethod: true } => VisitExtensionMethodInvocation(node, methodSymbol),
+            { IsStatic: true } => VisitStaticMethodInvocation(node, methodSymbol),
+            _ => (InvocationExpressionSyntax)base.VisitInvocationExpression(node)!,
+        };
+
         if (node.ArgumentList.Arguments.Count == 1 && mappingResolver.Invoke(methodSymbol) is { } mapping)
         {
             var annotation = new SyntaxAnnotation(SyntaxAnnotationKindMapperInvocation);
@@ -160,12 +167,7 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
             node = node.WithAdditionalAnnotations(annotation);
         }
 
-        return methodSymbol switch
-        {
-            { IsExtensionMethod: true } => VisitExtensionMethodInvocation(node, methodSymbol),
-            { IsStatic: true } => VisitStaticMethodInvocation(node, methodSymbol),
-            _ => base.VisitInvocationExpression(node),
-        };
+        return node;
     }
 
     public override SyntaxNode? VisitConditionalAccessExpression(ConditionalAccessExpressionSyntax node)
