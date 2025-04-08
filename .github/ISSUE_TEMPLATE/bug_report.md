@@ -16,6 +16,9 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is.
 
+**Repro**
+A link to a repro Gist or GitHub repository.
+
 **Declaration code**
 ```csharp
 // Relevant code of the Mapperly definition and all relevant classes
