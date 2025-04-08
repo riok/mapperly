@@ -216,4 +216,24 @@ public class QueryableProjectionUserImplementedTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task UserImplementedFlatteningWithCallToAnotherMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial IQueryable<D> Map(IQueryable<A> source);
+
+            private static E Map(B source) => Map(source.Child);
+            private static partial E Map(C source);
+            """,
+            "public record A(B Value);",
+            "public record B(C Child);",
+            "public record C(string Name);",
+            "public record D(E Value);",
+            "public record E(string Name);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }
