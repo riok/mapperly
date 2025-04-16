@@ -10,7 +10,7 @@ As a contributor, here are the guidelines we would like you to follow.
 
 ## Code of Conduct
 
-Help us keep OpenThread open and inclusive. Please read and follow our [code of conduct](https://github.com/riok/mapperly/blob/main/CODE_OF_CONDUCT.md).
+Help us keep Mapperly open and inclusive. Please read and follow our [code of conduct](https://github.com/riok/mapperly/blob/main/CODE_OF_CONDUCT.md).
 
 ## Got a question or problem?
 
