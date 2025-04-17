@@ -10,7 +10,7 @@ As a contributor, here are the guidelines we would like you to follow.
 
 ## Code of Conduct
 
-Help us keep OpenThread open and inclusive. Please read and follow our [code of conduct](https://github.com/riok/mapperly/blob/main/CODE_OF_CONDUCT.md).
+Help us keep Mapperly open and inclusive. Please read and follow our [code of conduct](https://github.com/riok/mapperly/blob/main/CODE_OF_CONDUCT.md).
 
 ## Got a question or problem?
 
@@ -57,7 +57,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
 
 4. [Fork](https://docs.github.com/en/github/getting-started-with-github/fork-a-repo) the riok/mapperly repository.
 
-5. In your forked repository, make your changes in a new git branch:
+5. In your forked repository, make your changes in a new Git branch:
 
    ```shell
    git checkout -b my-fix-branch main
