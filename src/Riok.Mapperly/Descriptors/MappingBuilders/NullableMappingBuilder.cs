@@ -37,7 +37,7 @@ public static class NullableMappingBuilder
 
         mappingKey = new TypeMappingKey(sourceNonNullable ?? ctx.Source, targetNonNullable ?? ctx.Target);
 
-        if (sourceIsNullable && !targetIsNullable)
+        if (ctx.MappingKey.Configuration.SuppressNullMismatchDiagnostic == false && sourceIsNullable && !targetIsNullable)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType, ctx.Source, ctx.Target);
         }
