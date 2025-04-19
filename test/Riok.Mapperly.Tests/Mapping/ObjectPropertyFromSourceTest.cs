@@ -212,4 +212,90 @@ public class ObjectPropertyFromSourceTest
                 """
             );
     }
+
+    [Fact]
+    public void NullableTypeWithNoSuppressNullMismatchDiagnosticShouldGiveWarningRMG090()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(\"IdA\", \"IdB\")] private partial B Map(A? source);",
+            new TestSourceBuilderOptions { ThrowOnMappingNullMismatch = false },
+            "class A { public int? IdA { get; set; } }",
+            "class B { public int? IdB { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type A? to target of type B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return new global::B();
+                var target = new global::B();
+                target.IdB = source.IdA;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableTypeWithSuppressNullMismatchDiagnosticFalseShouldGiveWarningRMG090()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(\"IdA\", \"IdB\", SuppressNullMismatchDiagnostic = false)] private partial B Map(A? source);",
+            new TestSourceBuilderOptions { ThrowOnMappingNullMismatch = false },
+            "class A { public int? IdA { get; set; } }",
+            "class B { public int? IdB { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type A? to target of type B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return new global::B();
+                var target = new global::B();
+                target.IdB = source.IdA;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableTypeWithSuppressNullMismatchDiagnosticTrueShouldIgnoreWarningRMG090()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(\"IdA\", \"IdB\", SuppressNullMismatchDiagnostic = true)] private partial B Map(A? source);",
+            new TestSourceBuilderOptions { ThrowOnMappingNullMismatch = false },
+            "class A { public int? IdA { get; set; } }",
+            "class B { public int? IdB { get; set; } }"
+        );
+
+        var mapperGenerationResult = TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics);
+
+        mapperGenerationResult.Diagnostics.Should().BeEmpty();
+        mapperGenerationResult
+            .Should()
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.IdA != null)
+                {
+                    target.IdB = source.IdA.Value;
+                }
+                return target;
+                """
+            );
+    }
 }
