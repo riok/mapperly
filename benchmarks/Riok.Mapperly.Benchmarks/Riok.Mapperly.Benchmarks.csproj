@@ -19,7 +19,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Build.Locator" Version="1.9.1" />
     <PackageReference Include="NuGet.Frameworks" Version="6.13.2" />
-    <PackageReference Include="System.Formats.Asn1" Version="9.0.3" />
+    <PackageReference Include="System.Formats.Asn1" Version="9.0.4" />
   </ItemGroup>
 
   <ItemGroup>
