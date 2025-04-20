@@ -30,6 +30,70 @@ public class ObjectPropertyValueMethodTest
     }
 
     [Fact]
+    public Task BaseClassProtectedMethodToProperty()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using Riok.Mapperly.Abstractions;
+
+            public abstract class BaseMapper
+            {
+                protected Guid CreateGuid() => Guid.NewGuid();
+            }
+
+            [Mapper]
+            public partial class Mapper : BaseMapper
+            {
+                [MapValue(nameof(B.Id), Use = nameof(CreateGuid))]
+                public partial B Map(A source);
+            }
+
+            public record A(int Value);
+            public record B(Guid Id, int Value);
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void BaseClassPrivateMethodToPropertyShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using Riok.Mapperly.Abstractions;
+
+            public abstract class BaseMapper
+            {
+                private Guid CreateGuid() => Guid.NewGuid();
+            }
+
+            [Mapper]
+            public partial class Mapper : BaseMapper
+            {
+                [MapValue(nameof(B.Id), Use = nameof(CreateGuid))]
+                public partial B Map(A source);
+            }
+
+            public record A(int Value);
+            public record B(Guid Id, int Value);
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.MapValueReferencedMethodNotFound,
+                "The referenced method CreateGuid could not be found or has an unsupported signature"
+            )
+            .HaveDiagnostic(DiagnosticDescriptors.NoConstructorFound, "B has no accessible constructor with mappable arguments")
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
     public void MethodToNestedProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

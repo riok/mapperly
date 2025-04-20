@@ -1,15 +1,7 @@
 import Link from '@docusaurus/Link';
 import React from 'react';
-
-interface AnalyzerRule {
-  id: string;
-  hasDocumentation: boolean;
-  category: string;
-  severity: string;
-  notes: string;
-}
-
-const rules: AnalyzerRule[] = require('../data/generated/analyzer-rules.json');
+import { JSX } from 'react';
+import rules from '../data/generated/analyzer-rules.json';
 
 export default function AnalyzerRules(): JSX.Element {
   return (

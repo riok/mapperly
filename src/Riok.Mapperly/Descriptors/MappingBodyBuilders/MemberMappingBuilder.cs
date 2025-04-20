@@ -101,6 +101,17 @@ internal static class MemberMappingBuilder
             );
         }
 
+        if (memberSourceNullable && !memberTargetNullable && delegateSourceNullable && !delegateTargetNullable)
+        {
+            sourceValue = new MappedMemberSourceValue(
+                delegateMapping,
+                sourceMember.MemberPath.BuildGetter(ctx.BuilderContext),
+                true,
+                false
+            );
+            return true;
+        }
+
         if (codeStyle == CodeStyle.Statement)
         {
             sourceValue = BuildBlockNullHandlingMapping(ctx, delegateMapping, sourceMember.MemberPath, targetMember);

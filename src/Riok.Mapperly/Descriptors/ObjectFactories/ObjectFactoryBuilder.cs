@@ -9,9 +9,8 @@ public static class ObjectFactoryBuilder
 {
     public static ObjectFactoryCollection ExtractObjectFactories(SimpleMappingBuilderContext ctx, ITypeSymbol mapperSymbol, bool isStatic)
     {
-        var objectFactories = mapperSymbol
-            .GetMembers()
-            .OfType<IMethodSymbol>()
+        var objectFactories = ctx
+            .SymbolAccessor.GetAllDirectlyAccessibleMethods(mapperSymbol)
             .Where(m => ctx.SymbolAccessor.HasAttribute<ObjectFactoryAttribute>(m))
             .Select(x => BuildObjectFactory(ctx, x, isStatic))
             .WhereNotNull()

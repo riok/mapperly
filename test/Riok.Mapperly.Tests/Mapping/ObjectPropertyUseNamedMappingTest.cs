@@ -623,4 +623,64 @@ public class ObjectPropertyUseNamedMappingTest
         );
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task BaseClassProtectedMethodToProperty()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using Riok.Mapperly.Abstractions;
+
+            public abstract class BaseMapper
+            {
+                protected int MapValue(int v) => v + 10;
+            }
+
+            [Mapper]
+            public partial class Mapper : BaseMapper
+            {
+                [MapProperty("Value", "Value", Use = nameof(MapValue))]
+                public partial B Map(A source);
+            }
+
+            public record A(int Value);
+            public record B(int Value);
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void BaseClassPrivateMethodToPropertyShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using Riok.Mapperly.Abstractions;
+
+            public abstract class BaseMapper
+            {
+                private int MapValue(int v) => v + 10;
+            }
+
+            [Mapper]
+            public partial class Mapper : BaseMapper
+            {
+                [MapProperty("Value", "Value", Use = nameof(MapValue))]
+                public partial B Map(A source);
+            }
+
+            public record A(int Value);
+            public record B(int Value);
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, "The referenced mapping named MapValue was not found")
+            .HaveAssertedAllDiagnostics();
+    }
 }
