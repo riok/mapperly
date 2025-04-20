@@ -22,5 +22,5 @@ public record MemberMappingConfiguration(IMemberPathConfiguration Source, IMembe
 
     public bool IsValid => Use == null || FormatProvider == null && StringFormat == null;
 
-    public TypeMappingConfiguration ToTypeMappingConfiguration() => new(StringFormat, FormatProvider, Use);
+    public TypeMappingConfiguration ToTypeMappingConfiguration() => new(StringFormat, FormatProvider, Use, SuppressNullMismatchDiagnostic);
 }
