@@ -1,5 +1,6 @@
 import Link from '@docusaurus/Link';
 import React from 'react';
+import { JSX } from 'react';
 import rules from '../data/generated/analyzer-rules.json';
 
 export default function AnalyzerRules(): JSX.Element {

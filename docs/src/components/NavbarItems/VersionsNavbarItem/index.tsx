@@ -1,4 +1,5 @@
 import React from 'react';
+import { JSX } from 'react';
 import DropdownNavbarItem from '@theme/NavbarItem/DropdownNavbarItem';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './styles.module.css';
