@@ -62,13 +62,14 @@ jobs:
           node-version-file: './docs/.node-version'
       - run: npm ci
         working-directory: ./docs
-      - run: npm run lint
-        working-directory: ./docs
       - run: npm run build
         working-directory: ./docs
         env:
           MAPPERLY_VERSION: ${{ inputs.version }}
           ENVIRONMENT: ${{ inputs.environment }}
+      # run lint after build, as generated files may be imported which cannot be found otherwise
+      - run: npm run lint
+        working-directory: ./docs
       - uses: actions/upload-artifact@v4
         with:
           name: mapperly-docs
