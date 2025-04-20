@@ -22,6 +22,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             nameof(TestObjectDtoProjection.ManuallyMappedModified),
             Use = nameof(ModifyInt)
         )]
+        [MapProperty(
+            nameof(TestObjectProjection.ManuallyMappedNullableToNonNullable),
+            nameof(TestObjectDtoProjection.ManuallyMappedNullableToNonNullable),
+            Use = nameof(MapNullableToNonNullableInt)
+        )]
         [MapperIgnoreObsoleteMembers]
         private static partial TestObjectDtoProjection ProjectToDto(this TestObjectProjection testObject);
 
@@ -47,5 +52,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         private static partial LongValueDto MapLongValue(LongValue value);
 
         private static int ModifyInt(int v) => v + 10;
+
+        private static int MapNullableToNonNullableInt(int? v) => v ?? -1;
     }
 }

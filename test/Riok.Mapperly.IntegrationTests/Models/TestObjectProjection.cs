@@ -67,6 +67,8 @@ namespace Riok.Mapperly.IntegrationTests.Models
 
         public int ManuallyMappedModified { get; set; }
 
+        public int? ManuallyMappedNullableToNonNullable { get; set; }
+
         public List<TestObjectProjectionEnumValue> ManuallyMappedList { get; set; } = new();
 
         public ICollection<IntegerValue> IntegerValues { get; set; } = new List<IntegerValue>();

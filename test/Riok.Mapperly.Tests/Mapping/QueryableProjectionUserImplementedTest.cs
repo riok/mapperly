@@ -236,4 +236,20 @@ public class QueryableProjectionUserImplementedTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task UserImplementedNullableValueTypeToNonNullable()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial IQueryable<B> Map(this IQueryable<A> query);
+
+            private static int MapValue(int? value) => value ?? 0;
+            """,
+            "public record A(int? Value);",
+            "public record B(int Value);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }
