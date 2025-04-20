@@ -170,13 +170,8 @@ internal static class SourceValueBuilder
     {
         var methodName = memberMappingInfo.ValueConfiguration!.Use!;
         var namedMethodCandidates = ctx
-            .BuilderContext.SymbolAccessor.GetAllMembers(ctx.BuilderContext.MapperDeclaration.Symbol)
-            .OfType<IMethodSymbol>()
-            .Where(m =>
-                string.Equals(m.Name, methodName, StringComparison.Ordinal)
-                && m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
-                && ctx.BuilderContext.SymbolAccessor.IsDirectlyAccessible(m)
-            )
+            .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(ctx.BuilderContext.MapperDeclaration.Symbol, methodName)
+            .Where(m => m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 })
             .ToList();
 
         if (namedMethodCandidates.Count == 0)

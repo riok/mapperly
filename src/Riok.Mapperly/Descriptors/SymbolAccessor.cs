@@ -256,6 +256,13 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     internal HashSet<IFieldSymbol> GetFieldsExcept(ITypeSymbol symbol, ISet<IFieldSymbol> ignoredMembers) =>
         GetAllFields(symbol).Where(x => !ignoredMembers.Remove(x)).ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
 
+    internal IEnumerable<IMethodSymbol> GetAllDirectlyAccessibleMethods(ITypeSymbol symbol, string name)
+    {
+        return GetAllMembers(symbol)
+            .OfType<IMethodSymbol>()
+            .Where(m => string.Equals(m.Name, name, StringComparison.Ordinal) && IsDirectlyAccessible(m));
+    }
+
     internal IReadOnlyCollection<ISymbol> GetAllMembers(ITypeSymbol symbol)
     {
         if (_allMembers.TryGetValue(symbol, out var members))
