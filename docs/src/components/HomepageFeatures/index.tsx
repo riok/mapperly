@@ -2,6 +2,9 @@ import React from 'react';
 import clsx from 'clsx';
 import styles from './styles.module.css';
 import Heading from '@theme/Heading';
+import EasyToUseIcon from '@site/static/img/easy-to-use.svg';
+import FastReadableIcon from '@site/static/img/fast-reliable.svg';
+import PoweredByIcon from '@site/static/img/powered-by.svg';
 
 type FeatureItem = {
   title: string;
@@ -12,7 +15,7 @@ type FeatureItem = {
 const FeatureList: FeatureItem[] = [
   {
     title: 'Easy to Use Object-Object Mapper',
-    Svg: require('@site/static/img/easy-to-use.svg').default,
+    Svg: EasyToUseIcon,
     description: (
       <>
         Mapperly is a .NET Source Generator that simplifies the implementation
@@ -23,7 +26,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Fast & Readable',
-    Svg: require('@site/static/img/fast-reliable.svg').default,
+    Svg: FastReadableIcon,
     description: (
       <>
         Because Mapperly creates the mapping code at build time, there is
@@ -35,7 +38,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Powered by source generators',
-    Svg: require('@site/static/img/powered-by.svg').default,
+    Svg: PoweredByIcon,
     description: (
       <>
         Mapperly works by using .NET Source Generators. Since no reflection is
