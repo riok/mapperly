@@ -29,6 +29,34 @@ public class ObjectFactoryTest
     }
 
     [Fact]
+    public Task ShouldUseSimpleObjectFactoryOfBaseClass()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using Riok.Mapperly.Abstractions;
+
+            public abstract class BaseMapper
+            {
+                [ObjectFactory]
+                protected B CreateB() => new B();
+            }
+
+            [Mapper]
+            public partial class Mapper : BaseMapper
+            {
+                public partial B Map(A source);
+            }
+
+            public record A(int Value);
+            public record B { public int Value { get; set; } };
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public void ShouldUseSimpleObjectFactoryForMultipleMaps()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
