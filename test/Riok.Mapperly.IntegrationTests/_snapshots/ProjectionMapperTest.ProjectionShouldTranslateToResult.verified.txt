@@ -68,7 +68,8 @@
       MagicIntValue: 100,
       StringValue: fooBar
     },
-    ManuallyMappedModified: 10
+    ManuallyMappedModified: 10,
+    ManuallyMappedNullableToNonNullable: -1
   },
   {
     CtorValue: 2,
@@ -96,6 +97,7 @@
       StringValue: fooBar5
     },
     ManuallyMappedModified: 11,
+    ManuallyMappedNullableToNonNullable: -1,
     ManuallyMappedList: [
       Value10,
       Value20

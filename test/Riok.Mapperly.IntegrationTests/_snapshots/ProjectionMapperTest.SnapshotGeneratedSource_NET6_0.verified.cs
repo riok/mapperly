@@ -53,6 +53,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                     DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(x.DateTimeValueTargetTimeOnly),
                     ManuallyMapped = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoManuallyMappedProjection(100) { StringValue = x.ManuallyMapped },
                     ManuallyMappedModified = x.ManuallyMappedModified + 10,
+                    ManuallyMappedNullableToNonNullable = x.ManuallyMappedNullableToNonNullable ?? -1,
                     ManuallyMappedList = global::System.Linq.Enumerable.ToList(
                         global::System.Linq.Enumerable.Select(x.ManuallyMappedList, x1 => x1.Value)
                     ),
@@ -143,6 +144,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(testObject.DateTimeValueTargetTimeOnly);
             target.ManuallyMapped = MapManual(testObject.ManuallyMapped);
             target.ManuallyMappedModified = ModifyInt(testObject.ManuallyMappedModified);
+            target.ManuallyMappedNullableToNonNullable = MapNullableToNonNullableInt(testObject.ManuallyMappedNullableToNonNullable);
             target.ManuallyMappedList = MapToListOfTestEnum(testObject.ManuallyMappedList);
             target.IntegerValues = OrderIntegerValues(testObject.IntegerValues);
             target.DecimalValues = OrderAndMapLongValues(testObject.DecimalValues);
