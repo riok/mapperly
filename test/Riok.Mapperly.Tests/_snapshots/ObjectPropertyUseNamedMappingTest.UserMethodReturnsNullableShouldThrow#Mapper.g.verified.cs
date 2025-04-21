@@ -8,8 +8,8 @@ public partial class Mapper
     {
         var target = new global::B();
         target.Value = ToC(
-            source.Name ?? throw new System.ArgumentNullException(nameof(source.Name))
-        ) ?? throw new System.NullReferenceException("ToC returned null");
+            source.Name ?? throw new global::System.ArgumentNullException(nameof(source.Name))
+        ) ?? throw new global::System.NullReferenceException("ToC returned null");
         return target;
     }
 }

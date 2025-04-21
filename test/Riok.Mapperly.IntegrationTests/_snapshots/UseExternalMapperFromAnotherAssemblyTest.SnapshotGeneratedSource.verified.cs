@@ -8,7 +8,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Mapper.UseExternalMapperFromAnotherAssembly.Target> ProjectToTarget(global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Mapper.UseExternalMapperFromAnotherAssembly.Source> source)
         {
 #nullable disable
-            return System.Linq.Queryable.Select(source, x => new global::Riok.Mapperly.IntegrationTests.Mapper.UseExternalMapperFromAnotherAssembly.Target()
+            return global::System.Linq.Queryable.Select(source, x => new global::Riok.Mapperly.IntegrationTests.Mapper.UseExternalMapperFromAnotherAssembly.Target()
             {
                 DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
             });

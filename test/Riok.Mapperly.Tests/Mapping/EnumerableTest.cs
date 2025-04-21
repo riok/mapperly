@@ -24,7 +24,7 @@ public class EnumerableTest
                 "Mapping the nullable source of type int[]? to target of type int[] which is not nullable"
             )
             .HaveAssertedAllDiagnostics()
-            .HaveSingleMethodBody("return source ?? throw new System.ArgumentNullException(nameof(source));");
+            .HaveSingleMethodBody("return source ?? throw new global::System.ArgumentNullException(nameof(source));");
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class EnumerableTest
                 var target = new int[source.Length];
                 for (var i = 0; i < source.Length; i++)
                 {
-                    target[i] = source[i] ?? throw new System.NullReferenceException($"Sequence {nameof(source)}, contained a null value at index {i}.");
+                    target[i] = source[i] ?? throw new global::System.NullReferenceException($"Sequence {nameof(source)}, contained a null value at index {i}.");
                 }
                 return target;
                 """
@@ -94,7 +94,7 @@ public class EnumerableTest
                 var target = new global::B[source.Length];
                 for (var i = 0; i < source.Length; i++)
                 {
-                    target[i] = source[i] ?? throw new System.NullReferenceException($"Sequence {nameof(source)}, contained a null value at index {i}.");
+                    target[i] = source[i] ?? throw new global::System.NullReferenceException($"Sequence {nameof(source)}, contained a null value at index {i}.");
                 }
                 return target;
                 """

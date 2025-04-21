@@ -122,7 +122,7 @@ public class ObjectPropertyNullableTest
                 }
                 else
                 {
-                    throw new System.ArgumentNullException(nameof(source.Value));
+                    throw new global::System.ArgumentNullException(nameof(source.Value));
                 }
                 return target;
                 """
@@ -269,7 +269,7 @@ public class ObjectPropertyNullableTest
                 }
                 else
                 {
-                    throw new System.ArgumentNullException(nameof(source.Value));
+                    throw new global::System.ArgumentNullException(nameof(source.Value));
                 }
                 return target;
                 """
@@ -414,7 +414,7 @@ public class ObjectPropertyNullableTest
                 }
                 else
                 {
-                    throw new System.ArgumentNullException(nameof(source.Value));
+                    throw new global::System.ArgumentNullException(nameof(source.Value));
                 }
                 return target;
                 """
@@ -546,7 +546,7 @@ public class ObjectPropertyNullableTest
                 }
                 else
                 {
-                    throw new System.ArgumentNullException(nameof(source.Value));
+                    throw new global::System.ArgumentNullException(nameof(source.Value));
                 }
                 return target;
                 """
@@ -743,7 +743,7 @@ public class ObjectPropertyNullableTest
                 }
                 else
                 {
-                    throw new System.ArgumentNullException(nameof(source.Value));
+                    throw new global::System.ArgumentNullException(nameof(source.Value));
                 }
                 return target;
                 """

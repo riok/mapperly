@@ -25,7 +25,7 @@ public class EnumToEnumExplicitMapTest
                     global::E2.e => global::E1.E,
                     global::E2.E => global::E1.E,
                     global::E2.f => global::E1.f,
-                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
+                    _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
                 };
                 """
             )
@@ -60,7 +60,7 @@ public class EnumToEnumExplicitMapTest
                     global::E2.e => global::E1.E,
                     global::E2.E => global::E1.E,
                     global::E2.f => global::E1.f,
-                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
+                    _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
                 };
                 """
             )
@@ -93,7 +93,7 @@ public class EnumToEnumExplicitMapTest
                     global::E2.e => global::E1.E,
                     global::E2.E => global::E1.E,
                     global::E2.f => global::E1.f,
-                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
+                    _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
                 };
                 """
             )
@@ -126,7 +126,7 @@ public class EnumToEnumExplicitMapTest
                 return source switch
                 {
                     global::E2.A => global::E1.A,
-                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
+                    _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
                 };
                 """
             )
@@ -150,7 +150,7 @@ public class EnumToEnumExplicitMapTest
                 return source switch
                 {
                     global::E2.A => global::E1.A,
-                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
+                    _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
                 };
                 """
             )
@@ -174,7 +174,7 @@ public class EnumToEnumExplicitMapTest
                 return source switch
                 {
                     global::E2.A => global::E1.A,
-                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
+                    _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
                 };
                 """
             )
@@ -201,7 +201,7 @@ public class EnumToEnumExplicitMapTest
                 return source switch
                 {
                     global::E2.A => global::E1.A,
-                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
+                    _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E2 is not supported"),
                 };
                 """
             )

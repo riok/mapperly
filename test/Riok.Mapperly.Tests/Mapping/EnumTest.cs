@@ -96,7 +96,7 @@ public class EnumTest
             .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
-                """return (global::E2)source is global::E2.A or global::E2.B or global::E2.C ? (global::E2)source : throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported");"""
+                """return (global::E2)source is global::E2.A or global::E2.B or global::E2.C ? (global::E2)source : throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported");"""
             );
     }
 
@@ -113,7 +113,7 @@ public class EnumTest
             .GenerateMapper(source)
             .Should()
             .HaveSingleMethodBody(
-                """return (global::E2)source == ((global::E2)source & (global::E2.A | global::E2.B | global::E2.C)) ? (global::E2)source : throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported");"""
+                """return (global::E2)source == ((global::E2)source & (global::E2.A | global::E2.B | global::E2.C)) ? (global::E2)source : throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported");"""
             );
     }
 
@@ -144,7 +144,7 @@ public class EnumTest
                     global::E1.B => global::E2.B,
                     global::E1.C => global::E2.C,
                     global::E1.E => global::E2.E,
-                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
+                    _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
                 };
                 """
             );
@@ -175,7 +175,7 @@ public class EnumTest
                     global::E1.E => global::E2.E,
                     global::E1.f => global::E2.f,
                     global::E1.F => global::E2.f,
-                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
+                    _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
                 };
                 """
             );
@@ -217,7 +217,7 @@ public class EnumTest
                     global::E1.A => global::E2.A,
                     global::E1.B => global::E2.B,
                     global::E1.C => global::E2.C,
-                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
+                    _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
                 };
                 """
             );
@@ -237,7 +237,7 @@ public class EnumTest
             )
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
-                "return source == null ? throw new System.ArgumentNullException(nameof(source)) : (global::E2)source.Value;"
+                "return source == null ? throw new global::System.ArgumentNullException(nameof(source)) : (global::E2)source.Value;"
             );
     }
 

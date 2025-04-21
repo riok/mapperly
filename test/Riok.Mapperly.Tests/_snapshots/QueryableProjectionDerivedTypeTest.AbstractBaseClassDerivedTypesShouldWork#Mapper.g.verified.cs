@@ -7,7 +7,7 @@ public partial class Mapper
     private partial global::System.Linq.IQueryable<global::B> Map(global::System.Linq.IQueryable<global::A> source)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(
+        return global::System.Linq.Queryable.Select(
             source,
             x => (global::B)(x is global::ASubType1 ? new global::BSubType1()
             {
@@ -31,7 +31,7 @@ public partial class Mapper
         {
             global::ASubType1 x => MapToBSubType1(x),
             global::ASubType2 x => MapToBSubType2(x),
-            _ => throw new System.ArgumentException($"Cannot map {src.GetType()} to B as there is no known derived type mapping", nameof(src)),
+            _ => throw new global::System.ArgumentException($"Cannot map {src.GetType()} to B as there is no known derived type mapping", nameof(src)),
         };
     }
 

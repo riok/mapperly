@@ -357,7 +357,7 @@ public class ObjectPropertyConstructorResolverTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(
-                    source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested.Value))
+                    source.Nested?.Value ?? throw new global::System.ArgumentNullException(nameof(source.Nested.Value))
                 );
                 return target;
                 """
@@ -448,7 +448,7 @@ public class ObjectPropertyConstructorResolverTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(
-                    source.Value ?? throw new System.ArgumentNullException(nameof(source.Value))
+                    source.Value ?? throw new global::System.ArgumentNullException(nameof(source.Value))
                 );
                 return target;
                 """
@@ -471,7 +471,7 @@ public class ObjectPropertyConstructorResolverTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(
-                    source.Value != null ? (double)source.Value.Value : throw new System.ArgumentNullException(nameof(source.Value.Value))
+                    source.Value != null ? (double)source.Value.Value : throw new global::System.ArgumentNullException(nameof(source.Value.Value))
                 );
                 return target;
                 """
@@ -494,7 +494,7 @@ public class ObjectPropertyConstructorResolverTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B(
-                    source.Nested != null ? (double)source.Nested.Value : throw new System.ArgumentNullException(nameof(source.Nested.Value))
+                    source.Nested != null ? (double)source.Nested.Value : throw new global::System.ArgumentNullException(nameof(source.Nested.Value))
                 );
                 return target;
                 """

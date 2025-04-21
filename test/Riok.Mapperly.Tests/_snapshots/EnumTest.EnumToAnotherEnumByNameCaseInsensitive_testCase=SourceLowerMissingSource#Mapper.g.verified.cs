@@ -17,7 +17,7 @@ public partial class Mapper
         return source switch
         {
             global::C.value2 => global::D.Value2,
-            _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum C is not supported"),
+            _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum C is not supported"),
         };
     }
 }

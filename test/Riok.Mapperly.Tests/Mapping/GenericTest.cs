@@ -120,8 +120,8 @@ public class GenericTest
                 {
                     global::A x => MapToB(x),
                     global::C x => MapToD(x),
-                    null => throw new System.ArgumentNullException(nameof(source)),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
+                    null => throw new global::System.ArgumentNullException(nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )
@@ -156,7 +156,7 @@ public class GenericTest
                 {
                     global::E x => MapToF(x),
                     global::A x => MapToB(x),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )
@@ -188,7 +188,7 @@ public class GenericTest
                 {
                     global::A x => MapToB(x),
                     global::C x => MapToD(x),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )
@@ -219,7 +219,7 @@ public class GenericTest
                 return source switch
                 {
                     global::A x => MapToB(x),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )
@@ -250,7 +250,7 @@ public class GenericTest
                 return source switch
                 {
                     global::A x => MapToB(x),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )
@@ -281,7 +281,7 @@ public class GenericTest
                 return source switch
                 {
                     global::C x => MapToD(x),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )
@@ -313,7 +313,7 @@ public class GenericTest
                 {
                     global::C x => MapToD(x),
                     null => default,
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )
@@ -344,8 +344,8 @@ public class GenericTest
                 return source switch
                 {
                     global::C x => MapToD(x),
-                    null => throw new System.ArgumentNullException(nameof(source)),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
+                    null => throw new global::System.ArgumentNullException(nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(object)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )
@@ -378,7 +378,7 @@ public class GenericTest
                 {
                     global::C x when typeof(TTarget).IsAssignableFrom(typeof(global::D)) => (TTarget)(object)MapToD(x),
                     null => default,
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )
@@ -413,8 +413,8 @@ public class GenericTest
                 {
                     global::A x => MapToC(x),
                     global::B x => MapToD(x),
-                    null => throw new System.ArgumentNullException(nameof(source)),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(global::BaseDto)} as there is no known type mapping", nameof(source)),
+                    null => throw new global::System.ArgumentNullException(nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(global::BaseDto)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )
@@ -445,7 +445,7 @@ public class GenericTest
                 {
                     global::A x when typeof(TTarget).IsAssignableFrom(typeof(global::B)) => (TTarget)(object)MapToB(x),
                     global::C x when typeof(TTarget).IsAssignableFrom(typeof(global::D)) => (TTarget)(object)MapToD(x),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )
@@ -544,7 +544,7 @@ public class GenericTest
                 return source switch
                 {
                     global::C x when typeof(TTarget).IsAssignableFrom(typeof(global::D)) => (TTarget)(object)MapToD(x),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )
@@ -579,7 +579,7 @@ public class GenericTest
                 {
                     global::A x when typeof(TTarget).IsAssignableFrom(typeof(global::C)) => (TTarget)(object)MapToC(x),
                     global::B x when typeof(TTarget).IsAssignableFrom(typeof(global::D)) => (TTarget)(object)MapToD(x),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )
@@ -611,7 +611,7 @@ public class GenericTest
                 return source switch
                 {
                     global::C x when typeof(TTarget).IsAssignableFrom(typeof(global::D)) => (TTarget)(object)MapToD(x),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )
@@ -644,8 +644,8 @@ public class GenericTest
                 {
                     global::A x when typeof(TTarget).IsAssignableFrom(typeof(global::B)) => (TTarget)(object)MapToB(x),
                     global::B x when typeof(TTarget).IsAssignableFrom(typeof(global::D)) => (TTarget)(object)MapToD(x),
-                    null => throw new System.ArgumentNullException(nameof(source)),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
+                    null => throw new global::System.ArgumentNullException(nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
             )

@@ -9,7 +9,7 @@ public partial class Mapper
         return src switch
         {
             global::A x => MapToB(x),
-            _ => throw new System.ArgumentException($"Cannot map {src.GetType()} to BBase as there is no known derived type mapping", nameof(src)),
+            _ => throw new global::System.ArgumentException($"Cannot map {src.GetType()} to BBase as there is no known derived type mapping", nameof(src)),
         };
     }
 
