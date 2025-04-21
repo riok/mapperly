@@ -4,16 +4,17 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private partial global::A Map(string source)
+    private partial global::A<global::System.Guid> Map(string source)
     {
-        return AAccessor.Create(source);
+        return AAccessor<global::System.Guid>.Create(source);
     }
 }
 
 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-static file class AAccessor
+static file class AAccessor<T>
+    where T : struct
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Constructor)]
-    public static extern global::A Create(string x);
+    public static extern global::A<T> Create(string x);
 }

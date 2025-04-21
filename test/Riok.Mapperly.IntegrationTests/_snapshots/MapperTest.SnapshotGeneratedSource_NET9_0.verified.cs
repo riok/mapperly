@@ -251,6 +251,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.FormattedIntValue = testObject.IntValue.ToString("C", _formatDeCh);
             target.FormattedDateValue = testObject.DateTimeValue.ToString("D", _formatEnUs);
             target.SetPrivateValue(DirectInt(testObject.GetPrivateValue()));
+            target.SetGenericPrivateValue(MapToTestGenericObjectDtoOfInt32AndTestGenericValueDto(testObject.GetGenericPrivateValue()));
             target.Sum = ComputeSum(testObject);
             return target;
         }
@@ -400,6 +401,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.WithFromShortParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.FromInt16(dto.WithFromShortParamsMethod);
             target.WithToDecimalMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.CreateFromDecimal(dto.WithToDecimalMethod);
             target.SetPrivateValue(DirectInt(dto.GetPrivateValue()));
+            target.SetGenericPrivateValue(MapToTestGenericObjectOfInt32AndTestGenericValue(dto.GetGenericPrivateValue()));
             return target;
         }
 
@@ -573,6 +575,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.WithToDecimalMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToDecimal(source.WithToDecimalMethod);
             }
             target.SetPrivateValue(DirectInt(source.GetPrivateValue()));
+            target.SetGenericPrivateValue(MapToTestGenericObjectDtoOfInt32AndTestGenericValueDto(source.GetGenericPrivateValue()));
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
@@ -692,6 +695,19 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private global::Riok.Mapperly.IntegrationTests.Dto.TestGenericObjectDto<int, global::Riok.Mapperly.IntegrationTests.Dto.TestGenericValueDto> MapToTestGenericObjectDtoOfInt32AndTestGenericValueDto(global::Riok.Mapperly.IntegrationTests.Models.TestGenericObject<int, global::Riok.Mapperly.IntegrationTests.Models.TestGenericValue> source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestGenericObjectDto<int, global::Riok.Mapperly.IntegrationTests.Dto.TestGenericValueDto>();
+            TestGenericObjectDtoAccessor<int, global::Riok.Mapperly.IntegrationTests.Dto.TestGenericValueDto>.SetId(target, DirectInt(
+                TestGenericObjectAccessor<int, global::Riok.Mapperly.IntegrationTests.Models.TestGenericValue>.GetId(source)
+            ));
+            TestGenericObjectDtoAccessor<int, global::Riok.Mapperly.IntegrationTests.Dto.TestGenericValueDto>.SetValue(target, MapToTestGenericValueDto(
+                TestGenericObjectAccessor<int, global::Riok.Mapperly.IntegrationTests.Models.TestGenericValue>.GetValue(source)
+            ));
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         private global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested MapToTestObjectNested(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectNestedDto source)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Models.TestObjectNested();
@@ -760,6 +776,35 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.BaseIntValue = DirectInt(source.BaseIntValue);
             return target;
         }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private global::Riok.Mapperly.IntegrationTests.Models.TestGenericObject<int, global::Riok.Mapperly.IntegrationTests.Models.TestGenericValue> MapToTestGenericObjectOfInt32AndTestGenericValue(global::Riok.Mapperly.IntegrationTests.Dto.TestGenericObjectDto<int, global::Riok.Mapperly.IntegrationTests.Dto.TestGenericValueDto> source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Models.TestGenericObject<int, global::Riok.Mapperly.IntegrationTests.Models.TestGenericValue>();
+            TestGenericObjectAccessor<int, global::Riok.Mapperly.IntegrationTests.Models.TestGenericValue>.SetId(target, DirectInt(
+                TestGenericObjectDtoAccessor<int, global::Riok.Mapperly.IntegrationTests.Dto.TestGenericValueDto>.GetId(source)
+            ));
+            TestGenericObjectAccessor<int, global::Riok.Mapperly.IntegrationTests.Models.TestGenericValue>.SetValue(target, MapToTestGenericValue(
+                TestGenericObjectDtoAccessor<int, global::Riok.Mapperly.IntegrationTests.Dto.TestGenericValueDto>.GetValue(source)
+            ));
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private global::Riok.Mapperly.IntegrationTests.Dto.TestGenericValueDto MapToTestGenericValueDto(global::Riok.Mapperly.IntegrationTests.Models.TestGenericValue source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestGenericValueDto();
+            target.Value = source.Value;
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private global::Riok.Mapperly.IntegrationTests.Models.TestGenericValue MapToTestGenericValue(global::Riok.Mapperly.IntegrationTests.Dto.TestGenericValueDto source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Models.TestGenericValue();
+            target.Value = source.Value;
+            return target;
+        }
     }
 }
 
@@ -771,8 +816,16 @@ static file class TestObjectAccessor
     public static extern int GetPrivateValue(this global::Riok.Mapperly.IntegrationTests.Models.TestObject source);
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_GenericPrivateValue")]
+    public static extern global::Riok.Mapperly.IntegrationTests.Models.TestGenericObject<int, global::Riok.Mapperly.IntegrationTests.Models.TestGenericValue> GetGenericPrivateValue(this global::Riok.Mapperly.IntegrationTests.Models.TestObject source);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "set_PrivateValue")]
     public static extern void SetPrivateValue(this global::Riok.Mapperly.IntegrationTests.Models.TestObject target, int value);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "set_GenericPrivateValue")]
+    public static extern void SetGenericPrivateValue(this global::Riok.Mapperly.IntegrationTests.Models.TestObject target, global::Riok.Mapperly.IntegrationTests.Models.TestGenericObject<int, global::Riok.Mapperly.IntegrationTests.Models.TestGenericValue> value);
 }
 
 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
@@ -783,8 +836,16 @@ static file class TestObjectDtoAccessor
     public static extern void SetPrivateValue(this global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto target, int value);
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "set_GenericPrivateValue")]
+    public static extern void SetGenericPrivateValue(this global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto target, global::Riok.Mapperly.IntegrationTests.Dto.TestGenericObjectDto<int, global::Riok.Mapperly.IntegrationTests.Dto.TestGenericValueDto> value);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_PrivateValue")]
     public static extern int GetPrivateValue(this global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto source);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_GenericPrivateValue")]
+    public static extern global::Riok.Mapperly.IntegrationTests.Dto.TestGenericObjectDto<int, global::Riok.Mapperly.IntegrationTests.Dto.TestGenericValueDto> GetGenericPrivateValue(this global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto source);
 }
 
 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
@@ -809,4 +870,48 @@ static file class PrivateCtorDtoAccessor
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Field, Name = "stringValue")]
     public static extern ref string GetStringValue(this global::Riok.Mapperly.IntegrationTests.Dto.PrivateCtorDto target);
+}
+
+[global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+static file class TestGenericObjectAccessor<T,TValue>
+    where T : struct
+    where TValue : global::Riok.Mapperly.IntegrationTests.Models.ITestGenericValue<float>
+{
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_Id")]
+    public static extern T GetId(global::Riok.Mapperly.IntegrationTests.Models.TestGenericObject<T, TValue> source);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_Value")]
+    public static extern TValue GetValue(global::Riok.Mapperly.IntegrationTests.Models.TestGenericObject<T, TValue> source);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "set_Id")]
+    public static extern void SetId(global::Riok.Mapperly.IntegrationTests.Models.TestGenericObject<T, TValue> target, T value);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "set_Value")]
+    public static extern void SetValue(global::Riok.Mapperly.IntegrationTests.Models.TestGenericObject<T, TValue> target, TValue value);
+}
+
+[global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+static file class TestGenericObjectDtoAccessor<T,TValue>
+    where T : struct
+    where TValue : global::Riok.Mapperly.IntegrationTests.Dto.ITestGenericValueDto<float>
+{
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "set_Id")]
+    public static extern void SetId(global::Riok.Mapperly.IntegrationTests.Dto.TestGenericObjectDto<T, TValue> target, T value);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "set_Value")]
+    public static extern void SetValue(global::Riok.Mapperly.IntegrationTests.Dto.TestGenericObjectDto<T, TValue> target, TValue value);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_Id")]
+    public static extern T GetId(global::Riok.Mapperly.IntegrationTests.Dto.TestGenericObjectDto<T, TValue> source);
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_Value")]
+    public static extern TValue GetValue(global::Riok.Mapperly.IntegrationTests.Dto.TestGenericObjectDto<T, TValue> source);
 }

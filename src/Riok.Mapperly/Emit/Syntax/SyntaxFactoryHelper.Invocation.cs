@@ -78,6 +78,11 @@ public partial struct SyntaxFactoryHelper
         return InvocationExpression(methodAccess).WithArgumentList(ArgumentList(arguments));
     }
 
+    public static TypeArgumentListSyntax TypeArgumentList(IEnumerable<ITypeSymbol> typeArgs)
+    {
+        return TypeArgumentList(typeArgs.Select(x => IdentifierName(x.FullyQualifiedIdentifierName())));
+    }
+
     public static ParameterListSyntax ParameterList(IEnumerable<IParameterSymbol> parameters)
     {
         var parameterSyntaxes = parameters.Select(Parameter);
@@ -157,8 +162,11 @@ public partial struct SyntaxFactoryHelper
             .WithRefOrOutKeyword(TrailingSpacedToken(SyntaxKind.OutKeyword));
     }
 
-    private static ArgumentListSyntax ArgumentListWithoutIndention(IEnumerable<ExpressionSyntax> argSyntaxes) =>
-        SyntaxFactory.ArgumentList(CommaSeparatedList(argSyntaxes.Select(Argument)));
+    public static ArgumentListSyntax ArgumentListWithoutIndention(IEnumerable<ExpressionSyntax> argSyntaxes) =>
+        ArgumentListWithoutIndention(argSyntaxes.Select(Argument));
+
+    public static ArgumentListSyntax ArgumentListWithoutIndention(IEnumerable<ArgumentSyntax> argSyntaxes) =>
+        SyntaxFactory.ArgumentList(CommaSeparatedList(argSyntaxes));
 
     private ArgumentListSyntax ArgumentList(IEnumerable<ExpressionSyntax> argSyntaxes) => ArgumentList(argSyntaxes.Select(Argument));
 

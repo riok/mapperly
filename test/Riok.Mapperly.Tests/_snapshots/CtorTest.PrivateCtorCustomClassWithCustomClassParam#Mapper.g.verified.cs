@@ -6,14 +6,14 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::B Map(global::A source)
     {
-        return UnsafeAccessor.CreateB(source);
+        return BAccessor.Create(source);
     }
 }
-    
+
 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-static file class UnsafeAccessor
+static file class BAccessor
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Constructor)]
-    public static extern global::B CreateB(global::A source);
+    public static extern global::B Create(global::A source);
 }

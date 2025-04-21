@@ -4,26 +4,28 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    partial global::B Map(global::A source)
+    partial global::B<int> Map(global::A<int> source)
     {
-        var target = new global::B();
-        target.GetValue() = source.GetValue();
+        var target = new global::B<int>();
+        BAccessor<int>.GetValue(target) = AAccessor<int>.GetValue(source);
         return target;
     }
 }
 
 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-static file class AAccessor
+static file class AAccessor<T>
+    where T : struct
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Field, Name = "value")]
-    public static extern ref int GetValue(this global::A target);
+    public static extern ref T GetValue(global::A<T> target);
 }
 
 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-static file class BAccessor
+static file class BAccessor<T>
+    where T : struct
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Field, Name = "value")]
-    public static extern ref int GetValue(this global::B target);
+    public static extern ref T GetValue(global::B<T> target);
 }
