@@ -18,7 +18,7 @@ public partial class Mapper
         {
             global::AImpl1 x => MapToBImpl1(x),
             global::AImpl2 x => MapToBImpl2(x),
-            _ => throw new System.ArgumentException($"Cannot map {src.GetType()} to BIntf as there is no known derived type mapping", nameof(src)),
+            _ => throw new global::System.ArgumentException($"Cannot map {src.GetType()} to BIntf as there is no known derived type mapping", nameof(src)),
         };
     }
 

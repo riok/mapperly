@@ -10,7 +10,7 @@ public partial class Mapper
         {
             global::System.Linq.IQueryable<global::A> x when typeof(global::System.Linq.IQueryable<TTarget>).IsAssignableFrom(typeof(global::System.Linq.IQueryable<global::B>)) => (global::System.Linq.IQueryable<TTarget>)(object)ProjectToB(x),
             global::System.Linq.IQueryable<global::C> x when typeof(global::System.Linq.IQueryable<TTarget>).IsAssignableFrom(typeof(global::System.Linq.IQueryable<global::D>)) => (global::System.Linq.IQueryable<TTarget>)(object)ProjectToD(x),
-            _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(global::System.Linq.IQueryable<TTarget>)} as there is no known type mapping", nameof(source)),
+            _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(global::System.Linq.IQueryable<TTarget>)} as there is no known type mapping", nameof(source)),
         };
     }
 
@@ -18,7 +18,7 @@ public partial class Mapper
     private partial global::System.Linq.IQueryable<global::B> ProjectToB(global::System.Linq.IQueryable<global::A> q)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(
+        return global::System.Linq.Queryable.Select(
             q,
             x => new global::B()
             {
@@ -32,7 +32,7 @@ public partial class Mapper
     private partial global::System.Linq.IQueryable<global::D> ProjectToD(global::System.Linq.IQueryable<global::C> q)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(
+        return global::System.Linq.Queryable.Select(
             q,
             x => new global::D()
             {

@@ -8,7 +8,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection> ProjectToDto(this global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjection> q)
         {
 #nullable disable
-            return System.Linq.Queryable.Select(
+            return global::System.Linq.Queryable.Select(
                 q,
                 x => new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection(x.CtorValue)
                 {
@@ -75,7 +75,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionBaseType> ProjectToDto(this global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionBaseType> q)
         {
 #nullable disable
-            return System.Linq.Queryable.Select(
+            return global::System.Linq.Queryable.Select(
                 q,
                 x => (global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionBaseType)(x is global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeA ? new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionTypeA()
                 {
@@ -162,7 +162,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeA x => MapToTestObjectDtoProjectionTypeA(x),
                 global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeB x => MapToTestObjectDtoProjectionTypeB(x),
-                _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionBaseType as there is no known derived type mapping", nameof(source)),
+                _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionBaseType as there is no known derived type mapping", nameof(source)),
             };
         }
 

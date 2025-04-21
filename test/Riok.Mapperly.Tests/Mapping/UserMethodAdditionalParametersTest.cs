@@ -73,7 +73,7 @@ public class UserMethodAdditionalParametersTest
                 """
                 var target = new global::B()
                 {
-                    Value = value != null ? value.Value.ToString() : throw new System.ArgumentNullException(nameof(value.Value)),
+                    Value = value != null ? value.Value.ToString() : throw new global::System.ArgumentNullException(nameof(value.Value)),
                 };
                 target.StringValue = src.StringValue;
                 return target;
@@ -168,7 +168,7 @@ public class UserMethodAdditionalParametersTest
                 """
                 var target = new global::B()
                 {
-                    NestedValue = nested != null ? nested.Value.ToString() : throw new System.ArgumentNullException(nameof(nested.Value)),
+                    NestedValue = nested != null ? nested.Value.ToString() : throw new global::System.ArgumentNullException(nameof(nested.Value)),
                 };
                 target.StringValue = src.StringValue;
                 return target;

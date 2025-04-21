@@ -380,7 +380,7 @@ public class ValueTupleTest
             .HaveDiagnostic(DiagnosticDescriptors.NoConstructorFound)
             .HaveSingleMethodBody(
                 """
-                throw new System.NotImplementedException("Mapperly: Could not generate mapping");
+                throw new global::System.NotImplementedException("Mapperly: Could not generate mapping");
                 """
             );
     }
@@ -406,7 +406,7 @@ public class ValueTupleTest
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
-                throw new System.NotImplementedException("Mapperly: Could not generate mapping");
+                throw new global::System.NotImplementedException("Mapperly: Could not generate mapping");
                 """
             );
     }
@@ -429,7 +429,7 @@ public class ValueTupleTest
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
-                throw new System.NotImplementedException("Mapperly: Could not generate mapping");
+                throw new global::System.NotImplementedException("Mapperly: Could not generate mapping");
                 """
             );
     }
@@ -598,7 +598,7 @@ public class ValueTupleTest
             .HaveSingleMethodBody(
                 """
                 #nullable disable
-                        return System.Linq.Queryable.Select(source, x => new global::System.ValueTuple<int, string>(x.A, x.B));
+                        return global::System.Linq.Queryable.Select(source, x => new global::System.ValueTuple<int, string>(x.A, x.B));
                 #nullable enable
                 """
             );
@@ -618,7 +618,7 @@ public class ValueTupleTest
             .HaveSingleMethodBody(
                 """
                 #nullable disable
-                        return System.Linq.Queryable.Select(source, x => new global::System.ValueTuple<int, string>(x.A, x.B));
+                        return global::System.Linq.Queryable.Select(source, x => new global::System.ValueTuple<int, string>(x.A, x.B));
                 #nullable enable
                 """
             );
@@ -671,7 +671,7 @@ public class ValueTupleTest
             .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
             .HaveSingleMethodBody(
                 """
-                throw new System.NotImplementedException("Mapperly: Could not generate mapping");
+                throw new global::System.NotImplementedException("Mapperly: Could not generate mapping");
                 """
             );
     }
@@ -687,7 +687,7 @@ public class ValueTupleTest
             .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)
             .HaveSingleMethodBody(
                 """
-                throw new System.NotImplementedException("Mapperly: Could not generate mapping");
+                throw new global::System.NotImplementedException("Mapperly: Could not generate mapping");
                 """
             );
     }

@@ -76,7 +76,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    Value = source.Value ?? throw new System.ArgumentNullException(nameof(source.Value)),
+                    Value = source.Value ?? throw new global::System.ArgumentNullException(nameof(source.Value)),
                 };
                 return target;
                 """
@@ -186,7 +186,7 @@ public class ObjectPropertyInitPropertyTest
                 """
                 var target = new global::B()
                 {
-                    NestedValue = source.Nested?.Value ?? throw new System.ArgumentNullException(nameof(source.Nested.Value)),
+                    NestedValue = source.Nested?.Value ?? throw new global::System.ArgumentNullException(nameof(source.Nested.Value)),
                 };
                 return target;
                 """

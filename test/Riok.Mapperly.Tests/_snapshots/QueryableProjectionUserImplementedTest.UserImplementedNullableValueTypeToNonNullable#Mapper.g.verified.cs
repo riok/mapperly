@@ -7,7 +7,7 @@ public partial class Mapper
     public static partial global::System.Linq.IQueryable<global::B> Map(this global::System.Linq.IQueryable<global::A> query)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(query, x => new global::B(x.Value ?? 0));
+        return global::System.Linq.Queryable.Select(query, x => new global::B(x.Value ?? 0));
 #nullable enable
     }
 }
