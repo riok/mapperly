@@ -882,10 +882,8 @@ public class ObjectPropertyFlatteningTest
             "class B { public int IdB { get; set; } }"
         );
 
-        var mapperGenerationResult = TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics);
-
-        mapperGenerationResult.Diagnostics.Should().BeEmpty();
-        mapperGenerationResult
+        TestHelper
+            .GenerateMapper(source)
             .Should()
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
