@@ -94,7 +94,7 @@ public sealed class MapPropertyAttribute : Attribute
     public string? Use { get; set; }
 
     /// <summary>
-    /// When set to true, RMG089 and RMG090 are not emitted.
+    /// When set to true, RMG089 is not emitted.
     /// </summary>
     public bool SuppressNullMismatchDiagnostic { get; set; }
 }
