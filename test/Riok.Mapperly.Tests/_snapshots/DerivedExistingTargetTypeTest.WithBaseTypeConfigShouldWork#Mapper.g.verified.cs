@@ -17,7 +17,7 @@ public partial class Mapper
                 target.BaseValueB = source.BaseValueA;
                 break;
             default:
-                throw new System.ArgumentException($"Cannot map {src.GetType()} to {trg.GetType()} as there is no known derived type mapping", nameof(src));
+                throw new global::System.ArgumentException($"Cannot map {src.GetType()} to {trg.GetType()} as there is no known derived type mapping", nameof(src));
         }
     }
 }

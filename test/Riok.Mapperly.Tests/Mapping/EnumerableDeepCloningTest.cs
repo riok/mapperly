@@ -48,7 +48,7 @@ public class EnumerableDeepCloningTest
                 var target = new int[source.Length];
                 for (var i = 0; i < source.Length; i++)
                 {
-                    target[i] = source[i] ?? throw new System.NullReferenceException($"Sequence {nameof(source)}, contained a null value at index {i}.");
+                    target[i] = source[i] ?? throw new global::System.NullReferenceException($"Sequence {nameof(source)}, contained a null value at index {i}.");
                 }
                 return target;
                 """

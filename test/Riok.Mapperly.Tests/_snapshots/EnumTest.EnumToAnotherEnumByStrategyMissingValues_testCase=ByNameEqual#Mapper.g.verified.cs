@@ -18,7 +18,7 @@ public partial class Mapper
         {
             global::C.Value1 => global::D.Value1,
             global::C.Value2 => global::D.Value2,
-            _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum C is not supported"),
+            _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum C is not supported"),
         };
     }
 }

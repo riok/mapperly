@@ -11,7 +11,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 global::Riok.Mapperly.IntegrationTests.Mapper.Enum1.Value1 => global::Riok.Mapperly.IntegrationTests.Mapper.Enum2.Value1,
                 global::Riok.Mapperly.IntegrationTests.Mapper.Enum1.Value2 => global::Riok.Mapperly.IntegrationTests.Mapper.Enum2.Value2,
-                _ => throw new System.ArgumentOutOfRangeException(nameof(e), e, "The value of enum Enum1 is not supported"),
+                _ => throw new global::System.ArgumentOutOfRangeException(nameof(e), e, "The value of enum Enum1 is not supported"),
             };
         }
     }

@@ -433,7 +433,7 @@ public class UseStaticMapperTest
             "ProjectToTarget",
             """
             #nullable disable
-                    return System.Linq.Queryable.Select(
+                    return global::System.Linq.Queryable.Select(
                         source,
                         x => new global::Mapper.Target()
                         {
@@ -459,7 +459,7 @@ public class UseStaticMapperTest
                 "ProjectToTarget",
                 """
                 #nullable disable
-                        return System.Linq.Queryable.Select(
+                        return global::System.Linq.Queryable.Select(
                             source,
                             x => new global::Mapper.Target()
                             {

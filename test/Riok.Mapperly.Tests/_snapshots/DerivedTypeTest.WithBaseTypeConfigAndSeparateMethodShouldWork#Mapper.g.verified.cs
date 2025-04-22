@@ -10,7 +10,7 @@ public partial class Mapper
         {
             global::ASubType1 x => Map(x),
             global::ASubType2 x => MapToBSubType2(x),
-            _ => throw new System.ArgumentException($"Cannot map {src.GetType()} to B as there is no known derived type mapping", nameof(src)),
+            _ => throw new global::System.ArgumentException($"Cannot map {src.GetType()} to B as there is no known derived type mapping", nameof(src)),
         };
     }
 

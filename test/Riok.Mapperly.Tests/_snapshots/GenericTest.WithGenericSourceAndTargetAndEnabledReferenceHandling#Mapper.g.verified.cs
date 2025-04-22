@@ -11,8 +11,8 @@ public partial class Mapper
         {
             global::A x when typeof(TTarget).IsAssignableFrom(typeof(global::B)) => (TTarget)(object)MapToB1(x, refHandler),
             global::C x when typeof(TTarget).IsAssignableFrom(typeof(global::D)) => (TTarget)(object)MapToD1(x, refHandler),
-            null => throw new System.ArgumentNullException(nameof(source)),
-            _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
+            null => throw new global::System.ArgumentNullException(nameof(source)),
+            _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
         };
     }
 

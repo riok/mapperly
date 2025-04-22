@@ -556,7 +556,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10 => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value10,
                 global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20 => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value20,
                 global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30 => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value30,
-                _ => throw new System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnum is not supported"),
+                _ => throw new global::System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnum is not supported"),
             };
         }
 

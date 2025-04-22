@@ -8,11 +8,11 @@ public partial struct SyntaxFactoryHelper
 {
     private const string NoMappingMessage = "Mapperly: Could not generate mapping";
 
-    private const string ArgumentOutOfRangeExceptionClassName = "System.ArgumentOutOfRangeException";
-    private const string ArgumentNullExceptionClassName = "System.ArgumentNullException";
-    private const string ArgumentExceptionClassName = "System.ArgumentException";
-    private const string NotImplementedExceptionClassName = "System.NotImplementedException";
-    private const string NullReferenceExceptionClassName = "System.NullReferenceException";
+    private const string ArgumentOutOfRangeExceptionClassName = "global::System.ArgumentOutOfRangeException";
+    private const string ArgumentNullExceptionClassName = "global::System.ArgumentNullException";
+    private const string ArgumentExceptionClassName = "global::System.ArgumentException";
+    private const string NotImplementedExceptionClassName = "global::System.NotImplementedException";
+    private const string NullReferenceExceptionClassName = "global::System.NullReferenceException";
 
     public static ThrowExpressionSyntax ThrowNullReferenceException(string message) => ThrowNullReferenceException(StringLiteral(message));
 

@@ -733,7 +733,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 string x => ParseableInt(x),
                 int x => x.ToString(),
-                _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to object as there is no known derived type mapping", nameof(source)),
+                _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to object as there is no known derived type mapping", nameof(source)),
             };
         }
 
@@ -759,7 +759,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<string>>> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<int>>>)) => MapNestedLists(x),
                 global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => MapAllDtos(x),
                 object x when targetType.IsAssignableFrom(typeof(object)) => DerivedTypes(x),
-                _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
+                _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
             };
         }
 
@@ -786,7 +786,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => MapAllDtos(x),
                 object x when targetType.IsAssignableFrom(typeof(object)) => DerivedTypes(x),
                 null => default,
-                _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
+                _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
             };
         }
 
@@ -812,8 +812,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<string>>> x when typeof(TTarget).IsAssignableFrom(typeof(global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<int>>>)) => (TTarget)(object)MapNestedLists(x),
                 global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when typeof(TTarget).IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => (TTarget)(object)MapAllDtos(x),
                 object x when typeof(TTarget).IsAssignableFrom(typeof(object)) => (TTarget)(object)DerivedTypes(x),
-                null => throw new System.ArgumentNullException(nameof(source)),
-                _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
+                null => throw new global::System.ArgumentNullException(nameof(source)),
+                _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
             };
         }
 
@@ -831,7 +831,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                     target1.Value = DirectInt(source1.Value);
                     break;
                 default:
-                    throw new System.ArgumentException($"Cannot map {source.GetType()} to {target.GetType()} as there is no known derived type mapping", nameof(source));
+                    throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {target.GetType()} as there is no known derived type mapping", nameof(source));
             }
         }
 
@@ -843,7 +843,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10 => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value10,
                 global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20 => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value20,
                 global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30 => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value30,
-                _ => throw new System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnum is not supported"),
+                _ => throw new global::System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnum is not supported"),
             };
         }
 
@@ -857,7 +857,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value30 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
                 global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value40 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
                 global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value50 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
-                _ => throw new System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnumDtoAdditionalValue is not supported"),
+                _ => throw new global::System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnumDtoAdditionalValue is not supported"),
             };
         }
 
@@ -879,14 +879,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value10 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10,
                 global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoAdditionalValue.Value20 => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20,
-                _ => throw new System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnumDtoAdditionalValue is not supported"),
+                _ => throw new global::System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnumDtoAdditionalValue is not supported"),
             };
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial global::Riok.Mapperly.IntegrationTests.Models.TestEnum MapToEnumByValueCheckDefined(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue v)
         {
-            return (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)v is global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10 or global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20 or global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30 ? (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)v : throw new System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnumDtoByValue is not supported");
+            return (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)v is global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10 or global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20 or global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30 ? (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)v : throw new global::System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestEnumDtoByValue is not supported");
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
@@ -898,7 +898,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial global::Riok.Mapperly.IntegrationTests.Models.TestFlagsEnum MapToFlagsEnumByValueCheckDefined(global::Riok.Mapperly.IntegrationTests.Dto.TestFlagsEnumDto v)
         {
-            return (global::Riok.Mapperly.IntegrationTests.Models.TestFlagsEnum)v == ((global::Riok.Mapperly.IntegrationTests.Models.TestFlagsEnum)v & (global::Riok.Mapperly.IntegrationTests.Models.TestFlagsEnum.V1 | global::Riok.Mapperly.IntegrationTests.Models.TestFlagsEnum.V2 | global::Riok.Mapperly.IntegrationTests.Models.TestFlagsEnum.V4)) ? (global::Riok.Mapperly.IntegrationTests.Models.TestFlagsEnum)v : throw new System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestFlagsEnumDto is not supported");
+            return (global::Riok.Mapperly.IntegrationTests.Models.TestFlagsEnum)v == ((global::Riok.Mapperly.IntegrationTests.Models.TestFlagsEnum)v & (global::Riok.Mapperly.IntegrationTests.Models.TestFlagsEnum.V1 | global::Riok.Mapperly.IntegrationTests.Models.TestFlagsEnum.V2 | global::Riok.Mapperly.IntegrationTests.Models.TestFlagsEnum.V4)) ? (global::Riok.Mapperly.IntegrationTests.Models.TestFlagsEnum)v : throw new global::System.ArgumentOutOfRangeException(nameof(v), v, "The value of enum TestFlagsEnumDto is not supported");
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

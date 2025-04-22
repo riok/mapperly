@@ -10,7 +10,7 @@ public partial class Mapper
         {
             global::System.Linq.IQueryable<global::A> x when typeof(TTarget).IsAssignableFrom(typeof(global::System.Linq.IQueryable<global::B>)) => (TTarget)(object)MapToB(x),
             global::System.Linq.IQueryable<global::C> x when typeof(TTarget).IsAssignableFrom(typeof(global::System.Linq.IQueryable<global::D>)) => (TTarget)(object)MapToD(x),
-            _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
+            _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
         };
     }
 
@@ -18,7 +18,7 @@ public partial class Mapper
     private partial global::System.Linq.IQueryable<global::B> MapToB(global::System.Linq.IQueryable<global::A> source)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(source, x => new global::B(x.Value));
+        return global::System.Linq.Queryable.Select(source, x => new global::B(x.Value));
 #nullable enable
     }
 
@@ -26,7 +26,7 @@ public partial class Mapper
     private partial global::System.Linq.IQueryable<global::D> MapToD(global::System.Linq.IQueryable<global::C> source)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(source, x => new global::D(x.Value1));
+        return global::System.Linq.Queryable.Select(source, x => new global::D(x.Value1));
 #nullable enable
     }
 }

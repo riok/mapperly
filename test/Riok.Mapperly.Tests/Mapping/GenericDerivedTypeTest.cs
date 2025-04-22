@@ -30,8 +30,8 @@ public class GenericDerivedTypeTest
                 return source switch
                 {
                     global::Base x when typeof(TTarget).IsAssignableFrom(typeof(global::BaseDto)) => (TTarget)(object)MapDerivedTypes(x),
-                    null => throw new System.ArgumentNullException(nameof(source)),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
+                    null => throw new global::System.ArgumentNullException(nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
             );
@@ -60,7 +60,7 @@ public class GenericDerivedTypeTest
                 {
                     global::A x when typeof(TTarget).IsAssignableFrom(typeof(global::B)) => (TTarget)(object)MapToB(x),
                     global::C x when typeof(TTarget).IsAssignableFrom(typeof(global::D)) => (TTarget)(object)MapToD(x),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
             );
@@ -94,7 +94,7 @@ public class GenericDerivedTypeTest
                 return source switch
                 {
                     global::A x when typeof(TTarget).IsAssignableFrom(typeof(global::B)) => (TTarget)(object)MapToB(x),
-                    _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
                 """
             );

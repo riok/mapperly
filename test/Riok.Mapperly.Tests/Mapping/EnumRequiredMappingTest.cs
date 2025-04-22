@@ -83,7 +83,7 @@ public class EnumRequiredMappingTest
                 {
                     global::E1.V1 => global::E2.V1,
                     global::E1.V2 => global::E2.V2,
-                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
+                    _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
                 };
                 """
             );
@@ -153,7 +153,7 @@ public class EnumRequiredMappingTest
                 {
                     global::E1.V1 => global::E2.V1,
                     global::E1.V2 => global::E2.V2,
-                    _ => throw new System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
+                    _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
                 };
                 """
             );

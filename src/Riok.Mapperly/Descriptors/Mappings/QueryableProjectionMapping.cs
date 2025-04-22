@@ -16,7 +16,7 @@ public class QueryableProjectionMapping(
     bool supportsNullableAttributes
 ) : NewInstanceMethodMapping(sourceType, targetType)
 {
-    private const string QueryableReceiverName = "System.Linq.Queryable";
+    private const string QueryableReceiverName = "global::System.Linq.Queryable";
     private const string SelectMethodName = nameof(Queryable.Select);
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)

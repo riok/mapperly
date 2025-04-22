@@ -7,7 +7,7 @@ public partial class Mapper
     public partial global::System.Linq.IQueryable<global::B> ProjectAToB(global::System.Linq.IQueryable<global::A> query)
     {
 #nullable disable
-        return System.Linq.Queryable.Select(
+        return global::System.Linq.Queryable.Select(
             query,
             x => new global::B(
                 x.Name,

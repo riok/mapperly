@@ -85,7 +85,7 @@ public class DictionaryTest
                 var target = new global::System.Collections.Generic.Dictionary<string, int>(source.Count);
                 foreach (var item in source)
                 {
-                    target[item.Key] = item.Value ?? throw new System.ArgumentNullException(nameof(item.Value));
+                    target[item.Key] = item.Value ?? throw new global::System.ArgumentNullException(nameof(item.Value));
                 }
                 return target;
                 """

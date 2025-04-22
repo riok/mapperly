@@ -20,7 +20,7 @@ public class NullableTest
             .HaveSingleMethodBody(
                 """
                 if (source == null)
-                    throw new System.ArgumentNullException(nameof(source));
+                    throw new global::System.ArgumentNullException(nameof(source));
                 var target = new global::B();
                 return target;
                 """

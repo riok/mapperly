@@ -7,12 +7,12 @@ public partial class Mapper
     public partial global::B Map(global::A? src)
     {
         if (src == null)
-            throw new System.ArgumentNullException(nameof(src));
+            throw new global::System.ArgumentNullException(nameof(src));
         return src switch
         {
             global::AImpl1 x => MapToBImpl1(x),
             global::AImpl2 x => MapToBImpl2(x),
-            _ => throw new System.ArgumentException($"Cannot map {src.GetType()} to B as there is no known derived type mapping", nameof(src)),
+            _ => throw new global::System.ArgumentException($"Cannot map {src.GetType()} to B as there is no known derived type mapping", nameof(src)),
         };
     }
 

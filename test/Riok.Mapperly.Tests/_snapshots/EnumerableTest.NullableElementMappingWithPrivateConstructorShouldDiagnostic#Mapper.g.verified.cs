@@ -10,7 +10,7 @@ public partial class Mapper
         target.Value = global::System.Linq.Enumerable.ToList(
             global::System.Linq.Enumerable.Select(
                 source.Value,
-                x => throw new System.NotImplementedException("Mapperly: Could not generate mapping")
+                x => throw new global::System.NotImplementedException("Mapperly: Could not generate mapping")
             )
         );
         return target;

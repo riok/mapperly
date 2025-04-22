@@ -10,7 +10,7 @@ public partial class Mapper
         if (source == null)
             return default;
 #nullable disable
-        return System.Linq.Queryable.Select(
+        return global::System.Linq.Queryable.Select(
             source,
             x => new global::B()
             {
