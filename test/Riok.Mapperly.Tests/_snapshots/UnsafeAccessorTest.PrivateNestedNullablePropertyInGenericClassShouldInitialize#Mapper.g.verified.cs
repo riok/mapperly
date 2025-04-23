@@ -4,50 +4,50 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    partial global::B Map(global::A source)
+    partial global::B<int> Map(global::A<int> source)
     {
-        var target = new global::B();
-        if (target.GetNested() == null)
+        var target = new global::B<int>();
+        if (BAccessor<int>.GetNested(target) == null)
         {
-            target.SetNested(new global::D());
+            BAccessor<int>.SetNested(target, new global::D<int>());
         }
-        target.GetNested().SetValue(source.GetNested().GetValue());
+        DAccessor<int>.SetValue(BAccessor<int>.GetNested(target), CAccessor<int>.GetValue(AAccessor<int>.GetNested(source)));
         return target;
     }
 }
 
 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-static file class AAccessor
+static file class AAccessor<T>
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_nested")]
-    public static extern global::C GetNested(this global::A source);
+    public static extern global::C<T> GetNested(global::A<T> source);
 }
 
 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-static file class CAccessor
+static file class CAccessor<T>
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_value")]
-    public static extern int GetValue(this global::C source);
+    public static extern T GetValue(global::C<T> source);
 }
 
 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-static file class BAccessor
+static file class BAccessor<T>
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_nested")]
-    public static extern global::D? GetNested(this global::B source);
+    public static extern global::D<T>? GetNested(global::B<T> source);
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "set_nested")]
-    public static extern void SetNested(this global::B target, global::D? value);
+    public static extern void SetNested(global::B<T> target, global::D<T>? value);
 }
 
 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-static file class DAccessor
+static file class DAccessor<T>
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "set_value")]
-    public static extern void SetValue(this global::D target, int value);
+    public static extern void SetValue(global::D<T> target, T value);
 }

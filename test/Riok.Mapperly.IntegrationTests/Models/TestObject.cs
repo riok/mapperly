@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Riok.Mapperly.Abstractions;
 
 namespace Riok.Mapperly.IntegrationTests.Models
 {
@@ -145,6 +146,15 @@ namespace Riok.Mapperly.IntegrationTests.Models
         public int ExposePrivateValue => PrivateValue;
 
         private int PrivateValue { get; set; }
+
+        // generic unsafe accessed members are only supported in .NET 9.0 and later
+#if NET9_0_OR_GREATER
+        [MapperIgnore]
+        public TestGenericObject<int, TestGenericValue> ExposeGenericPrivateValue => GenericPrivateValue;
+
+        private TestGenericObject<int, TestGenericValue> GenericPrivateValue { get; set; } =
+            TestGenericObject<int, TestGenericValue>.SampleValue;
+#endif
 
         public int SumComponent1 { get; set; }
 

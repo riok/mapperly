@@ -18,11 +18,8 @@ namespace Riok.Mapperly.Descriptors;
 
 public class DescriptorBuilder
 {
-    private const string UnsafeAccessorName = "System.Runtime.CompilerServices.UnsafeAccessorAttribute";
-
     private readonly MapperDescriptor _mapperDescriptor;
     private readonly SymbolAccessor _symbolAccessor;
-    private readonly WellKnownTypes _types;
 
     private readonly MappingCollection _mappings = new();
     private readonly InlinedExpressionMappingCollection _inlineMappings = new();
@@ -43,14 +40,13 @@ public class DescriptorBuilder
         var supportedFeatures = SupportedFeatures.Build(compilationContext.Types, symbolAccessor, compilationContext.ParseLanguageVersion);
         _mapperDescriptor = new MapperDescriptor(mapperDeclaration, _methodNameBuilder, supportedFeatures);
         _symbolAccessor = symbolAccessor;
-        _types = compilationContext.Types;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
-        _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor, _mapperDescriptor.UnsafeAccessorName);
+        _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
 
         var attributeAccessor = new AttributeDataAccessor(symbolAccessor);
         var configurationReader = new MapperConfigurationReader(
             attributeAccessor,
-            _types,
+            compilationContext.Types,
             mapperDeclaration.Symbol,
             defaultMapperConfiguration,
             supportedFeatures
@@ -62,7 +58,7 @@ public class DescriptorBuilder
             mapperDeclaration,
             configurationReader,
             _symbolAccessor,
-            new GenericTypeChecker(_symbolAccessor, _types),
+            new GenericTypeChecker(_symbolAccessor, compilationContext.Types),
             attributeAccessor,
             _unsafeAccessorContext,
             _diagnostics,
@@ -104,7 +100,7 @@ public class DescriptorBuilder
         var includedMembers = _builderContext.Configuration.Mapper.IncludedMembers;
         var includedConstructors = _builderContext.Configuration.Mapper.IncludedConstructors;
 
-        if (_types.TryGet(UnsafeAccessorName) != null)
+        if (_mapperDescriptor.SupportedFeatures.UnsafeAccessors)
         {
             _symbolAccessor.SetMemberVisibility(includedMembers);
             _symbolAccessor.SetConstructorVisibility(includedConstructors);
@@ -138,7 +134,7 @@ public class DescriptorBuilder
         {
             // if a user defined mapping method is static, all of them need to be static to avoid confusion for mapping method resolution
             // however, user implemented mapping methods are allowed to be static in a non-static context.
-            // Therefore we are only interested in partial method definitions here.
+            // Therefore, we are only interested in partial method definitions here.
             if (userMapping.Method is { IsStatic: true, IsPartialDefinition: true })
             {
                 _mapperDescriptor.Static = true;
@@ -222,8 +218,7 @@ public class DescriptorBuilder
 
     private void AddAccessorsToDescriptor()
     {
-        // add generated accessors to the mapper
-        _mapperDescriptor.AddUnsafeAccessors(_unsafeAccessorContext.Accessors);
+        _mapperDescriptor.UnsafeAccessors = _unsafeAccessorContext;
     }
 
     private void AddUserMapping(IUserMapping mapping, bool ignoreDuplicates, bool named)
