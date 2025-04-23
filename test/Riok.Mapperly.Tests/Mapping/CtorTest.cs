@@ -122,6 +122,18 @@ public class CtorTest
     }
 
     [Fact]
+    public Task PrivateCtorCustomGenericClass()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "string",
+            "A<Guid>",
+            TestSourceBuilderOptions.WithConstructorVisibility(MemberVisibility.All),
+            "class A<T> where T : struct { private A(string x) {} }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task PrivateCtorCustomClassWithCustomClassParam()
     {
         var source = TestSourceBuilder.Mapping(

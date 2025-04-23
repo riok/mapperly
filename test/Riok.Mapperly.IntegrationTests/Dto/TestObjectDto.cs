@@ -157,6 +157,15 @@ namespace Riok.Mapperly.IntegrationTests.Dto
 
         private int PrivateValue { get; set; }
 
+        // generic unsafe accessed members are only supported in .NET 9.0 and later
+#if NET9_0_OR_GREATER
+        [MapperIgnore]
+        public TestGenericObjectDto<int, TestGenericValueDto> ExposeGenericPrivateValue => GenericPrivateValue;
+
+        private TestGenericObjectDto<int, TestGenericValueDto> GenericPrivateValue { get; set; } =
+            TestGenericObjectDto<int, TestGenericValueDto>.SampleValue;
+#endif
+
         public int Sum { get; set; }
     }
 }

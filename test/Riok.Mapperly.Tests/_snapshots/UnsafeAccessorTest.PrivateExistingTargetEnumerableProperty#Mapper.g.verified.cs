@@ -6,22 +6,26 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     partial void Map(global::A source, global::B dest)
     {
-        dest.GetValue1().EnsureCapacity(source.GetValue().Count + dest.GetValue1().Count);
+        dest.GetValue().EnsureCapacity(source.GetValue().Count + dest.GetValue().Count);
         foreach (var item in source.GetValue())
         {
-            dest.GetValue1().Add(item);
+            dest.GetValue().Add(item);
         }
     }
 }
-    
+
 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-static file class UnsafeAccessor
+static file class AAccessor
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_value")]
     public static extern global::System.Collections.Generic.List<int> GetValue(this global::A source);
+}
 
+[global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+static file class BAccessor
+{
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get_value")]
-    public static extern global::System.Collections.Generic.List<int> GetValue1(this global::B source);
+    public static extern global::System.Collections.Generic.List<int> GetValue(this global::B source);
 }

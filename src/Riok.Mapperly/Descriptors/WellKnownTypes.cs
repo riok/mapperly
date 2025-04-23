@@ -14,6 +14,8 @@ public class WellKnownTypes(Compilation compilation)
 
     public INamedTypeSymbol? NotNullIfNotNullAttribute => TryGet("System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute");
 
+    public INamedTypeSymbol? UnsafeAccessorAttribute => TryGet("System.Runtime.CompilerServices.UnsafeAccessorAttribute");
+
     public ITypeSymbol GetArrayType(ITypeSymbol type) =>
         compilation.CreateArrayTypeSymbol(type, elementNullableAnnotation: type.NullableAnnotation).NonNullable();
 

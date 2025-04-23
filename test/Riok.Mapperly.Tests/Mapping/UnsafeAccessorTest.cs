@@ -19,6 +19,76 @@ public class UnsafeAccessorTest
     }
 
     [Fact]
+    public Task PrivatePropertyInNamespacedNestedMapper()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+
+            namespace FooBar;
+
+            public static partial class CarFeature
+            {
+                public static partial class Mappers
+                {
+                    [Mapper(IncludedMembers = MemberVisibility.All)]
+                    public partial class CarMapper
+                    {
+                        public partial B Map(A value);
+                    }
+
+                    public class A { private int _value { get; set; } }
+                    public class B { private int _value { get; set; } }
+                }
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task PrivatePropertyInGenericClass()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B<int> Map(A<int> source);",
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "class A<T> where T : struct { private T _value { get; set; } }",
+            "class B<T> where T : struct { private T _value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task PrivatePropertyInGenericClassMultiple()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B<int> Map(A<int> source);" + "partial B<float> Map(A<float> source);",
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "class A<T> where T : struct { private T _value { get; set; } }",
+            "class B<T> where T : struct { private T _value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task PrivatePropertyInGenericClassMultipleTypeParametersWithConstraints()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B<int, C> Map(A<int> source);",
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "class A<T> where T : struct { private T _value { get; set; } private C _value { get; set; } }",
+            "class B<T, T2> where T : struct where T2 : notnull, IC { private T _value { get; set; } private T2 _value { get; set; } }",
+            "class C : IC { public void Foo() {} }",
+            "interface IC { void Foo(); }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ProtectedProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -94,6 +164,23 @@ public class UnsafeAccessorTest
     }
 
     [Fact]
+    public Task PrivateNestedNullablePropertyInGenericClass()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("nested.value", "value")]
+            partial B<int> Map(A<int> source);
+            """,
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "class A<T> where T : struct { private C<T>? nested { get; set; } }",
+            "class B<T> where T : struct { private T? value { get; set; } }",
+            "class C<T> where T : struct { private T value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task PrivateNestedNullablePropertyShouldInitialize()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -103,9 +190,27 @@ public class UnsafeAccessorTest
             """,
             TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
             "class A { private C nested { get; set; } }",
-            "class B { private D nested { get; set; } }",
+            "class B { private D? nested { get; set; } }",
             "class C { private int value { get; set; } }",
             "class D { private int value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task PrivateNestedNullablePropertyInGenericClassShouldInitialize()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("nested.value", "nested.value")]
+            partial B<int> Map(A<int> source);
+            """,
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "class A<T> { private C<T> nested { get; set; } }",
+            "class B<T> { private D<T>? nested { get; set; } }",
+            "class C<T> { private T value { get; set; } }",
+            "class D<T> { private T value { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);
@@ -243,6 +348,36 @@ public class UnsafeAccessorTest
             TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
             "class A { private int value }",
             "class B { private int value }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task PrivateFieldInGenericClass()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B<int> Map(A<int> source);",
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "class A<T> where T : struct { private T value; }",
+            "class B<T> where T : struct { private T value; }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task PrivateNestedNullableFieldInGenericClass()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("nested.value", "value")]
+            partial B<int> Map(A<int> source);
+            """,
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "class A<T> where T : struct { private C<T>? nested; }",
+            "class B<T> where T : struct { private T? value; }",
+            "class C<T> where T : struct { private T value; }"
         );
 
         return TestHelper.VerifyGenerator(source);
@@ -501,6 +636,42 @@ public class UnsafeAccessorTest
             "class B { private B(int _intValue) {} private string _stringValue { get; set; } }"
         );
 
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task PrivateCtorCustomGenericClass()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B<Guid>",
+            TestSourceBuilderOptions.Default with
+            {
+                IncludedMembers = MemberVisibility.All,
+                IncludedConstructors = MemberVisibility.All,
+            },
+            "class A { public string Value { get; set; } }",
+            "class B<T> where T : struct { private A(T value) {} }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task PrivateCtorCustomGenericClassMultipleTypeParameters()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B<Guid, C>",
+            TestSourceBuilderOptions.Default with
+            {
+                IncludedMembers = MemberVisibility.All,
+                IncludedConstructors = MemberVisibility.All,
+            },
+            "class A { public string Value { get; set; } public C Value2 { get; set; } }",
+            "class B<TValue, TValue2> where TValue : struct where TValue2 : IC, new() { private A(TValue value, TValue2 value2) {} }",
+            "class C : IC { public void Foo() {} }",
+            "interface IC { void Foo(); }"
+        );
         return TestHelper.VerifyGenerator(source);
     }
 

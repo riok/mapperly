@@ -7,21 +7,25 @@ public partial class Mapper
     partial global::B Map(global::A source)
     {
         var target = new global::B();
-        target.GetValue() ??= UnsafeAccessor.CreateC();
+        target.GetValue() ??= CAccessor.Create();
         target.GetValue().Id = source.MyValueId;
         target.GetValue().Id2 = source.MyValueId2;
         return target;
     }
 }
-    
+
 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-static file class UnsafeAccessor
+static file class BAccessor
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Field, Name = "Value")]
     public static extern ref global::C? GetValue(this global::B target);
+}
 
+[global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+static file class CAccessor
+{
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Constructor)]
-    public static extern global::C CreateC();
+    public static extern global::C Create();
 }

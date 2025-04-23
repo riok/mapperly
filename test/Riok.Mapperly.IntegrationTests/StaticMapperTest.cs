@@ -22,7 +22,7 @@ namespace Riok.Mapperly.IntegrationTests
         }
 
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0)]
+        [VersionedSnapshot(Versions.NET6_0 | Versions.NET9_0)]
         public Task RunMappingShouldWork()
         {
             var model = NewTestObj();
@@ -31,7 +31,7 @@ namespace Riok.Mapperly.IntegrationTests
         }
 
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0)]
+        [VersionedSnapshot(Versions.NET6_0 | Versions.NET9_0)]
         public Task RunExtensionMappingShouldWork()
         {
             var model = NewTestObj();

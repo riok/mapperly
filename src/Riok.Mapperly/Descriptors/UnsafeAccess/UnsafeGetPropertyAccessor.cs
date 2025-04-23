@@ -16,7 +16,10 @@ namespace Riok.Mapperly.Descriptors.UnsafeAccess;
 /// public extern static int GetValue(this global::MyClass source);
 /// </code>
 /// </summary>
-public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string methodName) : IUnsafeAccessor, IMemberGetter
+/// <param name="symbol">The symbol of the property.</param>
+/// <param name="className">The name of the accessor class.</param>
+/// <param name="methodName">The name of the accessor method.</param>
+public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string className, string methodName) : IUnsafeAccessor, IMemberGetter
 {
     private const string DefaultSourceParameterName = "source";
 
@@ -25,12 +28,18 @@ public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string methodName
         var nameBuilder = ctx.NameBuilder.NewScope();
         var sourceName = nameBuilder.New(DefaultSourceParameterName);
 
-        var source = Parameter(symbol.ContainingType.FullyQualifiedIdentifierName(), sourceName, true);
+        var propertySymbol = symbol.ContainingType.IsGenericType ? symbol.OriginalDefinition : symbol;
+
+        var source = Parameter(
+            propertySymbol.ContainingType.FullyQualifiedIdentifierName(),
+            sourceName,
+            !symbol.ContainingType.IsGenericType
+        );
 
         var parameters = ParameterList(CommaSeparatedList(source));
         var attribute = ctx.SyntaxFactory.UnsafeAccessorAttribute(UnsafeAccessorType.Method, $"get_{symbol.Name}");
         return ctx.SyntaxFactory.PublicStaticExternMethod(
-            IdentifierName(symbol.Type.FullyQualifiedIdentifierName()).AddTrailingSpace(),
+            IdentifierName(propertySymbol.Type.FullyQualifiedIdentifierName()).AddTrailingSpace(),
             methodName,
             parameters,
             [attribute]
@@ -42,7 +51,19 @@ public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string methodName
         if (baseAccess == null)
             throw new ArgumentNullException(nameof(baseAccess));
 
-        ExpressionSyntax method = nullConditional ? ConditionalAccess(baseAccess, methodName) : MemberAccess(baseAccess, methodName);
-        return InvocationWithoutIndention(method);
+        if (!symbol.ContainingType.IsGenericType)
+        {
+            ExpressionSyntax method = nullConditional ? ConditionalAccess(baseAccess, methodName) : MemberAccess(baseAccess, methodName);
+            return InvocationWithoutIndention(method);
+        }
+
+        var genericClassName = GenericName(className).WithTypeArgumentList(TypeArgumentList(symbol.ContainingType.TypeArguments));
+        var invocation = InvocationExpression(MemberAccess(genericClassName, methodName))
+            .WithArgumentList(ArgumentListWithoutIndention([baseAccess]));
+
+        if (!nullConditional)
+            return invocation;
+
+        return Conditional(IsNotNull(baseAccess), invocation, DefaultLiteral());
     }
 }
