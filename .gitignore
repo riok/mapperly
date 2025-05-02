@@ -4,6 +4,7 @@ bin/
 obj/
 
 .vs/
+.idea/
 
 # verify received files
 *.received.*
