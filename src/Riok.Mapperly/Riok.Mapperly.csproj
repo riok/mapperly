@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <EnablePackageValidation>true</EnablePackageValidation>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
@@ -15,24 +14,19 @@
     </PackageDescription>
     <PackageTags>Mapper SourceGenerator</PackageTags>
     <PackageIcon>logo.png</PackageIcon>
-
     <!-- default roslyn version and constants, compare 4 numeric part versions -->
     <ROSLYN_VERSION Condition="'$(ROSLYN_VERSION)' == ''">4.11</ROSLYN_VERSION>
-    <DefineConstants Condition="'$(ROSLYN_VERSION).0.0' >= '4.4.0.0'">$(DefineConstants);ROSLYN4_4_OR_GREATER</DefineConstants>
-    <DefineConstants Condition="'$(ROSLYN_VERSION).0.0' >= '4.7.0.0'">$(DefineConstants);ROSLYN4_7_OR_GREATER</DefineConstants>
+    <DefineConstants Condition="'$(ROSLYN_VERSION).0.0' &gt;= '4.4.0.0'">$(DefineConstants);ROSLYN4_4_OR_GREATER</DefineConstants>
+    <DefineConstants Condition="'$(ROSLYN_VERSION).0.0' &gt;= '4.7.0.0'">$(DefineConstants);ROSLYN4_7_OR_GREATER</DefineConstants>
   </PropertyGroup>
-
   <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0 AND '$(CI)' == ''">
     <Exec Command="dotnet tool restore" StandardOutputImportance="Low" StandardErrorImportance="High" />
     <Exec Command="dotnet husky install" StandardOutputImportance="Low" StandardErrorImportance="High" WorkingDirectory="../.." />
   </Target>
-
   <Import Project="Riok.Mapperly.Roslyn$(ROSLYN_VERSION).props" />
-
   <ItemGroup>
     <AdditionalFiles Include="$(MSBuildThisFileDirectory)\BannedSymbols.txt" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
       <PrivateAssets>all</PrivateAssets>
@@ -43,23 +37,30 @@
       <IncludeAssets>analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Riok.Mapperly.Abstractions\Riok.Mapperly.Abstractions.csproj" PrivateAssets="all" />
   </ItemGroup>
-
   <ItemGroup Condition="!$(DefineConstants.Contains('DEBUG_SOURCE_GENERATOR'))">
     <Compile Remove="Helpers/DebuggerUtil.cs" />
   </ItemGroup>
-
   <!--
   This ensures the library will be packaged as a source generator when we use `dotnet pack`
   -->
   <ItemGroup>
     <None Include="../../README.md" Pack="true" PackagePath="\" />
     <None Include="../../docs/static/img/logo.png" Pack="true" PackagePath="\" />
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/roslyn$(ROSLYN_VERSION)/dotnet/cs" Visible="false" />
-    <None Include="$(OutputPath)\$(AssemblyName).Abstractions.dll" Pack="true" PackagePath="analyzers/roslyn$(ROSLYN_VERSION)/dotnet/cs" Visible="false" />
+    <None
+      Include="$(OutputPath)\$(AssemblyName).dll"
+      Pack="true"
+      PackagePath="analyzers/roslyn$(ROSLYN_VERSION)/dotnet/cs"
+      Visible="false"
+    />
+    <None
+      Include="$(OutputPath)\$(AssemblyName).Abstractions.dll"
+      Pack="true"
+      PackagePath="analyzers/roslyn$(ROSLYN_VERSION)/dotnet/cs"
+      Visible="false"
+    />
     <None Include="$(OutputPath)\$(AssemblyName).Abstractions.dll" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
     <None Include="$(OutputPath)\$(AssemblyName).Abstractions.xml" Pack="true" PackagePath="lib\netstandard2.0" Visible="true" />
     <None Include="Riok.Mapperly.targets" Pack="true" PackagePath="build" Visible="false" />

@@ -6,10 +6,14 @@
       "command": "dotnet",
       "args": [
         "csharpier",
+        "format",
         "${staged}"
       ],
       "include": [
-        "**/*.cs"
+        "**/*.cs",
+        "**/*.props",
+        "**/*.csproj",
+        "**/*.targets"
       ]
     }
   ]
