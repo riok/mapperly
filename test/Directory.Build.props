@@ -1,19 +1,16 @@
 <Project>
   <!-- import parent: https://docs.microsoft.com/en-us/visualstudio/msbuild/customize-your-build -->
-  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))"/>
-
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
   <ItemGroup>
-    <Using Include="FluentAssertions"/>
+    <Using Include="FluentAssertions" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0"/>
-    <PackageReference Include="FluentAssertions" Version="7.1.0"/>
-    <PackageReference Include="xunit" Version="2.9.3"/>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageReference Include="FluentAssertions" Version="7.1.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -26,7 +23,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Meziantou.Xunit.ParallelTestFramework" Version="2.3.0"/>
+    <PackageReference Include="Meziantou.Xunit.ParallelTestFramework" Version="2.3.0" />
     <PackageReference Include="Verify.XUnit" Version="28.9.0" />
     <PackageReference Include="Verify.DiffPlex" Version="3.1.2" />
     <PackageReference Include="JunitXml.TestLogger" Version="6.1.0" />

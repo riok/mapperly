@@ -1,5 +1,4 @@
 <Project>
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <DebugSymbols>true</DebugSymbols>
@@ -9,11 +8,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Version>0.0.1-dev</Version>
     <Authors>Mapperly Contributors, Lars Tönz, Manuel Allenspach</Authors>
-
     <!-- release environment constants -->
     <DefineConstants Condition="'$(MAPPERLY_ENVIRONMENT)' == 'next'">$(DefineConstants);ENV_NEXT</DefineConstants>
     <DefineConstants Condition="'$(MAPPERLY_ENVIRONMENT)' == 'stable'">$(DefineConstants);ENV_STABLE</DefineConstants>
     <DefineConstants Condition="'$(MAPPERLY_ENVIRONMENT)' == ''">$(DefineConstants);ENV_LOCAL</DefineConstants>
   </PropertyGroup>
-
 </Project>
