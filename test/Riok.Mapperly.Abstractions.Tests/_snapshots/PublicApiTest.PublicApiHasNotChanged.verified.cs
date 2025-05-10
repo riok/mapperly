@@ -36,7 +36,7 @@ namespace Riok.Mapperly.Abstractions
     }
     [System.AttributeUsage(System.AttributeTargets.Method)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
-    public class IncludeMappingConfigurationAttribute : System.Attribute
+    public sealed class IncludeMappingConfigurationAttribute : System.Attribute
     {
         public IncludeMappingConfigurationAttribute(string name) { }
         public string Name { get; }
@@ -250,7 +250,7 @@ namespace Riok.Mapperly.Abstractions
     }
     [System.AttributeUsage(System.AttributeTargets.Method)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
-    public class NamedMappingAttribute : System.Attribute
+    public sealed class NamedMappingAttribute : System.Attribute
     {
         public NamedMappingAttribute(string name) { }
         public string Name { get; }
