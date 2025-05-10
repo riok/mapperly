@@ -1,11 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.11.0" />
@@ -21,7 +19,6 @@
     <PackageReference Include="NuGet.Frameworks" Version="6.13.2" />
     <PackageReference Include="System.Formats.Asn1" Version="9.0.4" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\src\Riok.Mapperly\Riok.Mapperly.csproj" />
     <ProjectReference Include="..\..\src\Riok.Mapperly\Riok.Mapperly.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
