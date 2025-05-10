@@ -35,8 +35,8 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     private Compilation Compilation => compilationContext.Compilation;
 
-    private readonly Lazy<INamedTypeSymbol> _lazyEnumerableType = new(
-        () => compilationContext.Compilation.GetSpecialType(SpecialType.System_Collections_Generic_IEnumerable_T)
+    private readonly Lazy<INamedTypeSymbol> _lazyEnumerableType = new(() =>
+        compilationContext.Compilation.GetSpecialType(SpecialType.System_Collections_Generic_IEnumerable_T)
     );
     private INamedTypeSymbol EnumerableTypeSymbol => _lazyEnumerableType.Value;
 

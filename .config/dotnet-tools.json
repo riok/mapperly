@@ -6,31 +6,36 @@
       "version": "5.0.0",
       "commands": [
         "xmldoc2md"
-      ]
+      ],
+      "rollForward": false
     },
     "meziantou.framework.nugetpackagevalidation.tool": {
       "version": "1.0.20",
       "commands": [
         "meziantou.validate-nuget-package"
-      ]
+      ],
+      "rollForward": false
     },
     "verify.tool": {
       "version": "0.6.0",
       "commands": [
         "dotnet-verify"
-      ]
-    },
-    "csharpier": {
-      "version": "0.30.6",
-      "commands": [
-        "dotnet-csharpier"
-      ]
+      ],
+      "rollForward": false
     },
     "husky": {
       "version": "0.7.2",
       "commands": [
         "husky"
-      ]
+      ],
+      "rollForward": false
+    },
+    "csharpier": {
+      "version": "1.0.1",
+      "commands": [
+        "csharpier"
+      ],
+      "rollForward": false
     }
   }
 }

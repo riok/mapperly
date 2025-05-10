@@ -67,7 +67,7 @@ The source of Mapperly is linted with multiple dotnet analyzers.
 To fix issues locally run
 
 ```bash
-dotnet csharpier .
+dotnet csharpier format .
 dotnet format style
 dotnet format analyzers
 ```
@@ -75,9 +75,9 @@ dotnet format analyzers
 and to verify there are no issues run
 
 ```bash
-dotnet csharpier --check .
+dotnet csharpier check .
 dotnet format style --verify-no-changes
 dotnet format analyzers --verify-no-changes
 ```
 
-CSharpier should be run automatically via a git hook on commit.
+CSharpier should run automatically via a Git hook on commit.
