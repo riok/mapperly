@@ -105,6 +105,11 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         return mapping;
     }
 
+    public MappingBuilderContext? FindMappingBuilderContext(ITypeMapping mapping)
+    {
+        return MappingBuilder.FindMappingBuilderContext(mapping);
+    }
+
     /// <summary>
     /// Tries to find an existing mapping for the provided key.
     /// If none is found, <c>null</c> is returned.

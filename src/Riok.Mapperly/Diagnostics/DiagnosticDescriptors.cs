@@ -763,6 +763,15 @@ public static class DiagnosticDescriptors
         true
     );
 
+    public static readonly DiagnosticDescriptor CircularReferencedMapping = new(
+        "RMG091",
+        "Circular referenced mapping detected",
+        "A circular reference has been detected in mapping configuration: {0}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT

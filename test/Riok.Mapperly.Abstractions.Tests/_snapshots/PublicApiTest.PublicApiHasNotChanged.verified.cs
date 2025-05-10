@@ -34,6 +34,13 @@ namespace Riok.Mapperly.Abstractions
         Source = 1,
         Target = 2,
     }
+    [System.AttributeUsage(System.AttributeTargets.Method)]
+    [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
+    public class IncludeMappingConfigurationAttribute : System.Attribute
+    {
+        public IncludeMappingConfigurationAttribute(string name) { }
+        public string Name { get; }
+    }
     [System.AttributeUsage(System.AttributeTargets.Method, AllowMultiple=true)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
     public sealed class MapDerivedTypeAttribute : System.Attribute
@@ -240,6 +247,13 @@ namespace Riok.Mapperly.Abstractions
         Internal = 4,
         Protected = 8,
         Private = 16,
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method)]
+    [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
+    public class NamedMappingAttribute : System.Attribute
+    {
+        public NamedMappingAttribute(string name) { }
+        public string Name { get; }
     }
     [System.AttributeUsage(System.AttributeTargets.Method)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]

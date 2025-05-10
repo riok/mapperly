@@ -8,7 +8,7 @@ namespace Riok.Mapperly.Abstractions;
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
 [Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
-public class NamedMappingAttribute : Attribute
+public sealed class NamedMappingAttribute : Attribute
 {
     /// <summary>
     /// Gets the custom name defined for the mapping configuration.

@@ -32,6 +32,12 @@ public class MappingCollection
     private readonly Queue<(IMapping, MappingBuilderContext)> _mappingsToBuildBody = new();
 
     /// <summary>
+    /// A dictionary mapping each <see cref="ITypeMapping"/> to its corresponding <see cref="MappingBuilderContext"/>.
+    /// This collection is used to include the mapping configurations in another type mapping.
+    /// </summary>
+    private readonly Dictionary<ITypeMapping, MappingBuilderContext> _mappingContexts = new();
+
+    /// <summary>
     /// All new instance mappings
     /// </summary>
     private readonly MappingCollectionInstance<INewInstanceMapping, INewInstanceUserMapping> _newInstanceMappings = new();
@@ -71,6 +77,16 @@ public class MappingCollection
     public IEnumerable<(IMapping, MappingBuilderContext)> DequeueMappingsToBuildBody() => _mappingsToBuildBody.DequeueAll();
 
     public void EnqueueToBuildBody(ITypeMapping mapping, MappingBuilderContext ctx) => _mappingsToBuildBody.Enqueue((mapping, ctx));
+
+    public void AddMappingWithContext(ITypeMapping mapping, MappingBuilderContext ctx)
+    {
+        _mappingContexts.Add(mapping, ctx);
+    }
+
+    public MappingBuilderContext? FindMappingBuilderContext(ITypeMapping mapping)
+    {
+        return _mappingContexts.GetValueOrDefault(mapping);
+    }
 
     public MappingCollectionAddResult AddUserMapping(IUserMapping userMapping, string? name)
     {

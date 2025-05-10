@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors;
@@ -37,7 +38,16 @@ public class MapperConfigurationReader
                 mapper.RequiredEnumMappingStrategy,
                 mapper.EnumNamingStrategy
             ),
-            new MembersMappingConfiguration([], [], [], [], [], mapper.IgnoreObsoleteMembersStrategy, mapper.RequiredMappingStrategy),
+            new MembersMappingConfiguration(
+                [],
+                [],
+                [],
+                [],
+                [],
+                mapper.IgnoreObsoleteMembersStrategy,
+                mapper.RequiredMappingStrategy,
+                IncludedMapping: null
+            ),
             [],
             mapper.UseDeepCloning,
             supportedFeatures
@@ -103,6 +113,7 @@ public class MapperConfigurationReader
             .AccessFirstOrDefault<MapperIgnoreObsoleteMembersAttribute>(configRef.Method)
             ?.IgnoreObsoleteStrategy;
         var requiredMapping = _dataAccessor.AccessFirstOrDefault<MapperRequiredMappingAttribute>(configRef.Method)?.RequiredMappingStrategy;
+        var includeMapping = _dataAccessor.AccessFirstOrDefault<IncludeMappingConfigurationAttribute>(configRef.Method)?.Name;
 
         // ignore the required mapping / ignore obsolete as the same attribute is used for other mapping types
         // e.g. enum to enum
@@ -140,7 +151,8 @@ public class MapperConfigurationReader
             memberConfigurations,
             nestedMembersConfigurations,
             ignoreObsolete ?? MapperConfiguration.Members.IgnoreObsoleteMembersStrategy,
-            requiredMapping ?? MapperConfiguration.Members.RequiredMappingStrategy
+            requiredMapping ?? MapperConfiguration.Members.RequiredMappingStrategy,
+            includeMapping
         );
     }
 

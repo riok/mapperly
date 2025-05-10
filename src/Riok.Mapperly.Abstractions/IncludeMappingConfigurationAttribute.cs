@@ -9,7 +9,7 @@ namespace Riok.Mapperly.Abstractions;
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
 [Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
-public class IncludeMappingConfigurationAttribute : Attribute
+public sealed class IncludeMappingConfigurationAttribute : Attribute
 {
     /// <summary>
     /// Gets the name of the mapping configuration to include.
