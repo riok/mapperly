@@ -78,7 +78,7 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
-    public Task DetectsCircularReferences()
+    public Task ReportsCircularReferences()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -87,6 +87,27 @@ public class IncludeMappingConfigurationTest
             partial B OtherMappingMethod(A a);
 
             [IncludeMappingConfiguration(nameof(OtherMappingMethod))]
+            partial B MapAnother(A a);
+            """,
+            "class A { public string SourceName { get; set; } }",
+            "class B { public string DestinationName { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ReportsDuplicatedName()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
+            partial B ToDestination(A a);
+
+            [MapProperty(nameof(B.DestinationName), nameof(A.SourceName))]
+            partial A ToDestination(B b);
+
+            [IncludeMappingConfiguration(nameof(ToDestination))]
             partial B MapAnother(A a);
             """,
             "class A { public string SourceName { get; set; } }",
