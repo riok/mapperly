@@ -78,6 +78,35 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
+    public Task IncludesConfigurationFromAnotherClass()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using Riok.Mapperly.Abstractions.ReferenceHandling;
+
+            class A { public string SourceName { get; set; } }
+            class B { public string DestinationName { get; set; } }
+            [Mapper]
+            public static partial class OtherMapper
+            {
+                [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
+                public static partial B Map(A a);
+            }
+
+            [Mapper]
+            [UseStaticMapper(typeof(OtherMapper))]
+            public static partial class TestMapper
+            {
+                [IncludeMappingConfiguration(nameof(OtherMapper.Map))]
+                public static partial B MapAnother(A a);
+            }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ReportsCircularReferences()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

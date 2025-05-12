@@ -183,6 +183,7 @@ public class DescriptorBuilder
     {
         foreach (var externalMapping in ExternalMappingsExtractor.ExtractExternalMappings(_builderContext, _mapperDescriptor.Symbol))
         {
+            // TODO: External mapping include extension point?
             AddUserMapping(externalMapping, true, false);
         }
     }
