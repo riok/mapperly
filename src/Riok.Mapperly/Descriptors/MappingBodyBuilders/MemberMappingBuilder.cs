@@ -101,7 +101,10 @@ internal static class MemberMappingBuilder
             );
         }
 
-        if (memberSourceNullable && !memberTargetNullable && delegateSourceNullable && !delegateTargetNullable)
+        if (
+            (memberSourceNullable == delegateSourceNullable && memberTargetNullable == delegateTargetNullable)
+            || (memberSourceNullable && !memberTargetNullable && delegateSourceNullable && !delegateTargetNullable)
+        )
         {
             sourceValue = new MappedMemberSourceValue(
                 delegateMapping,
