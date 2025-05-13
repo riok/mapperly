@@ -144,4 +144,42 @@ public class IncludeMappingConfigurationTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task ReportsSourceTypeIsInvalidInInclude()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(C.SourceName), nameof(B.DestinationName))]
+            partial B UnrelatedMapper(C a);
+
+            [IncludeMappingConfiguration(nameof(UnrelatedMapper))]
+            partial B MapAnother(A a);
+            """,
+            "class A { public string SourceName { get; set; } }",
+            "class B { public string DestinationName { get; set; } }",
+            "class C { public string SourceName { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ReportsTargetTypeIsInvalidInInclude()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.SourceName), nameof(C.DestinationName))]
+            partial C UnrelatedMapper(A a);
+
+            [IncludeMappingConfiguration(nameof(UnrelatedMapper))]
+            partial B MapAnother(A a);
+            """,
+            "class A { public string SourceName { get; set; } }",
+            "class B { public string DestinationName { get; set; } }",
+            "class C { public string DestinationName { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

@@ -1,4 +1,5 @@
-﻿using Riok.Mapperly.Configuration;
+﻿using System.Diagnostics.CodeAnalysis;
+using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
@@ -20,7 +21,7 @@ internal class MembersMappingStateBuilder
     private readonly HashSet<string> _ignoredSourceMemberNames = new();
     private readonly HashSet<string> _ignoredTargetMemberNames = new();
 
-    private MembersMappingStateBuilder(MappingBuilderContext ctx, IMapping mapping)
+    private MembersMappingStateBuilder(MappingBuilderContext ctx)
     {
         var initialCapacity = ctx.Configuration.Members.ValueMappings.Count;
         _memberValueConfigsByRootTargetName = new ListDictionary<string, MemberValueMappingConfiguration>(initialCapacity);
@@ -28,7 +29,7 @@ internal class MembersMappingStateBuilder
 
     public static MembersMappingState Build(MappingBuilderContext ctx, IMapping mapping)
     {
-        var factory = new MembersMappingStateBuilder(ctx, mapping);
+        var factory = new MembersMappingStateBuilder(ctx);
 
         // build all members
         var unmappedSourceMemberNames = GetSourceMemberNames(ctx, mapping);
@@ -77,23 +78,11 @@ internal class MembersMappingStateBuilder
             ctx.ReportDiagnostic(DiagnosticDescriptors.CircularReferencedMapping, ctx.UserSymbol?.ToDisplayString() ?? "<unknown>");
             return;
         }
+
         // first collect the mappings from the included mappings, then apply the mappings from the current mapping.
-        var includedMappingName = ctx.Configuration.Members.IncludedMapping;
-        if (includedMappingName != null)
+        if (TryGetIncludedMapping(ctx, out var includedMapping, out var includedMappingContext))
         {
-            var includedMapping = ctx.FindNamedMapping(includedMappingName);
-            if (includedMapping == null)
-            {
-                ctx.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, includedMappingName);
-            }
-            else
-            {
-                var includedMappingContext = ctx.FindMappingBuilderContext(includedMapping);
-                if (includedMappingContext != null)
-                {
-                    BuildRecursively(includedMappingContext, includedMapping);
-                }
-            }
+            BuildRecursively(includedMappingContext, includedMapping);
         }
 
         // build configurations
@@ -176,5 +165,59 @@ internal class MembersMappingStateBuilder
             _configuredTargetMembersByRootName.Add(config.Target.RootName, config.Target);
             _memberConfigsByRootTargetName.Add(config.Target.RootName, config);
         }
+    }
+
+    private static bool TryGetIncludedMapping(
+        MappingBuilderContext ctx,
+        [NotNullWhen(true)] out INewInstanceMapping? includedMapping,
+        [NotNullWhen(true)] out MappingBuilderContext? includedMappingContext
+    )
+    {
+        includedMapping = null;
+        includedMappingContext = null;
+        var includedMappingName = ctx.Configuration.Members.IncludedMapping;
+        if (includedMappingName == null)
+        {
+            return false;
+        }
+
+        includedMapping = ctx.FindNamedMapping(includedMappingName);
+        if (includedMapping == null)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, includedMappingName);
+            return false;
+        }
+
+        var typeCheckerResult = ctx.GenericTypeChecker.InferAndCheckTypes(
+            ctx.UserSymbol!.TypeParameters,
+            (includedMapping.SourceType, ctx.Source),
+            (includedMapping.TargetType, ctx.Target)
+        );
+        if (!typeCheckerResult.Success)
+        {
+            if (ReferenceEquals(ctx.Source, typeCheckerResult.FailedArgument))
+            {
+                ctx.ReportDiagnostic(
+                    DiagnosticDescriptors.SourceTypeIsNotRelatedToIncludedSourceType,
+                    ctx.Source,
+                    includedMapping.SourceType
+                );
+            }
+            else
+            {
+                ctx.ReportDiagnostic(
+                    DiagnosticDescriptors.TargetTypeIsNotRelatedToIncludedTargetType,
+                    ctx.Target,
+                    includedMapping.TargetType
+                );
+            }
+        }
+        else
+        {
+            includedMappingContext = ctx.FindMappingBuilderContext(includedMapping);
+            return includedMappingContext != null;
+        }
+
+        return false;
     }
 }
