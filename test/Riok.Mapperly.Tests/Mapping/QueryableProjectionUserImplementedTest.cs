@@ -252,4 +252,44 @@ public class QueryableProjectionUserImplementedTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task UserImplementedAttributedNullableValueTypeToNullable()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial IQueryable<B> Map(this IQueryable<A> query);
+
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(MapValue))]
+            private static partial B Map(A src);
+
+            [UserMapping(Default = false)]
+            private static decimal? MapValue(decimal? value) => value ?? 1;
+            """,
+            "public class A { public decimal? Value { get; set; } }",
+            "public class B { public decimal? Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task UserImplementedAttributedNullableValueTypeToNullableMemberTypeMismatch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial IQueryable<B> Map(this IQueryable<A> query);
+
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(MapValue))]
+            private static partial B Map(A src);
+
+            [UserMapping(Default = false)]
+            private static decimal MapValue(decimal? value) => value ?? 1;
+            """,
+            "public class A { public decimal? Value { get; set; } }",
+            "public class B { public decimal? Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

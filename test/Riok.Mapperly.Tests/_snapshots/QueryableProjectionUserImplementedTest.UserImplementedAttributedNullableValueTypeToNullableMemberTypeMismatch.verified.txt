@@ -1,0 +1,44 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+
+[MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(MapValue))]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+private static partial B Map(A src);
+*/
+ : (13,1)-(13,70),
+      Message: The target type decimal of the referenced mapping MapValue does not match the expected type decimal?,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG073,
+        Title: The target type of the referenced mapping does not match,
+        MessageFormat: The target type {1} of the referenced mapping {0} does not match the expected type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+
+[MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(MapValue))]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+private static partial B Map(A src);
+*/
+ : (13,1)-(13,70),
+      Message: The target type decimal of the referenced mapping MapValue does not match the expected type decimal?,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG073,
+        Title: The target type of the referenced mapping does not match,
+        MessageFormat: The target type {1} of the referenced mapping {0} does not match the expected type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}
