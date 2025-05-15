@@ -32,10 +32,9 @@ public class MappingCollection
     private readonly Queue<(IMapping, MappingBuilderContext)> _mappingsToBuildBody = new();
 
     /// <summary>
-    /// A dictionary mapping each <see cref="ITypeMapping"/> to its corresponding <see cref="MappingBuilderContext"/>.
     /// This collection is used to include the mapping configurations in another type mapping.
     /// </summary>
-    private readonly Dictionary<ITypeMapping, MappingBuilderContext> _mappingContexts = new();
+    private readonly ListDictionary<string, MappingBuilderContext> _mappingContexts = new();
 
     /// <summary>
     /// All new instance mappings
@@ -78,14 +77,16 @@ public class MappingCollection
 
     public void EnqueueToBuildBody(ITypeMapping mapping, MappingBuilderContext ctx) => _mappingsToBuildBody.Enqueue((mapping, ctx));
 
-    public void AddMappingWithContext(ITypeMapping mapping, MappingBuilderContext ctx)
+    public void AddMappingWithContext(MappingBuilderContext ctx)
     {
-        _mappingContexts.Add(mapping, ctx);
+        var mappingName =
+            ctx.MappingName ?? throw new InvalidOperationException("Mapping name cannot be null when adding mapping with context");
+        _mappingContexts.Add(mappingName, ctx);
     }
 
-    public MappingBuilderContext? FindMappingBuilderContext(ITypeMapping mapping)
+    public IReadOnlyList<MappingBuilderContext> FindMappingBuilderContext(string mappingName)
     {
-        return _mappingContexts.GetValueOrDefault(mapping);
+        return _mappingContexts.GetOrEmpty(mappingName);
     }
 
     public MappingCollectionAddResult AddUserMapping(IUserMapping userMapping, string? name)

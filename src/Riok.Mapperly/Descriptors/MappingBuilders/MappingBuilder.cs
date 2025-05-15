@@ -57,9 +57,9 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
         return mappings.FindNamedNewInstanceMapping(name, out ambiguousName);
     }
 
-    public MappingBuilderContext? FindMappingBuilderContext(ITypeMapping mapping)
+    public IReadOnlyList<MappingBuilderContext> FindMappingBuilderContext(string mappingName)
     {
-        return mappings.FindMappingBuilderContext(mapping);
+        return mappings.FindMappingBuilderContext(mappingName);
     }
 
     public INewInstanceMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)

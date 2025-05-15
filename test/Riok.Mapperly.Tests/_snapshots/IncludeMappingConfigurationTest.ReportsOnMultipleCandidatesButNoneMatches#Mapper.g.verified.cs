@@ -4,7 +4,7 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    partial global::B ToDestination(global::A a)
+    partial global::B UnrelatedMapper(global::C a)
     {
         var target = new global::B();
         target.DestinationName = a.SourceName;
@@ -12,10 +12,10 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    partial global::A ToDestination(global::B b)
+    partial global::B UnrelatedMapper(global::D a)
     {
-        var target = new global::A();
-        target.SourceName = b.DestinationName;
+        var target = new global::B();
+        target.DestinationName = a.SourceName;
         return target;
     }
 
@@ -23,7 +23,6 @@ public partial class Mapper
     partial global::B MapAnother(global::A a)
     {
         var target = new global::B();
-        target.DestinationName = a.SourceName;
         return target;
     }
 }

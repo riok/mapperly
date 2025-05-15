@@ -5,11 +5,11 @@
 
 [IncludeMappingConfiguration(nameof(OtherMapper))]
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-partial B Mapper(A a);
-^^^^^^^^^^^^^^^^^^^^^^
+public static partial BDerived Mapper(ADerived a);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 }
 */
- : (17,0)-(18,22),
+ : (18,0)-(19,50),
       Message: The referenced mapping name OtherMapper is ambiguous, use a unique name,
       Severity: Error,
       Descriptor: {
@@ -18,6 +18,117 @@ partial B Mapper(A a);
         MessageFormat: The referenced mapping name {0} is ambiguous, use a unique name,
         Category: Mapper,
         DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+
+[IncludeMappingConfiguration(nameof(OtherMapper))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public static partial BDerived Mapper(ADerived a);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (18,0)-(19,50),
+      Message: The member SourceName2 on the mapping source type ADerived is not mapped to any member on the mapping target type BDerived,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG020,
+        Title: Source member is not mapped to any target member,
+        MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+
+[IncludeMappingConfiguration(nameof(OtherMapper))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public static partial BDerived Mapper(ADerived a);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (18,0)-(19,50),
+      Message: The member SourceName1 on the mapping source type ADerived is not mapped to any member on the mapping target type BDerived,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG020,
+        Title: Source member is not mapped to any target member,
+        MessageFormat: The member {0} on the mapping source type {1} is not mapped to any member on the mapping target type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+
+[IncludeMappingConfiguration(nameof(OtherMapper))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public static partial BDerived Mapper(ADerived a);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (18,0)-(19,50),
+      Message: The member DestinationName2 on the mapping target type BDerived was not found on the mapping source type ADerived,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG012,
+        Title: Source member was not found for target member,
+        MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+
+[IncludeMappingConfiguration(nameof(OtherMapper))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public static partial BDerived Mapper(ADerived a);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (18,0)-(19,50),
+      Message: The member DestinationName1 on the mapping target type BDerived was not found on the mapping source type ADerived,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG012,
+        Title: Source member was not found for target member,
+        MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+
+[IncludeMappingConfiguration(nameof(OtherMapper))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public static partial BDerived Mapper(ADerived a);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (18,0)-(19,50),
+      Message: No members are mapped in the object mapping from ADerived to BDerived,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG066,
+        Title: No members are mapped in an object mapping,
+        HelpLink: https://localhost:3000/docs/configuration/analyzer-diagnostics/RMG066,
+        MessageFormat: No members are mapped in the object mapping from {0} to {1},
+        Category: Mapper,
+        DefaultSeverity: Warning,
         IsEnabledByDefault: true
       }
     }

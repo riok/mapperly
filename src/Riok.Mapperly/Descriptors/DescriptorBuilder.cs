@@ -174,7 +174,7 @@ public class DescriptorBuilder
                 new TypeMappingKey(userMapping.SourceType, userMapping.TargetType)
             );
 
-            _mappings.AddMappingWithContext(userMapping, ctx);
+            _mappings.AddMappingWithContext(ctx);
             _mappings.EnqueueToBuildBody(userMapping, ctx);
         }
     }

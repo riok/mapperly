@@ -106,6 +106,27 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
+    public Task ResolvesMatchingCandidateIfOnlyOneMatches()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(B.DestinationName), nameof(A.SourceName))]
+            partial A OtherMapper(B b);
+
+            [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
+            partial B OtherMapper(A a);
+
+            [IncludeMappingConfiguration(nameof(OtherMapper))]
+            partial B Mapper(A a);
+            """,
+            "class A { public string SourceName { get; set; } }",
+            "class B { public string DestinationName { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ReportsCircularReferences()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -129,17 +150,20 @@ public class IncludeMappingConfigurationTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
-            partial B OtherMapper(A a);
+            [MapProperty(nameof(A.SourceName1), nameof(B.DestinationName1))]
+            public static partial B OtherMapper(A a);
 
-            [MapProperty(nameof(B.DestinationName), nameof(A.SourceName))]
-            partial A OtherMapper(B b);
+            [MapProperty(nameof(ADerived.SourceName1), nameof(BDerived.DestinationName1))]
+            [MapProperty(nameof(ADerived.SourceName2), nameof(BDerived.DestinationName2))]
+            public static partial BDerived OtherMapper(ADerived a);
 
             [IncludeMappingConfiguration(nameof(OtherMapper))]
-            partial B Mapper(A a);
+            public static partial BDerived Mapper(ADerived a);
             """,
-            "class A { public string SourceName { get; set; } }",
-            "class B { public string DestinationName { get; set; } }"
+            "class A { public string SourceName1 { get; set; } }",
+            "class ADerived : A { public string SourceName2 { get; set; } }",
+            "class B { public string DestinationName1 { get; set; } }",
+            "class BDerived : B { public string DestinationName2 { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);
@@ -178,6 +202,29 @@ public class IncludeMappingConfigurationTest
             "class A { public string SourceName { get; set; } }",
             "class B { public string DestinationName { get; set; } }",
             "class C { public string DestinationName { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ReportsOnMultipleCandidatesButNoneMatches()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(C.SourceName), nameof(B.DestinationName))]
+            partial B UnrelatedMapper(C a);
+
+            [MapProperty(nameof(D.SourceName), nameof(B.DestinationName))]
+            partial B UnrelatedMapper(D a);
+
+            [IncludeMappingConfiguration(nameof(UnrelatedMapper))]
+            partial B MapAnother(A a);
+            """,
+            "class A { public string SourceName { get; set; } }",
+            "class B { public string DestinationName { get; set; } }",
+            "class C { public string SourceName { get; set; } }",
+            "class D { public string SourceName { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);
