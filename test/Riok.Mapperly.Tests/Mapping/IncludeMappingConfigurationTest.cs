@@ -130,13 +130,13 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
-            partial B ToDestination(A a);
+            partial B OtherMapper(A a);
 
             [MapProperty(nameof(B.DestinationName), nameof(A.SourceName))]
-            partial A ToDestination(B b);
+            partial A OtherMapper(B b);
 
-            [IncludeMappingConfiguration(nameof(ToDestination))]
-            partial B MapAnother(A a);
+            [IncludeMappingConfiguration(nameof(OtherMapper))]
+            partial B Mapper(A a);
             """,
             "class A { public string SourceName { get; set; } }",
             "class B { public string DestinationName { get; set; } }"

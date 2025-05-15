@@ -3,14 +3,14 @@
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(ToDestination))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-partial B MapAnother(A a);
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(OtherMapper))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+partial B Mapper(A a);
+^^^^^^^^^^^^^^^^^^^^^^
 }
 */
- : (17,0)-(18,26),
-      Message: The referenced mapping name ToDestination is ambiguous, use a unique name,
+ : (17,0)-(18,22),
+      Message: The referenced mapping name OtherMapper is ambiguous, use a unique name,
       Severity: Error,
       Descriptor: {
         Id: RMG062,
