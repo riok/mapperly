@@ -17,7 +17,7 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 **Repro**
-A link to a repro Gist or GitHub repository.
+A link to a repro Gist or GitHub repository or a link to a Mapperly fork with a failing test.
 
 **Declaration code**
 ```csharp
