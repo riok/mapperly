@@ -4,13 +4,15 @@ using Riok.Mapperly.Symbols;
 namespace Riok.Mapperly.Configuration;
 
 public record MembersMappingConfiguration(
+    string? Name,
     IReadOnlyCollection<string> IgnoredSources,
     IReadOnlyCollection<string> IgnoredTargets,
     IReadOnlyCollection<MemberValueMappingConfiguration> ValueMappings,
     IReadOnlyCollection<MemberMappingConfiguration> ExplicitMappings,
     IReadOnlyCollection<NestedMembersMappingConfiguration> NestedMappings,
     IgnoreObsoleteMembersStrategy IgnoreObsoleteMembersStrategy,
-    RequiredMappingStrategy RequiredMappingStrategy
+    RequiredMappingStrategy RequiredMappingStrategy,
+    string? IncludedMapping
 )
 {
     public IEnumerable<string> GetMembersWithExplicitConfigurations(MappingSourceTarget sourceTarget)
