@@ -1,4 +1,4 @@
-﻿namespace Riok.Mapperly.Tests;
+﻿namespace Riok.Mapperly.Tests.Mapping;
 
 public class NamedMappingTest
 {
