@@ -78,28 +78,57 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
+    public Task AppliesOnDifferentMethodDeclaration()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [IncludeMappingConfiguration(nameof(ReferencedMapper))]
+            public partial B Mapper(A source);
+
+            [MapProperty(nameof(A.Source), nameof(B.Target))]
+            public partial void ReferencedMapper(A source, B target);
+            """,
+            "class A { public string Source { get; set; } }",
+            "class B { public string Target { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task AppliesOnDifferentMethodDeclaration2()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Source), nameof(B.Target))]
+            public partial B ReferencedMapper(A source);
+
+            [IncludeMappingConfiguration(nameof(ReferencedMapper))]
+            public partial void Mapper(A source, B target);
+            """,
+            "class A { public string Source { get; set; } }",
+            "class B { public string Target { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task IncludesConfigurationFromBaseClassMapping()
     {
-        var source = TestSourceBuilder.CSharp(
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            using Riok.Mapperly.Abstractions;
+            [MapProperty(nameof(A.SourceName1), nameof(B.DestinationName1))]
+            public static partial B Map(A a);
 
-            [Mapper]
-            public static partial class Mapper
-            {
-                [MapProperty(nameof(A.SourceName1), nameof(B.DestinationName1))]
-                public static partial B Map(A a);
-
-                [IncludeMappingConfiguration(nameof(Map))]
-                [MapProperty(nameof(A.SourceName2), nameof(B.DestinationName2))]
-                public static partial BDerived MapDerived(ADerived a);
-            }
-
-            class A { public string SourceName1 { get; set; } }
-            class ADerived : A { public string SourceName2 { get; set; } }
-            class B { public string DestinationName1 { get; set; } }
-            class BDerived : B { public string DestinationName2 { get; set; } }
-            """
+            [IncludeMappingConfiguration(nameof(Map))]
+            [MapProperty(nameof(A.SourceName2), nameof(B.DestinationName2))]
+            public static partial BDerived MapDerived(ADerived a);
+            """,
+            "class A { public string SourceName1 { get; set; } }",
+            "class ADerived : A { public string SourceName2 { get; set; } }",
+            "class B { public string DestinationName1 { get; set; } }",
+            "class BDerived : B { public string DestinationName2 { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);
@@ -121,6 +150,48 @@ public class IncludeMappingConfigurationTest
             """,
             "class A { public string SourceName { get; set; } }",
             "class B { public string DestinationName { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldIncludeUseReferencedMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.StringValue), nameof(B.StringValue), Use = nameof(ModifyString))]
+            public partial B OtherMapper(A source);
+
+            [IncludeMappingConfiguration(nameof(OtherMapper))]
+            public partial B Mapper(A source);
+
+            private string ModifyString(string source) => source + "-modified";
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldIncludeConfigurationOnUseReferencedMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial B MainMapper(A source);
+
+            [IncludeMappingConfiguration(nameof(ReferencedMapper))]
+            public partial BY UsedMapper(AX source);
+
+            [MapProperty(nameof(AX.Source), nameof(BY.Target))]
+            public partial void ReferencedMapper(AX source, BY target);
+            """,
+            "class A { public AX Item { get; set; } }",
+            "class AX { public string Source { get; set; } }",
+            "class B { public BY Item { get; set; } }",
+            "class BY { public string Target { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);

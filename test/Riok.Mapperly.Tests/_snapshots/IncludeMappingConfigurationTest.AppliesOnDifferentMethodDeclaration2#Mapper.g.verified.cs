@@ -4,19 +4,16 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    public static partial global::B Map(global::A a)
+    public partial global::B ReferencedMapper(global::A source)
     {
         var target = new global::B();
-        target.DestinationName1 = a.SourceName1;
+        target.Target = source.Source;
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    public static partial global::BDerived MapDerived(global::ADerived a)
+    public partial void Mapper(global::A source, global::B target)
     {
-        var target = new global::BDerived();
-        target.DestinationName2 = a.SourceName2;
-        target.DestinationName1 = a.SourceName1;
-        return target;
+        target.Target = source.Source;
     }
 }
