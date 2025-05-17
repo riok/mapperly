@@ -39,6 +39,7 @@ public class MapperConfigurationReader
                 mapper.EnumNamingStrategy
             ),
             new MembersMappingConfiguration(
+                null,
                 [],
                 [],
                 [],
@@ -90,6 +91,8 @@ public class MapperConfigurationReader
     {
         if (configRef.Method == null)
             return MapperConfiguration.Members;
+
+        var mappingName = _dataAccessor.AccessFirstOrDefault<NamedMappingAttribute>(configRef.Method)?.Name ?? configRef.Method.Name;
 
         var ignoredSourceMembers = _dataAccessor
             .Access<MapperIgnoreSourceAttribute>(configRef.Method)
@@ -145,6 +148,7 @@ public class MapperConfigurationReader
         }
 
         return new MembersMappingConfiguration(
+            mappingName,
             ignoredSourceMembers,
             ignoredTargetMembers,
             memberValueConfigurations,

@@ -4,6 +4,7 @@ using Riok.Mapperly.Symbols;
 namespace Riok.Mapperly.Configuration;
 
 public record MembersMappingConfiguration(
+    string? Name,
     IReadOnlyCollection<string> IgnoredSources,
     IReadOnlyCollection<string> IgnoredTargets,
     IReadOnlyCollection<MemberValueMappingConfiguration> ValueMappings,

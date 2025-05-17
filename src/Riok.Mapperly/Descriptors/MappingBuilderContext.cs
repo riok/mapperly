@@ -89,7 +89,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <inheritdoc cref="MappingBuilders.MappingBuilder.NewInstanceMappings"/>
     public IReadOnlyDictionary<TypeMappingKey, INewInstanceMapping> NewInstanceMappings => MappingBuilder.NewInstanceMappings;
 
-    public string? MappingName => UserMapping?.Method.Name;
+    public string? MappingName => Configuration.Members.Name;
 
     /// <summary>
     /// Tries to find an existing mapping with the provided name.
