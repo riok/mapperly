@@ -18,7 +18,7 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
 {
     private readonly MembersMappingState _state = MembersMappingStateBuilder.Build(builderContext, mapping);
 
-    private readonly NestedMappingsContext _nestedMappingsContext = NestedMappingsContext.Create(builderContext);
+    private readonly NestedMappingsContext _nestedMappingsContext = NestedMappingsContext.Create(builderContext, mapping);
 
     public MappingBuilderContext BuilderContext { get; } = builderContext;
 

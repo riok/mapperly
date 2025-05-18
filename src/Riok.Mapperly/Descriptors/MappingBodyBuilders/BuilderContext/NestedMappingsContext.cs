@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Symbols.Members;
 
@@ -21,12 +22,35 @@ public class NestedMappingsContext
         _unusedPaths = new HashSet<MemberPath>(paths, ReferenceEqualityComparer.Instance);
     }
 
-    public static NestedMappingsContext Create(MappingBuilderContext ctx) => new(ctx, ResolveNestedMappings(ctx));
+    public static NestedMappingsContext Create(MappingBuilderContext ctx, IMapping mapping) =>
+        new(ctx, ResolveNestedMappings(ctx, mapping));
 
-    private static List<MemberPath> ResolveNestedMappings(MappingBuilderContext ctx)
+    private static List<MemberPath> ResolveNestedMappings(MappingBuilderContext ctx, IMapping mapping)
     {
         var nestedMemberPaths = new List<MemberPath>(ctx.Configuration.Members.NestedMappings.Count);
 
+        ResolveNestedMappingsRecursively(new HashSet<IMapping>(), nestedMemberPaths, mapping, ctx);
+
+        return nestedMemberPaths;
+    }
+
+    private static void ResolveNestedMappingsRecursively(
+        HashSet<IMapping> mappingsInProcessing,
+        List<MemberPath> nestedMemberPaths,
+        IMapping mapping,
+        MappingBuilderContext ctx
+    )
+    {
+        if (!mappingsInProcessing.Add(mapping))
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.CircularReferencedMapping, ctx.UserSymbol?.ToDisplayString() ?? "<unknown>");
+            return;
+        }
+
+        if (ctx.TryResolveIncludedMapping(out var includedMapping, out var includedMappingContext))
+        {
+            ResolveNestedMappingsRecursively(mappingsInProcessing, nestedMemberPaths, includedMapping, includedMappingContext);
+        }
         foreach (var nestedMemberConfig in ctx.Configuration.Members.NestedMappings)
         {
             if (!ctx.SymbolAccessor.TryFindMemberPath(ctx.Source, nestedMemberConfig.Source, out var memberPath))
@@ -42,7 +66,7 @@ public class NestedMappingsContext
             nestedMemberPaths.Add(memberPath);
         }
 
-        return nestedMemberPaths;
+        mappingsInProcessing.Remove(mapping);
     }
 
     public bool TryFindNestedSourcePath(

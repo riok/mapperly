@@ -57,6 +57,25 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
+    public Task UsesMapNestedPropertiesFromTargetMapper()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapNestedProperties(nameof(A.Value))]
+            private partial B OtherMapper(A source);
+
+            [IncludeMappingConfiguration(nameof(OtherMapper))]
+            public partial B Mapper(A source);
+            """,
+            "class A { public C Value { get; set; } }",
+            "class B { public int Id { get; set; } }",
+            "class C { public int Id { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task AppliesRecursively()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
