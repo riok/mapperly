@@ -29,7 +29,7 @@ public class MappingCollection
     /// <summary>
     /// Queue of mappings which don't have the body built yet
     /// </summary>
-    private readonly Queue<(IMapping, MappingBuilderContext)> _mappingsToBuildBody = new();
+    private readonly Queue<(ITypeMapping, MappingBuilderContext)> _mappingsToBuildBody = new();
 
     /// <summary>
     /// This collection is used to include the mapping configurations in another type mapping.
@@ -73,11 +73,11 @@ public class MappingCollection
     public IExistingTargetMapping? FindExistingInstanceNamedMapping(string name, out bool ambiguousName) =>
         _existingTargetMappings.FindNamed(name, out ambiguousName);
 
-    public IEnumerable<(IMapping, MappingBuilderContext)> DequeueMappingsToBuildBody() => _mappingsToBuildBody.DequeueAll();
+    public IEnumerable<(ITypeMapping, MappingBuilderContext)> DequeueMappingsToBuildBody() => _mappingsToBuildBody.DequeueAll();
 
     public void EnqueueToBuildBody(ITypeMapping mapping, MappingBuilderContext ctx) => _mappingsToBuildBody.Enqueue((mapping, ctx));
 
-    public void AddMappingWithContext(MappingBuilderContext ctx)
+    public void AddMappingWithContext(IUserMapping userMapping, MappingBuilderContext ctx)
     {
         var mappingName =
             ctx.MappingName ?? throw new InvalidOperationException("Mapping name cannot be null when adding mapping with context");

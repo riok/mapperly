@@ -9,7 +9,6 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
 internal class MembersMappingStateBuilder
 {
-    private readonly HashSet<IMapping> _mappingsInProcessing = new();
     private readonly HashSet<string> _valueMappingConfiguredTargetPaths = [];
     private readonly ListDictionary<string, IMemberPathConfiguration> _configuredTargetMembersByRootName = new();
 
@@ -34,7 +33,7 @@ internal class MembersMappingStateBuilder
         var unmappedSourceMemberNames = GetSourceMemberNames(ctx, mapping);
         var targetMembers = GetTargetMembers(ctx, mapping);
 
-        factory.BuildRecursively(ctx, mapping);
+        factory.BuildWithIncludedContexts(ctx, mapping);
 
         // after collecting the ignored members cle
         IgnoredMembersBuilder.CleanupIgnoredMembers(
@@ -70,33 +69,22 @@ internal class MembersMappingStateBuilder
         );
     }
 
-    private void BuildRecursively(MappingBuilderContext ctx, IMapping mapping)
+    private void BuildWithIncludedContexts(MappingBuilderContext parentCtx, IMapping mapping)
     {
-        if (!_mappingsInProcessing.Add(mapping))
+        foreach (var ctx in parentCtx.GetContextWithChildren())
         {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.CircularReferencedMapping, ctx.UserSymbol?.ToDisplayString() ?? "<unknown>");
-            return;
+            // build configurations
+            // duplicated configurations are filtered inside the MapValue configurations
+            // if a MapProperty configuration references a target member which is already configured
+            // via MapValue, it is also filtered and reported
+            BuildMemberValueConfigurations(ctx, mapping);
+            BuildMemberConfigurations(ctx, mapping);
+            GetAdditionalSourceMembers(ctx);
+
+            // build ignored members
+            IgnoredMembersBuilder.CollectIgnoredMembers(_ignoredSourceMemberNames, ctx, MappingSourceTarget.Source);
+            IgnoredMembersBuilder.CollectIgnoredMembers(_ignoredTargetMemberNames, ctx, MappingSourceTarget.Target);
         }
-
-        // first collect the mappings from the included mappings, then apply the mappings from the current mapping.
-        if (ctx.TryResolveIncludedMapping(out var includedMapping, out var includedMappingContext))
-        {
-            BuildRecursively(includedMappingContext, includedMapping);
-        }
-
-        // build configurations
-        // duplicated configurations are filtered inside the MapValue configurations
-        // if a MapProperty configuration references a target member which is already configured
-        // via MapValue, it is also filtered and reported
-        BuildMemberValueConfigurations(ctx, mapping);
-        BuildMemberConfigurations(ctx, mapping);
-        GetAdditionalSourceMembers(ctx);
-
-        // build ignored members
-        IgnoredMembersBuilder.CollectIgnoredMembers(_ignoredSourceMemberNames, ctx, MappingSourceTarget.Source);
-        IgnoredMembersBuilder.CollectIgnoredMembers(_ignoredTargetMemberNames, ctx, MappingSourceTarget.Target);
-
-        _mappingsInProcessing.Remove(mapping);
     }
 
     private void GetAdditionalSourceMembers(MappingBuilderContext ctx)

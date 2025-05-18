@@ -24,7 +24,8 @@ public class SimpleMappingBuilderContext(
     MappingBuilder mappingBuilder,
     ExistingTargetMappingBuilder existingTargetMappingBuilder,
     InlinedExpressionMappingCollection inlinedMappings,
-    Location diagnosticLocation
+    Location diagnosticLocation,
+    SimpleMappingBuilderContext? childContext
 )
 {
     private readonly DiagnosticCollection _diagnostics = diagnostics;
@@ -32,7 +33,11 @@ public class SimpleMappingBuilderContext(
     private readonly MapperConfigurationReader _configurationReader = configurationReader;
     private readonly Location _diagnosticLocation = diagnosticLocation;
 
-    protected SimpleMappingBuilderContext(SimpleMappingBuilderContext ctx, Location? diagnosticLocation)
+    protected SimpleMappingBuilderContext(
+        SimpleMappingBuilderContext ctx,
+        Location? diagnosticLocation,
+        SimpleMappingBuilderContext? childContext
+    )
         : this(
             ctx._compilationContext,
             ctx.MapperDeclaration,
@@ -45,7 +50,8 @@ public class SimpleMappingBuilderContext(
             ctx.MappingBuilder,
             ctx.ExistingTargetMappingBuilder,
             ctx.InlinedMappings,
-            diagnosticLocation ?? ctx._diagnosticLocation
+            diagnosticLocation ?? ctx._diagnosticLocation,
+            childContext ?? ctx.ChildContext
         ) { }
 
     public MapperDeclaration MapperDeclaration { get; } = mapperDeclaration;
@@ -74,6 +80,8 @@ public class SimpleMappingBuilderContext(
     /// and the body of these mappings is never built.
     /// </summary>
     protected InlinedExpressionMappingCollection InlinedMappings { get; } = inlinedMappings;
+
+    public SimpleMappingBuilderContext? ChildContext { get; } = childContext;
 
     public SemanticModel? GetSemanticModel(SyntaxTree syntaxTree) => _compilationContext.GetSemanticModel(syntaxTree);
 

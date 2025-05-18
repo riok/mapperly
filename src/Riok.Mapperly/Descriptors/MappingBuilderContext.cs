@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Constructors;
@@ -27,7 +26,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null,
         bool supportsDeepCloning = true
     )
-        : base(parentCtx, diagnosticLocation ?? userMapping?.Method.GetSyntaxLocation())
+        : base(parentCtx, diagnosticLocation ?? userMapping?.Method.GetSyntaxLocation(), null)
     {
         InstanceConstructors = instanceConstructors;
         _formatProviders = formatProviders;
@@ -61,6 +60,16 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         {
             Configuration = Configuration with { DerivedTypes = [] };
         }
+    }
+
+    protected MappingBuilderContext(MappingBuilderContext ctx, MappingBuilderContext includedContext)
+        : base(ctx, null, includedContext)
+    {
+        InstanceConstructors = ctx.InstanceConstructors;
+        _formatProviders = ctx._formatProviders;
+        UserMapping = ctx.UserMapping;
+        MappingKey = ctx.MappingKey;
+        Configuration = ctx.Configuration;
     }
 
     public TypeMappingKey MappingKey { get; }
@@ -106,46 +115,6 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         }
 
         return mapping;
-    }
-
-    /// <summary>
-    /// Attempts to resolve an included mapping and its associated context. If multiple mappings are found,
-    /// then tries to find a single match that maps the same source and target types or base types.
-    /// </summary>
-    /// <param name="includedMapping">The resolved included mapping if successful, or <c>null</c> otherwise.</param>
-    /// <param name="includedMappingContext">The resolved mapping context if successful, or <c>null</c> otherwise.</param>
-    /// <returns><c>true</c> if an included mapping and context are successfully resolved; otherwise, <c>false</c>.</returns>
-    public bool TryResolveIncludedMapping(
-        [NotNullWhen(true)] out ITypeMapping? includedMapping,
-        [NotNullWhen(true)] out MappingBuilderContext? includedMappingContext
-    )
-    {
-        var mappingName = Configuration.Members.IncludedMapping;
-        if (mappingName == null)
-        {
-            includedMapping = null;
-            includedMappingContext = null;
-            return false;
-        }
-
-        var contexts = MappingBuilder.FindMappingBuilderContext(mappingName);
-        switch (contexts.Count)
-        {
-            case 0:
-                includedMapping = null;
-                includedMappingContext = null;
-                ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, mappingName);
-                return false;
-            case 1:
-            {
-                includedMappingContext = contexts[0];
-                includedMapping = includedMappingContext.UserMapping!;
-                var checkerResult = CheckIncludedMappingTypes(includedMappingContext);
-                return ReportFailedIncludeMapping(checkerResult, includedMappingContext);
-            }
-            default:
-                return TryGetBestIncludedMappingCandidate(out includedMapping, out includedMappingContext, contexts, mappingName);
-        }
     }
 
     /// <summary>
@@ -427,68 +396,26 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         return MappingBuilder.Build(ctx, options.HasFlag(MappingBuildingOptions.MarkAsReusable));
     }
 
-    private bool TryGetBestIncludedMappingCandidate(
-        out ITypeMapping? includedMapping,
-        out MappingBuilderContext? includedMappingContext,
-        IReadOnlyList<MappingBuilderContext> contexts,
-        string mappingName
-    )
+    public MappingBuilderContext IncludeMappingBuilderContext(MappingBuilderContext includedMappingContext)
     {
-        includedMapping = null;
-        includedMappingContext = null;
-        var candidates = new List<MappingBuilderContext>();
-        foreach (var context in contexts)
-        {
-            var checkerResult = CheckIncludedMappingTypes(context);
-            if (checkerResult.Success)
-            {
-                candidates.Add(context);
-            }
-        }
-
-        switch (candidates.Count)
-        {
-            case 0:
-                ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, mappingName);
-                return false;
-            case 1:
-                includedMappingContext = candidates[0];
-                includedMapping = includedMappingContext.UserMapping!;
-                return true;
-            default:
-                ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingAmbiguous, mappingName);
-                return false;
-        }
+        return new MappingBuilderContext(this, includedMappingContext);
     }
 
-    private GenericTypeChecker.GenericTypeCheckerResult CheckIncludedMappingTypes(MappingBuilderContext includedMapping)
+    public IEnumerable<MappingBuilderContext> GetContextWithChildren()
     {
-        return GenericTypeChecker.InferAndCheckTypes(
-            UserSymbol!.TypeParameters,
-            (includedMapping.Source, Source),
-            (includedMapping.Target, Target)
-        );
-    }
-
-    private bool ReportFailedIncludeMapping(
-        GenericTypeChecker.GenericTypeCheckerResult typeCheckerResult,
-        MappingBuilderContext includedMapping
-    )
-    {
-        if (typeCheckerResult.Success)
+        if (ChildContext == null)
         {
-            return true;
+            return [this];
+        }
+        List<MappingBuilderContext> list = new();
+        var currentContext = this;
+        while (currentContext != null)
+        {
+            list.Add(currentContext);
+            currentContext = currentContext.ChildContext as MappingBuilderContext;
         }
 
-        if (ReferenceEquals(Source, typeCheckerResult.FailedArgument))
-        {
-            ReportDiagnostic(DiagnosticDescriptors.SourceTypeIsNotRelatedToIncludedSourceType, Source, includedMapping.Source);
-        }
-        else
-        {
-            ReportDiagnostic(DiagnosticDescriptors.TargetTypeIsNotRelatedToIncludedTargetType, Target, includedMapping.Target);
-        }
-
-        return false;
+        list.Reverse();
+        return list;
     }
 }
