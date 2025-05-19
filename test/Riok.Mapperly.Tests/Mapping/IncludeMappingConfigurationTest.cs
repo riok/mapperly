@@ -57,6 +57,44 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
+    public Task UsesMapValueFromTargetMapper()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue(nameof(A.Value), "C1")]
+            partial B OtherMapper(A a);
+
+            [IncludeMappingConfiguration(nameof(OtherMapper))]
+            partial B Mapper(A a);
+            """,
+            "class A { }",
+            "class B { public string Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task UsesMapValueWithUseFromTargetMapper()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue(nameof(A.Value), Use = nameof(GetValue))]
+            partial B OtherMapper(A a);
+
+            [IncludeMappingConfiguration(nameof(OtherMapper))]
+            partial B Mapper(A a);
+
+            string GetValue() => "C1";
+            """,
+            "class A { }",
+            "class B { public string Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task UsesMapPropertyFromSourceFromTargetMapper()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
