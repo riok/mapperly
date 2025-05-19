@@ -8,10 +8,10 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
-            partial B OtherMappingMethod(A a);
+            partial B OtherMapper(A a);
 
-            [IncludeMappingConfiguration(nameof(OtherMappingMethod))]
-            partial B MapAnother(A a);
+            [IncludeMappingConfiguration(nameof(OtherMapper))]
+            partial B Mapper(A a);
             """,
             "class A { public string SourceName { get; set; } }",
             "class B { public string DestinationName { get; set; } }"
@@ -26,10 +26,10 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapperIgnoreSource(nameof(A.Ignored))]
-            partial B OtherMappingMethod(A a);
+            partial B OtherMapper(A a);
 
-            [IncludeMappingConfiguration(nameof(OtherMappingMethod))]
-            partial B MapAnother(A a);
+            [IncludeMappingConfiguration(nameof(OtherMapper))]
+            partial B Mapper(A a);
             """,
             "class A { public string Property { get; set; } public string Ignored { get; set; } }",
             "class B { public string Property { get; set; } }"
@@ -44,10 +44,10 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapperIgnoreTarget(nameof(A.Ignored))]
-            partial B OtherMappingMethod(A a);
+            partial B OtherMapper(A a);
 
-            [IncludeMappingConfiguration(nameof(OtherMappingMethod))]
-            partial B MapAnother(A a);
+            [IncludeMappingConfiguration(nameof(OtherMapper))]
+            partial B Mapper(A a);
             """,
             "class A { public string Property { get; set; } }",
             "class B { public string Property { get; set; } public string Ignored { get; set; } }"
