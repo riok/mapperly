@@ -57,6 +57,24 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
+    public Task UsesMapPropertyFromSourceFromTargetMapper()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapPropertyFromSource(nameof(A.Value))]
+            private partial B OtherMapper(A source);
+
+            [IncludeMappingConfiguration(nameof(OtherMapper))]
+            public partial B Mapper(A source);
+            """,
+            "class A { }",
+            "class B { public A Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task UsesMapNestedPropertiesFromTargetMapper()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
