@@ -15,7 +15,7 @@
     <PackageTags>Mapper SourceGenerator</PackageTags>
     <PackageIcon>logo.png</PackageIcon>
     <!-- default roslyn version and constants, compare 4 numeric part versions -->
-    <ROSLYN_VERSION Condition="'$(ROSLYN_VERSION)' == ''">4.11</ROSLYN_VERSION>
+    <ROSLYN_VERSION Condition="'$(ROSLYN_VERSION)' == ''">4.14</ROSLYN_VERSION>
     <DefineConstants Condition="'$(ROSLYN_VERSION).0.0' &gt;= '4.4.0.0'">$(DefineConstants);ROSLYN4_4_OR_GREATER</DefineConstants>
     <DefineConstants Condition="'$(ROSLYN_VERSION).0.0' &gt;= '4.7.0.0'">$(DefineConstants);ROSLYN4_7_OR_GREATER</DefineConstants>
   </PropertyGroup>

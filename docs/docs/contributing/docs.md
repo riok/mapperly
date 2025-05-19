@@ -25,7 +25,7 @@ npm i
 
 To build the generated parts of the documentation
 (eg. the API documentation (located in `docs/99-api`), the table of analyzer rules, the samples, ...)
-ensure the dotnet solution is built or run `dontet build` in the solutions root directory.
+ensure the dotnet solution is built or run `dotnet build` in the solutions root directory.
 Then run the prebuild script:
 
 ```bash
