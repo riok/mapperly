@@ -94,6 +94,24 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
+    public Task UsesMapperIgnoreObsoleteMembersFromTargetMapper()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapperIgnoreObsoleteMembers(IgnoreObsoleteMembersStrategy.Both)]
+            private partial B OtherMapper(A source);
+
+            [IncludeMappingConfiguration(nameof(OtherMapper))]
+            public partial B Mapper(A source);
+            """,
+            "class A { public int Id { get; set; } [Obsolete]public int Value { get; set; } }",
+            "class B { public int Id { get; set; } [Obsolete]public int Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task AppliesRecursively()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
