@@ -253,6 +253,24 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
+    public Task IncludesStringFormatFromMapProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Price), nameof(B.Price), StringFormat = "C")]
+            public partial B OtherMapper(A source);
+
+            [IncludeMappingConfiguration(nameof(OtherMapper))]
+            public partial B Mapper(A source);
+            """,
+            "class A { public int Price { get; set; } }",
+            "class B { public string Price { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ReportsCircularReferences()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
