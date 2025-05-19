@@ -253,11 +253,14 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
-    public Task IncludesStringFormatFromMapProperty()
+    public Task IncludesStringFormatAndFormatProviderFromMapProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [MapProperty(nameof(A.Price), nameof(B.Price), StringFormat = "C")]
+            [FormatProvider]
+            private readonly IFormatProvider _enCulture = CultureInfo.GetCultureInfo("en-US");
+
+            [MapProperty(nameof(A.Price), nameof(B.Price), StringFormat = "C", FormatProvider = nameof(_enCulture))]
             public partial B OtherMapper(A source);
 
             [IncludeMappingConfiguration(nameof(OtherMapper))]

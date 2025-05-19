@@ -7,7 +7,7 @@ public partial class Mapper
     public partial global::B OtherMapper(global::A source)
     {
         var target = new global::B();
-        target.Price = source.Price.ToString("C");
+        target.Price = source.Price.ToString("C", _enCulture);
         return target;
     }
 
@@ -15,7 +15,7 @@ public partial class Mapper
     public partial global::B Mapper(global::A source)
     {
         var target = new global::B();
-        target.Price = source.Price.ToString("C");
+        target.Price = source.Price.ToString("C", _enCulture);
         return target;
     }
 }
