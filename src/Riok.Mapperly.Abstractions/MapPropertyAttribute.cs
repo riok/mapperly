@@ -92,4 +92,9 @@ public sealed class MapPropertyAttribute : Attribute
     /// Reference to a unique named mapping method which should be used to map this member.
     /// </summary>
     public string? Use { get; set; }
+
+    /// <summary>
+    /// When set to true, RMG089 is not emitted.
+    /// </summary>
+    public bool SuppressNullMismatchDiagnostic { get; set; }
 }

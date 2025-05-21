@@ -814,4 +814,87 @@ public class ObjectPropertyFlatteningTest
                 """
             );
     }
+
+    [Fact]
+    public void NotNullablePropertyOnTargetWithNoSuppressNullMismatchDiagnosticShouldGiveWarningRMG089()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(\"IdA\", \"IdB\")] private partial B Map(A source);",
+            "class A { public int? IdA { get; set; } }",
+            "class B { public int IdB { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property IdA of A to the target property IdB of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.IdA != null)
+                {
+                    target.IdB = source.IdA.Value;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NotNullablePropertyOnTargetWithSuppressNullMismatchDiagnosticFalseShouldGiveWarningRMG089()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(\"IdA\", \"IdB\", SuppressNullMismatchDiagnostic = false)] private partial B Map(A source);",
+            "class A { public int? IdA { get; set; } }",
+            "class B { public int IdB { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property IdA of A to the target property IdB of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.IdA != null)
+                {
+                    target.IdB = source.IdA.Value;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NotNullablePropertyOnTargetWithSuppressNullMismatchDiagnosticTrueShouldIgnoreWarningRMG089()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(\"IdA\", \"IdB\", SuppressNullMismatchDiagnostic = true)] private partial B Map(A source);",
+            "class A { public int? IdA { get; set; } }",
+            "class B { public int IdB { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.IdA != null)
+                {
+                    target.IdB = source.IdA.Value;
+                }
+                return target;
+                """
+            );
+    }
 }
