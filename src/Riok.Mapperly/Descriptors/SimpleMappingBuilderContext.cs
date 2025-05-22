@@ -81,7 +81,11 @@ public class SimpleMappingBuilderContext(
     /// </summary>
     protected InlinedExpressionMappingCollection InlinedMappings { get; } = inlinedMappings;
 
-    public SimpleMappingBuilderContext? ChildContext { get; } = childContext;
+    /// <summary>
+    /// Gets the child mapping context, if any.
+    /// This is used to include mapping configurations from another mapper method.
+    /// </summary>
+    protected SimpleMappingBuilderContext? ChildContext { get; } = childContext;
 
     public SemanticModel? GetSemanticModel(SyntaxTree syntaxTree) => _compilationContext.GetSemanticModel(syntaxTree);
 
