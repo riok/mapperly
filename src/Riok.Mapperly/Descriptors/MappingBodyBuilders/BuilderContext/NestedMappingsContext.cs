@@ -23,25 +23,27 @@ public class NestedMappingsContext
 
     public static NestedMappingsContext Create(MappingBuilderContext ctx) => new(ctx, ResolveNestedMappings(ctx));
 
-    private static List<MemberPath> ResolveNestedMappings(MappingBuilderContext ctx)
+    private static List<MemberPath> ResolveNestedMappings(MappingBuilderContext parentCtx)
     {
-        var nestedMemberPaths = new List<MemberPath>(ctx.Configuration.Members.NestedMappings.Count);
+        var nestedMemberPaths = new List<MemberPath>(parentCtx.Configuration.Members.NestedMappings.Count);
 
-        foreach (var nestedMemberConfig in ctx.Configuration.Members.NestedMappings)
+        foreach (var ctx in parentCtx.GetContextWithChildren())
         {
-            if (!ctx.SymbolAccessor.TryFindMemberPath(ctx.Source, nestedMemberConfig.Source, out var memberPath))
+            foreach (var nestedMemberConfig in ctx.Configuration.Members.NestedMappings)
             {
-                ctx.ReportDiagnostic(
-                    DiagnosticDescriptors.ConfiguredMappingNestedMemberNotFound,
-                    nestedMemberConfig.Source.FullName,
-                    ctx.Source
-                );
-                continue;
+                if (!ctx.SymbolAccessor.TryFindMemberPath(ctx.Source, nestedMemberConfig.Source, out var memberPath))
+                {
+                    ctx.ReportDiagnostic(
+                        DiagnosticDescriptors.ConfiguredMappingNestedMemberNotFound,
+                        nestedMemberConfig.Source.FullName,
+                        ctx.Source
+                    );
+                    continue;
+                }
+
+                nestedMemberPaths.Add(memberPath);
             }
-
-            nestedMemberPaths.Add(memberPath);
         }
-
         return nestedMemberPaths;
     }
 
