@@ -1,4 +1,4 @@
-﻿#if NET8_0_OR_GREATER
+#if NET8_0_OR_GREATER
 using System.Threading.Tasks;
 using FluentAssertions;
 using Riok.Mapperly.IntegrationTests.Mapper;
