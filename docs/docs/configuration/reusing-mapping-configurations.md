@@ -1,10 +1,11 @@
-﻿sidebar_position: 17
-description: Include settings from another mapper method
+﻿---
+sidebar_position: 17
+description: Reusing Mapping Configurations
 ---
 
 # Including Mapping Configurations
 
-Mapperly supports reusing mapping configurations across different mapping methods using two new attributes:
+Mapperly supports reusing mapping configurations across different mapping methods using two attributes:
 `NamedMappingAttribute` and `IncludeMappingConfigurationAttribute`. This enables sharing and modularizing mapping logic for consistent mapping behavior between multiple methods.
 
 ## Defining and Reusing Mapping Configurations
@@ -34,12 +35,6 @@ Or refer to a method directly:
 [IncludeMappingConfiguration(nameof(ToFruit))] 
 public partial static AppleDto Map(Apple apple);
 ```
-
-> **Note:** The `IncludeMappingConfigurationAttribute` only uses a mapping if the mapped types are the same or base
-> types of the mapped type. This means that the configuration will only be applied if the source and target types of
-> the included mapping are compatible. Specifically, the types must either be the same, or the included mapping’s
-> types must be base types of the method where the attribute is applied.
-
 
 ### Usage Example
 
@@ -80,6 +75,12 @@ public partial class MyMapper {
 ```
 
 In this example, the `Map` method for `Apple` reuses the configuration from `ToFruit`, ensuring consistent property mapping.
+
+## Restrictions
+
+The `IncludeMappingConfigurationAttribute` can only include such mapping configurations that are in the same class. Currently, configurations from other classes cannot be included.
+
+The `IncludeMappingConfigurationAttribute` only uses a mapping if the mapped types are the same or base types of the mapped type. This means that the configuration will only be applied if the source and target types of the included mapping are compatible.
 
 ## Diagnostics
 

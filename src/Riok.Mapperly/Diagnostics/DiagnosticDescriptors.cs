@@ -772,19 +772,19 @@ public static class DiagnosticDescriptors
         true
     );
 
-    public static readonly DiagnosticDescriptor SourceTypeIsNotRelatedToIncludedSourceType = new(
+    public static readonly DiagnosticDescriptor SourceTypeIsNotAssignableToTheIncludedSourceType = new(
         "RMG092",
-        "Source type is not related to the included source type",
-        "Source type {0} is not related to the included source type {1}",
+        "Source type is not assignable to the included source type",
+        "Source type {0} is not assignable to the included source type {1}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true
     );
 
-    public static readonly DiagnosticDescriptor TargetTypeIsNotRelatedToIncludedTargetType = new(
+    public static readonly DiagnosticDescriptor TargetTypeIsNotAssignableToTheIncludedTargetType = new(
         "RMG093",
-        "Target type is not related to the included target type",
-        "Target type {0} is not related to the included target type {1}",
+        "Target type is not assignable to the included target type",
+        "Target type {0} is not assignable to the included target type {1}",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
         true

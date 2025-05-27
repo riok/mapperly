@@ -202,3 +202,13 @@ RMG017  | Mapper   | Warning  | An init only member can have one configuration a
 RMG026  | Mapper   | Info     | Cannot map from indexed member
 RMG027  | Mapper   | Warning  | A constructor parameter can have one configuration at max
 RMG028  | Mapper   | Warning  | Constructor parameter cannot handle target paths
+
+### Release 4.1
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+RMG091 | Mapper | Error | Circular referenced mapping detected
+RMG092 | Mapper | Error | Source type is not related to the included source type
+RMG093 | Mapper | Error | Target type is not related to the included target type

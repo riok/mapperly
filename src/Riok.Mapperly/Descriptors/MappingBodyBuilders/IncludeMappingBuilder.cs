@@ -162,11 +162,19 @@ public class IncludeMappingBuilder(MappingCollection mappings)
 
         if (ReferenceEquals(ctx.Source, typeCheckerResult.FailedArgument))
         {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.SourceTypeIsNotRelatedToIncludedSourceType, ctx.Source, includedMapping.Source);
+            ctx.ReportDiagnostic(
+                DiagnosticDescriptors.SourceTypeIsNotAssignableToTheIncludedSourceType,
+                ctx.Source,
+                includedMapping.Source
+            );
         }
         else
         {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.TargetTypeIsNotRelatedToIncludedTargetType, ctx.Target, includedMapping.Target);
+            ctx.ReportDiagnostic(
+                DiagnosticDescriptors.TargetTypeIsNotAssignableToTheIncludedTargetType,
+                ctx.Target,
+                includedMapping.Target
+            );
         }
 
         return false;
