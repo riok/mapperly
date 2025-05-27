@@ -1,4 +1,4 @@
-﻿using Riok.Mapperly.Diagnostics;
+using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
 
