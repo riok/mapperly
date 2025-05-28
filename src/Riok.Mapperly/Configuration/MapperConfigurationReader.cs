@@ -92,8 +92,6 @@ public class MapperConfigurationReader
         if (configRef.Method == null)
             return MapperConfiguration.Members;
 
-        var mappingName = _dataAccessor.AccessFirstOrDefault<NamedMappingAttribute>(configRef.Method)?.Name ?? configRef.Method.Name;
-
         var ignoredSourceMembers = _dataAccessor
             .Access<MapperIgnoreSourceAttribute>(configRef.Method)
             .Select(x => x.Source)
@@ -148,7 +146,7 @@ public class MapperConfigurationReader
         }
 
         return new MembersMappingConfiguration(
-            mappingName,
+            configRef.Method.Name,
             ignoredSourceMembers,
             ignoredTargetMembers,
             memberValueConfigurations,

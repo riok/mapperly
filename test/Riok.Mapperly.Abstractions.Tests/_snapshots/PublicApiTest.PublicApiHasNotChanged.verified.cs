@@ -250,13 +250,6 @@ namespace Riok.Mapperly.Abstractions
     }
     [System.AttributeUsage(System.AttributeTargets.Method)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
-    public sealed class NamedMappingAttribute : System.Attribute
-    {
-        public NamedMappingAttribute(string name) { }
-        public string Name { get; }
-    }
-    [System.AttributeUsage(System.AttributeTargets.Method)]
-    [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
     public sealed class ObjectFactoryAttribute : System.Attribute
     {
         public ObjectFactoryAttribute() { }

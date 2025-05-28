@@ -4,21 +4,19 @@ namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
 /// An attribute used to include the mapping configuration of another mapping method in the attributed method.
-/// The configuration to include can be identified either by the method name or by a custom name specified
-/// using the <see cref="NamedMappingAttribute"/>.
+/// Use the other mapping's method name to identify the configuration.
 /// </summary>
 [AttributeUsage(AttributeTargets.Method)]
 [Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
 public sealed class IncludeMappingConfigurationAttribute : Attribute
 {
     /// <summary>
-    /// Includes the mapping configuration of another mapping method into the attributed method.
-    /// The referenced mapping configuration can be identified by either its method name or a custom name specified
-    /// using <see cref="NamedMappingAttribute"/>.
+    /// An attribute used to include the mapping configuration of another mapping method in the attributed method.
+    /// Use the other mapping's method name to identify the configuration.
     /// </summary>
     /// <param name="name">
-    /// The name of the mapping configuration to include. This can be the method name of the other mapping
-    /// method or a custom name provided via <see cref="NamedMappingAttribute"/>.
+    /// The name of the mapping configuration to include. Use the method name of the other mapping
+    /// method.
     /// </param>
     public IncludeMappingConfigurationAttribute(string name)
     {

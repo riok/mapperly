@@ -87,7 +87,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapPropertyFromSource(nameof(TestObjectDto.Sum), Use = nameof(ComputeSum))]
         [MapNestedProperties(nameof(TestObject.NestedMember))]
         [MapperIgnoreObsoleteMembers]
-        [NamedMapping("MapToDtoInternal-Renamed")]
         private partial TestObjectDto MapToDtoInternal(TestObject testObject);
 
         [MapperIgnoreTarget(nameof(TestObject.DateTimeValueTargetDateOnly))]
@@ -110,7 +109,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [UserMapping(Default = false)]
         private int ComputeSum(TestObject testObject) => testObject.SumComponent1 + testObject.SumComponent2;
 
-        [IncludeMappingConfiguration("MapToDtoInternal-Renamed")]
+        [IncludeMappingConfiguration(nameof(MapToDtoInternal))]
         private partial TestObjectDto MapToDtoInternalInclude(TestObject testObject);
 
 #if NET8_0_OR_GREATER
