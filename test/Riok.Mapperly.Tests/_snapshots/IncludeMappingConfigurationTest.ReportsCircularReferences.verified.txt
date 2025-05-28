@@ -5,14 +5,14 @@
 {
     [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-[IncludeMappingConfiguration(nameof(MapAnother))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-partial B OtherMappingMethod(A a);
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapOther))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+partial B Map(A a);
+^^^^^^^^^^^^^^^^^^^
 
 */
- : (11,4)-(13,34),
-      Message: A circular reference has been detected in mapping configuration: Mapper.OtherMappingMethod(A),
+ : (11,4)-(13,19),
+      Message: A circular reference has been detected in mapping configuration: Mapper.Map(A),
       Severity: Error,
       Descriptor: {
         Id: RMG091,

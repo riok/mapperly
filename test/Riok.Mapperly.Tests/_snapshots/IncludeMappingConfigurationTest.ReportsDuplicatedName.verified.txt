@@ -3,14 +3,14 @@
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(OtherMapper))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-public static partial BDerived Mapper(ADerived a);
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapOther))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public static partial BDerived Map(ADerived a);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 }
 */
- : (18,0)-(19,50),
-      Message: The referenced mapping name OtherMapper is ambiguous, use a unique name,
+ : (18,0)-(19,47),
+      Message: The referenced mapping name MapOther is ambiguous, use a unique name,
       Severity: Error,
       Descriptor: {
         Id: RMG062,
@@ -24,13 +24,13 @@ public static partial BDerived Mapper(ADerived a);
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(OtherMapper))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-public static partial BDerived Mapper(ADerived a);
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapOther))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public static partial BDerived Map(ADerived a);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 }
 */
- : (18,0)-(19,50),
+ : (18,0)-(19,47),
       Message: The member SourceName2 on the mapping source type ADerived is not mapped to any member on the mapping target type BDerived,
       Severity: Warning,
       WarningLevel: 1,
@@ -46,13 +46,13 @@ public static partial BDerived Mapper(ADerived a);
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(OtherMapper))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-public static partial BDerived Mapper(ADerived a);
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapOther))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public static partial BDerived Map(ADerived a);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 }
 */
- : (18,0)-(19,50),
+ : (18,0)-(19,47),
       Message: The member SourceName1 on the mapping source type ADerived is not mapped to any member on the mapping target type BDerived,
       Severity: Warning,
       WarningLevel: 1,
@@ -68,13 +68,13 @@ public static partial BDerived Mapper(ADerived a);
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(OtherMapper))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-public static partial BDerived Mapper(ADerived a);
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapOther))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public static partial BDerived Map(ADerived a);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 }
 */
- : (18,0)-(19,50),
+ : (18,0)-(19,47),
       Message: The member DestinationName2 on the mapping target type BDerived was not found on the mapping source type ADerived,
       Severity: Warning,
       WarningLevel: 1,
@@ -90,13 +90,13 @@ public static partial BDerived Mapper(ADerived a);
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(OtherMapper))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-public static partial BDerived Mapper(ADerived a);
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapOther))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public static partial BDerived Map(ADerived a);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 }
 */
- : (18,0)-(19,50),
+ : (18,0)-(19,47),
       Message: The member DestinationName1 on the mapping target type BDerived was not found on the mapping source type ADerived,
       Severity: Warning,
       WarningLevel: 1,
@@ -112,13 +112,13 @@ public static partial BDerived Mapper(ADerived a);
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(OtherMapper))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-public static partial BDerived Mapper(ADerived a);
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapOther))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public static partial BDerived Map(ADerived a);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 }
 */
- : (18,0)-(19,50),
+ : (18,0)-(19,47),
       Message: No members are mapped in the object mapping from ADerived to BDerived,
       Severity: Warning,
       WarningLevel: 1,

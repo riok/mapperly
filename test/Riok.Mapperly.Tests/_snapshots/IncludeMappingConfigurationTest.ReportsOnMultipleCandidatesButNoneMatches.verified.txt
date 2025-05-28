@@ -3,14 +3,14 @@
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(UnrelatedMapper))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-partial B MapAnother(A a);
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapUnrelated))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+partial B Map(A a);
+^^^^^^^^^^^^^^^^^^^
 }
 */
- : (17,0)-(18,26),
-      Message: The referenced mapping named UnrelatedMapper was not found,
+ : (17,0)-(18,19),
+      Message: The referenced mapping named MapUnrelated was not found,
       Severity: Error,
       Descriptor: {
         Id: RMG061,
@@ -24,13 +24,13 @@ partial B MapAnother(A a);
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(UnrelatedMapper))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-partial B MapAnother(A a);
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapUnrelated))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+partial B Map(A a);
+^^^^^^^^^^^^^^^^^^^
 }
 */
- : (17,0)-(18,26),
+ : (17,0)-(18,19),
       Message: The member SourceName on the mapping source type A is not mapped to any member on the mapping target type B,
       Severity: Warning,
       WarningLevel: 1,
@@ -46,13 +46,13 @@ partial B MapAnother(A a);
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(UnrelatedMapper))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-partial B MapAnother(A a);
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapUnrelated))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+partial B Map(A a);
+^^^^^^^^^^^^^^^^^^^
 }
 */
- : (17,0)-(18,26),
+ : (17,0)-(18,19),
       Message: The member DestinationName on the mapping target type B was not found on the mapping source type A,
       Severity: Warning,
       WarningLevel: 1,
@@ -68,13 +68,13 @@ partial B MapAnother(A a);
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(UnrelatedMapper))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-partial B MapAnother(A a);
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapUnrelated))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+partial B Map(A a);
+^^^^^^^^^^^^^^^^^^^
 }
 */
- : (17,0)-(18,26),
+ : (17,0)-(18,19),
       Message: No members are mapped in the object mapping from A to B,
       Severity: Warning,
       WarningLevel: 1,

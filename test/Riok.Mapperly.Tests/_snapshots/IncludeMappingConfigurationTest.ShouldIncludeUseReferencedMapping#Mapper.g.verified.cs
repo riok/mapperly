@@ -4,7 +4,7 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    public partial global::B OtherMapper(global::A source)
+    public partial global::B MapOther(global::A source)
     {
         var target = new global::B();
         target.StringValue = ModifyString(source.StringValue);
@@ -12,7 +12,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    public partial global::B Mapper(global::A source)
+    public partial global::B Map(global::A source)
     {
         var target = new global::B();
         target.StringValue = ModifyString(source.StringValue);

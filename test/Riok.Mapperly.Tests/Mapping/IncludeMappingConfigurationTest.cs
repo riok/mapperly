@@ -8,10 +8,10 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
-            partial B OtherMapper(A a);
+            partial B MapOther(A a);
 
-            [IncludeMappingConfiguration(nameof(OtherMapper))]
-            partial B Mapper(A a);
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            partial B Map(A a);
             """,
             "class A { public string SourceName { get; set; } }",
             "class B { public string DestinationName { get; set; } }"
@@ -26,10 +26,10 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapperIgnoreSource(nameof(A.Ignored))]
-            partial B OtherMapper(A a);
+            partial B MapOther(A a);
 
-            [IncludeMappingConfiguration(nameof(OtherMapper))]
-            partial B Mapper(A a);
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            partial B Map(A a);
             """,
             "class A { public string Property { get; set; } public string Ignored { get; set; } }",
             "class B { public string Property { get; set; } }"
@@ -44,10 +44,10 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapperIgnoreTarget(nameof(A.Ignored))]
-            partial B OtherMapper(A a);
+            partial B MapOther(A a);
 
-            [IncludeMappingConfiguration(nameof(OtherMapper))]
-            partial B Mapper(A a);
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            partial B Map(A a);
             """,
             "class A { public string Property { get; set; } }",
             "class B { public string Property { get; set; } public string Ignored { get; set; } }"
@@ -62,10 +62,10 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapValue(nameof(A.Value), "C1")]
-            partial B OtherMapper(A a);
+            partial B MapOther(A a);
 
-            [IncludeMappingConfiguration(nameof(OtherMapper))]
-            partial B Mapper(A a);
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            partial B Map(A a);
             """,
             "class A { }",
             "class B { public string Value { get; set; } }"
@@ -80,10 +80,10 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapValue(nameof(A.Value), Use = nameof(GetValue))]
-            partial B OtherMapper(A a);
+            partial B MapOther(A a);
 
-            [IncludeMappingConfiguration(nameof(OtherMapper))]
-            partial B Mapper(A a);
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            partial B Map(A a);
 
             string GetValue() => "C1";
             """,
@@ -100,10 +100,10 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapPropertyFromSource(nameof(A.Value))]
-            private partial B OtherMapper(A source);
+            private partial B MapOther(A source);
 
-            [IncludeMappingConfiguration(nameof(OtherMapper))]
-            public partial B Mapper(A source);
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            public partial B Map(A source);
             """,
             "class A { }",
             "class B { public A Value { get; set; } }"
@@ -118,10 +118,10 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapNestedProperties(nameof(A.Value))]
-            private partial B OtherMapper(A source);
+            private partial B MapOther(A source);
 
-            [IncludeMappingConfiguration(nameof(OtherMapper))]
-            public partial B Mapper(A source);
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            public partial B Map(A source);
             """,
             "class A { public C Value { get; set; } }",
             "class B { public int Id { get; set; } }",
@@ -137,10 +137,10 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapperIgnoreObsoleteMembers(IgnoreObsoleteMembersStrategy.Both)]
-            private partial B OtherMapper(A source);
+            private partial B MapOther(A source);
 
-            [IncludeMappingConfiguration(nameof(OtherMapper))]
-            public partial B Mapper(A source);
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            public partial B Map(A source);
             """,
             "class A { public int Id { get; set; } [Obsolete]public int Value { get; set; } }",
             "class B { public int Id { get; set; } [Obsolete]public int Value { get; set; } }"
@@ -155,13 +155,13 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
-            partial B BaseMappingMethod(A a);
+            partial B MapBase(A a);
 
-            [IncludeMappingConfiguration(nameof(BaseMappingMethod))]
-            partial B FirstMappingMethod(A a);
+            [IncludeMappingConfiguration(nameof(MapBase))]
+            partial B MapFirst(A a);
 
-            [IncludeMappingConfiguration(nameof(FirstMappingMethod))]
-            partial B SecondMappingMethod(A a);
+            [IncludeMappingConfiguration(nameof(MapFirst))]
+            partial B MapSecond(A a);
             """,
             "class A { public string SourceName { get; set; } }",
             "class B { public string DestinationName { get; set; } }"
@@ -175,29 +175,11 @@ public class IncludeMappingConfigurationTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [IncludeMappingConfiguration(nameof(ReferencedMapper))]
-            public partial B Mapper(A source);
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            public partial B Map(A source);
 
             [MapProperty(nameof(A.Source), nameof(B.Target))]
-            public partial void ReferencedMapper(A source, B target);
-            """,
-            "class A { public string Source { get; set; } }",
-            "class B { public string Target { get; set; } }"
-        );
-
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task AppliesOnDifferentMethodDeclaration2()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            """
-            [MapProperty(nameof(A.Source), nameof(B.Target))]
-            public partial B ReferencedMapper(A source);
-
-            [IncludeMappingConfiguration(nameof(ReferencedMapper))]
-            public partial void Mapper(A source, B target);
+            public partial void MapOther(A source, B target);
             """,
             "class A { public string Source { get; set; } }",
             "class B { public string Target { get; set; } }"
@@ -233,13 +215,13 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(B.DestinationName), nameof(A.SourceName))]
-            partial A OtherMapper(B b);
+            partial A MapOther(B b);
 
             [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
-            partial B OtherMapper(A a);
+            partial B MapOther(A a);
 
-            [IncludeMappingConfiguration(nameof(OtherMapper))]
-            partial B Mapper(A a);
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            partial B Map(A a);
             """,
             "class A { public string SourceName { get; set; } }",
             "class B { public string DestinationName { get; set; } }"
@@ -254,10 +236,10 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(A.StringValue), nameof(B.StringValue), Use = nameof(ModifyString))]
-            public partial B OtherMapper(A source);
+            public partial B MapOther(A source);
 
-            [IncludeMappingConfiguration(nameof(OtherMapper))]
-            public partial B Mapper(A source);
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            public partial B Map(A source);
 
             private string ModifyString(string source) => source + "-modified";
             """,
@@ -273,13 +255,13 @@ public class IncludeMappingConfigurationTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            public partial B MainMapper(A source);
+            public partial B Map(A source);
 
-            [IncludeMappingConfiguration(nameof(ReferencedMapper))]
-            public partial BY UsedMapper(AX source);
+            [IncludeMappingConfiguration(nameof(MapSubPropertyOther))]
+            public partial BY MapSubProperty(AX source);
 
             [MapProperty(nameof(AX.Source), nameof(BY.Target))]
-            public partial void ReferencedMapper(AX source, BY target);
+            public partial void MapSubPropertyOther(AX source, BY target);
             """,
             "class A { public AX Item { get; set; } }",
             "class AX { public string Source { get; set; } }",
@@ -299,10 +281,10 @@ public class IncludeMappingConfigurationTest
             private readonly IFormatProvider _enCulture = CultureInfo.GetCultureInfo("en-US");
 
             [MapProperty(nameof(A.Price), nameof(B.Price), StringFormat = "C", FormatProvider = nameof(_enCulture))]
-            public partial B OtherMapper(A source);
+            public partial B MapOther(A source);
 
-            [IncludeMappingConfiguration(nameof(OtherMapper))]
-            public partial B Mapper(A source);
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            public partial B Map(A source);
             """,
             "class A { public int Price { get; set; } }",
             "class B { public string Price { get; set; } }"
@@ -317,11 +299,11 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
-            [IncludeMappingConfiguration(nameof(MapAnother))]
-            partial B OtherMappingMethod(A a);
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            partial B Map(A a);
 
-            [IncludeMappingConfiguration(nameof(OtherMappingMethod))]
-            partial B MapAnother(A a);
+            [IncludeMappingConfiguration(nameof(Map))]
+            partial B MapOther(A a);
             """,
             "class A { public string SourceName { get; set; } }",
             "class B { public string DestinationName { get; set; } }"
@@ -336,14 +318,14 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(A.SourceName1), nameof(B.DestinationName1))]
-            public static partial B OtherMapper(A a);
+            public static partial B MapOther(A a);
 
             [MapProperty(nameof(ADerived.SourceName1), nameof(BDerived.DestinationName1))]
             [MapProperty(nameof(ADerived.SourceName2), nameof(BDerived.DestinationName2))]
-            public static partial BDerived OtherMapper(ADerived a);
+            public static partial BDerived MapOther(ADerived a);
 
-            [IncludeMappingConfiguration(nameof(OtherMapper))]
-            public static partial BDerived Mapper(ADerived a);
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            public static partial BDerived Map(ADerived a);
             """,
             "class A { public string SourceName1 { get; set; } }",
             "class ADerived : A { public string SourceName2 { get; set; } }",
@@ -360,10 +342,10 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(C.SourceName), nameof(B.DestinationName))]
-            partial B UnrelatedMapper(C a);
+            partial B MapUnrelated(C a);
 
-            [IncludeMappingConfiguration(nameof(UnrelatedMapper))]
-            partial B MapAnother(A a);
+            [IncludeMappingConfiguration(nameof(MapUnrelated))]
+            partial B Map(A a);
             """,
             "class A { public string SourceName { get; set; } }",
             "class B { public string DestinationName { get; set; } }",
@@ -379,10 +361,10 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(A.SourceName), nameof(C.DestinationName))]
-            partial C UnrelatedMapper(A a);
+            partial C MapUnrelated(A a);
 
-            [IncludeMappingConfiguration(nameof(UnrelatedMapper))]
-            partial B MapAnother(A a);
+            [IncludeMappingConfiguration(nameof(MapUnrelated))]
+            partial B MapOther(A a);
             """,
             "class A { public string SourceName { get; set; } }",
             "class B { public string DestinationName { get; set; } }",
@@ -398,13 +380,13 @@ public class IncludeMappingConfigurationTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(C.SourceName), nameof(B.DestinationName))]
-            partial B UnrelatedMapper(C a);
+            partial B MapUnrelated(C a);
 
             [MapProperty(nameof(D.SourceName), nameof(B.DestinationName))]
-            partial B UnrelatedMapper(D a);
+            partial B MapUnrelated(D a);
 
-            [IncludeMappingConfiguration(nameof(UnrelatedMapper))]
-            partial B MapAnother(A a);
+            [IncludeMappingConfiguration(nameof(MapUnrelated))]
+            partial B Map(A a);
             """,
             "class A { public string SourceName { get; set; } }",
             "class B { public string DestinationName { get; set; } }",

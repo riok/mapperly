@@ -4,15 +4,15 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    public partial global::B MainMapper(global::A source)
+    public partial global::B Map(global::A source)
     {
         var target = new global::B();
-        target.Item = UsedMapper(source.Item);
+        target.Item = MapSubProperty(source.Item);
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    public partial global::BY UsedMapper(global::AX source)
+    public partial global::BY MapSubProperty(global::AX source)
     {
         var target = new global::BY();
         target.Target = source.Source;
@@ -20,7 +20,7 @@ public partial class Mapper
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    public partial void ReferencedMapper(global::AX source, global::BY target)
+    public partial void MapSubPropertyOther(global::AX source, global::BY target)
     {
         target.Target = source.Source;
     }
