@@ -6,13 +6,15 @@ description: Reusing Mapping Configurations
 # Including Mapping Configurations
 
 Mapperly supports reusing mapping configurations across different mapping methods using two attributes:
-`NamedMappingAttribute` and `IncludeMappingConfigurationAttribute`. This enables sharing and modularizing mapping logic for consistent mapping behavior between multiple methods.
+`NamedMappingAttribute` and `IncludeMappingConfigurationAttribute`. This enables sharing and modularizing
+mapping logic for consistent mapping behavior between multiple methods.
 
 ## Defining and Reusing Mapping Configurations
 
 ### 1. Naming a Mapping Configuration
 
-By default, every mapping method can be referenced by its method name as a mapping configuration. To explicitly assign a custom name, apply the `NamedMappingAttribute`
+By default, every mapping method can be referenced by its method name as a mapping configuration.
+To explicitly assign a custom name, apply the `NamedMappingAttribute`
 
 ```csharp
 [NamedMapping("CustomFruitMapping")] 
@@ -74,15 +76,21 @@ public partial class MyMapper {
 }
 ```
 
-In this example, the `Map` method for `Apple` reuses the configuration from `ToFruit`, ensuring consistent property mapping.
+In this example, the `Map` method for `Apple` reuses the configuration from `ToFruit`, ensuring consistent property
+mapping.
 
 ## Restrictions
 
-The `IncludeMappingConfigurationAttribute` can only include such mapping configurations that are in the same class. Currently, configurations from other classes cannot be included.
+The `IncludeMappingConfigurationAttribute` can only include such mapping configurations that are in the same class.
+Currently, configurations from other classes cannot be included.
 
-The `IncludeMappingConfigurationAttribute` only uses a mapping if the mapped types are the same or base types of the mapped type. This means that the configuration will only be applied if the source and target types of the included mapping are compatible.
+The `IncludeMappingConfigurationAttribute` only uses a mapping if the mapped types are the same or base types of
+the mapped type. This means that the configuration will only be applied if the source and target types of the
+included mapping are compatible.
 
 ## Diagnostics
 
-If an `IncludeMappingConfigurationAttribute` refers to an ambiguous mapping configuration (e.g., multiple configurations exist with the same name), the mapper will emit a diagnostic message to help you resolve the ambiguity. This configuration only considers the compatible mappings.
+If an `IncludeMappingConfigurationAttribute` refers to an ambiguous mapping configuration (e.g., multiple 
+configurations exist with the same name), the mapper will emit RMG062 to help you resolve the ambiguity. 
+This configuration only considers the compatible mappings.
 
