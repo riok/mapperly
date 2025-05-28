@@ -171,7 +171,7 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
-    public Task AppliesOnDifferentMethodDeclaration()
+    public Task NewInstanceConfigAppliesToExistingInstance()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -180,6 +180,24 @@ public class IncludeMappingConfigurationTest
 
             [MapProperty(nameof(A.Source), nameof(B.Target))]
             public partial void MapOther(A source, B target);
+            """,
+            "class A { public string Source { get; set; } }",
+            "class B { public string Target { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ExistingInstanceConfigAppliesToNewInstance()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Source), nameof(B.Target))]
+            public partial B MapOther(A source);
+
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            public partial void Map(A source, B target);
             """,
             "class A { public string Source { get; set; } }",
             "class B { public string Target { get; set; } }"
