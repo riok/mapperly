@@ -12,11 +12,6 @@ namespace Riok.Mapperly.Abstractions;
 public sealed class IncludeMappingConfigurationAttribute : Attribute
 {
     /// <summary>
-    /// Gets the name of the mapping configuration to include.
-    /// </summary>
-    public string Name { get; }
-
-    /// <summary>
     /// Includes the mapping configuration of another mapping method into the attributed method.
     /// The referenced mapping configuration can be identified by either its method name or a custom name specified
     /// using <see cref="NamedMappingAttribute"/>.
@@ -29,4 +24,9 @@ public sealed class IncludeMappingConfigurationAttribute : Attribute
     {
         Name = name;
     }
+
+    /// <summary>
+    /// Gets the name of the mapping configuration to include.
+    /// </summary>
+    public string Name { get; }
 }
