@@ -203,7 +203,7 @@ RMG026  | Mapper   | Info     | Cannot map from indexed member
 RMG027  | Mapper   | Warning  | A constructor parameter can have one configuration at max
 RMG028  | Mapper   | Warning  | Constructor parameter cannot handle target paths
 
-### Release 4.1
+## Release 4.1
 
 ### New Rules
 
