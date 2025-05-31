@@ -13,24 +13,24 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// </summary>
 internal static class IgnoredMembersBuilder
 {
-    internal static HashSet<string> BuildIgnoredMembers(
+    internal static void CollectIgnoredMembers(HashSet<string> container, MappingBuilderContext ctx, MappingSourceTarget sourceTarget)
+    {
+        container.UnionWith(
+            sourceTarget == MappingSourceTarget.Source ? ctx.Configuration.Members.IgnoredSources : ctx.Configuration.Members.IgnoredTargets
+        );
+        container.UnionWith(GetIgnoredAtMemberMembers(ctx, sourceTarget));
+        container.UnionWith(GetIgnoredObsoleteMembers(ctx, sourceTarget));
+    }
+
+    internal static void CleanupIgnoredMembers(
+        HashSet<string> ignoredMembers,
         MappingBuilderContext ctx,
         MappingSourceTarget sourceTarget,
         IReadOnlyCollection<string> allMembers
     )
     {
-        HashSet<string> ignoredMembers =
-        [
-            .. sourceTarget == MappingSourceTarget.Source
-                ? ctx.Configuration.Members.IgnoredSources
-                : ctx.Configuration.Members.IgnoredTargets,
-            .. GetIgnoredAtMemberMembers(ctx, sourceTarget),
-            .. GetIgnoredObsoleteMembers(ctx, sourceTarget),
-        ];
-
         RemoveAndReportConfiguredIgnoredMembers(ctx, sourceTarget, ignoredMembers);
         ReportUnmatchedIgnoredMembers(ctx, sourceTarget, ignoredMembers, allMembers);
-        return ignoredMembers;
     }
 
     private static void RemoveAndReportConfiguredIgnoredMembers(

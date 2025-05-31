@@ -26,7 +26,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null,
         bool supportsDeepCloning = true
     )
-        : base(parentCtx, diagnosticLocation ?? userMapping?.Method.GetSyntaxLocation())
+        : base(parentCtx, diagnosticLocation ?? userMapping?.Method.GetSyntaxLocation(), null)
     {
         InstanceConstructors = instanceConstructors;
         _formatProviders = formatProviders;
@@ -62,6 +62,16 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         }
     }
 
+    protected MappingBuilderContext(MappingBuilderContext ctx, MappingBuilderContext includedContext)
+        : base(ctx, null, includedContext)
+    {
+        InstanceConstructors = ctx.InstanceConstructors;
+        _formatProviders = ctx._formatProviders;
+        UserMapping = ctx.UserMapping;
+        MappingKey = ctx.MappingKey;
+        Configuration = ctx.Configuration;
+    }
+
     public TypeMappingKey MappingKey { get; }
 
     public ITypeSymbol Source => MappingKey.Source;
@@ -87,6 +97,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     /// <inheritdoc cref="MappingBuilders.MappingBuilder.NewInstanceMappings"/>
     public IReadOnlyDictionary<TypeMappingKey, INewInstanceMapping> NewInstanceMappings => MappingBuilder.NewInstanceMappings;
+
+    public string? MappingName => Configuration.Members.Name;
 
     /// <summary>
     /// Tries to find an existing mapping with the provided name.
@@ -382,5 +394,28 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     {
         var ctx = ContextForMapping(userMapping, mappingKey, options, diagnosticLocation);
         return MappingBuilder.Build(ctx, options.HasFlag(MappingBuildingOptions.MarkAsReusable));
+    }
+
+    public MappingBuilderContext IncludeMappingBuilderContext(MappingBuilderContext includedMappingContext)
+    {
+        return new MappingBuilderContext(this, includedMappingContext);
+    }
+
+    public IEnumerable<MappingBuilderContext> GetContextWithChildren()
+    {
+        if (ChildContext == null)
+        {
+            return [this];
+        }
+        List<MappingBuilderContext> list = new();
+        var currentContext = this;
+        while (currentContext != null)
+        {
+            list.Add(currentContext);
+            currentContext = currentContext.ChildContext as MappingBuilderContext;
+        }
+
+        list.Reverse();
+        return list;
     }
 }
