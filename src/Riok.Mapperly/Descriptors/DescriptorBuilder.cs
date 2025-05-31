@@ -26,7 +26,6 @@ public class DescriptorBuilder
 
     private readonly MethodNameBuilder _methodNameBuilder = new();
     private readonly MappingBodyBuilder _mappingBodyBuilder;
-    private readonly IncludeMappingBuilder _includeMappingBuilder;
     private readonly SimpleMappingBuilderContext _builderContext;
     private readonly DiagnosticCollection _diagnostics;
     private readonly UnsafeAccessorContext _unsafeAccessorContext;
@@ -42,7 +41,6 @@ public class DescriptorBuilder
         _mapperDescriptor = new MapperDescriptor(mapperDeclaration, _methodNameBuilder, supportedFeatures);
         _symbolAccessor = symbolAccessor;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
-        _includeMappingBuilder = new IncludeMappingBuilder(_mappings);
         _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
 
         var attributeAccessor = new AttributeDataAccessor(symbolAccessor);
@@ -84,7 +82,6 @@ public class DescriptorBuilder
         var formatProviders = ExtractFormatProviders();
         EnqueueUserMappings(constructorFactory, formatProviders);
         ExtractExternalMappings();
-        _includeMappingBuilder.Build(cancellationToken);
         _mappingBodyBuilder.BuildMappingBodies(cancellationToken);
         AddUserMappingDiagnostics();
         BuildMappingMethodNames();
@@ -170,6 +167,7 @@ public class DescriptorBuilder
     {
         foreach (var userMapping in _mappings.UserMappings)
         {
+            // Pass _mappings
             var ctx = new MappingBuilderContext(
                 _builderContext,
                 constructorFactory,
@@ -178,7 +176,6 @@ public class DescriptorBuilder
                 new TypeMappingKey(userMapping.SourceType, userMapping.TargetType)
             );
 
-            _mappings.AddMappingContextByName(ctx);
             _mappings.EnqueueToBuildBody(userMapping, ctx);
         }
     }

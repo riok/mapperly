@@ -2,6 +2,8 @@ using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBuilders;
+using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Descriptors.UnsafeAccess;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
@@ -95,6 +97,41 @@ public class SimpleMappingBuilderContext(
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? symbolLocation, params object[] messageArgs) =>
         _diagnostics.ReportDiagnostic(descriptor, symbolLocation?.GetSyntaxLocation() ?? _diagnosticLocation, messageArgs);
 
-    protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef, bool supportsDeepCloning) =>
-        _configurationReader.BuildFor(configRef, supportsDeepCloning, _diagnostics);
+    protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef, bool supportsDeepCloning)
+    {
+        var result = _configurationReader.BuildFor(configRef, supportsDeepCloning, _diagnostics);
+
+        if (configRef.Method == null)
+        {
+            return result;
+        }
+
+        // TODO Inspect and merge derived type configurations
+        var includeMapping = AttributeAccessor.AccessFirstOrDefault<IncludeMappingConfigurationAttribute>(configRef.Method)?.Name;
+        if (includeMapping != null)
+        {
+            ITypeMapping? newInstanceMapping =
+                (ITypeMapping?)MappingBuilder.FindOrResolveNamed(this, includeMapping, out var ambiguousName)
+                ?? MappingBuilder.FindExistingInstanceNamedMapping(this, includeMapping, out ambiguousName);
+            if (ambiguousName || newInstanceMapping is null)
+            {
+                return result;
+            }
+            var udMapping = newInstanceMapping switch
+            {
+                UserDefinedNewInstanceMethodMapping udm => udm.Method,
+                UserDefinedExistingTargetMethodMapping udm => udm.Method,
+                _ => null,
+            };
+            if (udMapping == null)
+            {
+                return result;
+            }
+
+            var newRef = new MappingConfigurationReference(udMapping, newInstanceMapping.SourceType, newInstanceMapping.TargetType);
+            var result2 = ReadConfiguration(newRef, supportsDeepCloning);
+            return result.MergeWith(result2);
+        }
+        return result;
+    }
 }

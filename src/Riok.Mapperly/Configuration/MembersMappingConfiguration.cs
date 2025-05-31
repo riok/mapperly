@@ -4,15 +4,13 @@ using Riok.Mapperly.Symbols;
 namespace Riok.Mapperly.Configuration;
 
 public record MembersMappingConfiguration(
-    string? Name,
     IReadOnlyCollection<string> IgnoredSources,
     IReadOnlyCollection<string> IgnoredTargets,
     IReadOnlyCollection<MemberValueMappingConfiguration> ValueMappings,
     IReadOnlyCollection<MemberMappingConfiguration> ExplicitMappings,
     IReadOnlyCollection<NestedMembersMappingConfiguration> NestedMappings,
     IgnoreObsoleteMembersStrategy IgnoreObsoleteMembersStrategy,
-    RequiredMappingStrategy RequiredMappingStrategy,
-    string? IncludedMapping
+    RequiredMappingStrategy RequiredMappingStrategy
 )
 {
     public IEnumerable<string> GetMembersWithExplicitConfigurations(MappingSourceTarget sourceTarget)
@@ -26,5 +24,18 @@ public record MembersMappingConfiguration(
             _ => throw new ArgumentOutOfRangeException(nameof(sourceTarget), sourceTarget, "Neither source or target"),
         };
         return members.Distinct();
+    }
+
+    public MembersMappingConfiguration MergeWith(MembersMappingConfiguration result2Members)
+    {
+        return new MembersMappingConfiguration(
+            IgnoredSources.Concat(result2Members.IgnoredSources).ToList(),
+            IgnoredTargets.Concat(result2Members.IgnoredTargets).ToList(),
+            ValueMappings.Concat(result2Members.ValueMappings).ToList(),
+            ExplicitMappings.Concat(result2Members.ExplicitMappings).ToList(),
+            NestedMappings.Concat(result2Members.NestedMappings).ToList(),
+            IgnoreObsoleteMembersStrategy,
+            RequiredMappingStrategy
+        );
     }
 }

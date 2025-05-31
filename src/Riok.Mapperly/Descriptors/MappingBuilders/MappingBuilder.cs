@@ -1,4 +1,5 @@
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
@@ -37,6 +38,8 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
     /// <inheritdoc cref="MappingCollection.NewInstanceMappings"/>
     public IReadOnlyDictionary<TypeMappingKey, INewInstanceMapping> NewInstanceMappings => mappings.NewInstanceMappings;
 
+    public MappingCollection MappingCollection => mappings;
+
     public INewInstanceMapping? Find(TypeMappingKey mapping) => mappings.FindNewInstanceMapping(mapping);
 
     public INewInstanceMapping? FindOrResolveNamed(SimpleMappingBuilderContext ctx, string name, out bool ambiguousName)
@@ -55,6 +58,11 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
         }
 
         return mappings.FindNamedNewInstanceMapping(name, out ambiguousName);
+    }
+
+    public IExistingTargetMapping? FindExistingInstanceNamedMapping(SimpleMappingBuilderContext ctx, string name, out bool ambiguousName)
+    {
+        return mappings.FindExistingInstanceNamedMapping(name, out ambiguousName);
     }
 
     public INewInstanceMapping? Build(MappingBuilderContext ctx, bool resultIsReusable)
