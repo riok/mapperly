@@ -259,6 +259,7 @@ public class IncludeMappingConfigurationTest
             [IncludeMappingConfiguration(nameof(MapOther))]
             public partial B Map(A source);
 
+            [UserMapping(Default = false)]
             private string ModifyString(string source) => source + "-modified";
             """,
             "class A { public string StringValue { get; set; } }",
