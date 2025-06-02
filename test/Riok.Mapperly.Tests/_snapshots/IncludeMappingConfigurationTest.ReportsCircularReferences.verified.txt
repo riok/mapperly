@@ -2,6 +2,27 @@
   Diagnostics: [
     {
       Location: /*
+
+[IncludeMappingConfiguration(nameof(Map))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+partial B MapOther(A a);
+^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (15,0)-(16,24),
+      Message: A circular reference has been detected in mapping configuration: Mapper.MapOther(A),
+      Severity: Error,
+      Descriptor: {
+        Id: RMG091,
+        Title: Circular referenced mapping detected,
+        MessageFormat: A circular reference has been detected in mapping configuration: {0},
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
 {
     [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
