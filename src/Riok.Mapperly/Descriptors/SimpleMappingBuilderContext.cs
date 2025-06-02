@@ -128,30 +128,35 @@ public class SimpleMappingBuilderContext(
             var newInstanceMapping =
                 (ITypeMapping?)MappingBuilder.FindOrResolveNamed(this, includeMapping, out var ambiguousName)
                 ?? MappingBuilder.FindExistingInstanceNamedMapping(this, includeMapping, out ambiguousName);
-            if (!IsMappingValid(ambiguousName, configRef, newInstanceMapping, includeMapping))
-            {
-                return result;
-            }
-
-            var udMapping = newInstanceMapping switch
+            var methodSymbol = newInstanceMapping switch
             {
                 UserDefinedNewInstanceMethodMapping udm => udm.Method,
                 UserDefinedExistingTargetMethodMapping udm => udm.Method,
                 _ => null,
             };
-            if (udMapping == null)
+
+            if (!IsMappingValid(ambiguousName, configRef, newInstanceMapping, includeMapping))
+            {
+                return result;
+            }
+
+            if (methodSymbol == null)
             {
                 _diagnostics.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, configRef.Method, includeMapping);
                 return result;
             }
 
-            if (!visitedMethods.Add(udMapping))
+            if (!visitedMethods.Add(methodSymbol))
             {
-                _diagnostics.ReportDiagnostic(DiagnosticDescriptors.CircularReferencedMapping, udMapping, udMapping.ToDisplayString());
+                _diagnostics.ReportDiagnostic(
+                    DiagnosticDescriptors.CircularReferencedMapping,
+                    methodSymbol,
+                    methodSymbol.ToDisplayString()
+                );
                 return null;
             }
 
-            var newRef = new MappingConfigurationReference(udMapping, newInstanceMapping.SourceType, newInstanceMapping.TargetType);
+            var newRef = new MappingConfigurationReference(methodSymbol, newInstanceMapping.SourceType, newInstanceMapping.TargetType);
 
             var result2 = ReadConfiguration(visitedMethods, newRef, supportsDeepCloning);
             return result2 != null ? result.MergeWith(result2) : result;
@@ -179,7 +184,37 @@ public class SimpleMappingBuilderContext(
             return false;
         }
 
-        return true;
+        var typeCheckerResult = GenericTypeChecker.InferAndCheckTypes(
+            configRef.Method!.TypeParameters,
+            (newInstanceMapping.SourceType, configRef.Source),
+            (newInstanceMapping.TargetType, configRef.Target)
+        );
+
+        if (typeCheckerResult.Success)
+        {
+            return true;
+        }
+
+        if (ReferenceEquals(configRef.Source, typeCheckerResult.FailedArgument))
+        {
+            _diagnostics.ReportDiagnostic(
+                DiagnosticDescriptors.SourceTypeIsNotAssignableToTheIncludedSourceType,
+                configRef.Method,
+                configRef.Source,
+                newInstanceMapping.SourceType
+            );
+        }
+        else
+        {
+            _diagnostics.ReportDiagnostic(
+                DiagnosticDescriptors.TargetTypeIsNotAssignableToTheIncludedTargetType,
+                configRef.Method,
+                configRef.Target,
+                newInstanceMapping.TargetType
+            );
+        }
+
+        return false;
     }
 
     public IgnoreObsoleteMembersStrategy GetIgnoreObsoleteMembersStrategy()
