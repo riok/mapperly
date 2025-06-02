@@ -770,4 +770,41 @@ public class UserMethodTest
             .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "Map has an unsupported mapping method signature")
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public void CustomMethodReturnTypesNotMatchingTargetTypeShouldNotShowIncorrectRMG020Warning()
+    {
+        // Reproduces issue #1793: Incorrect warning RMG020 for nested types when custom method return types do not match target type exactly
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial TargetWrapper MapToTargetWrapper(SourceWrapper source);
+
+            private static Target[] CustomMapToTargetArray(ICollection<Source?> sources)
+                => sources.Where(s => s is not null).Select(s => s!.MapToTarget()).ToArray();
+
+            [MapperIgnoreSource(nameof(Source.B))]
+            private static partial Target MapToTarget(this Source source);
+            """,
+            "public record Source(string A, string B);",
+            "public record SourceWrapper(ICollection<Source?> Values);",
+            "public record Target(string A);",
+            "public record TargetWrapper(IEnumerable<Target> Values);"
+        );
+
+        // This test should NOT have the RMG020 diagnostic
+        var result = TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics);
+
+        var rmg020Diagnostics = result.Diagnostics.Where(d => d.Descriptor.Id == DiagnosticDescriptors.SourceMemberNotMapped.Id);
+        rmg020Diagnostics.Should().BeEmpty("RMG020 should not be present when user mapping correctly handles the conversion");
+
+        result
+            .Should()
+            .HaveMethodBody(
+                "MapToTargetWrapper",
+                """
+                var target = new global::TargetWrapper(CustomMapToTargetArray(source.Values));
+                return target;
+                """
+            );
+    }
 }
