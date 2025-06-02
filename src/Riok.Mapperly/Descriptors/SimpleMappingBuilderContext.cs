@@ -97,7 +97,11 @@ public class SimpleMappingBuilderContext(
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? symbolLocation, params object[] messageArgs) =>
         _diagnostics.ReportDiagnostic(descriptor, symbolLocation?.GetSyntaxLocation() ?? _diagnosticLocation, messageArgs);
 
-    protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef, bool supportsDeepCloning)
+    protected MappingConfiguration ReadConfiguration(
+        HashSet<IMethodSymbol> visitedMethods,
+        MappingConfigurationReference configRef,
+        bool supportsDeepCloning
+    )
     {
         var result = _configurationReader.BuildFor(configRef, supportsDeepCloning, _diagnostics);
 
@@ -110,7 +114,7 @@ public class SimpleMappingBuilderContext(
         var includeMapping = AttributeAccessor.AccessFirstOrDefault<IncludeMappingConfigurationAttribute>(configRef.Method)?.Name;
         if (includeMapping != null)
         {
-            ITypeMapping? newInstanceMapping =
+            var newInstanceMapping =
                 (ITypeMapping?)MappingBuilder.FindOrResolveNamed(this, includeMapping, out var ambiguousName)
                 ?? MappingBuilder.FindExistingInstanceNamedMapping(this, includeMapping, out ambiguousName);
             if (ambiguousName || newInstanceMapping is null)
@@ -123,13 +127,18 @@ public class SimpleMappingBuilderContext(
                 UserDefinedExistingTargetMethodMapping udm => udm.Method,
                 _ => null,
             };
-            if (udMapping == null)
+            if (udMapping == null || !visitedMethods.Add(configRef.Method))
             {
+                _diagnostics.ReportDiagnostic(
+                    DiagnosticDescriptors.CircularReferencedMapping,
+                    udMapping,
+                    udMapping?.ToDisplayString() ?? "<unknown>"
+                );
                 return result;
             }
 
             var newRef = new MappingConfigurationReference(udMapping, newInstanceMapping.SourceType, newInstanceMapping.TargetType);
-            var result2 = ReadConfiguration(newRef, supportsDeepCloning);
+            var result2 = ReadConfiguration(visitedMethods, newRef, supportsDeepCloning);
             return result.MergeWith(result2);
         }
         return result;

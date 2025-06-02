@@ -33,6 +33,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         UserMapping = userMapping;
         MappingKey = mappingKey;
         Configuration = ReadConfiguration(
+            [],
             new MappingConfigurationReference(UserSymbol, mappingKey.Source, mappingKey.Target),
             supportsDeepCloning
         );
