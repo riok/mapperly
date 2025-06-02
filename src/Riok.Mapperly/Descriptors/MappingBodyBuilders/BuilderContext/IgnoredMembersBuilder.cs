@@ -92,7 +92,7 @@ internal static class IgnoredMembersBuilder
 
     private static IEnumerable<string> GetIgnoredObsoleteMembers(MappingBuilderContext ctx, MappingSourceTarget sourceTarget)
     {
-        var obsoleteStrategy = ctx.Configuration.Members.IgnoreObsoleteMembersStrategy;
+        var obsoleteStrategy = ctx.GetIgnoreObsoleteMembersStrategy();
         var strategy =
             sourceTarget == MappingSourceTarget.Source ? IgnoreObsoleteMembersStrategy.Source : IgnoreObsoleteMembersStrategy.Target;
 

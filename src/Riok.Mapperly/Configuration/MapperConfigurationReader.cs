@@ -141,7 +141,7 @@ public class MapperConfigurationReader
             memberValueConfigurations,
             memberConfigurations,
             nestedMembersConfigurations,
-            ignoreObsolete ?? MapperConfiguration.Members.IgnoreObsoleteMembersStrategy,
+            ignoreObsolete,
             requiredMapping ?? MapperConfiguration.Members.RequiredMappingStrategy
         );
     }

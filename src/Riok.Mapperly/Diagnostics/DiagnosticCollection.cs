@@ -20,10 +20,6 @@ public class DiagnosticCollection(Location defaultLocation) : IReadOnlyCollectio
 
     internal void ReportDiagnostic(DiagnosticDescriptor descriptor, Location? location = null, params object?[] messageArgs)
     {
-        if (_diagnostics.Any(d => ReferenceEquals(d.Descriptor, descriptor) && d.Location == location))
-        {
-            return;
-        }
         // cannot use the symbol since it would break the incremental generator
         // due to being different for each compilation.
         for (var i = 0; i < messageArgs.Length; i++)
@@ -34,6 +30,21 @@ public class DiagnosticCollection(Location defaultLocation) : IReadOnlyCollectio
             }
         }
 
-        _diagnostics.Add(Diagnostic.Create(descriptor, location ?? defaultLocation, messageArgs));
+        var diagnostic = Diagnostic.Create(descriptor, location ?? defaultLocation, messageArgs);
+
+        if (
+            _diagnostics.Exists(d =>
+                ReferenceEquals(d.Descriptor, diagnostic.Descriptor)
+                && Equals(d.Location, diagnostic.Location)
+                && Equals(d.Severity, diagnostic.Severity)
+                && Equals(d.WarningLevel, diagnostic.WarningLevel)
+                && Equals(d.GetMessage(), diagnostic.GetMessage())
+            )
+        )
+        {
+            return;
+        }
+
+        _diagnostics.Add(diagnostic);
     }
 }

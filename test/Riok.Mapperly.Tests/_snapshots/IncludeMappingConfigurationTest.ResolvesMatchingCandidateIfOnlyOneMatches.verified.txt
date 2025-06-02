@@ -3,14 +3,14 @@
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(MapUnrelated))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapOther))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 partial B Map(A a);
 ^^^^^^^^^^^^^^^^^^^
 }
 */
  : (17,0)-(18,19),
-      Message: The referenced mapping name MapUnrelated is ambiguous, use a unique name,
+      Message: The referenced mapping name MapOther is ambiguous, use a unique name,
       Severity: Error,
       Descriptor: {
         Id: RMG062,
@@ -24,8 +24,8 @@ partial B Map(A a);
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(MapUnrelated))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapOther))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 partial B Map(A a);
 ^^^^^^^^^^^^^^^^^^^
 }
@@ -46,8 +46,8 @@ partial B Map(A a);
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(MapUnrelated))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapOther))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 partial B Map(A a);
 ^^^^^^^^^^^^^^^^^^^
 }
@@ -68,8 +68,8 @@ partial B Map(A a);
     {
       Location: /*
 
-[IncludeMappingConfiguration(nameof(MapUnrelated))]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[IncludeMappingConfiguration(nameof(MapOther))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 partial B Map(A a);
 ^^^^^^^^^^^^^^^^^^^
 }

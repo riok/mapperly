@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Constructors;
 using Riok.Mapperly.Descriptors.Enumerables;
@@ -33,7 +34,6 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         UserMapping = userMapping;
         MappingKey = mappingKey;
         Configuration = ReadConfiguration(
-            [],
             new MappingConfigurationReference(UserSymbol, mappingKey.Source, mappingKey.Target),
             supportsDeepCloning
         );

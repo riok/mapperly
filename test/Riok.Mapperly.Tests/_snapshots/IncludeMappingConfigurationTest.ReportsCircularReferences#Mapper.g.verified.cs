@@ -8,7 +8,6 @@ public partial class Mapper
     {
         var target = new global::B();
         target.DestinationName = a.SourceName;
-        target.DestinationName = a.SourceName;
         return target;
     }
 

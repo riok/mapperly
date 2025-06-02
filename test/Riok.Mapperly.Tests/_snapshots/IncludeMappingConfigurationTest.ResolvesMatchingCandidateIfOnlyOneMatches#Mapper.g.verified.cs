@@ -23,7 +23,6 @@ public partial class Mapper
     partial global::B Map(global::A a)
     {
         var target = new global::B();
-        target.DestinationName = a.SourceName;
         return target;
     }
 }

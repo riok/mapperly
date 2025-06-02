@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
@@ -97,7 +98,18 @@ public class SimpleMappingBuilderContext(
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? symbolLocation, params object[] messageArgs) =>
         _diagnostics.ReportDiagnostic(descriptor, symbolLocation?.GetSyntaxLocation() ?? _diagnosticLocation, messageArgs);
 
-    protected MappingConfiguration ReadConfiguration(
+    protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef, bool supportsDeepCloning)
+    {
+        var result = ReadConfiguration([], configRef, supportsDeepCloning);
+        if (result == null)
+        {
+            throw new InvalidOperationException("Failed to read configuration.");
+        }
+
+        return result;
+    }
+
+    private MappingConfiguration? ReadConfiguration(
         HashSet<IMethodSymbol> visitedMethods,
         MappingConfigurationReference configRef,
         bool supportsDeepCloning
@@ -110,37 +122,70 @@ public class SimpleMappingBuilderContext(
             return result;
         }
 
-        // TODO Inspect and merge derived type configurations
         var includeMapping = AttributeAccessor.AccessFirstOrDefault<IncludeMappingConfigurationAttribute>(configRef.Method)?.Name;
         if (includeMapping != null)
         {
             var newInstanceMapping =
                 (ITypeMapping?)MappingBuilder.FindOrResolveNamed(this, includeMapping, out var ambiguousName)
                 ?? MappingBuilder.FindExistingInstanceNamedMapping(this, includeMapping, out ambiguousName);
-            if (ambiguousName || newInstanceMapping is null)
+            if (!IsMappingValid(ambiguousName, configRef, newInstanceMapping, includeMapping))
             {
                 return result;
             }
+
             var udMapping = newInstanceMapping switch
             {
                 UserDefinedNewInstanceMethodMapping udm => udm.Method,
                 UserDefinedExistingTargetMethodMapping udm => udm.Method,
                 _ => null,
             };
-            if (udMapping == null || !visitedMethods.Add(configRef.Method))
+            if (udMapping == null)
             {
-                _diagnostics.ReportDiagnostic(
-                    DiagnosticDescriptors.CircularReferencedMapping,
-                    udMapping,
-                    udMapping?.ToDisplayString() ?? "<unknown>"
-                );
+                _diagnostics.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, configRef.Method, includeMapping);
                 return result;
             }
 
+            if (!visitedMethods.Add(udMapping))
+            {
+                _diagnostics.ReportDiagnostic(DiagnosticDescriptors.CircularReferencedMapping, udMapping, udMapping.ToDisplayString());
+                return null;
+            }
+
             var newRef = new MappingConfigurationReference(udMapping, newInstanceMapping.SourceType, newInstanceMapping.TargetType);
+
             var result2 = ReadConfiguration(visitedMethods, newRef, supportsDeepCloning);
-            return result.MergeWith(result2);
+            return result2 != null ? result.MergeWith(result2) : result;
         }
+
         return result;
+    }
+
+    private bool IsMappingValid(
+        bool ambiguousName,
+        MappingConfigurationReference configRef,
+        [NotNullWhen(true)] ITypeMapping? newInstanceMapping,
+        string includeMapping
+    )
+    {
+        if (ambiguousName)
+        {
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingAmbiguous, configRef.Method, includeMapping);
+            return false;
+        }
+
+        if (newInstanceMapping is null)
+        {
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, configRef.Method, includeMapping);
+            return false;
+        }
+
+        return true;
+    }
+
+    public IgnoreObsoleteMembersStrategy GetIgnoreObsoleteMembersStrategy()
+    {
+        return Configuration.Members.IgnoreObsoleteMembersStrategy.GetValueOrDefault(
+            _configurationReader.MapperConfiguration.Members.IgnoreObsoleteMembersStrategy.GetValueOrDefault()
+        );
     }
 }
