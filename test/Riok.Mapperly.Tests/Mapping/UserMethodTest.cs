@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
@@ -806,5 +807,81 @@ public class UserMethodTest
                 return target;
                 """
             );
+    }
+
+    [Fact]
+    public void ArrayToListWithUserMappingShouldNotShowIncorrectRMG020Warning()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial TargetContainer MapContainer(SourceContainer source);
+
+            private static List<Target> CustomMapToList(Source[] sources)
+                => sources.Select(MapSourceToTarget).ToList();
+
+            [MapperIgnoreSource(nameof(Source.Extra))]
+            private static partial Target MapSourceToTarget(Source source);
+            """,
+            "public record Source(string Name, string Extra);",
+            "public record SourceContainer(Source[] Items);",
+            "public record Target(string Name);",
+            "public record TargetContainer(List<Target> Items);"
+        );
+
+        var result = TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics);
+
+        var rmg020Diagnostics = result.Diagnostics.Where(d => d.Descriptor.Id == DiagnosticDescriptors.SourceMemberNotMapped.Id);
+        rmg020Diagnostics.Should().BeEmpty("RMG020 should not be present for array to list conversion with user mapping");
+    }
+
+    [Fact]
+    public void MultipleIgnoredMembersInCollectionMappingShouldNotShowIncorrectRMG020Warning()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial ResultWrapper MapWrapper(DataWrapper source);
+
+            private static Result[] ProcessData(IEnumerable<Data> data)
+                => data.Select(ProcessSingle).ToArray();
+
+            [MapperIgnoreSource(nameof(Data.Internal))]
+            [MapperIgnoreSource(nameof(Data.Debug))]
+            private static partial Result ProcessSingle(Data source);
+            """,
+            "public record Data(string Value, string Internal, string Debug);",
+            "public record DataWrapper(IEnumerable<Data> Values);",
+            "public record Result(string Value);",
+            "public record ResultWrapper(IEnumerable<Result> Values);"
+        );
+
+        var result = TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics);
+
+        var rmg020Diagnostics = result.Diagnostics.Where(d => d.Descriptor.Id == DiagnosticDescriptors.SourceMemberNotMapped.Id);
+        rmg020Diagnostics.Should().BeEmpty("RMG020 should not be present when multiple source members are ignored");
+    }
+
+    [Fact]
+    public void NestedCollectionWithUserMappingShouldNotShowIncorrectRMG020Warning()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial OuterTarget MapOuter(OuterSource source);
+
+            private static InnerTarget[] MapInnerArray(List<InnerSource?> sources)
+                => sources.Where(s => s != null).Select(s => s!.MapInner()).ToArray();
+
+            [MapperIgnoreSource(nameof(InnerSource.Metadata))]
+            private static partial InnerTarget MapInner(this InnerSource source);
+            """,
+            "public record InnerSource(string Data, string Metadata);",
+            "public record OuterSource(List<InnerSource?> Inners);",
+            "public record InnerTarget(string Data);",
+            "public record OuterTarget(InnerTarget[] Inners);"
+        );
+
+        var result = TestHelper.GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics);
+
+        var rmg020Diagnostics = result.Diagnostics.Where(d => d.Descriptor.Id == DiagnosticDescriptors.SourceMemberNotMapped.Id);
+        rmg020Diagnostics.Should().BeEmpty("RMG020 should not be present for nested collection mapping");
     }
 }
