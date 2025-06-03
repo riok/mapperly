@@ -102,14 +102,8 @@ public class MapperConfigurationReader
             _ => null,
         };
 
-        if (!IsMappingValid(ambiguousName, reference, typeMapping, includeMapping))
+        if (!IsMappingValid(ambiguousName, reference, typeMapping, includeMapping, methodSymbol))
         {
-            return configuration;
-        }
-
-        if (methodSymbol == null)
-        {
-            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, reference.Method, includeMapping);
             return configuration;
         }
 
@@ -129,7 +123,8 @@ public class MapperConfigurationReader
         bool ambiguousName,
         MappingConfigurationReference configRef,
         [NotNullWhen(true)] ITypeMapping? newInstanceMapping,
-        string includeMapping
+        string includeMapping,
+        [NotNullWhen(true)] IMethodSymbol? methodSymbol
     )
     {
         if (ambiguousName)
@@ -150,31 +145,37 @@ public class MapperConfigurationReader
             (newInstanceMapping.TargetType, configRef.Target)
         );
 
-        if (typeCheckerResult.Success)
+        if (!typeCheckerResult.Success)
         {
-            return true;
+            if (ReferenceEquals(configRef.Source, typeCheckerResult.FailedArgument))
+            {
+                _diagnostics.ReportDiagnostic(
+                    DiagnosticDescriptors.SourceTypeIsNotAssignableToTheIncludedSourceType,
+                    configRef.Method,
+                    configRef.Source,
+                    newInstanceMapping.SourceType
+                );
+            }
+            else
+            {
+                _diagnostics.ReportDiagnostic(
+                    DiagnosticDescriptors.TargetTypeIsNotAssignableToTheIncludedTargetType,
+                    configRef.Method,
+                    configRef.Target,
+                    newInstanceMapping.TargetType
+                );
+            }
+
+            return false;
         }
 
-        if (ReferenceEquals(configRef.Source, typeCheckerResult.FailedArgument))
+        if (methodSymbol == null)
         {
-            _diagnostics.ReportDiagnostic(
-                DiagnosticDescriptors.SourceTypeIsNotAssignableToTheIncludedSourceType,
-                configRef.Method,
-                configRef.Source,
-                newInstanceMapping.SourceType
-            );
-        }
-        else
-        {
-            _diagnostics.ReportDiagnostic(
-                DiagnosticDescriptors.TargetTypeIsNotAssignableToTheIncludedTargetType,
-                configRef.Method,
-                configRef.Target,
-                newInstanceMapping.TargetType
-            );
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, configRef.Method, includeMapping);
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     private IReadOnlyCollection<DerivedTypeMappingConfiguration> BuildDerivedTypeConfigs(IMethodSymbol method)
