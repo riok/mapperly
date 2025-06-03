@@ -90,7 +90,12 @@ internal static class MemberMappingBuilder
         var memberSourceNullable = memberMappingInfo.IsSourceNullable;
         var delegateSourceNullable = delegateMapping.SourceType.IsNullable();
 
-        if (memberSourceNullable && !memberTargetNullable && !(delegateSourceNullable && !delegateTargetNullable))
+        if (
+            memberMappingInfo.Configuration?.SuppressNullMismatchDiagnostic != true
+            && memberSourceNullable
+            && !memberTargetNullable
+            && !(delegateSourceNullable && !delegateTargetNullable)
+        )
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
@@ -101,7 +106,10 @@ internal static class MemberMappingBuilder
             );
         }
 
-        if (memberSourceNullable && !memberTargetNullable && delegateSourceNullable && !delegateTargetNullable)
+        if (
+            (memberSourceNullable == delegateSourceNullable && memberTargetNullable == delegateTargetNullable)
+            || (memberSourceNullable && !memberTargetNullable && delegateSourceNullable && !delegateTargetNullable)
+        )
         {
             sourceValue = new MappedMemberSourceValue(
                 delegateMapping,

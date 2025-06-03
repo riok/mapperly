@@ -94,6 +94,7 @@ namespace Riok.Mapperly.Abstractions
         public System.Collections.Generic.IReadOnlyCollection<string> Source { get; }
         public string SourceFullName { get; }
         public string? StringFormat { get; set; }
+        public bool SuppressNullMismatchDiagnostic { get; set; }
         public System.Collections.Generic.IReadOnlyCollection<string> Target { get; }
         public string TargetFullName { get; }
         public string? Use { get; set; }
