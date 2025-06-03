@@ -18,9 +18,9 @@
     "lint": "prettier --ignore-path .gitignore --check . && tsc && eslint --ignore-path .gitignore src && stylelint 'src/**/*.css'"
   },
   "dependencies": {
-    "@docusaurus/core": "3.7.0",
-    "@docusaurus/plugin-ideal-image": "3.7.0",
-    "@docusaurus/preset-classic": "3.7.0",
+    "@docusaurus/core": "3.8.0",
+    "@docusaurus/plugin-ideal-image": "3.8.0",
+    "@docusaurus/preset-classic": "3.8.0",
     "@easyops-cn/docusaurus-search-local": "0.49.2",
     "@mdx-js/react": "3.0.1",
     "clsx": "2.1.1",
@@ -31,9 +31,9 @@
     "react-dom": "18.3.1"
   },
   "devDependencies": {
-    "@docusaurus/eslint-plugin": "3.7.0",
-    "@docusaurus/module-type-aliases": "3.7.0",
-    "@docusaurus/tsconfig": "3.7.0",
+    "@docusaurus/eslint-plugin": "3.8.0",
+    "@docusaurus/module-type-aliases": "3.8.0",
+    "@docusaurus/tsconfig": "3.8.0",
     "@types/react": "19.1.2",
     "@typescript-eslint/eslint-plugin": "8.33.1",
     "hast-util-to-html": "9.0.5",
