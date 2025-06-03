@@ -27,8 +27,7 @@ public class SimpleMappingBuilderContext(
     MappingBuilder mappingBuilder,
     ExistingTargetMappingBuilder existingTargetMappingBuilder,
     InlinedExpressionMappingCollection inlinedMappings,
-    Location diagnosticLocation,
-    SimpleMappingBuilderContext? childContext
+    Location diagnosticLocation
 )
 {
     private readonly DiagnosticCollection _diagnostics = diagnostics;
@@ -36,11 +35,7 @@ public class SimpleMappingBuilderContext(
     private readonly MapperConfigurationReader _configurationReader = configurationReader;
     private readonly Location _diagnosticLocation = diagnosticLocation;
 
-    protected SimpleMappingBuilderContext(
-        SimpleMappingBuilderContext ctx,
-        Location? diagnosticLocation,
-        SimpleMappingBuilderContext? childContext
-    )
+    protected SimpleMappingBuilderContext(SimpleMappingBuilderContext ctx, Location? diagnosticLocation)
         : this(
             ctx._compilationContext,
             ctx.MapperDeclaration,
@@ -53,8 +48,7 @@ public class SimpleMappingBuilderContext(
             ctx.MappingBuilder,
             ctx.ExistingTargetMappingBuilder,
             ctx.InlinedMappings,
-            diagnosticLocation ?? ctx._diagnosticLocation,
-            childContext ?? ctx.ChildContext
+            diagnosticLocation ?? ctx._diagnosticLocation
         ) { }
 
     public MapperDeclaration MapperDeclaration { get; } = mapperDeclaration;
@@ -83,12 +77,6 @@ public class SimpleMappingBuilderContext(
     /// and the body of these mappings is never built.
     /// </summary>
     protected InlinedExpressionMappingCollection InlinedMappings { get; } = inlinedMappings;
-
-    /// <summary>
-    /// Gets the child mapping context, if any.
-    /// This is used to include mapping configurations from another mapper method.
-    /// </summary>
-    protected SimpleMappingBuilderContext? ChildContext { get; } = childContext;
 
     public SemanticModel? GetSemanticModel(SyntaxTree syntaxTree) => _compilationContext.GetSemanticModel(syntaxTree);
 

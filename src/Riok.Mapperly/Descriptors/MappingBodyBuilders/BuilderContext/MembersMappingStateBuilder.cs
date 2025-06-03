@@ -7,99 +7,75 @@ using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
-internal class MembersMappingStateBuilder
+internal static class MembersMappingStateBuilder
 {
-    private readonly HashSet<string> _valueMappingConfiguredTargetPaths = [];
-    private readonly ListDictionary<string, IMemberPathConfiguration> _configuredTargetMembersByRootName = new();
-
-    private readonly Dictionary<string, IMappableMember> _additionalSourceMembers = new(StringComparer.OrdinalIgnoreCase);
-
-    private readonly ListDictionary<string, MemberValueMappingConfiguration> _memberValueConfigsByRootTargetName;
-    private readonly ListDictionary<string, MemberMappingConfiguration> _memberConfigsByRootTargetName = new();
-    private readonly HashSet<string> _ignoredSourceMemberNames = new();
-    private readonly HashSet<string> _ignoredTargetMemberNames = new();
-
-    private MembersMappingStateBuilder(MappingBuilderContext ctx)
-    {
-        var initialCapacity = ctx.Configuration.Members.ValueMappings.Count;
-        _memberValueConfigsByRootTargetName = new ListDictionary<string, MemberValueMappingConfiguration>(initialCapacity);
-    }
-
     public static MembersMappingState Build(MappingBuilderContext ctx, IMapping mapping)
     {
-        var factory = new MembersMappingStateBuilder(ctx);
+        // build configurations
+        // duplicated configurations are filtered inside the MapValue configurations
+        // if a MapProperty configuration references a target member which is already configured
+        // via MapValue it is also filtered & reported
+        var valueMappingConfiguredTargetPaths = new HashSet<string>();
+        var configuredTargetMembersByRootName = new ListDictionary<string, IMemberPathConfiguration>();
+        var memberValueConfigsByRootTargetName = BuildMemberValueConfigurations(
+            ctx,
+            mapping,
+            valueMappingConfiguredTargetPaths,
+            configuredTargetMembersByRootName
+        );
+        var memberConfigsByRootTargetName = BuildMemberConfigurations(
+            ctx,
+            mapping,
+            valueMappingConfiguredTargetPaths,
+            configuredTargetMembersByRootName
+        );
 
         // build all members
         var unmappedSourceMemberNames = GetSourceMemberNames(ctx, mapping);
+        var additionalSourceMembers = GetAdditionalSourceMembers(ctx);
+        var unmappedAdditionalSourceMemberNames = new HashSet<string>(additionalSourceMembers.Keys, StringComparer.Ordinal);
         var targetMembers = GetTargetMembers(ctx, mapping);
 
-        factory.BuildWithIncludedContexts(ctx, mapping);
-
-        // after collecting the ignored members cle
-        IgnoredMembersBuilder.CleanupIgnoredMembers(
-            factory._ignoredSourceMemberNames,
+        // build ignored members
+        var ignoredSourceMemberNames = IgnoredMembersBuilder.BuildIgnoredMembers(
             ctx,
             MappingSourceTarget.Source,
             unmappedSourceMemberNames
         );
-
-        IgnoredMembersBuilder.CleanupIgnoredMembers(factory._ignoredTargetMemberNames, ctx, MappingSourceTarget.Target, targetMembers.Keys);
+        var ignoredTargetMemberNames = IgnoredMembersBuilder.BuildIgnoredMembers(ctx, MappingSourceTarget.Target, targetMembers.Keys);
 
         // remove ignored members
-        unmappedSourceMemberNames.ExceptWith(factory._ignoredSourceMemberNames);
-        targetMembers.RemoveRange(factory._ignoredTargetMemberNames);
+        unmappedSourceMemberNames.ExceptWith(ignoredSourceMemberNames);
+        targetMembers.RemoveRange(ignoredTargetMemberNames);
 
         var targetMemberCaseMapping = targetMembers
             .Keys.GroupBy(x => x, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
         var unmappedTargetMemberNames = targetMembers.Keys.ToHashSet();
-
-        var unmappedAdditionalSourceMemberNames = new HashSet<string>(factory._additionalSourceMembers.Keys, StringComparer.Ordinal);
         return new MembersMappingState(
             unmappedSourceMemberNames,
             unmappedAdditionalSourceMemberNames,
             unmappedTargetMemberNames,
-            factory._additionalSourceMembers,
+            additionalSourceMembers,
             targetMemberCaseMapping,
             targetMembers,
-            factory._memberValueConfigsByRootTargetName.AsDictionary(),
-            factory._memberConfigsByRootTargetName.AsDictionary(),
-            factory._configuredTargetMembersByRootName.AsDictionary(),
-            factory._ignoredSourceMemberNames
+            memberValueConfigsByRootTargetName,
+            memberConfigsByRootTargetName,
+            configuredTargetMembersByRootName.AsDictionary(),
+            ignoredSourceMemberNames
         );
     }
 
-    private void BuildWithIncludedContexts(MappingBuilderContext parentCtx, IMapping mapping)
-    {
-        foreach (var ctx in parentCtx.GetContextWithChildren())
-        {
-            // build configurations
-            // duplicated configurations are filtered inside the MapValue configurations
-            // if a MapProperty configuration references a target member which is already configured
-            // via MapValue, it is also filtered and reported
-            BuildMemberValueConfigurations(ctx, mapping);
-            BuildMemberConfigurations(ctx, mapping);
-            GetAdditionalSourceMembers(ctx);
-
-            // build ignored members
-            IgnoredMembersBuilder.CollectIgnoredMembers(_ignoredSourceMemberNames, ctx, MappingSourceTarget.Source);
-            IgnoredMembersBuilder.CollectIgnoredMembers(_ignoredTargetMemberNames, ctx, MappingSourceTarget.Target);
-        }
-    }
-
-    private void GetAdditionalSourceMembers(MappingBuilderContext ctx)
+    private static IReadOnlyDictionary<string, IMappableMember> GetAdditionalSourceMembers(MappingBuilderContext ctx)
     {
         if (ctx.UserMapping is MethodMapping { AdditionalSourceParameters.Count: > 0 } methodMapping)
         {
-            foreach (
-                var mappableMember in methodMapping.AdditionalSourceParameters.Select<MethodParameter, IMappableMember>(
-                    p => new ParameterSourceMember(p)
-                )
-            )
-            {
-                _additionalSourceMembers.Add(mappableMember.Name, mappableMember);
-            }
+            return methodMapping
+                .AdditionalSourceParameters.Select<MethodParameter, IMappableMember>(p => new ParameterSourceMember(p))
+                .ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
         }
+
+        return new Dictionary<string, IMappableMember>();
     }
 
     private static HashSet<string> GetSourceMemberNames(MappingBuilderContext ctx, IMapping mapping)
@@ -112,14 +88,20 @@ internal class MembersMappingStateBuilder
         return ctx.SymbolAccessor.GetAllAccessibleMappableMembers(mapping.TargetType).ToDictionary(x => x.Name);
     }
 
-    private void BuildMemberValueConfigurations(MappingBuilderContext ctx, IMapping mapping)
+    private static Dictionary<string, List<MemberValueMappingConfiguration>> BuildMemberValueConfigurations(
+        MappingBuilderContext ctx,
+        IMapping mapping,
+        HashSet<string> configuredTargetPaths,
+        ListDictionary<string, IMemberPathConfiguration> configuredTargetMembersByRootName
+    )
     {
+        var byTargetRootName = new ListDictionary<string, MemberValueMappingConfiguration>(ctx.Configuration.Members.ValueMappings.Count);
         foreach (var config in ctx.Configuration.Members.ValueMappings)
         {
-            _configuredTargetMembersByRootName.Add(config.Target.RootName, config.Target);
-            if (_valueMappingConfiguredTargetPaths.Add(config.Target.FullName))
+            configuredTargetMembersByRootName.Add(config.Target.RootName, config.Target);
+            if (configuredTargetPaths.Add(config.Target.FullName))
             {
-                _memberValueConfigsByRootTargetName.Add(config.Target.RootName, config);
+                byTargetRootName.Add(config.Target.RootName, config);
                 continue;
             }
 
@@ -129,17 +111,25 @@ internal class MembersMappingStateBuilder
                 config.Target.FullName
             );
         }
+
+        return byTargetRootName.AsDictionary();
     }
 
-    private void BuildMemberConfigurations(MappingBuilderContext ctx, IMapping mapping)
+    private static Dictionary<string, List<MemberMappingConfiguration>> BuildMemberConfigurations(
+        MappingBuilderContext ctx,
+        IMapping mapping,
+        HashSet<string> valueConfiguredTargetPaths,
+        ListDictionary<string, IMemberPathConfiguration> configuredTargetMembersByRootName
+    )
     {
         // order by target path count as objects with less path depth should be mapped first
         // to prevent NREs in the generated code
+        var result = new ListDictionary<string, MemberMappingConfiguration>();
         foreach (var config in ctx.Configuration.Members.ExplicitMappings.OrderBy(cfg => cfg.Target.PathCount))
         {
-            // if MapValue is already configured for this target member,
+            // if MapValue is already configured for this target member
             // no additional MapProperty is allowed => diagnostic duplicate config.
-            if (_valueMappingConfiguredTargetPaths.Contains(config.Target.FullName))
+            if (valueConfiguredTargetPaths.Contains(config.Target.FullName))
             {
                 ctx.ReportDiagnostic(
                     DiagnosticDescriptors.MultipleConfigurationsForTargetMember,
@@ -149,8 +139,10 @@ internal class MembersMappingStateBuilder
                 continue;
             }
 
-            _configuredTargetMembersByRootName.Add(config.Target.RootName, config.Target);
-            _memberConfigsByRootTargetName.Add(config.Target.RootName, config);
+            configuredTargetMembersByRootName.Add(config.Target.RootName, config.Target);
+            result.Add(config.Target.RootName, config);
         }
+
+        return result.AsDictionary();
     }
 }

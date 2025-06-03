@@ -38,8 +38,6 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
     /// <inheritdoc cref="MappingCollection.NewInstanceMappings"/>
     public IReadOnlyDictionary<TypeMappingKey, INewInstanceMapping> NewInstanceMappings => mappings.NewInstanceMappings;
 
-    public MappingCollection MappingCollection => mappings;
-
     public INewInstanceMapping? Find(TypeMappingKey mapping) => mappings.FindNewInstanceMapping(mapping);
 
     public INewInstanceMapping? FindOrResolveNamed(SimpleMappingBuilderContext ctx, string name, out bool ambiguousName)

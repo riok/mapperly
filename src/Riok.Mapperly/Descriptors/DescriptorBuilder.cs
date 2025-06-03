@@ -65,8 +65,7 @@ public class DescriptorBuilder
             new MappingBuilder(_mappings, mapperDeclaration),
             new ExistingTargetMappingBuilder(_mappings, mapperDeclaration),
             _inlineMappings,
-            mapperDeclaration.Syntax.GetLocation(),
-            null
+            mapperDeclaration.Syntax.GetLocation()
         );
     }
 
@@ -167,7 +166,6 @@ public class DescriptorBuilder
     {
         foreach (var userMapping in _mappings.UserMappings)
         {
-            // Pass _mappings
             var ctx = new MappingBuilderContext(
                 _builderContext,
                 constructorFactory,
