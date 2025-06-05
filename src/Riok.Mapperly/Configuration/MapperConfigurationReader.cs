@@ -2,7 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors;
-using Riok.Mapperly.Descriptors.MappingBuilders;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
@@ -13,14 +12,14 @@ namespace Riok.Mapperly.Configuration;
 public class MapperConfigurationReader
 {
     private readonly AttributeDataAccessor _dataAccessor;
-    private readonly MappingBuilder _mappings;
+    private readonly MappingCollection _mappings;
     private readonly GenericTypeChecker _genericTypeChecker;
     private readonly DiagnosticCollection _diagnostics;
     private readonly WellKnownTypes _types;
 
     public MapperConfigurationReader(
         AttributeDataAccessor dataAccessor,
-        MappingBuilder mappings,
+        MappingCollection mappings,
         GenericTypeChecker genericTypeChecker,
         DiagnosticCollection diagnostics,
         WellKnownTypes types,
@@ -59,14 +58,13 @@ public class MapperConfigurationReader
 
     public MappingConfiguration MapperConfiguration { get; }
 
-    public MappingConfiguration BuildFor(SimpleMappingBuilderContext ctx, MappingConfigurationReference reference, bool supportsDeepCloning)
+    public MappingConfiguration BuildFor(MappingConfigurationReference reference, bool supportsDeepCloning)
     {
-        return BuildWithIncludedMappings([], ctx, reference, supportsDeepCloning)!;
+        return BuildWithIncludedMappings([], reference, supportsDeepCloning)!;
     }
 
     private MappingConfiguration? BuildWithIncludedMappings(
         HashSet<IMethodSymbol> visitedMethods,
-        SimpleMappingBuilderContext ctx,
         MappingConfigurationReference reference,
         bool supportsDeepCloning
     )
@@ -93,8 +91,8 @@ public class MapperConfigurationReader
         }
 
         var typeMapping =
-            (ITypeMapping?)_mappings.FindOrResolveNamed(ctx, includeMapping, out var ambiguousName)
-            ?? _mappings.FindExistingInstanceNamedMapping(ctx, includeMapping, out ambiguousName);
+            (ITypeMapping?)_mappings.FindNamedNewInstanceMapping(includeMapping, out var ambiguousName)
+            ?? _mappings.FindExistingInstanceNamedMapping(includeMapping, out ambiguousName);
         var methodSymbol = typeMapping switch
         {
             UserDefinedNewInstanceMethodMapping udm => udm.Method,
@@ -115,7 +113,7 @@ public class MapperConfigurationReader
 
         var includedReference = new MappingConfigurationReference(methodSymbol, typeMapping.SourceType, typeMapping.TargetType);
 
-        var includedConfiguration = BuildWithIncludedMappings(visitedMethods, ctx, includedReference, supportsDeepCloning);
+        var includedConfiguration = BuildWithIncludedMappings(visitedMethods, includedReference, supportsDeepCloning);
         return includedConfiguration != null ? configuration.MergeWith(includedConfiguration) : configuration;
     }
 

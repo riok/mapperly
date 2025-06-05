@@ -44,12 +44,11 @@ public class DescriptorBuilder
         _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
         _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
 
-        var mappingBuilder = new MappingBuilder(_mappings, mapperDeclaration);
         var attributeAccessor = new AttributeDataAccessor(symbolAccessor);
         var genericTypeChecker = new GenericTypeChecker(_symbolAccessor, compilationContext.Types);
         var configurationReader = new MapperConfigurationReader(
             attributeAccessor,
-            mappingBuilder,
+            _mappings,
             genericTypeChecker,
             _diagnostics,
             compilationContext.Types,
@@ -67,7 +66,7 @@ public class DescriptorBuilder
             attributeAccessor,
             _unsafeAccessorContext,
             _diagnostics,
-            mappingBuilder,
+            new MappingBuilder(_mappings, mapperDeclaration),
             new ExistingTargetMappingBuilder(_mappings, mapperDeclaration),
             _inlineMappings,
             mapperDeclaration.Syntax.GetLocation()

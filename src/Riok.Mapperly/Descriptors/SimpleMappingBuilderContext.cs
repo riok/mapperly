@@ -94,5 +94,5 @@ public class SimpleMappingBuilderContext(
     }
 
     protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef, bool supportsDeepCloning) =>
-        _configurationReader.BuildFor(this, configRef, supportsDeepCloning);
+        _configurationReader.BuildFor(configRef, supportsDeepCloning);
 }
