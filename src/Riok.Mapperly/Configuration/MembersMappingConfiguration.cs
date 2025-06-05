@@ -9,7 +9,7 @@ public record MembersMappingConfiguration(
     IReadOnlyCollection<MemberValueMappingConfiguration> ValueMappings,
     IReadOnlyCollection<MemberMappingConfiguration> ExplicitMappings,
     IReadOnlyCollection<NestedMembersMappingConfiguration> NestedMappings,
-    IgnoreObsoleteMembersStrategy IgnoreObsoleteMembersStrategy,
+    IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy,
     RequiredMappingStrategy RequiredMappingStrategy
 )
 {
@@ -24,5 +24,18 @@ public record MembersMappingConfiguration(
             _ => throw new ArgumentOutOfRangeException(nameof(sourceTarget), sourceTarget, "Neither source or target"),
         };
         return members.Distinct();
+    }
+
+    public MembersMappingConfiguration MergeWith(MembersMappingConfiguration? result2Members)
+    {
+        return new MembersMappingConfiguration(
+            IgnoredSources.Concat(result2Members?.IgnoredSources ?? []).ToList(),
+            IgnoredTargets.Concat(result2Members?.IgnoredTargets ?? []).ToList(),
+            ValueMappings.Concat(result2Members?.ValueMappings ?? []).ToList(),
+            ExplicitMappings.Concat(result2Members?.ExplicitMappings ?? []).ToList(),
+            NestedMappings.Concat(result2Members?.NestedMappings ?? []).ToList(),
+            IgnoreObsoleteMembersStrategy ?? result2Members?.IgnoreObsoleteMembersStrategy,
+            RequiredMappingStrategy
+        );
     }
 }

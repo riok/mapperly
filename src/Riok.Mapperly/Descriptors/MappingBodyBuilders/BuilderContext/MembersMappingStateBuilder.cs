@@ -1,4 +1,4 @@
-using Riok.Mapperly.Configuration;
+﻿using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;

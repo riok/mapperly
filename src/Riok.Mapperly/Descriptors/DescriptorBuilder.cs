@@ -42,23 +42,27 @@ public class DescriptorBuilder
         _symbolAccessor = symbolAccessor;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
         _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
+        _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
 
         var attributeAccessor = new AttributeDataAccessor(symbolAccessor);
+        var genericTypeChecker = new GenericTypeChecker(_symbolAccessor, compilationContext.Types);
         var configurationReader = new MapperConfigurationReader(
             attributeAccessor,
+            _mappings,
+            genericTypeChecker,
+            _diagnostics,
             compilationContext.Types,
             mapperDeclaration.Symbol,
             defaultMapperConfiguration,
             supportedFeatures
         );
-        _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
 
         _builderContext = new SimpleMappingBuilderContext(
             compilationContext,
             mapperDeclaration,
             configurationReader,
             _symbolAccessor,
-            new GenericTypeChecker(_symbolAccessor, compilationContext.Types),
+            genericTypeChecker,
             attributeAccessor,
             _unsafeAccessorContext,
             _diagnostics,

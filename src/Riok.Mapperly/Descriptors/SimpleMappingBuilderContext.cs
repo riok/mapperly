@@ -1,7 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBuilders;
+using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Descriptors.UnsafeAccess;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
@@ -83,6 +86,13 @@ public class SimpleMappingBuilderContext(
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? symbolLocation, params object[] messageArgs) =>
         _diagnostics.ReportDiagnostic(descriptor, symbolLocation?.GetSyntaxLocation() ?? _diagnosticLocation, messageArgs);
 
+    public IgnoreObsoleteMembersStrategy GetIgnoreObsoleteMembersStrategy()
+    {
+        return Configuration.Members.IgnoreObsoleteMembersStrategy.GetValueOrDefault(
+            _configurationReader.MapperConfiguration.Members.IgnoreObsoleteMembersStrategy.GetValueOrDefault()
+        );
+    }
+
     protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef, bool supportsDeepCloning) =>
-        _configurationReader.BuildFor(configRef, supportsDeepCloning, _diagnostics);
+        _configurationReader.BuildFor(configRef, supportsDeepCloning);
 }
