@@ -228,7 +228,7 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
-    public Task ShouldIncludeUseReferencedMapping()
+    public Task IncludesUseReferencedMapping()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -249,7 +249,7 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
-    public Task ShouldIncludeConfigurationOnUseReferencedMapping()
+    public Task IncludesConfigurationOnUseReferencedMapping()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -292,7 +292,7 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
-    public Task ShouldIncludeMapDerivedType()
+    public Task IncludesMapDerivedType()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
