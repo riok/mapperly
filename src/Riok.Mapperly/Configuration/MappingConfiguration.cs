@@ -12,13 +12,18 @@ public record MappingConfiguration(
     SupportedFeatures SupportedFeatures
 )
 {
-    public MappingConfiguration MergeWith(MappingConfiguration? result2)
+    public MappingConfiguration Include(MappingConfiguration? result2)
     {
         return this with
         {
-            Enum = Enum.MergeWith(result2?.Enum),
-            Members = Members.MergeWith(result2?.Members),
+            Enum = Enum.Include(result2?.Enum),
+            Members = Members.Include(result2?.Members),
             DerivedTypes = DerivedTypes.Concat(result2?.DerivedTypes ?? []).ToList(),
         };
+    }
+
+    public IgnoreObsoleteMembersStrategy GetIgnoreObsoleteMembersStrategy()
+    {
+        return Members.IgnoreObsoleteMembersStrategy.GetValueOrDefault(Mapper.IgnoreObsoleteMembersStrategy);
     }
 }

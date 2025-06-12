@@ -16,7 +16,7 @@ public record EnumMappingConfiguration(
 {
     public bool HasExplicitConfigurations => ExplicitMappings.Count > 0 || IgnoredSourceMembers.Count > 0 || IgnoredTargetMembers.Count > 0;
 
-    public EnumMappingConfiguration MergeWith(EnumMappingConfiguration? result2Enum)
+    public EnumMappingConfiguration Include(EnumMappingConfiguration? result2Enum)
     {
         return this with
         {

@@ -26,7 +26,7 @@ public record MembersMappingConfiguration(
         return members.Distinct();
     }
 
-    public MembersMappingConfiguration MergeWith(MembersMappingConfiguration? result2Members)
+    public MembersMappingConfiguration Include(MembersMappingConfiguration? result2Members)
     {
         return new MembersMappingConfiguration(
             IgnoredSources.Concat(result2Members?.IgnoredSources ?? []).ToList(),

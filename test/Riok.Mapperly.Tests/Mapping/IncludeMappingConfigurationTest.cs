@@ -61,7 +61,7 @@ public class IncludeMappingConfigurationTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [MapValue(nameof(A.Value), "C1")]
+            [MapValue(nameof(B.Value), "C1")]
             partial B MapOther(A a);
 
             [IncludeMappingConfiguration(nameof(MapOther))]

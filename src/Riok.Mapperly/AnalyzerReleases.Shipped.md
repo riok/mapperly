@@ -209,6 +209,6 @@ RMG028  | Mapper   | Warning  | Constructor parameter cannot handle target paths
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-RMG091 | Mapper | Error | Circular referenced mapping detected
+RMG091 | Mapper | Error | Circular included mapping configuration detected
 RMG092 | Mapper | Error | Source type is not assignable to the included source type
 RMG093 | Mapper | Error | Target type is not assignable to the included target type

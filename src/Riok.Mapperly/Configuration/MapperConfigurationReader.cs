@@ -93,14 +93,9 @@ public class MapperConfigurationReader
         var typeMapping =
             (ITypeMapping?)_mappings.FindNamedNewInstanceMapping(includeMapping, out var ambiguousName)
             ?? _mappings.FindExistingInstanceNamedMapping(includeMapping, out ambiguousName);
-        var methodSymbol = typeMapping switch
-        {
-            UserDefinedNewInstanceMethodMapping udm => udm.Method,
-            UserDefinedExistingTargetMethodMapping udm => udm.Method,
-            _ => null,
-        };
+        var methodSymbol = (typeMapping as IUserMapping)?.Method;
 
-        if (!IsMappingValid(ambiguousName, reference, typeMapping, includeMapping, methodSymbol))
+        if (!ValidateIncludedMapping(ambiguousName, reference, typeMapping, includeMapping, methodSymbol))
         {
             return configuration;
         }
@@ -114,10 +109,10 @@ public class MapperConfigurationReader
         var includedReference = new MappingConfigurationReference(methodSymbol, typeMapping.SourceType, typeMapping.TargetType);
 
         var includedConfiguration = BuildWithIncludedMappings(visitedMethods, includedReference, supportsDeepCloning);
-        return includedConfiguration != null ? configuration.MergeWith(includedConfiguration) : configuration;
+        return includedConfiguration != null ? configuration.Include(includedConfiguration) : configuration;
     }
 
-    private bool IsMappingValid(
+    private bool ValidateIncludedMapping(
         bool ambiguousName,
         MappingConfigurationReference configRef,
         [NotNullWhen(true)] ITypeMapping? newInstanceMapping,

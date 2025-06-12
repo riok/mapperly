@@ -86,13 +86,6 @@ public class SimpleMappingBuilderContext(
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, ISymbol? symbolLocation, params object[] messageArgs) =>
         _diagnostics.ReportDiagnostic(descriptor, symbolLocation?.GetSyntaxLocation() ?? _diagnosticLocation, messageArgs);
 
-    public IgnoreObsoleteMembersStrategy GetIgnoreObsoleteMembersStrategy()
-    {
-        return Configuration.Members.IgnoreObsoleteMembersStrategy.GetValueOrDefault(
-            _configurationReader.MapperConfiguration.Members.IgnoreObsoleteMembersStrategy.GetValueOrDefault()
-        );
-    }
-
     protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef, bool supportsDeepCloning) =>
         _configurationReader.BuildFor(configRef, supportsDeepCloning);
 }

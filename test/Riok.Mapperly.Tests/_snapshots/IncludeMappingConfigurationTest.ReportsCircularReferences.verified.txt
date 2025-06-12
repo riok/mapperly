@@ -10,12 +10,12 @@ partial B MapOther(A a);
 }
 */
  : (15,0)-(16,24),
-      Message: A circular reference has been detected in mapping configuration: Mapper.MapOther(A),
+      Message: A circular reference has been detected in included mapping configuration: Mapper.MapOther(A),
       Severity: Error,
       Descriptor: {
         Id: RMG091,
-        Title: Circular referenced mapping detected,
-        MessageFormat: A circular reference has been detected in mapping configuration: {0},
+        Title: Circular included mapping configuration detected,
+        MessageFormat: A circular reference has been detected in included mapping configuration: {0},
         Category: Mapper,
         DefaultSeverity: Error,
         IsEnabledByDefault: true
@@ -33,12 +33,12 @@ partial B Map(A a);
 
 */
  : (11,4)-(13,19),
-      Message: A circular reference has been detected in mapping configuration: Mapper.Map(A),
+      Message: A circular reference has been detected in included mapping configuration: Mapper.Map(A),
       Severity: Error,
       Descriptor: {
         Id: RMG091,
-        Title: Circular referenced mapping detected,
-        MessageFormat: A circular reference has been detected in mapping configuration: {0},
+        Title: Circular included mapping configuration detected,
+        MessageFormat: A circular reference has been detected in included mapping configuration: {0},
         Category: Mapper,
         DefaultSeverity: Error,
         IsEnabledByDefault: true
