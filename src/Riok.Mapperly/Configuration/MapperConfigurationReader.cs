@@ -243,7 +243,7 @@ public class MapperConfigurationReader
             memberConfigurations,
             nestedMembersConfigurations,
             ignoreObsolete,
-            requiredMapping ?? MapperConfiguration.Members.RequiredMappingStrategy
+            requiredMapping
         );
     }
 

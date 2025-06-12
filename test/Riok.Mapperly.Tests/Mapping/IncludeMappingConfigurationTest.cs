@@ -150,6 +150,24 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
+    public Task UsesMapperRequiredMappingStrategyFromTargetMapper()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapperRequiredMapping(RequiredMappingStrategy.Target)]
+            partial B MapOther(A source);
+
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            public partial B Map(A source);
+            """,
+            "class A { public int Value { get; set; } public int UnmappedSource { get; set; } }",
+            "class B { public int Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task AppliesRecursively()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

@@ -10,7 +10,7 @@ public record MembersMappingConfiguration(
     IReadOnlyCollection<MemberMappingConfiguration> ExplicitMappings,
     IReadOnlyCollection<NestedMembersMappingConfiguration> NestedMappings,
     IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy,
-    RequiredMappingStrategy RequiredMappingStrategy
+    RequiredMappingStrategy? RequiredMappingStrategy
 )
 {
     public IEnumerable<string> GetMembersWithExplicitConfigurations(MappingSourceTarget sourceTarget)
@@ -26,16 +26,16 @@ public record MembersMappingConfiguration(
         return members.Distinct();
     }
 
-    public MembersMappingConfiguration Include(MembersMappingConfiguration? result2Members)
+    public MembersMappingConfiguration Include(MembersMappingConfiguration? otherConfiguration)
     {
         return new MembersMappingConfiguration(
-            IgnoredSources.Concat(result2Members?.IgnoredSources ?? []).ToList(),
-            IgnoredTargets.Concat(result2Members?.IgnoredTargets ?? []).ToList(),
-            ValueMappings.Concat(result2Members?.ValueMappings ?? []).ToList(),
-            ExplicitMappings.Concat(result2Members?.ExplicitMappings ?? []).ToList(),
-            NestedMappings.Concat(result2Members?.NestedMappings ?? []).ToList(),
-            IgnoreObsoleteMembersStrategy ?? result2Members?.IgnoreObsoleteMembersStrategy,
-            RequiredMappingStrategy
+            IgnoredSources.Concat(otherConfiguration?.IgnoredSources ?? []).ToList(),
+            IgnoredTargets.Concat(otherConfiguration?.IgnoredTargets ?? []).ToList(),
+            ValueMappings.Concat(otherConfiguration?.ValueMappings ?? []).ToList(),
+            ExplicitMappings.Concat(otherConfiguration?.ExplicitMappings ?? []).ToList(),
+            NestedMappings.Concat(otherConfiguration?.NestedMappings ?? []).ToList(),
+            IgnoreObsoleteMembersStrategy ?? otherConfiguration?.IgnoreObsoleteMembersStrategy,
+            RequiredMappingStrategy ?? otherConfiguration?.RequiredMappingStrategy
         );
     }
 }
