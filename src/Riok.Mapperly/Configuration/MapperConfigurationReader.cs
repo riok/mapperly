@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
@@ -11,6 +12,7 @@ namespace Riok.Mapperly.Configuration;
 
 public class MapperConfigurationReader
 {
+    private Dictionary<MappingConfigurationReference, MappingConfiguration> _resolvedConfigurations = new();
     private readonly AttributeDataAccessor _dataAccessor;
     private readonly MappingCollection _mappings;
     private readonly GenericTypeChecker _genericTypeChecker;
@@ -60,6 +62,11 @@ public class MapperConfigurationReader
 
     public MappingConfiguration BuildFor(MappingConfigurationReference reference, bool supportsDeepCloning)
     {
+        if (_resolvedConfigurations.TryGetValue(reference, out var resolved))
+        {
+            return resolved;
+        }
+
         return BuildWithIncludedMappings([], reference, supportsDeepCloning)!;
     }
 
@@ -87,6 +94,7 @@ public class MapperConfigurationReader
         var includeMapping = _dataAccessor.AccessFirstOrDefault<IncludeMappingConfigurationAttribute>(reference.Method)?.Name;
         if (includeMapping is null)
         {
+            _resolvedConfigurations.Add(reference, configuration);
             return configuration;
         }
 
@@ -97,6 +105,7 @@ public class MapperConfigurationReader
 
         if (!ValidateIncludedMapping(ambiguousName, reference, typeMapping, includeMapping, methodSymbol))
         {
+            _resolvedConfigurations.Add(reference, configuration);
             return configuration;
         }
 
@@ -108,8 +117,14 @@ public class MapperConfigurationReader
 
         var includedReference = new MappingConfigurationReference(methodSymbol, typeMapping.SourceType, typeMapping.TargetType);
 
-        var includedConfiguration = BuildWithIncludedMappings(visitedMethods, includedReference, supportsDeepCloning);
-        return includedConfiguration != null ? configuration.Include(includedConfiguration) : configuration;
+        if (!_resolvedConfigurations.TryGetValue(includedReference, out var includedConfiguration))
+        {
+            includedConfiguration = BuildWithIncludedMappings(visitedMethods, includedReference, supportsDeepCloning);
+        }
+
+        configuration = includedConfiguration != null ? configuration.Include(includedConfiguration) : configuration;
+        _resolvedConfigurations.Add(reference, configuration);
+        return configuration;
     }
 
     private bool ValidateIncludedMapping(

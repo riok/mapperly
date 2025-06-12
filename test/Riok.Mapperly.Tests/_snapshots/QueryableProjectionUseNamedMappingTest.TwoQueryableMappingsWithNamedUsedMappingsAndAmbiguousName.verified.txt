@@ -26,6 +26,25 @@
  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 [MapProperty(nameof(A.StringValue2), nameof(B.StringValue2), Use = nameof(ModifyString2)]
 */
+ : (14,1)-(14,87),
+      Message: The referenced mapping name ModifyString is ambiguous, use a unique name,
+      Severity: Error,
+      Descriptor: {
+        Id: RMG062,
+        Title: The referenced mapping name is ambiguous,
+        MessageFormat: The referenced mapping name {0} is ambiguous, use a unique name,
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+
+[MapProperty(nameof(A.StringValue1), nameof(B.StringValue1), Use = nameof(ModifyString)]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[MapProperty(nameof(A.StringValue2), nameof(B.StringValue2), Use = nameof(ModifyString2)]
+*/
  : (18,1)-(18,87),
       Message: The referenced mapping name ModifyString is ambiguous, use a unique name,
       Severity: Error,
