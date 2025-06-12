@@ -138,31 +138,83 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
             return false;
         }
 
-        switch (symbol)
-        {
-            case INamedTypeSymbol { TypeArguments.Length: > 0 } namedSymbol:
-                var upgradedTypeArguments = namedSymbol.TypeArguments.Select(UpgradeNullable).ToImmutableArray();
-                upgradedSymbol = namedSymbol
-                    .ConstructedFrom.Construct(
-                        upgradedTypeArguments,
-                        upgradedTypeArguments.Select(ta => ta.NullableAnnotation).ToImmutableArray()
-                    )
-                    .WithNullableAnnotation(NullableAnnotation.Annotated);
-                break;
-
-            case IArrayTypeSymbol { ElementType.IsValueType: false, ElementNullableAnnotation: NullableAnnotation.None } arrayTypeSymbol:
-                upgradedSymbol = Compilation
-                    .CreateArrayTypeSymbol(UpgradeNullable(arrayTypeSymbol.ElementType), arrayTypeSymbol.Rank, NullableAnnotation.Annotated)
-                    .WithNullableAnnotation(NullableAnnotation.Annotated);
-                break;
-
-            default:
-                upgradedSymbol = symbol.WithNullableAnnotation(NullableAnnotation.Annotated);
-                break;
-        }
+        upgradedSymbol = UpgradeInnerSymbols(symbol).WithNullableAnnotation(NullableAnnotation.Annotated);
 
         _originalNullableTypes.Add(upgradedSymbol, symbol);
         return true;
+    }
+
+    private ITypeSymbol UpgradeInnerSymbols(ITypeSymbol symbol)
+    {
+        TryUpgradeInnerSymbols(symbol, out var upgradedSymbol);
+        return upgradedSymbol ?? symbol;
+    }
+
+    /// <summary>
+    /// Tries to upgrade the nullability of generic type arguments and array element type from <see cref="NullableAnnotation.None"/> to <see cref="NullableAnnotation.Annotated"/>.
+    /// If generic type parameter is notnull, it will be upgraded to <see cref="NullableAnnotation.NotAnnotated"/>
+    /// </summary>
+    /// <param name="symbol">The symbol.</param>
+    /// <param name="upgradedSymbol">The symbol with upgraded inner symbols.</param>
+    /// <returns>Whether an upgrade has taken place.</returns>
+    private bool TryUpgradeInnerSymbols(ITypeSymbol symbol, [NotNullWhen(true)] out ITypeSymbol? upgradedSymbol)
+    {
+        switch (symbol)
+        {
+            case INamedTypeSymbol { TypeArguments.Length: > 0 } namedSymbol:
+                var upgradedTypeArguments = UpgradeGenericTypeArguments(namedSymbol.TypeParameters, namedSymbol.TypeArguments);
+                upgradedSymbol = namedSymbol.ConstructedFrom.Construct(
+                    upgradedTypeArguments,
+                    upgradedTypeArguments.Select(ta => ta.NullableAnnotation).ToImmutableArray()
+                );
+                return true;
+
+            case IArrayTypeSymbol { ElementType.IsValueType: false, ElementNullableAnnotation: NullableAnnotation.None } arrayTypeSymbol:
+                upgradedSymbol = Compilation.CreateArrayTypeSymbol(
+                    UpgradeNullable(arrayTypeSymbol.ElementType),
+                    arrayTypeSymbol.Rank,
+                    NullableAnnotation.Annotated
+                );
+                return true;
+
+            default:
+                upgradedSymbol = default;
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Upgrades the nullability of generic type arguments.
+    /// If notnull constraint is applied to the parameter, symbol will be upgraded to <see cref="NullableAnnotation.NotAnnotated"/>,
+    /// otherwise to <see cref="NullableAnnotation.Annotated"/>.
+    /// </summary>
+    /// <param name="typeParameters">The type parameters of the generic type.</param>
+    /// <param name="typeArguments">The type arguments of the generic type.</param>
+    /// <returns>Upgraded generic type arguments.</returns>
+    private ImmutableArray<ITypeSymbol> UpgradeGenericTypeArguments(
+        ImmutableArray<ITypeParameterSymbol> typeParameters,
+        ImmutableArray<ITypeSymbol> typeArguments
+    )
+    {
+        Debug.Assert(typeArguments.Length == typeParameters.Length);
+        Debug.Assert(typeArguments.Length > 0);
+
+        var arguments = new ITypeSymbol[typeArguments.Length];
+        for (var i = 0; i < typeArguments.Length; i++)
+        {
+            var typeParameter = typeParameters[i];
+            var typeArgument = typeArguments[i];
+
+            var upgradedSymbol = typeParameter switch
+            {
+                { HasNotNullConstraint: true } => UpgradeInnerSymbols(typeArgument).WithNullableAnnotation(NullableAnnotation.NotAnnotated),
+                _ => UpgradeNullable(typeArgument),
+            };
+
+            arguments[i] = upgradedSymbol;
+        }
+
+        return arguments.ToImmutableArray();
     }
 
     /// <summary>
