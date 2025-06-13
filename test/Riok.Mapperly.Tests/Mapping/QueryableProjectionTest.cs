@@ -223,4 +223,20 @@ public class QueryableProjectionTest
             .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingsDoNotSupportReferenceHandling)
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public async Task TopLevelUserImplemented()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+
+            private B Map(A source) => new B(10) { Value2 = 11, Value3 = "foo bar" };
+            """,
+            "class A;",
+            "class B(int value) { public int Value2 { get; set; } public string Value3 { get; set; } }"
+        );
+
+        await TestHelper.VerifyGenerator(source);
+    }
 }
