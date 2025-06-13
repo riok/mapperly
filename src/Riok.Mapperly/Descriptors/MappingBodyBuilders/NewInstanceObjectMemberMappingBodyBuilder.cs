@@ -119,7 +119,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             // and no further mapping attempts should be undertaken
             if (
                 targetMember.IsRequired
-                || ctx.BuilderContext.Configuration.Members.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target)
+                || ctx.BuilderContext.Configuration.HasRequiredMappingStrategyForMembers(RequiredMappingStrategy.Target)
             )
             {
                 ctx.BuilderContext.ReportDiagnostic(

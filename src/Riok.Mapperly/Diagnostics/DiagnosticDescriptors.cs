@@ -763,6 +763,33 @@ public static class DiagnosticDescriptors
         true
     );
 
+    public static readonly DiagnosticDescriptor CircularReferencedMapping = new(
+        "RMG091",
+        "Circular included mapping configuration detected",
+        "A circular reference has been detected in included mapping configuration: {0}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor SourceTypeIsNotAssignableToTheIncludedSourceType = new(
+        "RMG092",
+        "Source type is not assignable to the included source type",
+        "Source type {0} is not assignable to the included source type {1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor TargetTypeIsNotAssignableToTheIncludedTargetType = new(
+        "RMG093",
+        "Target type is not assignable to the included target type",
+        "Target type {0} is not assignable to the included target type {1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT
