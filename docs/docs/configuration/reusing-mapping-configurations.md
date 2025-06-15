@@ -1,9 +1,9 @@
 ﻿---
 sidebar_position: 17
-description: Including Mapping Configurations
+description: Reusing Mapping Configurations
 ---
 
-# Including Mapping Configurations
+# Reusing Mapping Configurations
 
 Mapperly supports reusing mapping configurations across different mapping methods using the
 `IncludeMappingConfigurationAttribute`. This enables you to share and modularize mapping logic for consistent
@@ -20,11 +20,12 @@ and provide the method name:
 // Property mapping configurations
 public partial static void CopyApple(AppleDto dto, Apple apple);
 
-[IncludeMappingConfiguration(nameof(CopyApple))] 
+[IncludeMappingConfiguration(nameof(CopyApple))]
 public partial static AppleDto ToApple(Apple apple);
 ```
 
 The following configurations will be included:
+
 - `MapProperty`
 - `MapPropertyFromSource`
 - `MapperIgnoreTarget`
@@ -40,25 +41,24 @@ This attribute also supports including configurations from a base class. For exa
 `Apple` to `AppleDto` and the mapping logic is defined for the base classes `Fruit` to `FruitDto`.
 Here's how to set it up:
 
-
 ```csharp
-class Fruit 
+class Fruit
 {
     public string Name { get; set; }
     public decimal PricePerUnit { get; set; }
-} 
-    
-class FruitDto 
+}
+
+class FruitDto
 {
     public string Title { get; set; }
 }
-    
-class Apple : Fruit 
+
+class Apple : Fruit
 {
     public int Weight { get; set; }
-} 
+}
 
-class AppleDto : FruitDto 
+class AppleDto : FruitDto
 {
     public int Weight { get; set; }
 }
@@ -66,9 +66,9 @@ class AppleDto : FruitDto
 [Mapper]
 public partial class MyMapper {
     [MapProperty(nameof(Fruit.Name), nameof(FruitDto.Title))]
-    [MapperIgnoreSource(nameof(Fruit.PricePerUnit))] 
+    [MapperIgnoreSource(nameof(Fruit.PricePerUnit))]
     private partial FruitDto ToFruit(Fruit fruit);
-    
+
     [IncludeMappingConfiguration(nameof(ToFruit))]
     public partial static AppleDto Map(Apple apple);
 }
