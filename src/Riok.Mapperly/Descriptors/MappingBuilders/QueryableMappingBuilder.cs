@@ -26,6 +26,16 @@ public static class QueryableMappingBuilder
         var mappingKey = TryBuildMappingKey(ctx, sourceType, targetType);
         var userMapping = ctx.FindMapping(sourceType, targetType) as IUserMapping;
         var inlineCtx = new InlineExpressionMappingBuilderContext(ctx, userMapping, mappingKey);
+        if (userMapping is UserImplementedMethodMapping && inlineCtx.FindMapping(sourceType, targetType) is { } inlinedUserMapping)
+        {
+            return new QueryableProjectionMapping(
+                ctx.Source,
+                ctx.Target,
+                inlinedUserMapping,
+                ctx.Configuration.SupportedFeatures.NullableAttributes
+            );
+        }
+
         var mapping = inlineCtx.BuildMapping(mappingKey, MappingBuildingOptions.KeepUserSymbol);
         if (mapping == null)
             return null;
