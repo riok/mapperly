@@ -5,16 +5,16 @@ description: Including Mapping Configurations
 
 # Including Mapping Configurations
 
-Mapperly supports reusing mapping configurations across different mapping methods using
-`IncludeMappingConfigurationAttribute` attribute. This enables sharing and modularizing mapping logic for consistent
-mapping behavior between multiple methods.
+Mapperly supports reusing mapping configurations across different mapping methods using the
+`IncludeMappingConfigurationAttribute`. This enables you to share and modularize mapping logic for consistent
+behavior across multiple methods.
 
 ## Defining and Reusing Mapping Configurations
 
 ### Including an Existing Mapping Configuration
 
-To include an existing mapping configuration in another mapping method, use the `IncludeMappingConfigurationAttribute`,
-providing the method name:
+To include an existing mapping configuration in another mapping method, use the `IncludeMappingConfigurationAttribute`
+and provide the method name:
 
 ```csharp
 // Property mapping configurations
@@ -24,7 +24,7 @@ public partial static void CopyApple(AppleDto dto, Apple apple);
 public partial static AppleDto ToApple(Apple apple);
 ```
 
-This includes the following configurations:
+The following configurations will be included:
 - `MapProperty`
 - `MapPropertyFromSource`
 - `MapperIgnoreTarget`
@@ -34,12 +34,12 @@ This includes the following configurations:
 - `MapValue`
 - `MapDerivedType`
 
-### Including the Mapping configuration from base class
+### Including a Mapping Configuration from a Base Class
 
-This attribute also supports including
-the configurations of the base class. Suppose you want to map
-`Apple` to `AppleDto` and the mapping logic is defined for its base classes `Fruit` to `FruitDto`.
-Here's how you can do it:
+This attribute also supports including configurations from a base class. For example, suppose you want to map
+`Apple` to `AppleDto` and the mapping logic is defined for the base classes `Fruit` to `FruitDto`.
+Here's how to set it up:
+
 
 ```csharp
 class Fruit 
@@ -76,17 +76,11 @@ public partial class MyMapper {
 
 ## Restrictions
 
-This attribute can only include such mapping configurations that are in the same class.
-Currently, configurations from other classes cannot be included.
-
-This attribute only uses a mapping if the mapped types are the same or base types of
-the mapped type.
-
-If the attribute includes such configuration that causes collision, then it is reported as an error.
+- This attribute can only include mapping configurations defined in the same class. Configurations from other classes currently cannot be included.
+- The attribute only reuses a mapping if the mapped types are the same or a base type of the mapped type.
+- If the attribute includes configurations that cause a collision, it is reported as an error.
 
 ## Diagnostics
 
-If an `IncludeMappingConfigurationAttribute` refers to an ambiguous mapping configuration (e.g., multiple 
-configurations exist with the same name), the mapper will emit RMG062 to help you resolve the ambiguity. 
-This configuration only considers the compatible mappings.
-
+If an `IncludeMappingConfigurationAttribute` refers to an ambiguous mapping configuration (e.g., multiple
+configurations exist with the same name), the mapper emits RMG062 to help you resolve the ambiguity.
