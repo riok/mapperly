@@ -1,47 +1,45 @@
 ﻿---
 sidebar_position: 17
-description: Reusing Mapping Configurations
+description: Including Mapping Configurations
 ---
 
 # Including Mapping Configurations
 
-Mapperly supports reusing mapping configurations across different mapping methods using two attributes:
-`NamedMappingAttribute` and `IncludeMappingConfigurationAttribute`. This enables sharing and modularizing
-mapping logic for consistent mapping behavior between multiple methods.
+Mapperly supports reusing mapping configurations across different mapping methods using
+`IncludeMappingConfigurationAttribute` attribute. This enables sharing and modularizing mapping logic for consistent
+mapping behavior between multiple methods.
 
 ## Defining and Reusing Mapping Configurations
 
-### 1. Naming a Mapping Configuration
-
-By default, every mapping method can be referenced by its method name as a mapping configuration.
-To explicitly assign a custom name, apply the `NamedMappingAttribute`
-
-```csharp
-[NamedMapping("CustomFruitMapping")] 
-private partial FruitDto ToFruit(Fruit fruit);
-```
-
-### 2. Including an Existing Mapping Configuration
+### Including an Existing Mapping Configuration
 
 To include an existing mapping configuration in another mapping method, use the `IncludeMappingConfigurationAttribute`,
-providing either the configuration name or the method name:
+providing the method name:
 
 ```csharp
-[IncludeMappingConfiguration("CustomFruitMapping")] 
-public partial static AppleDto Map(Apple apple);
-``` 
+// Property mapping configurations
+public partial static void CopyApple(AppleDto dto, Apple apple);
 
-Or refer to a method directly:
-
-```csharp
-[IncludeMappingConfiguration(nameof(ToFruit))] 
-public partial static AppleDto Map(Apple apple);
+[IncludeMappingConfiguration(nameof(CopyApple))] 
+public partial static AppleDto ToApple(Apple apple);
 ```
 
-### Usage Example
+This includes the following configurations:
+- `MapProperty`
+- `MapPropertyFromSource`
+- `MapperIgnoreTarget`
+- `MapperIgnoreSource`
+- `MapperIgnoreObsoleteMembers`
+- `MapperRequiredMapping`
+- `MapValue`
+- `MapDerivedType`
 
-Suppose you want to map `Apple` to `AppleDto` but reuse the mapping logic defined for `Fruit` to `FruitDto`. Here's how
-you can do it:
+### Including the Mapping configuration from base class
+
+This attribute also supports including
+the configurations of the base class. Suppose you want to map
+`Apple` to `AppleDto` and the mapping logic is defined for its base classes `Fruit` to `FruitDto`.
+Here's how you can do it:
 
 ```csharp
 class Fruit 
@@ -76,17 +74,15 @@ public partial class MyMapper {
 }
 ```
 
-In this example, the `Map` method for `Apple` reuses the configuration from `ToFruit`, ensuring consistent property
-mapping.
-
 ## Restrictions
 
-The `IncludeMappingConfigurationAttribute` can only include such mapping configurations that are in the same class.
+This attribute can only include such mapping configurations that are in the same class.
 Currently, configurations from other classes cannot be included.
 
-The `IncludeMappingConfigurationAttribute` only uses a mapping if the mapped types are the same or base types of
-the mapped type. This means that the configuration will only be applied if the source and target types of the
-included mapping are compatible.
+This attribute only uses a mapping if the mapped types are the same or base types of
+the mapped type.
+
+If the attribute includes such configuration that causes collision, then it is reported as an error.
 
 ## Diagnostics
 
