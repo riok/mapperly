@@ -21,6 +21,28 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
+    public Task IncludesMultipleConfigs()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), StringFormat = "X")]
+            partial B MapOther(A a);
+
+            [MapProperty(nameof(A.Value2), nameof(B.Value2), StringFormat = "D")]
+            partial B MapOther2(A a);
+
+            [IncludeMappingConfiguration(nameof(MapOther))]
+            [IncludeMappingConfiguration(nameof(MapOther2))]
+            partial B Map(A a);
+            """,
+            "class A { public int Value { get; set; } public int Value2 { get; set; } }",
+            "class B { public string Value { get; set; } public string Value2 { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task UsesMapperIgnoreSourceFromTargetMapper()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
