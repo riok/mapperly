@@ -5,19 +5,19 @@
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.15.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="4.14.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.14.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.14.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="4.14.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Build.Locator" Version="1.9.1" />
-    <PackageReference Include="NuGet.Frameworks" Version="6.13.2" />
-    <PackageReference Include="System.Formats.Asn1" Version="9.0.4" />
+    <PackageReference Include="NuGet.Frameworks" Version="6.14.0" />
+    <PackageReference Include="System.Formats.Asn1" Version="9.0.6" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Riok.Mapperly\Riok.Mapperly.csproj" />
