@@ -11,7 +11,7 @@ namespace Riok.Mapperly.Configuration;
 
 public class MapperConfigurationReader
 {
-    private Dictionary<MappingConfigurationReference, MappingConfiguration> _resolvedConfigurations = new();
+    private readonly Dictionary<MappingConfigurationReference, MappingConfiguration> _resolvedConfigurations = new();
     private readonly AttributeDataAccessor _dataAccessor;
     private readonly MappingCollection _mappings;
     private readonly GenericTypeChecker _genericTypeChecker;
@@ -66,10 +66,10 @@ public class MapperConfigurationReader
             return resolved;
         }
 
-        return BuildWithIncludedMappings([], reference, supportsDeepCloning)!;
+        return BuildWithIncludedMappings([], reference, supportsDeepCloning);
     }
 
-    private MappingConfiguration? BuildWithIncludedMappings(
+    private MappingConfiguration BuildWithIncludedMappings(
         HashSet<IMethodSymbol> visitedMethods,
         MappingConfigurationReference reference,
         bool supportsDeepCloning
@@ -90,22 +90,46 @@ public class MapperConfigurationReader
             MapperConfiguration.SupportedFeatures
         );
 
-        var includeMapping = _dataAccessor.AccessFirstOrDefault<IncludeMappingConfigurationAttribute>(reference.Method)?.Name;
-        if (includeMapping is null)
+        configuration = IncludeConfigurations(configuration, visitedMethods, reference, supportsDeepCloning);
+        _resolvedConfigurations[reference] = configuration;
+        return configuration;
+    }
+
+    private MappingConfiguration IncludeConfigurations(
+        MappingConfiguration configuration,
+        HashSet<IMethodSymbol> visitedMethods,
+        MappingConfigurationReference reference,
+        bool supportsDeepCloning
+    )
+    {
+        foreach (var includedCfg in _dataAccessor.Access<IncludeMappingConfigurationAttribute>(reference.Method!))
         {
-            _resolvedConfigurations.Add(reference, configuration);
-            return configuration;
+            var cfgToInclude = BuildConfigToInclude(includedCfg.Name, reference, visitedMethods, supportsDeepCloning);
+            if (cfgToInclude == null)
+            {
+                continue;
+            }
+
+            configuration = configuration.Include(cfgToInclude);
         }
 
-        var typeMapping =
-            (ITypeMapping?)_mappings.FindNamedNewInstanceMapping(includeMapping, out var ambiguousName)
-            ?? _mappings.FindExistingInstanceNamedMapping(includeMapping, out ambiguousName);
-        var methodSymbol = (typeMapping as IUserMapping)?.Method;
+        return configuration;
+    }
 
-        if (!ValidateIncludedMapping(ambiguousName, reference, typeMapping, includeMapping, methodSymbol))
+    private MappingConfiguration? BuildConfigToInclude(
+        string name,
+        MappingConfigurationReference configRef,
+        HashSet<IMethodSymbol> visitedMethods,
+        bool supportsDeepCloning
+    )
+    {
+        var typeMapping =
+            (ITypeMapping?)_mappings.FindNamedNewInstanceMapping(name, out var ambiguousName)
+            ?? _mappings.FindExistingInstanceNamedMapping(name, out ambiguousName);
+        var methodSymbol = (typeMapping as IUserMapping)?.Method;
+        if (!ValidateIncludedConfig(ambiguousName, configRef, name, typeMapping, methodSymbol))
         {
-            _resolvedConfigurations.Add(reference, configuration);
-            return configuration;
+            return null;
         }
 
         if (!visitedMethods.Add(methodSymbol))
@@ -115,74 +139,63 @@ public class MapperConfigurationReader
         }
 
         var includedReference = new MappingConfigurationReference(methodSymbol, typeMapping.SourceType, typeMapping.TargetType);
-
-        if (!_resolvedConfigurations.TryGetValue(includedReference, out var includedConfiguration))
+        if (!_resolvedConfigurations.TryGetValue(includedReference, out var config))
         {
-            includedConfiguration = BuildWithIncludedMappings(visitedMethods, includedReference, supportsDeepCloning);
+            config = BuildWithIncludedMappings(visitedMethods, includedReference, supportsDeepCloning);
         }
 
-        configuration = includedConfiguration != null ? configuration.Include(includedConfiguration) : configuration;
-        _resolvedConfigurations.Add(reference, configuration);
-        return configuration;
+        return config;
     }
 
-    private bool ValidateIncludedMapping(
+    private bool ValidateIncludedConfig(
         bool ambiguousName,
         MappingConfigurationReference configRef,
-        [NotNullWhen(true)] ITypeMapping? newInstanceMapping,
-        string includeMapping,
-        [NotNullWhen(true)] IMethodSymbol? methodSymbol
+        string mappingToIncludeName,
+        [NotNullWhen(true)] ITypeMapping? mappingToInclude,
+        [NotNullWhen(true)] IMethodSymbol? mappingToIncludeMethodSymbol
     )
     {
         if (ambiguousName)
         {
-            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingAmbiguous, configRef.Method, includeMapping);
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingAmbiguous, configRef.Method, mappingToIncludeName);
             return false;
         }
 
-        if (newInstanceMapping is null)
+        if (mappingToInclude is null || mappingToIncludeMethodSymbol is null)
         {
-            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, configRef.Method, includeMapping);
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, configRef.Method, mappingToIncludeName);
             return false;
         }
 
         var typeCheckerResult = _genericTypeChecker.InferAndCheckTypes(
             configRef.Method!.TypeParameters,
-            (newInstanceMapping.SourceType, configRef.Source),
-            (newInstanceMapping.TargetType, configRef.Target)
+            (mappingToInclude.SourceType, configRef.Source),
+            (mappingToInclude.TargetType, configRef.Target)
         );
 
-        if (!typeCheckerResult.Success)
-        {
-            if (ReferenceEquals(configRef.Source, typeCheckerResult.FailedArgument))
-            {
-                _diagnostics.ReportDiagnostic(
-                    DiagnosticDescriptors.SourceTypeIsNotAssignableToTheIncludedSourceType,
-                    configRef.Method,
-                    configRef.Source,
-                    newInstanceMapping.SourceType
-                );
-            }
-            else
-            {
-                _diagnostics.ReportDiagnostic(
-                    DiagnosticDescriptors.TargetTypeIsNotAssignableToTheIncludedTargetType,
-                    configRef.Method,
-                    configRef.Target,
-                    newInstanceMapping.TargetType
-                );
-            }
+        if (typeCheckerResult.Success)
+            return true;
 
-            return false;
+        if (ReferenceEquals(configRef.Source, typeCheckerResult.FailedArgument))
+        {
+            _diagnostics.ReportDiagnostic(
+                DiagnosticDescriptors.SourceTypeIsNotAssignableToTheIncludedSourceType,
+                configRef.Method,
+                configRef.Source,
+                mappingToInclude.SourceType
+            );
+        }
+        else
+        {
+            _diagnostics.ReportDiagnostic(
+                DiagnosticDescriptors.TargetTypeIsNotAssignableToTheIncludedTargetType,
+                configRef.Method,
+                configRef.Target,
+                mappingToInclude.TargetType
+            );
         }
 
-        if (methodSymbol == null)
-        {
-            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, configRef.Method, includeMapping);
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     private IReadOnlyCollection<DerivedTypeMappingConfiguration> BuildDerivedTypeConfigs(IMethodSymbol method)
