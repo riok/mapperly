@@ -24,7 +24,7 @@ internal static class MemberMappingDiagnosticReporter
 
     private static void AddUnmappedSourceMembersDiagnostics(MappingBuilderContext ctx, MembersMappingState state)
     {
-        if (!ctx.Configuration.Members.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Source))
+        if (!ctx.Configuration.HasRequiredMappingStrategyForMembers(RequiredMappingStrategy.Source))
             return;
 
         foreach (var sourceMemberName in state.UnmappedSourceMemberNames)
@@ -47,7 +47,7 @@ internal static class MemberMappingDiagnosticReporter
                 continue;
             }
 
-            if (targetMember.CanSet && ctx.Configuration.Members.RequiredMappingStrategy.HasFlag(RequiredMappingStrategy.Target))
+            if (targetMember.CanSet && ctx.Configuration.HasRequiredMappingStrategyForMembers(RequiredMappingStrategy.Target))
             {
                 ctx.ReportDiagnostic(DiagnosticDescriptors.SourceMemberNotFound, targetMember.Name, ctx.Target, ctx.Source);
             }

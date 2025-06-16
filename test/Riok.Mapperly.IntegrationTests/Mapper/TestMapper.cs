@@ -109,6 +109,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [UserMapping(Default = false)]
         private int ComputeSum(TestObject testObject) => testObject.SumComponent1 + testObject.SumComponent2;
 
+        [IncludeMappingConfiguration(nameof(MapToDtoInternal))]
+        private partial TestObjectDto MapToDtoInternalInclude(TestObject testObject);
+
 #if NET8_0_OR_GREATER
         public partial PrivateCtorDto MapPrivateDto(PrivateCtorObject testObject);
 

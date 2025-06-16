@@ -597,6 +597,204 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private partial global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto MapToDtoInternalInclude(global::Riok.Mapperly.IntegrationTests.Models.TestObject testObject)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto(
+                DirectInt(testObject.CtorValue),
+                ctorValue2: DirectInt(testObject.CtorValue2)
+            )
+            {
+                IntInitOnlyValue = DirectInt(testObject.IntInitOnlyValue),
+                RequiredValue = DirectInt(testObject.RequiredValue),
+            };
+            target.IntValue = DirectInt(testObject.IntValue);
+            target.StringValue = testObject.StringValue;
+            target.RenamedStringValue2 = testObject.RenamedStringValue;
+            target.FlatteningIdValue = DirectInt(testObject.Flattening.IdValue);
+            if (testObject.NullableFlattening != null)
+            {
+                target.NullableFlatteningIdValue = CastIntNullable(testObject.NullableFlattening.IdValue);
+            }
+            else
+            {
+                target.NullableFlatteningIdValue = null;
+            }
+            target.Unflattening.IdValue = DirectInt(testObject.UnflatteningIdValue);
+            if (testObject.NullableUnflatteningIdValue != null)
+            {
+                target.NullableUnflattening ??= new global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto();
+                target.NullableUnflattening.IdValue = DirectInt(testObject.NullableUnflatteningIdValue.Value);
+            }
+            if (testObject.NestedNullable != null)
+            {
+                target.NestedNullableIntValue = DirectInt(testObject.NestedNullable.IntValue);
+                target.NestedNullable = MapToTestObjectNestedDto(testObject.NestedNullable);
+            }
+            else
+            {
+                target.NestedNullable = null;
+            }
+            if (testObject.NestedNullableTargetNotNullable != null)
+            {
+                target.NestedNullableTargetNotNullable = MapToTestObjectNestedDto(testObject.NestedNullableTargetNotNullable);
+            }
+            if (testObject.NestedMember != null)
+            {
+                target.NestedMemberId = DirectInt(testObject.NestedMember.NestedMemberId);
+                if (testObject.NestedMember.NestedMemberObject != null)
+                {
+                    target.NestedMemberObjectIntValue = DirectInt(testObject.NestedMember.NestedMemberObject.IntValue);
+                }
+            }
+            if (testObject.StringNullableTargetNotNullable != null)
+            {
+                target.StringNullableTargetNotNullable = testObject.StringNullableTargetNotNullable;
+            }
+            if (testObject.TupleValue != null)
+            {
+                target.TupleValue = MapToValueTupleOfInt32AndInt32(testObject.TupleValue.Value);
+            }
+            else
+            {
+                target.TupleValue = null;
+            }
+            if (testObject.RecursiveObject != null)
+            {
+                target.RecursiveObject = MapToDto(testObject.RecursiveObject);
+            }
+            else
+            {
+                target.RecursiveObject = null;
+            }
+            target.SourceTargetSameObjectType = testObject.SourceTargetSameObjectType;
+            if (testObject.NullableReadOnlyObjectCollection != null)
+            {
+                target.NullableReadOnlyObjectCollection = MapToTestObjectNestedDtoArray(testObject.NullableReadOnlyObjectCollection);
+            }
+            else
+            {
+                target.NullableReadOnlyObjectCollection = null;
+            }
+            target.SpanValue = MapToInt32Array(testObject.SpanValue);
+            target.MemoryValue = MapToInt32Array1(testObject.MemoryValue.Span);
+            target.StackValue = new global::System.Collections.Generic.Stack<int>(
+                global::System.Linq.Enumerable.Select(testObject.StackValue, x => ParseableInt(x))
+            );
+            target.QueueValue = new global::System.Collections.Generic.Queue<int>(
+                global::System.Linq.Enumerable.Select(testObject.QueueValue, x => ParseableInt(x))
+            );
+            target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(
+                global::System.Linq.Enumerable.Select(testObject.ImmutableArrayValue, x => ParseableInt(x))
+            );
+            target.ImmutableListValue = global::System.Collections.Immutable.ImmutableList.ToImmutableList(
+                global::System.Linq.Enumerable.Select(testObject.ImmutableListValue, x => ParseableInt(x))
+            );
+            target.ImmutableHashSetValue = global::System.Collections.Immutable.ImmutableHashSet.ToImmutableHashSet(
+                global::System.Linq.Enumerable.Select(testObject.ImmutableHashSetValue, x => ParseableInt(x))
+            );
+            target.ImmutableQueueValue = global::System.Collections.Immutable.ImmutableQueue.CreateRange(
+                global::System.Linq.Enumerable.Select(testObject.ImmutableQueueValue, x => ParseableInt(x))
+            );
+            target.ImmutableStackValue = global::System.Collections.Immutable.ImmutableStack.CreateRange(
+                global::System.Linq.Enumerable.Select(testObject.ImmutableStackValue, x => ParseableInt(x))
+            );
+            target.ImmutableSortedSetValue = global::System.Collections.Immutable.ImmutableSortedSet.ToImmutableSortedSet(
+                global::System.Linq.Enumerable.Select(testObject.ImmutableSortedSetValue, x => ParseableInt(x))
+            );
+            target.ImmutableDictionaryValue = global::System.Collections.Immutable.ImmutableDictionary.ToImmutableDictionary(
+                testObject.ImmutableDictionaryValue,
+                x => ParseableInt(x.Key),
+                x => ParseableInt(x.Value)
+            );
+            target.ImmutableSortedDictionaryValue = global::System.Collections.Immutable.ImmutableSortedDictionary.ToImmutableSortedDictionary(
+                testObject.ImmutableSortedDictionaryValue,
+                x => ParseableInt(x.Key),
+                x => ParseableInt(x.Value)
+            );
+            foreach (var item in testObject.ExistingISet)
+            {
+                target.ExistingISet.Add(ParseableInt(item));
+            }
+            target.ExistingHashSet.EnsureCapacity(testObject.ExistingHashSet.Count + target.ExistingHashSet.Count);
+            foreach (var item1 in testObject.ExistingHashSet)
+            {
+                target.ExistingHashSet.Add(ParseableInt(item1));
+            }
+            foreach (var item2 in testObject.ExistingSortedSet)
+            {
+                target.ExistingSortedSet.Add(ParseableInt(item2));
+            }
+            target.ExistingList.EnsureCapacity(testObject.ExistingList.Count + target.ExistingList.Count);
+            foreach (var item3 in testObject.ExistingList)
+            {
+                target.ExistingList.Add(ParseableInt(item3));
+            }
+            target.ISet = global::System.Linq.Enumerable.ToHashSet(
+                global::System.Linq.Enumerable.Select(testObject.ISet, x => ParseableInt(x))
+            );
+            target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(
+                global::System.Linq.Enumerable.Select(testObject.IReadOnlySet, x => ParseableInt(x))
+            );
+            target.HashSet = global::System.Linq.Enumerable.ToHashSet(
+                global::System.Linq.Enumerable.Select(testObject.HashSet, x => ParseableInt(x))
+            );
+            target.SortedSet = new global::System.Collections.Generic.SortedSet<int>(
+                global::System.Linq.Enumerable.Select(testObject.SortedSet, x => ParseableInt(x))
+            );
+            target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)testObject.EnumValue;
+            target.FlagsEnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestFlagsEnumDto)testObject.FlagsEnumValue;
+            target.EnumName = MapToEnumDtoByName(testObject.EnumName);
+            target.EnumRawValue = (byte)testObject.EnumRawValue;
+            target.EnumStringValue = MapToString(testObject.EnumStringValue);
+            target.EnumReverseStringValue = MapToTestEnumDtoByValue(testObject.EnumReverseStringValue);
+            if (testObject.SubObject != null)
+            {
+                target.SubObject = MapToInheritanceSubObjectDto(testObject.SubObject);
+            }
+            else
+            {
+                target.SubObject = null;
+            }
+            target.DateTimeValueTargetDateOnly = global::System.DateOnly.FromDateTime(testObject.DateTimeValueTargetDateOnly);
+            target.DateTimeValueTargetTimeOnly = global::System.TimeOnly.FromDateTime(testObject.DateTimeValueTargetTimeOnly);
+            target.ToByteArrayWithInstanceMethod = ConvertWithInstanceMethod(testObject.ToByteArrayWithInstanceMethod);
+            if (testObject.WithCreateMethod != null)
+            {
+                target.WithCreateMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToInt32(testObject.WithCreateMethod);
+            }
+            if (testObject.WithCreateFromMethod != null)
+            {
+                target.WithCreateFromMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToByte(testObject.WithCreateFromMethod);
+            }
+            if (testObject.WithFromSingleMethod != null)
+            {
+                target.WithFromSingleMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToSingle(testObject.WithFromSingleMethod);
+            }
+            if (testObject.WithCreateParamsMethod != null)
+            {
+                target.WithCreateParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToDouble(testObject.WithCreateParamsMethod);
+            }
+            if (testObject.WithCreateFromParamsMethod != null)
+            {
+                target.WithCreateFromParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToUInt32(testObject.WithCreateFromParamsMethod);
+            }
+            if (testObject.WithFromShortParamsMethod != null)
+            {
+                target.WithFromShortParamsMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToInt16(testObject.WithFromShortParamsMethod);
+            }
+            if (testObject.WithToDecimalMethod != null)
+            {
+                target.WithToDecimalMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToDecimal(testObject.WithToDecimalMethod);
+            }
+            target.FormattedIntValue = testObject.IntValue.ToString("C", _formatDeCh);
+            target.FormattedDateValue = testObject.DateTimeValue.ToString("D", _formatEnUs);
+            target.SetPrivateValue(DirectInt(testObject.GetPrivateValue()));
+            target.SetGenericPrivateValue(MapToTestGenericObjectDtoOfInt32AndTestGenericValueDto(testObject.GetGenericPrivateValue()));
+            target.Sum = ComputeSum(testObject);
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public partial global::Riok.Mapperly.IntegrationTests.Dto.PrivateCtorDto MapPrivateDto(global::Riok.Mapperly.IntegrationTests.Models.PrivateCtorObject testObject)
         {
             var target = PrivateCtorDtoAccessor.Create(DirectInt(testObject.GetIntValue()));

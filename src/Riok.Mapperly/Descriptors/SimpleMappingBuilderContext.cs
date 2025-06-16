@@ -84,5 +84,5 @@ public class SimpleMappingBuilderContext(
         _diagnostics.ReportDiagnostic(descriptor, symbolLocation?.GetSyntaxLocation() ?? _diagnosticLocation, messageArgs);
 
     protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef, bool supportsDeepCloning) =>
-        _configurationReader.BuildFor(configRef, supportsDeepCloning, _diagnostics);
+        _configurationReader.BuildFor(configRef, supportsDeepCloning);
 }

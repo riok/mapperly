@@ -15,4 +15,15 @@ public record EnumMappingConfiguration(
 )
 {
     public bool HasExplicitConfigurations => ExplicitMappings.Count > 0 || IgnoredSourceMembers.Count > 0 || IgnoredTargetMembers.Count > 0;
+
+    public EnumMappingConfiguration Include(EnumMappingConfiguration? otherConfiguration)
+    {
+        return this with
+        {
+            FallbackValue = FallbackValue ?? otherConfiguration?.FallbackValue,
+            IgnoredSourceMembers = IgnoredSourceMembers.Concat(otherConfiguration?.IgnoredSourceMembers ?? []).ToList(),
+            IgnoredTargetMembers = IgnoredTargetMembers.Concat(otherConfiguration?.IgnoredTargetMembers ?? []).ToList(),
+            ExplicitMappings = ExplicitMappings.Concat(otherConfiguration?.ExplicitMappings ?? []).ToList(),
+        };
+    }
 }

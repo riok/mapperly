@@ -1,6 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors;
+using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 
@@ -8,11 +11,18 @@ namespace Riok.Mapperly.Configuration;
 
 public class MapperConfigurationReader
 {
+    private Dictionary<MappingConfigurationReference, MappingConfiguration> _resolvedConfigurations = new();
     private readonly AttributeDataAccessor _dataAccessor;
+    private readonly MappingCollection _mappings;
+    private readonly GenericTypeChecker _genericTypeChecker;
+    private readonly DiagnosticCollection _diagnostics;
     private readonly WellKnownTypes _types;
 
     public MapperConfigurationReader(
         AttributeDataAccessor dataAccessor,
+        MappingCollection mappings,
+        GenericTypeChecker genericTypeChecker,
+        DiagnosticCollection diagnostics,
         WellKnownTypes types,
         ISymbol mapperSymbol,
         MapperConfiguration defaultMapperConfiguration,
@@ -20,6 +30,9 @@ public class MapperConfigurationReader
     )
     {
         _dataAccessor = dataAccessor;
+        _mappings = mappings;
+        _genericTypeChecker = genericTypeChecker;
+        _diagnostics = diagnostics;
         _types = types;
 
         var mapperConfiguration = _dataAccessor.AccessSingle<MapperAttribute, MapperConfiguration>(mapperSymbol);
@@ -46,19 +59,29 @@ public class MapperConfigurationReader
 
     public MappingConfiguration MapperConfiguration { get; }
 
-    public MappingConfiguration BuildFor(
+    public MappingConfiguration BuildFor(MappingConfigurationReference reference, bool supportsDeepCloning)
+    {
+        if (_resolvedConfigurations.TryGetValue(reference, out var resolved))
+        {
+            return resolved;
+        }
+
+        return BuildWithIncludedMappings([], reference, supportsDeepCloning)!;
+    }
+
+    private MappingConfiguration? BuildWithIncludedMappings(
+        HashSet<IMethodSymbol> visitedMethods,
         MappingConfigurationReference reference,
-        bool supportsDeepCloning,
-        DiagnosticCollection diagnostics
+        bool supportsDeepCloning
     )
     {
         if (reference.Method == null)
             return supportsDeepCloning ? MapperConfiguration : MapperConfiguration with { UseDeepCloning = false };
 
-        var enumConfig = BuildEnumConfig(reference, diagnostics);
-        var membersConfig = BuildMembersConfig(reference, diagnostics);
+        var enumConfig = BuildEnumConfig(reference);
+        var membersConfig = BuildMembersConfig(reference);
         var derivedTypesConfig = BuildDerivedTypeConfigs(reference.Method);
-        return new MappingConfiguration(
+        var configuration = new MappingConfiguration(
             MapperConfiguration.Mapper,
             enumConfig,
             membersConfig,
@@ -66,6 +89,100 @@ public class MapperConfigurationReader
             supportsDeepCloning && MapperConfiguration.Mapper.UseDeepCloning,
             MapperConfiguration.SupportedFeatures
         );
+
+        var includeMapping = _dataAccessor.AccessFirstOrDefault<IncludeMappingConfigurationAttribute>(reference.Method)?.Name;
+        if (includeMapping is null)
+        {
+            _resolvedConfigurations.Add(reference, configuration);
+            return configuration;
+        }
+
+        var typeMapping =
+            (ITypeMapping?)_mappings.FindNamedNewInstanceMapping(includeMapping, out var ambiguousName)
+            ?? _mappings.FindExistingInstanceNamedMapping(includeMapping, out ambiguousName);
+        var methodSymbol = (typeMapping as IUserMapping)?.Method;
+
+        if (!ValidateIncludedMapping(ambiguousName, reference, typeMapping, includeMapping, methodSymbol))
+        {
+            _resolvedConfigurations.Add(reference, configuration);
+            return configuration;
+        }
+
+        if (!visitedMethods.Add(methodSymbol))
+        {
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.CircularReferencedMapping, methodSymbol, methodSymbol.ToDisplayString());
+            return null;
+        }
+
+        var includedReference = new MappingConfigurationReference(methodSymbol, typeMapping.SourceType, typeMapping.TargetType);
+
+        if (!_resolvedConfigurations.TryGetValue(includedReference, out var includedConfiguration))
+        {
+            includedConfiguration = BuildWithIncludedMappings(visitedMethods, includedReference, supportsDeepCloning);
+        }
+
+        configuration = includedConfiguration != null ? configuration.Include(includedConfiguration) : configuration;
+        _resolvedConfigurations.Add(reference, configuration);
+        return configuration;
+    }
+
+    private bool ValidateIncludedMapping(
+        bool ambiguousName,
+        MappingConfigurationReference configRef,
+        [NotNullWhen(true)] ITypeMapping? newInstanceMapping,
+        string includeMapping,
+        [NotNullWhen(true)] IMethodSymbol? methodSymbol
+    )
+    {
+        if (ambiguousName)
+        {
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingAmbiguous, configRef.Method, includeMapping);
+            return false;
+        }
+
+        if (newInstanceMapping is null)
+        {
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, configRef.Method, includeMapping);
+            return false;
+        }
+
+        var typeCheckerResult = _genericTypeChecker.InferAndCheckTypes(
+            configRef.Method!.TypeParameters,
+            (newInstanceMapping.SourceType, configRef.Source),
+            (newInstanceMapping.TargetType, configRef.Target)
+        );
+
+        if (!typeCheckerResult.Success)
+        {
+            if (ReferenceEquals(configRef.Source, typeCheckerResult.FailedArgument))
+            {
+                _diagnostics.ReportDiagnostic(
+                    DiagnosticDescriptors.SourceTypeIsNotAssignableToTheIncludedSourceType,
+                    configRef.Method,
+                    configRef.Source,
+                    newInstanceMapping.SourceType
+                );
+            }
+            else
+            {
+                _diagnostics.ReportDiagnostic(
+                    DiagnosticDescriptors.TargetTypeIsNotAssignableToTheIncludedTargetType,
+                    configRef.Method,
+                    configRef.Target,
+                    newInstanceMapping.TargetType
+                );
+            }
+
+            return false;
+        }
+
+        if (methodSymbol == null)
+        {
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, configRef.Method, includeMapping);
+            return false;
+        }
+
+        return true;
     }
 
     private IReadOnlyCollection<DerivedTypeMappingConfiguration> BuildDerivedTypeConfigs(IMethodSymbol method)
@@ -76,7 +193,7 @@ public class MapperConfigurationReader
             .ToList();
     }
 
-    private MembersMappingConfiguration BuildMembersConfig(MappingConfigurationReference configRef, DiagnosticCollection diagnostics)
+    private MembersMappingConfiguration BuildMembersConfig(MappingConfigurationReference configRef)
     {
         if (configRef.Method == null)
             return MapperConfiguration.Members;
@@ -109,7 +226,7 @@ public class MapperConfigurationReader
         var hasMemberConfigs = ignoredSourceMembers.Count > 0 || ignoredTargetMembers.Count > 0 || memberConfigurations.Count > 0;
         if (hasMemberConfigs && (configRef.Source.IsEnum() || configRef.Target.IsEnum()))
         {
-            diagnostics.ReportDiagnostic(DiagnosticDescriptors.MemberConfigurationOnNonMemberMapping, configRef.Method);
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.MemberConfigurationOnNonMemberMapping, configRef.Method);
             return MapperConfiguration.Members;
         }
 
@@ -119,18 +236,18 @@ public class MapperConfigurationReader
             && configRef.Target.ImplementsGeneric(_types.Get(typeof(IQueryable<>)), out _)
         )
         {
-            diagnostics.ReportDiagnostic(DiagnosticDescriptors.MemberConfigurationOnQueryableProjectionMapping, configRef.Method);
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.MemberConfigurationOnQueryableProjectionMapping, configRef.Method);
             return MapperConfiguration.Members;
         }
 
         foreach (var invalidMemberConfig in memberValueConfigurations.Where(x => !x.IsValid))
         {
-            diagnostics.ReportDiagnostic(DiagnosticDescriptors.InvalidMapValueAttributeUsage, invalidMemberConfig.Location);
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.InvalidMapValueAttributeUsage, invalidMemberConfig.Location);
         }
 
         foreach (var invalidMemberConfig in memberConfigurations.Where(x => !x.IsValid))
         {
-            diagnostics.ReportDiagnostic(DiagnosticDescriptors.InvalidMapPropertyAttributeUsage, invalidMemberConfig.Location);
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.InvalidMapPropertyAttributeUsage, invalidMemberConfig.Location);
         }
 
         return new MembersMappingConfiguration(
@@ -139,12 +256,12 @@ public class MapperConfigurationReader
             memberValueConfigurations,
             memberConfigurations,
             nestedMembersConfigurations,
-            ignoreObsolete ?? MapperConfiguration.Members.IgnoreObsoleteMembersStrategy,
-            requiredMapping ?? MapperConfiguration.Members.RequiredMappingStrategy
+            ignoreObsolete,
+            requiredMapping
         );
     }
 
-    private EnumMappingConfiguration BuildEnumConfig(MappingConfigurationReference configRef, DiagnosticCollection diagnostics)
+    private EnumMappingConfiguration BuildEnumConfig(MappingConfigurationReference configRef)
     {
         if (configRef.Method == null)
             return MapperConfiguration.Enum;
@@ -166,7 +283,7 @@ public class MapperConfigurationReader
         var hasEnumConfigs = configData != null || explicitMappings.Count > 0 || ignoredSources.Count > 0 || ignoredTargets.Count > 0;
         if (hasEnumConfigs && !configRef.Source.IsEnum() && !configRef.Target.IsEnum())
         {
-            diagnostics.ReportDiagnostic(DiagnosticDescriptors.EnumConfigurationOnNonEnumMapping, configRef.Method);
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.EnumConfigurationOnNonEnumMapping, configRef.Method);
             return MapperConfiguration.Enum;
         }
 
