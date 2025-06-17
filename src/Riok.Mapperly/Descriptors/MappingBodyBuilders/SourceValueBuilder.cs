@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
@@ -170,8 +171,14 @@ internal static class SourceValueBuilder
     {
         var methodName = memberMappingInfo.ValueConfiguration!.Use!;
         var namedMethodCandidates = ctx
-            .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(ctx.BuilderContext.MapperDeclaration.Symbol, methodName)
-            .Where(m => m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 })
+            .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(ctx.BuilderContext.MapperDeclaration.Symbol)
+            .Where(m =>
+                string.Equals(
+                    ctx.BuilderContext.AttributeAccessor.AccessFirstOrDefault<NamedMappingAttribute>(m)?.Name ?? m.Name,
+                    methodName,
+                    StringComparison.Ordinal
+                ) && m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
+            )
             .ToList();
 
         if (namedMethodCandidates.Count == 0)

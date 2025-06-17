@@ -3,7 +3,7 @@
 public class NamedMappingTest
 {
     [Fact]
-    public Task IncludeMappingConfigurationOnNewInstanceMappingShouldWork()
+    public Task IncludeMappingConfigurationOnNewInstanceMappingUsesNamedMapping()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -22,7 +22,7 @@ public class NamedMappingTest
     }
 
     [Fact]
-    public Task IncludeMappingConfigurationOnExistingInstanceMappingShouldWork()
+    public Task IncludeMappingConfigurationOnExistingInstanceMappingUsesNamedMapping()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -35,6 +35,24 @@ public class NamedMappingTest
             """,
             "class A { public string Source { get; set; } }",
             "class B { public string Target { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapValueWithUseUsesNamedMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue(nameof(A.Value), Use = "CustomGetValue")]
+            partial B Map(A a);
+
+            [NamedMapping("CustomGetValue")]
+            string GetValue() => "C1";
+            """,
+            "class A { }",
+            "class B { public string Value { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);
