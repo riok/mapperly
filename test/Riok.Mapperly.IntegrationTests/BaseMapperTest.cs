@@ -224,7 +224,7 @@ namespace Riok.Mapperly.IntegrationTests
 
         private static string GetProjectDirectory() => FindDirectoryOfFile(".csproj");
 
-        private static string GetSolutionDirectory() => FindDirectoryOfFile(".sln");
+        private static string GetSolutionDirectory() => FindDirectoryOfFile(".slnx");
 
         private static string FindDirectoryOfFile(string fileExtension, [CallerFilePath] string baseFilePath = "")
         {

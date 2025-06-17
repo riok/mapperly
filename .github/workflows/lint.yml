@@ -43,7 +43,7 @@ jobs:
 
           # exclusions:
           # LICENSE: 1:1 copy of the license text
-          # sln files: Usually edited by the IDE
+          # slnx files: Usually edited by the IDE
           # AnalyzerReleases.Shipped.md and Analyzer.Unshipped.md: their structure is predefined by its analyzer
           # _snapshots: Snapshots are generated and should not be linted
-          FILTER_REGEX_EXCLUDE: 'LICENSE|.*.sln|src/Riok\.Mapperly/AnalyzerReleases\..*\.md|.*_snapshots.*'
+          FILTER_REGEX_EXCLUDE: 'LICENSE|.*.slnx|src/Riok\.Mapperly/AnalyzerReleases\..*\.md|.*_snapshots.*'

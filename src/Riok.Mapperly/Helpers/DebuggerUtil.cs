@@ -52,9 +52,9 @@ internal static class DebuggerUtil
         var dir = Path.GetDirectoryName(callerFile) ?? throw new InvalidOperationException("could not resolve solution directory");
         do
         {
-            var slnFiles = Directory.GetFiles(dir, "*.sln", SearchOption.TopDirectoryOnly);
-            if (slnFiles.Length == 1)
-                return slnFiles[0];
+            var solutionFiles = Directory.GetFiles(dir, "*.slnx", SearchOption.TopDirectoryOnly);
+            if (solutionFiles.Length == 1)
+                return solutionFiles[0];
 
             dir = Path.GetDirectoryName(dir);
         } while (dir != null);
