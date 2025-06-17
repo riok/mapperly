@@ -1,10 +1,11 @@
 using System.Threading.Tasks;
 using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Mapper;
+using Shouldly;
 using VerifyXunit;
 using Xunit;
 #if NET8_0_OR_GREATER
-using FluentAssertions;
+
 using Riok.Mapperly.IntegrationTests.Models;
 #endif
 
@@ -35,8 +36,8 @@ namespace Riok.Mapperly.IntegrationTests
         {
             var source = PrivateCtorObject.CreateObject(11, "fooBar");
             var target = new TestMapper().MapPrivateDto(source);
-            target.ExposeIntValue().Should().Be(11);
-            target.ExposeStringValue().Should().Be("fooBar");
+            target.ExposeIntValue().ShouldBe(11);
+            target.ExposeStringValue().ShouldBe("fooBar");
         }
 
         [Fact]
@@ -44,8 +45,8 @@ namespace Riok.Mapperly.IntegrationTests
         {
             var source = (10, 20);
             var target = new TestMapper().MapAliasedTuple(source);
-            target.X.Should().Be("10");
-            target.Y.Should().Be("20");
+            target.X.ShouldBe("10");
+            target.Y.ShouldBe("20");
         }
 #endif
     }

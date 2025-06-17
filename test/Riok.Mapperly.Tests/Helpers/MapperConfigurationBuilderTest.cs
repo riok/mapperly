@@ -25,8 +25,10 @@ public class MapperConfigurationBuilderTest
         {
             property
                 .GetValue(mergedConfiguration)
-                .Should()
-                .Be(GetValue(property.PropertyType, true), $"the property {property.Name} does not match, is it missing in the merger?");
+                .ShouldBe(
+                    GetValue(property.PropertyType, true),
+                    $"the property {property.Name} does not match, is it missing in the merger?"
+                );
         }
     }
 
@@ -35,19 +37,19 @@ public class MapperConfigurationBuilderTest
     {
         var mapperConfiguration = NewMapperConfiguration();
         var mapper = MapperConfigurationMerger.Merge(mapperConfiguration, new());
-        mapper.PropertyNameMappingStrategy.Should().Be(PropertyNameMappingStrategy.CaseSensitive);
-        mapper.EnumMappingStrategy.Should().Be(EnumMappingStrategy.ByName);
-        mapper.EnumMappingIgnoreCase.Should().BeTrue();
-        mapper.ThrowOnMappingNullMismatch.Should().BeTrue();
-        mapper.ThrowOnPropertyMappingNullMismatch.Should().BeTrue();
-        mapper.AllowNullPropertyAssignment.Should().BeTrue();
-        mapper.UseDeepCloning.Should().BeTrue();
-        mapper.EnabledConversions.Should().Be(MappingConversionType.Constructor);
-        mapper.UseReferenceHandling.Should().BeTrue();
-        mapper.IgnoreObsoleteMembersStrategy.Should().Be(IgnoreObsoleteMembersStrategy.Source);
-        mapper.RequiredMappingStrategy.Should().Be(RequiredMappingStrategy.Source);
-        mapper.UseReferenceHandling.Should().BeTrue();
-        mapper.PreferParameterlessConstructors.Should().BeTrue();
+        mapper.PropertyNameMappingStrategy.ShouldBe(PropertyNameMappingStrategy.CaseSensitive);
+        mapper.EnumMappingStrategy.ShouldBe(EnumMappingStrategy.ByName);
+        mapper.EnumMappingIgnoreCase.ShouldBeTrue();
+        mapper.ThrowOnMappingNullMismatch.ShouldBeTrue();
+        mapper.ThrowOnPropertyMappingNullMismatch.ShouldBeTrue();
+        mapper.AllowNullPropertyAssignment.ShouldBeTrue();
+        mapper.UseDeepCloning.ShouldBeTrue();
+        mapper.EnabledConversions.ShouldBe(MappingConversionType.Constructor);
+        mapper.UseReferenceHandling.ShouldBeTrue();
+        mapper.IgnoreObsoleteMembersStrategy.ShouldBe(IgnoreObsoleteMembersStrategy.Source);
+        mapper.RequiredMappingStrategy.ShouldBe(RequiredMappingStrategy.Source);
+        mapper.UseReferenceHandling.ShouldBeTrue();
+        mapper.PreferParameterlessConstructors.ShouldBeTrue();
     }
 
     [Fact]
@@ -62,9 +64,9 @@ public class MapperConfigurationBuilderTest
         };
 
         var mapper = MapperConfigurationMerger.Merge(mapperConfiguration, defaultMapperConfiguration);
-        mapper.PropertyNameMappingStrategy.Should().Be(PropertyNameMappingStrategy.CaseInsensitive);
-        mapper.EnumMappingStrategy.Should().Be(EnumMappingStrategy.ByName);
-        mapper.EnumMappingIgnoreCase.Should().BeTrue();
+        mapper.PropertyNameMappingStrategy.ShouldBe(PropertyNameMappingStrategy.CaseInsensitive);
+        mapper.EnumMappingStrategy.ShouldBe(EnumMappingStrategy.ByName);
+        mapper.EnumMappingIgnoreCase.ShouldBeTrue();
     }
 
     private MapperConfiguration NewMapperConfiguration()

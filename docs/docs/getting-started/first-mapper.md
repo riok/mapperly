@@ -21,5 +21,5 @@ public partial class CarMapper
 var mapper = new CarMapper();
 var car = new Car { NumberOfSeats = 10, ... };
 var dto = mapper.CarToCarDto(car);
-dto.NumberOfSeats.Should().Be(10);
+dto.NumberOfSeats.ShouldBe(10);
 ```

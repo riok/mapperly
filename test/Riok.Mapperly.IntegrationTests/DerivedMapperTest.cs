@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using FluentAssertions;
 using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Mapper;
+using Shouldly;
 using VerifyXunit;
 using Xunit;
 
@@ -36,12 +36,12 @@ namespace Riok.Mapperly.IntegrationTests
         [Fact]
         public void RunMappingShouldWork()
         {
-            new BaseMapper().IntToLong(10).Should().Be(10L);
-            new BaseMapper().IntToShort(10).Should().Be(10);
-            new DerivedMapper().IntToLong(10).Should().Be(10L);
-            new DerivedMapper().IntToShort(10).Should().Be(10);
-            new DerivedMapper2().IntToLong(10).Should().Be(10L);
-            new DerivedMapper2().IntToShort(10).Should().Be(10);
+            new BaseMapper().IntToLong(10).ShouldBe(10L);
+            new BaseMapper().IntToShort(10).ShouldBe((short)10);
+            new DerivedMapper().IntToLong(10).ShouldBe(10L);
+            new DerivedMapper().IntToShort(10).ShouldBe((short)10);
+            new DerivedMapper2().IntToLong(10).ShouldBe(10L);
+            new DerivedMapper2().IntToShort(10).ShouldBe((short)10);
         }
     }
 }

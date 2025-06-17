@@ -8,7 +8,7 @@ public class TestAssembly : IDisposable
 
     internal TestAssembly(Compilation compilation)
     {
-        compilation.Emit(_data).Success.Should().BeTrue();
+        compilation.Emit(_data).Success.ShouldBeTrue();
 
         _data.Seek(0, SeekOrigin.Begin);
         MetadataReference = MetadataReference.CreateFromStream(_data);

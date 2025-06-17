@@ -59,8 +59,8 @@ public class InlineExpressionRewriterTest
             }
             """
         );
-        inlineOk.Should().Be(canBeInlined);
-        result.Should().Be(inlinedExpression ?? expression);
+        inlineOk.ShouldBe(canBeInlined);
+        result.ShouldBe(inlinedExpression ?? expression);
     }
 
     [Fact]
@@ -85,8 +85,8 @@ public class InlineExpressionRewriterTest
             """
         );
 
-        inlineOk.Should().BeTrue();
-        result.Should().Be("((global::AnotherAssembly.MyEnum) value & global::AnotherAssembly.MyEnum.OptionA) > 0");
+        inlineOk.ShouldBeTrue();
+        result.ShouldBe("((global::AnotherAssembly.MyEnum) value & global::AnotherAssembly.MyEnum.OptionA) > 0");
     }
 
     [Fact]
@@ -111,8 +111,8 @@ public class InlineExpressionRewriterTest
             """
         );
 
-        inlineOk.Should().BeTrue();
-        result.Should().Be("(value & global::AnotherAssembly.MyEnum.OptionA) > 0");
+        inlineOk.ShouldBeTrue();
+        result.ShouldBe("(value & global::AnotherAssembly.MyEnum.OptionA) > 0");
     }
 
     [Fact]
@@ -134,8 +134,8 @@ public class InlineExpressionRewriterTest
             """
         );
 
-        inlineOk.Should().BeTrue();
-        result.Should().Be("(value as global::AnotherAssembly.B).Value");
+        inlineOk.ShouldBeTrue();
+        result.ShouldBe("(value as global::AnotherAssembly.B).Value");
     }
 
     [Fact]
@@ -157,8 +157,8 @@ public class InlineExpressionRewriterTest
             """
         );
 
-        inlineOk.Should().BeTrue();
-        result.Should().Be("(string)(object)(value as global::AnotherAssembly.B).Value");
+        inlineOk.ShouldBeTrue();
+        result.ShouldBe("(string)(object)(value as global::AnotherAssembly.B).Value");
     }
 
     [Fact]
@@ -180,8 +180,8 @@ public class InlineExpressionRewriterTest
             """
         );
 
-        inlineOk.Should().BeTrue();
-        result.Should().Be("global::System.Array.Empty<global::AnotherAssembly.A>()");
+        inlineOk.ShouldBeTrue();
+        result.ShouldBe("global::System.Array.Empty<global::AnotherAssembly.A>()");
     }
 
     private (string Result, bool CanBeInlined) Rewrite([StringSyntax(StringSyntax.CSharp)] string source)

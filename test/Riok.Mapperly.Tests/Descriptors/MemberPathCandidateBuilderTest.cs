@@ -29,16 +29,12 @@ public class MemberPathCandidateBuilderTest
     )]
     public void BuildMemberPathCandidatesShouldWork(string name, string[] chunks)
     {
-        MemberPathCandidateBuilder
-            .BuildMemberPathCandidates(name)
-            .Select(x => x.FullName)
-            .Should()
-            .BeEquivalentTo(chunks, o => o.WithStrictOrdering());
+        MemberPathCandidateBuilder.BuildMemberPathCandidates(name).Select(x => x.FullName).ShouldBe(chunks);
     }
 
     [Fact]
     public void BuildMemberPathCandidatesWithPascalCaseShouldLimitPermutations()
     {
-        MemberPathCandidateBuilder.BuildMemberPathCandidates("NOT_A_PASCAL_CASE_STRING").Should().HaveCount(256);
+        MemberPathCandidateBuilder.BuildMemberPathCandidates("NOT_A_PASCAL_CASE_STRING").Count().ShouldBe(256);
     }
 }

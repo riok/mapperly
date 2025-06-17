@@ -1,7 +1,7 @@
 #if NET8_0_OR_GREATER
 using System.Threading.Tasks;
-using FluentAssertions;
 using Riok.Mapperly.IntegrationTests.Mapper;
+using Shouldly;
 using VerifyXunit;
 using Xunit;
 
@@ -22,7 +22,7 @@ namespace Riok.Mapperly.IntegrationTests
         public void RunMappingShouldWork()
         {
             var v = NestedTestMapperPrimaryConstructor.TestNesting.NestedMapper.ToInt(10.25m);
-            v.Should().Be(10);
+            v.ShouldBe(10);
         }
     }
 }

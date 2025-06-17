@@ -18,7 +18,7 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions HaveDiagnostics()
     {
-        _mapper.Diagnostics.Should().NotBeEmpty();
+        _mapper.Diagnostics.ShouldNotBeEmpty();
         return this;
     }
 
@@ -62,7 +62,7 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions OnlyHaveDiagnosticSeverities(IReadOnlySet<DiagnosticSeverity> allowedDiagnosticSeverities)
     {
-        _mapper.Diagnostics.FirstOrDefault(d => !allowedDiagnosticSeverities.Contains(d.Severity)).Should().BeNull();
+        _mapper.Diagnostics.FirstOrDefault(d => !allowedDiagnosticSeverities.Contains(d.Severity)).ShouldBeNull();
         return this;
     }
 
@@ -73,7 +73,7 @@ public class MapperGenerationResultAssertions
         for (var i = 0; i < max; i++)
         {
             var diagnostic = diagnostics[i];
-            diagnostic.GetMessage().Should().Be(messages[i]);
+            diagnostic.GetMessage().ShouldBe(messages[i]);
             _notAssertedDiagnostics.Remove(diagnostic);
         }
 
@@ -103,7 +103,7 @@ public class MapperGenerationResultAssertions
         var matchingIdDiagnostic =
             _notAssertedDiagnostics.FirstOrDefault(x => x.Descriptor.Equals(descriptor))
             ?? _mapper.Diagnostics.First(x => x.Descriptor.Equals(descriptor));
-        matchingIdDiagnostic.GetMessage().Should().Be(message, $"message of {descriptor.Id} should match");
+        matchingIdDiagnostic.GetMessage().ShouldBe(message, $"message of {descriptor.Id} should match");
         return this;
     }
 
@@ -115,7 +115,7 @@ public class MapperGenerationResultAssertions
                 Assert.Fail("No generated method found");
                 break;
             case 1:
-                _mapper.Methods.First().Value.Body.Should().Be(mapperMethodBody.ReplaceLineEndings());
+                _mapper.Methods.First().Value.Body.ShouldBe(mapperMethodBody.ReplaceLineEndings());
                 break;
             default:
                 Assert.Fail($"Found multiple methods ({_mapper.Methods.Count}): {string.Join(", ", _mapper.Methods.Select(x => x.Key))}");
@@ -127,7 +127,7 @@ public class MapperGenerationResultAssertions
 
     public MapperGenerationResultAssertions HaveMethodCount(int count)
     {
-        _mapper.Methods.Should().HaveCount(count);
+        _mapper.Methods.Count.ShouldBe(count);
         return this;
     }
 
@@ -136,7 +136,7 @@ public class MapperGenerationResultAssertions
         mapperMethodBody = mapperMethodBody.ReplaceLineEndings().Trim();
         foreach (var method in _mapper.Methods.Values)
         {
-            method.Body.Should().Be(mapperMethodBody);
+            method.Body.ShouldBe(mapperMethodBody);
         }
 
         return this;
@@ -146,7 +146,7 @@ public class MapperGenerationResultAssertions
     {
         foreach (var methodName in methodNames)
         {
-            _mapper.Methods.Keys.Should().Contain(methodName);
+            _mapper.Methods.Keys.ShouldContain(methodName);
         }
 
         return this;
@@ -162,7 +162,7 @@ public class MapperGenerationResultAssertions
     public MapperGenerationResultAssertions HaveMethodBody(string methodName, [StringSyntax(StringSyntax.CSharp)] string mapperMethodBody)
     {
         var body = _mapper.Methods[methodName].Body;
-        body.Should().Be(mapperMethodBody.ReplaceLineEndings().Trim(), $"Method: {methodName}");
+        body.ShouldBe(mapperMethodBody.ReplaceLineEndings().Trim(), $"Method: {methodName}");
         return this;
     }
 
@@ -174,7 +174,7 @@ public class MapperGenerationResultAssertions
         [StringSyntax(StringSyntax.CSharp)] string? constraintClauses
     )
     {
-        _mapper.Methods[methodName].ConstraintClauses.Should().Be(constraintClauses);
+        _mapper.Methods[methodName].ConstraintClauses.ShouldBe(constraintClauses);
         return this;
     }
 

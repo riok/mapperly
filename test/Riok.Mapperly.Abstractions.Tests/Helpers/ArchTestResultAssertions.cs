@@ -1,15 +1,14 @@
-using FluentAssertions.Primitives;
 using NetArchTest.Rules;
 
 namespace Riok.Mapperly.Abstractions.Tests.Helpers;
 
-internal class ArchTestResultAssertions(TestResult value) : ObjectAssertions<TestResult, ArchTestResultAssertions>(value)
+internal static class ArchTestResultShouldExtensions
 {
-    public void BeSuccessful()
+    public static void ShouldHaveNoViolations(this TestResult result)
     {
-        if (!Subject.IsSuccessful)
+        if (!result.IsSuccessful)
         {
-            Subject.IsSuccessful.Should().BeTrue("the following types do not conform: " + string.Join(", ", Subject.FailingTypeNames));
+            result.IsSuccessful.ShouldBeTrue("the following types do not conform: " + string.Join(", ", result.FailingTypeNames));
         }
     }
 }

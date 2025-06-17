@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
-using FluentAssertions;
 using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using Riok.Mapperly.IntegrationTests.Models;
+using Shouldly;
 using VerifyXunit;
 using Xunit;
 
@@ -32,8 +32,8 @@ namespace Riok.Mapperly.IntegrationTests
         {
             var source = new IdObject { IdValue = 20 };
             var copy = DeepCloningMapper.Copy(source);
-            source.Should().NotBeSameAs(copy);
-            copy.IdValue.Should().Be(20);
+            source.ShouldNotBeSameAs(copy);
+            copy.IdValue.ShouldBe(20);
         }
     }
 }

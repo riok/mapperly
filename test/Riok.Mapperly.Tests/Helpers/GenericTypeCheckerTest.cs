@@ -46,8 +46,8 @@ public class GenericTypeCheckerTest
             class Target;
             """
         );
-        result.Success.Should().BeFalse();
-        result.FailedArgument.Should().BeNull();
+        result.Success.ShouldBeFalse();
+        result.FailedArgument.ShouldBeNull();
     }
 
     [Fact]
@@ -68,12 +68,12 @@ public class GenericTypeCheckerTest
                     (m.Parameters[2].Type, c.GetTypeByMetadataName("Target2")!.WithNullableAnnotation(NullableAnnotation.NotAnnotated)),
                 ]
         );
-        result.Success.Should().BeFalse();
-        result.FailedIndex.Should().Be(2);
-        result.FailedArgument.Should().NotBeNull();
-        result.FailedArgument!.Name.Should().Be("Target2");
-        result.FailedParameter.Should().NotBeNull();
-        result.FailedParameter!.Name.Should().Be("B");
+        result.Success.ShouldBeFalse();
+        result.FailedIndex.ShouldBe(2);
+        result.FailedArgument.ShouldNotBeNull();
+        result.FailedArgument.Name.ShouldBe("Target2");
+        result.FailedParameter.ShouldNotBeNull();
+        result.FailedParameter.Name.ShouldBe("B");
     }
 
     [Fact]
@@ -131,8 +131,8 @@ public class GenericTypeCheckerTest
             (s, c) => c.CreateArrayTypeSymbol(s, 1, NullableAnnotation.Annotated).WithNullableAnnotation(NullableAnnotation.NotAnnotated),
             (s, c) => c.CreateArrayTypeSymbol(s, 1, NullableAnnotation.NotAnnotated).WithNullableAnnotation(NullableAnnotation.NotAnnotated)
         );
-        result.Success.Should().BeFalse();
-        result.FailedIndex.Should().Be(0);
+        result.Success.ShouldBeFalse();
+        result.FailedIndex.ShouldBe(0);
     }
 
     [Fact]
@@ -309,9 +309,9 @@ public class GenericTypeCheckerTest
 
     private static void AssertFailureResult(GenericTypeChecker.GenericTypeCheckerResult result, string failedArgumentName)
     {
-        result.Success.Should().BeFalse();
-        result.FailedArgument.Should().NotBeNull();
-        result.FailedArgument!.Name.Should().Be(failedArgumentName);
+        result.Success.ShouldBeFalse();
+        result.FailedArgument.ShouldNotBeNull();
+        result.FailedArgument.Name.ShouldBe(failedArgumentName);
     }
 
     private static void AssertSuccessResult(
@@ -319,15 +319,15 @@ public class GenericTypeCheckerTest
         params (string TypeParameterName, string TypeName)[] inferredTypeNames
     )
     {
-        result.Success.Should().BeTrue();
-        result.FailedArgument.Should().BeNull();
+        result.Success.ShouldBeTrue();
+        result.FailedArgument.ShouldBeNull();
 
         var inferredTypeNamesDict = inferredTypeNames.ToDictionary(x => x.TypeParameterName, x => x.TypeName);
 
         foreach (var (typeParameter, inferredType) in result.InferredTypes)
         {
-            inferredTypeNamesDict.Remove(typeParameter.Name, out var typeName).Should().BeTrue();
-            inferredType.Name.Should().Be(typeName);
+            inferredTypeNamesDict.Remove(typeParameter.Name, out var typeName).ShouldBeTrue();
+            inferredType.Name.ShouldBe(typeName);
         }
     }
 }
