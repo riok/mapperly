@@ -29,6 +29,7 @@ public class DescriptorBuilder
     private readonly SimpleMappingBuilderContext _builderContext;
     private readonly DiagnosticCollection _diagnostics;
     private readonly UnsafeAccessorContext _unsafeAccessorContext;
+    private readonly AttributeDataAccessor _attributeAccessor;
 
     public DescriptorBuilder(
         CompilationContext compilationContext,
@@ -43,11 +44,11 @@ public class DescriptorBuilder
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
         _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
         _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
+        _attributeAccessor = new AttributeDataAccessor(symbolAccessor);
 
-        var attributeAccessor = new AttributeDataAccessor(symbolAccessor);
         var genericTypeChecker = new GenericTypeChecker(_symbolAccessor, compilationContext.Types);
         var configurationReader = new MapperConfigurationReader(
-            attributeAccessor,
+            _attributeAccessor,
             _mappings,
             genericTypeChecker,
             _diagnostics,
@@ -63,7 +64,7 @@ public class DescriptorBuilder
             configurationReader,
             _symbolAccessor,
             genericTypeChecker,
-            attributeAccessor,
+            _attributeAccessor,
             _unsafeAccessorContext,
             _diagnostics,
             new MappingBuilder(_mappings, mapperDeclaration),
@@ -227,7 +228,7 @@ public class DescriptorBuilder
 
     private void AddUserMapping(IUserMapping mapping, bool ignoreDuplicates, bool named)
     {
-        var name = named ? mapping.Method.Name : null;
+        var name = named ? GetMethodName(mapping) : null;
         var result = _mappings.AddUserMapping(mapping, name);
         if (!ignoreDuplicates && mapping.Default == true && result == MappingCollectionAddResult.NotAddedDuplicated)
         {
@@ -240,6 +241,11 @@ public class DescriptorBuilder
         }
 
         _inlineMappings.AddUserMapping(mapping, name);
+    }
+
+    private string GetMethodName(IUserMapping mapping)
+    {
+        return _attributeAccessor.AccessFirstOrDefault<NamedMappingAttribute>(mapping.Method)?.Name ?? mapping.Method.Name;
     }
 
     private void AddUserMappingDiagnostics()
