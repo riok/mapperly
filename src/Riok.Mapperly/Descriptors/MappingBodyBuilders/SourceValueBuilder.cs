@@ -157,9 +157,9 @@ internal static class SourceValueBuilder
         [NotNullWhen(true)] out ISourceValue? sourceValue
     )
     {
-        if (ValidateValueProviderMethod(ctx, memberMappingInfo))
+        if (TryGetValueProviderMethod(ctx, memberMappingInfo, out var method))
         {
-            sourceValue = new MethodProvidedSourceValue(memberMappingInfo.ValueConfiguration!.Use!);
+            sourceValue = new MethodProvidedSourceValue(method.Name);
             return true;
         }
 
@@ -167,7 +167,11 @@ internal static class SourceValueBuilder
         return false;
     }
 
-    private static bool ValidateValueProviderMethod(IMembersBuilderContext<IMapping> ctx, MemberMappingInfo memberMappingInfo)
+    private static bool TryGetValueProviderMethod(
+        IMembersBuilderContext<IMapping> ctx,
+        MemberMappingInfo memberMappingInfo,
+        [NotNullWhen(true)] out IMethodSymbol? method
+    )
     {
         var methodName = memberMappingInfo.ValueConfiguration!.Use!;
         var namedMethodCandidates = ctx
@@ -184,6 +188,7 @@ internal static class SourceValueBuilder
         if (namedMethodCandidates.Count == 0)
         {
             ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.MapValueReferencedMethodNotFound, methodName);
+            method = null;
             return false;
         }
 
@@ -200,7 +205,7 @@ internal static class SourceValueBuilder
             methodCandidates = methodCandidates.Where(m => m.ReturnNullableAnnotation != NullableAnnotation.Annotated);
         }
 
-        var method = methodCandidates.FirstOrDefault();
+        method = methodCandidates.FirstOrDefault();
         if (method != null)
             return true;
 

@@ -57,4 +57,26 @@ public class NamedMappingTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task MapPropertyWithUseUsesNamedMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.StringValue), nameof(B.StringValue), Use = "CustomModifyString")]
+            public partial B Map(A source);
+
+            [NamedMapping("CustomModifyString")]
+            [UserMapping(Default = false)]
+            private string ModifyString(string source) => source + "-modified";
+
+            [UserMapping(Default = true)]
+            private string DefaultModifyString(string source) => source;
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }
