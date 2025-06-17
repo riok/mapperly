@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Riok.Mapperly.Benchmarks/Riok.Mapperly.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/Riok.Mapperly.Sample/Riok.Mapperly.Sample.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Riok.Mapperly.Abstractions/Riok.Mapperly.Abstractions.csproj" />
+    <Project Path="src/Riok.Mapperly/Riok.Mapperly.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/Riok.Mapperly.Abstractions.Tests/Riok.Mapperly.Abstractions.Tests.csproj" />
+    <Project Path="test/Riok.Mapperly.IntegrationTests/Riok.Mapperly.IntegrationTests.csproj" />
+    <Project Path="test/Riok.Mapperly.Tests/Riok.Mapperly.Tests.csproj" />
+  </Folder>
+</Solution>
