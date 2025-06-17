@@ -9,12 +9,12 @@ public class UniqueNameBuilderTest
     {
         var builder = new UniqueNameBuilder();
         builder.Reserve("FooBar");
-        builder.New("FooBar").Should().Be("FooBar1");
-        builder.New("FooBar").Should().Be("FooBar2");
+        builder.New("FooBar").ShouldBe("FooBar1");
+        builder.New("FooBar").ShouldBe("FooBar2");
 
         var builder2 = builder.NewScope();
         builder2.Reserve("Baz");
-        builder2.New("FooBar").Should().Be("FooBar3");
-        builder2.New("Baz").Should().Be("Baz1");
+        builder2.New("FooBar").ShouldBe("FooBar3");
+        builder2.New("Baz").ShouldBe("Baz1");
     }
 }

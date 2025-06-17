@@ -9,30 +9,26 @@ public class EnumerableExtensionsTest
     {
         new int?[] { 1, null, null, 2, 3, 4, null }
             .WhereNotNull()
-            .Should()
-            .BeEquivalentTo([1, 2, 3, 4], o => o.WithStrictOrdering());
+            .ShouldBe([1, 2, 3, 4]);
     }
 
     [Fact]
     public void WhereNotNullShouldFilterNulls()
     {
-        new[] { "a", "b", "c", null, "d", null, null, "e" }
-            .WhereNotNull()
-            .Should()
-            .BeEquivalentTo(["a", "b", "c", "d", "e"], o => o.WithStrictOrdering());
+        new[] { "a", "b", "c", null, "d", null, null, "e" }.WhereNotNull().ShouldBe(["a", "b", "c", "d", "e"]);
     }
 
     [Fact]
     public void SkipLastShouldWork()
     {
         var items = new[] { 1, 2, 5, 6, 7 };
-        items.SkipLast().Should().BeEquivalentTo(items.Take(items.Length - 1), o => o.WithoutStrictOrdering());
+        items.SkipLast().ShouldBe(items.Take(items.Length - 1));
     }
 
     [Fact]
     public void AggregateWithPrevious()
     {
         var items = new[] { 1, 2, 5, 6, 7 };
-        items.AggregateWithPrevious(100, (agg, prev, item) => agg - prev + item).Should().Be(107);
+        items.AggregateWithPrevious(100, (agg, prev, item) => agg - prev + item).ShouldBe(107);
     }
 }

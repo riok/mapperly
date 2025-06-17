@@ -13,10 +13,10 @@ public class MethodNameBuilderTest
     {
         var builder = new MethodNameBuilder();
         builder.Reserve("MapToA");
-        builder.Build(NewMethodMappingMock("A")).Should().Be("MapToA1");
-        builder.Build(NewMethodMappingMock("A")).Should().Be("MapToA2");
-        builder.Build(NewMethodMappingMock("B")).Should().Be("MapToB");
-        builder.Build(NewMethodMappingMock("B")).Should().Be("MapToB1");
+        builder.Build(NewMethodMappingMock("A")).ShouldBe("MapToA1");
+        builder.Build(NewMethodMappingMock("A")).ShouldBe("MapToA2");
+        builder.Build(NewMethodMappingMock("B")).ShouldBe("MapToB");
+        builder.Build(NewMethodMappingMock("B")).ShouldBe("MapToB1");
     }
 
     private MethodMapping NewMethodMappingMock(string targetTypeName)

@@ -60,6 +60,6 @@ internal static class IncrementalGeneratorTestHelper
     )
     {
         var actualStepReason = runResult.TrackedSteps[stepName].SelectMany(x => x.Outputs).ElementAt(outputIndex).Reason;
-        actualStepReason.Should().Be(expectedStepReason, $"step {stepName} of mapper at index {outputIndex}");
+        actualStepReason.ShouldBe(expectedStepReason, $"step {stepName} of mapper at index {outputIndex}");
     }
 }

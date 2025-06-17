@@ -19,8 +19,7 @@ public class AbstractionsArchTests
             .Should()
             .BeSealed()
             .GetResult()
-            .Should()
-            .BeSuccessful();
+            .ShouldHaveNoViolations();
     }
 
     [Fact]
@@ -33,7 +32,6 @@ public class AbstractionsArchTests
             .Should()
             .MeetCustomRule(new ConditionalAttributeSymbolRule("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME"))
             .GetResult()
-            .Should()
-            .BeSuccessful();
+            .ShouldHaveNoViolations();
     }
 }

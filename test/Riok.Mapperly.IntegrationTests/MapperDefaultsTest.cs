@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using FluentAssertions;
 using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Mapper;
+using Shouldly;
 using VerifyXunit;
 using Xunit;
 
@@ -21,7 +21,7 @@ namespace Riok.Mapperly.IntegrationTests
         public void RunMappingShouldWork()
         {
             var enum2 = EnumMapper.Map(Enum1.Value1);
-            enum2.Should().Be(Enum2.Value1);
+            enum2.ShouldBe(Enum2.Value1);
         }
     }
 }

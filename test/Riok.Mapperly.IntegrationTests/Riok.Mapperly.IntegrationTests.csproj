@@ -15,7 +15,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Not supported in .NET Framework -->
-    <Using Remove="FluentAssertions" />
+    <Using Remove="Shouldly" />
   </ItemGroup>
   <!-- For local development, simply reference the projects. -->
   <ItemGroup Condition="'$(MapperlyNugetPackageVersion)' == ''">

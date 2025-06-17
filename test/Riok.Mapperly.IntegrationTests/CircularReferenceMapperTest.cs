@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
-using FluentAssertions;
 using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using Riok.Mapperly.IntegrationTests.Models;
+using Shouldly;
 using VerifyXunit;
 using Xunit;
 
@@ -21,10 +21,10 @@ namespace Riok.Mapperly.IntegrationTests
             obj.Parent.Parent = obj;
 
             var dto = CircularReferenceMapper.ToDto(obj);
-            dto.Value.Should().Be(1);
-            dto.Parent.Should().NotBeNull();
-            dto.Parent!.Value.Should().Be(2);
-            dto.Parent.Parent.Should().Be(dto);
+            dto.Value.ShouldBe(1);
+            dto.Parent.ShouldNotBeNull();
+            dto.Parent!.Value.ShouldBe(2);
+            dto.Parent.Parent.ShouldBe(dto);
         }
 
         [Fact]
