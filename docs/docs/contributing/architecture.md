@@ -42,7 +42,7 @@ The `DescriptorBuilder` does this by following this process:
    To create a mapping from one type to another, the `DescriptorBuilder` loops through a set of `*MappingBuilder`s.
    Each of the mapping builders try to create a mapping (an `ITypeMapping` implementation) for the asked type mapping by using
    one approach on how to map types (eg. an explicit cast is implemented by the `ExplicitCastMappingBuilder`).
-   These mappings are queued in the queue of mappings which need the body to be built (currently body builders are only used for object to object (property-based) mappings).
+   These mappings are queued in the queue of mappings which need the body to be built.
 7. The `SourceEmitter` emits the code described by the `MapperDescriptor` and all its mappings.
    The syntax objects are created by using `SyntaxFactory` and `SyntaxFactoryHelper`.
    The `SyntaxFactoryHelper` tries to simplify creating formatted syntax trees.
