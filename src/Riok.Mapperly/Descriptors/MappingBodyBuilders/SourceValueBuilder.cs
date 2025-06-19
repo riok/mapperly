@@ -173,21 +173,18 @@ internal static class SourceValueBuilder
         [NotNullWhen(true)] out IMethodSymbol? method
     )
     {
-        var methodName = memberMappingInfo.ValueConfiguration!.Use!;
+        var mappingName = memberMappingInfo.ValueConfiguration!.Use!;
         var namedMethodCandidates = ctx
             .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(ctx.BuilderContext.MapperDeclaration.Symbol)
             .Where(m =>
-                string.Equals(
-                    ctx.BuilderContext.AttributeAccessor.AccessFirstOrDefault<NamedMappingAttribute>(m)?.Name ?? m.Name,
-                    methodName,
-                    StringComparison.Ordinal
-                ) && m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
+                m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
+                && ctx.BuilderContext.IsMappingNameEqualsTo(m, mappingName)
             )
             .ToList();
 
         if (namedMethodCandidates.Count == 0)
         {
-            ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.MapValueReferencedMethodNotFound, methodName);
+            ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.MapValueReferencedMethodNotFound, mappingName);
             method = null;
             return false;
         }
@@ -211,7 +208,7 @@ internal static class SourceValueBuilder
 
         ctx.BuilderContext.ReportDiagnostic(
             DiagnosticDescriptors.MapValueMethodTypeMismatch,
-            methodName,
+            mappingName,
             namedMethodCandidates[0].ReturnType.ToDisplayString(),
             memberMappingInfo.TargetMember.ToDisplayString()
         );

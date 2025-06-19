@@ -78,6 +78,46 @@ public class NamedMappingTest
     }
 
     [Fact]
+    public Task MapPropertyWithUseUsesNamedMappingOnNewInstanceWhenNoAutoMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.StringValue), nameof(B.StringValue), Use = "CustomModifyString")]
+            public partial B Map(A source);
+
+            [NamedMapping("CustomModifyString")]
+            private string ModifyString(string source) => source + "-modified";
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapPropertyWithUseUsesNamedMappingOnExistingInstanceWhenNoAutoMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = "CustomCopyString")]
+            public partial void Map(A source, B target);
+
+            [NamedMapping("CustomCopyString")]
+            private void CopyString(C source, D target) => target.StringValue = source.StringValue + "-modified";
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "class A { public C Value { get; set; } }",
+            "class B { public D Value { get; set; } }",
+            "class C { public string StringValue { get; set; } }",
+            "class D { public string StringValue { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task MapPropertyFromSourceWithUseUsesNamedMapping()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

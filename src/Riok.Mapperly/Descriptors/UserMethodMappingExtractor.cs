@@ -321,8 +321,8 @@ public static class UserMethodMappingExtractor
     )
     {
         return ctx
-            .SymbolAccessor.GetAllDirectlyAccessibleMethods(mapperSymbol, name)
-            .Where(m => IsMappingMethodCandidate(ctx, m, requireAttribute: false))
+            .SymbolAccessor.GetAllDirectlyAccessibleMethods(mapperSymbol)
+            .Where(m => ctx.IsMappingNameEqualsTo(m, name) && IsMappingMethodCandidate(ctx, m, requireAttribute: false))
             .Select(m => BuildUserImplementedMapping(ctx, m, null, allowPartial: true, isStatic: mapperSymbol.IsStatic, isExternal: false))
             .OfType<T>();
     }
