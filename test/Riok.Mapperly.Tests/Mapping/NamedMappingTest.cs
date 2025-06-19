@@ -69,12 +69,28 @@ public class NamedMappingTest
             [NamedMapping("CustomModifyString")]
             [UserMapping(Default = false)]
             private string ModifyString(string source) => source + "-modified";
-
-            [UserMapping(Default = true)]
-            private string DefaultModifyString(string source) => source;
             """,
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapPropertyFromSourceWithUseUsesNamedMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapPropertyFromSource(nameof(B.FullName), Use = "CustomToFullName")]
+            partial B Map(A source);
+
+            [NamedMapping("CustomToFullName")]
+            [UserMapping(Default = false)]
+            string ToFullName(A x) => $"{x.FirstName} {x.LastName}";
+            """,
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string FullName { get; set; } }"
         );
 
         return TestHelper.VerifyGenerator(source);
