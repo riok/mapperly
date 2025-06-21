@@ -31,7 +31,7 @@ namespace Riok.Mapperly.IntegrationTests
         public void RunMappingWithIncludeShouldWork()
         {
             var model = NewNamedMappingObject();
-            var dto = new NamedMappedValuesDto();
+            var dto = new NamedMappingValuesDto();
             NamedMappings.UpdateDto(model, dto);
             dto.FromMapPropertyUse.ShouldBe("Test-modified");
             dto.FromMapValue.ShouldBe("fooBar");

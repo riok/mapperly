@@ -5,9 +5,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
     public static partial class NamedMappings
     {
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        public static partial global::Riok.Mapperly.IntegrationTests.Dto.NamedMappedValuesDto MapWithNamedMappings(global::Riok.Mapperly.IntegrationTests.Models.NamedMappingObject source)
+        public static partial global::Riok.Mapperly.IntegrationTests.Dto.NamedMappingValuesDto MapWithNamedMappings(global::Riok.Mapperly.IntegrationTests.Models.NamedMappingObject source)
         {
-            var target = new global::Riok.Mapperly.IntegrationTests.Dto.NamedMappedValuesDto();
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.NamedMappingValuesDto();
             target.FromMapValue = StringValueBuilder();
             target.FromMapPropertyUse = ModifyValue(source.SourceValue);
             target.FromMapPropertyFromSource = UseSource(source);
@@ -15,7 +15,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        public static partial void UpdateDto(global::Riok.Mapperly.IntegrationTests.Models.NamedMappingObject source, global::Riok.Mapperly.IntegrationTests.Dto.NamedMappedValuesDto target)
+        public static partial void UpdateDto(global::Riok.Mapperly.IntegrationTests.Models.NamedMappingObject source, global::Riok.Mapperly.IntegrationTests.Dto.NamedMappingValuesDto target)
         {
             target.FromMapValue = StringValueBuilder();
             target.FromMapPropertyUse = ModifyValue(source.SourceValue);

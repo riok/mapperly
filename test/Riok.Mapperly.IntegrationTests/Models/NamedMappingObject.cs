@@ -2,6 +2,6 @@
 {
     public class NamedMappingObject
     {
-        public string SourceValue { get; set; }
+        public string SourceValue { get; set; } = "";
     }
 }

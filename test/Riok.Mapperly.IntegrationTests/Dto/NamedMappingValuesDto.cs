@@ -1,6 +1,6 @@
 ﻿namespace Riok.Mapperly.IntegrationTests.Dto
 {
-    public class NamedMappedValuesDto
+    public class NamedMappingValuesDto
     {
         public string FromMapValue { get; set; } = "";
         public string FromMapPropertyUse { get; set; } = "";
