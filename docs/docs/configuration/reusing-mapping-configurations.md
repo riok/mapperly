@@ -27,6 +27,7 @@ public partial static AppleDto ToApple(Apple apple);
 ```
 
 Or use the provided mapper name:
+
 ```csharp
 // Property mapping configurations
 // highlight-start
@@ -39,7 +40,6 @@ public partial static void CopyApple(AppleDto dto, Apple apple);
 // highlight-end
 public partial static AppleDto ToApple(Apple apple);
 ```
-
 
 The following configurations will be included:
 
@@ -101,4 +101,4 @@ public partial class MyMapper {
 
 If an `IncludeMappingConfigurationAttribute` refers to an ambiguous mapping configuration (e.g., multiple
 configurations exist with the same name), the mapper emits RMG062 to help you resolve the ambiguity.
-This can be easily resolved by providing a custom name for the target mapping with `NamedMapping` attribute. 
+This can be easily resolved by providing a custom name for the target mapping with `NamedMapping` attribute.
