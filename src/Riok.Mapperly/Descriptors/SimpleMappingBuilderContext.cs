@@ -85,4 +85,10 @@ public class SimpleMappingBuilderContext(
 
     protected MappingConfiguration ReadConfiguration(MappingConfigurationReference configRef, bool supportsDeepCloning) =>
         _configurationReader.BuildFor(configRef, supportsDeepCloning);
+
+    public bool IsMappingNameEqualsTo(IMethodSymbol methodSymbol, string name)
+    {
+        var mappingName = AttributeAccessor.AccessFirstOrDefault<NamedMappingAttribute>(methodSymbol)?.Name ?? methodSymbol.Name;
+        return string.Equals(mappingName, name, StringComparison.Ordinal);
+    }
 }

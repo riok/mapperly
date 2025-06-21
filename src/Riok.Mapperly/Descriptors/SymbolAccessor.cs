@@ -261,13 +261,6 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         return GetAllMembers(symbol).OfType<IMethodSymbol>().Where(IsDirectlyAccessible);
     }
 
-    internal IEnumerable<IMethodSymbol> GetAllDirectlyAccessibleMethods(ITypeSymbol symbol, string name)
-    {
-        return GetAllMembers(symbol)
-            .OfType<IMethodSymbol>()
-            .Where(m => string.Equals(m.Name, name, StringComparison.Ordinal) && IsDirectlyAccessible(m));
-    }
-
     internal IReadOnlyCollection<ISymbol> GetAllMembers(ITypeSymbol symbol)
     {
         if (_allMembers.TryGetValue(symbol, out var members))
