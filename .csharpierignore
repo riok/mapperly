@@ -2,3 +2,4 @@ _snapshots
 artifacts/
 bin/
 obj/
+.idea/
