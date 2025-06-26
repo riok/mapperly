@@ -10,12 +10,10 @@ Mapperly resolves the constructor to be used by the following priorities:
 
 - accessible constructors annotated with `MapperConstructor`
 - if `PreferParameterlessConstructors` attribute is set to `true` (default behavior):
-
   - accessible parameterless constructors.
   - accessible constructors ordered in descending by their parameter count
 
 - If `PreferParameterlessConstructors` attribute is set to `false` :
-
   - Accessible constructors are ordered in descending order by their parameter count.
   - Accessible parameterless constructors are considered afterward.
 
