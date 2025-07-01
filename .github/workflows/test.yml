@@ -39,7 +39,7 @@ jobs:
           reports: 'test/**/*cobertura.xml'
           reporttypes: 'Cobertura'
           targetdir: '${{ github.workspace }}'
-      - uses: clearlyip/code-coverage-report-action@v5
+      - uses: clearlyip/code-coverage-report-action@v6
         id: code_coverage_report_action
         # dont run for dependabot
         if: ${{ always() && github.actor != 'dependabot[bot]'}}
