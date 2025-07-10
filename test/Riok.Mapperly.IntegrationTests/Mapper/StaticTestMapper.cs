@@ -16,8 +16,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public static partial long ImplicitCastInt(int value);
 
-        public static partial int ExplicitCastInt(uint value);
-
         public static partial int? CastIntNullable(int value);
 
         public static partial Guid ParseableGuid(string id);

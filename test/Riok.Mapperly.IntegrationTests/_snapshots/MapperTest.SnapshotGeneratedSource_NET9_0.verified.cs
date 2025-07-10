@@ -17,12 +17,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        public partial int ExplicitCastInt(uint value)
-        {
-            return (int)value;
-        }
-
-        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public partial int? CastIntNullable(int value)
         {
             return (int?)value;

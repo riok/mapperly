@@ -10,9 +10,9 @@ namespace FooBar
             public partial class CarMapper
             {
                 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-                public partial int ToInt(double value)
+                public partial double ToDouble(int value)
                 {
-                    return (int)value;
+                    return (double)value;
                 }
             }
         }

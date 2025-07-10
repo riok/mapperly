@@ -30,7 +30,16 @@ public record TestSourceBuilderOptions(
     public static readonly TestSourceBuilderOptions Default = new();
     public static readonly TestSourceBuilderOptions AsStatic = new(Static: true);
     public static readonly TestSourceBuilderOptions WithDeepCloning = new(UseDeepCloning: true);
+    public static readonly TestSourceBuilderOptions WithDeepCloningAndConversionTypeAll = new TestSourceBuilderOptions(
+        UseDeepCloning: true,
+        EnabledConversions: MappingConversionType.All
+    );
+    public static readonly TestSourceBuilderOptions WithAll = new TestSourceBuilderOptions(EnabledConversions: MappingConversionType.All);
     public static readonly TestSourceBuilderOptions WithReferenceHandling = new(UseReferenceHandling: true);
+    public static readonly TestSourceBuilderOptions WithReferenceHandlingAndConversionTypeAll = new(
+        UseReferenceHandling: true,
+        EnabledConversions: MappingConversionType.All
+    );
     public static readonly TestSourceBuilderOptions WithDisabledAutoUserMappings = new(AutoUserMappings: false);
 
     public static readonly TestSourceBuilderOptions PreferParameterizedConstructors = new(PreferParameterlessConstructors: false);

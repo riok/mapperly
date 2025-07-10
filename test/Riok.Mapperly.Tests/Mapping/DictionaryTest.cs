@@ -29,7 +29,7 @@ public class DictionaryTest
     [Fact]
     public void DictionaryToDictionaryExplicitCastedValue()
     {
-        var source = TestSourceBuilder.Mapping("Dictionary<string, long>", "Dictionary<string, int>");
+        var source = TestSourceBuilder.Mapping("Dictionary<string, long>", "Dictionary<string, int>", TestSourceBuilderOptions.WithAll);
         TestHelper
             .GenerateMapper(source)
             .Should()
@@ -51,7 +51,7 @@ public class DictionaryTest
         var source = TestSourceBuilder.Mapping(
             "Dictionary<string, long>",
             "Dictionary<string, int>",
-            TestSourceBuilderOptions.WithDeepCloning
+            TestSourceBuilderOptions.WithDeepCloningAndConversionTypeAll
         );
         TestHelper
             .GenerateMapper(source)
@@ -126,7 +126,11 @@ public class DictionaryTest
     [Fact]
     public void DictionaryToIDictionaryExplicitCastedValue()
     {
-        var source = TestSourceBuilder.Mapping("Dictionary<string, long>", "IDictionary<string, int>");
+        var source = TestSourceBuilder.Mapping(
+            "Dictionary<string, long>",
+            "IDictionary<string, int>",
+            TestSourceBuilderOptions.WithDeepCloningAndConversionTypeAll
+        );
         TestHelper
             .GenerateMapper(source)
             .Should()

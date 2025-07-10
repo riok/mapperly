@@ -23,12 +23,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        public static partial int ExplicitCastInt(uint value)
-        {
-            return (int)value;
-        }
-
-        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial int? CastIntNullable(int value)
         {
             return (int?)value;
@@ -772,7 +766,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum)) => MapToEnumByNameWithFallback(x),
                 int x when targetType.IsAssignableFrom(typeof(int)) => DirectInt(x),
                 int x when targetType.IsAssignableFrom(typeof(long)) => ImplicitCastInt(x),
-                uint x when targetType.IsAssignableFrom(typeof(int)) => ExplicitCastInt(x),
                 global::System.DateTime x when targetType.IsAssignableFrom(typeof(global::System.DateTime)) => DirectDateTime(x),
                 string x when targetType.IsAssignableFrom(typeof(global::System.Guid)) => ParseableGuid(x),
                 string x when targetType.IsAssignableFrom(typeof(int)) => ParseableInt(x),
@@ -798,7 +791,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum)) => MapToEnumByNameWithFallback(x),
                 int x when targetType.IsAssignableFrom(typeof(int)) => DirectInt(x),
                 int x when targetType.IsAssignableFrom(typeof(long)) => ImplicitCastInt(x),
-                uint x when targetType.IsAssignableFrom(typeof(int)) => ExplicitCastInt(x),
                 global::System.DateTime x when targetType.IsAssignableFrom(typeof(global::System.DateTime)) => DirectDateTime(x),
                 string x when targetType.IsAssignableFrom(typeof(global::System.Guid)) => ParseableGuid(x),
                 string x when targetType.IsAssignableFrom(typeof(int)) => ParseableInt(x),
@@ -825,7 +817,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName x when typeof(TTarget).IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum)) => (TTarget)(object)MapToEnumByNameWithFallback(x),
                 int x when typeof(TTarget).IsAssignableFrom(typeof(int)) => (TTarget)(object)DirectInt(x),
                 int x when typeof(TTarget).IsAssignableFrom(typeof(long)) => (TTarget)(object)ImplicitCastInt(x),
-                uint x when typeof(TTarget).IsAssignableFrom(typeof(int)) => (TTarget)(object)ExplicitCastInt(x),
                 global::System.DateTime x when typeof(TTarget).IsAssignableFrom(typeof(global::System.DateTime)) => (TTarget)(object)DirectDateTime(x),
                 string x when typeof(TTarget).IsAssignableFrom(typeof(global::System.Guid)) => (TTarget)(object)ParseableGuid(x),
                 string x when typeof(TTarget).IsAssignableFrom(typeof(int)) => (TTarget)(object)ParseableInt(x),

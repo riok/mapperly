@@ -48,7 +48,7 @@ public class NullableTest
     [Fact]
     public void NullablePrimitiveToOtherNullablePrimitiveShouldWork()
     {
-        var source = TestSourceBuilder.Mapping("decimal?", "int?");
+        var source = TestSourceBuilder.Mapping("decimal?", "int?", TestSourceBuilderOptions.WithAll);
         TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source == null ? default(int?) : (int)source.Value;");
     }
 
