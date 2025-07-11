@@ -2,6 +2,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
 
@@ -73,6 +74,17 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         {
             yield return Access<TAttribute, TData>(attrData, symbolAccessor);
         }
+    }
+
+    public string GetMethodName(IMethodSymbol methodSymbol)
+    {
+        var mappingName = AccessFirstOrDefault<NamedMappingAttribute>(methodSymbol)?.Name ?? methodSymbol.Name;
+        return mappingName;
+    }
+
+    public bool IsMappingNameEqualsTo(IMethodSymbol methodSymbol, string name)
+    {
+        return string.Equals(GetMethodName(methodSymbol), name, StringComparison.Ordinal);
     }
 
     internal static TData Access<TAttribute, TData>(AttributeData attrData, SymbolAccessor? symbolAccessor = null)

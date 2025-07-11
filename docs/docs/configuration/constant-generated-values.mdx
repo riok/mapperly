@@ -53,3 +53,13 @@ Make sure the return type exactly matches the target type.
 </Tabs>
 
 This also works for constructor parameters.
+
+The name of the value generator can be overriden by the `NamedMapping` attribute:
+
+```csharp
+[MapValue(nameof(CarDto.SourceSystem), Use = "CustomGetSourceSystem")]
+public partial CarDto Map(Car car);
+
+[NamedMapping("CustomGetSourceSystem")]
+string GetSourceSystem() => "C1";
+```
