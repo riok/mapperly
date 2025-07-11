@@ -177,7 +177,7 @@ internal static class SourceValueBuilder
             .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(ctx.BuilderContext.MapperDeclaration.Symbol)
             .Where(m =>
                 m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
-                && ctx.BuilderContext.IsMappingNameEqualsTo(m, mappingName)
+                && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualsTo(m, mappingName)
             )
             .ToList();
 

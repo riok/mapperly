@@ -228,7 +228,7 @@ public class DescriptorBuilder
 
     private void AddUserMapping(IUserMapping mapping, bool ignoreDuplicates, bool named)
     {
-        var name = named ? GetMappingName(mapping) : null;
+        var name = named ? _attributeAccessor.GetMethodName(mapping.Method) : null;
         var result = _mappings.AddUserMapping(mapping, name);
         if (!ignoreDuplicates && mapping.Default == true && result == MappingCollectionAddResult.NotAddedDuplicated)
         {
@@ -241,11 +241,6 @@ public class DescriptorBuilder
         }
 
         _inlineMappings.AddUserMapping(mapping, name);
-    }
-
-    private string GetMappingName(IUserMapping mapping)
-    {
-        return _attributeAccessor.AccessFirstOrDefault<NamedMappingAttribute>(mapping.Method)?.Name ?? mapping.Method.Name;
     }
 
     private void AddUserMappingDiagnostics()
