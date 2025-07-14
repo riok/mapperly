@@ -156,9 +156,9 @@ internal static class SourceValueBuilder
         [NotNullWhen(true)] out ISourceValue? sourceValue
     )
     {
-        if (ValidateValueProviderMethod(ctx, memberMappingInfo))
+        if (TryGetValueProviderMethod(ctx, memberMappingInfo, out var method))
         {
-            sourceValue = new MethodProvidedSourceValue(memberMappingInfo.ValueConfiguration!.Use!);
+            sourceValue = new MethodProvidedSourceValue(method.Name);
             return true;
         }
 
@@ -166,17 +166,25 @@ internal static class SourceValueBuilder
         return false;
     }
 
-    private static bool ValidateValueProviderMethod(IMembersBuilderContext<IMapping> ctx, MemberMappingInfo memberMappingInfo)
+    private static bool TryGetValueProviderMethod(
+        IMembersBuilderContext<IMapping> ctx,
+        MemberMappingInfo memberMappingInfo,
+        [NotNullWhen(true)] out IMethodSymbol? method
+    )
     {
-        var methodName = memberMappingInfo.ValueConfiguration!.Use!;
+        var mappingName = memberMappingInfo.ValueConfiguration!.Use!;
         var namedMethodCandidates = ctx
-            .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(ctx.BuilderContext.MapperDeclaration.Symbol, methodName)
-            .Where(m => m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 })
+            .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(ctx.BuilderContext.MapperDeclaration.Symbol)
+            .Where(m =>
+                m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
+                && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualsTo(m, mappingName)
+            )
             .ToList();
 
         if (namedMethodCandidates.Count == 0)
         {
-            ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.MapValueReferencedMethodNotFound, methodName);
+            ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.MapValueReferencedMethodNotFound, mappingName);
+            method = null;
             return false;
         }
 
@@ -193,13 +201,13 @@ internal static class SourceValueBuilder
             methodCandidates = methodCandidates.Where(m => m.ReturnNullableAnnotation != NullableAnnotation.Annotated);
         }
 
-        var method = methodCandidates.FirstOrDefault();
+        method = methodCandidates.FirstOrDefault();
         if (method != null)
             return true;
 
         ctx.BuilderContext.ReportDiagnostic(
             DiagnosticDescriptors.MapValueMethodTypeMismatch,
-            methodName,
+            mappingName,
             namedMethodCandidates[0].ReturnType.ToDisplayString(),
             memberMappingInfo.TargetMember.ToDisplayString()
         );
