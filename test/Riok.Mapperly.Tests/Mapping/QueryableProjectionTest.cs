@@ -70,6 +70,7 @@ public class QueryableProjectionTest
             [MapProperty("StringValue", "StringValue2")] private partial B MapToB(A source);
             [MapProperty("LongValue", "IntValue")] private partial D MapToD(C source);
             """,
+            TestSourceBuilderOptions.AllConversions,
             "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",
             "class B { public string StringValue2 { get; set; } public D NestedValue { get; set; } }",
             "class C { public long LongValue { get; set; } public E NestedValue { get; set; } }",
@@ -214,7 +215,7 @@ public class QueryableProjectionTest
         var source = TestSourceBuilder.Mapping(
             "System.Linq.IQueryable<long>",
             "System.Linq.IQueryable<int>",
-            TestSourceBuilderOptions.WithReferenceHandling
+            TestSourceBuilderOptions.AllConversionsWithReferenceHandling
         );
 
         TestHelper

@@ -58,7 +58,11 @@ public class DictionaryImmutableTest
     [Fact]
     public void DictionaryToImmutableDictionaryExplicitCastedKeyValue()
     {
-        var source = TestSourceBuilder.Mapping("Dictionary<long, long>", "System.Collections.Immutable.ImmutableDictionary<int, int>");
+        var source = TestSourceBuilder.Mapping(
+            "Dictionary<long, long>",
+            "System.Collections.Immutable.ImmutableDictionary<int, int>",
+            TestSourceBuilderOptions.AllConversions
+        );
         TestHelper
             .GenerateMapper(source)
             .Should()
@@ -72,7 +76,11 @@ public class DictionaryImmutableTest
     [Fact]
     public void DictionaryToImmutableDictionaryExplicitCastedValue()
     {
-        var source = TestSourceBuilder.Mapping("Dictionary<string, long>", "System.Collections.Immutable.ImmutableDictionary<string, int>");
+        var source = TestSourceBuilder.Mapping(
+            "Dictionary<string, long>",
+            "System.Collections.Immutable.ImmutableDictionary<string, int>",
+            TestSourceBuilderOptions.AllConversions
+        );
         TestHelper
             .GenerateMapper(source)
             .Should()

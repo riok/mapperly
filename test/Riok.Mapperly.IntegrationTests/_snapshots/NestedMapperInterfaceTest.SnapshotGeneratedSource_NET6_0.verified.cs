@@ -7,9 +7,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial class NestedMapper
         {
             [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-            public static partial int ToInt(decimal value)
+            public static partial decimal ToDecimal(int value)
             {
-                return (int)value;
+                return (decimal)value;
             }
         }
     }
