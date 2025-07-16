@@ -101,7 +101,7 @@ public class IncludeMappingConfigurationTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [MapValue(nameof(A.Value), Use = nameof(GetValue))]
+            [MapValue(nameof(B.Value), Use = nameof(GetValue))]
             partial B MapOther(A a);
 
             [IncludeMappingConfiguration(nameof(MapOther))]
@@ -121,7 +121,7 @@ public class IncludeMappingConfigurationTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [MapPropertyFromSource(nameof(A.Value))]
+            [MapPropertyFromSource(nameof(B.Value))]
             private partial B MapOther(A source);
 
             [IncludeMappingConfiguration(nameof(MapOther))]
@@ -255,7 +255,7 @@ public class IncludeMappingConfigurationTest
             public static partial B Map(A a);
 
             [IncludeMappingConfiguration(nameof(Map))]
-            [MapProperty(nameof(A.SourceName2), nameof(B.DestinationName2))]
+            [MapProperty(nameof(ADerived.SourceName2), nameof(BDerived.DestinationName2))]
             public static partial BDerived MapDerived(ADerived a);
             """,
             "class A { public string SourceName1 { get; set; } }",

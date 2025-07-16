@@ -45,7 +45,7 @@ public class NamedMappingTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [MapValue(nameof(A.Value), Use = "CustomGetValue")]
+            [MapValue(nameof(B.Value), Use = "CustomGetValue")]
             partial B Map(A a);
 
             [NamedMapping("CustomGetValue")]
