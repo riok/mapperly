@@ -1,5 +1,6 @@
 using System.Reflection;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using Riok.Mapperly.Abstractions;
@@ -172,6 +173,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             ),
             _ when arg.IsNull => null,
             _ when targetType == typeof(IMemberPathConfiguration) => CreateMemberPath(arg, syntax, symbolAccessor),
+            _ when targetType == typeof(MethodReferenceConfiguration) => CreateMethodReferenceConfiguration(arg, syntax, symbolAccessor),
             TypedConstantKind.Enum => GetEnumValue(arg, targetType),
             TypedConstantKind.Array => BuildArrayValue(arg, targetType, symbolAccessor),
             TypedConstantKind.Primitive => arg.Value,
@@ -188,10 +190,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         SymbolAccessor? symbolAccessor
     )
     {
-        if (symbolAccessor == null)
-        {
-            throw new ArgumentNullException(nameof(symbolAccessor), "The symbol accessor cannot be null when resolving member paths");
-        }
+        ThrowHelpers.ThrowIfNull(symbolAccessor);
 
         if (arg.Kind == TypedConstantKind.Array)
         {
@@ -257,6 +256,94 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
         memberPath.Reverse();
         return new SymbolMemberPath(memberPath.ToImmutableEquatableArray());
+    }
+
+    private static MethodReferenceConfiguration CreateMethodReferenceConfiguration(
+        TypedConstant arg,
+        AttributeArgumentSyntax? syntax,
+        SymbolAccessor? symbolAccessor
+    )
+    {
+        ThrowHelpers.ThrowIfNull(symbolAccessor);
+
+        if (arg.Kind == TypedConstantKind.Array)
+        {
+            var values = arg
+                .Values.Select(x => (string?)BuildArgumentValue(x, typeof(string), null, symbolAccessor))
+                .WhereNotNull()
+                .ToList();
+            var methodName = values[^1];
+            var targetType = values.Count > 1 ? string.Join(".", values.SkipLast()) : null;
+            return new MethodReferenceConfiguration(methodName, null);
+        }
+
+        // try to extract the full nameof path from syntax
+        if (
+            arg.Kind == TypedConstantKind.Primitive
+            && syntax?.Expression
+                is InvocationExpressionSyntax
+                {
+                    Expression: IdentifierNameSyntax { Identifier.Text: NameOfOperatorName }
+                } invocationExpressionSyntax
+        )
+        {
+            return CreateNameOfMethodReferenceConfiguration(invocationExpressionSyntax, symbolAccessor);
+        }
+
+        if (arg is { Kind: TypedConstantKind.Primitive, Value: string v })
+        {
+            var splitPoint = v.LastIndexOf(MemberPathConstants.MemberAccessSeparator);
+            var methodName = splitPoint == -1 ? v : v.Substring(splitPoint + 1);
+            var targetType = splitPoint == -1 ? null : v.Substring(0, splitPoint);
+            return new MethodReferenceConfiguration(methodName, null);
+        }
+
+        throw new InvalidOperationException($"Cannot create {nameof(StringMemberPath)} from {arg.Kind}");
+    }
+
+    private static MethodReferenceConfiguration CreateNameOfMethodReferenceConfiguration(
+        InvocationExpressionSyntax nameofSyntax,
+        SymbolAccessor symbolAccessor
+    )
+    {
+        var nameOfOperation = symbolAccessor.GetOperation(nameofSyntax) as INameOfOperation;
+        var operation = nameOfOperation?.GetFirstChildOperation();
+
+        string? memberName = null;
+        while (operation is not null)
+        {
+            if (operation.Type is not null && memberName is not null)
+            {
+                var typeSymbol = operation.Type;
+                var member = typeSymbol.GetMembers(memberName).FirstOrDefault();
+                if (member is not null)
+                {
+                    return new MethodReferenceConfiguration(memberName, typeSymbol);
+                }
+
+                break;
+            }
+
+            memberName ??= operation.Syntax.TryGetInferredMemberName();
+            operation = operation.GetFirstChildOperation();
+        }
+
+        if (memberName is not null)
+        {
+            return new MethodReferenceConfiguration(memberName, null);
+        }
+
+        // if resolution fails, just pick up the text.
+
+        var argMemberPathStr = nameofSyntax.ArgumentList.Arguments[0].ToFullString();
+
+        // @ prefix opts-in to full nameof
+        var fullNameOf = argMemberPathStr[0] == FullNameOfPrefix;
+
+        var parts = argMemberPathStr.TrimStart(FullNameOfPrefix).Split([MemberPathConstants.MemberAccessSeparator], 2);
+        memberName = parts.Length == 1 ? parts[0] : parts[1];
+        var targetType = parts.Length > 1 && fullNameOf ? parts[0] : null;
+        return new MethodReferenceConfiguration(memberName, null);
     }
 
     private static object?[] BuildArrayValue(TypedConstant arg, Type targetType, SymbolAccessor? symbolAccessor)
