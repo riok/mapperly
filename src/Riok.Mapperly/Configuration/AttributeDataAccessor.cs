@@ -273,7 +273,6 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
                 .WhereNotNull()
                 .ToList();
             var methodName = values[^1];
-            var targetType = values.Count > 1 ? string.Join(".", values.SkipLast()) : null;
             return new MethodReferenceConfiguration(methodName, null);
         }
 
@@ -287,14 +286,14 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
                 } invocationExpressionSyntax
         )
         {
-            return CreateNameOfMethodReferenceConfiguration(invocationExpressionSyntax, symbolAccessor);
+            var containingType = symbolAccessor.GetContainingTypeSymbol(syntax);
+            return CreateNameOfMethodReferenceConfiguration(invocationExpressionSyntax, symbolAccessor, containingType);
         }
 
         if (arg is { Kind: TypedConstantKind.Primitive, Value: string v })
         {
             var splitPoint = v.LastIndexOf(MemberPathConstants.MemberAccessSeparator);
             var methodName = splitPoint == -1 ? v : v.Substring(splitPoint + 1);
-            var targetType = splitPoint == -1 ? null : v.Substring(0, splitPoint);
             return new MethodReferenceConfiguration(methodName, null);
         }
 
@@ -303,7 +302,8 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
     private static MethodReferenceConfiguration CreateNameOfMethodReferenceConfiguration(
         InvocationExpressionSyntax nameofSyntax,
-        SymbolAccessor symbolAccessor
+        SymbolAccessor symbolAccessor,
+        ITypeSymbol? containingType
     )
     {
         var nameOfOperation = symbolAccessor.GetOperation(nameofSyntax) as INameOfOperation;
@@ -318,7 +318,10 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
                 var member = typeSymbol.GetMembers(memberName).FirstOrDefault();
                 if (member is not null)
                 {
-                    return new MethodReferenceConfiguration(memberName, typeSymbol);
+                    return new MethodReferenceConfiguration(
+                        memberName,
+                        containingType?.ExtendsType(typeSymbol) ?? false ? null : typeSymbol
+                    );
                 }
 
                 break;
@@ -342,7 +345,6 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
         var parts = argMemberPathStr.TrimStart(FullNameOfPrefix).Split([MemberPathConstants.MemberAccessSeparator], 2);
         memberName = parts.Length == 1 ? parts[0] : parts[1];
-        var targetType = parts.Length > 1 && fullNameOf ? parts[0] : null;
         return new MethodReferenceConfiguration(memberName, null);
     }
 

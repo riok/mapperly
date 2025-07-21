@@ -60,7 +60,7 @@ internal static class SymbolExtensions
     internal static int GetInheritanceLevel(this ITypeSymbol symbol)
     {
         var level = 0;
-        while (symbol.BaseType != null)
+        while (symbol.BaseType is not null && symbol.BaseType.SpecialType != SpecialType.System_Object)
         {
             symbol = symbol.BaseType;
             level++;
@@ -123,7 +123,11 @@ internal static class SymbolExtensions
             return true;
         }
 
-        for (var baseType = t.BaseType; baseType != null; baseType = baseType.BaseType)
+        for (
+            var baseType = t.BaseType;
+            baseType is not null && baseType.SpecialType != SpecialType.System_Object;
+            baseType = baseType.BaseType
+        )
         {
             if (!SymbolEqualityComparer.Default.Equals(baseType.OriginalDefinition, genericSymbol))
                 continue;
@@ -228,7 +232,7 @@ internal static class SymbolExtensions
     internal static IEnumerable<ITypeSymbol> WalkTypeHierarchy(this ITypeSymbol symbol)
     {
         yield return symbol;
-        while (symbol.BaseType != null)
+        while (symbol.BaseType != null && symbol.BaseType.SpecialType != SpecialType.System_Object)
         {
             yield return symbol.BaseType;
             symbol = symbol.BaseType;
@@ -263,6 +267,26 @@ internal static class SymbolExtensions
         }
 
         keywordName = null;
+        return false;
+    }
+
+    internal static bool ExtendsType(this ITypeSymbol derivedType, ITypeSymbol baseType)
+    {
+        var type = derivedType;
+        if (baseType.TypeKind == TypeKind.Interface)
+        {
+            return type.AllInterfaces.Any(x => SymbolEqualityComparer.Default.Equals(x, baseType));
+        }
+        while (type is not null && type.SpecialType != SpecialType.System_Object)
+        {
+            if (SymbolEqualityComparer.Default.Equals(baseType, type))
+            {
+                return true;
+            }
+
+            type = type.BaseType;
+        }
+
         return false;
     }
 }

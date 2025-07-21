@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Helpers;
@@ -478,6 +479,23 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     }
 
     public IOperation? GetOperation(SyntaxNode node) => compilationContext.GetSemanticModel(node.SyntaxTree)?.GetOperation(node);
+
+    public ITypeSymbol? GetContainingTypeSymbol(SyntaxNode? node)
+    {
+        var classNode = node;
+        while (classNode is not (null or BaseTypeDeclarationSyntax))
+        {
+            classNode = classNode.Parent;
+        }
+
+        if (classNode is null)
+        {
+            return null;
+        }
+
+        var semanticModel = compilationContext.GetSemanticModel(classNode.SyntaxTree);
+        return semanticModel?.GetDeclaredSymbol(classNode) as ITypeSymbol;
+    }
 
     private ImmutableArray<AttributeData> GetAttributesCore(ISymbol symbol)
     {
