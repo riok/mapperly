@@ -79,13 +79,13 @@ public class DescriptorBuilder
         ConfigureMemberVisibility();
         ReserveMethodNames();
         ExtractUserMappings();
+        ExtractExternalMappings();
 
         // ExtractObjectFactories needs to be called after ExtractUserMappings due to configuring mapperDescriptor.Static
         var objectFactories = ExtractObjectFactories();
         var constructorFactory = new InstanceConstructorFactory(objectFactories, _symbolAccessor, _unsafeAccessorContext);
         var formatProviders = ExtractFormatProviders();
         EnqueueUserMappings(constructorFactory, formatProviders);
-        ExtractExternalMappings();
         _mappingBodyBuilder.BuildMappingBodies(cancellationToken);
         AddUserMappingDiagnostics();
         BuildMappingMethodNames();

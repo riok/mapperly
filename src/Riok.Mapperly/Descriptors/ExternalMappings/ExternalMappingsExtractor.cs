@@ -40,25 +40,19 @@ internal static class ExternalMappingsExtractor
         var externalStaticDirectlyReferencedMappings = ctx
             .SymbolAccessor.GetAllMethods(mapperSymbol)
             .SelectMany(CollectMemberMappingConfigurations)
-            .Where(e => e.Use?.TargetType is not null)
-            .SelectMany(e =>
-                UserMethodMappingExtractor
-                    .ExtractNamedUserImplementedMappings(
-                        ctx,
-                        e.Use!.TargetType!,
-                        e.Use.Name,
-                        receiver: e.Use.TargetTypeName,
-                        isStatic: true
-                    )
-                    .Select(y => (e.Use.FullName, y))
-            );
+            .SelectMany(e => UserMethodMappingExtractor.ExtractNamedUserImplementedMappings(ctx, e).Select(y => (e.FullName, y)));
 
         return externalStaticDirectlyReferencedMappings;
 
-        IEnumerable<MemberMappingConfiguration> CollectMemberMappingConfigurations(IMethodSymbol x) =>
+        IEnumerable<MethodReferenceConfiguration> CollectMemberMappingConfigurations(IMethodSymbol x) =>
             ctx
                 .AttributeAccessor.Access<MapPropertyAttribute, MemberMappingConfiguration>(x)
-                .Concat(ctx.AttributeAccessor.Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(x));
+                .Select(e => e.Use)
+                .Concat(ctx.AttributeAccessor.Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(x).Select(e => e.Use))
+                .Concat(
+                    ctx.AttributeAccessor.Access<IncludeMappingConfigurationAttribute, IncludeMappingConfiguration>(x).Select(e => e.Name)
+                )
+                .Where(e => e?.TargetType is not null)!;
     }
 
     private static IEnumerable<IUserMapping> ValidateAndExtractExternalInstanceMappings(SimpleMappingBuilderContext ctx, ISymbol symbol)
