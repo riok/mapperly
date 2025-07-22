@@ -39,7 +39,7 @@ internal static class ExternalMappingsExtractor
     {
         var externalStaticDirectlyReferencedMappings = ctx
             .SymbolAccessor.GetAllMethods(mapperSymbol)
-            .SelectMany(x => ctx.AttributeAccessor.Access<MapPropertyAttribute, MemberMappingConfiguration>(x))
+            .SelectMany(CollectMemberMappingConfigurations)
             .Where(e => e.Use?.TargetType is not null)
             .SelectMany(e =>
                 UserMethodMappingExtractor
@@ -54,6 +54,11 @@ internal static class ExternalMappingsExtractor
             );
 
         return externalStaticDirectlyReferencedMappings;
+
+        IEnumerable<MemberMappingConfiguration> CollectMemberMappingConfigurations(IMethodSymbol x) =>
+            ctx
+                .AttributeAccessor.Access<MapPropertyAttribute, MemberMappingConfiguration>(x)
+                .Concat(ctx.AttributeAccessor.Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(x));
     }
 
     private static IEnumerable<IUserMapping> ValidateAndExtractExternalInstanceMappings(SimpleMappingBuilderContext ctx, ISymbol symbol)
