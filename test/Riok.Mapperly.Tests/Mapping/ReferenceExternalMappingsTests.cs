@@ -88,4 +88,27 @@ public class ReferenceExternalMappingsTests
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task MapValueUseOnInstanceSupportsExternalMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper mapper = new();
+
+            [MapValue("Value", Use = nameof(mapper.NewValue))]
+            internal partial B Map(A source);
+            """,
+            "class A;",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public string NewValue() => "new value";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

@@ -273,7 +273,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
                 .WhereNotNull()
                 .ToList();
             var methodName = values[^1];
-            return new MethodReferenceConfiguration(methodName, null);
+            return new MethodReferenceConfiguration(methodName);
         }
 
         // try to extract the full nameof path from syntax
@@ -294,7 +294,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         {
             var splitPoint = v.LastIndexOf(MemberPathConstants.MemberAccessSeparator);
             var methodName = splitPoint == -1 ? v : v.Substring(splitPoint + 1);
-            return new MethodReferenceConfiguration(methodName, null);
+            return new MethodReferenceConfiguration(methodName);
         }
 
         throw new InvalidOperationException($"Cannot create {nameof(StringMemberPath)} from {arg.Kind}");
@@ -312,15 +312,16 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         string? memberName = null;
         while (operation is not null)
         {
-            if (operation.Type is not null && memberName is not null)
+            if (memberName is not null && operation.Type is INamedTypeSymbol typeSymbol)
             {
-                var typeSymbol = operation.Type;
                 var member = typeSymbol.GetMembers(memberName).FirstOrDefault();
                 if (member is not null)
                 {
+                    var field = operation is IFieldReferenceOperation fieldRefOperation ? fieldRefOperation.Field : null;
                     return new MethodReferenceConfiguration(
                         memberName,
-                        containingType?.ExtendsType(typeSymbol) ?? false ? null : typeSymbol
+                        containingType?.ExtendsType(typeSymbol) ?? false ? null : typeSymbol,
+                        field
                     );
                 }
 
@@ -333,7 +334,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
         if (memberName is not null)
         {
-            return new MethodReferenceConfiguration(memberName, null);
+            return new MethodReferenceConfiguration(memberName);
         }
 
         // if resolution fails, just pick up the text.
@@ -345,7 +346,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
         var parts = argMemberPathStr.TrimStart(FullNameOfPrefix).Split([MemberPathConstants.MemberAccessSeparator], 2);
         memberName = parts.Length == 1 ? parts[0] : parts[1];
-        return new MethodReferenceConfiguration(memberName, null);
+        return new MethodReferenceConfiguration(memberName);
     }
 
     private static object?[] BuildArrayValue(TypedConstant arg, Type targetType, SymbolAccessor? symbolAccessor)

@@ -9,6 +9,7 @@ using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
@@ -156,10 +157,18 @@ internal static class SourceValueBuilder
         [NotNullWhen(true)] out ISourceValue? sourceValue
     )
     {
-        if (TryGetValueProviderMethod(ctx, memberMappingInfo, out var method))
+        if (TryGetValueProviderMethod(ctx, memberMappingInfo, out var methodReference))
         {
-            var targetType = CanAccessWithoutQualification(ctx, method.ContainingType) ? null : method.ContainingType;
-            sourceValue = new MethodProvidedSourceValue(method.Name, targetType?.FullyQualifiedIdentifierName());
+            string? targetName = null;
+            if (methodReference.TargetMember is not null)
+            {
+                targetName = methodReference.TargetMember.Name;
+            }
+            else if (!CanAccessWithoutQualification(ctx, methodReference.TargetType))
+            {
+                targetName = methodReference.TargetType.FullyQualifiedIdentifierName();
+            }
+            sourceValue = new MethodProvidedSourceValue(methodReference.Method.Name, targetName);
             return true;
         }
 
@@ -186,23 +195,23 @@ internal static class SourceValueBuilder
     private static bool TryGetValueProviderMethod(
         IMembersBuilderContext<IMapping> ctx,
         MemberMappingInfo memberMappingInfo,
-        [NotNullWhen(true)] out IMethodSymbol? method
+        [NotNullWhen(true)] out MapperMethodReference? methodReference
     )
     {
-        var methodReference = memberMappingInfo.ValueConfiguration!.Use!;
-        var targetSymbol = methodReference.TargetType ?? ctx.BuilderContext.MapperDeclaration.Symbol;
+        var methodReferenceConfiguration = memberMappingInfo.ValueConfiguration!.Use!;
+        var targetSymbol = methodReferenceConfiguration.TargetType ?? ctx.BuilderContext.MapperDeclaration.Symbol;
         var namedMethodCandidates = ctx
             .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(targetSymbol)
             .Where(m =>
                 m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
-                && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualsTo(m, methodReference.Name)
+                && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualsTo(m, methodReferenceConfiguration.Name)
             )
             .ToList();
 
         if (namedMethodCandidates.Count == 0)
         {
-            ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.MapValueReferencedMethodNotFound, methodReference.Name);
-            method = null;
+            ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.MapValueReferencedMethodNotFound, methodReferenceConfiguration.Name);
+            methodReference = null;
             return false;
         }
 
@@ -219,16 +228,20 @@ internal static class SourceValueBuilder
             methodCandidates = methodCandidates.Where(m => m.ReturnNullableAnnotation != NullableAnnotation.Annotated);
         }
 
-        method = methodCandidates.FirstOrDefault();
-        if (method != null)
-            return true;
+        var methodSymbol = methodCandidates.FirstOrDefault();
+        if (methodSymbol == null)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.MapValueMethodTypeMismatch,
+                methodReferenceConfiguration.Name,
+                namedMethodCandidates[0].ReturnType.ToDisplayString(),
+                memberMappingInfo.TargetMember.ToDisplayString()
+            );
+            methodReference = null;
+            return false;
+        }
 
-        ctx.BuilderContext.ReportDiagnostic(
-            DiagnosticDescriptors.MapValueMethodTypeMismatch,
-            methodReference.Name,
-            namedMethodCandidates[0].ReturnType.ToDisplayString(),
-            memberMappingInfo.TargetMember.ToDisplayString()
-        );
-        return false;
+        methodReference = new MapperMethodReference(methodSymbol, targetSymbol, methodReferenceConfiguration.TargetMember);
+        return true;
     }
 }
