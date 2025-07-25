@@ -24,6 +24,29 @@ public class ReferenceExternalMappingsTests
     }
 
     [Fact]
+    public Task MapValueUseOnInstanceSupportsExternalMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper mapper = new();
+
+            [MapValue("Value", Use = nameof(mapper.NewValue))]
+            internal partial B Map(A source);
+            """,
+            "class A;",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public string NewValue() => "new value";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task MapPropertyUseSupportsExternalMappings()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -69,6 +92,32 @@ public class ReferenceExternalMappingsTests
     }
 
     [Fact]
+    public Task MapPropertyUseOnInstanceSupportsExternalMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper mapper = new();
+
+            [MapProperty(nameof(A.Value1), nameof(B.Value1), Use = nameof(ModifyString)]
+            [MapProperty(nameof(A.Value2), nameof(B.Value2), Use = nameof(mapper.ModifyString)]
+            private partial B Map(A source);
+
+            public string ModifyString(string source) => source + "-modified";
+            """,
+            "record A(string Value1, string Value2);",
+            "record B(string Value1, string Value2);",
+            """
+            class OtherMapper
+            {
+                public string ModifyString(string source) => source + "-externally-modified";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task IncludeMappingConfigurationNameSupportsExternalMappings()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -82,29 +131,6 @@ public class ReferenceExternalMappingsTests
             class OtherMapper {
                 [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
                 public static partial B MapOther(A a);
-            }
-            """
-        );
-
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task MapValueUseOnInstanceSupportsExternalMappings()
-    {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            """
-            OtherMapper mapper = new();
-
-            [MapValue("Value", Use = nameof(mapper.NewValue))]
-            internal partial B Map(A source);
-            """,
-            "class A;",
-            "record B(string Value);",
-            """
-            class OtherMapper
-            {
-                public string NewValue() => "new value";
             }
             """
         );
