@@ -317,7 +317,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
                 var member = typeSymbol.GetMembers(memberName).FirstOrDefault();
                 if (member is not null)
                 {
-                    var field = operation is IFieldReferenceOperation fieldRefOperation ? fieldRefOperation.Field : null;
+                    var field = GetFieldOrProperty(operation);
                     return new MethodReferenceConfiguration(
                         memberName,
                         containingType?.ExtendsType(typeSymbol) ?? false ? null : typeSymbol,
@@ -347,6 +347,16 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         var parts = argMemberPathStr.TrimStart(FullNameOfPrefix).Split([MemberPathConstants.MemberAccessSeparator], 2);
         memberName = parts.Length == 1 ? parts[0] : parts[1];
         return new MethodReferenceConfiguration(memberName);
+    }
+
+    private static ISymbol? GetFieldOrProperty(IOperation operation)
+    {
+        return operation switch
+        {
+            IFieldReferenceOperation fieldRefOperation => fieldRefOperation.Field,
+            IPropertyReferenceOperation propertyRefOperation => propertyRefOperation.Property,
+            _ => null,
+        };
     }
 
     private static object?[] BuildArrayValue(TypedConstant arg, Type targetType, SymbolAccessor? symbolAccessor)

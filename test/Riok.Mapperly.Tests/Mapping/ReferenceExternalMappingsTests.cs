@@ -3,7 +3,7 @@
 public class ReferenceExternalMappingsTests
 {
     [Fact]
-    public Task MapValueUseSupportsExternalMappings()
+    public Task MapValueUseOnStaticSupportsExternalMappings()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -24,7 +24,7 @@ public class ReferenceExternalMappingsTests
     }
 
     [Fact]
-    public Task MapValueUseOnInstanceSupportsExternalMappings()
+    public Task MapValueUseOnInstanceFieldSupportsExternalMappings()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -47,18 +47,38 @@ public class ReferenceExternalMappingsTests
     }
 
     [Fact]
-    public Task MapPropertyUseSupportsExternalMappings()
+    public Task MapValueUseOnInstancePropertySupportsExternalMappings()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [MapProperty(nameof(A.Value1), nameof(B.Value1), Use = nameof(ModifyString)]
-            [MapProperty(nameof(A.Value2), nameof(B.Value2), Use = nameof(OtherMapper.ModifyString)]
-            private static partial B Map(A source);
+            OtherMapper Mapper { get; } = new();
 
-            public static string ModifyString(string source) => source + "-modified";
+            [MapValue("Value", Use = nameof(Mapper.NewValue))]
+            internal partial B Map(A source);
             """,
-            "record A(string Value1, string Value2);",
-            "record B(string Value1, string Value2);",
+            "class A;",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public string NewValue() => "new value";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapPropertyUseOnStaticSupportsExternalMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(OtherMapper.ModifyString)]
+            private static partial B Map(A source);
+            """,
+            "record A(string Value);",
+            "record B(string Value);",
             """
             class OtherMapper
             {
@@ -71,7 +91,55 @@ public class ReferenceExternalMappingsTests
     }
 
     [Fact]
-    public Task MapPropertyFromSourceUseSupportsExternalMappings()
+    public Task MapPropertyUseOnInstanceFieldSupportsExternalMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper mapper = new();
+
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(mapper.ModifyString)]
+            private partial B Map(A source);
+            """,
+            "record A(string Value);",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public string ModifyString(string source) => source + "-externally-modified";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapPropertyUseOnInstancePropertySupportsExternalMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper Mapper { get; } = new();
+
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(Mapper.ModifyString)]
+            private partial B Map(A source);
+
+            public string ModifyString(string source) => source + "-modified";
+            """,
+            "record A(string Value);",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public string ModifyString(string source) => source + "-externally-modified";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapPropertyFromSourceUseOnStaticSupportsExternalMappings()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -92,24 +160,44 @@ public class ReferenceExternalMappingsTests
     }
 
     [Fact]
-    public Task MapPropertyUseOnInstanceSupportsExternalMappings()
+    public Task MapPropertyFromSourceOnInstanceFieldUseSupportsExternalMappings()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             OtherMapper mapper = new();
 
-            [MapProperty(nameof(A.Value1), nameof(B.Value1), Use = nameof(ModifyString)]
-            [MapProperty(nameof(A.Value2), nameof(B.Value2), Use = nameof(mapper.ModifyString)]
-            private partial B Map(A source);
-
-            public string ModifyString(string source) => source + "-modified";
+            [MapPropertyFromSource(nameof(B.FullName), Use = nameof(mapper.ToFullName))]
+            partial B Map(A source);
             """,
-            "record A(string Value1, string Value2);",
-            "record B(string Value1, string Value2);",
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string FullName { get; set; } }",
             """
             class OtherMapper
             {
-                public string ModifyString(string source) => source + "-externally-modified";
+                public string ToFullName(A x) => $"{x.FirstName} {x.LastName}"
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapPropertyFromSourceOnInstancePropertyUseSupportsExternalMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper Mapper { get; } = new();
+
+            [MapPropertyFromSource(nameof(B.FullName), Use = nameof(Mapper.ToFullName))]
+            partial B Map(A source);
+            """,
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string FullName { get; set; } }",
+            """
+            class OtherMapper
+            {
+                public string ToFullName(A x) => $"{x.FirstName} {x.LastName}"
             }
             """
         );
