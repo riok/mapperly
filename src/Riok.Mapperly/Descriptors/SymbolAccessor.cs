@@ -478,7 +478,11 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         return symbolMembers.GetValueOrDefault(name);
     }
 
-    public IOperation? GetOperation(SyntaxNode node) => compilationContext.GetSemanticModel(node.SyntaxTree)?.GetOperation(node);
+    public TOperation? GetOperation<TOperation>(SyntaxNode node)
+        where TOperation : class, IOperation
+    {
+        return compilationContext.GetSemanticModel(node.SyntaxTree)?.GetOperation(node) as TOperation;
+    }
 
     public ITypeSymbol? GetContainingTypeSymbol(SyntaxNode? node)
     {
