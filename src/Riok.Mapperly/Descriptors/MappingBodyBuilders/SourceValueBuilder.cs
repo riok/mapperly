@@ -164,7 +164,7 @@ internal static class SourceValueBuilder
             {
                 targetName = methodReference.TargetMember.Name;
             }
-            else if (!CanAccessWithoutQualification(ctx, methodReference.TargetType))
+            else if (methodReference.TargetType is not null)
             {
                 targetName = methodReference.TargetType.FullyQualifiedIdentifierName();
             }
@@ -173,22 +173,6 @@ internal static class SourceValueBuilder
         }
 
         sourceValue = null;
-        return false;
-    }
-
-    private static bool CanAccessWithoutQualification(IMembersBuilderContext<IMapping> ctx, INamedTypeSymbol methodContainingType)
-    {
-        var type = ctx.BuilderContext.MapperDeclaration.Symbol;
-        while (type is not null && type.SpecialType != SpecialType.System_Object)
-        {
-            if (ReferenceEquals(methodContainingType, type))
-            {
-                return true;
-            }
-
-            type = type.BaseType;
-        }
-
         return false;
     }
 
@@ -241,7 +225,11 @@ internal static class SourceValueBuilder
             return false;
         }
 
-        methodReference = new MapperMethodReference(methodSymbol, targetSymbol, methodReferenceConfiguration.TargetMember);
+        methodReference = new MapperMethodReference(
+            methodSymbol,
+            methodReferenceConfiguration.TargetType,
+            methodReferenceConfiguration.TargetMember
+        );
         return true;
     }
 }
