@@ -15,7 +15,6 @@ namespace Riok.Mapperly.Configuration;
 /// </summary>
 public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 {
-    private const string NameOfOperatorName = "nameof";
     private const char FullNameOfPrefix = '@';
 
     public TAttribute AccessSingle<TAttribute>(ISymbol symbol)

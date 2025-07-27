@@ -60,7 +60,7 @@ internal static class SymbolExtensions
     internal static int GetInheritanceLevel(this ITypeSymbol symbol)
     {
         var level = 0;
-        while (symbol.BaseType is not null && symbol.BaseType.SpecialType != SpecialType.System_Object)
+        while (symbol.BaseType != null)
         {
             symbol = symbol.BaseType;
             level++;
@@ -123,11 +123,7 @@ internal static class SymbolExtensions
             return true;
         }
 
-        for (
-            var baseType = t.BaseType;
-            baseType is not null && baseType.SpecialType != SpecialType.System_Object;
-            baseType = baseType.BaseType
-        )
+        for (var baseType = t.BaseType; baseType != null; baseType = baseType.BaseType)
         {
             if (!SymbolEqualityComparer.Default.Equals(baseType.OriginalDefinition, genericSymbol))
                 continue;
@@ -232,7 +228,7 @@ internal static class SymbolExtensions
     internal static IEnumerable<ITypeSymbol> WalkTypeHierarchy(this ITypeSymbol symbol)
     {
         yield return symbol;
-        while (symbol.BaseType != null && symbol.BaseType.SpecialType != SpecialType.System_Object)
+        while (symbol.BaseType != null)
         {
             yield return symbol.BaseType;
             symbol = symbol.BaseType;

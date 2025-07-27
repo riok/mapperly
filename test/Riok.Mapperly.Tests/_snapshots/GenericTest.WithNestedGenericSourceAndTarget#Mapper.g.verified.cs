@@ -8,8 +8,8 @@ public partial class Mapper
     {
         return source switch
         {
-            global::System.Collections.Generic.IEnumerable<global::A> x when typeof(global::System.Collections.Generic.IEnumerable<TTarget>).IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::B>)) => (global::System.Collections.Generic.IEnumerable<TTarget>)(object)MapToB(x),
             global::System.Collections.Generic.IReadOnlyCollection<global::C> x when typeof(global::System.Collections.Generic.IEnumerable<TTarget>).IsAssignableFrom(typeof(global::System.Collections.Generic.List<global::D>)) => (global::System.Collections.Generic.IEnumerable<TTarget>)(object)MapToD(x),
+            global::System.Collections.Generic.IEnumerable<global::A> x when typeof(global::System.Collections.Generic.IEnumerable<TTarget>).IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::B>)) => (global::System.Collections.Generic.IEnumerable<TTarget>)(object)MapToB(x),
             _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(global::System.Collections.Generic.IEnumerable<TTarget>)} as there is no known type mapping", nameof(source)),
         };
     }
