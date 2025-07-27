@@ -273,14 +273,22 @@ internal static class SymbolExtensions
         {
             return type.AllInterfaces.Any(x => SymbolEqualityComparer.Default.Equals(x, baseType));
         }
-        while (type is not null && type.SpecialType != SpecialType.System_Object)
+        while (type is not null)
         {
+            if (ReferenceEquals(baseType, type))
+            {
+                return true;
+            }
             if (SymbolEqualityComparer.Default.Equals(baseType, type))
             {
                 return true;
             }
 
             type = type.BaseType;
+            if (type is not null && type.BaseType is not null && type.SpecialType == SpecialType.System_Object)
+            {
+                Debugger.Break();
+            }
         }
 
         return false;
