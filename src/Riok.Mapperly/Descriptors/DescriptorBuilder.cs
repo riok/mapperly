@@ -149,7 +149,8 @@ public class DescriptorBuilder
                 firstNonStaticUserMapping = userMapping.Method;
             }
 
-            AddUserMapping(userMapping, false, true);
+            var name = _attributeAccessor.GetMethodName(userMapping.Method);
+            AddUserMapping(userMapping, false, name);
         }
 
         if (_mapperDescriptor.Static && firstNonStaticUserMapping is not null)
@@ -187,12 +188,12 @@ public class DescriptorBuilder
     {
         foreach (var externalMapping in ExternalMappingsExtractor.ExtractExternalMappings(_builderContext, _mapperDescriptor.Symbol))
         {
-            AddUserMapping(externalMapping, true, false);
+            AddUserMapping(externalMapping, true);
         }
 
         foreach (var externalMapping in ExternalMappingsExtractor.ExtractExternalNamedMappings(_builderContext, _mapperDescriptor.Symbol))
         {
-            AddNamedUserMapping(externalMapping.Mapping, true, externalMapping.Name);
+            AddUserMapping(externalMapping.Mapping, true, externalMapping.Name);
         }
     }
 
@@ -231,24 +232,7 @@ public class DescriptorBuilder
         _mapperDescriptor.UnsafeAccessors = _unsafeAccessorContext;
     }
 
-    private void AddUserMapping(IUserMapping mapping, bool ignoreDuplicates, bool named)
-    {
-        var name = named ? _attributeAccessor.GetMethodName(mapping.Method) : null;
-        var result = _mappings.AddUserMapping(mapping, name);
-        if (!ignoreDuplicates && mapping.Default == true && result == MappingCollectionAddResult.NotAddedDuplicated)
-        {
-            _diagnostics.ReportDiagnostic(
-                DiagnosticDescriptors.MultipleDefaultUserMappings,
-                mapping.Method,
-                mapping.SourceType.ToDisplayString(),
-                mapping.TargetType.ToDisplayString()
-            );
-        }
-
-        _inlineMappings.AddUserMapping(mapping, name);
-    }
-
-    private void AddNamedUserMapping(IUserMapping mapping, bool ignoreDuplicates, string name)
+    private void AddUserMapping(IUserMapping mapping, bool ignoreDuplicates, string? name = null)
     {
         var result = _mappings.AddUserMapping(mapping, name);
         if (!ignoreDuplicates && mapping.Default == true && result == MappingCollectionAddResult.NotAddedDuplicated)

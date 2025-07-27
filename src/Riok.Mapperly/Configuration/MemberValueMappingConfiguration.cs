@@ -18,7 +18,7 @@ public record MemberValueMappingConfiguration(IMemberPathConfiguration Target, A
     public string DescribeValue()
     {
         if (Use != null)
-            return Use.ToString();
+            return Use + "()";
 
         return Value?.Expression.ToFullString() ?? string.Empty;
     }
