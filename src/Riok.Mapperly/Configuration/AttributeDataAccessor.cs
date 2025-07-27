@@ -222,7 +222,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         var fullNameOf = argMemberPathStr[0] == FullNameOfPrefix;
 
         var nameOfOperation = symbolAccessor.GetOperation<INameOfOperation>(nameofSyntax);
-        var memberRefOperation = nameOfOperation?.GetFirstChildOperation() as IMemberReferenceOperation;
+        var memberRefOperation = nameOfOperation?.GetFirstChildOperation<IMemberReferenceOperation>();
         if (memberRefOperation == null)
         {
             // fall back to old skip-first-segment approach
@@ -239,7 +239,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         while (memberRefOperation != null)
         {
             memberPath.Add(memberRefOperation.Member);
-            memberRefOperation = memberRefOperation.GetFirstChildOperation() as IMemberReferenceOperation;
+            memberRefOperation = memberRefOperation.GetFirstChildOperation<IMemberReferenceOperation>();
 
             // if not fullNameOf only consider the last member path segment
             if (!fullNameOf && memberPath.Count > 1)
@@ -289,14 +289,14 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     {
         configuration = null;
         var nameOfOperation = symbolAccessor.GetOperation<INameOfOperation>(nameofSyntax);
-        var operation = nameOfOperation?.GetFirstChildOperation();
+        var operation = nameOfOperation?.GetFirstChildOperation<IOperation>();
         var memberName = operation?.Syntax.TryGetInferredMemberName();
         if (memberName is null || operation is null)
         {
             return false;
         }
 
-        operation = operation.GetFirstChildOperation();
+        operation = operation.GetFirstChildOperation<IOperation>();
         if (operation is null)
         {
             return false;
@@ -309,7 +309,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             return true;
         }
 
-        var field = operation.GetFieldOrProperty();
+        var field = operation.GetMemberSymbol();
         configuration = new MethodReferenceConfiguration(memberName, typeSymbol, field);
         return true;
     }

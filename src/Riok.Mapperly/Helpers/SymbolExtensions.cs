@@ -275,10 +275,6 @@ internal static class SymbolExtensions
         }
         while (type is not null)
         {
-            if (ReferenceEquals(baseType, type))
-            {
-                return true;
-            }
             if (SymbolEqualityComparer.Default.Equals(baseType, type))
             {
                 return true;

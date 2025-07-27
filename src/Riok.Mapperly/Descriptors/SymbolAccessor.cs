@@ -479,10 +479,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     }
 
     public TOperation? GetOperation<TOperation>(SyntaxNode node)
-        where TOperation : class, IOperation
-    {
-        return compilationContext.GetSemanticModel(node.SyntaxTree)?.GetOperation(node) as TOperation;
-    }
+        where TOperation : class, IOperation => compilationContext.GetSemanticModel(node.SyntaxTree)?.GetOperation(node) as TOperation;
 
     public ITypeSymbol? GetContainingTypeSymbol(SyntaxNode? node)
     {
