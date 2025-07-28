@@ -56,7 +56,7 @@ public class UserMethodTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(A.Value), nameof(A.Value), Use = nameof(MapList))]
-            public static partial void Update([MappingTarget] this A dest, A src);"            
+            public static partial void Update([MappingTarget] this A dest, A src);"
             static void MapList([MappingTarget] this ref int[] dest, int[] src) { }
             """,
             "public class A { public int[] Value { get; set; } }"
