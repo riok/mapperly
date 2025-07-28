@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Symbols;
@@ -32,6 +33,28 @@ public class UserImplementedExistingTargetMethodMapping(
         // we explicitly cast to be able to use the default interface implementation or explicit implementations
         if (Method.ReceiverType?.TypeKind != TypeKind.Interface)
         {
+            // if target parameter expects the ref keyword we need to add some extra lines so the reference is correctly stored back into the property.
+            if (targetParameter.RefKind == RefKind.Ref)
+            {
+                var indented = ctx.SyntaxFactory.AddIndentation();
+                yield return ctx.SyntaxFactory.Block(
+                    [
+                        indented.DeclareLocalVariable("tempRef", target),
+                        indented.ExpressionStatement(
+                            indented.Invocation(
+                                receiver == null ? IdentifierName(Method.Name) : MemberAccess(receiver, Method.Name),
+                                sourceParameter.WithArgument(ctx.Source),
+                                targetParameter.WithArgument(target),
+                                referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+                            )
+                        ),
+                        indented.ExpressionStatement(Assignment(target, IdentifierName("tempRef"), false)),
+                    ]
+                );
+
+                yield break;
+            }
+
             yield return ctx.SyntaxFactory.ExpressionStatement(
                 ctx.SyntaxFactory.Invocation(
                     receiver == null ? IdentifierName(Method.Name) : MemberAccess(receiver, Method.Name),

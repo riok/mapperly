@@ -34,7 +34,7 @@ public partial struct SyntaxFactoryHelper
         Invocation(IdentifierName(methodName), arguments);
 
     public InvocationExpressionSyntax Invocation(ExpressionSyntax method, params MethodArgument?[] arguments) =>
-        Invocation(method, arguments.WhereNotNull().OrderBy(x => x.Parameter.Ordinal).Select(x => x.Argument).ToArray());
+        InvocationExpression(method).WithArgumentList(ArgumentList(arguments.WhereNotNull().OrderBy(x => x.Parameter.Ordinal)));
 
     public InvocationExpressionSyntax Invocation(string methodName, params ExpressionSyntax[] arguments) =>
         Invocation(IdentifierName(methodName), arguments);
@@ -169,6 +169,16 @@ public partial struct SyntaxFactoryHelper
         SyntaxFactory.ArgumentList(CommaSeparatedList(argSyntaxes));
 
     private ArgumentListSyntax ArgumentList(IEnumerable<ExpressionSyntax> argSyntaxes) => ArgumentList(argSyntaxes.Select(Argument));
+
+    private ArgumentListSyntax ArgumentList(IEnumerable<MethodArgument> argSyntaxes) =>
+        ArgumentList(argSyntaxes.Select(ma => Argument(default, RefKindToken(ma.Parameter.RefKind), ma.Argument)));
+
+    private static SyntaxToken RefKindToken(RefKind refKind) =>
+        refKind switch
+        {
+            RefKind.Ref => TrailingSpacedToken(SyntaxKind.RefKeyword),
+            _ => default,
+        };
 
     private ArgumentListSyntax ArgumentList(IEnumerable<ArgumentSyntax> argSyntaxes) =>
         SyntaxFactory.ArgumentList(ConditionalCommaLineFeedSeparatedList(argSyntaxes));
