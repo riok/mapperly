@@ -19,10 +19,10 @@ namespace Riok.Mapperly.IntegrationTests
         [Fact]
         public void RunArrayMappingWithRef()
         {
-            var modelTarget = new ArrayObject { IntArray = [10, 12] };
-            var modelSrc = new ArrayObject { IntArray = [11, 13] };
+            var modelTarget = new ArrayObject { IntArray = new[] { 10, 12 } };
+            var modelSrc = new ArrayObject { IntArray = new[] { 11, 13 } };
             UseUserMethodWithRef.Merge(modelTarget, modelSrc);
-            modelTarget.IntArray.ShouldBe([10, 12, 11, 13]);
+            modelTarget.IntArray.ShouldBe(new[] { 10, 12, 11, 13 });
         }
     }
 }
