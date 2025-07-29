@@ -3,6 +3,7 @@ using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Enumerables;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
+using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Emit.Syntax;
 using Riok.Mapperly.Helpers;
@@ -34,7 +35,20 @@ public static class EnumerableMappingBuilder
         if (!ctx.CollectionInfos.Source.ImplementsIEnumerable || !ctx.CollectionInfos.Target.ImplementsIEnumerable)
             return null;
 
-        var elementMapping = ctx.FindOrBuildMapping(ctx.CollectionInfos.Source.EnumeratedType, ctx.CollectionInfos.Target.EnumeratedType);
+        // When mapping collection elements, check if there's a user mapping for the non-nullable element types.
+        // If a user mapping exists, use FindOrBuildLooseNullableMapping to preserve user configurations
+        // (like MapperIgnoreSource attributes) and prevent false positive RMG020 diagnostics.
+        var sourceType = ctx.CollectionInfos.Source.EnumeratedType;
+        var targetType = ctx.CollectionInfos.Target.EnumeratedType;
+        var nonNullableSourceType = sourceType.NonNullable();
+        var nonNullableTargetType = targetType.NonNullable();
+
+        var existingMapping = ctx.FindMapping(nonNullableSourceType, nonNullableTargetType);
+        var hasUserMappingForNonNullable = existingMapping is IUserMapping;
+
+        var elementMapping = hasUserMappingForNonNullable
+            ? ctx.FindOrBuildLooseNullableMapping(new TypeMappingKey(sourceType, targetType))
+            : ctx.FindOrBuildMapping(sourceType, targetType);
         if (elementMapping == null)
             return null;
 
