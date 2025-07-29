@@ -171,7 +171,7 @@ public partial struct SyntaxFactoryHelper
     private ArgumentListSyntax ArgumentList(IEnumerable<ExpressionSyntax> argSyntaxes) => ArgumentList(argSyntaxes.Select(Argument));
 
     private ArgumentListSyntax ArgumentList(IEnumerable<MethodArgument> argSyntaxes) =>
-        ArgumentList(argSyntaxes.Select(ma => Argument(default, RefKindToken(ma.Parameter.RefKind), ma.Argument)));
+        ArgumentList(argSyntaxes.Select(ma => Argument(null, RefKindToken(ma.Parameter.RefKind), ma.Argument)));
 
     private static SyntaxToken RefKindToken(RefKind refKind) =>
         refKind switch

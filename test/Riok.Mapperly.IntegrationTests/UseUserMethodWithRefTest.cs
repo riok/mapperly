@@ -1,0 +1,30 @@
+using System.Threading.Tasks;
+using Riok.Mapperly.IntegrationTests.Helpers;
+using Riok.Mapperly.IntegrationTests.Mapper;
+using Riok.Mapperly.IntegrationTests.Models;
+using Shouldly;
+using VerifyXunit;
+using Xunit;
+
+namespace Riok.Mapperly.IntegrationTests
+{
+    public class UseUserMethodWithRefTest : BaseMapperTest
+    {
+        [Fact]
+        [VersionedSnapshot(Versions.NET6_0)]
+        public Task SnapshotGeneratedSource()
+        {
+            var path = GetGeneratedMapperFilePath(nameof(UseUserMethodWithRef));
+            return Verifier.VerifyFile(path);
+        }
+
+        [Fact]
+        public void RunArrayMappingWithRef()
+        {
+            var modelTarget = new ArrayObject { IntArray = [10, 12] };
+            var modelSrc = new ArrayObject { IntArray = [11, 13] };
+            UseUserMethodWithRef.Merge(modelTarget, modelSrc);
+            modelTarget.IntArray.ShouldBe([10, 12, 11, 13]);
+        }
+    }
+}

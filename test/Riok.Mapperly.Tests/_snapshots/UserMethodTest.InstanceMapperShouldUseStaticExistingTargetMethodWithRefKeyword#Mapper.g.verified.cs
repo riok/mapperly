@@ -6,10 +6,8 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public static partial void Update(this global::A dest, global::A src)
     {
-        {
-            var tempRef = dest.Value;
-            MapList(ref dest.Value, src.Value);
-            dest.Value = tempRef;
-        }
+        var MapListTargetRef = dest.Value;
+        MapList(ref MapListTargetRef, src.Value);
+        dest.Value = MapListTargetRef;
     }
 }

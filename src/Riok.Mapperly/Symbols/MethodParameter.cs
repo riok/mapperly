@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Riok.Mapperly.Symbols;
 
-public readonly record struct MethodParameter(int Ordinal, string Name, ITypeSymbol Type, RefKind RefKind)
+public readonly record struct MethodParameter(int Ordinal, string Name, ITypeSymbol Type, RefKind RefKind = RefKind.None)
 {
     private static readonly SymbolDisplayFormat _parameterNameFormat = new(
         parameterOptions: SymbolDisplayParameterOptions.IncludeName,
