@@ -10,7 +10,7 @@
       "rollForward": false
     },
     "meziantou.framework.nugetpackagevalidation.tool": {
-      "version": "1.0.20",
+      "version": "1.0.25",
       "commands": [
         "meziantou.validate-nuget-package"
       ],
@@ -31,7 +31,7 @@
       "rollForward": false
     },
     "csharpier": {
-      "version": "1.0.1",
+      "version": "1.0.3",
       "commands": [
         "csharpier"
       ],
