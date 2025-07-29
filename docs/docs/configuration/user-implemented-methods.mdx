@@ -99,6 +99,18 @@ which can be changed using the [`.editorconfig`](./analyzer-diagnostics/index.md
 ## Map properties using user-implemented mappings
 
 See [user-implemented property conversions](./mapper.mdx#user-implemented-property-mappings).
+The mapper will respect the `ref` keyword on the target parameter when using an existing target function, allowing the reference to be updated in the caller.
+
+```csharp
+  [Mapper(AllowNullPropertyAssignment = false, UseDeepCloning = true, RequiredMappingStrategy = RequiredMappingStrategy.Source)]
+  public static partial class UseUserMethodWithRef
+  {
+      [MapProperty(nameof(ArrayObject.IntArray), nameof(ArrayObject.IntArray), Use = nameof(MapArray))] // `Use` is required otheriwse it will generate it's own
+      public static partial void Merge([MappingTarget] ArrayObject target, ArrayObject second);
+
+      private static void MapArray([MappingTarget] ref int[] target, int[] second) => target = [.. target, .. second.Except(target)];
+  }
+```
 
 ## Use external mappings
 
