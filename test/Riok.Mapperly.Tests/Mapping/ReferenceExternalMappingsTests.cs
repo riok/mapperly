@@ -7,7 +7,7 @@ public class ReferenceExternalMappingsTests
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [MapValue("Value", Use = nameof(OtherMapper.NewValue))]
+            [MapValue("Value", Use = nameof(@OtherMapper.NewValue))]
             internal static partial B Map(A source);
             """,
             "class A;",
@@ -30,7 +30,7 @@ public class ReferenceExternalMappingsTests
             """
             OtherMapper mapper = new();
 
-            [MapValue("Value", Use = nameof(mapper.NewValue))]
+            [MapValue("Value", Use = nameof(@mapper.NewValue))]
             internal partial B Map(A source);
             """,
             "class A;",
@@ -53,7 +53,7 @@ public class ReferenceExternalMappingsTests
             """
             OtherMapper Mapper { get; } = new();
 
-            [MapValue("Value", Use = nameof(Mapper.NewValue))]
+            [MapValue("Value", Use = nameof(@Mapper.NewValue))]
             internal partial B Map(A source);
             """,
             "class A;",
@@ -74,7 +74,7 @@ public class ReferenceExternalMappingsTests
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(OtherMapper.ModifyString)]
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@OtherMapper.ModifyString)]
             private static partial B Map(A source);
             """,
             "record A(string Value);",
@@ -97,7 +97,7 @@ public class ReferenceExternalMappingsTests
             """
             OtherMapper mapper = new();
 
-            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(mapper.ModifyString)]
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@mapper.ModifyString)]
             private partial B Map(A source);
             """,
             "record A(string Value);",
@@ -120,7 +120,7 @@ public class ReferenceExternalMappingsTests
             """
             OtherMapper Mapper { get; } = new();
 
-            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(Mapper.ModifyString)]
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@Mapper.ModifyString)]
             private partial B Map(A source);
 
             public string ModifyString(string source) => source + "-modified";
@@ -143,7 +143,7 @@ public class ReferenceExternalMappingsTests
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [MapPropertyFromSource(nameof(B.FullName), Use = nameof(OtherMapper.ToFullName))]
+            [MapPropertyFromSource(nameof(B.FullName), Use = nameof(@OtherMapper.ToFullName))]
             partial B Map(A source);
             """,
             "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
@@ -166,7 +166,7 @@ public class ReferenceExternalMappingsTests
             """
             OtherMapper mapper = new();
 
-            [MapPropertyFromSource(nameof(B.FullName), Use = nameof(mapper.ToFullName))]
+            [MapPropertyFromSource(nameof(B.FullName), Use = nameof(@mapper.ToFullName))]
             partial B Map(A source);
             """,
             "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
@@ -189,7 +189,7 @@ public class ReferenceExternalMappingsTests
             """
             OtherMapper Mapper { get; } = new();
 
-            [MapPropertyFromSource(nameof(B.FullName), Use = nameof(Mapper.ToFullName))]
+            [MapPropertyFromSource(nameof(B.FullName), Use = nameof(@Mapper.ToFullName))]
             partial B Map(A source);
             """,
             "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
@@ -210,7 +210,7 @@ public class ReferenceExternalMappingsTests
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [IncludeMappingConfiguration(nameof(OtherMapper.MapOther))]
+            [IncludeMappingConfiguration(nameof(@OtherMapper.MapOther))]
             static partial B Map(A a);
             """,
             "class A { public string SourceName { get; set; } }",

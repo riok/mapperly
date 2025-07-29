@@ -160,6 +160,7 @@ internal static class SourceValueBuilder
         if (TryGetValueProviderMethod(ctx, memberMappingInfo, out var methodReference))
         {
             string? targetName = null;
+
             if (methodReference.TargetMember is not null)
             {
                 targetName = methodReference.TargetMember.Name;
@@ -168,6 +169,7 @@ internal static class SourceValueBuilder
             {
                 targetName = methodReference.TargetType.FullyQualifiedIdentifierName();
             }
+
             sourceValue = new MethodProvidedSourceValue(methodReference.Method.Name, targetName);
             return true;
         }

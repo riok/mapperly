@@ -173,7 +173,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             ),
             _ when arg.IsNull => null,
             _ when targetType == typeof(IMemberPathConfiguration) => CreateMemberPath(arg, syntax, symbolAccessor),
-            _ when targetType == typeof(MethodReferenceConfiguration) => CreateMethodReferenceConfiguration(arg, syntax, symbolAccessor),
+            _ when targetType == typeof(MethodReferenceConfiguration) => CreateMethodReference(arg, syntax, symbolAccessor),
             TypedConstantKind.Enum => GetEnumValue(arg, targetType),
             TypedConstantKind.Array => BuildArrayValue(arg, targetType, symbolAccessor),
             TypedConstantKind.Primitive => arg.Value,
@@ -201,7 +201,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             return new StringMemberPath(values);
         }
 
-        if (arg.Kind == TypedConstantKind.Primitive && syntax.TryGetFullNameOfSyntax(out var invocationExpressionSyntax))
+        if (arg.Kind == TypedConstantKind.Primitive && syntax.TryGetNameOfSyntax(out var invocationExpressionSyntax))
         {
             return CreateNameOfMemberPath(invocationExpressionSyntax, symbolAccessor);
         }
@@ -216,10 +216,8 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
     private static IMemberPathConfiguration CreateNameOfMemberPath(InvocationExpressionSyntax nameofSyntax, SymbolAccessor symbolAccessor)
     {
-        var argMemberPathStr = nameofSyntax.ArgumentList.Arguments[0].ToFullString();
-
         // @ prefix opts-in to full nameof
-        var fullNameOf = argMemberPathStr[0] == FullNameOfPrefix;
+        var fullNameOf = nameofSyntax.IsFullNameOfSyntax();
 
         var nameOfOperation = symbolAccessor.GetOperation<INameOfOperation>(nameofSyntax);
         var memberRefOperation = nameOfOperation?.GetFirstChildOperation<IMemberReferenceOperation>();
@@ -227,6 +225,8 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         {
             // fall back to old skip-first-segment approach
             // to ensure backwards compability.
+
+            var argMemberPathStr = nameofSyntax.ArgumentList.Arguments[0].ToFullString();
             var argMemberPath = argMemberPathStr
                 .TrimStart(FullNameOfPrefix)
                 .Split(MemberPathConstants.MemberAccessSeparator)
@@ -250,7 +250,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return new SymbolMemberPath(memberPath.ToImmutableEquatableArray());
     }
 
-    private static MethodReferenceConfiguration CreateMethodReferenceConfiguration(
+    private static MethodReferenceConfiguration CreateMethodReference(
         TypedConstant arg,
         AttributeArgumentSyntax? syntax,
         SymbolAccessor? symbolAccessor
@@ -260,11 +260,12 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
         if (arg.Kind != TypedConstantKind.Primitive)
         {
-            throw new InvalidOperationException($"Cannot create {nameof(StringMemberPath)} from {arg.Kind}");
+            throw new InvalidOperationException($"Cannot create {nameof(MethodReferenceConfiguration)} from {arg.Kind}");
         }
 
         if (
-            syntax.TryGetFullNameOfSyntax(out var invocationExpressionSyntax)
+            syntax.TryGetNameOfSyntax(out var invocationExpressionSyntax)
+            && invocationExpressionSyntax.IsFullNameOfSyntax()
             && TryCreateNameOfMethodReferenceConfiguration(invocationExpressionSyntax, symbolAccessor, out var configuration)
         )
         {
@@ -303,7 +304,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         }
 
         var containingType = symbolAccessor.GetContainingTypeSymbol(nameofSyntax);
-        if (containingType is null || operation.Type is not INamedTypeSymbol typeSymbol || containingType.ExtendsType(typeSymbol))
+        if (containingType is null || operation.Type is not INamedTypeSymbol typeSymbol || containingType.Extends(typeSymbol))
         {
             configuration = new MethodReferenceConfiguration(memberName);
             return true;

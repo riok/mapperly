@@ -483,19 +483,18 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     public ITypeSymbol? GetContainingTypeSymbol(SyntaxNode? node)
     {
-        var classNode = node;
-        while (classNode is not (null or BaseTypeDeclarationSyntax))
+        while (node is not null and not BaseTypeDeclarationSyntax)
         {
-            classNode = classNode.Parent;
+            node = node.Parent;
         }
 
-        if (classNode is null)
+        if (node is null)
         {
             return null;
         }
 
-        var semanticModel = compilationContext.GetSemanticModel(classNode.SyntaxTree);
-        return semanticModel?.GetDeclaredSymbol(classNode) as ITypeSymbol;
+        var semanticModel = compilationContext.GetSemanticModel(node.SyntaxTree);
+        return semanticModel?.GetDeclaredSymbol(node) as ITypeSymbol;
     }
 
     private ImmutableArray<AttributeData> GetAttributesCore(ISymbol symbol)
