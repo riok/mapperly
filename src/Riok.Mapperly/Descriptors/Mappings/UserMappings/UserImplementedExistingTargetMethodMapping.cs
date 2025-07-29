@@ -35,7 +35,7 @@ public class UserImplementedExistingTargetMethodMapping(
             // if target parameter expects the ref keyword we need to add some extra lines so the reference is correctly stored back into the property.
             if (targetParameter.RefKind == RefKind.Ref)
             {
-                var targetRefVarName = Method.Name + "TargetRef";
+                var targetRefVarName = ctx.NameBuilder.New("targetRef");
                 yield return ctx.SyntaxFactory.DeclareLocalVariable(targetRefVarName, target);
                 yield return ctx.SyntaxFactory.ExpressionStatement(
                     ctx.SyntaxFactory.Invocation(

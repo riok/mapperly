@@ -39,7 +39,7 @@ public abstract class MethodMapping : ITypeMapping
     protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
     {
         TargetType = targetType;
-        SourceParameter = new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType, RefKind.None);
+        SourceParameter = new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType);
         _returnType = targetType;
     }
 
@@ -119,8 +119,7 @@ public abstract class MethodMapping : ITypeMapping
         ReferenceHandlerParameter ??= new MethodParameter(
             ReferenceHandlerParameterIndex,
             DefaultReferenceHandlerParameterName,
-            iReferenceHandlerType,
-            RefKind.None
+            iReferenceHandlerType
         );
     }
 

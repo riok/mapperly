@@ -7,9 +7,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial void Merge(global::Riok.Mapperly.IntegrationTests.Models.ArrayObject target, global::Riok.Mapperly.IntegrationTests.Models.ArrayObject second)
         {
-            var MapArrayTargetRef = target.IntArray;
-            MapArray(ref MapArrayTargetRef, second.IntArray);
-            target.IntArray = MapArrayTargetRef;
+            var targetRef = target.IntArray;
+            MapArray(ref targetRef, second.IntArray);
+            target.IntArray = targetRef;
         }
     }
 }

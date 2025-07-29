@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using Riok.Mapperly.IntegrationTests.Models;
 using Shouldly;
@@ -11,7 +10,6 @@ namespace Riok.Mapperly.IntegrationTests
     public class UseUserMethodWithRefTest : BaseMapperTest
     {
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0)]
         public Task SnapshotGeneratedSource()
         {
             var path = GetGeneratedMapperFilePath(nameof(UseUserMethodWithRef));
