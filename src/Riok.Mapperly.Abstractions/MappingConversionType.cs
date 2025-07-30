@@ -142,4 +142,10 @@ public enum MappingConversionType
     /// Enables all supported conversions.
     /// </summary>
     All = ~None,
+
+    /// <summary>
+    /// Enables all supported conversions except explicit casts.
+    /// This is the default value for enabled conversions.
+    /// </summary>
+    Default = All & ~ExplicitCast,
 }

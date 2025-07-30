@@ -51,7 +51,7 @@ public class MapperTest
                     [Mapper]
                     public partial class CarMapper
                     {
-                        public partial int ToInt(double value);
+                        public partial double ToDouble(int value);
                     }
                 }
             }
@@ -75,7 +75,7 @@ public class MapperTest
                     [Mapper]
                     public partial class CarMapper
                     {
-                        public partial int ToInt(double value);
+                        public partial double ToDouble(int value);
                     }
                 }
             }
@@ -101,7 +101,7 @@ public class MapperTest
                     [Mapper]
                     public partial class CarMapper
                     {
-                        public partial int ToInt(double value);
+                        public partial double ToDouble(int value);
                     }
                 }
             }
@@ -127,7 +127,7 @@ public class MapperTest
                     [Mapper]
                     public partial class CarMapper
                     {
-                        public partial int ToInt(double value);
+                        public partial double ToDouble(int value);
                     }
                 }
             }

@@ -139,7 +139,7 @@ public class EnumerableTest
     [Fact]
     public void ArrayToArrayOfCastedTypes()
     {
-        var source = TestSourceBuilder.Mapping("long[]", "int[]");
+        var source = TestSourceBuilder.Mapping("long[]", "int[]", TestSourceBuilderOptions.AllConversions);
         TestHelper
             .GenerateMapper(source)
             .Should()
@@ -252,7 +252,7 @@ public class EnumerableTest
     [Fact]
     public void EnumerableToReadOnlyCollectionOfCastedTypes()
     {
-        var source = TestSourceBuilder.Mapping("IEnumerable<long>", "IReadOnlyCollection<int>");
+        var source = TestSourceBuilder.Mapping("IEnumerable<long>", "IReadOnlyCollection<int>", TestSourceBuilderOptions.AllConversions);
         TestHelper
             .GenerateMapper(source)
             .Should()
@@ -292,7 +292,7 @@ public class EnumerableTest
     [Fact]
     public void EnumerableToIListOfCastedTypes()
     {
-        var source = TestSourceBuilder.Mapping("IEnumerable<long>", "IList<int>");
+        var source = TestSourceBuilder.Mapping("IEnumerable<long>", "IList<int>", TestSourceBuilderOptions.AllConversions);
         TestHelper
             .GenerateMapper(source)
             .Should()
@@ -304,7 +304,7 @@ public class EnumerableTest
     [Fact]
     public void EnumerableToListOfCastedTypes()
     {
-        var source = TestSourceBuilder.Mapping("IEnumerable<long>", "List<int>");
+        var source = TestSourceBuilder.Mapping("IEnumerable<long>", "List<int>", TestSourceBuilderOptions.AllConversions);
         TestHelper
             .GenerateMapper(source)
             .Should()
@@ -316,7 +316,7 @@ public class EnumerableTest
     [Fact]
     public void EnumerableToIReadOnlyListOfCastedTypes()
     {
-        var source = TestSourceBuilder.Mapping("IEnumerable<long>", "IReadOnlyList<int>");
+        var source = TestSourceBuilder.Mapping("IEnumerable<long>", "IReadOnlyList<int>", TestSourceBuilderOptions.AllConversions);
         TestHelper
             .GenerateMapper(source)
             .Should()
