@@ -157,33 +157,6 @@ internal static class SourceValueBuilder
         [NotNullWhen(true)] out ISourceValue? sourceValue
     )
     {
-        if (TryGetValueProviderMethod(ctx, memberMappingInfo, out var methodReference))
-        {
-            string? targetName = null;
-
-            if (methodReference.TargetMember is not null)
-            {
-                targetName = methodReference.TargetMember.Name;
-            }
-            else if (methodReference.TargetType is not null)
-            {
-                targetName = methodReference.TargetType.FullyQualifiedIdentifierName();
-            }
-
-            sourceValue = new MethodProvidedSourceValue(methodReference.Method.Name, targetName);
-            return true;
-        }
-
-        sourceValue = null;
-        return false;
-    }
-
-    private static bool TryGetValueProviderMethod(
-        IMembersBuilderContext<IMapping> ctx,
-        MemberMappingInfo memberMappingInfo,
-        [NotNullWhen(true)] out MapperMethodReference? methodReference
-    )
-    {
         var methodReferenceConfiguration = memberMappingInfo.ValueConfiguration!.Use!;
         var targetSymbol = methodReferenceConfiguration.TargetType ?? ctx.BuilderContext.MapperDeclaration.Symbol;
         var namedMethodCandidates = ctx
@@ -197,7 +170,7 @@ internal static class SourceValueBuilder
         if (namedMethodCandidates.Count == 0)
         {
             ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.MapValueReferencedMethodNotFound, methodReferenceConfiguration.Name);
-            methodReference = null;
+            sourceValue = null;
             return false;
         }
 
@@ -223,15 +196,22 @@ internal static class SourceValueBuilder
                 namedMethodCandidates[0].ReturnType.ToDisplayString(),
                 memberMappingInfo.TargetMember.ToDisplayString()
             );
-            methodReference = null;
+            sourceValue = null;
             return false;
         }
 
-        methodReference = new MapperMethodReference(
-            methodSymbol,
-            methodReferenceConfiguration.TargetType,
-            methodReferenceConfiguration.TargetMember
-        );
+        string? targetName = null;
+
+        if (methodReferenceConfiguration.TargetMember is not null)
+        {
+            targetName = methodReferenceConfiguration.TargetMember.Name;
+        }
+        else if (methodReferenceConfiguration.TargetType is not null)
+        {
+            targetName = methodReferenceConfiguration.TargetType.FullyQualifiedIdentifierName();
+        }
+
+        sourceValue = new MethodProvidedSourceValue(methodSymbol.Name, targetName);
         return true;
     }
 }
