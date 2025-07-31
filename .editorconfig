@@ -12,7 +12,6 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 charset = utf-8
-max_line_length = 140
 
 # Generated code
 [*{_AssemblyInfo.cs,.notsupported.cs,AsmOffsets.cs}]

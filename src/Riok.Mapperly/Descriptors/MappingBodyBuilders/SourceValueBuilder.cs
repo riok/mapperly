@@ -9,7 +9,6 @@ using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
-using Riok.Mapperly.Symbols;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
