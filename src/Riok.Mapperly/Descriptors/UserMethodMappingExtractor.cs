@@ -69,7 +69,7 @@ public static class UserMethodMappingExtractor
         MethodReferenceConfiguration? target
     )
     {
-        if (target is not { TargetType: not null, TargetTypeName: not null })
+        if (target is null or { TargetType: null })
         {
             return [];
         }

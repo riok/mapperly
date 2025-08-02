@@ -195,9 +195,9 @@ public class DescriptorBuilder
 
     private void ExtractExternalNamedMappings()
     {
-        foreach (var externalMapping in ExternalMappingsExtractor.ExtractExternalNamedMappings(_builderContext, _mapperDescriptor.Symbol))
+        foreach (var (name, mapping) in ExternalMappingsExtractor.ExtractExternalNamedMappings(_builderContext, _mapperDescriptor.Symbol))
         {
-            AddUserMapping(externalMapping.Mapping, true, externalMapping.Name);
+            AddUserMapping(mapping, true, name);
         }
     }
 

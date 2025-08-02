@@ -437,4 +437,71 @@ public class ObjectPropertyValueMethodTest
                 """
             );
     }
+
+    [Fact]
+    public Task MethodOnStaticClassSupportsExternalMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("Value", Use = nameof(@OtherMapper.NewValue))]
+            internal static partial B Map(A source);
+            """,
+            "class A;",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public static string NewValue() => "new value";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MethodOnInstanceFieldSupportsExternalMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper mapper = new();
+
+            [MapValue("Value", Use = nameof(@mapper.NewValue))]
+            internal partial B Map(A source);
+            """,
+            "class A;",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public string NewValue() => "new value";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MethodOnInstancePropertySupportsExternalMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper Mapper { get; } = new();
+
+            [MapValue("Value", Use = nameof(@Mapper.NewValue))]
+            internal partial B Map(A source);
+            """,
+            "class A;",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public string NewValue() => "new value";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }
