@@ -504,4 +504,28 @@ public class ObjectPropertyValueMethodTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task ExternalMappingWorksWithFullNamespacePath()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("Value", Use = nameof(@Some.Namespace.OtherMapper.NewValue))]
+            internal static partial B Map(A source);
+            """,
+            "class A;",
+            "record B(string Value);",
+            """
+            namespace Some.Namespace
+            {
+                class OtherMapper
+                {
+                    public static string NewValue() => "new value";
+                }
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }
