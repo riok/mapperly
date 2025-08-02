@@ -212,4 +212,71 @@ public class ObjectPropertyFromSourceTest
                 """
             );
     }
+
+    [Fact]
+    public Task ShouldSupportExternalMappingsOnStaticMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapPropertyFromSource(nameof(B.FullName), Use = nameof(@OtherMapper.ToFullName))]
+            partial B Map(A source);
+            """,
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string FullName { get; set; } }",
+            """
+            class OtherMapper
+            {
+                public static string ToFullName(A x) => $"{x.FirstName} {x.LastName}"
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldSupportExternalMappingsOnInstanceField()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper mapper = new();
+
+            [MapPropertyFromSource(nameof(B.FullName), Use = nameof(@mapper.ToFullName))]
+            partial B Map(A source);
+            """,
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string FullName { get; set; } }",
+            """
+            class OtherMapper
+            {
+                public string ToFullName(A x) => $"{x.FirstName} {x.LastName}"
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldSupportExternalMappingsOnInstanceProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper Mapper { get; } = new();
+
+            [MapPropertyFromSource(nameof(B.FullName), Use = nameof(@Mapper.ToFullName))]
+            partial B Map(A source);
+            """,
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string FullName { get; set; } }",
+            """
+            class OtherMapper
+            {
+                public string ToFullName(A x) => $"{x.FirstName} {x.LastName}"
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

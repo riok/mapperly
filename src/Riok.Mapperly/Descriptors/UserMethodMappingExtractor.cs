@@ -64,6 +64,21 @@ public static class UserMethodMappingExtractor
         string name
     ) => ExtractNamedUserImplementedMappings<IExistingTargetUserMapping>(ctx, mapperSymbol, name);
 
+    internal static IEnumerable<IUserMapping> ExtractNamedUserImplementedMappings(
+        SimpleMappingBuilderContext ctx,
+        MethodReferenceConfiguration? target
+    )
+    {
+        if (target is null or { TargetType: null })
+        {
+            return [];
+        }
+
+        var type = target.TargetType;
+        var methods = ctx.SymbolAccessor.GetAllMethods(type).Where(e => string.Equals(e.Name, target.Name, StringComparison.Ordinal));
+        return BuildUserImplementedMappings(ctx, methods, target.TargetTypeName, type.IsStatic, isExternal: true);
+    }
+
     internal static IEnumerable<IUserMapping> ExtractUserImplementedMappings(
         SimpleMappingBuilderContext ctx,
         ITypeSymbol type,

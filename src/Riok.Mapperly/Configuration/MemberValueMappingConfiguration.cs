@@ -11,7 +11,7 @@ public record MemberValueMappingConfiguration(IMemberPathConfiguration Target, A
     public MemberValueMappingConfiguration(IMemberPathConfiguration target)
         : this(target, null) { }
 
-    public string? Use { get; set; }
+    public MethodReferenceConfiguration? Use { get; set; }
 
     public bool IsValid => Use != null ^ Value != null;
 
