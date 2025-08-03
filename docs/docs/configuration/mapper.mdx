@@ -348,7 +348,7 @@ See also [user-implemented mapping methods](./user-implemented-methods.mdx).
             // if using AutoUserMappings = false, the UserMapping is not needed.
             [UserMapping(Default = false)]
             private string MapPrice(decimal price)
-            => (price / 100).ToString("C");
+                => (price / 100).ToString("C");
             // highlight-end
     
             // generates
@@ -368,7 +368,7 @@ See also [user-implemented mapping methods](./user-implemented-methods.mdx).
 
             // highlight-start
             private string MapPrice(decimal price)
-            => (price / 100).ToString("C");
+                => (price / 100).ToString("C");
             // highlight-end
 
             // generates
@@ -421,7 +421,7 @@ public partial class CarMapper
     [NamedMapping("CustomMapPrice")]
     // highlight-end
     private string MapPrice(decimal price)
-    => (price / 100).ToString("C");
+        => (price / 100).ToString("C");
 }
 ```
 
@@ -438,6 +438,138 @@ public partial class CarMapper
     [NamedMapping("CustomMapPrice")]
     // highlight-end
     private decimal MapPrice(Car car)
-    => car.Price - car.Discount;
+        => car.Price - car.Discount;
 }
 ```
+
+#### External method reference 
+
+Sometimes you may want to map a property using custom logic defined outside the mapper class. Mapperly supports referencing such
+external methods to perform property mappings. To do this, prefix the path with `@` in the `Use` property. This applies
+for both `MapProperty` and `MapPropertyFromSource`. The type containing the method must be accessible in the current context,
+either by using a fully qualified path or by including the namespace with `using` directive.
+
+
+<Tabs>
+    <TabItem value="fully-qualified-namespace" label="Fully qualified path" default>
+        ```csharp
+        namespace MyNamespace;
+        
+        [Mapper]
+        public partial class CarMapper
+        {
+            // highlight-start
+            [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = nameof(@OtherNamespace.PriceMapper.MapPrice))]
+            // highlight-end
+            public partial CarDto MapCar(Car source);
+            
+            // generates
+            target.Price = global::OtherNamespace.PriceMapper.MapPrice(source.Price);
+        }
+        ```
+
+        ```csharp
+        namespace OtherNamespace;
+
+        public static class PriceMapper
+        {
+            public static string MapPrice(decimal price)
+                => (price / 100).ToString("C");
+        }
+        ```
+
+    </TabItem>
+    <TabItem value="using-namespace" label="With using directive">
+        ```csharp
+        // highlight-start
+        using OtherNamespace;
+        // highlight-end
+        
+        namespace MyNamespace;
+
+        [Mapper]
+        public partial class CarMapper
+        {
+            // highlight-start
+            [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = nameof(@PriceMapper.MapPrice))]
+            // highlight-end
+            public partial CarDto MapCar(Car source);
+
+            // generates
+            target.Price = global::OtherNamespace.PriceMapper.MapPrice(source.Price);
+        }
+        ```
+
+        ```csharp
+        namespace OtherNamespace;
+
+        public static class PriceMapper
+        {
+            public static string MapPrice(decimal price)
+               => (price / 100).ToString("C");
+        }
+        ```
+
+    </TabItem>
+
+</Tabs>
+
+With this syntax, you can also use instance methods if the mapper class has a property or field referencing the external type.
+In this case, the method should be referenced through this member.
+
+
+<Tabs>
+    <TabItem value="referenced-through-field" label="Referenced through field" default>
+        ```csharp
+        [Mapper]
+        public partial class CarMapper
+        {
+            // highlight-start
+            private readonly PriceMapper _priceMapper = new();
+            // highlight-end
+            
+            // highlight-start
+            [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = nameof(@_priceMapper.MapPrice))]
+            // highlight-end
+            public partial CarDto MapCar(Car source);
+
+            // generates
+            target.Price = _priceMapper.MapPrice(source.Price);
+        }
+        
+        public class PriceMapper
+        {
+            public string MapPrice(decimal price)
+               => (price / 100).ToString("C");
+        }
+        ```
+
+    </TabItem>
+    <TabItem value="referenced-through-property" label="Referenced through property">
+        ```csharp
+        [Mapper]
+        public partial class CarMapper
+        {
+            // highlight-start
+            public PriceMapper PriceMapper { get; } = new();
+            // highlight-end
+
+            // highlight-start
+            [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = nameof(@PriceMapper.MapPrice))]
+            // highlight-end
+            public partial CarDto MapCar(Car source);
+
+            // generates
+            target.Price = PriceMapper.MapPrice(source.Price);
+        }
+
+        public class PriceMapper
+        {
+            public string MapPrice(decimal price)
+                => (price / 100).ToString("C");
+        }
+        ```
+
+    </TabItem>
+
+</Tabs>

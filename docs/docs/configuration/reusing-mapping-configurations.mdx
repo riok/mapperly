@@ -3,15 +3,18 @@ sidebar_position: 17
 description: Reusing Mapping Configurations
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Reusing Mapping Configurations
 
 Mapperly supports reusing mapping configurations across different mapping methods using the
 `IncludeMappingConfigurationAttribute`. This enables you to share and modularize mapping logic for consistent
 behavior across multiple methods.
 
-## Defining and Reusing Mapping Configurations
+## Defining and reusing mapping configurations
 
-### Including an Existing Mapping Configuration
+### Including an existing mapping configuration
 
 To include an existing mapping configuration in another mapping method, use the `IncludeMappingConfigurationAttribute`
 and provide the method name:
@@ -52,7 +55,7 @@ The following configurations will be included:
 - `MapValue`
 - `MapDerivedType`
 
-### Including a Mapping Configuration from a Base Class
+### Including a mapping configuration from a base class
 
 This attribute also supports including configurations from a base class. For example, suppose you want to map
 `Apple` to `AppleDto` and the mapping logic is defined for the base classes `Fruit` to `FruitDto`.
@@ -91,9 +94,68 @@ public partial class MyMapper {
 }
 ```
 
+### Including external configurations
+
+If the configuration is in another class, it is possible to reference it using the "fullnameof" syntax.
+To do this, prefix the path with `@` in the constructor argument. The method must be accessible
+in the current context. This can be done by referencing through the containing type, or through a field or property.
+
+<Tabs>
+    <TabItem value="qualified-through-type" label="Qualified through type" default>
+        ```csharp
+        // highlight-start
+        using OtherNamespace;
+        // highlight-end
+        
+        namespace MyNamespace;
+
+        [Mapper]
+        public partial class FruitMapper
+        {
+            // highlight-start
+            [IncludeMappingConfiguration(nameof(@OtherMapper.CopyApple))]
+            // highlight-end
+            public partial static AppleDto ToApple(Apple apple);
+        }
+        ```
+
+        ```csharp
+        namespace OtherNamespace;
+
+        public static class OtherMapper
+        {
+            // Property mapping configurations
+            public partial static void CopyApple(AppleDto dto, Apple apple);
+        }
+        ```
+
+    </TabItem>
+    <TabItem value="qualified-through-field" label="Qualified through field/property">
+        ```csharp
+        [Mapper]
+        public partial class FruitMapper
+        {
+            private readonly OtherMapper _otherMapper = new();
+            
+            // highlight-start
+            [IncludeMappingConfiguration(nameof(@_otherMapper.CopyApple))]
+            // highlight-end
+            public partial AppleDto ToApple(Apple apple);
+        }
+        
+        public class OtherMapper
+        {
+            // Property mapping configurations
+            public partial void CopyApple(AppleDto dto, Apple apple);
+        }
+        ```
+
+    </TabItem>
+
+</Tabs>
+
 ## Restrictions
 
-- This attribute can only include mapping configurations defined in the same class. Configurations from other classes currently cannot be included.
 - The attribute only reuses a mapping if the mapped types are the same or a base type of the mapped type.
 - If the attribute includes configurations that cause a collision, it is reported as an error.
 
