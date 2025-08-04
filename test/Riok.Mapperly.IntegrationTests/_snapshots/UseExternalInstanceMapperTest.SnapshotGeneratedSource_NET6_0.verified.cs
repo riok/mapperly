@@ -8,7 +8,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public partial global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto Map(global::Riok.Mapperly.IntegrationTests.Models.IdObject source)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto();
-            target.IdValue = _myOtherMapper.MapInstance(source.IdValue);
+            target.IdValue = _myOtherMapper.MapInt(source.IdValue);
             return target;
         }
 

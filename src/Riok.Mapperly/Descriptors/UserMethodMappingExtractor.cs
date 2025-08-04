@@ -76,7 +76,7 @@ public static class UserMethodMappingExtractor
 
         var type = target.TargetType;
         var methods = ctx.SymbolAccessor.GetAllMethods(type).Where(e => string.Equals(e.Name, target.Name, StringComparison.Ordinal));
-        return BuildUserImplementedMappings(ctx, methods, target.TargetTypeName, type.IsStatic, isExternal: true);
+        return BuildUserImplementedMappings(ctx, methods, target.TargetTypeName, type.IsStatic, isExternal: true, isDefault: false);
     }
 
     internal static IEnumerable<IUserMapping> ExtractUserImplementedMappings(
@@ -99,7 +99,8 @@ public static class UserMethodMappingExtractor
         IEnumerable<IMethodSymbol> methods,
         string? receiver,
         bool isStatic,
-        bool isExternal
+        bool isExternal,
+        bool? isDefault = null
     )
     {
         foreach (var method in methods)
@@ -111,7 +112,7 @@ public static class UserMethodMappingExtractor
             // but still treated as user implemented methods,
             // since the user should provide an implementation elsewhere.
             // This is the case if a partial mapper class is extended.
-            var mapping = BuildUserImplementedMapping(ctx, method, receiver, true, isStatic, isExternal);
+            var mapping = BuildUserImplementedMapping(ctx, method, receiver, true, isStatic, isExternal, isDefault);
             if (mapping != null)
                 yield return mapping;
         }
@@ -139,7 +140,8 @@ public static class UserMethodMappingExtractor
         string? receiver,
         bool allowPartial,
         bool isStatic,
-        bool isExternal
+        bool isExternal,
+        bool? isDefault = null
     )
     {
         var userMappingConfig = GetUserMappingConfig(ctx, method, out var hasAttribute);
@@ -163,7 +165,7 @@ public static class UserMethodMappingExtractor
             return new UserImplementedExistingTargetMethodMapping(
                 receiver,
                 method,
-                userMappingConfig.Default,
+                userMappingConfig.Default ?? isDefault,
                 parameters.Source,
                 parameters.Target!.Value,
                 parameters.ReferenceHandler,
@@ -175,7 +177,7 @@ public static class UserMethodMappingExtractor
         return new UserImplementedMethodMapping(
             receiver,
             method,
-            userMappingConfig.Default,
+            userMappingConfig.Default ?? isDefault,
             parameters.Source,
             targetType,
             parameters.ReferenceHandler,

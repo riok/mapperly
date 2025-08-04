@@ -482,8 +482,8 @@ public class UseStaticMapperTest
             record A(int Value);
             record B(int Value);
 
-            class OtherMapper { public int AutoMap(int source) => source + 1; }
-            class ExternalMapper { public int ExplicitMap(int source) => source + 2; }
+            class OtherMapper { public static int AutoMap(int source) => source + 1; }
+            class ExternalMapper { public static int ExplicitMap(int source) => source + 2; }
 
             [Mapper]
             [UseStaticMapper<OtherMapper>]
@@ -492,7 +492,7 @@ public class UseStaticMapperTest
                 partial B Map(A source);
 
                 [MapProperty("Value", "Value", Use = nameof(@ExternalMapper.ExplicitMap)]
-                partial B MapOther(A source);
+                partial  B MapOther(A source);
             }
             """
         );
