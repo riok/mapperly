@@ -470,4 +470,40 @@ public class UseStaticMapperTest
                 """
             );
     }
+
+    [Fact]
+    public void ExternalMappingDoesNotAffectOnUseStaticMapper()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using Riok.Mapperly.Abstractions.ReferenceHandling;
+
+            record A(int Value);
+            record B(int Value);
+
+            class OtherMapper { public int AutoMap(int source) => source + 1; }
+            class ExternalMapper { public int ExplicitMap(int source) => source + 2; }
+
+            [Mapper]
+            [UseStaticMapper<OtherMapper>]
+            public partial class Mapper
+            {
+                partial B Map(A source);
+
+                [MapProperty("Value", "Value", Use = nameof(@ExternalMapper.ExplicitMap)]
+                partial B MapOther(A source);
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(global::OtherMapper.AutoMap(source.Value));
+                return target;
+                """
+            );
+    }
 }
