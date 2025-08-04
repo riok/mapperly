@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using Riok.Mapperly.IntegrationTests.Models;
@@ -8,13 +8,15 @@ using Xunit;
 
 namespace Riok.Mapperly.IntegrationTests
 {
-    public class UseExternalMapperTest : BaseMapperTest
+    public class UseExternalInstanceMapperTest : BaseMapperTest
     {
+        private readonly UseExternalInstanceMapper _mapper = new();
+
         [Fact]
         [VersionedSnapshot(Versions.NET6_0)]
         public Task SnapshotGeneratedSource()
         {
-            var path = GetGeneratedMapperFilePath(nameof(UseExternalMapper));
+            var path = GetGeneratedMapperFilePath(nameof(UseExternalInstanceMapper));
             return Verifier.VerifyFile(path);
         }
 
@@ -22,7 +24,7 @@ namespace Riok.Mapperly.IntegrationTests
         public void RunMappingShouldWork()
         {
             var model = new IdObject { IdValue = 10 };
-            var dto = UseExternalMapper.Map(model);
+            var dto = _mapper.Map(model);
             dto.IdValue.ShouldBe(100);
         }
 
@@ -30,7 +32,7 @@ namespace Riok.Mapperly.IntegrationTests
         public void RunMapExternalShouldWork()
         {
             var model = new IdObject { IdValue = 10 };
-            var dto = UseExternalMapper.MapExternal(model);
+            var dto = _mapper.MapExternal(model);
             dto.IdValue.ShouldBe(11);
         }
 
@@ -38,7 +40,7 @@ namespace Riok.Mapperly.IntegrationTests
         public void RunMapFromSourceExternalShouldWork()
         {
             var model = new IdObject { IdValue = 10 };
-            var dto = UseExternalMapper.MapFromSourceExternal(model);
+            var dto = _mapper.MapFromSourceExternal(model);
             dto.IdValue.ShouldBe(12);
         }
 
@@ -46,7 +48,7 @@ namespace Riok.Mapperly.IntegrationTests
         public void RunConstantMapExternalShouldWork()
         {
             var model = new IdObject { IdValue = 10 };
-            var dto = UseExternalMapper.ConstantMapExternal(model);
+            var dto = _mapper.ConstantMapExternal(model);
             dto.IdValue.ShouldBe(13);
         }
     }
