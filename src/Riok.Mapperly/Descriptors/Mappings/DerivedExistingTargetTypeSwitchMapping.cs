@@ -24,7 +24,11 @@ public class DerivedExistingTargetTypeSwitchMapping(
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
         var sourceExpression = TupleExpression(CommaSeparatedList(Argument(ctx.Source), Argument(target)));
-        var caseSections = existingTargetTypeMappings.Select(x => BuildSwitchSection(ctx, x));
+        var (sectionCtx, sourceVariableName) = ctx.WithNewScopedSource(SourceName);
+        var targetVariableName = ctx.NameBuilder.New(TargetName);
+        var caseSections = existingTargetTypeMappings.Select(x =>
+            BuildSwitchSection(sectionCtx, x, sourceVariableName, targetVariableName)
+        );
         var defaultSection = BuildDefaultSwitchSection(ctx, target);
 
         yield return ctx
@@ -32,11 +36,14 @@ public class DerivedExistingTargetTypeSwitchMapping(
             .AddLeadingLineFeed(ctx.SyntaxFactory.Indentation);
     }
 
-    private SwitchSectionSyntax BuildSwitchSection(TypeMappingBuildContext ctx, IExistingTargetMapping mapping)
+    private SwitchSectionSyntax BuildSwitchSection(
+        TypeMappingBuildContext ctx,
+        IExistingTargetMapping mapping,
+        string sourceVariableName,
+        string targetVariableName
+    )
     {
-        var (sectionCtx, sourceVariableName) = ctx.WithNewScopedSource(SourceName);
-        var targetVariableName = sectionCtx.NameBuilder.New(TargetName);
-        sectionCtx = sectionCtx.AddIndentation();
+        var sectionCtx = ctx.AddIndentation();
 
         // (A source, B target)
         var positionalTypeMatch = PositionalPatternClause(

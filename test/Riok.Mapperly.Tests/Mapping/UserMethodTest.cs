@@ -66,6 +66,25 @@ public class UserMethodTest
     }
 
     [Fact]
+    public Task InstanceMapperShouldUseStaticExistingTargetMethodWithRefKeywordAndSwitch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(A.Value), Use = nameof(MapList))]
+            [MapDerivedType<B, B>]
+            [MapDerivedType<C, C>]
+            public static partial void Update([MappingTarget] this A dest, A src);"
+            static void MapList([MappingTarget] this ref int[] dest, int[] src) { }
+            """,
+            "public abstract class A { public int[] Value { get; set; } }",
+            "public class B : A { public int BValue { get; set; } }",
+            "public class C : A { public int CValue { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public void WithExistingInstance()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
