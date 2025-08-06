@@ -67,7 +67,7 @@ public record MapperConfiguration
 
     /// <summary>
     /// Enabled conversions which Mapperly automatically implements.
-    /// By default all supported type conversions are enabled.
+    /// By default all supported type conversions except explicit casts are enabled.
     /// <example>
     /// Eg. to disable all automatically implemented conversions:<br />
     /// <c>EnabledConversions = MappingConversionType.None</c>
