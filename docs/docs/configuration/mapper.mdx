@@ -442,13 +442,12 @@ public partial class CarMapper
 }
 ```
 
-#### External method reference 
+#### External method reference
 
 Sometimes you may want to map a property using custom logic defined outside the mapper class. Mapperly supports referencing such
 external methods to perform property mappings. To do this, prefix the path with `@` in the `Use` property. This applies
 for both `MapProperty` and `MapPropertyFromSource`. The type containing the method must be accessible in the current context,
 either by using a fully qualified path or by including the namespace with `using` directive.
-
 
 <Tabs>
     <TabItem value="fully-qualified-namespace" label="Fully qualified path" default>
@@ -484,7 +483,7 @@ either by using a fully qualified path or by including the namespace with `using
         // highlight-start
         using OtherNamespace;
         // highlight-end
-        
+
         namespace MyNamespace;
 
         [Mapper]
@@ -517,7 +516,6 @@ either by using a fully qualified path or by including the namespace with `using
 With this syntax, you can also use instance methods if the mapper class has a property or field referencing the external type.
 In this case, the method should be referenced through this member.
 
-
 <Tabs>
     <TabItem value="referenced-through-field" label="Referenced through field" default>
         ```csharp
@@ -536,7 +534,7 @@ In this case, the method should be referenced through this member.
             // generates
             target.Price = _priceMapper.MapPrice(source.Price);
         }
-        
+
         public class PriceMapper
         {
             public string MapPrice(decimal price)

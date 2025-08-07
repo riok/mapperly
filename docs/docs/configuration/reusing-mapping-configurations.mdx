@@ -136,13 +136,13 @@ in the current context. This can be done by referencing through the containing t
         public partial class FruitMapper
         {
             private readonly OtherMapper _otherMapper = new();
-            
+
             // highlight-start
             [IncludeMappingConfiguration(nameof(@_otherMapper.CopyApple))]
             // highlight-end
             public partial AppleDto ToApple(Apple apple);
         }
-        
+
         public class OtherMapper
         {
             // Property mapping configurations
