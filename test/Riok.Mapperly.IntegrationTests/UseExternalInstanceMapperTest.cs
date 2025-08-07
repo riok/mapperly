@@ -13,7 +13,7 @@ namespace Riok.Mapperly.IntegrationTests
         private readonly UseExternalInstanceMapper _mapper = new();
 
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0)]
+        [VersionedSnapshot(Versions.NET6_0 | Versions.NET8_0)]
         public Task SnapshotGeneratedSource()
         {
             var path = GetGeneratedMapperFilePath(nameof(UseExternalInstanceMapper));
@@ -28,6 +28,7 @@ namespace Riok.Mapperly.IntegrationTests
             dto.IdValue.ShouldBe(100);
         }
 
+#if NET8_0_OR_GREATER
         [Fact]
         public void RunMapExternalShouldWork()
         {
@@ -51,5 +52,6 @@ namespace Riok.Mapperly.IntegrationTests
             var dto = _mapper.ConstantMapExternal(model);
             dto.IdValue.ShouldBe(13);
         }
+#endif
     }
 }

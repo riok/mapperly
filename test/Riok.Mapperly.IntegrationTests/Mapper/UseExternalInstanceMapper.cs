@@ -14,6 +14,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public partial IdObjectDto Map(IdObject source);
 
+#if NET8_0_OR_GREATER
         [MapProperty(nameof(IdObject.IdValue), nameof(IdObjectDto.IdValue), Use = nameof(@_externalMapper.MapInstance))]
         public partial IdObjectDto MapExternal(IdObject source);
 
@@ -22,6 +23,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         [MapPropertyFromSource(nameof(IdObjectDto.IdValue), Use = nameof(@_externalMapper.ComputeSumInstance))]
         public partial IdObjectDto MapFromSourceExternal(IdObject source);
+#endif
 
         public class MyOtherMapper
         {

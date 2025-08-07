@@ -11,29 +11,5 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.IdValue = _myOtherMapper.MapInt(source.IdValue);
             return target;
         }
-
-        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        public partial global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto MapExternal(global::Riok.Mapperly.IntegrationTests.Models.IdObject source)
-        {
-            var target = new global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto();
-            target.IdValue = _externalMapper.MapInstance(source.IdValue);
-            return target;
-        }
-
-        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        public partial global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto ConstantMapExternal(global::Riok.Mapperly.IntegrationTests.Models.IdObject source)
-        {
-            var target = new global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto();
-            target.IdValue = _externalMapper.IntValueInstance();
-            return target;
-        }
-
-        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        public partial global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto MapFromSourceExternal(global::Riok.Mapperly.IntegrationTests.Models.IdObject source)
-        {
-            var target = new global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto();
-            target.IdValue = _externalMapper.ComputeSumInstance(source);
-            return target;
-        }
     }
 }
