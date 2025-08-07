@@ -683,4 +683,73 @@ public class ObjectPropertyUseNamedMappingTest
             .HaveDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, "The referenced mapping named MapValue was not found")
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public Task ShouldSupportExternalMappingsOnStaticMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@OtherMapper.ModifyString)]
+            private static partial B Map(A source);
+            """,
+            "record A(string Value);",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public static string ModifyString(string source) => source + "-externally-modified";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldSupportExternalMappingsOnInstanceField()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper mapper = new();
+
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@mapper.ModifyString)]
+            private partial B Map(A source);
+            """,
+            "record A(string Value);",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public string ModifyString(string source) => source + "-externally-modified";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldSupportExternalMappingsOnInstanceProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper Mapper { get; } = new();
+
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@Mapper.ModifyString)]
+            private partial B Map(A source);
+
+            public string ModifyString(string source) => source + "-modified";
+            """,
+            "record A(string Value);",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public string ModifyString(string source) => source + "-externally-modified";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

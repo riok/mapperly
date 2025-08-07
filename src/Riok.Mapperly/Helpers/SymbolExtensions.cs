@@ -265,4 +265,19 @@ internal static class SymbolExtensions
         keywordName = null;
         return false;
     }
+
+    internal static bool Extends(this ITypeSymbol? derivedType, ITypeSymbol baseType)
+    {
+        while (derivedType is not null)
+        {
+            if (SymbolEqualityComparer.Default.Equals(baseType, derivedType))
+            {
+                return true;
+            }
+
+            derivedType = derivedType.BaseType;
+        }
+
+        return false;
+    }
 }
