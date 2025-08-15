@@ -20,6 +20,7 @@ public class UserDefinedNewInstanceGenericTypeMapping(
     IMethodSymbol method,
     MappingMethodParameters parameters,
     ITypeSymbol targetType,
+    ITypeSymbol returnType,
     bool enableReferenceHandling,
     NullFallbackValue? nullArm,
     ITypeSymbol objectType
@@ -29,9 +30,11 @@ public class UserDefinedNewInstanceGenericTypeMapping(
         parameters.Source,
         parameters.ReferenceHandler,
         targetType,
+        returnType,
         enableReferenceHandling,
         nullArm,
-        objectType
+        objectType,
+        parameters.ResultOut
     )
 {
     public override MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
