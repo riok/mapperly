@@ -215,6 +215,7 @@ public static class UserMethodMappingExtractor
             return new UserDefinedNewInstanceGenericTypeMapping(
                 methodSymbol,
                 parameters,
+                ctx.SymbolAccessor.UpgradeNullable(parameters.ResultOut?.Type ?? methodSymbol.ReturnType),
                 ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
                 ctx.Configuration.Mapper.UseReferenceHandling,
                 GetTypeSwitchNullArm(methodSymbol, parameters),
@@ -278,8 +279,9 @@ public static class UserMethodMappingExtractor
         return new UserDefinedNewInstanceRuntimeTargetTypeParameterMapping(
             methodSymbol,
             runtimeTargetTypeParams,
-            ctx.Configuration.Mapper.UseReferenceHandling,
+            ctx.SymbolAccessor.UpgradeNullable(runtimeTargetTypeParams.ResultOut?.Type ?? methodSymbol.ReturnType),
             ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
+            ctx.Configuration.Mapper.UseReferenceHandling,
             GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams),
             ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
         );

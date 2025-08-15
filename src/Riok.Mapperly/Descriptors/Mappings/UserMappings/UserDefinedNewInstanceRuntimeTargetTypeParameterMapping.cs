@@ -13,8 +13,9 @@ namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 public class UserDefinedNewInstanceRuntimeTargetTypeParameterMapping(
     IMethodSymbol method,
     RuntimeTargetTypeMappingMethodParameters parameters,
-    bool enableReferenceHandling,
     ITypeSymbol targetType,
+    ITypeSymbol returnType,
+    bool enableReferenceHandling,
     NullFallbackValue? nullArm,
     ITypeSymbol objectType
 )
@@ -23,15 +24,17 @@ public class UserDefinedNewInstanceRuntimeTargetTypeParameterMapping(
         parameters.Source,
         parameters.ReferenceHandler,
         targetType,
+        returnType,
         enableReferenceHandling,
         nullArm,
-        objectType
+        objectType,
+        parameters.ResultOut
     )
 {
     protected override ParameterListSyntax BuildParameterList() =>
         ParameterList(
             IsExtensionMethod,
-            [SourceParameter, parameters.TargetType, ReferenceHandlerParameter, .. AdditionalSourceParameters]
+            [SourceParameter, parameters.TargetType, ReferenceHandlerParameter, .. AdditionalSourceParameters, parameters.ResultOut]
         );
 
     protected override ExpressionSyntax BuildTargetType() => IdentifierName(parameters.TargetType.Name);

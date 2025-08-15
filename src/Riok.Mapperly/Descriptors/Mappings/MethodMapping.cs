@@ -31,23 +31,23 @@ public abstract class MethodMapping : ITypeMapping
         TrailingSpacedToken(SyntaxKind.StaticKeyword),
     ];
 
-    private readonly ITypeSymbol _returnType;
     private readonly MethodDeclarationSyntax? _methodDeclarationSyntax;
 
     private string? _methodName;
 
-    protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
+    protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType, ITypeSymbol? returnType = null)
     {
         TargetType = targetType;
         SourceParameter = new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType);
-        _returnType = targetType;
+        ReturnType = returnType ?? targetType;
     }
 
     protected MethodMapping(
         IMethodSymbol method,
         MethodParameter sourceParameter,
         MethodParameter? referenceHandlerParameter,
-        ITypeSymbol targetType
+        ITypeSymbol targetType,
+        ITypeSymbol? returnType = null
     )
     {
         TargetType = targetType;
@@ -57,7 +57,7 @@ public abstract class MethodMapping : ITypeMapping
         ReferenceHandlerParameter = referenceHandlerParameter;
         _methodDeclarationSyntax = method.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() as MethodDeclarationSyntax;
         _methodName = method.Name;
-        _returnType = method.ReturnsVoid ? method.ReturnType : targetType;
+        ReturnType = returnType ?? (method.ReturnsVoid ? method.ReturnType : targetType);
     }
 
     public IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; init; } = [];
@@ -75,6 +75,8 @@ public abstract class MethodMapping : ITypeMapping
     public ITypeSymbol SourceType => SourceParameter.Type;
 
     public ITypeSymbol TargetType { get; }
+
+    public ITypeSymbol ReturnType { get; }
 
     public bool IsSynthetic => false;
 
@@ -99,7 +101,7 @@ public abstract class MethodMapping : ITypeMapping
         var parameters = BuildParameterList();
         ReserveParameterNames(typeMappingBuildContext.NameBuilder, parameters);
 
-        var returnType = FullyQualifiedIdentifier(_returnType);
+        var returnType = FullyQualifiedIdentifier(ReturnType);
         return MethodDeclaration(returnType.AddTrailingSpace(), Identifier(MethodName))
             .WithModifiers(TokenList(BuildModifiers(ctx.IsStatic)))
             .WithParameterList(parameters)

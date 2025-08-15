@@ -27,8 +27,13 @@ internal static class UserMappingMethodParameterExtractor
         }
 
         // If the method returns void, a target parameter is required
-        // if the method doesn't return void, a target parameter is not allowed.
+        // If the method doesn't return void
+        //  1) If the method returns bool and has an out parameter, we assign the result into the out parameter
+        //  2) Otherwise, the target parameter is not allowed (original behavior)
+
         MethodParameter? targetParameter = null;
+        MethodParameter? resultOutParameter = null;
+
         if (method.ReturnsVoid)
         {
             targetParameter = FindTargetParameter(ctx, method, sourceParameter.Value, refHandlerParameter);
@@ -38,13 +43,24 @@ internal static class UserMappingMethodParameterExtractor
                 return false;
             }
         }
+        else if (method.ReturnType.SpecialType == SpecialType.System_Boolean)
+        {
+            // If the method returns bool, there might be an out parameter
+            resultOutParameter = FindOutParameter(ctx, method);
+        }
 
         var targetParameterOrdinal = targetParameter?.Ordinal ?? -1;
+        var resultOutParameterOrdinal = resultOutParameter?.Ordinal ?? -1;
+
         var additionalParameterSymbols = method
             .Parameters.Where(p =>
-                p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != targetParameterOrdinal && p.Ordinal != refHandlerParameterOrdinal
+                p.Ordinal != sourceParameter.Value.Ordinal
+                && p.Ordinal != targetParameterOrdinal
+                && p.Ordinal != refHandlerParameterOrdinal
+                && p.Ordinal != resultOutParameterOrdinal
             )
             .ToList();
+
         if (!allowAdditionalParameters && additionalParameterSymbols.Count > 0)
         {
             parameters = null;
@@ -64,7 +80,13 @@ internal static class UserMappingMethodParameterExtractor
         }
 
         var additionalParameters = additionalParameterSymbols.Select(p => ctx.SymbolAccessor.WrapMethodParameter(p)).ToList();
-        parameters = new MappingMethodParameters(sourceParameter.Value, targetParameter, refHandlerParameter, additionalParameters);
+        parameters = new MappingMethodParameters(
+            sourceParameter.Value,
+            targetParameter,
+            refHandlerParameter,
+            additionalParameters,
+            resultOutParameter
+        );
         return true;
     }
 
@@ -107,14 +129,38 @@ internal static class UserMappingMethodParameterExtractor
             return false;
         }
 
+        MethodParameter? resultOutParameter = null;
+
+        // We only look for an out parameter if the method has a boolean return type
+        // This is a pattern for bool TryMap(object source, Type targetType, out object result)
+        if (method.ReturnType.SpecialType == SpecialType.System_Boolean)
+        {
+            resultOutParameter = FindOutParameter(ctx, method);
+            if (resultOutParameter.HasValue)
+                expectedParameterCount++;
+        }
+
         if (method.Parameters.Length != expectedParameterCount)
         {
             parameters = null;
             return false;
         }
 
-        parameters = new RuntimeTargetTypeMappingMethodParameters(sourceParameter.Value, targetTypeParameter.Value, refHandlerParameter);
+        parameters = new RuntimeTargetTypeMappingMethodParameters(
+            sourceParameter.Value,
+            targetTypeParameter.Value,
+            refHandlerParameter,
+            resultOutParameter
+        );
         return true;
+    }
+
+    private static MethodParameter? FindOutParameter(SimpleMappingBuilderContext ctx, IMethodSymbol method)
+    {
+        // The FindTargetParameter is going to be the System.Type. Should we add a check here to make sure that the out parameter
+        // can be assigned to the return type?
+        var resultOutParameter = method.Parameters.FirstOrDefault(p => p.RefKind == RefKind.Out);
+        return resultOutParameter == null ? null : ctx.SymbolAccessor.WrapOptionalMethodParameter(resultOutParameter);
     }
 
     private static MethodParameter? FindSourceParameter(

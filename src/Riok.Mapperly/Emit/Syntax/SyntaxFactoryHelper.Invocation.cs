@@ -101,7 +101,7 @@ public partial struct SyntaxFactoryHelper
 
     private static ParameterSyntax Parameter(bool addThisKeyword, MethodParameter parameter)
     {
-        return Parameter(parameter.Type.FullyQualifiedIdentifierName(), parameter.Name, addThisKeyword);
+        return Parameter(parameter.Type.FullyQualifiedIdentifierName(), parameter.Name, addThisKeyword, parameter.RefKind);
     }
 
     private static ParameterSyntax Parameter(IParameterSymbol symbol)
@@ -115,6 +115,11 @@ public partial struct SyntaxFactoryHelper
             param = param.WithModifiers(TokenList(TrailingSpacedToken(SyntaxKind.ThisKeyword)));
         }
 
+        if (symbol.RefKind != RefKind.None)
+        {
+            param = param.WithModifiers(TokenList(RefKindToken(symbol.RefKind)));
+        }
+
         if (symbol.HasExplicitDefaultValue)
         {
             param = param.WithDefault(EqualsValueClause(Literal(symbol.ExplicitDefaultValue)));
@@ -123,13 +128,18 @@ public partial struct SyntaxFactoryHelper
         return param;
     }
 
-    public static ParameterSyntax Parameter(string type, string identifier, bool addThisKeyword = false)
+    public static ParameterSyntax Parameter(string type, string identifier, bool addThisKeyword = false, RefKind kind = RefKind.None)
     {
         var param = SyntaxFactory.Parameter(Identifier(identifier)).WithType(IdentifierName(type).AddTrailingSpace());
 
         if (addThisKeyword)
         {
             param = param.WithModifiers(TokenList(TrailingSpacedToken(SyntaxKind.ThisKeyword)));
+        }
+
+        if (kind != RefKind.None)
+        {
+            param = param.WithModifiers(TokenList(RefKindToken(kind)));
         }
 
         return param;
@@ -177,6 +187,7 @@ public partial struct SyntaxFactoryHelper
         refKind switch
         {
             RefKind.Ref => TrailingSpacedToken(SyntaxKind.RefKeyword),
+            RefKind.Out => TrailingSpacedToken(SyntaxKind.OutKeyword),
             _ => default,
         };
 

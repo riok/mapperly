@@ -169,6 +169,9 @@ public class MapperGenerationResultAssertions
     public MapperGenerationResultAssertions HaveMapMethodBody([StringSyntax(StringSyntax.CSharp)] string mapperMethodBody) =>
         HaveMethodBody(TestSourceBuilder.DefaultMapMethodName, mapperMethodBody);
 
+    public MapperGenerationResultAssertions HaveTryMapMethodBody([StringSyntax(StringSyntax.CSharp)] string mapperMethodBody) =>
+        HaveMethodBody(TestSourceBuilder.DefaultTryMapMethodName, mapperMethodBody);
+
     public MapperGenerationResultAssertions HaveMapMethodWithGenericConstraints(
         string methodName,
         [StringSyntax(StringSyntax.CSharp)] string? constraintClauses

@@ -10,6 +10,8 @@ public static class TestSourceBuilder
 {
     internal const string DefaultMapMethodName = "Map";
 
+    internal const string DefaultTryMapMethodName = "TryMap";
+
     /// <summary>
     /// Helper method to apply <see cref="System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/>
     /// to a given string.
