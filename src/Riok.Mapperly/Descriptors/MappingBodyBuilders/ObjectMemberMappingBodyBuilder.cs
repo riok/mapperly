@@ -1,8 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
+using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
@@ -217,6 +219,16 @@ public static class ObjectMemberMappingBodyBuilder
         var sourceMemberPath = memberMappingInfo.SourceMember;
         var targetMemberPath = memberMappingInfo.TargetMember;
 
+        var diExistingEnabled =
+            !ctx.BuilderContext.IsExpression
+            && !ctx.BuilderContext.MapperDeclaration.Symbol.IsStatic
+            && ctx.BuilderContext.ServiceProviderMemberName is not null
+            && ctx.BuilderContext.Types.IServiceProvider is not null
+            && ctx.BuilderContext.Types.IExistingMapper2 is not null;
+
+        // Prefer existing-target mapping under DI only when the current container mapping maps into an existing target (void root mappings).
+        var preferExistingTarget = diExistingEnabled && ctx.Mapping is IExistingTargetMapping;
+
         // if a named existing target mapping exists, we are always good.
         // if the member is readonly
         // and the target and source path is readable,
@@ -228,6 +240,7 @@ public static class ObjectMemberMappingBodyBuilder
                 || !targetMemberPath.Path.All(op => op.CanGet)
                 || !sourceMemberPath.MemberPath.Path.All(op => op.CanGet)
             )
+            && !preferExistingTarget
         )
         {
             return false;
@@ -236,6 +249,17 @@ public static class ObjectMemberMappingBodyBuilder
         var existingTargetMapping = ctx.BuilderContext.FindOrBuildExistingTargetMapping(memberMappingInfo.ToTypeMappingKey());
         if (existingTargetMapping == null)
             return false;
+
+        // If DI composition is available, wrap existing-target mapping with DI-first behavior using IExistingMapper<S,T>.
+        if (diExistingEnabled)
+        {
+            var srcT = existingTargetMapping.SourceType.NonNullable();
+            var dstT = existingTargetMapping.TargetType.NonNullable();
+            var iface = ctx.BuilderContext.Types.IExistingMapper2!.Construct(srcT, dstT);
+            var cacheFieldName = "_diExistingMapper_" + srcT.Name + "_" + dstT.Name;
+            ctx.BuilderContext.RequestedDiMapperCacheFields[cacheFieldName] = iface;
+            existingTargetMapping = new DiFirstExistingTargetDelegateMapping(existingTargetMapping, cacheFieldName, srcT, dstT);
+        }
 
         var sourceMemberGetter = sourceMemberPath.MemberPath.BuildGetter(ctx.BuilderContext);
         var targetMemberGetter = targetMemberPath.BuildGetter(ctx.BuilderContext);

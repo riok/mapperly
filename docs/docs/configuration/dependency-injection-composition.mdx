@@ -1,0 +1,162 @@
+---
+sidebar_position: 11
+description: Compose nested mappings via DI using IMapper and IExistingMapper
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# DI-based composition for nested mappings
+
+Mapperly can optionally compose nested complex mappings via your dependency injection container.
+If an appropriate mapper service is registered, Mapperly will use it; otherwise it falls back to the generated mapping.
+
+This works for:
+
+- New-instance mappings via `IMapper<TSource, TDestination>`
+- Existing-target (void) mappings via `IExistingMapper<TSource, TDestination>`
+
+It’s opt-in: it activates only if your mapper exposes an `IServiceProvider`.
+
+## Setup
+
+Expose an `IServiceProvider` on your mapper and mark it with `[MapperServiceProvider]`.
+
+```csharp
+using System;
+using Riok.Mapperly.Abstractions;
+
+[Mapper]
+public partial class MyMapper
+{
+    [MapperServiceProvider]
+    public IServiceProvider Services { get; }
+
+    public MyMapper(IServiceProvider services) => Services = services;
+
+    public partial Dto Map(Model src);
+    public partial void Map(Model src, Dto dst);
+}
+```
+
+Register nested mapper services in your DI container:
+
+```csharp
+using Microsoft.Extensions.DependencyInjection;
+using Riok.Mapperly.Abstractions;
+
+var services = new ServiceCollection();
+// for new-instance nested mappings
+services.AddSingleton<IMapper<NestedModel, NestedDto>, MyNestedMapper>();
+// for existing-target nested mappings
+services.AddSingleton<IExistingMapper<NestedModel, NestedDto>, MyNestedMapper>();
+var sp = services.BuildServiceProvider();
+
+var mapper = new MyMapper(sp);
+```
+
+Your nested mapper can implement one or both interfaces:
+
+```csharp
+using Riok.Mapperly.Abstractions;
+
+file sealed class MyNestedMapper
+    : IMapper<NestedModel, NestedDto>,
+      IExistingMapper<NestedModel, NestedDto>
+{
+    public NestedDto Map(NestedModel src) => new() { Value = src.Value + 5 };
+    public void Map(NestedModel src, NestedDto dst) => dst.Value = src.Value + 10;
+}
+```
+
+## How it works
+
+When mapping a complex member (for example `dst.Nested = ...` or `Map(src.Nested, dst.Nested)`):
+
+- New-instance: Mapperly first tries to resolve `IMapper<S, T>` from `IServiceProvider`. If found, it calls `Map(S)` and assigns the result. If not found, it uses the generated mapping.
+- Existing-target: For void mappings, Mapperly first tries `IExistingMapper<S, T>` and calls `Map(S, T)`; otherwise it falls back to the generated existing-target mapping.
+
+To avoid repeated DI lookups, Mapperly caches the resolved services per mapper instance (lazy-initialized).
+
+## Limitations
+
+- Not available for static mappers.
+- Not available for expression-based mappings such as queryable projections.
+- Requires an `IServiceProvider` property/field marked with `[MapperServiceProvider]` (or the only readable `IServiceProvider` member).
+
+## Example
+
+<Tabs>
+  <TabItem value="model" label="Model">
+
+```csharp
+public class Model { public NestedModel Nested { get; set; } = new(); }
+public class NestedModel { public int Value { get; set; } }
+public class Dto { public NestedDto Nested { get; set; } = new(); }
+public class NestedDto { public int Value { get; set; } }
+```
+
+  </TabItem>
+  <TabItem value="mapping" label="Mapping">
+
+```csharp
+[Mapper]
+public partial class DiCompositionMapper
+{
+    [MapperServiceProvider]
+    public IServiceProvider Services { get; }
+    public DiCompositionMapper(IServiceProvider services) => Services = services;
+
+    public partial Dto Map(Model src);           // uses IMapper<NestedModel, NestedDto> if available
+    public partial void Map(Model src, Dto dst);  // uses IExistingMapper<NestedModel, NestedDto> if available
+}
+```
+
+  </TabItem>
+  <TabItem value="usage" label="Usage">
+
+```csharp
+var services = new ServiceCollection()
+    .AddSingleton<IMapper<NestedModel, NestedDto>>(new MyNestedMapper())
+    .AddSingleton<IExistingMapper<NestedModel, NestedDto>>(new MyNestedMapper())
+    .BuildServiceProvider();
+
+var mapper = new DiCompositionMapper(services);
+
+var src = new Model { Nested = new NestedModel { Value = 10 } };
+var dto = mapper.Map(src);      // dto.Nested.Value == 15 via DI IMapper
+
+var dst = new Dto();
+mapper.Map(src, dst);           // dst.Nested.Value == 20 via DI IExistingMapper
+```
+
+  </TabItem>
+</Tabs>
+
+## Reference
+
+Interfaces in `Riok.Mapperly.Abstractions`:
+
+```csharp
+public interface IMapper<in TSource, out TDestination>
+{
+    TDestination Map(TSource source);
+}
+
+public interface IExistingMapper<in TSource, in TDestination>
+{
+    void Map(TSource source, TDestination destination);
+}
+```
+
+Attribute to expose DI:
+
+```csharp
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+public sealed class MapperServiceProviderAttribute : Attribute { }
+```
+
+See also:
+
+- [Existing target object](./existing-target.mdx)
+- [Queryable projections](./queryable-projections.mdx)

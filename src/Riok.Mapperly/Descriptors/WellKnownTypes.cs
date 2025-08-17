@@ -12,6 +12,11 @@ public class WellKnownTypes(Compilation compilation)
 
     public INamedTypeSymbol? TimeOnly => TryGet("System.TimeOnly");
 
+    public INamedTypeSymbol? IServiceProvider => TryGet("System.IServiceProvider");
+
+    public INamedTypeSymbol? IMapper2 => TryGet("Riok.Mapperly.Abstractions.IMapper`2");
+    public INamedTypeSymbol? IExistingMapper2 => TryGet("Riok.Mapperly.Abstractions.IExistingMapper`2");
+
     public INamedTypeSymbol? NotNullIfNotNullAttribute => TryGet("System.Diagnostics.CodeAnalysis.NotNullIfNotNullAttribute");
 
     public INamedTypeSymbol? UnsafeAccessorAttribute => TryGet("System.Runtime.CompilerServices.UnsafeAccessorAttribute");

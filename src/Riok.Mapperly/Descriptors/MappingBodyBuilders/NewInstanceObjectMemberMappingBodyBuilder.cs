@@ -6,6 +6,7 @@ using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
+using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
@@ -26,6 +27,24 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
     public static void BuildMappingBody(MappingBuilderContext ctx, NewInstanceObjectMemberMethodMapping mapping)
     {
         var mappingCtx = new NewInstanceContainerBuilderContext<NewInstanceObjectMemberMethodMapping>(ctx, mapping);
+
+        // If DI is available, request a cache field for IMapper<S,T> and tag the mapping
+        // so it can early-return using DI inside the generated method body.
+        if (
+            !mappingCtx.BuilderContext.IsExpression
+            && !mappingCtx.BuilderContext.MapperDeclaration.Symbol.IsStatic
+            && mappingCtx.BuilderContext.ServiceProviderMemberName is not null
+            && mappingCtx.BuilderContext.Types.IServiceProvider is not null
+            && mappingCtx.BuilderContext.Types.IMapper2 is not null
+        )
+        {
+            var srcT = mapping.SourceType.NonNullable();
+            var dstT = mapping.TargetType.NonNullable();
+            var iface = mappingCtx.BuilderContext.Types.IMapper2.Construct(srcT, dstT);
+            var cacheFieldName = "_diMapper_" + srcT.Name + "_" + dstT.Name;
+            mappingCtx.BuilderContext.RequestedDiMapperCacheFields[cacheFieldName] = iface;
+            mapping.DiMapperCacheFieldName = cacheFieldName;
+        }
         BuildConstructorMapping(mappingCtx);
         BuildInitMemberMappings(mappingCtx);
         ObjectMemberMappingBodyBuilder.BuildMappingBody(mappingCtx);

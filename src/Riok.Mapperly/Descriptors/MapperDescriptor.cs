@@ -12,6 +12,7 @@ public class MapperDescriptor
 {
     private readonly MapperDeclaration _declaration;
     private readonly List<MethodMapping> _methodMappings = [];
+    private readonly List<MemberDeclarationSyntax> _additionalMembers = [];
 
     public MapperDescriptor(MapperDeclaration declaration, UniqueNameBuilder nameBuilder, SupportedFeatures supportedFeatures)
     {
@@ -44,7 +45,14 @@ public class MapperDescriptor
 
     public IReadOnlyCollection<MethodMapping> MethodMappings => _methodMappings;
 
+    public IReadOnlyCollection<MemberDeclarationSyntax> AdditionalMembers => _additionalMembers;
+
+    // Name of the service provider member on the mapper (property/field). Null if none.
+    public string? ServiceProviderMemberName { get; set; }
+
     public void AddMethodMappings(IReadOnlyCollection<MethodMapping> mappings) => _methodMappings.AddRange(mappings);
+
+    public void AddAdditionalMember(MemberDeclarationSyntax member) => _additionalMembers.Add(member);
 
     private string BuildName(INamedTypeSymbol symbol)
     {

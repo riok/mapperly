@@ -20,6 +20,13 @@ public class NewInstanceObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeS
     private readonly HashSet<ConstructorParameterMapping> _constructorMemberMappings = [];
     private readonly HashSet<MemberAssignmentMapping> _initMemberMappings = [];
 
+    // When set, this mapping should try a DI-provided IMapper<S,T> first.
+    // The value is the backing cache field name (e.g. _diMapper_S_T), used to call the helper method.
+    internal string? DiMapperCacheFieldName { get; set; }
+
+    // If true, skip emitting DI early-return logic for this mapping (prevents recursion in root user-defined mappings).
+    internal bool DisableDiEarlyReturn { get; set; }
+
     public IInstanceConstructor Constructor
     {
         get => _constructor ?? throw new InvalidOperationException("constructor is not set");
@@ -35,6 +42,25 @@ public class NewInstanceObjectMemberMethodMapping(ITypeSymbol sourceType, ITypeS
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
         var targetVariableName = ctx.NameBuilder.New(TargetVariableName);
+
+        // If DI composition is enabled for this mapping, add an early return via a DI-provided mapper.
+        if (!DisableDiEarlyReturn && DiMapperCacheFieldName is not null)
+        {
+            // var diMapper = this.GetOrNull_<cache>();
+            var thisExpr = ThisExpression();
+            var helperName = "GetOrNull_" + DiMapperCacheFieldName.TrimStart('_');
+            var helperCall = ctx.SyntaxFactory.Invocation(Emit.Syntax.SyntaxFactoryHelper.MemberAccess(thisExpr, helperName));
+
+            var diVarName = ctx.NameBuilder.New("diMapper");
+            yield return ctx.SyntaxFactory.DeclareLocalVariable(diVarName, helperCall);
+
+            // if (diMapper != null) { return diMapper.Map(source); }
+            var diVarId = IdentifierName(diVarName);
+            var notNull = Emit.Syntax.SyntaxFactoryHelper.IsNotNull(diVarId);
+            var mapCall = ctx.SyntaxFactory.Invocation(Emit.Syntax.SyntaxFactoryHelper.MemberAccess(diVarId, "Map"), ctx.Source);
+            var thenReturn = ctx.SyntaxFactory.AddIndentation().Return(mapCall);
+            yield return ctx.SyntaxFactory.If(notNull, [thenReturn]);
+        }
 
         // create target instance
         foreach (var statement in CreateTargetInstance(ctx, targetVariableName))

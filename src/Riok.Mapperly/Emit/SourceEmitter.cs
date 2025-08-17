@@ -61,6 +61,10 @@ public static class SourceEmitter
         CancellationToken cancellationToken
     )
     {
+        foreach (var member in descriptor.AdditionalMembers)
+        {
+            yield return member;
+        }
         foreach (var mapping in descriptor.MethodMappings)
         {
             cancellationToken.ThrowIfCancellationRequested();

@@ -1,3 +1,4 @@
+using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
 
@@ -39,6 +40,11 @@ public static class UserMethodMappingBodyBuilder
         var delegateMapping = ctx.BuildMapping(new TypeMappingKey(mapping), options);
         if (delegateMapping != null)
         {
+            // Prevent DI early-return recursion on the root mapping by disabling it on the delegate if applicable.
+            if (delegateMapping is NewInstanceObjectMemberMethodMapping m)
+            {
+                m.DisableDiEarlyReturn = true;
+            }
             mapping.SetDelegateMapping(delegateMapping);
             return;
         }

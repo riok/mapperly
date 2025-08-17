@@ -26,6 +26,14 @@ namespace Riok.Mapperly.Abstractions
         public FormatProviderAttribute() { }
         public bool Default { get; set; }
     }
+    public interface IExistingMapper<in TSource, in TDestination>
+    {
+        void Map(TSource source, TDestination destination);
+    }
+    public interface IMapper<in TSource, out TDestination>
+    {
+        TDestination Map(TSource source);
+    }
     [System.Flags]
     public enum IgnoreObsoleteMembersStrategy
     {
@@ -206,6 +214,12 @@ namespace Riok.Mapperly.Abstractions
     {
         public MapperRequiredMappingAttribute(Riok.Mapperly.Abstractions.RequiredMappingStrategy requiredMappingStrategy) { }
         public Riok.Mapperly.Abstractions.RequiredMappingStrategy RequiredMappingStrategy { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
+    public sealed class MapperServiceProviderAttribute : System.Attribute
+    {
+        public MapperServiceProviderAttribute() { }
     }
     [System.Flags]
     public enum MappingConversionType

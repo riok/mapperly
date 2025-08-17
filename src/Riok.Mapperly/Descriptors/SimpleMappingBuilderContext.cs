@@ -46,7 +46,12 @@ public class SimpleMappingBuilderContext(
             ctx.ExistingTargetMappingBuilder,
             ctx.InlinedMappings,
             diagnosticLocation ?? ctx._diagnosticLocation
-        ) { }
+        )
+    {
+        // propagate DI settings and share cache fields dictionary
+        ServiceProviderMemberName = ctx.ServiceProviderMemberName;
+        RequestedDiMapperCacheFields = ctx.RequestedDiMapperCacheFields;
+    }
 
     public MapperDeclaration MapperDeclaration { get; } = mapperDeclaration;
 
@@ -74,6 +79,14 @@ public class SimpleMappingBuilderContext(
     /// and the body of these mappings is never built.
     /// </summary>
     protected InlinedExpressionMappingCollection InlinedMappings { get; } = inlinedMappings;
+
+    /// <summary>
+    /// Name of the mapper member annotated with [MapperServiceProvider] which exposes an IServiceProvider. Null if none.
+    /// </summary>
+    public string? ServiceProviderMemberName { get; set; }
+
+    // Tracks requested cached DI mapper fields: fieldName -> constructed interface type (IMapper<S,T> or IExistingMapper<S,T>)
+    internal Dictionary<string, INamedTypeSymbol> RequestedDiMapperCacheFields { get; } = [];
 
     public SemanticModel? GetSemanticModel(SyntaxTree syntaxTree) => _compilationContext.GetSemanticModel(syntaxTree);
 
