@@ -13,7 +13,7 @@ jobs:
   lint-dotnet:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-dotnet@v4
       - run: dotnet tool restore
       - run: dotnet csharpier check .
@@ -23,7 +23,7 @@ jobs:
   superlinter:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - uses: github/super-linter/slim@v7
