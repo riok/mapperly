@@ -102,7 +102,9 @@ public class MapperConfigurationReader
         bool supportsDeepCloning
     )
     {
-        foreach (var includedCfg in _dataAccessor.Access<IncludeMappingConfigurationAttribute>(reference.Method!))
+        foreach (
+            var includedCfg in _dataAccessor.Access<IncludeMappingConfigurationAttribute, IncludeMappingConfiguration>(reference.Method!)
+        )
         {
             var cfgToInclude = BuildConfigToInclude(includedCfg.Name, reference, visitedMethods, supportsDeepCloning);
             if (cfgToInclude == null)
@@ -117,17 +119,17 @@ public class MapperConfigurationReader
     }
 
     private MappingConfiguration? BuildConfigToInclude(
-        string name,
+        MethodReferenceConfiguration name,
         MappingConfigurationReference configRef,
         HashSet<IMethodSymbol> visitedMethods,
         bool supportsDeepCloning
     )
     {
         var typeMapping =
-            (ITypeMapping?)_mappings.FindNamedNewInstanceMapping(name, out var ambiguousName)
-            ?? _mappings.FindExistingInstanceNamedMapping(name, out ambiguousName);
+            (ITypeMapping?)_mappings.FindNamedNewInstanceMapping(name.FullName, out var ambiguousName)
+            ?? _mappings.FindExistingInstanceNamedMapping(name.FullName, out ambiguousName);
         var methodSymbol = (typeMapping as IUserMapping)?.Method;
-        if (!ValidateIncludedConfig(ambiguousName, configRef, name, typeMapping, methodSymbol))
+        if (!ValidateIncludedConfig(ambiguousName, configRef, name.FullName, typeMapping, methodSymbol))
         {
             return null;
         }

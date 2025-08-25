@@ -32,6 +32,29 @@ internal static class ExternalMappingsExtractor
         return staticExternalMappers.Concat(externalInstanceMappers);
     }
 
+    public static IEnumerable<(string Name, IUserMapping Mapping)> ExtractExternalNamedMappings(
+        SimpleMappingBuilderContext ctx,
+        INamedTypeSymbol mapperSymbol
+    )
+    {
+        var externalStaticDirectlyReferencedMappings = ctx
+            .SymbolAccessor.GetAllMethods(mapperSymbol)
+            .SelectMany(CollectMemberMappingConfigurations)
+            .SelectMany(e => UserMethodMappingExtractor.ExtractNamedUserImplementedMappings(ctx, e).Select(y => (e.FullName, y)));
+
+        return externalStaticDirectlyReferencedMappings;
+
+        IEnumerable<MethodReferenceConfiguration> CollectMemberMappingConfigurations(IMethodSymbol x) =>
+            ctx
+                .AttributeAccessor.Access<MapPropertyAttribute, MemberMappingConfiguration>(x)
+                .Select(e => e.Use)
+                .Concat(ctx.AttributeAccessor.Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(x).Select(e => e.Use))
+                .Concat(
+                    ctx.AttributeAccessor.Access<IncludeMappingConfigurationAttribute, IncludeMappingConfiguration>(x).Select(e => e.Name)
+                )
+                .Where(e => e?.TargetType is not null)!;
+    }
+
     private static IEnumerable<IUserMapping> ValidateAndExtractExternalInstanceMappings(SimpleMappingBuilderContext ctx, ISymbol symbol)
     {
         var (name, type, nullableAnnotation) = symbol switch
