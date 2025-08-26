@@ -157,7 +157,9 @@ internal static class SourceValueBuilder
     )
     {
         var methodReferenceConfiguration = memberMappingInfo.ValueConfiguration!.Use!;
-        var targetSymbol = methodReferenceConfiguration.TargetType ?? ctx.BuilderContext.MapperDeclaration.Symbol;
+        var targetSymbol = methodReferenceConfiguration is ExternalMethodReferenceConfiguration external
+            ? external.TargetType
+            : ctx.BuilderContext.MapperDeclaration.Symbol;
         var namedMethodCandidates = ctx
             .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(targetSymbol)
             .Where(m =>
@@ -199,16 +201,11 @@ internal static class SourceValueBuilder
             return false;
         }
 
-        string? targetName = null;
-
-        if (methodReferenceConfiguration.TargetMember is not null)
+        var targetName = methodReferenceConfiguration switch
         {
-            targetName = methodReferenceConfiguration.TargetMember.Name;
-        }
-        else if (methodReferenceConfiguration.TargetType is not null)
-        {
-            targetName = methodReferenceConfiguration.TargetType.FullyQualifiedIdentifierName();
-        }
+            ExternalMethodReferenceConfiguration externalMethod => externalMethod.TargetName,
+            _ => null,
+        };
 
         sourceValue = new MethodProvidedSourceValue(methodSymbol.Name, targetName);
         return true;

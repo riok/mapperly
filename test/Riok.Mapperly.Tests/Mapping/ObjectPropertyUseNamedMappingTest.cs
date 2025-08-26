@@ -706,6 +706,21 @@ public class ObjectPropertyUseNamedMappingTest
     }
 
     [Fact]
+    public Task ShouldReportNonExistentExternalMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@OtherMapper.ModifyString)]
+            private static partial B Map(A source);
+            """,
+            "record A(string Value);",
+            "record B(string Value);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ShouldSupportExternalMappingsOnInstanceField()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -723,6 +738,21 @@ public class ObjectPropertyUseNamedMappingTest
                 public string ModifyString(string source) => source + "-externally-modified";
             }
             """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact(Skip = "asd")]
+    public Task ShouldReportNonExistentExternalMappingsOnInstanceField()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@mapper.ModifyString)]
+            private partial B Map(A source);
+            """,
+            "record A(string Value);",
+            "record B(string Value);"
         );
 
         return TestHelper.VerifyGenerator(source);

@@ -1,13 +1,10 @@
-﻿using Microsoft.CodeAnalysis;
-using Riok.Mapperly.Helpers;
+﻿namespace Riok.Mapperly.Configuration;
 
-namespace Riok.Mapperly.Configuration;
-
-public record MethodReferenceConfiguration(string Name, INamedTypeSymbol? TargetType = null, ISymbol? TargetMember = null)
+public record MethodReferenceConfiguration(string Name)
 {
-    public string? TargetTypeName { get; } = TargetMember?.Name ?? TargetType?.FullyQualifiedIdentifierName();
+    public virtual string FullName => Name;
 
-    public string FullName { get; } = TargetType is null ? Name : $"{TargetType.FullyQualifiedIdentifierName()}.{Name}";
+    public virtual bool IsExternal => true;
 
     public override string ToString() => FullName;
 }

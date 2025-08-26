@@ -303,6 +303,12 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             return false;
         }
 
+        if (operation is IInvalidOperation)
+        {
+            configuration = new InvalidMethodReferenceConfiguration(memberName, operation.Syntax.ToString());
+            return true;
+        }
+
         var containingType = symbolAccessor.GetContainingTypeSymbol(nameofSyntax);
         if (containingType is null || operation.Type is not INamedTypeSymbol typeSymbol || containingType.Extends(typeSymbol))
         {
@@ -311,7 +317,13 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         }
 
         var field = operation.GetMemberSymbol();
-        configuration = new MethodReferenceConfiguration(memberName, typeSymbol, field);
+        if (field is null)
+        {
+            configuration = new StaticMethodReferenceConfiguration(memberName, typeSymbol);
+            return true;
+        }
+
+        configuration = new InstanceMethodReferenceConfiguration(memberName, field, typeSymbol);
         return true;
     }
 

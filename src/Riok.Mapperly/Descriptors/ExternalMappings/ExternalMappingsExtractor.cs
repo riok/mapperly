@@ -52,7 +52,7 @@ internal static class ExternalMappingsExtractor
                 .Concat(
                     ctx.AttributeAccessor.Access<IncludeMappingConfigurationAttribute, IncludeMappingConfiguration>(x).Select(e => e.Name)
                 )
-                .Where(e => e?.TargetType is not null)!;
+                .Where(e => e?.IsExternal ?? false)!;
     }
 
     private static IEnumerable<IUserMapping> ValidateAndExtractExternalInstanceMappings(SimpleMappingBuilderContext ctx, ISymbol symbol)
