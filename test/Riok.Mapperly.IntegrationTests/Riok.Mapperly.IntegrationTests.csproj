@@ -34,7 +34,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.19" Condition="'$(TargetFramework)' == 'net7.0'" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" Condition="'$(TargetFramework)' == 'net8.0'" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.6" Condition="'$(TargetFramework)' == 'net9.0'" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.7" Condition="'$(TargetFramework)' == 'net9.0'" />
     <PackageReference
       Include="Microsoft.EntityFrameworkCore.Sqlite"
       Version="10.0.0-preview.5.*"

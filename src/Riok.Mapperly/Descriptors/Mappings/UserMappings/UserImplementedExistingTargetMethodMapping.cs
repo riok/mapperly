@@ -32,6 +32,24 @@ public class UserImplementedExistingTargetMethodMapping(
         // we explicitly cast to be able to use the default interface implementation or explicit implementations
         if (Method.ReceiverType?.TypeKind != TypeKind.Interface)
         {
+            // if target parameter expects the ref keyword we need to add some extra lines so the reference is correctly stored back into the property.
+            if (targetParameter.RefKind == RefKind.Ref)
+            {
+                var targetRefVarName = ctx.NameBuilder.New("targetRef");
+                yield return ctx.SyntaxFactory.DeclareLocalVariable(targetRefVarName, target);
+                yield return ctx.SyntaxFactory.ExpressionStatement(
+                    ctx.SyntaxFactory.Invocation(
+                        receiver == null ? IdentifierName(Method.Name) : MemberAccess(receiver, Method.Name),
+                        sourceParameter.WithArgument(ctx.Source),
+                        targetParameter.WithArgument(IdentifierName(targetRefVarName)),
+                        referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+                    )
+                );
+                yield return ctx.SyntaxFactory.ExpressionStatement(Assignment(target, IdentifierName(targetRefVarName), false));
+
+                yield break;
+            }
+
             yield return ctx.SyntaxFactory.ExpressionStatement(
                 ctx.SyntaxFactory.Invocation(
                     receiver == null ? IdentifierName(Method.Name) : MemberAccess(receiver, Method.Name),

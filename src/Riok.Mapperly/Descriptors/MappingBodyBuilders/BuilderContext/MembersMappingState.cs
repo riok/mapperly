@@ -205,8 +205,7 @@ internal class MembersMappingState(
 
         switch (sourcePath.Type)
         {
-            case SourceMemberType.Member
-            or SourceMemberType.MemberAlias:
+            case SourceMemberType.Member or SourceMemberType.MemberAlias:
                 _unmappedSourceMemberNames.Remove(sourceMember.Name);
                 break;
             case SourceMemberType.AdditionalMappingMethodParameter:
