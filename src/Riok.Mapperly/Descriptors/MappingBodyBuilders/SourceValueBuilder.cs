@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Configuration.MethodReferences;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -157,7 +158,7 @@ internal static class SourceValueBuilder
     )
     {
         var methodReferenceConfiguration = memberMappingInfo.ValueConfiguration!.Use!;
-        var targetSymbol = methodReferenceConfiguration is ExternalMethodReferenceConfiguration external
+        var targetSymbol = methodReferenceConfiguration is IExternalMethodReferenceConfiguration external
             ? external.TargetType
             : ctx.BuilderContext.MapperDeclaration.Symbol;
         var namedMethodCandidates = ctx
@@ -203,7 +204,7 @@ internal static class SourceValueBuilder
 
         var targetName = methodReferenceConfiguration switch
         {
-            ExternalMethodReferenceConfiguration externalMethod => externalMethod.TargetName,
+            IExternalMethodReferenceConfiguration externalMethod => externalMethod.TargetName,
             _ => null,
         };
 

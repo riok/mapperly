@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Configuration.MethodReferences;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
@@ -119,7 +120,7 @@ public class MapperConfigurationReader
     }
 
     private MappingConfiguration? BuildConfigToInclude(
-        MethodReferenceConfiguration name,
+        IMethodReferenceConfiguration name,
         MappingConfigurationReference configRef,
         HashSet<IMethodSymbol> visitedMethods,
         bool supportsDeepCloning

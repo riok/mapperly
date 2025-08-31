@@ -1,3 +1,5 @@
-﻿namespace Riok.Mapperly.Configuration;
+﻿using Riok.Mapperly.Configuration.MethodReferences;
 
-public record IncludeMappingConfiguration(MethodReferenceConfiguration Name);
+namespace Riok.Mapperly.Configuration;
+
+public record IncludeMappingConfiguration(IMethodReferenceConfiguration Name);

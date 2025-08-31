@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Configuration.MethodReferences;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
@@ -44,7 +45,7 @@ internal static class ExternalMappingsExtractor
 
         return externalStaticDirectlyReferencedMappings;
 
-        IEnumerable<MethodReferenceConfiguration> CollectMemberMappingConfigurations(IMethodSymbol x) =>
+        IEnumerable<IMethodReferenceConfiguration> CollectMemberMappingConfigurations(IMethodSymbol x) =>
             ctx
                 .AttributeAccessor.Access<MapPropertyAttribute, MemberMappingConfiguration>(x)
                 .Select(e => e.Use)

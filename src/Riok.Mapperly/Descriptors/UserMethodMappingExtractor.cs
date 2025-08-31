@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Configuration.MethodReferences;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
@@ -66,10 +67,10 @@ public static class UserMethodMappingExtractor
 
     internal static IEnumerable<IUserMapping> ExtractNamedUserImplementedMappings(
         SimpleMappingBuilderContext ctx,
-        MethodReferenceConfiguration? target
+        IMethodReferenceConfiguration? target
     )
     {
-        if (target is not ExternalMethodReferenceConfiguration externalTarget)
+        if (target is not IExternalMethodReferenceConfiguration externalTarget)
         {
             return [];
         }

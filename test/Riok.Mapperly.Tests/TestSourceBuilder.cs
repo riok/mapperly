@@ -8,7 +8,19 @@ namespace Riok.Mapperly.Tests;
 
 public static class TestSourceBuilder
 {
+    public const string DefaultNamespace = "MapperNamespace";
+
+    private const string DefaultUsingDirectives = """
+        using System;
+        using System.Linq;
+        using System.Collections.Generic;
+        using Riok.Mapperly.Abstractions;
+        using Riok.Mapperly.Abstractions.ReferenceHandling;
+        """;
+
     internal const string DefaultMapMethodName = "Map";
+
+    private static readonly string _newlines = Environment.NewLine + Environment.NewLine;
 
     /// <summary>
     /// Helper method to apply <see cref="System.Diagnostics.CodeAnalysis.StringSyntaxAttribute"/>
@@ -37,25 +49,47 @@ public static class TestSourceBuilder
     public static string MapperWithBody([StringSyntax(StringSyntax.CSharp)] string body, TestSourceBuilderOptions? options = null)
     {
         options ??= TestSourceBuilderOptions.Default;
+        var additionalUsings = AdditionalUsings(options);
 
         return CSharp(
             $$"""
-            using System;
-            using System.Linq;
-            using System.Collections.Generic;
-            using Riok.Mapperly.Abstractions;
-            using Riok.Mapperly.Abstractions.ReferenceHandling;
+              {{DefaultUsingDirectives}}{{additionalUsings}}
+              {{(options.Namespace != null ? $"namespace {options.Namespace};" : "")}}
 
-            {{(options.Namespace != null ? $"namespace {options.Namespace};" : "")}}
+              {{BuildAttribute(options)}}
+              public {{(options.Static ? "static " : "")}}partial class {{options.MapperClassName}}{{(
+                  options.MapperBaseClassName != null ? " : " + options.MapperBaseClassName : ""
+              )}}
+              {
+                  {{body}}
+              }
+              """
+        );
+    }
 
-            {{BuildAttribute(options)}}
-            public {{(options.Static ? "static " : "")}}partial class {{options.MapperClassName}}{{(
-                options.MapperBaseClassName != null ? " : " + options.MapperBaseClassName : ""
-            )}}
-            {
-                {{body}}
-            }
-            """
+    public static string MapperWithBodyInBlockScopedNamespace(
+        [StringSyntax(StringSyntax.CSharp)] string body,
+        TestSourceBuilderOptions? options = null
+    )
+    {
+        options ??= TestSourceBuilderOptions.Default;
+        var additionalUsings = AdditionalUsings(options);
+
+        return CSharp(
+            $$"""
+              {{DefaultUsingDirectives}}{{additionalUsings}}
+
+              namespace {{options.Namespace ?? DefaultNamespace}} {
+
+                  {{BuildAttribute(options)}}
+                  public {{(options.Static ? "static " : "")}}partial class {{options.MapperClassName}}{{(
+                      options.MapperBaseClassName != null ? " : " + options.MapperBaseClassName : ""
+                  )}}
+                  {
+                      {{body}}
+                  }
+              }
+              """
         );
     }
 
@@ -70,8 +104,26 @@ public static class TestSourceBuilder
         [StringSyntax(StringSyntax.CSharp)] params string[] types
     )
     {
-        var sep = Environment.NewLine + Environment.NewLine;
-        return MapperWithBody(body, options) + sep + string.Join(sep, types);
+        return $"{MapperWithBody(body, options)}{_newlines}{string.Join(_newlines, types)}";
+    }
+
+    public static string Append(string source, [StringSyntax(StringSyntax.CSharp)] string[] classes)
+    {
+        return Append(source, DefaultNamespace, classes);
+    }
+
+    public static string Append(string source, string @namespace, [StringSyntax(StringSyntax.CSharp)] string[] classes)
+    {
+        var newClasses = string.Join(_newlines, classes);
+
+        var newSource = $$"""
+            namespace {{@namespace}} {
+
+                {{newClasses}}
+            }
+            """;
+
+        return $"{source}{_newlines}{newSource}";
     }
 
     public static SyntaxTree SyntaxTree([StringSyntax(StringSyntax.CSharp)] string source)
@@ -125,5 +177,12 @@ public static class TestSourceBuilder
             throw new ArgumentNullException(nameof(expression));
 
         return $"{expression.Split(".").Last()} = {value}";
+    }
+
+    private static string AdditionalUsings(TestSourceBuilderOptions options)
+    {
+        var additionalUsings =
+            options.AdditionalUsings != null ? string.Join(_newlines, options.AdditionalUsings.Select(u => $"using {u};")) : string.Empty;
+        return Environment.NewLine + additionalUsings;
     }
 }

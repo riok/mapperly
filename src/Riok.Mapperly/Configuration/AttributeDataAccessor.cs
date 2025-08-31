@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Configuration.MethodReferences;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
 
@@ -173,7 +174,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             ),
             _ when arg.IsNull => null,
             _ when targetType == typeof(IMemberPathConfiguration) => CreateMemberPath(arg, syntax, symbolAccessor),
-            _ when targetType == typeof(MethodReferenceConfiguration) => CreateMethodReference(arg, syntax, symbolAccessor),
+            _ when targetType == typeof(IMethodReferenceConfiguration) => CreateMethodReference(arg, syntax, symbolAccessor),
             TypedConstantKind.Enum => GetEnumValue(arg, targetType),
             TypedConstantKind.Array => BuildArrayValue(arg, targetType, symbolAccessor),
             TypedConstantKind.Primitive => arg.Value,
@@ -250,7 +251,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return new SymbolMemberPath(memberPath.ToImmutableEquatableArray());
     }
 
-    private static MethodReferenceConfiguration CreateMethodReference(
+    private static IMethodReferenceConfiguration CreateMethodReference(
         TypedConstant arg,
         AttributeArgumentSyntax? syntax,
         SymbolAccessor? symbolAccessor
@@ -260,7 +261,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
         if (arg.Kind != TypedConstantKind.Primitive)
         {
-            throw new InvalidOperationException($"Cannot create {nameof(MethodReferenceConfiguration)} from {arg.Kind}");
+            throw new InvalidOperationException($"Cannot create {nameof(IMethodReferenceConfiguration)} from {arg.Kind}");
         }
 
         if (
@@ -276,7 +277,20 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         {
             var splitPoint = v.LastIndexOf(MemberPathConstants.MemberAccessSeparator);
             var methodName = splitPoint == -1 ? v : v[(splitPoint + 1)..];
-            return new MethodReferenceConfiguration(methodName);
+            var targetTypeName = splitPoint == -1 ? null : v[..splitPoint];
+            if (targetTypeName != null)
+            {
+                var targetType = symbolAccessor.GetTypeByMetadataName(targetTypeName, syntax);
+                if (targetType != null)
+                {
+                    return new ExternalStaticMethodReferenceConfiguration(methodName, targetType);
+                }
+                else
+                {
+                    return new InvalidMethodReferenceConfiguration(methodName, targetTypeName);
+                }
+            }
+            return new InternalMethodReferenceConfiguration(methodName);
         }
 
         throw new InvalidOperationException($"Unknown method reference configuration: {arg.Value}");
@@ -285,7 +299,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     private static bool TryCreateNameOfMethodReferenceConfiguration(
         InvocationExpressionSyntax nameofSyntax,
         SymbolAccessor symbolAccessor,
-        [NotNullWhen(true)] out MethodReferenceConfiguration? configuration
+        [NotNullWhen(true)] out IMethodReferenceConfiguration? configuration
     )
     {
         configuration = null;
@@ -309,21 +323,20 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             return true;
         }
 
-        var containingType = symbolAccessor.GetContainingTypeSymbol(nameofSyntax);
-        if (containingType is null || operation.Type is not INamedTypeSymbol typeSymbol || containingType.Extends(typeSymbol))
+        if (operation.Type is not INamedTypeSymbol typeSymbol || symbolAccessor.IsMapperOrBaseClass(typeSymbol))
         {
-            configuration = new MethodReferenceConfiguration(memberName);
+            configuration = new InternalMethodReferenceConfiguration(memberName);
             return true;
         }
 
         var field = operation.GetMemberSymbol();
         if (field is null)
         {
-            configuration = new StaticMethodReferenceConfiguration(memberName, typeSymbol);
+            configuration = new ExternalStaticMethodReferenceConfiguration(memberName, typeSymbol);
             return true;
         }
 
-        configuration = new InstanceMethodReferenceConfiguration(memberName, field, typeSymbol);
+        configuration = new ExternalInstanceMethodReferenceConfiguration(memberName, field, typeSymbol);
         return true;
     }
 

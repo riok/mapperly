@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Riok.Mapperly.Configuration.MethodReferences;
 using Riok.Mapperly.Descriptors;
 
 namespace Riok.Mapperly.Configuration;
@@ -16,7 +17,7 @@ public record MemberMappingConfiguration(IMemberPathConfiguration Source, IMembe
 
     public string? FormatProvider { get; set; }
 
-    public MethodReferenceConfiguration? Use { get; set; }
+    public IMethodReferenceConfiguration? Use { get; set; }
 
     public bool SuppressNullMismatchDiagnostic { get; set; }
 

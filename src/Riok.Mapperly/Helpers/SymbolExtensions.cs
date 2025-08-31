@@ -266,9 +266,12 @@ internal static class SymbolExtensions
         return false;
     }
 
-    internal static bool Extends(this ITypeSymbol? derivedType, ITypeSymbol baseType)
+    internal static bool ExtendsOrSelf(this ITypeSymbol? derivedType, ITypeSymbol baseType)
     {
-        while (derivedType is not null)
+        if (baseType.SpecialType == SpecialType.System_Object)
+            return derivedType is not null;
+
+        while (derivedType is not null && derivedType.SpecialType != SpecialType.System_Object)
         {
             if (SymbolEqualityComparer.Default.Equals(baseType, derivedType))
             {
