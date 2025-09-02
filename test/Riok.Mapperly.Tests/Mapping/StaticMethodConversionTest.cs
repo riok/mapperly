@@ -215,9 +215,23 @@ public class StaticMethodConversionTest
         var source = TestSourceBuilder.Mapping(
             "B",
             "A",
-            "class A { [MapperIgnore] public static A fromB(B source) => new(); public static A CreateFrom(B source) => new(); }",
+            "class A { [MapperIgnore] public static A"
+                + nameof(FromB)
+                + "(B source) => new(); public static A CreateFrom(B source) => new(); }",
             "class B {}"
         );
         TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return global::A.CreateFrom(source);");
+    }
+
+    [Fact]
+    public void IgnoredTargetFactoryMethodShouldFallbackToConstructor()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "B",
+            "A",
+            "class A { public A(B source) {} [MapperIgnore] public static A FromB(B source) => new(source); }",
+            "class B {}"
+        );
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return new global::A(source);");
     }
 }

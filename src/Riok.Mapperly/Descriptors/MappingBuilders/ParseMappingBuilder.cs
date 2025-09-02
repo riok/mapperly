@@ -24,6 +24,7 @@ public static class ParseMappingBuilder
             .Where(m =>
                 m is { IsStatic: true, ReturnsVoid: false, IsAsync: false, Parameters.Length: 1 }
                 && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type, ctx.Source)
+                && !ctx.SymbolAccessor.HasAttribute<MapperIgnoreAttribute>(m)
             )
             .ToList();
 
