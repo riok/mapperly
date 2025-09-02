@@ -33,8 +33,9 @@ internal static class SyntaxProvider
     )
     {
         var metadataProviderProperty =
-            context.GetType().GetProperty(nameof(context.MetadataReferencesProvider))
-            ?? throw new Exception($"The property '{nameof(context.MetadataReferencesProvider)}' not found");
+            context.GetType().GetProperty(nameof(context.MetadataReferencesProvider)) ?? throw new Exception(
+                $"The property '{nameof(context.MetadataReferencesProvider)}' not found"
+            );
 
         var metadataProvider = metadataProviderProperty.GetValue(context);
 
