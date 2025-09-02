@@ -197,4 +197,27 @@ public class StaticMethodConversionTest
             .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public void IgnoredSourceStaticMethodShouldNotBeUsed()
+    {
+        var source = TestSourceBuilder.Mapping("A", "int", "class A { [MapperIgnore] public static int ToInt32(A source) => 42; }");
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void IgnoredTargetFactoryMethodShouldBeSkippedIfAlternativeExists()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "B",
+            "A",
+            "class A { [MapperIgnore] public static A fromB(B source) => new(); public static A CreateFrom(B source) => new(); }",
+            "class B {}"
+        );
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return global::A.CreateFrom(source);");
+    }
 }
