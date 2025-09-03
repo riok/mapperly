@@ -55,4 +55,16 @@ public class ParseTest
             .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public void IgnoredParseMethodShouldBeSkipped()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "string",
+            "A",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.Constructor),
+            "class A { [MapperIgnore] public static A Parse(string source) => new(); public static A Create(string source) => new(); }"
+        );
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return global::A.Create(source);");
+    }
 }

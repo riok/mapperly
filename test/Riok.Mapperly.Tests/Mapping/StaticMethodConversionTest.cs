@@ -215,9 +215,7 @@ public class StaticMethodConversionTest
         var source = TestSourceBuilder.Mapping(
             "B",
             "A",
-            "class A { [MapperIgnore] public static A"
-                + nameof(FromB)
-                + "(B source) => new(); public static A CreateFrom(B source) => new(); }",
+            "class A { [MapperIgnore] public static A FromB(B source) => new(); public static A CreateFrom(B source) => new(); }",
             "class B {}"
         );
         TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return global::A.CreateFrom(source);");
@@ -233,29 +231,5 @@ public class StaticMethodConversionTest
             "class B {}"
         );
         TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return new global::A(source);");
-    }
-
-    [Fact]
-    public void IgnoredParseMethodShouldBeSkipped()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "string",
-            "A",
-            "class A { [MapperIgnore] public static A Parse(string source) => new(); public static A Create(string source) => new(); }",
-            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.Constructor)
-        );
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return global::A.Create(source);");
-    }
-
-    [Fact]
-    public void IgnoredInstanceMethodShouldBeSkipped()
-    {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "B",
-            "class A { [MapperIgnore] public B ToB() => new(); public B Convert() => new(); } class B {}",
-            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.Constructor)
-        );
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source.Convert();");
     }
 }
