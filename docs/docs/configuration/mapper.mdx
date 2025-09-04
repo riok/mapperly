@@ -89,7 +89,7 @@ public partial class CarMapper
 
 #### Ignore a member at definition
 
-To ignore a property or field at definition, the `MapperIgnoreAttribute` can be used.
+To ignore a property, field, or method at definition, the `MapperIgnoreAttribute` can be used.
 
 ```csharp
 public partial class CarMapper
@@ -110,6 +110,25 @@ public class Car
 public class CarDto
 {
     public string ModelName { get; set; }
+}
+```
+To exclude conversion methods from being used in mappings, annotate them with `MapperIgnore`:
+
+```csharp
+public class A
+{
+    // Prevents using Parse(string) in string -> A mappings
+    [MapperIgnore]
+    public static A Parse(string s) => new();
+
+    // Alternative factory is still considered
+    public static A Create(string s) => new();
+
+    // Prevents using ToB() in A -> B mappings
+    [MapperIgnore]
+    public B ToB() => new();
+
+    public B Convert() => new();
 }
 ```
 
