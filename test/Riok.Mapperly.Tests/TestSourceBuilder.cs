@@ -53,17 +53,17 @@ public static class TestSourceBuilder
 
         return CSharp(
             $$"""
-              {{DefaultUsingDirectives}}{{additionalUsings}}
-              {{(options.Namespace != null ? $"namespace {options.Namespace};" : "")}}
+            {{DefaultUsingDirectives}}{{additionalUsings}}
+            {{(options.Namespace != null ? $"namespace {options.Namespace};" : "")}}
 
-              {{BuildAttribute(options)}}
-              public {{(options.Static ? "static " : "")}}partial class {{options.MapperClassName}}{{(
-                  options.MapperBaseClassName != null ? " : " + options.MapperBaseClassName : ""
-              )}}
-              {
-                  {{body}}
-              }
-              """
+            {{BuildAttribute(options)}}
+            public {{(options.Static ? "static " : "")}}partial class {{options.MapperClassName}}{{(
+                options.MapperBaseClassName != null ? " : " + options.MapperBaseClassName : ""
+            )}}
+            {
+                {{body}}
+            }
+            """
         );
     }
 
@@ -77,19 +77,19 @@ public static class TestSourceBuilder
 
         return CSharp(
             $$"""
-              {{DefaultUsingDirectives}}{{additionalUsings}}
+            {{DefaultUsingDirectives}}{{additionalUsings}}
 
-              namespace {{options.Namespace ?? DefaultNamespace}} {
+            namespace {{options.Namespace ?? DefaultNamespace}} {
 
-                  {{BuildAttribute(options)}}
-                  public {{(options.Static ? "static " : "")}}partial class {{options.MapperClassName}}{{(
-                      options.MapperBaseClassName != null ? " : " + options.MapperBaseClassName : ""
-                  )}}
-                  {
-                      {{body}}
-                  }
-              }
-              """
+                {{BuildAttribute(options)}}
+                public {{(options.Static ? "static " : "")}}partial class {{options.MapperClassName}}{{(
+                        options.MapperBaseClassName != null ? " : " + options.MapperBaseClassName : ""
+                    )}}
+                {
+                    {{body}}
+                }
+            }
+            """
         );
     }
 
