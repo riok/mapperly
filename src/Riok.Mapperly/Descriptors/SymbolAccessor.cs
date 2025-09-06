@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Helpers;
@@ -20,15 +21,20 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     private readonly ConditionalWeakTable<ITypeSymbol, ITypeSymbol> _originalNullableTypes = new();
     private readonly Dictionary<ISymbol, ImmutableArray<AttributeData>> _attributes = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<ISymbol>> _allMembers = new(SymbolEqualityComparer.Default);
+
     private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<IMappableMember>> _allAccessibleMembers = new(
         SymbolEqualityComparer.Default
     );
+
     private readonly Dictionary<ITypeSymbol, IReadOnlyDictionary<string, IMappableMember>> _allAccessibleMembersCaseInsensitive = new(
         SymbolEqualityComparer.Default
     );
+
     private readonly Dictionary<ITypeSymbol, IReadOnlyDictionary<string, IMappableMember>> _allAccessibleMembersCaseSensitive = new(
         SymbolEqualityComparer.Default
     );
+
+    private readonly Dictionary<(SyntaxNode Context, string TypeName), INamedTypeSymbol?> _typeByMetadataNameCache = new();
 
     private MemberVisibility _memberVisibility = MemberVisibility.AllAccessible;
     private MemberVisibility _constructorVisibility = MemberVisibility.AllAccessible;
@@ -38,6 +44,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     private readonly Lazy<INamedTypeSymbol> _lazyEnumerableType = new(() =>
         compilationContext.Compilation.GetSpecialType(SpecialType.System_Collections_Generic_IEnumerable_T)
     );
+
     private INamedTypeSymbol EnumerableTypeSymbol => _lazyEnumerableType.Value;
 
     internal void SetMemberVisibility(MemberVisibility visibility) => _memberVisibility = visibility;
@@ -477,7 +484,28 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         return symbolMembers.GetValueOrDefault(name);
     }
 
-    public IOperation? GetOperation(SyntaxNode node) => compilationContext.GetSemanticModel(node.SyntaxTree)?.GetOperation(node);
+    public TOperation? GetOperation<TOperation>(SyntaxNode node)
+        where TOperation : class, IOperation => compilationContext.GetSemanticModel(node.SyntaxTree)?.GetOperation(node) as TOperation;
+
+    public SyntaxNode? GetContainingTypeSyntax(SyntaxNode? node)
+    {
+        while (node is not null and not BaseTypeDeclarationSyntax)
+        {
+            node = node.Parent;
+        }
+
+        if (node is null)
+        {
+            return null;
+        }
+
+        return node;
+    }
+
+    public bool IsMapperOrBaseClass(INamedTypeSymbol typeSymbol)
+    {
+        return mapperSymbol.ExtendsOrSelf(typeSymbol);
+    }
 
     private ImmutableArray<AttributeData> GetAttributesCore(ISymbol symbol)
     {
@@ -518,5 +546,67 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
             .DistinctBy(x => x.Name)
             .Select(x => MappableMember.Create(this, x))
             .WhereNotNull();
+    }
+
+    public INamedTypeSymbol? GetTypeByMetadataName(string targetTypeName, SyntaxNode? contextNode)
+    {
+        if (contextNode is null)
+        {
+            return null;
+        }
+
+        var startsWithGlobal = targetTypeName.StartsWith("global::", StringComparison.Ordinal);
+        var isFullyQualified = targetTypeName.Contains('.', StringComparison.Ordinal) || startsWithGlobal;
+        if (isFullyQualified && !startsWithGlobal)
+        {
+            targetTypeName = "global::" + targetTypeName;
+        }
+
+        var containingType = GetContainingTypeSyntax(contextNode);
+        if (containingType is not null && _typeByMetadataNameCache.TryGetValue((containingType, targetTypeName), out var cachedType))
+        {
+            return cachedType;
+        }
+
+        var semanticModel = compilationContext.GetSemanticModel(contextNode.SyntaxTree);
+        if (semanticModel is null)
+        {
+            return null;
+        }
+
+        var accessibleSymbols = semanticModel.LookupSymbols(contextNode.SpanStart);
+        INamedTypeSymbol? result = null;
+        foreach (var accessibleSymbol in accessibleSymbols)
+        {
+            if (accessibleSymbol is not INamedTypeSymbol namedTypeSymbol)
+            {
+                continue;
+            }
+
+            if (isFullyQualified)
+            {
+                var displayString = namedTypeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+                if (string.Equals(displayString, targetTypeName, StringComparison.Ordinal))
+                {
+                    result = namedTypeSymbol;
+                    break;
+                }
+            }
+            else
+            {
+                if (string.Equals(namedTypeSymbol.Name, targetTypeName, StringComparison.Ordinal))
+                {
+                    result = namedTypeSymbol;
+                    break;
+                }
+            }
+        }
+
+        if (result != null && containingType != null)
+        {
+            _typeByMetadataNameCache[(containingType, targetTypeName)] = result;
+        }
+
+        return result;
     }
 }

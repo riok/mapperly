@@ -683,4 +683,227 @@ public class ObjectPropertyUseNamedMappingTest
             .HaveDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, "The referenced mapping named MapValue was not found")
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public Task ShouldSupportExternalMappingsOnStaticMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@OtherMapper.ModifyString)]
+            private static partial B Map(A source);
+            """,
+            "record A(string Value);",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public static string ModifyString(string source) => source + "-externally-modified";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldSupportExternalMappingsOnStringWithSameNamespace()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = $"{nameof(OtherMapper)}.{nameof(OtherMapper.ModifyString)}")]
+            private static partial B Map(A source);
+            """,
+            new TestSourceBuilderOptions { Namespace = "MyNamespace" },
+            "record A(string Value);",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public static string ModifyString(string source) => source + "-externally-modified";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldSupportExternalMappingsOnStringWithUsingNamespace()
+    {
+        var source = TestSourceBuilder.MapperWithBodyInBlockScopedNamespace(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = $"{nameof(OtherMapper)}.{nameof(OtherMapper.ModifyString)}")]
+            private static partial B Map(A source);
+            """,
+            new TestSourceBuilderOptions { AdditionalUsings = ["OtherNamespace"] }
+        );
+        source = TestSourceBuilder.Append(source, ["record A(string Value);", "record B(string Value);"]);
+
+        source = TestSourceBuilder.Append(
+            source,
+            "OtherNamespace",
+            [
+                """
+                class OtherMapper
+                {
+                    public static string ModifyString(string source) => source + "-externally-modified";
+                }
+                """,
+            ]
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldSupportExternalMappingsOnStringWithFullNameSpecification()
+    {
+        var source = TestSourceBuilder.MapperWithBodyInBlockScopedNamespace(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = "OtherNamespace.OtherMapper.ModifyString")]
+            private static partial B Map(A source);
+            """,
+            new TestSourceBuilderOptions { AdditionalUsings = ["OtherNamespace"] }
+        );
+        source = TestSourceBuilder.Append(source, ["record A(string Value);", "record B(string Value);"]);
+
+        source = TestSourceBuilder.Append(
+            source,
+            "OtherNamespace",
+            [
+                """
+                class OtherMapper
+                {
+                    public static string ModifyString(string source) => source + "-externally-modified";
+                }
+                """,
+            ]
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldSupportExternalMappingsOnInstanceField()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper mapper = new();
+
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@mapper.ModifyString)]
+            private partial B Map(A source);
+            """,
+            "record A(string Value);",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public string ModifyString(string source) => source + "-externally-modified";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldSupportExternalMappingsOnInstanceProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper Mapper { get; } = new();
+
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@Mapper.ModifyString)]
+            private partial B Map(A source);
+
+            public string ModifyString(string source) => source + "-modified";
+            """,
+            "record A(string Value);",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public string ModifyString(string source) => source + "-externally-modified";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldReportNonExistentStaticExternalMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@OtherMapper.ModifyString)]
+            private static partial B Map(A source);
+            """,
+            "record A(string Value);",
+            "record B(string Value);",
+            "class OtherMapper;"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldReportNonExistentExternalMappingsOnInstanceReference()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper mapper = new();
+
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@mapper.ModifyString)]
+            private partial B Map(A source);
+            """,
+            "record A(string Value);",
+            "record B(string Value);",
+            "class OtherMapper;"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldReportNonExistentInstanceFieldReference()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@mapper.ModifyString)]
+            private partial B Map(A source);
+            """,
+            "record A(string Value);",
+            "record B(string Value);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldReportExternalMappingsOnStringWithoutUsingNamespace()
+    {
+        var source = TestSourceBuilder.MapperWithBodyInBlockScopedNamespace(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = "OtherMapper.ModifyString")]
+            private static partial B Map(A source);
+            """
+        );
+        source = TestSourceBuilder.Append(source, ["record A(string Value);", "record B(string Value);"]);
+
+        source = TestSourceBuilder.Append(
+            source,
+            "OtherNamespace",
+            [
+                """
+                class OtherMapper
+                {
+                    public static string ModifyString(string source) => source + "-externally-modified";
+                }
+                """,
+            ]
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }
