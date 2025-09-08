@@ -89,6 +89,22 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public static partial global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionWithParameters> ProjectToDto(this global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionBaseType> q, int valueFromParameter)
+        {
+#nullable disable
+            return global::System.Linq.Queryable.Select(
+                q,
+                x => new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionWithParameters()
+                {
+                    Id = x.Id,
+                    BaseValue = x.BaseValue,
+                    ValueFromParameter = valueFromParameter,
+                }
+            );
+#nullable enable
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         private static partial global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection ProjectToDto(this global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjection testObject)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection(testObject.CtorValue)

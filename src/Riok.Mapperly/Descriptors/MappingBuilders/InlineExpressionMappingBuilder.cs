@@ -26,7 +26,7 @@ public static class InlineExpressionMappingBuilder
 
         var methodSyntax = methodSyntaxRef.GetSyntax();
 
-        if (methodSyntax is not MethodDeclarationSyntax { ParameterList.Parameters: [var sourceParameter] } methodDeclaration)
+        if (methodSyntax is not MethodDeclarationSyntax { ParameterList.Parameters: [var sourceParameter, ..] } methodDeclaration)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, mapping.Method);
             return null;

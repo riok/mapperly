@@ -13,6 +13,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public static partial IQueryable<TestObjectDtoProjectionBaseType> ProjectToDto(this IQueryable<TestObjectProjectionBaseType> q);
 
+        public static partial IQueryable<TestObjectDtoProjectionWithParameters> ProjectToDto(
+            this IQueryable<TestObjectProjectionBaseType> q,
+            int valueFromParameter
+        );
+
         [MapperIgnoreTarget(nameof(TestObjectDtoProjection.IgnoredStringValue))]
         [MapperIgnoreTarget(nameof(TestObjectDtoProjection.IgnoredIntValue))]
         [MapperIgnoreSource(nameof(TestObjectProjection.IgnoredStringValue))]

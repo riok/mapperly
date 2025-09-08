@@ -25,6 +25,7 @@ public static class QueryableMappingBuilder
 
         var mappingKey = TryBuildMappingKey(ctx, sourceType, targetType);
         var userMapping = ctx.FindMapping(sourceType, targetType) as IUserMapping;
+
         var inlineCtx = new InlineExpressionMappingBuilderContext(ctx, userMapping, mappingKey);
         if (userMapping is UserImplementedMethodMapping && inlineCtx.FindMapping(sourceType, targetType) is { } inlinedUserMapping)
         {

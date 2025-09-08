@@ -37,6 +37,17 @@ namespace Riok.Mapperly.IntegrationTests
         }
 
         [Fact]
+        [VersionedSnapshot(Versions.NET8_0 | Versions.NET9_0)]
+        public Task ProjectionWithParametersShouldTranslateToQuery()
+        {
+            return RunWithDatabase(ctx =>
+            {
+                var query = ctx.BaseTypeObjects.ProjectToDto(valueFromParameter: 10);
+                return Verifier.Verify(query.ToQueryString(), "sql");
+            });
+        }
+
+        [Fact]
         public Task ProjectionShouldTranslateToResult()
         {
             return RunWithDatabase(async ctx =>
