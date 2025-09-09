@@ -130,7 +130,7 @@ public static class UserMethodMappingExtractor
         var userMappingConfig = GetUserMappingConfig(ctx, method, out var hasAttribute);
         var valid = !method.IsGenericMethod && (allowPartial || !method.IsPartialDefinition) && (!isStatic || method.IsStatic);
 
-        if (!valid || !UserMappingMethodParameterExtractor.BuildParameters(ctx, method, false, out var parameters))
+        if (!valid || !UserMappingMethodParameterExtractor.BuildParameters(ctx, method, out var parameters))
         {
             if (!hasAttribute)
                 return null;
@@ -162,6 +162,7 @@ public static class UserMethodMappingExtractor
             method,
             userMappingConfig.Default,
             parameters.Source,
+            parameters.AdditionalParameters,
             targetType,
             parameters.ReferenceHandler,
             isExternal,
@@ -204,7 +205,7 @@ public static class UserMethodMappingExtractor
         if (TryBuildRuntimeTargetTypeMapping(ctx, methodSymbol) is { } userMapping)
             return userMapping;
 
-        if (!UserMappingMethodParameterExtractor.BuildParameters(ctx, methodSymbol, true, out var parameters))
+        if (!UserMappingMethodParameterExtractor.BuildParameters(ctx, methodSymbol, out var parameters))
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, methodSymbol, methodSymbol.Name);
             return null;

@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Symbols;
 
@@ -38,6 +39,12 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
     public IReadOnlyDictionary<TypeMappingKey, INewInstanceMapping> NewInstanceMappings => mappings.NewInstanceMappings;
 
     public INewInstanceMapping? Find(TypeMappingKey mapping) => mappings.FindNewInstanceMapping(mapping);
+
+    public INewInstanceMapping? FindWithParameters(
+        ITypeSymbol source,
+        ITypeSymbol target,
+        IReadOnlyCollection<MethodParameter> additionalParameters
+    ) => mappings.FindNewInstanceMappingWithParameters(source, target, additionalParameters);
 
     public INewInstanceMapping? FindOrResolveNamed(SimpleMappingBuilderContext ctx, string name, out bool ambiguousName)
     {

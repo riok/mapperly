@@ -12,7 +12,6 @@ internal static class UserMappingMethodParameterExtractor
     public static bool BuildParameters(
         SimpleMappingBuilderContext ctx,
         IMethodSymbol method,
-        bool allowAdditionalParameters,
         [NotNullWhen(true)] out MappingMethodParameters? parameters
     )
     {
@@ -45,11 +44,6 @@ internal static class UserMappingMethodParameterExtractor
                 p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != targetParameterOrdinal && p.Ordinal != refHandlerParameterOrdinal
             )
             .ToList();
-        if (!allowAdditionalParameters && additionalParameterSymbols.Count > 0)
-        {
-            parameters = null;
-            return false;
-        }
 
         // additional parameters should not be attributed as target or ref handler
         var hasInvalidAdditionalParameter = additionalParameterSymbols.Exists(p =>

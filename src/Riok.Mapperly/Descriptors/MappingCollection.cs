@@ -4,6 +4,7 @@ using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -59,6 +60,12 @@ public class MappingCollection
     public INewInstanceMapping? FindNewInstanceMapping(TypeMappingKey mappingKey) => _newInstanceMappings.Find(mappingKey);
 
     public INewInstanceUserMapping? FindNewInstanceUserMapping(IMethodSymbol method) => _newInstanceMappings.FindUserMapping(method);
+
+    public INewInstanceMapping? FindNewInstanceMappingWithParameters(
+        ITypeSymbol source,
+        ITypeSymbol target,
+        IReadOnlyCollection<MethodParameter> additionalParameters
+    ) => _newInstanceMappings.FindWithParameters(source, target, additionalParameters);
 
     public INewInstanceMapping? FindNamedNewInstanceMapping(string name, out bool ambiguousName) =>
         _newInstanceMappings.FindNamed(name, out ambiguousName);
@@ -218,6 +225,39 @@ public class MappingCollection
             }
 
             return mapping;
+        }
+
+        public T? FindWithParameters(ITypeSymbol source, ITypeSymbol target, IReadOnlyCollection<MethodParameter> additionalParameters)
+        {
+            // First, try to find user mappings that match both type signature and parameter signature
+            var userMapping = _userMappingsByMethod.Values.FirstOrDefault(userMapping =>
+                SymbolEqualityComparer.Default.Equals(userMapping.SourceType, source)
+                && SymbolEqualityComparer.Default.Equals(userMapping.TargetType, target)
+                && userMapping is MethodMapping methodMapping
+                && ParametersMatch(methodMapping.AdditionalSourceParameters, additionalParameters)
+            );
+
+            if (userMapping is null)
+                return default;
+
+            // Mark this mapping key as used
+            var mappingKey = new TypeMappingKey(source, target);
+            _usedMappingKeys.Add(mappingKey);
+
+            return userMapping;
+        }
+
+        private static bool ParametersMatch(
+            IReadOnlyCollection<MethodParameter> userMappingParams,
+            IReadOnlyCollection<MethodParameter> additionalParameters
+        )
+        {
+            return userMappingParams.All(mappingParam =>
+                additionalParameters.Any(param =>
+                    SymbolEqualityComparer.Default.Equals(param.Type, mappingParam.Type)
+                    && string.Equals(param.Name, mappingParam.Name, StringComparison.Ordinal)
+                )
+            );
         }
 
         public T? FindNamed(string name, out bool ambiguousName)

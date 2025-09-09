@@ -15,6 +15,7 @@ public class UserImplementedMethodMapping(
     IMethodSymbol method,
     bool? isDefault,
     MethodParameter sourceParameter,
+    IReadOnlyCollection<MethodParameter> additionalSourceParameters,
     ITypeSymbol targetType,
     MethodParameter? referenceHandlerParameter,
     bool isExternal,
@@ -34,6 +35,8 @@ public class UserImplementedMethodMapping(
 
     public bool IsExternal { get; } = isExternal;
 
+    public IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; } = additionalSourceParameters;
+
     public override IEnumerable<TypeMappingKey> BuildAdditionalMappingKeys(TypeMappingConfiguration config)
     {
         var keys = base.BuildAdditionalMappingKeys(config);
@@ -52,14 +55,20 @@ public class UserImplementedMethodMapping(
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
+        var arguments = new List<MethodArgument?>
+        {
+            sourceParameter.WithArgument(ctx.Source),
+            referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler),
+        };
+        arguments.AddRange(AdditionalSourceParameters.Select(p => (MethodArgument?)p.WithArgument(IdentifierName(p.Name))));
+
         // if the user implemented method is on an interface,
         // we explicitly cast to be able to use the default interface implementation or explicit implementations
         if (Method.ReceiverType?.TypeKind != TypeKind.Interface)
         {
             return ctx.SyntaxFactory.Invocation(
                 receiver == null ? IdentifierName(Method.Name) : MemberAccess(receiver, Method.Name),
-                sourceParameter.WithArgument(ctx.Source),
-                referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+                arguments.ToArray()
             );
         }
 
@@ -68,10 +77,6 @@ public class UserImplementedMethodMapping(
             receiver == null ? ThisExpression() : IdentifierName(receiver)
         );
         var methodExpr = MemberAccess(ParenthesizedExpression(castedReceiver), Method.Name);
-        return ctx.SyntaxFactory.Invocation(
-            methodExpr,
-            sourceParameter.WithArgument(ctx.Source),
-            referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
-        );
+        return ctx.SyntaxFactory.Invocation(methodExpr, arguments.ToArray());
     }
 }

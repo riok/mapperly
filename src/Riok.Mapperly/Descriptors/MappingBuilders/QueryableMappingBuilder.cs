@@ -4,6 +4,7 @@ using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
@@ -24,7 +25,10 @@ public static class QueryableMappingBuilder
         var targetType = targetQueryable.TypeArguments[0];
 
         var mappingKey = TryBuildMappingKey(ctx, sourceType, targetType);
-        var userMapping = ctx.FindMapping(sourceType, targetType) as IUserMapping;
+
+        // Extract additional parameters from the current user mapping (the queryable projection method)
+        var additionalParameters = ctx.UserMapping is MethodMapping methodMapping ? methodMapping.AdditionalSourceParameters : [];
+        var userMapping = ctx.FindMappingWithParameters(sourceType, targetType, additionalParameters) as IUserMapping;
 
         var inlineCtx = new InlineExpressionMappingBuilderContext(ctx, userMapping, mappingKey);
         if (userMapping is UserImplementedMethodMapping && inlineCtx.FindMapping(sourceType, targetType) is { } inlinedUserMapping)
