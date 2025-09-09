@@ -266,4 +266,140 @@ public class QueryableProjectionTest
 
         await TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task QueryableProjectionWithParameterizedPropertyMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source, int multiplier);
+
+            [MapProperty(nameof(A.Value), nameof(B.ProcessedValue), Use = nameof(ProcessValue))]
+            private partial B MapToB(A source, int multiplier);
+
+            private static int ProcessValue(int value, int multiplier) => value * multiplier;
+            """,
+            new TestSourceBuilderOptions { AutoUserMappings = false },
+            "class A { public int Value { get; set; } }",
+            "class B { public int ProcessedValue { get; set; } public int Value { get; set; } public int Multiplier { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task QueryableProjectionWithMultipleParameterizedPropertyMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source, int multiplier, string prefix);
+
+            [MapProperty(nameof(A.Value1), nameof(B.ProcessedValue1), Use = nameof(ProcessValue))]
+            [MapProperty(nameof(A.Value2), nameof(B.ProcessedValue2), Use = nameof(ProcessValueWithPrefix))]
+            private partial B MapToB(A source, int multiplier, string prefix);
+
+            private static string ProcessValue(int value, int multiplier)
+                => (value * multiplier).ToString();
+
+            private static string ProcessValueWithPrefix(int value, int multiplier, string prefix)
+                => prefix + (value * multiplier).ToString();
+            """,
+            "class A { public int Value1 { get; set; } public int Value2 { get; set; } }",
+            "class B { public string ProcessedValue1 { get; set; } public string ProcessedValue2 { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task QueryableProjectionWithParameterizedAndNonParameterizedMethods()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source, int multiplier);
+
+            [MapProperty(nameof(A.Value1), nameof(B.ProcessedValue1), Use = nameof(ProcessValue1))]
+            [MapProperty(nameof(A.Value2), nameof(B.ProcessedValue2), Use = nameof(ProcessValue2))]
+            private partial B MapToB(A source, int multiplier);
+
+            private static int ProcessValue1(int value, int multiplier) => value * multiplier;
+
+            private static int ProcessValue2(int value) => value * 2;
+            """,
+            "class A { public int Value1 { get; set; } public int Value2 { get; set; } }",
+            "class B { public int ProcessedValue1 { get; set; } public int ProcessedValue2 { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task QueryableProjectionWithNestedParameterizedPropertyMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source, int multiplier);
+
+            [MapProperty("Nested.Value", nameof(B.ProcessedValue), Use = nameof(ProcessValue))]
+            private partial B MapToB(A source, int multiplier);
+
+            private static int ProcessValue(int value, int multiplier) => value * multiplier;
+            """,
+            "class A { public C Nested { get; set; } }",
+            "class B { public int ProcessedValue { get; set; } }",
+            "class C { public int Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void QueryableProjectionParameterTypeMismatchShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source, int multiplier);
+
+            [MapProperty(nameof(A.Value), nameof(B.ProcessedValue), Use = nameof(ProcessValue))]
+            private partial B MapToB(A source, int multiplier);
+
+            private static string ProcessValue(int value, string wrongType)
+                => value + wrongType;
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public string ProcessedValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.AdditionalParameterNotMapped)
+            .HaveDiagnostic(DiagnosticDescriptors.AdditionalParameterNotMapped)
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void QueryableProjectionWithTooManyParametersShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source, int multiplier);
+
+            [MapProperty(nameof(A.Value), nameof(B.ProcessedValue), Use = nameof(ProcessValue))]
+            private partial B MapToB(A source, int multiplier);
+
+            private static string ProcessValue(int value, int multiplier, string extraParam)
+                => value + multiplier + extraParam;
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public string ProcessedValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.AdditionalParameterNotMapped)
+            .HaveDiagnostic(DiagnosticDescriptors.AdditionalParameterNotMapped)
+            .HaveAssertedAllDiagnostics();
+    }
 }

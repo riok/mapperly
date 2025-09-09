@@ -99,6 +99,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                     Id = x.Id,
                     BaseValue = x.BaseValue,
                     ValueFromParameter = valueFromParameter,
+                    ValueFromParameter2 = x.BaseValue * valueFromParameter,
                 }
             );
 #nullable enable
@@ -165,6 +166,34 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.IntegerValues = OrderIntegerValues(testObject.IntegerValues);
             target.DecimalValues = OrderAndMapLongValues(testObject.DecimalValues);
             return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static partial global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionWithParameters MapWithParameters(global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionBaseType source, int valueFromParameter)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionWithParameters();
+            target.Id = source.Id;
+            target.BaseValue = source.BaseValue;
+            target.ValueFromParameter = valueFromParameter;
+            target.ValueFromParameter2 = MultiplyValue(source.BaseValue, valueFromParameter);
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static partial global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionWithParameters> ProjectWithParameters(this global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionBaseType> source, int valueFromParameter)
+        {
+#nullable disable
+            return global::System.Linq.Queryable.Select(
+                source,
+                x => new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionWithParameters()
+                {
+                    Id = x.Id,
+                    BaseValue = x.BaseValue,
+                    ValueFromParameter = valueFromParameter,
+                    ValueFromParameter2 = x.BaseValue * valueFromParameter,
+                }
+            );
+#nullable enable
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

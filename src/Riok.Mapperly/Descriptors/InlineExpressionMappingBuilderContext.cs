@@ -22,9 +22,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         : base(ctx, userMapping, null, mappingKey, ignoreDerivedTypes: false, supportsDeepCloning: false)
     {
         // Inherit additional parameters from the parent context if available
-        AdditionalSourceParameters = ctx.UserMapping is MethodMapping { AdditionalSourceParameters.Count: > 0 } methodMapping
-            ? methodMapping.AdditionalSourceParameters
-            : [];
+        AdditionalSourceParameters = ctx.UserMapping is MethodMapping methodMapping ? methodMapping.AdditionalSourceParameters : [];
     }
 
     private InlineExpressionMappingBuilderContext(

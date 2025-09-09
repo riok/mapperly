@@ -1,0 +1,100 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+
+[MapProperty(nameof(A.Value1), nameof(B.ProcessedValue1), Use = nameof(ProcessValue))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[MapProperty(nameof(A.Value2), nameof(B.ProcessedValue2), Use = nameof(ProcessValueWithPrefix))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+private partial B MapToB(A source, int multiplier, string prefix);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*/
+ : (13,0)-(15,66),
+      Message: The additional mapping method parameter multiplier of the method MapToB is not mapped,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG082,
+        Title: An additional mapping method parameter is not mapped,
+        MessageFormat: The additional mapping method parameter {0} of the method {1} is not mapped,
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+
+[MapProperty(nameof(A.Value1), nameof(B.ProcessedValue1), Use = nameof(ProcessValue))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[MapProperty(nameof(A.Value2), nameof(B.ProcessedValue2), Use = nameof(ProcessValueWithPrefix))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+private partial B MapToB(A source, int multiplier, string prefix);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*/
+ : (13,0)-(15,66),
+      Message: The additional mapping method parameter prefix of the method MapToB is not mapped,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG082,
+        Title: An additional mapping method parameter is not mapped,
+        MessageFormat: The additional mapping method parameter {0} of the method {1} is not mapped,
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+
+[MapProperty(nameof(A.Value1), nameof(B.ProcessedValue1), Use = nameof(ProcessValue))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[MapProperty(nameof(A.Value2), nameof(B.ProcessedValue2), Use = nameof(ProcessValueWithPrefix))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+private partial B MapToB(A source, int multiplier, string prefix);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*/
+ : (13,0)-(15,66),
+      Message: The additional mapping method parameter multiplier of the method MapToB is not mapped,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG082,
+        Title: An additional mapping method parameter is not mapped,
+        MessageFormat: The additional mapping method parameter {0} of the method {1} is not mapped,
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+
+[MapProperty(nameof(A.Value1), nameof(B.ProcessedValue1), Use = nameof(ProcessValue))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[MapProperty(nameof(A.Value2), nameof(B.ProcessedValue2), Use = nameof(ProcessValueWithPrefix))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+private partial B MapToB(A source, int multiplier, string prefix);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+*/
+ : (13,0)-(15,66),
+      Message: The additional mapping method parameter prefix of the method MapToB is not mapped,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG082,
+        Title: An additional mapping method parameter is not mapped,
+        MessageFormat: The additional mapping method parameter {0} of the method {1} is not mapped,
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

@@ -41,6 +41,21 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [UserMapping]
         private static TestEnum MapManual(TestObjectProjectionEnumValue source) => source.Value;
 
+        [MapProperty(
+            nameof(TestObjectProjectionBaseType.BaseValue),
+            nameof(TestObjectDtoProjectionWithParameters.ValueFromParameter2),
+            Use = nameof(MultiplyValue)
+        )]
+        private static partial TestObjectDtoProjectionWithParameters MapWithParameters(
+            TestObjectProjectionBaseType source,
+            int valueFromParameter
+        );
+
+        private static partial IQueryable<TestObjectDtoProjectionWithParameters> ProjectWithParameters(
+            this IQueryable<TestObjectProjectionBaseType> source,
+            int valueFromParameter
+        );
+
         [MapDerivedType(typeof(TestObjectProjectionTypeA), typeof(TestObjectDtoProjectionTypeA))]
         [MapDerivedType(typeof(TestObjectProjectionTypeB), typeof(TestObjectDtoProjectionTypeB))]
         private static partial TestObjectDtoProjectionBaseType MapDerived(TestObjectProjectionBaseType source);
@@ -59,5 +74,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         private static int ModifyInt(int v) => v + 10;
 
         private static int MapNullableToNonNullableInt(int? v) => v ?? -1;
+
+        private static int MultiplyValue(int baseValue, int valueFromParameter) => baseValue * valueFromParameter;
     }
 }
