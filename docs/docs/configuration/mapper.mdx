@@ -459,4 +459,35 @@ public partial class CarMapper
     private decimal MapPrice(Car car)
     => car.Price - car.Discount;
 }
-```
+
+
+### Ignoring members and methods
+
+Specific properties, fields, or methods can be excluded from being used in mappings by applying the `[MapperIgnore]` attribute. This is particularly useful when you want to prevent certain members from being included in automatic mappings.
+
+## Ignoring members and methods
+
+```csharp
+public class Source
+{
+    public string Name { get; set; }
+
+    [MapperIgnore]
+    public string SecretValue { get; set; } // This will be ignored in mappings
+}
+
+### Ignoring methods
+
+You can also ignore specific methods from being used as mapping methods:
+
+```csharp
+public class Source
+{
+    // This method will be ignored by Mapperly 
+    [MapperIgnore]
+    public static Target FromSource(Source src) => new();
+
+    // This method will be used for mapping
+    public static Target CreateFrom(Source src) => new();
+}
+

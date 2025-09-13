@@ -41,6 +41,18 @@ public class ParseTest
     }
 
     [Fact]
+    public void IgnoredParseMethodWithAlternativeShouldBeSkipped()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "string",
+            "A",
+            TestSourceBuilderOptions.WithDisabledMappingConversion(MappingConversionType.Constructor),
+            "class A { [MapperIgnore] public static A Parse(string v) => new(); public static A FromString(string v) => new(); }"
+        );
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return global::A.FromString(source);");
+    }
+
+    [Fact]
     public void ParseMappingDisabledShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
