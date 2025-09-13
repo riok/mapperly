@@ -32,6 +32,8 @@ Mapperly implements several types of automatic conversions (in order of priority
 
 Note: To exclude a candidate conversion method (Parse, ToTarget instance methods, or static Create/CreateFrom/From/To methods), annotate that method with `[MapperIgnore]`.
 
+This only works when the annotated method is in the same assembly as the mapper unless Mapperly attributes are preserved at runtime; see the ["Ignore a member at definition"](./mapper.mdx#ignore-a-member-at-definition) section in the mapper configuration docs.
+
 ## Disable all automatic conversions
 
 To disable all conversions supported by Mapperly set `EnabledConversions` to `None`:
