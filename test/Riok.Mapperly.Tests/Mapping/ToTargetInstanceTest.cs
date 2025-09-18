@@ -55,4 +55,11 @@ public class ToTargetInstanceTest
             .HaveDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping)
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public void IgnoredInstanceMethodShouldBeSkipped()
+    {
+        var source = TestSourceBuilder.Mapping("A", "B", "class A { [MapperIgnore] public B ToB() => new(); } class B {}");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("var target = new global::B();\nreturn target;");
+    }
 }

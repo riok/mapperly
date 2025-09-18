@@ -30,6 +30,10 @@ Mapperly implements several types of automatic conversions (in order of priority
 | Static method        | Convert source uses source type static `ToTTarget` method or target type static `CreateFromTTarget`, `FromTSource`, `Create`, `CreateFrom`, except for converting `DateTime` to `DateOnly` or `TimeOnly` | The source type contains a static method with signature `TTarget ToTTarget()` or the target type contains one of the following static methods `TTarget Create(TSource)`, `TTarget CreateFrom(TSource)`, `TTarget CreateFromTTarget(TSource)` `TTarget FromTSource(TSource)` |
 | New instance         | Create a new instance of the target type and map all properties                                                                                                                                          | The target type has a visible constructor or an object factory exists for the target type                                                                                                                                                                                   |
 
+Note: To exclude a candidate conversion method (Parse, ToTarget instance methods, or static Create/CreateFrom/From/To methods), annotate that method with `[MapperIgnore]`.
+
+This only works when the annotated method is in the same assembly as the mapper unless Mapperly attributes are preserved at runtime; see the ["Ignore a member at definition"](./mapper.mdx#ignore-a-member-at-definition) section in the mapper configuration docs.
+
 ## Disable all automatic conversions
 
 To disable all conversions supported by Mapperly set `EnabledConversions` to `None`:
