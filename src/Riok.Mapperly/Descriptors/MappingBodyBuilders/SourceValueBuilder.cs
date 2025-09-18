@@ -9,6 +9,7 @@ using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
@@ -158,7 +159,7 @@ internal static class SourceValueBuilder
     {
         if (TryGetValueProviderMethod(ctx, memberMappingInfo, out var method))
         {
-            sourceValue = new MethodProvidedSourceValue(method.Name);
+            sourceValue = new MethodProvidedSourceValue(method);
             return true;
         }
 
@@ -173,10 +174,14 @@ internal static class SourceValueBuilder
     )
     {
         var mappingName = memberMappingInfo.ValueConfiguration!.Use!;
+
+        // Get additional parameters from the current mapping
+        var additionalParameters = GetAdditionalParameters(ctx);
+
         var namedMethodCandidates = ctx
             .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(ctx.BuilderContext.MapperDeclaration.Symbol)
             .Where(m =>
-                m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
+                m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false }
                 && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualsTo(m, mappingName)
             )
             .ToList();
@@ -188,20 +193,31 @@ internal static class SourceValueBuilder
             return false;
         }
 
+        // Filter by parameter compatibility first
+        var parameterCompatibleMethods = namedMethodCandidates.Where(x => CanMatchMethodParameters(x, additionalParameters)).ToList();
+
+        if (parameterCompatibleMethods.Count == 0)
+        {
+            // No methods match parameter criteria, this is a method signature issue
+            ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.MapValueReferencedMethodNotFound, mappingName);
+            method = null;
+            return false;
+        }
+
         // use non-nullable to allow non-null value type assignments
         // to nullable value types
         // nullable is checked with nullable annotation
-        var methodCandidates = namedMethodCandidates.Where(x =>
+        var typeCompatibleMethods = parameterCompatibleMethods.Where(x =>
             SymbolEqualityComparer.Default.Equals(x.ReturnType.NonNullable(), memberMappingInfo.TargetMember.MemberType.NonNullable())
         );
 
         if (!memberMappingInfo.TargetMember.Member.IsNullable)
         {
             // only assume annotated is nullable, none is threated as non-nullable here
-            methodCandidates = methodCandidates.Where(m => m.ReturnNullableAnnotation != NullableAnnotation.Annotated);
+            typeCompatibleMethods = typeCompatibleMethods.Where(m => m.ReturnNullableAnnotation != NullableAnnotation.Annotated);
         }
 
-        method = methodCandidates.FirstOrDefault();
+        method = typeCompatibleMethods.FirstOrDefault();
         if (method != null)
             return true;
 
@@ -212,5 +228,30 @@ internal static class SourceValueBuilder
             memberMappingInfo.TargetMember.ToDisplayString()
         );
         return false;
+    }
+
+    private static IReadOnlyCollection<MethodParameter> GetAdditionalParameters(IMembersBuilderContext<IMapping> ctx)
+    {
+        return ctx.Mapping is MethodMapping { AdditionalSourceParameters.Count: > 0 } methodMapping
+            ? methodMapping.AdditionalSourceParameters
+            : [];
+    }
+
+    private static bool CanMatchMethodParameters(IMethodSymbol method, IReadOnlyCollection<MethodParameter> additionalParameters)
+    {
+        // For methods with parameters, the first parameter is the source member value,
+        // and the remaining parameters should match with additional parameters
+        if (method.Parameters.Length <= 1)
+            return true;
+
+        // Check if method parameters (after the first one) can be matched with additional parameters by name and type
+        return method
+            .Parameters.Skip(1)
+            .All(mParam =>
+                additionalParameters.Any(param =>
+                    string.Equals(param.Name, mParam.Name, StringComparison.Ordinal)
+                    && SymbolEqualityComparer.Default.Equals(param.Type, mParam.Type)
+                )
+            );
     }
 }

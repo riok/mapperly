@@ -6,6 +6,7 @@ using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -15,8 +16,14 @@ namespace Riok.Mapperly.Descriptors;
 /// </summary>
 public class InlineExpressionMappingBuilderContext : MappingBuilderContext
 {
+    internal IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; }
+
     public InlineExpressionMappingBuilderContext(MappingBuilderContext ctx, IUserMapping? userMapping, TypeMappingKey mappingKey)
-        : base(ctx, userMapping, null, mappingKey, ignoreDerivedTypes: false, supportsDeepCloning: false) { }
+        : base(ctx, userMapping, null, mappingKey, ignoreDerivedTypes: false, supportsDeepCloning: false)
+    {
+        // Inherit additional parameters from the parent context if available
+        AdditionalSourceParameters = ctx.UserMapping is MethodMapping methodMapping ? methodMapping.AdditionalSourceParameters : [];
+    }
 
     private InlineExpressionMappingBuilderContext(
         InlineExpressionMappingBuilderContext ctx,
@@ -25,7 +32,10 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         TypeMappingKey mappingKey,
         bool ignoreDerivedTypes
     )
-        : base(ctx, userMapping, diagnosticLocation, mappingKey, ignoreDerivedTypes, supportsDeepCloning: false) { }
+        : base(ctx, userMapping, diagnosticLocation, mappingKey, ignoreDerivedTypes, supportsDeepCloning: false)
+    {
+        AdditionalSourceParameters = ctx.AdditionalSourceParameters;
+    }
 
     public override bool IsExpression => true;
 

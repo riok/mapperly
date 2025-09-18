@@ -683,4 +683,175 @@ public class ObjectPropertyUseNamedMappingTest
             .HaveDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, "The referenced mapping named MapValue was not found")
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public Task SingleParameterizedPropertyMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.ProcessedValue), Use = nameof(ProcessValue))]
+            partial B Map(A src, int multiplier);
+
+            private static string ProcessValue(int value, int multiplier)
+                => (value * multiplier).ToString();
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public string ProcessedValue { get; set; } public int Value { get; set; } public int Multiplier { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MultipleParametersPropertyMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.ProcessedValue), Use = nameof(ProcessValueWithPrefix))]
+            partial B Map(A src, int multiplier, string prefix);
+
+            private static string ProcessValueWithPrefix(int value, int multiplier, string prefix)
+                => prefix + (value * multiplier).ToString();
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public string ProcessedValue { get; set; } public int Value { get; set; } public int Multiplier { get; set; } public string Prefix { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ParameterizedPropertyMappingWithMultipleProperties()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value1), nameof(B.ProcessedValue1), Use = nameof(ProcessValue))]
+            [MapProperty(nameof(A.Value2), nameof(B.ProcessedValue2), Use = nameof(ProcessValue))]
+            partial B Map(A src, int multiplier);
+
+            private static string ProcessValue(int value, int multiplier)
+                => (value * multiplier).ToString();
+            """,
+            "class A { public int Value1 { get; set; } public int Value2 { get; set; } }",
+            "class B { public string ProcessedValue1 { get; set; } public string ProcessedValue2 { get; set; } public int Multiplier { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void ParameterTypeMismatchShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.ProcessedValue), Use = nameof(ProcessValue))]
+            partial B Map(A src, int multiplier);
+
+            private static string ProcessValue(int value, string wrongType)
+                => value + wrongType;
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public string ProcessedValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.AdditionalParameterNotMapped,
+                "The additional mapping method parameter multiplier of the method Map is not mapped"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void TooManyParametersInReferencedMethodShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.ProcessedValue), Use = nameof(ProcessValue))]
+            partial B Map(A src, int multiplier);
+
+            private static string ProcessValue(int value, int multiplier, string extraParam)
+                => value + multiplier + extraParam;
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public string ProcessedValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.AdditionalParameterNotMapped,
+                "The additional mapping method parameter multiplier of the method Map is not mapped"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void MissingParametersInReferencedMethodShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.ProcessedValue), Use = nameof(ProcessValue))]
+            partial B Map(A src, int multiplier, string prefix);
+
+            private static string ProcessValue(int value, int multiplier)
+                => (value * multiplier).ToString();
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public string ProcessedValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.AdditionalParameterNotMapped,
+                "The additional mapping method parameter prefix of the method Map is not mapped"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.AdditionalParameterNotMapped,
+                "The additional mapping method parameter multiplier of the method Map is not mapped"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public Task ParameterizedPropertyMappingWithNestedProperties()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("Nested.Value", nameof(B.ProcessedValue), Use = nameof(ProcessValue))]
+            partial B Map(A src, int multiplier);
+
+            private static string ProcessValue(int value, int multiplier)
+                => (value * multiplier).ToString();
+            """,
+            "class A { public C Nested { get; set; } }",
+            "class B { public string ProcessedValue { get; set; } public int Multiplier { get; set; } }",
+            "class C { public int Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ParameterizedPropertyMappingWithRecordConstructors()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.ProcessedValue), Use = nameof(ProcessValue))]
+            partial B Map(A src, int multiplier);
+
+            private static string ProcessValue(int value, int multiplier)
+                => (value * multiplier).ToString();
+            """,
+            "record A(int Value);",
+            "record B(string ProcessedValue, int Value, int Multiplier);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }
