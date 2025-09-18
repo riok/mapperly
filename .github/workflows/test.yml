@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
       - run: dotnet build /p:TreatWarningsAsErrors=true
       - run: dotnet test --no-build --logger 'junit' /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
       - uses: test-summary/action@v2
@@ -52,7 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - run: sudo apt update && sudo apt -y install zipmerge # zipmerge is used to merge the multi target nupkg
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
       - run: dotnet tool restore
       - run: RELEASE_VERSION="0.0.1-dev.$GITHUB_RUN_ID" ./build/package.sh
       - uses: actions/upload-artifact@v4
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
       - run: dotnet tool restore
       - uses: actions/download-artifact@v5
         with:
@@ -100,7 +100,7 @@ jobs:
       - run: apk add --no-cache bash icu-libs krb5-libs libgcc libintl libssl1.1 libstdc++ zlib
       # delete global.json since we want to use custom versions here
       - run: rm global.json
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ matrix.dotnet }}
       - run: dotnet --list-sdks
@@ -158,7 +158,7 @@ jobs:
     needs: package
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
       - run: dotnet run --project ./samples/Riok.Mapperly.Sample
 
       # run the same again with the real nuget without runtime assets
