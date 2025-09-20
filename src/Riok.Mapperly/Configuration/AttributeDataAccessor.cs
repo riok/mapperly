@@ -273,27 +273,26 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             return configuration;
         }
 
-        if (arg.Value is string v)
+        if (arg.Value is not string v)
         {
-            var splitPoint = v.LastIndexOf(MemberPathConstants.MemberAccessSeparator);
-            var methodName = splitPoint == -1 ? v : v[(splitPoint + 1)..];
-            var targetTypeName = splitPoint == -1 ? null : v[..splitPoint];
-            if (targetTypeName != null)
-            {
-                var targetType = symbolAccessor.GetTypeByMetadataName(targetTypeName, syntax);
-                if (targetType != null)
-                {
-                    return new ExternalStaticMethodReferenceConfiguration(methodName, targetType);
-                }
-                else
-                {
-                    return new InvalidMethodReferenceConfiguration(methodName, targetTypeName);
-                }
-            }
+            throw new InvalidOperationException($"Unknown method reference configuration: {arg.Value}");
+        }
+
+        var splitPoint = v.LastIndexOf(MemberPathConstants.MemberAccessSeparator);
+        var methodName = splitPoint == -1 ? v : v[(splitPoint + 1)..];
+        var targetTypeName = splitPoint == -1 ? null : v[..splitPoint];
+        if (targetTypeName == null)
+        {
             return new InternalMethodReferenceConfiguration(methodName);
         }
 
-        throw new InvalidOperationException($"Unknown method reference configuration: {arg.Value}");
+        var targetType = symbolAccessor.GetTypeByMetadataName(targetTypeName);
+        if (targetType == null)
+        {
+            return new InvalidMethodReferenceConfiguration(methodName, targetTypeName);
+        }
+
+        return new ExternalStaticMethodReferenceConfiguration(methodName, targetType);
     }
 
     private static bool TryCreateNameOfMethodReferenceConfiguration(

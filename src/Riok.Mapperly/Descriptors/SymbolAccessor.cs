@@ -34,8 +34,6 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         SymbolEqualityComparer.Default
     );
 
-    private readonly Dictionary<(SyntaxNode Context, string TypeName), INamedTypeSymbol?> _typeByMetadataNameCache = new();
-
     private MemberVisibility _memberVisibility = MemberVisibility.AllAccessible;
     private MemberVisibility _constructorVisibility = MemberVisibility.AllAccessible;
 
@@ -548,65 +546,14 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
             .WhereNotNull();
     }
 
-    public INamedTypeSymbol? GetTypeByMetadataName(string targetTypeName, SyntaxNode? contextNode)
+    public INamedTypeSymbol? GetTypeByMetadataName(string targetTypeName)
     {
-        if (contextNode is null)
-        {
-            return null;
-        }
-
         var startsWithGlobal = targetTypeName.StartsWith("global::", StringComparison.Ordinal);
-        var isFullyQualified = targetTypeName.Contains('.', StringComparison.Ordinal) || startsWithGlobal;
-        if (isFullyQualified && !startsWithGlobal)
+        if (startsWithGlobal)
         {
-            targetTypeName = "global::" + targetTypeName;
+            targetTypeName = targetTypeName[8..];
         }
 
-        var containingType = GetContainingTypeSyntax(contextNode);
-        if (containingType is not null && _typeByMetadataNameCache.TryGetValue((containingType, targetTypeName), out var cachedType))
-        {
-            return cachedType;
-        }
-
-        var semanticModel = compilationContext.GetSemanticModel(contextNode.SyntaxTree);
-        if (semanticModel is null)
-        {
-            return null;
-        }
-
-        var accessibleSymbols = semanticModel.LookupSymbols(contextNode.SpanStart);
-        INamedTypeSymbol? result = null;
-        foreach (var accessibleSymbol in accessibleSymbols)
-        {
-            if (accessibleSymbol is not INamedTypeSymbol namedTypeSymbol)
-            {
-                continue;
-            }
-
-            if (isFullyQualified)
-            {
-                var displayString = namedTypeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                if (string.Equals(displayString, targetTypeName, StringComparison.Ordinal))
-                {
-                    result = namedTypeSymbol;
-                    break;
-                }
-            }
-            else
-            {
-                if (string.Equals(namedTypeSymbol.Name, targetTypeName, StringComparison.Ordinal))
-                {
-                    result = namedTypeSymbol;
-                    break;
-                }
-            }
-        }
-
-        if (result != null && containingType != null)
-        {
-            _typeByMetadataNameCache[(containingType, targetTypeName)] = result;
-        }
-
-        return result;
+        return Compilation.GetBestTypeByMetadataName(targetTypeName);
     }
 }

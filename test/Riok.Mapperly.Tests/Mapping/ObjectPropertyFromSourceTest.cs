@@ -281,90 +281,28 @@ public class ObjectPropertyFromSourceTest
     }
 
     [Fact]
-    public Task ShouldSupportExternalMappingsOnStringWithSameNamespace()
+    public Task ShouldSupportExternalMappingsOnStringFullNameSpecification()
     {
-        var source = TestSourceBuilder.MapperWithBodyAndTypes(
-            """
-            [MapPropertyFromSource(nameof(B.FullName), Use = $"{nameof(OtherMapper)}.{nameof(OtherMapper.ToFullName)}")]
-            partial B Map(A source);
-            """,
-            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
-            "class B { public string FullName { get; set; } }",
-            """
-            class OtherMapper
-            {
-                public static string ToFullName(A x) => $"{x.FirstName} {x.LastName}";
-            }
-            """
-        );
-
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task ShouldSupportExternalMappingsOnStringWithUsingNamespace()
-    {
-        var source = TestSourceBuilder.MapperWithBodyInBlockScopedNamespace(
-            """
-            [MapPropertyFromSource(nameof(B.FullName), Use = $"{nameof(OtherMapper)}.{nameof(OtherMapper.ToFullName)}")]
-            partial B Map(A source);
-            """,
-            new TestSourceBuilderOptions { AdditionalUsings = ["OtherNamespace"] }
-        );
-        source = TestSourceBuilder.Append(
-            source,
-            [
-                "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
-                "class B { public string FullName { get; set; } }",
-            ]
-        );
-
-        source = TestSourceBuilder.Append(
-            source,
-            "OtherNamespace",
-            [
-                """
-                class OtherMapper
-                {
-                    public static string ToFullName(MapperNamespace.A x) => $"{x.FirstName} {x.LastName}";
-                }
-                """,
-            ]
-        );
-
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
-    public Task ShouldSupportExternalMappingsOnStringWithFullNameSpecification()
-    {
-        var source = TestSourceBuilder.MapperWithBodyInBlockScopedNamespace(
+        var source = TestSourceBuilder.MapperWithBodyAndTypesInBlockScopedNamespace(
             """
             [MapPropertyFromSource(nameof(B.FullName), Use = "OtherNamespace.OtherMapper.ToFullName")]
             partial B Map(A source);
             """,
-            new TestSourceBuilderOptions { AdditionalUsings = ["OtherNamespace"] }
-        );
-        source = TestSourceBuilder.Append(
-            source,
-            [
-                "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
-                "class B { public string FullName { get; set; } }",
-            ]
+            TestSourceBuilderOptions.Default,
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string FullName { get; set; } }"
         );
 
-        source = TestSourceBuilder.Append(
-            source,
-            "OtherNamespace",
-            [
-                """
+        // language=csharp
+        source += """
+
+            namespace OtherNamespace {
                 class OtherMapper
                 {
                     public static string ToFullName(MapperNamespace.A x) => $"{x.FirstName} {x.LastName}";
                 }
-                """,
-            ]
-        );
+            }
+            """;
 
         return TestHelper.VerifyGenerator(source);
     }

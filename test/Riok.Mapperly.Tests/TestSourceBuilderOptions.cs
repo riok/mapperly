@@ -22,8 +22,7 @@ public record TestSourceBuilderOptions(
     MemberVisibility? IncludedConstructors = null,
     bool Static = false,
     bool PreferParameterlessConstructors = true,
-    bool AutoUserMappings = true,
-    string[]? AdditionalUsings = null
+    bool AutoUserMappings = true
 )
 {
     public const string DefaultMapperClassName = "Mapper";
