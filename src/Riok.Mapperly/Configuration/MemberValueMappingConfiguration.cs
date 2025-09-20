@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Riok.Mapperly.Configuration.MethodReferences;
+using Riok.Mapperly.Configuration.PropertyReferences;
 
 namespace Riok.Mapperly.Configuration;
 

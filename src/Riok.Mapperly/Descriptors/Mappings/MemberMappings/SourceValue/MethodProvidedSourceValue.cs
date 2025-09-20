@@ -9,8 +9,6 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
 /// </summary>
 public class MethodProvidedSourceValue(string methodName, string? targetType) : ISourceValue
 {
-    public ExpressionSyntax Build(TypeMappingBuildContext ctx)
-    {
-        return ctx.SyntaxFactory.Invocation(targetType == null ? IdentifierName(methodName) : MemberAccess(targetType, methodName));
-    }
+    public ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
+        ctx.SyntaxFactory.Invocation(targetType == null ? IdentifierName(methodName) : MemberAccess(targetType, methodName));
 }

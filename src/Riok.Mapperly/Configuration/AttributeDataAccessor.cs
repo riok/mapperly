@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration.MethodReferences;
+using Riok.Mapperly.Configuration.PropertyReferences;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
 

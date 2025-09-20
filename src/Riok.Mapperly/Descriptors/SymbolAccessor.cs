@@ -4,9 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Configuration.PropertyReferences;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 using Riok.Mapperly.Symbols.Members;
@@ -21,15 +20,12 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     private readonly ConditionalWeakTable<ITypeSymbol, ITypeSymbol> _originalNullableTypes = new();
     private readonly Dictionary<ISymbol, ImmutableArray<AttributeData>> _attributes = new(SymbolEqualityComparer.Default);
     private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<ISymbol>> _allMembers = new(SymbolEqualityComparer.Default);
-
     private readonly Dictionary<ITypeSymbol, IReadOnlyCollection<IMappableMember>> _allAccessibleMembers = new(
         SymbolEqualityComparer.Default
     );
-
     private readonly Dictionary<ITypeSymbol, IReadOnlyDictionary<string, IMappableMember>> _allAccessibleMembersCaseInsensitive = new(
         SymbolEqualityComparer.Default
     );
-
     private readonly Dictionary<ITypeSymbol, IReadOnlyDictionary<string, IMappableMember>> _allAccessibleMembersCaseSensitive = new(
         SymbolEqualityComparer.Default
     );
@@ -42,7 +38,6 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     private readonly Lazy<INamedTypeSymbol> _lazyEnumerableType = new(() =>
         compilationContext.Compilation.GetSpecialType(SpecialType.System_Collections_Generic_IEnumerable_T)
     );
-
     private INamedTypeSymbol EnumerableTypeSymbol => _lazyEnumerableType.Value;
 
     internal void SetMemberVisibility(MemberVisibility visibility) => _memberVisibility = visibility;
@@ -484,21 +479,6 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     public TOperation? GetOperation<TOperation>(SyntaxNode node)
         where TOperation : class, IOperation => compilationContext.GetSemanticModel(node.SyntaxTree)?.GetOperation(node) as TOperation;
-
-    public SyntaxNode? GetContainingTypeSyntax(SyntaxNode? node)
-    {
-        while (node is not null and not BaseTypeDeclarationSyntax)
-        {
-            node = node.Parent;
-        }
-
-        if (node is null)
-        {
-            return null;
-        }
-
-        return node;
-    }
 
     public bool IsMapperOrBaseClass(INamedTypeSymbol typeSymbol)
     {
