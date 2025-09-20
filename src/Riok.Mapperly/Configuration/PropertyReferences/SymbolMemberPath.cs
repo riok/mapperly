@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Helpers;
 
-namespace Riok.Mapperly.Configuration;
+namespace Riok.Mapperly.Configuration.PropertyReferences;
 
 /// <summary>
 /// A configured member path consisting of resolved symbols.

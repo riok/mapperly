@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Riok.Mapperly.Configuration.MethodReferences;
+using Riok.Mapperly.Configuration.PropertyReferences;
 
 namespace Riok.Mapperly.Configuration;
 
@@ -11,7 +13,7 @@ public record MemberValueMappingConfiguration(IMemberPathConfiguration Target, A
     public MemberValueMappingConfiguration(IMemberPathConfiguration target)
         : this(target, null) { }
 
-    public string? Use { get; set; }
+    public IMethodReferenceConfiguration? Use { get; set; }
 
     public bool IsValid => Use != null ^ Value != null;
 

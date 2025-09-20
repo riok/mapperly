@@ -74,6 +74,42 @@ public static class TestSourceBuilder
         return MapperWithBody(body, options) + sep + string.Join(sep, types);
     }
 
+    public static string MapperWithBodyAndTypesInBlockScopedNamespace(
+        [StringSyntax(StringSyntax.CSharp)] string body,
+        TestSourceBuilderOptions? options,
+        [StringSyntax(StringSyntax.CSharp)] params string[] types
+    )
+    {
+        const string DefaultNamespace = "MapperNamespace";
+        options ??= TestSourceBuilderOptions.Default;
+        var additionalTypes = "";
+        if (types.Length > 0)
+        {
+            additionalTypes = Environment.NewLine + string.Join(Environment.NewLine, types);
+        }
+
+        return CSharp(
+            $$"""
+            using System;
+            using System.Linq;
+            using System.Collections.Generic;
+            using Riok.Mapperly.Abstractions;
+            using Riok.Mapperly.Abstractions.ReferenceHandling;
+
+            namespace {{options.Namespace ?? DefaultNamespace}} {
+
+                {{BuildAttribute(options)}}
+                public {{(options.Static ? "static " : "")}}partial class {{options.MapperClassName}}{{(
+                        options.MapperBaseClassName != null ? " : " + options.MapperBaseClassName : ""
+                    )}}
+                {
+                    {{body}}
+                }{{additionalTypes}}
+            }
+            """
+        );
+    }
+
     public static SyntaxTree SyntaxTree([StringSyntax(StringSyntax.CSharp)] string source)
     {
         return CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);

@@ -1,4 +1,5 @@
 using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Configuration.PropertyReferences;
 
 namespace Riok.Mapperly.Descriptors;
 

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Configuration.PropertyReferences;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 using Riok.Mapperly.Symbols.Members;
@@ -529,7 +529,13 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         return symbolMembers.GetValueOrDefault(name);
     }
 
-    public IOperation? GetOperation(SyntaxNode node) => compilationContext.GetSemanticModel(node.SyntaxTree)?.GetOperation(node);
+    public TOperation? GetOperation<TOperation>(SyntaxNode node)
+        where TOperation : class, IOperation => compilationContext.GetSemanticModel(node.SyntaxTree)?.GetOperation(node) as TOperation;
+
+    public bool IsMapperOrBaseClass(INamedTypeSymbol typeSymbol)
+    {
+        return mapperSymbol.ExtendsOrSelf(typeSymbol);
+    }
 
     private ImmutableArray<AttributeData> GetAttributesCore(ISymbol symbol)
     {
@@ -570,5 +576,16 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
             .DistinctBy(x => x.Name)
             .Select(x => MappableMember.Create(this, x))
             .WhereNotNull();
+    }
+
+    public INamedTypeSymbol? GetTypeByMetadataName(string targetTypeName)
+    {
+        var startsWithGlobal = targetTypeName.StartsWith("global::", StringComparison.Ordinal);
+        if (startsWithGlobal)
+        {
+            targetTypeName = targetTypeName[8..];
+        }
+
+        return Compilation.GetBestTypeByMetadataName(targetTypeName);
     }
 }

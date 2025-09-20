@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Configuration.PropertyReferences;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
 

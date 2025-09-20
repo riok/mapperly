@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Riok.Mapperly.Configuration.MethodReferences;
+using Riok.Mapperly.Configuration.PropertyReferences;
 using Riok.Mapperly.Descriptors;
 
 namespace Riok.Mapperly.Configuration;
@@ -16,11 +18,12 @@ public record MemberMappingConfiguration(IMemberPathConfiguration Source, IMembe
 
     public string? FormatProvider { get; set; }
 
-    public string? Use { get; set; }
+    public IMethodReferenceConfiguration? Use { get; set; }
 
     public bool SuppressNullMismatchDiagnostic { get; set; }
 
     public bool IsValid => Use == null || FormatProvider == null && StringFormat == null;
 
-    public TypeMappingConfiguration ToTypeMappingConfiguration() => new(StringFormat, FormatProvider, Use, SuppressNullMismatchDiagnostic);
+    public TypeMappingConfiguration ToTypeMappingConfiguration() =>
+        new(StringFormat, FormatProvider, Use?.FullName, SuppressNullMismatchDiagnostic);
 }
