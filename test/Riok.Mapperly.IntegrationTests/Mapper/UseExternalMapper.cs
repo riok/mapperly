@@ -19,6 +19,22 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapValue(nameof(IdObjectDto.IdValue), Use = nameof(@ExternalMapperMethods.IntValueStatic))]
         public static partial IdObjectDto ConstantMapExternal(IdObject source);
 
+        [MapProperty(
+            nameof(IdObject.IdValue),
+            nameof(IdObjectDto.IdValue),
+            Use = "Riok.Mapperly.IntegrationTests.Mapper.ExternalMapperMethods.MapStatic"
+        )]
+        public static partial IdObjectDto MapExternalString(IdObject source);
+
+        [MapPropertyFromSource(
+            nameof(IdObjectDto.IdValue),
+            Use = "Riok.Mapperly.IntegrationTests.Mapper.ExternalMapperMethods.ComputeSumStatic"
+        )]
+        public static partial IdObjectDto MapFromSourceExternalString(IdObject source);
+
+        [MapValue(nameof(IdObjectDto.IdValue), Use = "Riok.Mapperly.IntegrationTests.Mapper.ExternalMapperMethods.IntValueStatic")]
+        public static partial IdObjectDto ConstantMapExternalString(IdObject source);
+
         public static class MyOtherMapper
         {
             public static int MapInt(int source) => source * 10;
