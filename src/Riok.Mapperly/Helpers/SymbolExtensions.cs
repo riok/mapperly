@@ -265,22 +265,4 @@ internal static class SymbolExtensions
         keywordName = null;
         return false;
     }
-
-    internal static bool ExtendsOrSelf(this ITypeSymbol? derivedType, ITypeSymbol baseType)
-    {
-        if (baseType.SpecialType == SpecialType.System_Object)
-            return derivedType is not null;
-
-        while (derivedType is not null && derivedType.SpecialType != SpecialType.System_Object)
-        {
-            if (SymbolEqualityComparer.Default.Equals(baseType, derivedType))
-            {
-                return true;
-            }
-
-            derivedType = derivedType.BaseType;
-        }
-
-        return false;
-    }
 }

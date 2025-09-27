@@ -480,9 +480,15 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     public TOperation? GetOperation<TOperation>(SyntaxNode node)
         where TOperation : class, IOperation => compilationContext.GetSemanticModel(node.SyntaxTree)?.GetOperation(node) as TOperation;
 
-    public bool IsMapperOrBaseClass(INamedTypeSymbol typeSymbol)
+    public INamedTypeSymbol? GetTypeByMetadataName(string targetTypeName)
     {
-        return mapperSymbol.ExtendsOrSelf(typeSymbol);
+        var startsWithGlobal = targetTypeName.StartsWith("global::", StringComparison.Ordinal);
+        if (startsWithGlobal)
+        {
+            targetTypeName = targetTypeName[8..];
+        }
+
+        return Compilation.GetBestTypeByMetadataName(targetTypeName);
     }
 
     private ImmutableArray<AttributeData> GetAttributesCore(ISymbol symbol)
@@ -524,16 +530,5 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
             .DistinctBy(x => x.Name)
             .Select(x => MappableMember.Create(this, x))
             .WhereNotNull();
-    }
-
-    public INamedTypeSymbol? GetTypeByMetadataName(string targetTypeName)
-    {
-        var startsWithGlobal = targetTypeName.StartsWith("global::", StringComparison.Ordinal);
-        if (startsWithGlobal)
-        {
-            targetTypeName = targetTypeName[8..];
-        }
-
-        return Compilation.GetBestTypeByMetadataName(targetTypeName);
     }
 }
