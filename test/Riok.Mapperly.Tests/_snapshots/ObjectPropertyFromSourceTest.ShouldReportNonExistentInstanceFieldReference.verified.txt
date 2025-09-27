@@ -8,7 +8,7 @@
 partial B Map(A source);
 */
  : (11,5)-(11,80),
-      Message: The referenced mapping named ToFullName was not found,
+      Message: The referenced mapping named @mapper.ToFullName was not found,
       Severity: Error,
       Descriptor: {
         Id: RMG061,

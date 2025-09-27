@@ -204,7 +204,7 @@ internal static class SourceValueBuilder
             return false;
         }
 
-        sourceValue = new MethodProvidedSourceValue(methodSymbol.Name, methodReferenceConfiguration.TargetName);
+        sourceValue = new MethodProvidedSourceValue(methodSymbol.Name, methodReferenceConfiguration.GetTargetName(ctx.BuilderContext));
         return true;
     }
 }

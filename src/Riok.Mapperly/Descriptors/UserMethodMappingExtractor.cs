@@ -82,7 +82,7 @@ public static class UserMethodMappingExtractor
         }
 
         var methods = ctx.SymbolAccessor.GetAllMethods(type).Where(e => string.Equals(e.Name, target.Name, StringComparison.Ordinal));
-        return BuildUserImplementedMappings(ctx, methods, target.TargetName, type.IsStatic, isExternal: true, isDefault: false);
+        return BuildUserImplementedMappings(ctx, methods, target.GetTargetName(ctx), type.IsStatic, isExternal: true, isDefault: false);
     }
 
     internal static IEnumerable<IUserMapping> ExtractUserImplementedMappings(

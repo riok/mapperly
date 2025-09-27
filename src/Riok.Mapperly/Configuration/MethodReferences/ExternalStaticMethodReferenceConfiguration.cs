@@ -11,13 +11,13 @@ namespace Riok.Mapperly.Configuration.MethodReferences;
 /// <param name="TargetType">The type containing the method.</param>
 public record ExternalStaticMethodReferenceConfiguration(string Name, INamedTypeSymbol TargetType) : IMethodReferenceConfiguration
 {
-    public INamedTypeSymbol GetTargetType(SimpleMappingBuilderContext ctx) => TargetType;
-
-    public string TargetName { get; } = TargetType.FullyQualifiedIdentifierName();
-
-    public string FullName => $"{TargetName}.{Name}";
+    public string FullName => $"{TargetType.FullyQualifiedIdentifierName()}.{Name}";
 
     public bool IsExternal => true;
+
+    public INamedTypeSymbol GetTargetType(SimpleMappingBuilderContext ctx) => TargetType;
+
+    public string? GetTargetName(SimpleMappingBuilderContext ctx) => TargetType.FullyQualifiedIdentifierName();
 
     public override string ToString() => FullName;
 }

@@ -8,7 +8,7 @@ namespace MapperNamespace
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         private static partial global::MapperNamespace.B Map(global::MapperNamespace.A source)
         {
-            var target = new global::MapperNamespace.B(OtherNamespace.OtherMapper.ModifyString(source.Value));
+            var target = new global::MapperNamespace.B(global::OtherNamespace.OtherMapper.ModifyString(source.Value));
             return target;
         }
     }

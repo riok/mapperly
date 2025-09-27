@@ -7,9 +7,9 @@ public interface IMethodReferenceConfiguration
 {
     INamedTypeSymbol? GetTargetType(SimpleMappingBuilderContext ctx);
 
-    string Name { get; }
+    string? GetTargetName(SimpleMappingBuilderContext ctx);
 
-    string? TargetName { get; }
+    string Name { get; }
 
     string FullName { get; }
 
