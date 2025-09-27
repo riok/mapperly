@@ -3,7 +3,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Configuration;
-using Riok.Mapperly.Configuration.MethodReferences;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -158,20 +157,23 @@ internal static class SourceValueBuilder
     )
     {
         var methodReferenceConfiguration = memberMappingInfo.ValueConfiguration!.Use!;
-        var targetSymbol = methodReferenceConfiguration is IExternalMethodReferenceConfiguration external
-            ? external.TargetType
-            : ctx.BuilderContext.MapperDeclaration.Symbol;
-        var namedMethodCandidates = ctx
-            .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(targetSymbol)
-            .Where(m =>
-                m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
-                && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualsTo(m, methodReferenceConfiguration.Name)
-            )
-            .ToList();
+        var targetSymbol = methodReferenceConfiguration.GetTargetType(ctx.BuilderContext);
+        var namedMethodCandidates = targetSymbol is null
+            ? []
+            : ctx
+                .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(targetSymbol)
+                .Where(m =>
+                    m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
+                    && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualsTo(m, methodReferenceConfiguration.Name)
+                )
+                .ToList();
 
         if (namedMethodCandidates.Count == 0)
         {
-            ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.MapValueReferencedMethodNotFound, methodReferenceConfiguration.Name);
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.MapValueReferencedMethodNotFound,
+                methodReferenceConfiguration.FullName
+            );
             sourceValue = null;
             return false;
         }
@@ -185,7 +187,7 @@ internal static class SourceValueBuilder
 
         if (!memberMappingInfo.TargetMember.Member.IsNullable)
         {
-            // only assume annotated is nullable, none is threated as non-nullable here
+            // only assume annotated is nullable; none is threaded as non-nullable here
             methodCandidates = methodCandidates.Where(m => m.ReturnNullableAnnotation != NullableAnnotation.Annotated);
         }
 
@@ -202,13 +204,7 @@ internal static class SourceValueBuilder
             return false;
         }
 
-        var targetName = methodReferenceConfiguration switch
-        {
-            IExternalMethodReferenceConfiguration externalMethod => externalMethod.TargetName,
-            _ => null,
-        };
-
-        sourceValue = new MethodProvidedSourceValue(methodSymbol.Name, targetName);
+        sourceValue = new MethodProvidedSourceValue(methodSymbol.Name, methodReferenceConfiguration.TargetName);
         return true;
     }
 }

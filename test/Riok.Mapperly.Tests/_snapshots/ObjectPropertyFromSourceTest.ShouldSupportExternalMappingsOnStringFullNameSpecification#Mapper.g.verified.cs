@@ -9,7 +9,7 @@ namespace MapperNamespace
         partial global::MapperNamespace.B Map(global::MapperNamespace.A source)
         {
             var target = new global::MapperNamespace.B();
-            target.FullName = global::OtherNamespace.OtherMapper.ToFullName(source);
+            target.FullName = OtherNamespace.OtherMapper.ToFullName(source);
             return target;
         }
     }

@@ -281,6 +281,29 @@ public class ObjectPropertyFromSourceTest
     }
 
     [Fact]
+    public Task ShouldSupportExternalMappingsOnInstancePropertyWithString()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            OtherMapper Property { get; } = new();
+
+            [MapPropertyFromSource(nameof(B.FullName), Use = "Property.ToFullName")]
+            partial B Map(A source);
+            """,
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string FullName { get; set; } }",
+            """
+            class OtherMapper
+            {
+                public string ToFullName(A x) => $"{x.FirstName} {x.LastName}"
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ShouldSupportExternalMappingsOnStringFullNameSpecification()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypesInBlockScopedNamespace(

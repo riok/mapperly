@@ -274,26 +274,15 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             return configuration;
         }
 
-        if (arg.Value is not string v)
+        if (arg.Value is not string fullName)
         {
             throw new InvalidOperationException($"Unknown method reference configuration: {arg.Value}");
         }
 
-        var splitPoint = v.LastIndexOf(MemberPathConstants.MemberAccessSeparator);
-        var methodName = splitPoint == -1 ? v : v[(splitPoint + 1)..];
-        var targetTypeName = splitPoint == -1 ? null : v[..splitPoint];
-        if (targetTypeName == null)
-        {
-            return new InternalMethodReferenceConfiguration(methodName);
-        }
-
-        var targetType = symbolAccessor.GetTypeByMetadataName(targetTypeName);
-        if (targetType == null)
-        {
-            return new InvalidMethodReferenceConfiguration(methodName, targetTypeName);
-        }
-
-        return new ExternalStaticMethodReferenceConfiguration(methodName, targetType);
+        var splitPoint = fullName.LastIndexOf(MemberPathConstants.MemberAccessSeparator);
+        var methodName = splitPoint == -1 ? fullName : fullName[(splitPoint + 1)..];
+        var targetName = splitPoint == -1 ? null : fullName[..splitPoint];
+        return new StringMethodReferenceConfiguration(methodName, targetName, fullName);
     }
 
     private static bool TryCreateNameOfMethodReferenceConfiguration(
@@ -319,14 +308,14 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
         if (operation is IInvalidOperation)
         {
-            configuration = new InvalidMethodReferenceConfiguration(memberName, operation.Syntax.ToString());
+            var targetName = operation.Syntax.ToString();
+            configuration = new StringMethodReferenceConfiguration(memberName, targetName, $"{targetName}.{memberName}");
             return true;
         }
 
-        if (operation.Type is not INamedTypeSymbol typeSymbol || symbolAccessor.IsMapperOrBaseClass(typeSymbol))
+        if (operation.Type is not INamedTypeSymbol typeSymbol)
         {
-            configuration = new InternalMethodReferenceConfiguration(memberName);
-            return true;
+            return false;
         }
 
         var field = operation.GetMemberSymbol();

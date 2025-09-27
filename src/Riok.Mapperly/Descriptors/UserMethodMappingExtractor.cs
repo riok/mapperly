@@ -70,14 +70,19 @@ public static class UserMethodMappingExtractor
         IMethodReferenceConfiguration? target
     )
     {
-        if (target is not IExternalMethodReferenceConfiguration externalTarget)
+        if (target is null || !target.IsExternal)
         {
             return [];
         }
 
-        var type = externalTarget.TargetType;
+        var type = target.GetTargetType(ctx);
+        if (type is null)
+        {
+            return [];
+        }
+
         var methods = ctx.SymbolAccessor.GetAllMethods(type).Where(e => string.Equals(e.Name, target.Name, StringComparison.Ordinal));
-        return BuildUserImplementedMappings(ctx, methods, externalTarget.TargetName, type.IsStatic, isExternal: true, isDefault: false);
+        return BuildUserImplementedMappings(ctx, methods, target.TargetName, type.IsStatic, isExternal: true, isDefault: false);
     }
 
     internal static IEnumerable<IUserMapping> ExtractUserImplementedMappings(
