@@ -69,42 +69,12 @@ string GetSourceSystem() => "C1";
 ### External method reference
 
 It is also possible to reference methods which are outside the mapper class. To do this, prefix the path with `@` in the `Use` property.
-The type containing the method must be accessible in the current context, either by using a fully qualified path or by including
-the namespace with `using` directive.
+Alternatively, you can also string reference of the type. In this case the type must be fully qualified.
 
 <Tabs>
-    <TabItem value="fully-qualified-namespace" label="Fully qualified path" default>
+    <TabItem value="use-full-nameof" label="Use with fullnameof" default>
         ```csharp
-        namespace MyNamespace;
-
-        [Mapper]
-        public partial class CarMapper
-        {
-            // highlight-start
-            [MapValue(nameof(CarDto.SourceSystem), Use = nameof(@OtherNamespace.SourceSystems.GetSourceSystem))]
-            // highlight-end
-            public partial CarDto Map(Car car);
-
-            // generates
-            target.SourceSystem = global::OtherNamespace.SourceSystems.GetSourceSystem();
-        }
-        ```
-
-        ```csharp
-        namespace OtherNamespace;
-
-        public static class SourceSystems
-        {
-            public static string GetSourceSystem() => "C1";
-        }
-        ```
-
-    </TabItem>
-    <TabItem value="using-namespace" label="With using directive">
-        ```csharp
-        // highlight-start
         using OtherNamespace;
-        // highlight-end
 
         namespace MyNamespace;
 
@@ -132,38 +102,40 @@ the namespace with `using` directive.
 
     </TabItem>
 
-</Tabs>
-
-With this syntax, you can also use instance methods if the mapper class has a property or field referencing the external type.
-In this case, the method should be referenced through this member.
-
-<Tabs>
-    <TabItem value="referenced-through-field" label="Referenced through field" default>
+    <TabItem value="use-with-string-path" label="Use with string path">
         ```csharp
+        namespace MyNamespace;
+
         [Mapper]
         public partial class CarMapper
         {
             // highlight-start
-            private readonly SourceSystems _sourceSystems = new();
-            // highlight-end
-
-            // highlight-start
-            [MapValue(nameof(CarDto.SourceSystem), Use = nameof(@_sourceSystems.GetSourceSystem))]
+            [MapValue(nameof(CarDto.SourceSystem), Use = "OtherNamespace.SourceSystems.GetSourceSystem")]
             // highlight-end
             public partial CarDto Map(Car car);
 
             // generates
-            target.SourceSystem = _sourceSystems.GetSourceSystem();
+            target.SourceSystem = global::OtherNamespace.SourceSystems.GetSourceSystem();
         }
+        ```
 
-        public class SourceSystems
+        ```csharp
+        namespace OtherNamespace;
+
+        public static class SourceSystems
         {
-            public string GetSourceSystem() => "C1";
+            public static string GetSourceSystem() => "C1";
         }
         ```
 
     </TabItem>
-    <TabItem value="referenced-through-property" label="Referenced through property">
+</Tabs>
+
+With this syntax, you can also use instance methods if the mapper class has a property or field referencing the external type.
+In this case, the method should be referenced through this member with the `@` prefix or use string reference.
+
+<Tabs>
+    <TabItem value="instance-with-fullnameof" label="Instance with fullnameof" default>
         ```csharp
         [Mapper]
         public partial class CarMapper
@@ -178,7 +150,7 @@ In this case, the method should be referenced through this member.
             public partial CarDto Map(Car car);
 
             // generates
-            target.SourceSystem = _sourceSystems.GetSourceSystem();
+            target.SourceSystem = SourceSystems.GetSourceSystem();
         }
 
         public class SourceSystems
@@ -189,4 +161,29 @@ In this case, the method should be referenced through this member.
 
     </TabItem>
 
+    <TabItem value="instance-with-string-path" label="Instance with string path">
+        ```csharp
+        [Mapper]
+        public partial class CarMapper
+        {
+            // highlight-start
+            public SourceSystems SourceSystems { get; } = new();
+            // highlight-end
+
+            // highlight-start
+            [MapValue(nameof(CarDto.SourceSystem), Use = "SourceSystems.GetSourceSystem")]
+            // highlight-end
+            public partial CarDto Map(Car car);
+
+            // generates
+            target.SourceSystem = _sourceSystems.GetSourceSystem();
+        }
+
+        public class SourceSystems
+        {
+            public string GetSourceSystem() => "C1";
+        }
+        ```
+
+    </TabItem>
 </Tabs>

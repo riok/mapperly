@@ -97,8 +97,9 @@ public partial class MyMapper {
 ### Including external configurations
 
 If the configuration is in another class, it is possible to reference it using the "fullnameof" syntax.
-To do this, prefix the path with `@` in the constructor argument. The method must be accessible
-in the current context. This can be done by referencing through the containing type, or through a field or property.
+To do this, prefix the path with `@` in the constructor argument.
+It is also possible to reference it using the field or property name.
+Additionally, you can also use a string reference of the method. In this case, the type must be fully qualified.
 
 <Tabs>
     <TabItem value="qualified-through-type" label="Qualified through type" default>
@@ -130,6 +131,7 @@ in the current context. This can be done by referencing through the containing t
         ```
 
     </TabItem>
+
     <TabItem value="qualified-through-field" label="Qualified through field/property">
         ```csharp
         [Mapper]
@@ -152,6 +154,35 @@ in the current context. This can be done by referencing through the containing t
 
     </TabItem>
 
+    <TabItem value="qualified-through-field" label="Qualified through string path">
+        ```csharp
+        // highlight-start
+        using OtherNamespace;
+        // highlight-end
+
+        namespace MyNamespace;
+
+        [Mapper]
+        public partial class FruitMapper
+        {
+            // highlight-start
+            [IncludeMappingConfiguration("OtherNamespace.OtherMapper.CopyApple")]
+            // highlight-end
+            public partial static AppleDto ToApple(Apple apple);
+        }
+        ```
+
+        ```csharp
+        namespace OtherNamespace;
+
+        public static class OtherMapper
+        {
+            // Property mapping configurations
+            public partial static void CopyApple(AppleDto dto, Apple apple);
+        }
+        ```
+
+    </TabItem>
 </Tabs>
 
 ## Restrictions
