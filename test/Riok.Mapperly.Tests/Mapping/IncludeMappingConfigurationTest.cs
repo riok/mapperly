@@ -437,7 +437,7 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
-    public Task IncludeMappingConfigurationSupportsExternalMappings()
+    public Task IncludeMappingConfigurationSupportsStaticExternalMappings()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -458,7 +458,30 @@ public class IncludeMappingConfigurationTest
     }
 
     [Fact]
-    public Task IncludeMappingConfigurationSupportsExternalMappingsOnStringFullNameSpecification()
+    public Task IncludeMappingConfigurationSupportsInstanceExternalMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public OtherMapper MapperProperty { get; } = new();
+
+            [IncludeMappingConfiguration(nameof(@MapperProperty.MapOther))]
+            static partial B Map(A a);
+            """,
+            "class A { public string SourceName { get; set; } }",
+            "class B { public string DestinationName { get; set; } }",
+            """
+            class OtherMapper {
+                [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
+                public partial B MapOther(A a);
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task IncludeMappingConfigurationSupportsStaticExternalMappingsOnString()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypesInBlockScopedNamespace(
             """
@@ -482,6 +505,29 @@ public class IncludeMappingConfigurationTest
                 }
             }
             """;
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task IncludeMappingConfigurationSupportsInstanceExternalMappingsOnString()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public OtherMapper MapperProperty { get; } = new();
+
+            [IncludeMappingConfiguration("MapperProperty.MapOther")]
+            static partial B Map(A a);
+            """,
+            "class A { public string SourceName { get; set; } }",
+            "class B { public string DestinationName { get; set; } }",
+            """
+            class OtherMapper {
+                [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
+                public partial B MapOther(A a);
+            }
+            """
+        );
 
         return TestHelper.VerifyGenerator(source);
     }

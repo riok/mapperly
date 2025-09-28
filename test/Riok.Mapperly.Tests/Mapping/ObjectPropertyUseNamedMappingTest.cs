@@ -706,7 +706,7 @@ public class ObjectPropertyUseNamedMappingTest
     }
 
     [Fact]
-    public Task ShouldSupportExternalMappingsOnStringWithFullNameSpecification()
+    public Task ShouldSupportExternalMappingsOnString()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypesInBlockScopedNamespace(
             """
@@ -823,6 +823,22 @@ public class ObjectPropertyUseNamedMappingTest
             [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@mapper.ModifyString)]
             private partial B Map(A source);
             """,
+            "record A(string Value);",
+            "record B(string Value);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldReportNonExistentExternalMappingsOnString()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypesInBlockScopedNamespace(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = "OtherNamespace.OtherMapper.ModifyString")]
+            private static partial B Map(A source);
+            """,
+            TestSourceBuilderOptions.Default,
             "record A(string Value);",
             "record B(string Value);"
         );
