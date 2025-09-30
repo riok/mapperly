@@ -27,6 +27,53 @@ public class DictionaryTest
     }
 
     [Fact]
+    public void DictionaryToSameDictionaryDeepCloningInDisabledNullableContext()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "Dictionary<string, string>",
+            "Dictionary<string, string>",
+            TestSourceBuilderOptions.WithDeepCloning
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.DisabledNullable)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return default;
+                var target = new global::System.Collections.Generic.Dictionary<string, string?>(source.Count);
+                foreach (var item in source)
+                {
+                    target[item.Key] = item.Value == null ? default : item.Value;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public Task DictionaryToDictionaryWithNonNullableKeyAndValueDeepCloningInDisabledNullableContext()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source)",
+            TestSourceBuilderOptions.WithDeepCloning,
+            """
+            class A
+            {
+                public Dictionary<string, string> Value { get; set; }
+            }
+            """,
+            """
+            class B
+            {
+                public Dictionary<string, string> Value { get; set; }
+            }
+            """
+        );
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
+
+    [Fact]
     public void DictionaryToDictionaryExplicitCastedValue()
     {
         var source = TestSourceBuilder.Mapping("Dictionary<string, long>", "Dictionary<string, int>");
