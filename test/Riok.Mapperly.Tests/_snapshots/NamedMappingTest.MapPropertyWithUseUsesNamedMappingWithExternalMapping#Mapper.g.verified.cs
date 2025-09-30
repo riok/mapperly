@@ -6,10 +6,10 @@ namespace MapperNamespace
     public partial class Mapper
     {
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        static partial global::MapperNamespace.B Map(global::MapperNamespace.A source)
+        public partial global::MapperNamespace.B Map(global::MapperNamespace.A source)
         {
             var target = new global::MapperNamespace.B();
-            target.FullName = global::OtherNamespace.OtherMapper.ToFullName(source);
+            target.StringValue = global::OtherNamespace.OtherMapper.ModifyString(source.StringValue);
             return target;
         }
     }

@@ -53,5 +53,29 @@ namespace Riok.Mapperly.IntegrationTests
             dto.IdValue.ShouldBe(13);
         }
 #endif
+
+        [Fact]
+        public void RunMapExternalWithStringShouldWork()
+        {
+            var model = new IdObject { IdValue = 10 };
+            var dto = _mapper.MapExternalWithString(model);
+            dto.IdValue.ShouldBe(11);
+        }
+
+        [Fact]
+        public void RunMapFromSourceExternalWithStringShouldWork()
+        {
+            var model = new IdObject { IdValue = 10 };
+            var dto = _mapper.MapFromSourceExternalWithString(model);
+            dto.IdValue.ShouldBe(12);
+        }
+
+        [Fact]
+        public void RunConstantMapExternalWithStringShouldWork()
+        {
+            var model = new IdObject { IdValue = 10 };
+            var dto = _mapper.ConstantMapExternalWithString(model);
+            dto.IdValue.ShouldBe(13);
+        }
     }
 }
