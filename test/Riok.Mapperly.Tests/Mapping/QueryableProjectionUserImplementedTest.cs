@@ -292,4 +292,109 @@ public class QueryableProjectionUserImplementedTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task UserImplementedTwoNestedProjectionsShouldReuseInlinedMapping()
+    {
+        // https://github.com/riok/mapperly/issues/1965
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System;
+            using System.Collections.Generic;
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            [Mapper]
+            public static partial class Mapper
+            {
+                public static partial IQueryable<VendorResponse> ProjectToDto(this IQueryable<Vendor> query);
+                public static partial IQueryable<ScopeResponse> ProjectToDto(this IQueryable<Scope> q);
+
+                [MapPropertyFromSource(nameof(CountryListResponse.Name), Use = nameof(GetCountryLocalizedName))]
+                public static partial CountryListResponse ToCountryListDto(this Country q);
+
+                private static IReadOnlyCollection<CountryListResponse> MapScopeCountries(ICollection<ScopeCountry> countries)
+                {
+                    return countries.Select(c => ToCountryListDto(c.Country)).ToList();
+                }
+
+                private static IReadOnlyCollection<CountryListResponse> MapVendorCountries(ICollection<VendorCountry> models)
+                {
+                    return models.Select(x => ToCountryListDto(x.Country)).ToList();
+                }
+
+                private static string GetCountryLocalizedName(Country x)
+                {
+                    return x.LocalizedNames.FirstOrDefault()!.Name ?? x.Name;
+                }
+            }
+
+            public class Vendor
+            {
+                public string VendorName { get; set; } = null!;
+                public ICollection<VendorCountry> Countries { get; set; } = [];
+            }
+
+            public class VendorCountry
+            {
+                public Guid VendorId { get; set; }
+                public Vendor Vendor { get; set; } = null!;
+                public Guid CountryId { get; set; }
+                public Country Country { get; set; } = null!;
+            }
+
+            public class Scope
+            {
+                public Guid Id { get; set; }
+                public ICollection<ScopeCountry> Countries { get; set; } = [];
+            }
+
+            public class ScopeCountry
+            {
+                public Guid ScopeId { get; set; }
+                public Scope Scope { get; set; } = null!;
+                public Guid CountryId { get; set; }
+                public Country Country { get; set; } = null!;
+            }
+
+            public class Country
+            {
+                public string Code { get; set; } = null!;
+                public string Name { get; set; } = null!;
+                public ICollection<LocalizedName> LocalizedNames { get; set; } = [];
+            }
+
+            public class LocalizedName
+            {
+                public string LanguageCode { get; set; } = null!;
+                public string Name { get; set; } = null!;
+            }
+
+            public class CountryListResponse
+            {
+                public required string Code { get; set; }
+                public required string Name { get; set; }
+            }
+
+            public class CountryListResponse2
+            {
+                public required string Code { get; set; }
+                public required string Name { get; set; }
+            }
+
+            public class VendorResponse
+            {
+                public required string VendorName { get; set; }
+                public IReadOnlyCollection<CountryListResponse> Countries { get; set; } = [];
+            }
+
+            public class ScopeResponse
+            {
+                public required Guid Id { get; set; }
+                public IReadOnlyCollection<CountryListResponse> Countries { get; set; } = [];
+            }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
 }
