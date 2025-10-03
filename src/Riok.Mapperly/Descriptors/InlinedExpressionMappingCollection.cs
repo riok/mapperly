@@ -44,7 +44,7 @@ public class InlinedExpressionMappingCollection
         return _delegate.FindNewInstanceMapping(mappingKey);
     }
 
-    public INewInstanceUserMapping? FindNewInstanceUserMapping(IMethodSymbol method, out bool isInlined)
+    public INewInstanceMapping? FindNewInstanceMapping(IMethodSymbol method, out bool isInlined)
     {
         var mapping = _delegate.FindNewInstanceUserMapping(method);
         if (mapping == null)
@@ -56,7 +56,7 @@ public class InlinedExpressionMappingCollection
         if (_inlinedMappings.TryGetValue(new TypeMappingKey(mapping), out var inlinedMapping))
         {
             isInlined = true;
-            return inlinedMapping as INewInstanceUserMapping;
+            return inlinedMapping;
         }
 
         isInlined = false;
