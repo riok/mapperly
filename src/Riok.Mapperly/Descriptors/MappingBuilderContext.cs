@@ -9,6 +9,7 @@ using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -121,6 +122,37 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <param name="mappingKey">The mapping key.</param>
     /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
     public virtual INewInstanceMapping? FindMapping(TypeMappingKey mappingKey) => MappingBuilder.Find(mappingKey);
+
+    /// <summary>
+    /// Tries to find an existing mapping for the provided types with parameter-aware matching.
+    /// If none is found with parameter compatibility, falls back to regular type-only matching.
+    /// </summary>
+    /// <param name="source">The source type</param>
+    /// <param name="target">The target type</param>
+    /// <param name="additionalParameters">The additional parameters to match</param>
+    /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
+    public INewInstanceMapping? FindMappingWithParameters(
+        ITypeSymbol source,
+        ITypeSymbol target,
+        IReadOnlyCollection<MethodParameter>? additionalParameters
+    )
+    {
+        // If no additional parameters are provided, use regular type-only matching
+        if (additionalParameters == null || additionalParameters.Count == 0)
+        {
+            return FindMapping(source, target);
+        }
+
+        // Try parameter-aware matching first
+        var parameterAwareMapping = MappingBuilder.FindWithParameters(source, target, additionalParameters);
+        if (parameterAwareMapping != null)
+        {
+            return parameterAwareMapping;
+        }
+
+        // Fall back to regular type-only matching
+        return FindMapping(source, target);
+    }
 
     /// <summary>
     /// Tries to find an existing mapping for the provided types.

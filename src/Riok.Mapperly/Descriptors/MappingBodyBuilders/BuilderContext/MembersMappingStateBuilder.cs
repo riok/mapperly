@@ -68,9 +68,18 @@ internal static class MembersMappingStateBuilder
 
     private static IReadOnlyDictionary<string, IMappableMember> GetAdditionalSourceMembers(MappingBuilderContext ctx)
     {
+        // First check if the current UserMapping has additional parameters
         if (ctx.UserMapping is MethodMapping { AdditionalSourceParameters.Count: > 0 } methodMapping)
         {
             return methodMapping
+                .AdditionalSourceParameters.Select<MethodParameter, IMappableMember>(p => new ParameterSourceMember(p))
+                .ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
+        }
+
+        // For inline expression contexts, check if additional parameters are inherited from a parent
+        if (ctx is InlineExpressionMappingBuilderContext { AdditionalSourceParameters.Count: > 0 } inlineCtx)
+        {
+            return inlineCtx
                 .AdditionalSourceParameters.Select<MethodParameter, IMappableMember>(p => new ParameterSourceMember(p))
                 .ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
         }
