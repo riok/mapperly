@@ -1,4 +1,4 @@
-﻿namespace Riok.Mapperly.IntegrationTests.Dto
+namespace Riok.Mapperly.IntegrationTests.Dto
 {
     public class NamedMappingValuesDto
     {
