@@ -1,4 +1,4 @@
-﻿namespace Riok.Mapperly.IntegrationTests.Models
+namespace Riok.Mapperly.IntegrationTests.Models
 {
     public class NamedMappingObject
     {
