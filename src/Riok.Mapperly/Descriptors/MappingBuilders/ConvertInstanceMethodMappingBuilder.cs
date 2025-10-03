@@ -25,6 +25,7 @@ public static class ConvertInstanceMethodMappingBuilder
                 .Where(m =>
                     string.Equals(m.Name, methodName, StringComparison.OrdinalIgnoreCase)
                     && m is { IsStatic: false, ReturnsVoid: false, IsAsync: false, Parameters.Length: 0 }
+                    && !ctx.SymbolAccessor.HasAttribute<MapperIgnoreAttribute>(m)
                 )
                 .ToList();
 
