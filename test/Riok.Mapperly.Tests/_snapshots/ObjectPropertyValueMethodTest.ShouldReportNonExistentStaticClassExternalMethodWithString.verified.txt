@@ -1,0 +1,69 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+{
+    [MapValue("Value", Use = "OtherNamesapce.OtherMapper.NewValue")]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+internal static partial B Map(A source);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(12,40),
+      Message: The referenced method OtherNamesapce.OtherMapper.NewValue could not be found or has an unsupported signature,
+      Severity: Error,
+      Descriptor: {
+        Id: RMG079,
+        Title: The referenced method could not be found or has an unsupported signature,
+        MessageFormat: The referenced method {0} could not be found or has an unsupported signature,
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    [MapValue("Value", Use = "OtherNamesapce.OtherMapper.NewValue")]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+internal static partial B Map(A source);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(12,40),
+      Message: B has no accessible constructor with mappable arguments,
+      Severity: Error,
+      Descriptor: {
+        Id: RMG013,
+        Title: No accessible constructor with mappable arguments found,
+        MessageFormat: {0} has no accessible constructor with mappable arguments,
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    [MapValue("Value", Use = "OtherNamesapce.OtherMapper.NewValue")]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+internal static partial B Map(A source);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(12,40),
+      Message: No members are mapped in the object mapping from A to B,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG066,
+        Title: No members are mapped in an object mapping,
+        HelpLink: https://localhost:3000/docs/configuration/analyzer-diagnostics/RMG066,
+        MessageFormat: No members are mapped in the object mapping from {0} to {1},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

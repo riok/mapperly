@@ -135,4 +135,93 @@ public class NamedMappingTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task MapPropertyWithUseUsesNamedMappingWithExternalMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypesInBlockScopedNamespace(
+            """
+            [MapProperty(nameof(A.StringValue), nameof(B.StringValue), Use = "OtherNamespace.OtherMapper.CustomModifyString")]
+            public partial B Map(A source);
+            """,
+            TestSourceBuilderOptions.Default,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        // language=csharp
+        source += """
+
+            namespace OtherNamespace
+            {
+                class OtherMapper
+                {
+                    [NamedMapping("CustomModifyString")]
+                    [UserMapping(Default = false)]
+                    public static string ModifyString(string source) => source + "-modified";
+                }
+            }
+            """;
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task MapPropertyFromSourceWithUseUsesNamedMappingWithExternalMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypesInBlockScopedNamespace(
+            """
+            [MapPropertyFromSource(nameof(B.FullName), Use = "OtherNamespace.OtherMapper.CustomToFullName")]
+            static partial B Map(A source);
+            """,
+            TestSourceBuilderOptions.Default,
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string FullName { get; set; } }"
+        );
+
+        // language=csharp
+        source += """
+
+            namespace OtherNamespace
+            {
+                class OtherMapper
+                {
+                    [NamedMapping("CustomToFullName")]
+                    [UserMapping(Default = false)]
+                    public static string ToFullName(MapperNamespace.A x) => $"{x.FirstName} {x.LastName}";
+                }
+            }
+            """;
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task IncludeMappingConfigurationUsesNamedMappingWithExternalMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [IncludeMappingConfiguration("OtherNamespace.OtherMapper.CustomName")]
+            partial B Map(A a);
+            """,
+            "class A { public string SourceName { get; set; } }",
+            "class B { public string DestinationName { get; set; } }"
+        );
+
+        // language=csharp
+        source += """
+
+            namespace OtherNamespace
+            {
+                class OtherMapper
+                {
+                    [NamedMapping("CustomName")]
+                    [MapProperty(nameof(A.SourceName), nameof(B.DestinationName))]
+                    public static partial B MapOther(A a);
+                }
+            }
+            """;
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

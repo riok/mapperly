@@ -1,4 +1,4 @@
-namespace Riok.Mapperly.Configuration;
+namespace Riok.Mapperly.Configuration.PropertyReferences;
 
 /// <summary>
 /// A user-configured member path.
