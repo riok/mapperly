@@ -15,7 +15,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Build.Locator" Version="1.9.1" />
+    <PackageReference Include="Microsoft.Build.Locator" Version="1.10.2" />
     <PackageReference Include="NuGet.Frameworks" Version="6.14.0" />
   </ItemGroup>
   <ItemGroup>
