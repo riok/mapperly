@@ -85,7 +85,10 @@ public static class ConvertStaticMethodMappingBuilder
         // and convert them to a dictionary whose key is the method name.
         // The keys in the dictionary are compared case-insensitively to handle possible `Uint` vs `UInt` cases, etc.
         var allMethodCandidates = allMethods
-            .Where(m => m is { IsStatic: true, ReturnsVoid: false, IsAsync: false, Parameters.Length: 1 })
+            .Where(m =>
+                m is { IsStatic: true, ReturnsVoid: false, IsAsync: false, Parameters.Length: 1 }
+                && !symbolAccessor.HasAttribute<MapperIgnoreAttribute>(m)
+            )
             .GroupBy(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(x => x.Key, x => x.ToList(), StringComparer.OrdinalIgnoreCase);
 

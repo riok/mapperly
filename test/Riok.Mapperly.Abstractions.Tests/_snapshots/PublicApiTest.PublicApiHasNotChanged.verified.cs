@@ -159,7 +159,7 @@ namespace Riok.Mapperly.Abstractions
     {
         public MapperDefaultsAttribute() { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
     public sealed class MapperIgnoreAttribute : System.Attribute
     {
