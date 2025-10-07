@@ -1,0 +1,72 @@
+---
+sidebar_position: 10
+description: Use external mappings
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Use external mappings
+
+Mapperly can also consider mappings implemented in other classes.
+In order for Mapperly to find the mappings, they must be made known with `UseMapper` / `UseStaticMapper`.
+
+<Tabs>
+    <TabItem value="static" label="Static">
+
+        For static mappings, `UseStaticMapper` can be used:
+
+        ```csharp
+        [Mapper]
+        // highlight-start
+        [UseStaticMapper(typeof(BananaMapper))]
+        // highlight-end
+        public static partial class BoxMapper
+        {
+            public static partial BananaBox MapBananaBox(BananaBoxDto dto);
+        }
+
+        public static class BananaMapper
+        {
+            public static Banana MapBanana(BananaDto dto)
+            => new Banana(dto.Weigth);
+        }
+        ```
+
+    </TabItem>
+    <TabItem value="instance" label="Instance">
+
+        To use the mappings of an object instance `UseMapper` can be used:
+
+        ```csharp
+        [Mapper]
+        public static partial class BoxMapper
+        {
+            // highlight-start
+            [UseMapper]
+            private readonly BananaMapper _bananaMapper = new();
+            // highlight-end
+
+            public static partial BananaBox MapBananaBox(BananaBoxDto dto);
+        }
+
+        public static class BananaMapper
+        {
+            public static Banana MapBanana(BananaDto dto)
+            => new Banana(dto.Weigth);
+        }
+        ```
+
+        :::info
+        The initialization of fields and properties annotated with `UseMapper` needs to be done by the user.
+        :::
+
+    </TabItem>
+
+</Tabs>
+
+Whenever Mapperly needs a mapping from `BananaBox` to `BananaBoxDto` inside the `BoxMapper` implementation,
+it will use the provided implementation by the `BananaMapper`.
+
+Used mappers themselves can be Mapperly backed classes.  
+The [`AutoUserMappings`](#automatic-user-implemented-mapping-method-discovery) value also applies to the usage of external mappers.

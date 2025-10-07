@@ -14,7 +14,7 @@ namespace Riok.Mapperly.Symbols.Members;
 [DebuggerDisplay("{MemberPath}")]
 public class MemberPathGetter
 {
-    private const string NullableValueProperty = nameof(Nullable<int>.Value);
+    private const string NullableValueProperty = nameof(Nullable<>.Value);
 
     public MemberPath MemberPath { get; }
 

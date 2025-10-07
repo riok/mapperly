@@ -1,5 +1,5 @@
 ﻿---
-sidebar_position: 17
+sidebar_position: 18
 description: Reusing Mapping Configurations
 ---
 
@@ -20,7 +20,7 @@ To include an existing mapping configuration in another mapping method, use the 
 and provide the method name:
 
 ```csharp
-// Property mapping configurations
+[MapProperty("Weight", "WeightInGrams")]
 public partial static void CopyApple(AppleDto dto, Apple apple);
 
 // highlight-start
@@ -29,13 +29,13 @@ public partial static void CopyApple(AppleDto dto, Apple apple);
 public partial static AppleDto ToApple(Apple apple);
 ```
 
-Or use the provided mapper name:
+Or use the provided mapping name:
 
 ```csharp
-// Property mapping configurations
 // highlight-start
 [NamedMapping("CustomToApple")]
 // highlight-end
+[MapProperty("Weight", "WeightInGrams")]
 public partial static void CopyApple(AppleDto dto, Apple apple);
 
 // highlight-start
@@ -61,6 +61,24 @@ This attribute also supports including configurations from a base class. For exa
 `Apple` to `AppleDto` and the mapping logic is defined for the base classes `Fruit` to `FruitDto`.
 Here's how to set it up:
 
+<Tabs>
+    <TabItem value="mapper" label="Mapper">
+    ```csharp
+    [Mapper]
+    public partial class MyMapper
+    {
+        [MapProperty(nameof(Fruit.Name), nameof(FruitDto.Title))]
+        [MapperIgnoreSource(nameof(Fruit.PricePerUnit))]
+        private partial FruitDto ToFruit(Fruit fruit);
+    
+        [IncludeMappingConfiguration(nameof(ToFruit))]
+        public partial static AppleDto Map(Apple apple);
+    }
+    ```
+    </TabItem>
+    
+    <TabItem value="classes" label="Classes">
+        
 ```csharp
 class Fruit
 {
@@ -70,29 +88,23 @@ class Fruit
 
 class FruitDto
 {
-    public string Title { get; set; }
+public string Title { get; set; }
 }
 
 class Apple : Fruit
 {
-    public int Weight { get; set; }
+public int Weight { get; set; }
 }
 
 class AppleDto : FruitDto
 {
-    public int Weight { get; set; }
+public int Weight { get; set; }
 }
 
-[Mapper]
-public partial class MyMapper {
-    [MapProperty(nameof(Fruit.Name), nameof(FruitDto.Title))]
-    [MapperIgnoreSource(nameof(Fruit.PricePerUnit))]
-    private partial FruitDto ToFruit(Fruit fruit);
+````
 
-    [IncludeMappingConfiguration(nameof(ToFruit))]
-    public partial static AppleDto Map(Apple apple);
-}
-```
+    </TabItem>
+</Tabs>
 
 ### Including external configurations
 
@@ -107,7 +119,7 @@ Additionally, you can also use a string reference of the method. In this case, t
         // highlight-start
         using OtherNamespace;
         // highlight-end
-        
+
         namespace MyNamespace;
 
         [Mapper]
@@ -196,3 +208,4 @@ Additionally, you can also use a string reference of the method. In this case, t
 If an `IncludeMappingConfigurationAttribute` refers to an ambiguous mapping configuration (e.g., multiple
 configurations exist with the same name), the mapper emits RMG062 to help you resolve the ambiguity.
 This can be easily resolved by providing a custom name for the target mapping with `NamedMapping` attribute.
+````

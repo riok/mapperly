@@ -16,7 +16,7 @@ public class NullDelegateExistingTargetMapping(
     IExistingTargetMapping delegateMapping
 ) : ExistingTargetMapping(nullableSourceType, nullableTargetType)
 {
-    private const string NullableValueProperty = nameof(Nullable<int>.Value);
+    private const string NullableValueProperty = nameof(Nullable<>.Value);
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {

@@ -12,7 +12,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public class NullDelegateMapping : NewInstanceMapping
 {
-    private const string NullableValueProperty = nameof(Nullable<int>.Value);
+    private const string NullableValueProperty = nameof(Nullable<>.Value);
 
     private readonly INewInstanceMapping _delegateMapping;
     private readonly NullFallbackValue _nullFallbackValue;
