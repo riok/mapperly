@@ -1,8 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Configuration.MethodReferences;
+using Riok.Mapperly.Configuration.PropertyReferences;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
 
@@ -13,7 +17,6 @@ namespace Riok.Mapperly.Configuration;
 /// </summary>
 public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 {
-    private const string NameOfOperatorName = "nameof";
     private const char FullNameOfPrefix = '@';
 
     public TAttribute AccessSingle<TAttribute>(ISymbol symbol)
@@ -76,15 +79,15 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         }
     }
 
-    public string GetMethodName(IMethodSymbol methodSymbol)
+    public string GetMappingName(IMethodSymbol methodSymbol)
     {
         var mappingName = AccessFirstOrDefault<NamedMappingAttribute>(methodSymbol)?.Name ?? methodSymbol.Name;
         return mappingName;
     }
 
-    public bool IsMappingNameEqualsTo(IMethodSymbol methodSymbol, string name)
+    public bool IsMappingNameEqualTo(IMethodSymbol methodSymbol, string name)
     {
-        return string.Equals(GetMethodName(methodSymbol), name, StringComparison.Ordinal);
+        return string.Equals(GetMappingName(methodSymbol), name, StringComparison.Ordinal);
     }
 
     internal static TData Access<TAttribute, TData>(AttributeData attrData, SymbolAccessor? symbolAccessor = null)
@@ -172,6 +175,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             ),
             _ when arg.IsNull => null,
             _ when targetType == typeof(IMemberPathConfiguration) => CreateMemberPath(arg, syntax, symbolAccessor),
+            _ when targetType == typeof(IMethodReferenceConfiguration) => CreateMethodReference(arg, syntax, symbolAccessor),
             TypedConstantKind.Enum => GetEnumValue(arg, targetType),
             TypedConstantKind.Array => BuildArrayValue(arg, targetType, symbolAccessor),
             TypedConstantKind.Primitive => arg.Value,
@@ -188,10 +192,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         SymbolAccessor? symbolAccessor
     )
     {
-        if (symbolAccessor == null)
-        {
-            throw new ArgumentNullException(nameof(symbolAccessor), "The symbol accessor cannot be null when resolving member paths");
-        }
+        ThrowHelpers.ThrowIfNull(symbolAccessor);
 
         if (arg.Kind == TypedConstantKind.Array)
         {
@@ -202,15 +203,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             return new StringMemberPath(values);
         }
 
-        // try to extract the full nameof path from syntax
-        if (
-            arg.Kind == TypedConstantKind.Primitive
-            && syntax?.Expression
-                is InvocationExpressionSyntax
-                {
-                    Expression: IdentifierNameSyntax { Identifier.Text: NameOfOperatorName }
-                } invocationExpressionSyntax
-        )
+        if (arg.Kind == TypedConstantKind.Primitive && syntax.TryGetNameOfSyntax(out var invocationExpressionSyntax))
         {
             return CreateNameOfMemberPath(invocationExpressionSyntax, symbolAccessor);
         }
@@ -225,17 +218,17 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
     private static IMemberPathConfiguration CreateNameOfMemberPath(InvocationExpressionSyntax nameofSyntax, SymbolAccessor symbolAccessor)
     {
-        var argMemberPathStr = nameofSyntax.ArgumentList.Arguments[0].ToFullString();
-
         // @ prefix opts-in to full nameof
-        var fullNameOf = argMemberPathStr[0] == FullNameOfPrefix;
+        var fullNameOf = nameofSyntax.IsFullNameOfSyntax();
 
-        var nameOfOperation = symbolAccessor.GetOperation(nameofSyntax) as INameOfOperation;
-        var memberRefOperation = nameOfOperation?.GetFirstChildOperation() as IMemberReferenceOperation;
+        var nameOfOperation = symbolAccessor.GetOperation<INameOfOperation>(nameofSyntax);
+        var memberRefOperation = nameOfOperation?.GetFirstChildOperation<IMemberReferenceOperation>();
         if (memberRefOperation == null)
         {
             // fall back to old skip-first-segment approach
             // to ensure backwards compability.
+
+            var argMemberPathStr = nameofSyntax.ArgumentList.Arguments[0].ToFullString();
             var argMemberPath = argMemberPathStr
                 .TrimStart(FullNameOfPrefix)
                 .Split(MemberPathConstants.MemberAccessSeparator)
@@ -248,7 +241,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         while (memberRefOperation != null)
         {
             memberPath.Add(memberRefOperation.Member);
-            memberRefOperation = memberRefOperation.GetFirstChildOperation() as IMemberReferenceOperation;
+            memberRefOperation = memberRefOperation.GetFirstChildOperation<IMemberReferenceOperation>();
 
             // if not fullNameOf only consider the last member path segment
             if (!fullNameOf && memberPath.Count > 1)
@@ -257,6 +250,83 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
         memberPath.Reverse();
         return new SymbolMemberPath(memberPath.ToImmutableEquatableArray());
+    }
+
+    private static IMethodReferenceConfiguration CreateMethodReference(
+        TypedConstant arg,
+        AttributeArgumentSyntax? syntax,
+        SymbolAccessor? symbolAccessor
+    )
+    {
+        ThrowHelpers.ThrowIfNull(symbolAccessor);
+
+        if (arg.Kind != TypedConstantKind.Primitive)
+        {
+            throw new InvalidOperationException($"Cannot create {nameof(IMethodReferenceConfiguration)} from {arg.Kind}");
+        }
+
+        if (
+            syntax.TryGetNameOfSyntax(out var invocationExpressionSyntax)
+            && invocationExpressionSyntax.IsFullNameOfSyntax()
+            && TryCreateNameOfMethodReferenceConfiguration(invocationExpressionSyntax, symbolAccessor, out var configuration)
+        )
+        {
+            return configuration;
+        }
+
+        if (arg.Value is not string fullName)
+        {
+            throw new InvalidOperationException($"Unknown method reference configuration: {arg.Value}");
+        }
+
+        var splitPoint = fullName.LastIndexOf(MemberPathConstants.MemberAccessSeparator);
+        var methodName = splitPoint == -1 ? fullName : fullName[(splitPoint + 1)..];
+        var targetName = splitPoint == -1 ? null : fullName[..splitPoint];
+        return new StringMethodReferenceConfiguration(methodName, targetName, fullName);
+    }
+
+    private static bool TryCreateNameOfMethodReferenceConfiguration(
+        InvocationExpressionSyntax nameofSyntax,
+        SymbolAccessor symbolAccessor,
+        [NotNullWhen(true)] out IMethodReferenceConfiguration? configuration
+    )
+    {
+        configuration = null;
+        var nameOfOperation = symbolAccessor.GetOperation<INameOfOperation>(nameofSyntax);
+        var operation = nameOfOperation?.GetFirstChildOperation<IOperation>();
+        var memberName = operation?.Syntax.TryGetInferredMemberName();
+        if (memberName is null || operation is null)
+        {
+            return false;
+        }
+
+        operation = operation.GetFirstChildOperation<IOperation>();
+        if (operation is null)
+        {
+            return false;
+        }
+
+        if (operation is IInvalidOperation)
+        {
+            var targetName = operation.Syntax.ToString();
+            configuration = new StringMethodReferenceConfiguration(memberName, targetName, $"{targetName}.{memberName}");
+            return true;
+        }
+
+        if (operation.Type is not INamedTypeSymbol typeSymbol)
+        {
+            return false;
+        }
+
+        var field = operation.GetMemberSymbol();
+        if (field is null)
+        {
+            configuration = new ExternalStaticMethodReferenceConfiguration(memberName, typeSymbol);
+            return true;
+        }
+
+        configuration = new ExternalInstanceMethodReferenceConfiguration(memberName, field, typeSymbol);
+        return true;
     }
 
     private static object?[] BuildArrayValue(TypedConstant arg, Type targetType, SymbolAccessor? symbolAccessor)

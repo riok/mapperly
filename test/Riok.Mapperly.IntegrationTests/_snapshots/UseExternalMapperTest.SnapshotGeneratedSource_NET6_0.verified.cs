@@ -11,5 +11,53 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.IdValue = global::Riok.Mapperly.IntegrationTests.Mapper.UseExternalMapper.MyOtherMapper.MapInt(source.IdValue);
             return target;
         }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public static partial global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto MapExternal(global::Riok.Mapperly.IntegrationTests.Models.IdObject source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto();
+            target.IdValue = global::Riok.Mapperly.IntegrationTests.Mapper.ExternalMapperMethods.MapStatic(source.IdValue);
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public static partial global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto MapFromSourceExternal(global::Riok.Mapperly.IntegrationTests.Models.IdObject source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto();
+            target.IdValue = global::Riok.Mapperly.IntegrationTests.Mapper.ExternalMapperMethods.ComputeSumStatic(source);
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public static partial global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto ConstantMapExternal(global::Riok.Mapperly.IntegrationTests.Models.IdObject source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto();
+            target.IdValue = global::Riok.Mapperly.IntegrationTests.Mapper.ExternalMapperMethods.IntValueStatic();
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public static partial global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto MapExternalString(global::Riok.Mapperly.IntegrationTests.Models.IdObject source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto();
+            target.IdValue = global::Riok.Mapperly.IntegrationTests.Mapper.ExternalMapperMethods.MapStatic(source.IdValue);
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public static partial global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto MapFromSourceExternalString(global::Riok.Mapperly.IntegrationTests.Models.IdObject source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto();
+            target.IdValue = global::Riok.Mapperly.IntegrationTests.Mapper.ExternalMapperMethods.ComputeSumStatic(source);
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public static partial global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto ConstantMapExternalString(global::Riok.Mapperly.IntegrationTests.Models.IdObject source)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto();
+            target.IdValue = global::Riok.Mapperly.IntegrationTests.Mapper.ExternalMapperMethods.IntValueStatic();
+            return target;
+        }
     }
 }

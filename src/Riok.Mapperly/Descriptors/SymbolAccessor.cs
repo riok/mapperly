@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Configuration.PropertyReferences;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
 using Riok.Mapperly.Symbols.Members;
@@ -14,6 +14,8 @@ namespace Riok.Mapperly.Descriptors;
 
 public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSymbol mapperSymbol)
 {
+    private const string GlobalPrefix = "global::";
+
     // this is a weak reference table
     // since if there is no reference to the key
     // the values should not be kept in the memory anymore / are not needed anymore.
@@ -529,7 +531,19 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         return symbolMembers.GetValueOrDefault(name);
     }
 
-    public IOperation? GetOperation(SyntaxNode node) => compilationContext.GetSemanticModel(node.SyntaxTree)?.GetOperation(node);
+    public TOperation? GetOperation<TOperation>(SyntaxNode node)
+        where TOperation : class, IOperation => compilationContext.GetSemanticModel(node.SyntaxTree)?.GetOperation(node) as TOperation;
+
+    public INamedTypeSymbol? GetTypeByMetadataName(string targetTypeName)
+    {
+        var startsWithGlobal = targetTypeName.StartsWith(GlobalPrefix, StringComparison.Ordinal);
+        if (startsWithGlobal)
+        {
+            targetTypeName = targetTypeName[GlobalPrefix.Length..];
+        }
+
+        return Compilation.GetBestTypeByMetadataName(targetTypeName);
+    }
 
     private ImmutableArray<AttributeData> GetAttributesCore(ISymbol symbol)
     {

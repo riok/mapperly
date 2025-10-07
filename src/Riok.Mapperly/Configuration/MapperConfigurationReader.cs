@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Configuration.MethodReferences;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
@@ -102,7 +103,10 @@ public class MapperConfigurationReader
         bool supportsDeepCloning
     )
     {
-        foreach (var includedCfg in _dataAccessor.Access<IncludeMappingConfigurationAttribute>(reference.Method!))
+        var includedMappingConfigs = _dataAccessor.Access<IncludeMappingConfigurationAttribute, IncludeMappingConfiguration>(
+            reference.Method!
+        );
+        foreach (var includedCfg in includedMappingConfigs)
         {
             var cfgToInclude = BuildConfigToInclude(includedCfg.Name, reference, visitedMethods, supportsDeepCloning);
             if (cfgToInclude == null)
@@ -117,17 +121,17 @@ public class MapperConfigurationReader
     }
 
     private MappingConfiguration? BuildConfigToInclude(
-        string name,
+        IMethodReferenceConfiguration name,
         MappingConfigurationReference configRef,
         HashSet<IMethodSymbol> visitedMethods,
         bool supportsDeepCloning
     )
     {
         var typeMapping =
-            (ITypeMapping?)_mappings.FindNamedNewInstanceMapping(name, out var ambiguousName)
-            ?? _mappings.FindExistingInstanceNamedMapping(name, out ambiguousName);
+            (ITypeMapping?)_mappings.FindNamedNewInstanceMapping(name.FullName, out var ambiguousName)
+            ?? _mappings.FindExistingInstanceNamedMapping(name.FullName, out ambiguousName);
         var methodSymbol = (typeMapping as IUserMapping)?.Method;
-        if (!ValidateIncludedConfig(ambiguousName, configRef, name, typeMapping, methodSymbol))
+        if (!ValidateIncludedConfig(ambiguousName, configRef, name.FullName, typeMapping, methodSymbol))
         {
             return null;
         }

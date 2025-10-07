@@ -1,6 +1,6 @@
 using Riok.Mapperly.Helpers;
 
-namespace Riok.Mapperly.Configuration;
+namespace Riok.Mapperly.Configuration.PropertyReferences;
 
 public readonly record struct StringMemberPath(ImmutableEquatableArray<string> Path) : IMemberPathConfiguration
 {

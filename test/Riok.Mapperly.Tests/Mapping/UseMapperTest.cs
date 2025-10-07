@@ -391,4 +391,43 @@ public class UseMapperTest
                 """
             );
     }
+
+    [Fact]
+    public void ExternalMappingDoesNotAffectOnUseMapper()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UseMapper]
+            private readonly OtherMapper _otherMapper = new();
+
+            private readonly ExternalMapper _externalMapper = new();
+
+            partial B Map(A source);
+
+            [MapProperty("Value", "Value", Use = nameof(@_externalMapper.ExplicitMap)]
+            partial B MapOther(A source);
+            """,
+            "record A(int Value);",
+            "record B(int Value);",
+            "class OtherMapper { public int AutoMap(int source) => source + 1; }",
+            "class ExternalMapper { public int ExplicitMap(int source) => source + 2; }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(_otherMapper.AutoMap(source.Value));
+                return target;
+                """
+            )
+            .HaveMethodBody(
+                "MapOther",
+                """
+                var target = new global::B(_externalMapper.ExplicitMap(source.Value));
+                return target;
+                """
+            );
+    }
 }

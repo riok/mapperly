@@ -1,0 +1,23 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+
+[MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@mapper.ModifyString)]
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+private partial B Map(A source);
+*/
+ : (13,1)-(13,81),
+      Message: The referenced mapping named mapper.ModifyString was not found,
+      Severity: Error,
+      Descriptor: {
+        Id: RMG061,
+        Title: The referenced mapping was not found,
+        MessageFormat: The referenced mapping named {0} was not found,
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}
