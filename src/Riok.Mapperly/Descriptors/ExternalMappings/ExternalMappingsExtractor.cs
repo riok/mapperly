@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
