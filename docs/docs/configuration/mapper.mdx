@@ -71,7 +71,7 @@ public partial class CarMapper
 }
 ```
 
-### Ignore properties / fields
+### Ignore members
 
 To ignore a property or field, the `MapperIgnoreTargetAttribute` or `MapperIgnoreSourceAttribute` can be used.
 
@@ -426,29 +426,12 @@ public partial class CarMapper
 }
 ```
 
-#### Custom mapper names
+#### Custom mapping names
 
 By default, Mapperly uses the method name as the identifier for each mapping.
 However, you can assign a custom name to any mapping by applying the `NamedMapping` attribute:
 
 ```csharp
-[Mapper(AutoUserMappings = false)]
-public partial class CarMapper
-{
-    // highlight-start
-    [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = "CustomMapPrice")]
-    // highlight-end
-    public partial CarDto MapCar(Car source);
-
-    // highlight-start
-    [NamedMapping("CustomMapPrice")]
-    // highlight-end
-    private string MapPrice(decimal price)
-        => (price / 100).ToString("C");
-}
-```
-
-````csharp
 [Mapper]
 public partial class CarMapper
 {
@@ -468,7 +451,7 @@ public partial class CarMapper
 #### External method reference
 
 Mapperly also supports referencing methods external to the mapper class to perform property mappings. To do this, prefix the path
-with `@` in the `Use` property. This applies for both `MapProperty` and `MapPropertyFromSource`.
+with `@` in the `Use` property (see also [full-nameof](./full-nameof.md)). This applies for both `MapProperty` and `MapPropertyFromSource`.
 It is also possible to use a string reference of the type. In this case the type must be fully qualified.
 
 <Tabs>
@@ -492,19 +475,6 @@ It is also possible to use a string reference of the type. In this case the type
             target.NetPrice = global::OtherNamespace.PriceMapper.MapPriceFromSource(source);
         }
         ```
-
-        ```csharp
-        namespace OtherNamespace;
-
-        public static class PriceMapper
-        {
-            public static string MapPrice(decimal price)
-                => (price / 100).ToString("C");
-
-            public static string MapPriceFromSource(Car source)
-                => (source.Price / 100).ToString("C");
-        }
-        ```
     </TabItem>
 
     <TabItem value="use-with-string-path" label="Use with string path">
@@ -526,6 +496,9 @@ It is also possible to use a string reference of the type. In this case the type
             target.NetPrice = global::OtherNamespace.PriceMapper.MapPriceFromSource(source);
         }
         ```
+    </TabItem>
+
+    <TabItem value="otherMapper" label="Other mapper class">
 
         ```csharp
         namespace OtherNamespace;
@@ -533,12 +506,13 @@ It is also possible to use a string reference of the type. In this case the type
         public static class PriceMapper
         {
             public static string MapPrice(decimal price)
-                => (price / 100).ToString("C");
+            => (price / 100).ToString("C");
 
             public static string MapPriceFromSource(Car source)
-                => (source.Price / 100).ToString("C");
+            => (source.Price / 100).ToString("C");
         }
         ```
+
     </TabItem>
 
 </Tabs>
@@ -566,19 +540,11 @@ In this case, the method should be referenced through this member.
             target.Price = PriceMapper.MapPrice(source.Price);
             target.NetPrice = PriceMapper.MapPriceFromSource(source);
         }
-
-        public class PriceMapper
-        {
-            public string MapPrice(decimal price)
-                => (price / 100).ToString("C");
-
-            public string MapPriceFromSource(Car source)
-                => (source.Price / 100).ToString("C");
-        }
         ```
 
     </TabItem>
     <TabItem value="instance-with-string-path" label="Instance with string path">
+
         ```csharp
         [Mapper]
         public partial class CarMapper
@@ -597,14 +563,20 @@ In this case, the method should be referenced through this member.
             target.Price = PriceMapper.MapPrice(source.Price);
             target.NetPrice = PriceMapper.MapPriceFromSource(source);
         }
+        ```
 
+    </TabItem>
+
+    <TabItem value="priceMapper" label="Price mapper class">
+
+        ```csharp
         public class PriceMapper
         {
             public string MapPrice(decimal price)
-                => (price / 100).ToString("C");
+            => (price / 100).ToString("C");
 
             public string MapPriceFromSource(Car source)
-                => (source.Price / 100).ToString("C");
+            => (source.Price / 100).ToString("C");
         }
         ```
 
@@ -612,69 +584,6 @@ In this case, the method should be referenced through this member.
 
 </Tabs>
 
-The `NamedMapping` attribute can also be used in combination with the external method reference.
-
-```csharp
-namespace MyNamespace;
-
-[Mapper]
-public partial class CarMapper
-{
-    // highlight-start
-    [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = "OtherNamespace.PriceMapper.CustomMapPrice")]
-    [MapPropertyFromSource(nameof(CarDto.NetPrice), Use = "OtherNamespace.PriceMapper.CustomMapPriceFromSource")]
-    // highlight-end
-    public partial CarDto MapCar(Car source);
-
-    // generates
-    target.Price = global::OtherNamespace.PriceMapper.MapPrice(source.Price);
-    target.NetPrice = global::OtherNamespace.PriceMapper.MapPriceFromSource(source);
-}
 ```
 
-```csharp
-namespace OtherNamespace;
-
-public static class PriceMapper
-{
-    [NamedMapping("CustomMapPrice")]
-    public static string MapPrice(decimal price)
-        => (price / 100).ToString("C");
-
-    [NamedMapping("CustomMapPriceFromSource")]
-    public static string MapPriceFromSource(Car source)
-        => (source.Price / 100).ToString("C");
-}
-
-
-### Ignoring members and methods
-
-Specific properties, fields, or methods can be excluded from being used in mappings by applying the `[MapperIgnore]` attribute. This is particularly useful when you want to prevent certain members from being included in automatic mappings.
-
-## Ignoring members and methods
-
-```csharp
-public class Source
-{
-    public string Name { get; set; }
-
-    [MapperIgnore]
-    public string SecretValue { get; set; } // This will be ignored in mappings
-}
-
-### Ignoring methods
-
-You can also ignore specific methods from being used as mapping methods:
-
-```csharp
-public class Source
-{
-    // This method will be ignored by Mapperly
-    [MapperIgnore]
-    public static Target FromSource(Source src) => new();
-
-    // This method will be used for mapping
-    public static Target CreateFrom(Source src) => new();
-}
-
-````
+```
