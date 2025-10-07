@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
@@ -38,12 +39,10 @@ internal static class ExternalMappingsExtractor
         INamedTypeSymbol mapperSymbol
     )
     {
-        var externalStaticDirectlyReferencedMappings = ctx
+        return ctx
             .SymbolAccessor.GetAllMethods(mapperSymbol)
             .SelectMany(CollectMemberMappingConfigurations)
             .SelectMany(e => UserMethodMappingExtractor.ExtractNamedUserImplementedMappings(ctx, e).Select(y => (e.FullName, y)));
-
-        return externalStaticDirectlyReferencedMappings;
 
         IEnumerable<IMethodReferenceConfiguration> CollectMemberMappingConfigurations(IMethodSymbol x) =>
             ctx
@@ -53,7 +52,8 @@ internal static class ExternalMappingsExtractor
                 .Concat(
                     ctx.AttributeAccessor.Access<IncludeMappingConfigurationAttribute, IncludeMappingConfiguration>(x).Select(e => e.Name)
                 )
-                .Where(e => e?.IsExternal ?? false)!;
+                .Where(e => e?.IsExternal ?? false)
+                .WhereNotNull();
     }
 
     private static IEnumerable<IUserMapping> ValidateAndExtractExternalInstanceMappings(SimpleMappingBuilderContext ctx, ISymbol symbol)

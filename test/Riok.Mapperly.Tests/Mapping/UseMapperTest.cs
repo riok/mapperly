@@ -421,6 +421,13 @@ public class UseMapperTest
                 var target = new global::B(_otherMapper.AutoMap(source.Value));
                 return target;
                 """
+            )
+            .HaveMethodBody(
+                "MapOther",
+                """
+                var target = new global::B(_externalMapper.ExplicitMap(source.Value));
+                return target;
+                """
             );
     }
 }

@@ -81,7 +81,7 @@ public static class UserMethodMappingExtractor
             return [];
         }
 
-        var methods = ctx.SymbolAccessor.GetAllMethods(type).Where(e => ctx.AttributeAccessor.IsMappingNameEqualsTo(e, target.Name));
+        var methods = ctx.SymbolAccessor.GetAllMethods(type).Where(e => ctx.AttributeAccessor.IsMappingNameEqualTo(e, target.Name));
         return BuildUserImplementedMappings(ctx, methods, target.GetTargetName(ctx), type.IsStatic, isExternal: true, isDefault: false);
     }
 
@@ -345,7 +345,7 @@ public static class UserMethodMappingExtractor
     {
         return ctx
             .SymbolAccessor.GetAllDirectlyAccessibleMethods(mapperSymbol)
-            .Where(m => ctx.AttributeAccessor.IsMappingNameEqualsTo(m, name) && IsMappingMethodCandidate(ctx, m, requireAttribute: false))
+            .Where(m => ctx.AttributeAccessor.IsMappingNameEqualTo(m, name) && IsMappingMethodCandidate(ctx, m, requireAttribute: false))
             .Select(m => BuildUserImplementedMapping(ctx, m, null, allowPartial: true, isStatic: mapperSymbol.IsStatic, isExternal: false))
             .OfType<T>();
     }

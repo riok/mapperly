@@ -79,15 +79,15 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         }
     }
 
-    public string GetMethodName(IMethodSymbol methodSymbol)
+    public string GetMappingName(IMethodSymbol methodSymbol)
     {
         var mappingName = AccessFirstOrDefault<NamedMappingAttribute>(methodSymbol)?.Name ?? methodSymbol.Name;
         return mappingName;
     }
 
-    public bool IsMappingNameEqualsTo(IMethodSymbol methodSymbol, string name)
+    public bool IsMappingNameEqualTo(IMethodSymbol methodSymbol, string name)
     {
-        return string.Equals(GetMethodName(methodSymbol), name, StringComparison.Ordinal);
+        return string.Equals(GetMappingName(methodSymbol), name, StringComparison.Ordinal);
     }
 
     internal static TData Access<TAttribute, TData>(AttributeData attrData, SymbolAccessor? symbolAccessor = null)

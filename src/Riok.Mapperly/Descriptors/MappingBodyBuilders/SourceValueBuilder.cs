@@ -164,7 +164,7 @@ internal static class SourceValueBuilder
                 .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(targetSymbol)
                 .Where(m =>
                     m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
-                    && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualsTo(m, methodReferenceConfiguration.Name)
+                    && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualTo(m, methodReferenceConfiguration.Name)
                 )
                 .ToList();
 
@@ -187,7 +187,7 @@ internal static class SourceValueBuilder
 
         if (!memberMappingInfo.TargetMember.Member.IsNullable)
         {
-            // only assume annotated is nullable; none is threaded as non-nullable here
+            // Only annotated values are treated as nullable; unannotated ones are considered non-nullable.
             methodCandidates = methodCandidates.Where(m => m.ReturnNullableAnnotation != NullableAnnotation.Annotated);
         }
 

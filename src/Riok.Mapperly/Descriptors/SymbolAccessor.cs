@@ -14,6 +14,8 @@ namespace Riok.Mapperly.Descriptors;
 
 public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSymbol mapperSymbol)
 {
+    private const string GlobalPrefix = "global::";
+
     // this is a weak reference table
     // since if there is no reference to the key
     // the values should not be kept in the memory anymore / are not needed anymore.
@@ -534,10 +536,10 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     public INamedTypeSymbol? GetTypeByMetadataName(string targetTypeName)
     {
-        var startsWithGlobal = targetTypeName.StartsWith("global::", StringComparison.Ordinal);
+        var startsWithGlobal = targetTypeName.StartsWith(GlobalPrefix, StringComparison.Ordinal);
         if (startsWithGlobal)
         {
-            targetTypeName = targetTypeName[8..];
+            targetTypeName = targetTypeName[GlobalPrefix.Length..];
         }
 
         return Compilation.GetBestTypeByMetadataName(targetTypeName);

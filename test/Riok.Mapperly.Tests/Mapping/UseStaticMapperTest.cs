@@ -492,7 +492,7 @@ public class UseStaticMapperTest
                 partial B Map(A source);
 
                 [MapProperty("Value", "Value", Use = nameof(@ExternalMapper.ExplicitMap)]
-                partial  B MapOther(A source);
+                partial B MapOther(A source);
             }
             """
         );
@@ -502,6 +502,13 @@ public class UseStaticMapperTest
             .HaveMapMethodBody(
                 """
                 var target = new global::B(global::OtherMapper.AutoMap(source.Value));
+                return target;
+                """
+            )
+            .HaveMethodBody(
+                "MapOther",
+                """
+                var target = new global::B(global::ExternalMapper.ExplicitMap(source.Value));
                 return target;
                 """
             );

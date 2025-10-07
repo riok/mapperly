@@ -22,7 +22,6 @@ public class StringMethodReferenceConfiguration(string name, string? targetName,
         }
 
         EnsureTargetResolved(ctx);
-
         return _targetType;
     }
 

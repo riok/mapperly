@@ -139,19 +139,18 @@ public class NamedMappingTest
     [Fact]
     public Task MapPropertyWithUseUsesNamedMappingWithExternalMapping()
     {
-        var source = TestSourceBuilder.MapperWithBodyAndTypesInBlockScopedNamespace(
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(A.StringValue), nameof(B.StringValue), Use = "OtherNamespace.OtherMapper.CustomModifyString")]
             public partial B Map(A source);
             """,
-            TestSourceBuilderOptions.Default,
+            TestSourceBuilderOptions.InBlockScopedNamespace,
             "class A { public string StringValue { get; set; } }",
             "class B { public string StringValue { get; set; } }"
         );
 
-        // language=csharp
-        source += """
-
+        source += TestSourceBuilder.CSharp(
+            """
             namespace OtherNamespace
             {
                 class OtherMapper
@@ -161,7 +160,8 @@ public class NamedMappingTest
                     public static string ModifyString(string source) => source + "-modified";
                 }
             }
-            """;
+            """
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -169,19 +169,18 @@ public class NamedMappingTest
     [Fact]
     public Task MapPropertyFromSourceWithUseUsesNamedMappingWithExternalMapping()
     {
-        var source = TestSourceBuilder.MapperWithBodyAndTypesInBlockScopedNamespace(
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapPropertyFromSource(nameof(B.FullName), Use = "OtherNamespace.OtherMapper.CustomToFullName")]
             static partial B Map(A source);
             """,
-            TestSourceBuilderOptions.Default,
+            TestSourceBuilderOptions.InBlockScopedNamespace,
             "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
             "class B { public string FullName { get; set; } }"
         );
 
-        // language=csharp
-        source += """
-
+        source += TestSourceBuilder.CSharp(
+            """
             namespace OtherNamespace
             {
                 class OtherMapper
@@ -191,7 +190,8 @@ public class NamedMappingTest
                     public static string ToFullName(MapperNamespace.A x) => $"{x.FirstName} {x.LastName}";
                 }
             }
-            """;
+            """
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -208,9 +208,8 @@ public class NamedMappingTest
             "class B { public string DestinationName { get; set; } }"
         );
 
-        // language=csharp
-        source += """
-
+        source += TestSourceBuilder.CSharp(
+            """
             namespace OtherNamespace
             {
                 class OtherMapper
@@ -220,7 +219,8 @@ public class NamedMappingTest
                     public static partial B MapOther(A a);
                 }
             }
-            """;
+            """
+        );
 
         return TestHelper.VerifyGenerator(source);
     }

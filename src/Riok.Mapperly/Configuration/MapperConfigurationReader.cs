@@ -103,9 +103,10 @@ public class MapperConfigurationReader
         bool supportsDeepCloning
     )
     {
-        foreach (
-            var includedCfg in _dataAccessor.Access<IncludeMappingConfigurationAttribute, IncludeMappingConfiguration>(reference.Method!)
-        )
+        var includedMappingConfigs = _dataAccessor.Access<IncludeMappingConfigurationAttribute, IncludeMappingConfiguration>(
+            reference.Method!
+        );
+        foreach (var includedCfg in includedMappingConfigs)
         {
             var cfgToInclude = BuildConfigToInclude(includedCfg.Name, reference, visitedMethods, supportsDeepCloning);
             if (cfgToInclude == null)

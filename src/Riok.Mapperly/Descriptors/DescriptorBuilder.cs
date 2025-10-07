@@ -150,7 +150,7 @@ public class DescriptorBuilder
                 firstNonStaticUserMapping = userMapping.Method;
             }
 
-            var name = _attributeAccessor.GetMethodName(userMapping.Method);
+            var name = _attributeAccessor.GetMappingName(userMapping.Method);
             AddUserMapping(userMapping, false, name);
         }
 

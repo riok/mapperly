@@ -532,19 +532,18 @@ public class ObjectPropertyValueMethodTest
     [Fact]
     public Task MethodOnStaticClassSupportsExternalMappingsWithString()
     {
-        var source = TestSourceBuilder.MapperWithBodyAndTypesInBlockScopedNamespace(
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapValue("Value", Use = "OtherNamespace.OtherMapper.NewValue")]
             internal static partial B Map(A source);
             """,
-            TestSourceBuilderOptions.Default,
+            TestSourceBuilderOptions.InBlockScopedNamespace,
             "class A;",
             "record B(string Value);"
         );
 
-        // language=csharp
-        source += """
-
+        source += TestSourceBuilder.CSharp(
+            """
             namespace OtherNamespace
             {
                 class OtherMapper
@@ -552,7 +551,8 @@ public class ObjectPropertyValueMethodTest
                     public static string NewValue() => "new value";
                 }
             }
-            """;
+            """
+        );
 
         return TestHelper.VerifyGenerator(source);
     }

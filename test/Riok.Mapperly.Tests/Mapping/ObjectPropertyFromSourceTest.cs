@@ -306,26 +306,27 @@ public class ObjectPropertyFromSourceTest
     [Fact]
     public Task ShouldSupportExternalMappingsOnString()
     {
-        var source = TestSourceBuilder.MapperWithBodyAndTypesInBlockScopedNamespace(
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapPropertyFromSource(nameof(B.FullName), Use = "OtherNamespace.OtherMapper.ToFullName")]
             partial B Map(A source);
             """,
-            TestSourceBuilderOptions.Default,
+            TestSourceBuilderOptions.InBlockScopedNamespace,
             "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
             "class B { public string FullName { get; set; } }"
         );
 
-        // language=csharp
-        source += """
-
-            namespace OtherNamespace {
+        source += TestSourceBuilder.CSharp(
+            """
+            namespace OtherNamespace
+            {
                 class OtherMapper
                 {
                     public static string ToFullName(MapperNamespace.A x) => $"{x.FirstName} {x.LastName}";
                 }
             }
-            """;
+            """
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -382,12 +383,12 @@ public class ObjectPropertyFromSourceTest
     [Fact]
     public Task ShouldReportNonExistentExternalMappingsOnString()
     {
-        var source = TestSourceBuilder.MapperWithBodyAndTypesInBlockScopedNamespace(
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapPropertyFromSource(nameof(B.FullName), Use = "OtherNamespace.OtherMapper.ToFullName")]
             partial B Map(A source);
             """,
-            TestSourceBuilderOptions.Default,
+            TestSourceBuilderOptions.InBlockScopedNamespace,
             "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
             "class B { public string FullName { get; set; } }"
         );

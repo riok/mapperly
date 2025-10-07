@@ -34,7 +34,11 @@ public static class TestSourceBuilder
         return MapperWithBodyAndTypes($"private partial {toTypeName} {DefaultMapMethodName}({fromTypeName} source);", options, types);
     }
 
-    public static string MapperWithBody([StringSyntax(StringSyntax.CSharp)] string body, TestSourceBuilderOptions? options = null)
+    public static string MapperWithBody(
+        [StringSyntax(StringSyntax.CSharp)] string body,
+        TestSourceBuilderOptions? options = null,
+        string? additionalNamespaceContent = null
+    )
     {
         options ??= TestSourceBuilderOptions.Default;
 
@@ -46,7 +50,7 @@ public static class TestSourceBuilder
             using Riok.Mapperly.Abstractions;
             using Riok.Mapperly.Abstractions.ReferenceHandling;
 
-            {{(options.Namespace != null ? $"namespace {options.Namespace};" : "")}}
+            {{(options.Namespace != null ? $"namespace {options.Namespace}{(options.UseFileScopedNamespace ? ";" : "{")}" : "")}}
 
             {{BuildAttribute(options)}}
             public {{(options.Static ? "static " : "")}}partial class {{options.MapperClassName}}{{(
@@ -55,6 +59,9 @@ public static class TestSourceBuilder
             {
                 {{body}}
             }
+
+            {{ additionalNamespaceContent ?? "" }}
+            {{(options is { Namespace: not null, UseFileScopedNamespace: false } ? "}" : "") }}
             """
         );
     }
@@ -71,43 +78,7 @@ public static class TestSourceBuilder
     )
     {
         var sep = Environment.NewLine + Environment.NewLine;
-        return MapperWithBody(body, options) + sep + string.Join(sep, types);
-    }
-
-    public static string MapperWithBodyAndTypesInBlockScopedNamespace(
-        [StringSyntax(StringSyntax.CSharp)] string body,
-        TestSourceBuilderOptions? options,
-        [StringSyntax(StringSyntax.CSharp)] params string[] types
-    )
-    {
-        const string DefaultNamespace = "MapperNamespace";
-        options ??= TestSourceBuilderOptions.Default;
-        var additionalTypes = "";
-        if (types.Length > 0)
-        {
-            additionalTypes = Environment.NewLine + string.Join(Environment.NewLine, types);
-        }
-
-        return CSharp(
-            $$"""
-            using System;
-            using System.Linq;
-            using System.Collections.Generic;
-            using Riok.Mapperly.Abstractions;
-            using Riok.Mapperly.Abstractions.ReferenceHandling;
-
-            namespace {{options.Namespace ?? DefaultNamespace}} {
-
-                {{BuildAttribute(options)}}
-                public {{(options.Static ? "static " : "")}}partial class {{options.MapperClassName}}{{(
-                        options.MapperBaseClassName != null ? " : " + options.MapperBaseClassName : ""
-                    )}}
-                {
-                    {{body}}
-                }{{additionalTypes}}
-            }
-            """
-        );
+        return MapperWithBody(body, options, sep + string.Join(sep, types));
     }
 
     public static SyntaxTree SyntaxTree([StringSyntax(StringSyntax.CSharp)] string source)

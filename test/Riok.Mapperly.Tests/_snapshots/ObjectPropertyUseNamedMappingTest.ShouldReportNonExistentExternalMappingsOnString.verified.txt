@@ -2,12 +2,12 @@
   Diagnostics: [
     {
       Location: /*
-    {
-        [MapProperty(nameof(A.Value), nameof(B.Value), Use = "OtherNamespace.OtherMapper.ModifyString")]
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+{
+    [MapProperty(nameof(A.Value), nameof(B.Value), Use = "OtherNamespace.OtherMapper.ModifyString")]
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 private static partial B Map(A source);
 */
- : (11,9)-(11,103),
+ : (11,5)-(11,99),
       Message: The referenced mapping named OtherNamespace.OtherMapper.ModifyString was not found,
       Severity: Error,
       Descriptor: {

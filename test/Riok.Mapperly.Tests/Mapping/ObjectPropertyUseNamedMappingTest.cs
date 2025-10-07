@@ -708,19 +708,18 @@ public class ObjectPropertyUseNamedMappingTest
     [Fact]
     public Task ShouldSupportExternalMappingsOnString()
     {
-        var source = TestSourceBuilder.MapperWithBodyAndTypesInBlockScopedNamespace(
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(A.Value), nameof(B.Value), Use = "OtherNamespace.OtherMapper.ModifyString")]
             private static partial B Map(A source);
             """,
-            TestSourceBuilderOptions.Default,
+            TestSourceBuilderOptions.InBlockScopedNamespace,
             "record A(string Value);",
             "record B(string Value);"
         );
 
-        // language=csharp
-        source += """
-
+        source += TestSourceBuilder.CSharp(
+            """
             namespace OtherNamespace
             {
                 class OtherMapper
@@ -728,7 +727,8 @@ public class ObjectPropertyUseNamedMappingTest
                     public static string ModifyString(string source) => source + "-externally-modified";
                 }
             }
-            """;
+            """
+        );
 
         return TestHelper.VerifyGenerator(source);
     }
@@ -833,12 +833,12 @@ public class ObjectPropertyUseNamedMappingTest
     [Fact]
     public Task ShouldReportNonExistentExternalMappingsOnString()
     {
-        var source = TestSourceBuilder.MapperWithBodyAndTypesInBlockScopedNamespace(
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [MapProperty(nameof(A.Value), nameof(B.Value), Use = "OtherNamespace.OtherMapper.ModifyString")]
             private static partial B Map(A source);
             """,
-            TestSourceBuilderOptions.Default,
+            TestSourceBuilderOptions.InBlockScopedNamespace,
             "record A(string Value);",
             "record B(string Value);"
         );
