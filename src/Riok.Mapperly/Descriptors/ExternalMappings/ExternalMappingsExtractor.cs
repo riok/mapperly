@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Configuration.MethodReferences;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
@@ -30,6 +31,28 @@ internal static class ExternalMappingsExtractor
             .SelectMany(x => ValidateAndExtractExternalInstanceMappings(ctx, x));
 
         return staticExternalMappers.Concat(externalInstanceMappers);
+    }
+
+    public static IEnumerable<(string Name, IUserMapping Mapping)> ExtractExternalNamedMappings(
+        SimpleMappingBuilderContext ctx,
+        INamedTypeSymbol mapperSymbol
+    )
+    {
+        return ctx
+            .SymbolAccessor.GetAllMethods(mapperSymbol)
+            .SelectMany(CollectMemberMappingConfigurations)
+            .SelectMany(e => UserMethodMappingExtractor.ExtractNamedUserImplementedMappings(ctx, e).Select(y => (e.FullName, y)));
+
+        IEnumerable<IMethodReferenceConfiguration> CollectMemberMappingConfigurations(IMethodSymbol x) =>
+            ctx
+                .AttributeAccessor.Access<MapPropertyAttribute, MemberMappingConfiguration>(x)
+                .Select(e => e.Use)
+                .Concat(ctx.AttributeAccessor.Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(x).Select(e => e.Use))
+                .Concat(
+                    ctx.AttributeAccessor.Access<IncludeMappingConfigurationAttribute, IncludeMappingConfiguration>(x).Select(e => e.Name)
+                )
+                .Where(e => e?.IsExternal ?? false)
+                .WhereNotNull();
     }
 
     private static IEnumerable<IUserMapping> ValidateAndExtractExternalInstanceMappings(SimpleMappingBuilderContext ctx, ISymbol symbol)

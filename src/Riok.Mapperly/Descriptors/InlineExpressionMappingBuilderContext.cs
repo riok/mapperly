@@ -91,7 +91,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
 
     public INewInstanceMapping? FindNewInstanceMapping(IMethodSymbol method)
     {
-        INewInstanceMapping? mapping = InlinedMappings.FindNewInstanceUserMapping(method, out var isInlined);
+        var mapping = InlinedMappings.FindNewInstanceMapping(method, out var isInlined);
         if (mapping == null)
             return null;
 

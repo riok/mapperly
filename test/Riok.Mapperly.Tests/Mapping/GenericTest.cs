@@ -748,4 +748,143 @@ public class GenericTest
             .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "Map has an unsupported mapping method signature")
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public void WithGenericUnconstrainedTypesInNullableDisabledContext()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B<string> Map(A<string> source);",
+            """
+            class A<T>
+            {
+                public T Value { get; set; }
+            }
+            """,
+            """
+            class B<T>
+            {
+                public T Value { get; set; }
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.DisabledNullable with { AllowedDiagnosticSeverities = null })
+            .Should()
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return default;
+                var target = new global::B<string?>();
+                target.Value = source.Value;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void WithGenericNotNullConstraintOnSourceOnlyInNullableDisabledContext()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B<string> Map(A<string> source);",
+            """
+            class A<T> where T: notnull
+            {
+                public T Value { get; set; }
+            }
+            """,
+            """
+            class B<T>
+            {
+                public T Value { get; set; }
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.DisabledNullable with { AllowedDiagnosticSeverities = null })
+            .Should()
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return default;
+                var target = new global::B<string?>();
+                target.Value = source.Value;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void WithGenericNotNullConstraintOnTargetOnlyInNullableDisabledContext()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B<string> Map(A<string> source);",
+            """
+            class A<T>
+            {
+                public T Value { get; set; }
+            }
+            """,
+            """
+            class B<T> where T: notnull
+            {
+                public T Value { get; set; }
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.DisabledNullable with { AllowedDiagnosticSeverities = null })
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Value of A<string?> to the target property Value of B<string> which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return default;
+                var target = new global::B<string>();
+                if (source.Value != null)
+                {
+                    target.Value = source.Value;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void WithGenericNotNullConstraintOnBothTypesInNullableDisabledContext()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B<string> Map(A<string> source);",
+            """
+            class A<T> where T: notnull
+            {
+                public T Value { get; set; }
+            }
+            """,
+            """
+            class B<T> where T: notnull
+            {
+                public T Value { get; set; }
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.DisabledNullable with { AllowedDiagnosticSeverities = null })
+            .Should()
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return default;
+                var target = new global::B<string>();
+                target.Value = source.Value;
+                return target;
+                """
+            );
+    }
 }

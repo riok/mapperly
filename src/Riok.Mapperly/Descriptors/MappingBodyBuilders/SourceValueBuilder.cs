@@ -156,35 +156,25 @@ internal static class SourceValueBuilder
         [NotNullWhen(true)] out ISourceValue? sourceValue
     )
     {
-        if (TryGetValueProviderMethod(ctx, memberMappingInfo, out var method))
-        {
-            sourceValue = new MethodProvidedSourceValue(method.Name);
-            return true;
-        }
-
-        sourceValue = null;
-        return false;
-    }
-
-    private static bool TryGetValueProviderMethod(
-        IMembersBuilderContext<IMapping> ctx,
-        MemberMappingInfo memberMappingInfo,
-        [NotNullWhen(true)] out IMethodSymbol? method
-    )
-    {
-        var mappingName = memberMappingInfo.ValueConfiguration!.Use!;
-        var namedMethodCandidates = ctx
-            .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(ctx.BuilderContext.MapperDeclaration.Symbol)
-            .Where(m =>
-                m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
-                && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualsTo(m, mappingName)
-            )
-            .ToList();
+        var methodReferenceConfiguration = memberMappingInfo.ValueConfiguration!.Use!;
+        var targetSymbol = methodReferenceConfiguration.GetTargetType(ctx.BuilderContext);
+        var namedMethodCandidates = targetSymbol is null
+            ? []
+            : ctx
+                .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(targetSymbol)
+                .Where(m =>
+                    m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
+                    && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualTo(m, methodReferenceConfiguration.Name)
+                )
+                .ToList();
 
         if (namedMethodCandidates.Count == 0)
         {
-            ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.MapValueReferencedMethodNotFound, mappingName);
-            method = null;
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.MapValueReferencedMethodNotFound,
+                methodReferenceConfiguration.FullName
+            );
+            sourceValue = null;
             return false;
         }
 
@@ -197,20 +187,24 @@ internal static class SourceValueBuilder
 
         if (!memberMappingInfo.TargetMember.Member.IsNullable)
         {
-            // only assume annotated is nullable, none is threated as non-nullable here
+            // Only annotated values are treated as nullable; unannotated ones are considered non-nullable.
             methodCandidates = methodCandidates.Where(m => m.ReturnNullableAnnotation != NullableAnnotation.Annotated);
         }
 
-        method = methodCandidates.FirstOrDefault();
-        if (method != null)
-            return true;
+        var methodSymbol = methodCandidates.FirstOrDefault();
+        if (methodSymbol == null)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.MapValueMethodTypeMismatch,
+                methodReferenceConfiguration.Name,
+                namedMethodCandidates[0].ReturnType.ToDisplayString(),
+                memberMappingInfo.TargetMember.ToDisplayString()
+            );
+            sourceValue = null;
+            return false;
+        }
 
-        ctx.BuilderContext.ReportDiagnostic(
-            DiagnosticDescriptors.MapValueMethodTypeMismatch,
-            mappingName,
-            namedMethodCandidates[0].ReturnType.ToDisplayString(),
-            memberMappingInfo.TargetMember.ToDisplayString()
-        );
-        return false;
+        sourceValue = new MethodProvidedSourceValue(methodSymbol.Name, methodReferenceConfiguration.GetTargetName(ctx.BuilderContext));
+        return true;
     }
 }

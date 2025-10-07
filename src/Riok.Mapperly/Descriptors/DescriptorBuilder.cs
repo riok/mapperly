@@ -79,6 +79,7 @@ public class DescriptorBuilder
         ConfigureMemberVisibility();
         ReserveMethodNames();
         ExtractUserMappings();
+        ExtractExternalNamedMappings();
 
         // ExtractObjectFactories needs to be called after ExtractUserMappings due to configuring mapperDescriptor.Static
         var objectFactories = ExtractObjectFactories();
@@ -149,7 +150,8 @@ public class DescriptorBuilder
                 firstNonStaticUserMapping = userMapping.Method;
             }
 
-            AddUserMapping(userMapping, false, true);
+            var name = _attributeAccessor.GetMappingName(userMapping.Method);
+            AddUserMapping(userMapping, false, name);
         }
 
         if (_mapperDescriptor.Static && firstNonStaticUserMapping is not null)
@@ -187,7 +189,15 @@ public class DescriptorBuilder
     {
         foreach (var externalMapping in ExternalMappingsExtractor.ExtractExternalMappings(_builderContext, _mapperDescriptor.Symbol))
         {
-            AddUserMapping(externalMapping, true, false);
+            AddUserMapping(externalMapping, true);
+        }
+    }
+
+    private void ExtractExternalNamedMappings()
+    {
+        foreach (var (name, mapping) in ExternalMappingsExtractor.ExtractExternalNamedMappings(_builderContext, _mapperDescriptor.Symbol))
+        {
+            AddUserMapping(mapping, true, name);
         }
     }
 
@@ -226,9 +236,8 @@ public class DescriptorBuilder
         _mapperDescriptor.UnsafeAccessors = _unsafeAccessorContext;
     }
 
-    private void AddUserMapping(IUserMapping mapping, bool ignoreDuplicates, bool named)
+    private void AddUserMapping(IUserMapping mapping, bool ignoreDuplicates, string? name = null)
     {
-        var name = named ? _attributeAccessor.GetMethodName(mapping.Method) : null;
         var result = _mappings.AddUserMapping(mapping, name);
         if (!ignoreDuplicates && mapping.Default == true && result == MappingCollectionAddResult.NotAddedDuplicated)
         {
