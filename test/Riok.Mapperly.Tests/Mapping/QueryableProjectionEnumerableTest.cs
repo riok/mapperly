@@ -8,6 +8,7 @@ public class QueryableProjectionEnumerableTest
         var source = TestSourceBuilder.Mapping(
             "System.Linq.IQueryable<A>",
             "System.Linq.IQueryable<B>",
+            TestSourceBuilderOptions.AllConversions,
             "class A { public IEnumerable<long> Values { get; set; } }",
             "class B { public IEnumerable<int> Values { get; set; } }"
         );
@@ -21,6 +22,7 @@ public class QueryableProjectionEnumerableTest
         var source = TestSourceBuilder.Mapping(
             "System.Linq.IQueryable<A>",
             "System.Linq.IQueryable<B>",
+            TestSourceBuilderOptions.AllConversions,
             "class A { public long[] Values { get; set; } }",
             "class B { public int[] Values { get; set; } }"
         );

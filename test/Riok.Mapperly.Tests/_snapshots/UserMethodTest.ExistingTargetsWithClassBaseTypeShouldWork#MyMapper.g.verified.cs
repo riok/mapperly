@@ -10,7 +10,7 @@ public partial class MyMapper
         MyMapping(source.Value, target.Value);
         ((global::BaseMapper2)this).MyMapping2(source.Value2, target.Value2);
         ((global::BaseMapper3)this).MyMapping3(source.Value3, target.Value3);
-        MyIntToShortMapping(source.Value4, target.Value4);
+        MyIntToDoubleMapping(source.Value4, target.Value4);
         return target;
     }
 }
