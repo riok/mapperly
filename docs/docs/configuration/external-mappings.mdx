@@ -8,6 +8,8 @@ import TabItem from '@theme/TabItem';
 
 # Use external mappings
 
+## External mapping with UseMapper / UseStaticMapper
+
 Mapperly can also consider mappings implemented in other classes.
 In order for Mapperly to find the mappings, they must be made known with `UseMapper` / `UseStaticMapper`.
 
@@ -69,4 +71,207 @@ Whenever Mapperly needs a mapping from `BananaBox` to `BananaBoxDto` inside the 
 it will use the provided implementation by the `BananaMapper`.
 
 Used mappers themselves can be Mapperly backed classes.  
-The [`AutoUserMappings`](#automatic-user-implemented-mapping-method-discovery) value also applies to the usage of external mappers.
+The [`AutoUserMappings`](./user-implemented-methods.mdx) value also applies to the usage of external mappers.
+
+
+## External method reference
+
+### Static external method reference
+
+Mapperly also supports referencing methods directly from an external class. To do this, prefix the path
+with `@` in the `Use` property (see also [full-nameof](./full-nameof.md)). This applies for `MapProperty`, `MapPropertyFromSource`
+and `MapValue`. It is also possible to use a string reference of the type. In this case the type must be fully qualified.
+
+<Tabs>
+    <TabItem value="use-full-nameof" label="Use with fullnameof" default>
+        ```csharp
+        using OtherNamespace;
+
+        namespace MyNamespace;
+
+        [Mapper]
+        public partial class CarMapper
+        {
+            // highlight-start
+            [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = nameof(@PriceMapper.MapPrice))]
+            [MapPropertyFromSource(nameof(CarDto.NetPrice), Use = nameof(@PriceMapper.MapPriceFromSource))]
+            [MapValue(nameof(CarDto.SourceSystem), Use = nameof(@SourceSystems.GetSourceSystem))]
+            // highlight-end
+            public partial CarDto MapCar(Car source);
+
+            // generates
+            target.Price = global::OtherNamespace.PriceMapper.MapPrice(source.Price);
+            target.NetPrice = global::OtherNamespace.PriceMapper.MapPriceFromSource(source);
+            target.SourceSystem = global::OtherNamespace.SourceSystems.GetSourceSystem();
+        }
+        ```
+    </TabItem>
+
+    <TabItem value="use-with-string-path" label="Use with string path">
+
+        ```csharp
+        namespace MyNamespace;
+
+        [Mapper]
+        public partial class CarMapper
+        {
+            // highlight-start
+            [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = "OtherNamespace.PriceMapper.MapPrice")]
+            [MapPropertyFromSource(nameof(CarDto.NetPrice), Use = "OtherNamespace.PriceMapper.MapPriceFromSource")]
+            [MapValue(nameof(CarDto.SourceSystem), Use = "OtherNamespace.SourceSystems.GetSourceSystem")]
+            // highlight-end
+            public partial CarDto MapCar(Car source);
+
+            // generates
+            target.Price = global::OtherNamespace.PriceMapper.MapPrice(source.Price);
+            target.NetPrice = global::OtherNamespace.PriceMapper.MapPriceFromSource(source);
+            target.SourceSystem = global::OtherNamespace.SourceSystems.GetSourceSystem();
+        }
+        ```
+    </TabItem>
+
+    <TabItem value="otherMapper" label="Other mapper class">
+
+        ```csharp
+        namespace OtherNamespace;
+
+        public static class PriceMapper
+        {
+            public static string MapPrice(decimal price)
+            => (price / 100).ToString("C");
+
+            public static string MapPriceFromSource(Car source)
+            => (source.Price / 100).ToString("C");
+        }
+
+        public static class SourceSystems
+        {
+            public static string GetSourceSystem() => "C1";
+        }
+        ```
+
+    </TabItem>
+
+</Tabs>
+
+### Instance external method reference
+
+It is also possible to use this syntax to reference instance methods if the mapper class has a property or field referencing
+the external type. In this case, the method should be referenced through this member.
+
+<Tabs>
+    <TabItem value="instance-with-fullnameof" label="Instance with fullnameof" default>
+        ```csharp
+        [Mapper]
+        public partial class CarMapper
+        {
+            // highlight-start
+            public PriceMapper PriceMapper { get; } = new();
+            public SourceSystems SourceSystems { get; } = new();
+            // highlight-end
+
+            // highlight-start
+            [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = nameof(@PriceMapper.MapPrice))]
+            [MapPropertyFromSource(nameof(CarDto.NetPrice), Use = nameof(@PriceMapper.MapPriceFromSource))]
+            [MapValue(nameof(CarDto.SourceSystem), Use = nameof(@SourceSystems.GetSourceSystem))]
+            // highlight-end
+            public partial CarDto MapCar(Car source);
+
+            // generates
+            target.Price = PriceMapper.MapPrice(source.Price);
+            target.NetPrice = PriceMapper.MapPriceFromSource(source);
+            target.SourceSystem = SourceSystems.GetSourceSystem();
+        }
+        ```
+
+    </TabItem>
+    <TabItem value="instance-with-string-path" label="Instance with string path">
+
+        ```csharp
+        [Mapper]
+        public partial class CarMapper
+        {
+            // highlight-start
+            public PriceMapper PriceMapper { get; } = new();
+            public SourceSystems SourceSystems { get; } = new();
+            // highlight-end
+
+            // highlight-start
+            [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = "PriceMapper.MapPrice")]
+            [MapPropertyFromSource(nameof(CarDto.NetPrice), Use = "PriceMapper.MapPriceFromSource")]
+            [MapValue(nameof(CarDto.SourceSystem), Use = "SourceSystems.GetSourceSystem")]
+            // highlight-end
+            public partial CarDto MapCar(Car source);
+
+            // generates
+            target.Price = PriceMapper.MapPrice(source.Price);
+            target.NetPrice = PriceMapper.MapPriceFromSource(source);
+            target.SourceSystem = SourceSystems.GetSourceSystem();
+        }
+        ```
+
+    </TabItem>
+
+    <TabItem value="priceMapper" label="Price mapper class">
+
+        ```csharp
+        public class PriceMapper
+        {
+            public string MapPrice(decimal price)
+            => (price / 100).ToString("C");
+
+            public string MapPriceFromSource(Car source)
+            => (source.Price / 100).ToString("C");
+        }
+
+        public static class SourceSystems
+        {
+            public static string GetSourceSystem() => "C1";
+        }
+        ```
+    </TabItem>
+
+</Tabs>
+
+### Named mapping
+
+The `NamedMapping` attribute can also be used in combination with the external method reference.
+
+```csharp
+namespace MyNamespace;
+
+[Mapper]
+public partial class CarMapper
+{
+    // highlight-start
+    [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = "PriceMapper.CustomMapPrice")]
+    [MapPropertyFromSource(nameof(CarDto.NetPrice), Use = "PriceMapper.CustomMapPriceFromSource")]
+    [MapValue(nameof(CarDto.SourceSystem), Use = "OtherNamespace.SourceSystems.CustomGetSourceSystem")]
+    // highlight-end
+    public partial CarDto Map(Car car);
+
+    // generates
+    target.Price = PriceMapper.MapPrice(source.Price);
+    target.NetPrice = PriceMapper.MapPriceFromSource(source);
+    target.SourceSystem = SourceSystems.GetSourceSystem();
+}
+```
+
+```csharp
+namespace OtherNamespace;
+
+public class PriceMapper
+{
+    public string MapPrice(decimal price)
+    => (price / 100).ToString("C");
+
+    public string MapPriceFromSource(Car source)
+    => (source.Price / 100).ToString("C");
+}
+
+public static class SourceSystems
+{
+    [NamedMapping("CustomGetSourceSystem")]
+    public static string GetSourceSystem() => "C1";
+}
+```
