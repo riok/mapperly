@@ -50,6 +50,69 @@ public class ObjectPropertyFlatteningTest
     }
 
     [Fact]
+    public void ManualFlattenedPropertyWithFullNameOfSourceAndOnlyTypeShouldReport()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(nameof(@A), nameof(B.Destination))] partial B Map(A source);",
+            "class A { public int Source { get; set; } }",
+            "class B { public int Destination { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.CouldNotMapMember, "Could not map member A to B.Destination of type int")
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member Source on the mapping source type A is not mapped to any member on the mapping target type B"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotFound,
+                "The member Destination on the mapping target type B was not found on the mapping source type A"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ManualFlattenedPropertyWithFullNameOfDestinationAndOnlyTypeShouldReport()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(nameof(@A.Source), nameof(@B))] partial B Map(A source);",
+            "class A { public int Source { get; set; } }",
+            "class B { public int Destination { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.ConfiguredMappingTargetMemberNotFound,
+                "Specified member  on mapping target type B was not found"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member Source on the mapping source type A is not mapped to any member on the mapping target type B"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotFound,
+                "The member Destination on the mapping target type B was not found on the mapping source type A"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void ManualFlattenedPropertyWithFullNameOfNamespacedSource()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
