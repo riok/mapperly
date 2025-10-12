@@ -21,6 +21,52 @@ public class ReferenceHandlingTest
     }
 
     [Fact]
+    public Task ShouldWorkIfHasWriteablePropertyOnPath()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "C",
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A { public B Parent { get; set; } }",
+            "class B { public A Parent { get; set; } }",
+            "class C { public D Parent { get; } }",
+            "class D { public C Parent { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact(Skip = "Not fixed yet")]
+    public Task ShouldReportDiagnosticWhenTargetGetterReadOnly()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A { public A Parent { get; set; } }",
+            "class B { public B Parent { get; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact(Skip = "Not fixed yet")]
+    public Task ShouldReportDiagnosticWhenTargetGetterReadOnlyDeep()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "C",
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A { public B Parent { get; set; } }",
+            "class B { public A DeepParent { get; set; } }",
+            "class C { public D Parent { get; } }",
+            "class D { public C DeepParent { get; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ManuallyMappedPropertiesShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
