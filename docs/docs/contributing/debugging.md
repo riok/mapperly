@@ -13,7 +13,7 @@ Check [here](../configuration/generated-source.mdx) on how to inspect the genera
 ## Unit tests
 
 To debug the Mapperly in unit tests, set a breakpoint
-in the code of Mappery which you want to debug and run the tests in debug mode.
+in the code of Mapperly which you want to debug and run the tests in debug mode.
 
 ## Integration tests
 

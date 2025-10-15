@@ -115,7 +115,7 @@ are not affected by naming strategies.
 
 ## Manually mapped enum values
 
-To explicitly map enum values the `MapEnumValueAttibute` can be used.
+To explicitly map enum values the `MapEnumValueAttribute` can be used.
 Attribute is only valid on enum-to-enum, enum-to-string and string-to-enum mappings.
 
 Explicit enum mappings are not affected by enum naming strategies.
@@ -189,7 +189,7 @@ the `RequiredEnumMappingStrategy` can be used. By default this property will inh
     
         Sets the `RequiredEnumMappingStrategy` for all methods within the mapper,
         by default it is `Both` requiring all members to be mapped.
-        This can be overriden by individual mapping methods using `MapperRequiredMappingAttribute`.
+        This can be overridden by individual mapping methods using `MapperRequiredMappingAttribute`.
     
         ```csharp
         // highlight-start
