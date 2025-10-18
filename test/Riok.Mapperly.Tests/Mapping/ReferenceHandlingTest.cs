@@ -36,12 +36,13 @@ public class ReferenceHandlingTest
         return TestHelper.VerifyGenerator(source);
     }
 
-    [Fact(Skip = "Not fixed yet")]
+    [Fact]
     public Task ShouldReportDiagnosticWhenTargetGetterReadOnly()
     {
-        var source = TestSourceBuilder.Mapping(
-            "A",
-            "B",
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B MapToB(A source, [ReferenceHandler] IReferenceHandler refHandler);
+            """,
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public A Parent { get; set; } }",
             "class B { public B Parent { get; } }"
@@ -50,7 +51,7 @@ public class ReferenceHandlingTest
         return TestHelper.VerifyGenerator(source);
     }
 
-    [Fact(Skip = "Not fixed yet")]
+    [Fact]
     public Task ShouldReportDiagnosticWhenTargetGetterReadOnlyDeep()
     {
         var source = TestSourceBuilder.Mapping(

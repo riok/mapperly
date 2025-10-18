@@ -16,6 +16,12 @@ public class MemberExistingTargetMapping(
 {
     public MemberMappingInfo MemberInfo { get; } = memberInfo;
 
+    public bool TryGetMemberAssignmentMappingContainer(out IMemberAssignmentMappingContainer? container)
+    {
+        container = delegateMapping as IMemberAssignmentMappingContainer;
+        return container != null;
+    }
+
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
         var source = sourcePath.BuildAccess(ctx.Source);

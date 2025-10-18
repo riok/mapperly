@@ -18,6 +18,12 @@ public class MemberAssignmentMapping(MemberPathSetter targetPath, ISourceValue s
     private readonly ISourceValue _sourceValue = sourceValue;
     private readonly MemberPathSetter _targetPath = targetPath;
 
+    public bool TryGetMemberAssignmentMappingContainer(out IMemberAssignmentMappingContainer? container)
+    {
+        container = null;
+        return false;
+    }
+
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess) =>
         ctx.SyntaxFactory.SingleStatement(BuildExpression(ctx, targetAccess));
 

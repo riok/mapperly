@@ -6,4 +6,6 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 public interface IMemberAssignmentMapping : IAssignmentMappings
 {
     MemberMappingInfo MemberInfo { get; }
+
+    bool TryGetMemberAssignmentMappingContainer(out IMemberAssignmentMappingContainer? container);
 }
