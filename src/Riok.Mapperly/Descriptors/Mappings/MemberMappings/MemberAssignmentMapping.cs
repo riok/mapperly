@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
 using Riok.Mapperly.Symbols.Members;
@@ -17,6 +18,12 @@ public class MemberAssignmentMapping(MemberPathSetter targetPath, ISourceValue s
 
     private readonly ISourceValue _sourceValue = sourceValue;
     private readonly MemberPathSetter _targetPath = targetPath;
+
+    public bool TryGetMemberAssignmentMappingContainer([NotNullWhen(true)] out IMemberAssignmentMappingContainer? container)
+    {
+        container = null;
+        return false;
+    }
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess) =>
         ctx.SyntaxFactory.SingleStatement(BuildExpression(ctx, targetAccess));
