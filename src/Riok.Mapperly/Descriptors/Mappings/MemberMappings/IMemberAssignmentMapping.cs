@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
 /// <summary>
@@ -7,5 +9,5 @@ public interface IMemberAssignmentMapping : IAssignmentMappings
 {
     MemberMappingInfo MemberInfo { get; }
 
-    bool TryGetMemberAssignmentMappingContainer(out IMemberAssignmentMappingContainer? container);
+    bool TryGetMemberAssignmentMappingContainer([NotNullWhen(true)] out IMemberAssignmentMappingContainer? container);
 }
