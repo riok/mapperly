@@ -57,7 +57,7 @@ jobs:
       - uses: actions/setup-dotnet@v5
       - run: dotnet tool restore
       - run: dotnet build
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version-file: './docs/.node-version'
       - run: npm ci
