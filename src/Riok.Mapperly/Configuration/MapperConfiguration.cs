@@ -130,4 +130,10 @@ public record MapperConfiguration
     /// Can be overwritten on specific enums via mapping method configurations.
     /// </summary>
     public EnumNamingStrategy? EnumNamingStrategy { get; init; }
+
+    /// <summary>
+    /// When set to <c>true</c>, only properties with explicit configurations (via attributes like <c>MapProperty</c>)
+    /// will be mapped. All other properties will be ignored by default.
+    /// </summary>
+    public bool? OnlyExplicitMappedMembers { get; init; }
 }

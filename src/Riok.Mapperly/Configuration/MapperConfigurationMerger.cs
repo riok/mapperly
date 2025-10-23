@@ -75,6 +75,11 @@ public static class MapperConfigurationMerger
         mapper.EnumNamingStrategy =
             mapperConfiguration.EnumNamingStrategy ?? defaultMapperConfiguration.EnumNamingStrategy ?? mapper.EnumNamingStrategy;
 
+        mapper.OnlyExplicitMappedMembers =
+            mapperConfiguration.OnlyExplicitMappedMembers
+            ?? defaultMapperConfiguration.OnlyExplicitMappedMembers
+            ?? mapper.OnlyExplicitMappedMembers;
+
         return mapper;
     }
 }

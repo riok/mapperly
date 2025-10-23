@@ -168,4 +168,73 @@ public class ObjectPropertyIgnoreTest
                 """
             );
     }
+
+    [Fact]
+    public void OnlyExplicitMappedMembersWithExtraSourceMembers()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions(OnlyExplicitMappedMembers: true),
+            "class A { public int Value1 { get; set; } public int Value2 { get; set; } public int Value4 { get; set; } }",
+            "class B { public int Value1 { get; set; } public int Value2 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value1 = source.Value1;
+                target.Value2 = source.Value2;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void OnlyExplicitMappedMembersWithExtraTargetMembers()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions(OnlyExplicitMappedMembers: true),
+            "class A { public int Value1 { get; set; } public int Value2 { get; set; } }",
+            "class B { public int Value1 { get; set; } public int Value2 { get; set; } public int Value4 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value1 = source.Value1;
+                target.Value2 = source.Value2;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void OnlyExplicitMappedMembersWithExtraMembersInBoth()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions(OnlyExplicitMappedMembers: true),
+            "class A { public int Value1 { get; set; } public int Value2 { get; set; } public int Value4 { get; set; } }",
+            "class B { public int Value1 { get; set; } public int Value2 { get; set; } public int Value3 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value1 = source.Value1;
+                target.Value2 = source.Value2;
+                return target;
+                """
+            );
+    }
 }
