@@ -60,8 +60,8 @@ public static class TestSourceBuilder
                 {{body}}
             }
 
-            {{ additionalNamespaceContent ?? "" }}
-            {{(options is { Namespace: not null, UseFileScopedNamespace: false } ? "}" : "") }}
+            {{additionalNamespaceContent ?? ""}}
+            {{(options is { Namespace: not null, UseFileScopedNamespace: false } ? "}" : "")}}
             """
         );
     }
@@ -107,6 +107,7 @@ public static class TestSourceBuilder
             Attribute(options.IncludedConstructors),
             Attribute(options.PreferParameterlessConstructors),
             Attribute(options.AutoUserMappings),
+            Attribute(options.OnlyExplicitMappedMembers),
         }.WhereNotNull();
 
         return $"[Mapper({string.Join(", ", attrs)})]";
