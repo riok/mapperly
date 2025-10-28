@@ -36,7 +36,7 @@ public class MapperConfigurationReader
         _diagnostics = diagnostics;
         _types = types;
 
-        var mapperConfiguration = _dataAccessor.AccessSingle<MapperAttribute, MapperConfiguration>(mapperSymbol);
+        var mapperConfiguration = _dataAccessor.ReadMapperAttribute(mapperSymbol);
         var mapper = MapperConfigurationMerger.Merge(mapperConfiguration, defaultMapperConfiguration);
 
         MapperConfiguration = new MappingConfiguration(
@@ -103,9 +103,7 @@ public class MapperConfigurationReader
         bool supportsDeepCloning
     )
     {
-        var includedMappingConfigs = _dataAccessor.Access<IncludeMappingConfigurationAttribute, IncludeMappingConfiguration>(
-            reference.Method!
-        );
+        var includedMappingConfigs = _dataAccessor.ReadIncludeMappingConfigurationAttributes(reference.Method!);
         foreach (var includedCfg in includedMappingConfigs)
         {
             var cfgToInclude = BuildConfigToInclude(includedCfg.Name, reference, visitedMethods, supportsDeepCloning);
@@ -205,8 +203,8 @@ public class MapperConfigurationReader
     private IReadOnlyCollection<DerivedTypeMappingConfiguration> BuildDerivedTypeConfigs(IMethodSymbol method)
     {
         return _dataAccessor
-            .Access<MapDerivedTypeAttribute, DerivedTypeMappingConfiguration>(method)
-            .Concat(_dataAccessor.Access<MapDerivedTypeAttribute<object, object>, DerivedTypeMappingConfiguration>(method))
+            .ReadMapDerivedTypeAttributes(method)
+            .Concat(_dataAccessor.ReadGenericMapDerivedTypeAttributes(method))
             .ToList();
     }
 
@@ -216,27 +214,23 @@ public class MapperConfigurationReader
             return MapperConfiguration.Members;
 
         var ignoredSourceMembers = _dataAccessor
-            .Access<MapperIgnoreSourceAttribute>(configRef.Method)
+            .ReadMapperIgnoreSourceAttributes(configRef.Method)
             .Select(x => x.Source)
             .WhereNotNull()
             .ToList();
         var ignoredTargetMembers = _dataAccessor
-            .Access<MapperIgnoreTargetAttribute>(configRef.Method)
+            .ReadMapperIgnoreTargetAttributes(configRef.Method)
             .Select(x => x.Target)
             .WhereNotNull()
             .ToList();
-        var memberValueConfigurations = _dataAccessor.Access<MapValueAttribute, MemberValueMappingConfiguration>(configRef.Method).ToList();
+        var memberValueConfigurations = _dataAccessor.ReadMapValueAttribute(configRef.Method).ToList();
         var memberConfigurations = _dataAccessor
-            .Access<MapPropertyAttribute, MemberMappingConfiguration>(configRef.Method)
-            .Concat(_dataAccessor.Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(configRef.Method))
+            .ReadMapPropertyAttributes(configRef.Method)
+            .Concat(_dataAccessor.ReadMapPropertyFromSourceAttributes(configRef.Method))
             .ToList();
-        var nestedMembersConfigurations = _dataAccessor
-            .Access<MapNestedPropertiesAttribute, NestedMembersMappingConfiguration>(configRef.Method)
-            .ToList();
-        var ignoreObsolete = _dataAccessor
-            .AccessFirstOrDefault<MapperIgnoreObsoleteMembersAttribute>(configRef.Method)
-            ?.IgnoreObsoleteStrategy;
-        var requiredMapping = _dataAccessor.AccessFirstOrDefault<MapperRequiredMappingAttribute>(configRef.Method)?.RequiredMappingStrategy;
+        var nestedMembersConfigurations = _dataAccessor.ReadMapNestedPropertiesAttribute(configRef.Method).ToList();
+        var ignoreObsolete = _dataAccessor.ReadMapperIgnoreObsoleteMembersAttribute(configRef.Method)?.IgnoreObsoleteStrategy;
+        var requiredMapping = _dataAccessor.ReadMapperRequiredMappingAttribute(configRef.Method)?.RequiredMappingStrategy;
 
         // ignore the required mapping / ignore obsolete as the same attribute is used for other mapping types
         // e.g. enum to enum
@@ -283,17 +277,11 @@ public class MapperConfigurationReader
         if (configRef.Method == null)
             return MapperConfiguration.Enum;
 
-        var configData = _dataAccessor.AccessFirstOrDefault<MapEnumAttribute, EnumConfiguration>(configRef.Method);
-        var explicitMappings = _dataAccessor.Access<MapEnumValueAttribute, EnumValueMappingConfiguration>(configRef.Method).ToList();
-        var ignoredSources = _dataAccessor
-            .Access<MapperIgnoreSourceValueAttribute, MapperIgnoreEnumValueConfiguration>(configRef.Method)
-            .Select(x => x.Value)
-            .ToList();
-        var ignoredTargets = _dataAccessor
-            .Access<MapperIgnoreTargetValueAttribute, MapperIgnoreEnumValueConfiguration>(configRef.Method)
-            .Select(x => x.Value)
-            .ToList();
-        var requiredMapping = _dataAccessor.AccessFirstOrDefault<MapperRequiredMappingAttribute>(configRef.Method)?.RequiredMappingStrategy;
+        var configData = _dataAccessor.ReadMapEnumAttribute(configRef.Method);
+        var explicitMappings = _dataAccessor.ReadMapEnumValueAttribute(configRef.Method).ToList();
+        var ignoredSources = _dataAccessor.ReadMapperIgnoreSourceValueAttribute(configRef.Method).Select(x => x.Value).ToList();
+        var ignoredTargets = _dataAccessor.ReadMapperIgnoreTargetValueAttribute(configRef.Method).Select(x => x.Value).ToList();
+        var requiredMapping = _dataAccessor.ReadMapperRequiredMappingAttribute(configRef.Method)?.RequiredMappingStrategy;
 
         // ignore the required mapping as the same attribute is used for other mapping types
         // e.g. object to object

@@ -1,5 +1,7 @@
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -19,30 +21,142 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 {
     private const char FullNameOfPrefix = '@';
 
-    public TAttribute AccessSingle<TAttribute>(ISymbol symbol)
-        where TAttribute : Attribute => AccessSingle<TAttribute, TAttribute>(symbol);
+    public static MapperConfiguration ReadMapperDefaultsAttribute(AttributeData attrData)
+    {
+        return Access<MapperDefaultsAttribute, MapperConfiguration>(attrData);
+    }
 
-    public TData AccessSingle<TAttribute, TData>(ISymbol symbol)
-        where TAttribute : Attribute
-        where TData : notnull => Access<TAttribute, TData>(symbol).Single();
+    public FormatProviderAttribute ReadFormatProviderAttribute(ISymbol symbol)
+    {
+        return Access<FormatProviderAttribute, FormatProviderAttribute>(symbol).First();
+    }
 
-    public TAttribute? AccessFirstOrDefault<TAttribute>(ISymbol symbol)
-        where TAttribute : Attribute => Access<TAttribute, TAttribute>(symbol).FirstOrDefault();
+    public MapperConfiguration ReadMapperAttribute(ISymbol symbol)
+    {
+        return Access<MapperAttribute, MapperConfiguration>(symbol).First();
+    }
 
-    public TData? AccessFirstOrDefault<TAttribute, TData>(ISymbol symbol)
-        where TAttribute : Attribute
-        where TData : notnull => Access<TAttribute, TData>(symbol).FirstOrDefault();
+    public MapperIgnoreObsoleteMembersAttribute? ReadMapperIgnoreObsoleteMembersAttribute(ISymbol symbol)
+    {
+        return Access<MapperIgnoreObsoleteMembersAttribute, MapperIgnoreObsoleteMembersAttribute>(symbol).FirstOrDefault();
+    }
 
-    public bool HasAttribute<TAttribute>(ISymbol symbol)
-        where TAttribute : Attribute => symbolAccessor.HasAttribute<TAttribute>(symbol);
+    public IEnumerable<NestedMembersMappingConfiguration> ReadMapNestedPropertiesAttribute(ISymbol symbol)
+    {
+        return Access<MapNestedPropertiesAttribute, NestedMembersMappingConfiguration>(symbol);
+    }
 
-    public IEnumerable<TAttribute> Access<TAttribute>(ISymbol symbol)
-        where TAttribute : Attribute => Access<TAttribute, TAttribute>(symbol);
+    public MapperRequiredMappingAttribute? ReadMapperRequiredMappingAttribute(ISymbol symbol)
+    {
+        return Access<MapperRequiredMappingAttribute, MapperRequiredMappingAttribute>(symbol).FirstOrDefault();
+    }
 
-    public IEnumerable<TAttribute> TryAccess<TAttribute>(IEnumerable<AttributeData> data)
-        where TAttribute : Attribute => TryAccess<TAttribute, TAttribute>(data);
+    public EnumMemberAttribute? ReadEnumMemberAttribute(ISymbol symbol)
+    {
+        return Access<EnumMemberAttribute, EnumMemberAttribute>(symbol).FirstOrDefault();
+    }
 
-    public IEnumerable<TData> Access<TAttribute, TData>(ISymbol symbol)
+    public EnumConfiguration? ReadMapEnumAttribute(ISymbol symbol)
+    {
+        return Access<MapEnumAttribute, EnumConfiguration>(symbol).FirstOrDefault();
+    }
+
+    public IEnumerable<EnumValueMappingConfiguration> ReadMapEnumValueAttribute(ISymbol symbol)
+    {
+        return Access<MapEnumValueAttribute, EnumValueMappingConfiguration>(symbol);
+    }
+
+    public IEnumerable<MapperIgnoreEnumValueConfiguration> ReadMapperIgnoreSourceValueAttribute(ISymbol symbol)
+    {
+        return Access<MapperIgnoreSourceValueAttribute, MapperIgnoreEnumValueConfiguration>(symbol);
+    }
+
+    public IEnumerable<MapperIgnoreEnumValueConfiguration> ReadMapperIgnoreTargetValueAttribute(ISymbol symbol)
+    {
+        return Access<MapperIgnoreTargetValueAttribute, MapperIgnoreEnumValueConfiguration>(symbol);
+    }
+
+    public ComponentModelDescriptionAttributeConfiguration? ReadDescriptionAttribute(ISymbol symbol)
+    {
+        return Access<DescriptionAttribute, ComponentModelDescriptionAttributeConfiguration>(symbol).FirstOrDefault();
+    }
+
+    public UserMappingConfiguration? ReadUserMappingAttribute(ISymbol symbol)
+    {
+        return Access<UserMappingAttribute, UserMappingConfiguration>(symbol).FirstOrDefault();
+    }
+
+    public bool HasUseMapperAttribute(ISymbol symbol)
+    {
+        return Access<UseMapperAttribute, UseMapperAttribute>(symbol).Any();
+    }
+
+    public IEnumerable<MapperIgnoreSourceAttribute> ReadMapperIgnoreSourceAttributes(ISymbol symbol)
+    {
+        return Access<MapperIgnoreSourceAttribute, MapperIgnoreSourceAttribute>(symbol);
+    }
+
+    public IEnumerable<MapperIgnoreTargetAttribute> ReadMapperIgnoreTargetAttributes(ISymbol symbol)
+    {
+        return Access<MapperIgnoreTargetAttribute, MapperIgnoreTargetAttribute>(symbol);
+    }
+
+    public IEnumerable<MemberValueMappingConfiguration> ReadMapValueAttribute(ISymbol symbol)
+    {
+        return Access<MapValueAttribute, MemberValueMappingConfiguration>(symbol);
+    }
+
+    public IEnumerable<MemberMappingConfiguration> ReadMapPropertyAttributes(ISymbol symbol)
+    {
+        return Access<MapPropertyAttribute, MemberMappingConfiguration>(symbol);
+    }
+
+    public IEnumerable<IncludeMappingConfiguration> ReadIncludeMappingConfigurationAttributes(ISymbol symbol)
+    {
+        return Access<IncludeMappingConfigurationAttribute, IncludeMappingConfiguration>(symbol);
+    }
+
+    public IEnumerable<DerivedTypeMappingConfiguration> ReadMapDerivedTypeAttributes(ISymbol symbol)
+    {
+        return Access<MapDerivedTypeAttribute, DerivedTypeMappingConfiguration>(symbol);
+    }
+
+    public IEnumerable<DerivedTypeMappingConfiguration> ReadGenericMapDerivedTypeAttributes(ISymbol symbol)
+    {
+        return Access<MapDerivedTypeAttribute<object, object>, DerivedTypeMappingConfiguration>(symbol);
+    }
+
+    public IEnumerable<MemberMappingConfiguration> ReadMapPropertyFromSourceAttributes(ISymbol symbol)
+    {
+        return Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(symbol);
+    }
+
+    public IEnumerable<UseStaticMapperConfiguration> ReadUseStaticMapperAttributes(ISymbol symbol)
+    {
+        return Access<UseStaticMapperAttribute, UseStaticMapperConfiguration>(symbol);
+    }
+
+    public IEnumerable<UseStaticMapperConfiguration> ReadGenericUseStaticMapperAttributes(ISymbol symbol)
+    {
+        return Access<UseStaticMapperAttribute<object>, UseStaticMapperConfiguration>(symbol);
+    }
+
+    public string GetMappingName(IMethodSymbol methodSymbol)
+    {
+        return Access<NamedMappingAttribute, NamedMappingAttribute>(methodSymbol).Select(e => e.Name).FirstOrDefault() ?? methodSymbol.Name;
+    }
+
+    public bool IsMappingNameEqualTo(IMethodSymbol methodSymbol, string name)
+    {
+        return string.Equals(GetMappingName(methodSymbol), name, StringComparison.Ordinal);
+    }
+
+    internal IEnumerable<NotNullIfNotNullAttribute> TryReadNotNullIfNotNullAttributes(IMethodSymbol symbol)
+    {
+        return TryAccess<NotNullIfNotNullAttribute, NotNullIfNotNullAttribute>(symbol.GetReturnTypeAttributes());
+    }
+
+    private IEnumerable<TData> Access<TAttribute, TData>(ISymbol symbol)
         where TAttribute : Attribute
         where TData : notnull
     {
@@ -50,7 +164,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return Access<TAttribute, TData>(attrDatas);
     }
 
-    public IEnumerable<TData> TryAccess<TAttribute, TData>(IEnumerable<AttributeData> attributes)
+    private IEnumerable<TData> TryAccess<TAttribute, TData>(IEnumerable<AttributeData> attributes)
         where TAttribute : Attribute
         where TData : notnull
     {
@@ -69,7 +183,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     /// <typeparam name="TData">The type of the data class. If no type parameters are involved, this is usually the same as <see cref="TAttribute"/>.</typeparam>
     /// <returns>The attribute data.</returns>
     /// <exception cref="InvalidOperationException">If a property or ctor argument of <see cref="TData"/> could not be read on the attribute.</exception>
-    public IEnumerable<TData> Access<TAttribute, TData>(IEnumerable<AttributeData> attributes)
+    private IEnumerable<TData> Access<TAttribute, TData>(IEnumerable<AttributeData> attributes)
         where TAttribute : Attribute
         where TData : notnull
     {
@@ -79,18 +193,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         }
     }
 
-    public string GetMappingName(IMethodSymbol methodSymbol)
-    {
-        var mappingName = AccessFirstOrDefault<NamedMappingAttribute>(methodSymbol)?.Name ?? methodSymbol.Name;
-        return mappingName;
-    }
-
-    public bool IsMappingNameEqualTo(IMethodSymbol methodSymbol, string name)
-    {
-        return string.Equals(GetMappingName(methodSymbol), name, StringComparison.Ordinal);
-    }
-
-    internal static TData Access<TAttribute, TData>(AttributeData attrData, SymbolAccessor? symbolAccessor = null)
+    private static TData Access<TAttribute, TData>(AttributeData attrData, SymbolAccessor? symbolAccessor = null)
         where TAttribute : Attribute
         where TData : notnull
     {

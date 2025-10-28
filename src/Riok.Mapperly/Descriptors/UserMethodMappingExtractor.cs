@@ -205,7 +205,7 @@ public static class UserMethodMappingExtractor
         }
 
         var targetNotNullIfSourceNotNull = ctx
-            .AttributeAccessor.TryAccess<NotNullIfNotNullAttribute>(method.GetReturnTypeAttributes())
+            .AttributeAccessor.TryReadNotNullIfNotNullAttributes(method)
             .Any(attr => string.Equals(attr.ParameterName, sourceParameterName, StringComparison.Ordinal));
         var nullability = targetNotNullIfSourceNotNull
             ? UserImplementedMethodMapping.TargetNullability.NotNullIfSourceNotNull
@@ -332,7 +332,7 @@ public static class UserMethodMappingExtractor
         out bool hasAttribute
     )
     {
-        var userMappingAttr = ctx.AttributeAccessor.AccessFirstOrDefault<UserMappingAttribute, UserMappingConfiguration>(method);
+        var userMappingAttr = ctx.AttributeAccessor.ReadUserMappingAttribute(method);
         hasAttribute = userMappingAttr != null;
         return userMappingAttr ?? new UserMappingConfiguration();
     }
