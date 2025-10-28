@@ -28,6 +28,16 @@ internal static class IgnoredMembersBuilder
             .. GetIgnoredObsoleteMembers(ctx, sourceTarget),
         ];
 
+        if (ctx.Configuration.Mapper.OnlyExplicitMappedMembers)
+        {
+            var oppositeType = sourceTarget == MappingSourceTarget.Source ? ctx.Target : ctx.Source;
+            var oppositeTypeMembers = ctx.SymbolAccessor.GetAllAccessibleMappableMembers(oppositeType).Select(x => x.Name).ToHashSet();
+
+            var unmatchedMembers = allMembers.Except(oppositeTypeMembers, StringComparer.Ordinal);
+
+            ignoredMembers.UnionWith(unmatchedMembers);
+        }
+
         RemoveAndReportConfiguredIgnoredMembers(ctx, sourceTarget, ignoredMembers);
         ReportUnmatchedIgnoredMembers(ctx, sourceTarget, ignoredMembers, allMembers);
         return ignoredMembers;
