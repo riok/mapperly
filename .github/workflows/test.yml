@@ -55,12 +55,12 @@ jobs:
       - uses: actions/setup-dotnet@v5
       - run: dotnet tool restore
       - run: RELEASE_VERSION="0.0.1-dev.$GITHUB_RUN_ID" ./build/package.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: mapperly-nupkg
           path: artifacts/*.nupkg
       - if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: verify-test-results-package
           path: '**/*.received.*'
@@ -72,7 +72,7 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-dotnet@v5
       - run: dotnet tool restore
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: mapperly-nupkg
           path: artifacts
@@ -104,7 +104,7 @@ jobs:
         with:
           dotnet-version: ${{ matrix.dotnet }}
       - run: dotnet --list-sdks
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: mapperly-nupkg
           path: artifacts
@@ -120,7 +120,7 @@ jobs:
       - run: dotnet test --no-build -f net${{ matrix.dotnet }}
         working-directory: ./test/Riok.Mapperly.IntegrationTests
       - if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: verify-test-results-net${{ matrix.dotnet }}
           path: '**/*.received.*'
@@ -132,7 +132,7 @@ jobs:
       - uses: actions/checkout@v5
       # delete global.json since we want to use custom versions here
       - run: rm global.json
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: mapperly-nupkg
           path: artifacts
@@ -148,7 +148,7 @@ jobs:
       - run: dotnet test --no-build -f net48
         working-directory: ./test/Riok.Mapperly.IntegrationTests
       - if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: verify-test-results-net-framework
           path: '**/*.received.*'
@@ -162,7 +162,7 @@ jobs:
       - run: dotnet run --project ./samples/Riok.Mapperly.Sample
 
       # run the same again with the real nuget without runtime assets
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: mapperly-nupkg
           path: artifacts
