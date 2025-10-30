@@ -266,6 +266,7 @@ namespace Riok.Mapperly.Abstractions
     {
         CaseSensitive = 0,
         CaseInsensitive = 1,
+        SnakeCase = 2,
     }
     [System.Flags]
     public enum RequiredMappingStrategy

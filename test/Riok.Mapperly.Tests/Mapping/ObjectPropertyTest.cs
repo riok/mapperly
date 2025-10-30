@@ -247,6 +247,29 @@ public class ObjectPropertyTest
     }
 
     [Fact]
+    public void WithPropertyNameMappingStrategySnakeCase()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.SnakeCase },
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string first_name { get; set; } public string last_name { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.first_name = source.FirstName;
+                target.last_name = source.LastName;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public Task WithPropertyNameMappingStrategyCaseSensitive()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
