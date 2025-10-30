@@ -40,7 +40,7 @@ public static class MemberPathCandidateBuilder
 
     /// <summary>
     /// Builds member path candidates based on the specified naming strategy.
-    /// For SnakeCase strategy, converts the name from snake_case to PascalCase to match source members.
+    /// For SnakeCase strategy, generates both PascalCase and snake_case versions to support bidirectional mapping.
     /// Otherwise, delegates to the default BuildMemberPathCandidates method.
     /// </summary>
     /// <param name="name">The name to build candidates from.</param>
@@ -53,9 +53,25 @@ public static class MemberPathCandidateBuilder
             if (name.Length == 0)
                 yield break;
 
-            // Convert from snake_case to PascalCase to match source members
-            // e.g., "first_name" -> "FirstName"
-            yield return new StringMemberPath([name.ToPascalCase()]);
+            // For bidirectional support, yield both versions:
+            // 1. If target is snake_case, convert to PascalCase to find PascalCase source
+            //    e.g., "first_name" -> "FirstName"
+            // 2. If target is PascalCase, convert to snake_case to find snake_case source
+            //    e.g., "FirstName" -> "first_name"
+            var pascalCase = name.ToPascalCase();
+
+            // Yield the converted version first as it's more likely to match
+            if (!string.Equals(name, pascalCase, StringComparison.Ordinal))
+            {
+                yield return new StringMemberPath([pascalCase]);
+            }
+
+            var snakeCase = name.ToSnakeCase();
+
+            if (!string.Equals(name, snakeCase, StringComparison.Ordinal))
+            {
+                yield return new StringMemberPath([snakeCase]);
+            }
         }
         else
         {
