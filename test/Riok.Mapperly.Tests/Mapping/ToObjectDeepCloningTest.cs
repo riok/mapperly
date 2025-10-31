@@ -7,14 +7,14 @@ public class ToObjectDeepCloningTest
     [Fact]
     public void ClassToObjectDeepCloning()
     {
-        var source = TestSourceBuilder.Mapping("A", "object", TestSourceBuilderOptions.WithDeepCloning, "class A {}");
+        var source = TestSourceBuilder.Mapping("A", "object", TestSourceBuilderOptions.AllConversionsWithDeepCloning, "class A {}");
         TestHelper.GenerateMapper(source).Should().HaveMapMethodBody("return (object)MapToA(source);");
     }
 
     [Fact]
     public void ObjectToObjectDeepCloning()
     {
-        var source = TestSourceBuilder.Mapping("object", "object", TestSourceBuilderOptions.WithDeepCloning);
+        var source = TestSourceBuilder.Mapping("object", "object", TestSourceBuilderOptions.AllConversionsWithDeepCloning);
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
@@ -26,7 +26,7 @@ public class ToObjectDeepCloningTest
     [Fact]
     public void NullableObjectToNullableObjectDeepCloning()
     {
-        var source = TestSourceBuilder.Mapping("object?", "object?", TestSourceBuilderOptions.WithDeepCloning);
+        var source = TestSourceBuilder.Mapping("object?", "object?", TestSourceBuilderOptions.AllConversionsWithDeepCloning);
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
@@ -62,7 +62,7 @@ public class ToObjectDeepCloningTest
         var source = TestSourceBuilder.Mapping(
             "A",
             "object",
-            TestSourceBuilderOptions.WithDeepCloning,
+            TestSourceBuilderOptions.AllConversionsWithDeepCloning,
             "struct A { public string Value { get; set; } }"
         );
         TestHelper.GenerateMapper(source).Should().HaveMapMethodBody("return (object)MapToA(source);");
