@@ -57,7 +57,7 @@ jobs:
       - uses: actions/setup-dotnet@v5
       - run: dotnet tool restore
       - run: dotnet build
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version-file: './docs/.node-version'
       - run: npm ci
@@ -70,7 +70,7 @@ jobs:
       # run lint after build, as generated files may be imported which cannot be found otherwise
       - run: npm run lint
         working-directory: ./docs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: mapperly-docs
           path: 'docs/build'
@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           name: mapperly-docs
           path: 'docs/build'
