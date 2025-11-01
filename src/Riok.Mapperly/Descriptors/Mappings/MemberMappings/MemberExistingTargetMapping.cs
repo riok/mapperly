@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Symbols.Members;
@@ -15,6 +16,12 @@ public class MemberExistingTargetMapping(
 ) : IMemberAssignmentMapping
 {
     public MemberMappingInfo MemberInfo { get; } = memberInfo;
+
+    public bool TryGetMemberAssignmentMappingContainer([NotNullWhen(true)] out IMemberAssignmentMappingContainer? container)
+    {
+        container = delegateMapping as IMemberAssignmentMappingContainer;
+        return container != null;
+    }
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
