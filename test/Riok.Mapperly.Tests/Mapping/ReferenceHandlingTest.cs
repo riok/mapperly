@@ -28,9 +28,25 @@ public class ReferenceHandlingTest
             "C",
             TestSourceBuilderOptions.WithReferenceHandling,
             "class A { public B Parent { get; set; } }",
-            "class B { public A Parent { get; set; } }",
+            "class B { public A DeepParent { get; set; } }",
             "class C { public D Parent { get; } }",
-            "class D { public C Parent { get; set; } }"
+            "class D { public C DeepParent { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldWorkIfHasInitOnlyPropertyOnPath()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "C",
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A { public B Parent { get; set; } }",
+            "class B { public A DeepParent { get; set; } }",
+            "class C { public D Parent { get; init; } }",
+            "class D { public C DeepParent { get; init; } }"
         );
 
         return TestHelper.VerifyGenerator(source);
@@ -62,6 +78,22 @@ public class ReferenceHandlingTest
             "class B { public A DeepParent { get; set; } }",
             "class C { public D Parent { get; } }",
             "class D { public C DeepParent { get; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldReportDiagnosticWhenTargetGetterInitOnlyDeep()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "C",
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A { public B Parent { get; set; } }",
+            "class B { public A DeepParent { get; set; } }",
+            "class C { public D Parent { get; } }",
+            "class D { public C DeepParent { get; init; } }"
         );
 
         return TestHelper.VerifyGenerator(source);

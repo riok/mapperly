@@ -19,7 +19,6 @@ public partial class Mapper
             return existingTargetReference;
         var target = new global::C();
         refHandler.SetReference<global::A, global::C>(source, target);
-        target.Parent.DeepParent = MapToC(source.Parent.DeepParent, refHandler);
         return target;
     }
 }

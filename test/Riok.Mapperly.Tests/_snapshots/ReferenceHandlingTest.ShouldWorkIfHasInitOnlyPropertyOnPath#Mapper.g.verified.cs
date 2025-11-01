@@ -17,9 +17,24 @@ public partial class Mapper
     {
         if (refHandler.TryGetReference<global::A, global::C>(source, out var existingTargetReference))
             return existingTargetReference;
-        var target = new global::C();
+        var target = new global::C()
+        {
+            Parent = MapToD(source.Parent, refHandler),
+        };
         refHandler.SetReference<global::A, global::C>(source, target);
-        target.Parent.DeepParent = MapToC(source.Parent.DeepParent, refHandler);
+        return target;
+    }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    private global::D MapToD(global::B source, global::Riok.Mapperly.Abstractions.ReferenceHandling.IReferenceHandler refHandler)
+    {
+        if (refHandler.TryGetReference<global::B, global::D>(source, out var existingTargetReference))
+            return existingTargetReference;
+        var target = new global::D()
+        {
+            DeepParent = MapToC(source.DeepParent, refHandler),
+        };
+        refHandler.SetReference<global::B, global::D>(source, target);
         return target;
     }
 }
