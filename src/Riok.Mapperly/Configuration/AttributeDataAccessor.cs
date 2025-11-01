@@ -23,7 +23,44 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
     public static MapperConfiguration ReadMapperDefaultsAttribute(AttributeData attrData)
     {
-        return Access<MapperDefaultsAttribute, MapperConfiguration>(attrData);
+        return new MapperConfiguration
+        {
+            AllowNullPropertyAssignment = GetSimpleValue<bool>(attrData, nameof(MapperDefaultsAttribute.AllowNullPropertyAssignment)),
+            AutoUserMappings = GetSimpleValue<bool>(attrData, nameof(MapperDefaultsAttribute.AutoUserMappings)),
+            EnabledConversions = GetSimpleValue<MappingConversionType>(attrData, nameof(MapperDefaultsAttribute.EnabledConversions)),
+            EnumMappingIgnoreCase = GetSimpleValue<bool>(attrData, nameof(MapperDefaultsAttribute.EnumMappingIgnoreCase)),
+            EnumMappingStrategy = GetSimpleValue<EnumMappingStrategy>(attrData, nameof(MapperDefaultsAttribute.EnumMappingStrategy)),
+            EnumNamingStrategy = GetSimpleValue<EnumNamingStrategy>(attrData, nameof(MapperDefaultsAttribute.EnumNamingStrategy)),
+            IgnoreObsoleteMembersStrategy = GetSimpleValue<IgnoreObsoleteMembersStrategy>(
+                attrData,
+                nameof(MapperDefaultsAttribute.IgnoreObsoleteMembersStrategy)
+            ),
+            IncludedConstructors = GetSimpleValue<MemberVisibility>(attrData, nameof(MapperDefaultsAttribute.IncludedConstructors)),
+            IncludedMembers = GetSimpleValue<MemberVisibility>(attrData, nameof(MapperDefaultsAttribute.IncludedMembers)),
+            PreferParameterlessConstructors = GetSimpleValue<bool>(
+                attrData,
+                nameof(MapperDefaultsAttribute.PreferParameterlessConstructors)
+            ),
+            PropertyNameMappingStrategy = GetSimpleValue<PropertyNameMappingStrategy>(
+                attrData,
+                nameof(MapperDefaultsAttribute.PropertyNameMappingStrategy)
+            ),
+            RequiredEnumMappingStrategy = GetSimpleValue<RequiredMappingStrategy>(
+                attrData,
+                nameof(MapperDefaultsAttribute.RequiredEnumMappingStrategy)
+            ),
+            RequiredMappingStrategy = GetSimpleValue<RequiredMappingStrategy>(
+                attrData,
+                nameof(MapperDefaultsAttribute.RequiredMappingStrategy)
+            ),
+            ThrowOnMappingNullMismatch = GetSimpleValue<bool>(attrData, nameof(MapperDefaultsAttribute.ThrowOnMappingNullMismatch)),
+            ThrowOnPropertyMappingNullMismatch = GetSimpleValue<bool>(
+                attrData,
+                nameof(MapperDefaultsAttribute.ThrowOnPropertyMappingNullMismatch)
+            ),
+            UseDeepCloning = GetSimpleValue<bool>(attrData, nameof(MapperDefaultsAttribute.UseDeepCloning)),
+            UseReferenceHandling = GetSimpleValue<bool>(attrData, nameof(MapperDefaultsAttribute.UseReferenceHandling)),
+        };
     }
 
     public FormatProviderAttribute ReadFormatProviderAttribute(ISymbol symbol)
@@ -475,5 +512,22 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         }
 
         return true;
+    }
+
+    private static TValue? GetSimpleValue<TValue>(AttributeData attrData, string propertyName, TValue? defaultValue = null)
+        where TValue : struct
+    {
+        var value = attrData.NamedArguments.FirstOrDefault(kv => kv.Key == propertyName).Value.Value;
+        if (typeof(TValue).IsEnum && value is int i)
+        {
+            return (TValue)(object)i;
+        }
+
+        if (value is TValue tValue)
+        {
+            return tValue;
+        }
+
+        return defaultValue;
     }
 }
