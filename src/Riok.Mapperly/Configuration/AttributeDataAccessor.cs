@@ -127,7 +127,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         var attrDatas = symbolAccessor.GetAttributes<MapNestedPropertiesAttribute>(symbol);
         foreach (var attrData in attrDatas)
         {
-            var config = CreateMemberPath(attrData, nameof(NestedMembersMappingConfiguration.Source));
+            var config = GetMemberPath(attrData, nameof(NestedMembersMappingConfiguration.Source));
             yield return new NestedMembersMappingConfiguration(config);
         }
     }
@@ -220,42 +220,106 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
     public UserMappingConfiguration? ReadUserMappingAttribute(ISymbol symbol)
     {
-        return Access<UserMappingAttribute, UserMappingConfiguration>(symbol).FirstOrDefault();
+        var attrData = GetAttribute<UserMappingAttribute>(symbol);
+        if (attrData == null)
+            return null;
+
+        return new UserMappingConfiguration
+        {
+            Default = GetSimpleValue<bool>(attrData, nameof(UserMappingAttribute.Default)),
+            Ignore = GetSimpleValue<bool>(attrData, nameof(UserMappingAttribute.Ignore)),
+        };
     }
 
     public bool HasUseMapperAttribute(ISymbol symbol)
     {
-        return Access<UseMapperAttribute, UseMapperAttribute>(symbol).Any();
+        return symbolAccessor.GetAttributes<UseMapperAttribute>(symbol).Any();
     }
 
     public IEnumerable<MapperIgnoreSourceAttribute> ReadMapperIgnoreSourceAttributes(ISymbol symbol)
     {
-        return Access<MapperIgnoreSourceAttribute, MapperIgnoreSourceAttribute>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<MapperIgnoreSourceAttribute>(symbol);
+        foreach (var attrData in attrDatas)
+        {
+            var source = GetSimpleValue(attrData, nameof(MapperIgnoreSourceAttribute.Source));
+            if (source is null)
+                continue;
+            yield return new MapperIgnoreSourceAttribute(source);
+        }
     }
 
     public IEnumerable<MapperIgnoreTargetAttribute> ReadMapperIgnoreTargetAttributes(ISymbol symbol)
     {
-        return Access<MapperIgnoreTargetAttribute, MapperIgnoreTargetAttribute>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<MapperIgnoreTargetAttribute>(symbol);
+        foreach (var attrData in attrDatas)
+        {
+            var target = GetSimpleValue(attrData, nameof(MapperIgnoreTargetAttribute.Target));
+            if (target is null)
+                continue;
+            yield return new MapperIgnoreTargetAttribute(target);
+        }
     }
 
     public IEnumerable<MemberValueMappingConfiguration> ReadMapValueAttribute(ISymbol symbol)
     {
-        return Access<MapValueAttribute, MemberValueMappingConfiguration>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<MapValueAttribute>(symbol);
+        foreach (var attrData in attrDatas)
+        {
+            var target = GetMemberPath(attrData, nameof(MapValueAttribute.Target));
+            var value = GetAttributeValue(attrData, nameof(MapValueAttribute.Value));
+            yield return new MemberValueMappingConfiguration(target, value)
+            {
+                Use = GetMethodReference(attrData, nameof(MapValueAttribute.Use)),
+            };
+        }
     }
 
     public IEnumerable<MemberMappingConfiguration> ReadMapPropertyAttributes(ISymbol symbol)
     {
-        return Access<MapPropertyAttribute, MemberMappingConfiguration>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<MapPropertyAttribute>(symbol);
+        foreach (var attrData in attrDatas)
+        {
+            var source = GetMemberPath(attrData, nameof(MapPropertyAttribute.Source));
+            var target = GetMemberPath(attrData, nameof(MapPropertyAttribute.Target));
+            var syntaxReference = attrData.ApplicationSyntaxReference?.GetSyntax();
+            yield return new MemberMappingConfiguration(source, target)
+            {
+                FormatProvider = GetSimpleValue(attrData, nameof(MapPropertyAttribute.FormatProvider)),
+                StringFormat = GetSimpleValue(attrData, nameof(MapPropertyAttribute.StringFormat)),
+                SuppressNullMismatchDiagnostic =
+                    GetSimpleValue<bool>(attrData, nameof(MapPropertyAttribute.SuppressNullMismatchDiagnostic)) ?? false,
+                Use = GetMethodReference(attrData, nameof(MapPropertyAttribute.Use)),
+                SyntaxReference = syntaxReference,
+            };
+        }
     }
 
     public IEnumerable<IncludeMappingConfiguration> ReadIncludeMappingConfigurationAttributes(ISymbol symbol)
     {
-        return Access<IncludeMappingConfigurationAttribute, IncludeMappingConfiguration>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<IncludeMappingConfigurationAttribute>(symbol);
+        foreach (var attrData in attrDatas)
+        {
+            var name = GetMethodReference(attrData, nameof(IncludeMappingConfigurationAttribute.Name));
+            if (name is null)
+                continue;
+
+            yield return new IncludeMappingConfiguration(name);
+        }
     }
 
     public IEnumerable<DerivedTypeMappingConfiguration> ReadMapDerivedTypeAttributes(ISymbol symbol)
     {
-        return Access<MapDerivedTypeAttribute, DerivedTypeMappingConfiguration>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<MapDerivedTypeAttribute>(symbol);
+        foreach (var attrData in attrDatas)
+        {
+            var sourceType = GetTypeSymbolFromValue(attrData, nameof(MapDerivedTypeAttribute.SourceType));
+            var targetType = GetTypeSymbolFromValue(attrData, nameof(MapDerivedTypeAttribute.TargetType));
+
+            if (sourceType is null || targetType is null)
+                continue;
+
+            yield return new DerivedTypeMappingConfiguration(sourceType, targetType);
+        }
     }
 
     public IEnumerable<DerivedTypeMappingConfiguration> ReadGenericMapDerivedTypeAttributes(ISymbol symbol)
@@ -627,7 +691,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             ?? throw new InvalidOperationException($"Could not find attribute {typeof(TAttribute).FullName} on {symbol.Name}");
     }
 
-    private IMemberPathConfiguration CreateMemberPath(AttributeData attrData, string name)
+    private IMemberPathConfiguration GetMemberPath(AttributeData attrData, string name)
     {
         if (TryGetTypedConstantWithAttributeArgumentSyntax(attrData, name, out var typedConstant, out var argumentSyntax))
         {
@@ -635,6 +699,16 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         }
 
         return new StringMemberPath(name.Split(MemberPathConstants.MemberAccessSeparator).ToImmutableEquatableArray());
+    }
+
+    private IMethodReferenceConfiguration? GetMethodReference(AttributeData attrData, string name)
+    {
+        if (TryGetTypedConstantWithAttributeArgumentSyntax(attrData, name, out var typedConstant, out var argumentSyntax))
+        {
+            return CreateMethodReference(typedConstant.Value, argumentSyntax, symbolAccessor);
+        }
+
+        return null;
     }
 
     private static string? GetSimpleValue(AttributeData attrData, string propertyName)
@@ -659,6 +733,17 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
         var roslynType = typedConstant.Type;
         return roslynType?.GetFields().FirstOrDefault(f => Equals(f.ConstantValue, typedConstant.Value));
+    }
+
+    public static ITypeSymbol? GetTypeSymbolFromValue(AttributeData attrData, string propertyName)
+    {
+        var nullableTypedConstant = GetTypedConstant(attrData, propertyName);
+        if (nullableTypedConstant is not { } typedConstant)
+        {
+            return null;
+        }
+
+        return typedConstant.Value as ITypeSymbol;
     }
 
     private static TValue? GetSimpleValue<TValue>(AttributeData attrData, string propertyName)
