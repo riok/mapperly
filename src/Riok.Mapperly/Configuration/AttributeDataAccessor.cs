@@ -135,12 +135,22 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
     public MapperRequiredMappingAttribute? ReadMapperRequiredMappingAttribute(ISymbol symbol)
     {
-        return Access<MapperRequiredMappingAttribute, MapperRequiredMappingAttribute>(symbol).FirstOrDefault();
+        var attrData = GetAttribute<MapperRequiredMappingAttribute>(symbol);
+        if (attrData == null)
+            return null;
+
+        return new MapperRequiredMappingAttribute(
+            GetSimpleValueOrDefault(attrData, nameof(MapperRequiredMappingAttribute.RequiredMappingStrategy), RequiredMappingStrategy.None)
+        );
     }
 
     public EnumMemberAttribute? ReadEnumMemberAttribute(ISymbol symbol)
     {
-        return Access<EnumMemberAttribute, EnumMemberAttribute>(symbol).FirstOrDefault();
+        var attrData = GetAttribute<EnumMemberAttribute>(symbol);
+        if (attrData == null)
+            return null;
+
+        return new EnumMemberAttribute { Value = GetSimpleValue(attrData, nameof(EnumMemberAttribute.Value)) };
     }
 
     public EnumConfiguration? ReadMapEnumAttribute(ISymbol symbol)
@@ -595,6 +605,12 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return new StringMemberPath(name.Split(MemberPathConstants.MemberAccessSeparator).ToImmutableEquatableArray());
     }
 
+    private static string? GetSimpleValue(AttributeData attrData, string propertyName)
+    {
+        var typedConstant = GetTypedConstant(attrData, propertyName);
+        return typedConstant?.Value as string;
+    }
+
     private static TValue GetSimpleValueOrDefault<TValue>(AttributeData attrData, string propertyName, TValue defaultValue = default)
         where TValue : struct
     {
@@ -604,17 +620,11 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     private static TValue? GetSimpleValue<TValue>(AttributeData attrData, string propertyName)
         where TValue : struct
     {
-        var value = attrData.NamedArguments.FirstOrDefault(kv => string.Equals(kv.Key, propertyName, StringComparison.Ordinal)).Value.Value;
+        var typedConstant = GetTypedConstant(attrData, propertyName);
+        var value = typedConstant?.Value;
+
         if (value is null)
-        {
-            var constructorArgument = attrData.AttributeConstructor?.Parameters.FirstOrDefault(p =>
-                string.Equals(p.Name, propertyName, StringComparison.OrdinalIgnoreCase)
-            );
-            if (constructorArgument != null && constructorArgument.Ordinal < attrData.ConstructorArguments.Length)
-            {
-                value = attrData.ConstructorArguments[constructorArgument.Ordinal].Value;
-            }
-        }
+            return null;
 
         if (typeof(TValue).IsEnum && value is int i)
         {
@@ -624,6 +634,35 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         if (value is TValue tValue)
         {
             return tValue;
+        }
+
+        return null;
+    }
+
+    private static TypedConstant? GetTypedConstant(AttributeData attrData, string propertyName)
+    {
+        foreach (var argument in attrData.NamedArguments)
+        {
+            if (string.Equals(argument.Key, propertyName, StringComparison.Ordinal))
+            {
+                return argument.Value;
+            }
+        }
+
+        if (attrData.AttributeConstructor?.Parameters is null)
+        {
+            return null;
+        }
+
+        foreach (var parameter in attrData.AttributeConstructor.Parameters)
+        {
+            if (!string.Equals(parameter.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            var ordinal = parameter.Ordinal;
+            return ordinal < attrData.ConstructorArguments.Length ? attrData.ConstructorArguments[ordinal] : null;
         }
 
         return null;
