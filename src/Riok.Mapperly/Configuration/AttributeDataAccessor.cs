@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -163,31 +162,51 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return new EnumConfiguration(GetSimpleValueOrDefault<EnumMappingStrategy>(attrData, nameof(MapEnumAttribute.Strategy)))
         {
             NamingStrategy = GetSimpleValueOrDefault(attrData, nameof(MapEnumAttribute.NamingStrategy), EnumNamingStrategy.MemberName),
-            FallbackValue = TryGetTypedConstantWithAttributeArgumentSyntax(
-                attrData,
-                nameof(MapEnumAttribute.FallbackValue),
-                out var typedConstant,
-                out var syntax
-            )
-                ? new AttributeValue(typedConstant.Value, syntax.Expression)
-                : null,
+            FallbackValue = GetAttributeValue(attrData, nameof(MapEnumAttribute.FallbackValue)),
             IgnoreCase = GetSimpleValue<bool>(attrData, nameof(MapEnumAttribute.IgnoreCase)),
         };
     }
 
     public IEnumerable<EnumValueMappingConfiguration> ReadMapEnumValueAttribute(ISymbol symbol)
     {
-        return Access<MapEnumValueAttribute, EnumValueMappingConfiguration>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<MapEnumValueAttribute>(symbol);
+        foreach (var attrData in attrDatas)
+        {
+            var source = GetAttributeValue(attrData, nameof(MapEnumValueAttribute.Source));
+            if (source == null)
+                continue;
+            var target = GetAttributeValue(attrData, nameof(MapEnumValueAttribute.Target));
+            if (target == null)
+                continue;
+
+            yield return new EnumValueMappingConfiguration(source.Value, target.Value);
+        }
     }
 
     public IEnumerable<MapperIgnoreEnumValueConfiguration> ReadMapperIgnoreSourceValueAttribute(ISymbol symbol)
     {
-        return Access<MapperIgnoreSourceValueAttribute, MapperIgnoreEnumValueConfiguration>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<MapperIgnoreSourceValueAttribute>(symbol);
+        foreach (var attrData in attrDatas)
+        {
+            var fieldSymbol = GetFieldSymbol(attrData, "source");
+            if (fieldSymbol is null)
+                continue;
+
+            yield return new MapperIgnoreEnumValueConfiguration(fieldSymbol);
+        }
     }
 
     public IEnumerable<MapperIgnoreEnumValueConfiguration> ReadMapperIgnoreTargetValueAttribute(ISymbol symbol)
     {
-        return Access<MapperIgnoreTargetValueAttribute, MapperIgnoreEnumValueConfiguration>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<MapperIgnoreTargetValueAttribute>(symbol);
+        foreach (var attrData in attrDatas)
+        {
+            var fieldSymbol = GetFieldSymbol(attrData, "target");
+            if (fieldSymbol is null)
+                continue;
+
+            yield return new MapperIgnoreEnumValueConfiguration(fieldSymbol);
+        }
     }
 
     public ComponentModelDescriptionAttributeConfiguration? ReadDescriptionAttribute(ISymbol symbol)
@@ -626,11 +645,28 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return GetSimpleValue<TValue>(attrData, propertyName) ?? defaultValue;
     }
 
+    public static IFieldSymbol? GetFieldSymbol(AttributeData attrData, string propertyName)
+    {
+        var nullableTypedConstant = GetTypedConstant(attrData, propertyName);
+        if (nullableTypedConstant is not { } typedConstant)
+        {
+            return null;
+        }
+
+        var roslynType = typedConstant.Type;
+        return roslynType?.GetFields().FirstOrDefault(f => Equals(f.ConstantValue, typedConstant.Value));
+    }
+
     private static TValue? GetSimpleValue<TValue>(AttributeData attrData, string propertyName)
         where TValue : struct
     {
-        var typedConstant = GetTypedConstant(attrData, propertyName);
-        var value = typedConstant?.Value;
+        var nullableTypedConstant = GetTypedConstant(attrData, propertyName);
+        if (nullableTypedConstant is not { } typedConstant)
+        {
+            return null;
+        }
+
+        var value = typedConstant.Value;
 
         if (value is null)
             return null;
@@ -678,6 +714,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
                 {
                     break;
                 }
+
                 typedConstant = attrData.ConstructorArguments[ordinal];
 
                 if (argumentSyntaxes.Count <= ordinal)
@@ -733,4 +770,9 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
         return null;
     }
+
+    private static AttributeValue? GetAttributeValue(AttributeData attrData, string propertyName) =>
+        TryGetTypedConstantWithAttributeArgumentSyntax(attrData, propertyName, out var typedConstant, out var syntax)
+            ? new AttributeValue(typedConstant.Value, syntax.Expression)
+            : null;
 }
