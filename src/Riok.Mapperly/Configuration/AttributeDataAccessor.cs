@@ -125,7 +125,12 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
     public IEnumerable<NestedMembersMappingConfiguration> ReadMapNestedPropertiesAttribute(ISymbol symbol)
     {
-        return Access<MapNestedPropertiesAttribute, NestedMembersMappingConfiguration>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<MapNestedPropertiesAttribute>(symbol);
+        foreach (var attrData in attrDatas)
+        {
+            var config = CreateMemberPath(attrData, nameof(NestedMembersMappingConfiguration.Source));
+            yield return new NestedMembersMappingConfiguration(config);
+        }
     }
 
     public MapperRequiredMappingAttribute? ReadMapperRequiredMappingAttribute(ISymbol symbol)
@@ -570,6 +575,24 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     {
         return GetAttribute<TAttribute>(symbol)
             ?? throw new InvalidOperationException($"Could not find attribute {typeof(TAttribute).FullName} on {symbol.Name}");
+    }
+
+    private IMemberPathConfiguration CreateMemberPath(AttributeData attrData, string name)
+    {
+        if (
+            attrData.AttributeConstructor?.Parameters.FirstOrDefault(p =>
+                string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase)
+            ) is
+            { } constructorArgument
+        )
+        {
+            var argument = attrData.ConstructorArguments[constructorArgument.Ordinal];
+            var syntaxes = (AttributeSyntax?)attrData.ApplicationSyntaxReference?.GetSyntax();
+            var syntax = syntaxes?.ArgumentList?.Arguments[constructorArgument.Ordinal];
+            return CreateMemberPath(argument, syntax, symbolAccessor);
+        }
+
+        return new StringMemberPath(name.Split(MemberPathConstants.MemberAccessSeparator).ToImmutableEquatableArray());
     }
 
     private static TValue GetSimpleValueOrDefault<TValue>(AttributeData attrData, string propertyName, TValue defaultValue = default)
