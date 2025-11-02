@@ -155,7 +155,24 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
     public EnumConfiguration? ReadMapEnumAttribute(ISymbol symbol)
     {
-        return Access<MapEnumAttribute, EnumConfiguration>(symbol).FirstOrDefault();
+        //var oldValue = Access<MapEnumAttribute, EnumConfiguration>(symbol).FirstOrDefault();
+        var attrData = GetAttribute<MapEnumAttribute>(symbol);
+        if (attrData == null)
+            return null;
+
+        return new EnumConfiguration(GetSimpleValueOrDefault<EnumMappingStrategy>(attrData, nameof(MapEnumAttribute.Strategy)))
+        {
+            NamingStrategy = GetSimpleValueOrDefault(attrData, nameof(MapEnumAttribute.NamingStrategy), EnumNamingStrategy.MemberName),
+            FallbackValue = TryGetTypedConstantWithAttributeArgumentSyntax(
+                attrData,
+                nameof(MapEnumAttribute.FallbackValue),
+                out var typedConstant,
+                out var syntax
+            )
+                ? new AttributeValue(typedConstant.Value, syntax.Expression)
+                : null,
+            IgnoreCase = GetSimpleValue<bool>(attrData, nameof(MapEnumAttribute.IgnoreCase)),
+        };
     }
 
     public IEnumerable<EnumValueMappingConfiguration> ReadMapEnumValueAttribute(ISymbol symbol)
@@ -589,17 +606,9 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
     private IMemberPathConfiguration CreateMemberPath(AttributeData attrData, string name)
     {
-        if (
-            attrData.AttributeConstructor?.Parameters.FirstOrDefault(p =>
-                string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase)
-            ) is
-            { } constructorArgument
-        )
+        if (TryGetTypedConstantWithAttributeArgumentSyntax(attrData, name, out var typedConstant, out var argumentSyntax))
         {
-            var argument = attrData.ConstructorArguments[constructorArgument.Ordinal];
-            var syntaxes = (AttributeSyntax?)attrData.ApplicationSyntaxReference?.GetSyntax();
-            var syntax = syntaxes?.ArgumentList?.Arguments[constructorArgument.Ordinal];
-            return CreateMemberPath(argument, syntax, symbolAccessor);
+            return CreateMemberPath(typedConstant.Value, argumentSyntax, symbolAccessor);
         }
 
         return new StringMemberPath(name.Split(MemberPathConstants.MemberAccessSeparator).ToImmutableEquatableArray());
@@ -639,30 +648,87 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return null;
     }
 
+    private static bool TryGetTypedConstantWithAttributeArgumentSyntax(
+        AttributeData attrData,
+        string propertyName,
+        [NotNullWhen(true)] out TypedConstant? typedConstant,
+        [NotNullWhen(true)] out AttributeArgumentSyntax? syntax
+    )
+    {
+        syntax = null;
+        typedConstant = null;
+        var syntaxes = (AttributeSyntax?)attrData.ApplicationSyntaxReference?.GetSyntax();
+        if (syntaxes?.ArgumentList?.Arguments is not { } argumentSyntaxes)
+        {
+            return false;
+        }
+
+        var constructorParameters = attrData.AttributeConstructor?.Parameters;
+        if (constructorParameters is not null)
+        {
+            foreach (var parameter in constructorParameters)
+            {
+                if (!string.Equals(parameter.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var ordinal = parameter.Ordinal;
+                if (ordinal >= attrData.ConstructorArguments.Length)
+                {
+                    break;
+                }
+                typedConstant = attrData.ConstructorArguments[ordinal];
+
+                if (argumentSyntaxes.Count <= ordinal)
+                {
+                    break;
+                }
+
+                syntax = argumentSyntaxes[ordinal];
+                return true;
+            }
+        }
+
+        foreach (var argument in attrData.NamedArguments)
+        {
+            if (string.Equals(argument.Key, propertyName, StringComparison.Ordinal))
+            {
+                typedConstant = argument.Value;
+                syntax = argumentSyntaxes.FirstOrDefault(x =>
+                    string.Equals(x.NameEquals?.Name.Identifier.ValueText, propertyName, StringComparison.Ordinal)
+                );
+
+                return syntax is not null;
+            }
+        }
+
+        return false;
+    }
+
     private static TypedConstant? GetTypedConstant(AttributeData attrData, string propertyName)
     {
+        var constructorParameters = attrData.AttributeConstructor?.Parameters;
+        if (constructorParameters is not null)
+        {
+            foreach (var parameter in constructorParameters)
+            {
+                if (!string.Equals(parameter.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                var ordinal = parameter.Ordinal;
+                return ordinal < attrData.ConstructorArguments.Length ? attrData.ConstructorArguments[ordinal] : null;
+            }
+        }
+
         foreach (var argument in attrData.NamedArguments)
         {
             if (string.Equals(argument.Key, propertyName, StringComparison.Ordinal))
             {
                 return argument.Value;
             }
-        }
-
-        if (attrData.AttributeConstructor?.Parameters is null)
-        {
-            return null;
-        }
-
-        foreach (var parameter in attrData.AttributeConstructor.Parameters)
-        {
-            if (!string.Equals(parameter.Name, propertyName, StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            var ordinal = parameter.Ordinal;
-            return ordinal < attrData.ConstructorArguments.Length ? attrData.ConstructorArguments[ordinal] : null;
         }
 
         return null;
