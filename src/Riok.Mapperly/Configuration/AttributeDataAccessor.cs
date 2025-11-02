@@ -154,7 +154,6 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
     public EnumConfiguration? ReadMapEnumAttribute(ISymbol symbol)
     {
-        //var oldValue = Access<MapEnumAttribute, EnumConfiguration>(symbol).FirstOrDefault();
         var attrData = GetAttribute<MapEnumAttribute>(symbol);
         if (attrData == null)
             return null;
@@ -211,7 +210,12 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
     public ComponentModelDescriptionAttributeConfiguration? ReadDescriptionAttribute(ISymbol symbol)
     {
-        return Access<DescriptionAttribute, ComponentModelDescriptionAttributeConfiguration>(symbol).FirstOrDefault();
+        var attrData = GetAttribute<DescriptionAttribute>(symbol);
+        if (attrData == null)
+            return null;
+
+        var simpleValue = GetSimpleValue(attrData, nameof(ComponentModelDescriptionAttributeConfiguration.Description));
+        return new ComponentModelDescriptionAttributeConfiguration(simpleValue);
     }
 
     public UserMappingConfiguration? ReadUserMappingAttribute(ISymbol symbol)
