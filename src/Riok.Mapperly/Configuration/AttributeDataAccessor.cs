@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -65,17 +66,61 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
     public FormatProviderAttribute ReadFormatProviderAttribute(ISymbol symbol)
     {
-        return Access<FormatProviderAttribute, FormatProviderAttribute>(symbol).First();
+        var attrData = GetRequiredAttribute<FormatProviderAttribute>(symbol);
+
+        return new FormatProviderAttribute { Default = GetSimpleValueOrDefault<bool>(attrData, nameof(FormatProviderAttribute.Default)) };
     }
 
     public MapperConfiguration ReadMapperAttribute(ISymbol symbol)
     {
-        return Access<MapperAttribute, MapperConfiguration>(symbol).First();
+        var attrData = GetRequiredAttribute<MapperAttribute>(symbol);
+
+        return new MapperConfiguration
+        {
+            AllowNullPropertyAssignment = GetSimpleValue<bool>(attrData, nameof(MapperAttribute.AllowNullPropertyAssignment)),
+            AutoUserMappings = GetSimpleValue<bool>(attrData, nameof(MapperAttribute.AutoUserMappings)),
+            EnabledConversions = GetSimpleValue<MappingConversionType>(attrData, nameof(MapperAttribute.EnabledConversions)),
+            EnumMappingIgnoreCase = GetSimpleValue<bool>(attrData, nameof(MapperAttribute.EnumMappingIgnoreCase)),
+            EnumMappingStrategy = GetSimpleValue<EnumMappingStrategy>(attrData, nameof(MapperAttribute.EnumMappingStrategy)),
+            EnumNamingStrategy = GetSimpleValue<EnumNamingStrategy>(attrData, nameof(MapperAttribute.EnumNamingStrategy)),
+            IgnoreObsoleteMembersStrategy = GetSimpleValue<IgnoreObsoleteMembersStrategy>(
+                attrData,
+                nameof(MapperAttribute.IgnoreObsoleteMembersStrategy)
+            ),
+            IncludedConstructors = GetSimpleValue<MemberVisibility>(attrData, nameof(MapperAttribute.IncludedConstructors)),
+            IncludedMembers = GetSimpleValue<MemberVisibility>(attrData, nameof(MapperAttribute.IncludedMembers)),
+            PreferParameterlessConstructors = GetSimpleValue<bool>(attrData, nameof(MapperAttribute.PreferParameterlessConstructors)),
+            PropertyNameMappingStrategy = GetSimpleValue<PropertyNameMappingStrategy>(
+                attrData,
+                nameof(MapperAttribute.PropertyNameMappingStrategy)
+            ),
+            RequiredEnumMappingStrategy = GetSimpleValue<RequiredMappingStrategy>(
+                attrData,
+                nameof(MapperAttribute.RequiredEnumMappingStrategy)
+            ),
+            RequiredMappingStrategy = GetSimpleValue<RequiredMappingStrategy>(attrData, nameof(MapperAttribute.RequiredMappingStrategy)),
+            ThrowOnMappingNullMismatch = GetSimpleValue<bool>(attrData, nameof(MapperAttribute.ThrowOnMappingNullMismatch)),
+            ThrowOnPropertyMappingNullMismatch = GetSimpleValue<bool>(attrData, nameof(MapperAttribute.ThrowOnPropertyMappingNullMismatch)),
+            UseDeepCloning = GetSimpleValue<bool>(attrData, nameof(MapperAttribute.UseDeepCloning)),
+            UseReferenceHandling = GetSimpleValue<bool>(attrData, nameof(MapperAttribute.UseReferenceHandling)),
+        };
     }
 
     public MapperIgnoreObsoleteMembersAttribute? ReadMapperIgnoreObsoleteMembersAttribute(ISymbol symbol)
     {
-        return Access<MapperIgnoreObsoleteMembersAttribute, MapperIgnoreObsoleteMembersAttribute>(symbol).FirstOrDefault();
+        var attrData = GetAttribute<MapperIgnoreObsoleteMembersAttribute>(symbol);
+        if (attrData == null)
+        {
+            return null;
+        }
+
+        return new MapperIgnoreObsoleteMembersAttribute(
+            GetSimpleValueOrDefault(
+                attrData,
+                nameof(MapperIgnoreObsoleteMembersAttribute.IgnoreObsoleteStrategy),
+                IgnoreObsoleteMembersStrategy.Both
+            )
+        );
     }
 
     public IEnumerable<NestedMembersMappingConfiguration> ReadMapNestedPropertiesAttribute(ISymbol symbol)
@@ -514,10 +559,40 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return true;
     }
 
-    private static TValue? GetSimpleValue<TValue>(AttributeData attrData, string propertyName, TValue? defaultValue = null)
+    private AttributeData? GetAttribute<TAttribute>(ISymbol symbol)
+        where TAttribute : Attribute
+    {
+        return symbolAccessor.GetAttributes<TAttribute>(symbol).FirstOrDefault();
+    }
+
+    private AttributeData GetRequiredAttribute<TAttribute>(ISymbol symbol)
+        where TAttribute : Attribute
+    {
+        return GetAttribute<TAttribute>(symbol)
+            ?? throw new InvalidOperationException($"Could not find attribute {typeof(TAttribute).FullName} on {symbol.Name}");
+    }
+
+    private static TValue GetSimpleValueOrDefault<TValue>(AttributeData attrData, string propertyName, TValue defaultValue = default)
         where TValue : struct
     {
-        var value = attrData.NamedArguments.FirstOrDefault(kv => kv.Key == propertyName).Value.Value;
+        return GetSimpleValue<TValue>(attrData, propertyName) ?? defaultValue;
+    }
+
+    private static TValue? GetSimpleValue<TValue>(AttributeData attrData, string propertyName)
+        where TValue : struct
+    {
+        var value = attrData.NamedArguments.FirstOrDefault(kv => string.Equals(kv.Key, propertyName, StringComparison.Ordinal)).Value.Value;
+        if (value is null)
+        {
+            var constructorArgument = attrData.AttributeConstructor?.Parameters.FirstOrDefault(p =>
+                string.Equals(p.Name, propertyName, StringComparison.OrdinalIgnoreCase)
+            );
+            if (constructorArgument != null && constructorArgument.Ordinal < attrData.ConstructorArguments.Length)
+            {
+                value = attrData.ConstructorArguments[constructorArgument.Ordinal].Value;
+            }
+        }
+
         if (typeof(TValue).IsEnum && value is int i)
         {
             return (TValue)(object)i;
@@ -528,6 +603,6 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             return tValue;
         }
 
-        return defaultValue;
+        return null;
     }
 }
