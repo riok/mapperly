@@ -324,7 +324,14 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
     public IEnumerable<DerivedTypeMappingConfiguration> ReadGenericMapDerivedTypeAttributes(ISymbol symbol)
     {
-        return Access<MapDerivedTypeAttribute<object, object>, DerivedTypeMappingConfiguration>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<MapDerivedTypeAttribute<object, object>>(symbol);
+        foreach (var attrData in attrDatas)
+        {
+            var sourceType = GetTypeSymbolFromGenericArgument(attrData, 0);
+            var targetType = GetTypeSymbolFromGenericArgument(attrData, 1);
+
+            yield return new DerivedTypeMappingConfiguration(sourceType, targetType);
+        }
     }
 
     public IEnumerable<MemberMappingConfiguration> ReadMapPropertyFromSourceAttributes(ISymbol symbol)
@@ -735,7 +742,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return roslynType?.GetFields().FirstOrDefault(f => Equals(f.ConstantValue, typedConstant.Value));
     }
 
-    public static ITypeSymbol? GetTypeSymbolFromValue(AttributeData attrData, string propertyName)
+    private static ITypeSymbol? GetTypeSymbolFromValue(AttributeData attrData, string propertyName)
     {
         var nullableTypedConstant = GetTypedConstant(attrData, propertyName);
         if (nullableTypedConstant is not { } typedConstant)
@@ -744,6 +751,13 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         }
 
         return typedConstant.Value as ITypeSymbol;
+    }
+
+    private static ITypeSymbol GetTypeSymbolFromGenericArgument(AttributeData attrData, int index)
+    {
+        return attrData.AttributeClass?.TypeArguments is { Length: > 0 } typeArguments && typeArguments.Length > index
+            ? typeArguments[index]
+            : throw new InvalidOperationException($"Could not get type argument {index} of attribute {attrData.AttributeClass?.Name}");
     }
 
     private static TValue? GetSimpleValue<TValue>(AttributeData attrData, string propertyName)
