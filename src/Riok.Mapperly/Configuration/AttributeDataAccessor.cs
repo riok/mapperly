@@ -336,22 +336,51 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
     public IEnumerable<MemberMappingConfiguration> ReadMapPropertyFromSourceAttributes(ISymbol symbol)
     {
-        return Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<MapPropertyFromSourceAttribute>(symbol);
+        foreach (var attrData in attrDatas)
+        {
+            var target = GetMemberPath(attrData, nameof(MapPropertyFromSourceAttribute.Target));
+            var syntaxReference = attrData.ApplicationSyntaxReference?.GetSyntax();
+            yield return new MemberMappingConfiguration(StringMemberPath.Empty, target)
+            {
+                StringFormat = GetSimpleValue(attrData, nameof(MapPropertyFromSourceAttribute.StringFormat)),
+                FormatProvider = GetSimpleValue(attrData, nameof(MapPropertyFromSourceAttribute.FormatProvider)),
+                Use = GetMethodReference(attrData, nameof(MapPropertyFromSourceAttribute.Use)),
+                SyntaxReference = syntaxReference,
+            };
+        }
     }
 
     public IEnumerable<UseStaticMapperConfiguration> ReadUseStaticMapperAttributes(ISymbol symbol)
     {
-        return Access<UseStaticMapperAttribute, UseStaticMapperConfiguration>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<UseStaticMapperAttribute>(symbol);
+        foreach (var attrData in attrDatas)
+        {
+            var type = GetTypeSymbolFromValue(attrData, "mapperType");
+            if (type is null)
+                continue;
+
+            yield return new UseStaticMapperConfiguration(type);
+        }
     }
 
     public IEnumerable<UseStaticMapperConfiguration> ReadGenericUseStaticMapperAttributes(ISymbol symbol)
     {
-        return Access<UseStaticMapperAttribute<object>, UseStaticMapperConfiguration>(symbol);
+        var attrDatas = symbolAccessor.GetAttributes<UseStaticMapperAttribute<object>>(symbol);
+        foreach (var attrData in attrDatas)
+        {
+            var type = GetTypeSymbolFromGenericArgument(attrData, 0);
+            yield return new UseStaticMapperConfiguration(type);
+        }
     }
 
     public string GetMappingName(IMethodSymbol methodSymbol)
     {
-        return Access<NamedMappingAttribute, NamedMappingAttribute>(methodSymbol).Select(e => e.Name).FirstOrDefault() ?? methodSymbol.Name;
+        var attrData = GetAttribute<NamedMappingAttribute>(methodSymbol);
+        if (attrData == null)
+            return methodSymbol.Name;
+
+        return GetSimpleValue(attrData, nameof(NamedMappingAttribute.Name)) ?? methodSymbol.Name;
     }
 
     public bool IsMappingNameEqualTo(IMethodSymbol methodSymbol, string name)
