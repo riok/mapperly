@@ -205,7 +205,7 @@ public static class UserMethodMappingExtractor
         }
 
         var targetNotNullIfSourceNotNull = ctx
-            .AttributeAccessor.TryReadNotNullIfNotNullAttributes(method)
+            .AttributeAccessor.ReadNotNullIfNotNullAttributes(method)
             .Any(attr => string.Equals(attr.ParameterName, sourceParameterName, StringComparison.Ordinal));
         var nullability = targetNotNullIfSourceNotNull
             ? UserImplementedMethodMapping.TargetNullability.NotNullIfSourceNotNull

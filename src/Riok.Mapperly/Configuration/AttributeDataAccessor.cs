@@ -388,87 +388,17 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return string.Equals(GetMappingName(methodSymbol), name, StringComparison.Ordinal);
     }
 
-    internal IEnumerable<NotNullIfNotNullAttribute> TryReadNotNullIfNotNullAttributes(IMethodSymbol symbol)
+    internal IEnumerable<NotNullIfNotNullAttribute> ReadNotNullIfNotNullAttributes(IMethodSymbol symbol)
     {
-        return TryAccess<NotNullIfNotNullAttribute, NotNullIfNotNullAttribute>(symbol.GetReturnTypeAttributes());
-    }
-
-    private IEnumerable<TData> TryAccess<TAttribute, TData>(IEnumerable<AttributeData> attributes)
-        where TAttribute : Attribute
-        where TData : notnull
-    {
-        var attrDatas = symbolAccessor.TryGetAttributes<TAttribute>(attributes);
-        return attrDatas.Select(a => Access<TAttribute, TData>(a));
-    }
-
-    private static TData Access<TAttribute, TData>(AttributeData attrData, SymbolAccessor? symbolAccessor = null)
-        where TAttribute : Attribute
-        where TData : notnull
-    {
-        var attrType = typeof(TAttribute);
-        var dataType = typeof(TData);
-
-        var syntax = (AttributeSyntax?)attrData.ApplicationSyntaxReference?.GetSyntax();
-        var syntaxArguments =
-            (IReadOnlyList<AttributeArgumentSyntax>?)syntax?.ArgumentList?.Arguments
-            ?? new AttributeArgumentSyntax[attrData.ConstructorArguments.Length + attrData.NamedArguments.Length];
-        var typeArguments = (IReadOnlyCollection<ITypeSymbol>?)attrData.AttributeClass?.TypeArguments ?? [];
-        var attr = Create<TData>(typeArguments, attrData.ConstructorArguments, syntaxArguments, symbolAccessor);
-
-        var syntaxIndex = attrData.ConstructorArguments.Length;
-        var propertiesByName = dataType.GetProperties().GroupBy(x => x.Name).ToDictionary(x => x.Key, x => x.First());
-        foreach (var namedArgument in attrData.NamedArguments)
+        var attrDatas = symbolAccessor.GetAttributes<NotNullIfNotNullAttribute>(symbol.GetReturnTypeAttributes());
+        foreach (var attrData in attrDatas)
         {
-            if (!propertiesByName.TryGetValue(namedArgument.Key, out var prop))
-                throw new InvalidOperationException($"Could not get property {namedArgument.Key} of attribute {attrType.FullName}");
-
-            var value = BuildArgumentValue(namedArgument.Value, prop.PropertyType, syntaxArguments[syntaxIndex], symbolAccessor);
-            prop.SetValue(attr, value);
-            syntaxIndex++;
-        }
-
-        if (attr is HasSyntaxReference symbolRefHolder)
-        {
-            symbolRefHolder.SyntaxReference = attrData.ApplicationSyntaxReference?.GetSyntax();
-        }
-
-        return attr;
-    }
-
-    private static TData Create<TData>(
-        IReadOnlyCollection<ITypeSymbol> typeArguments,
-        IReadOnlyCollection<TypedConstant> constructorArguments,
-        IReadOnlyList<AttributeArgumentSyntax> argumentSyntax,
-        SymbolAccessor? symbolAccessor
-    )
-        where TData : notnull
-    {
-        // The data class should have a constructor
-        // with generic type parameters of the attribute class
-        // as ITypeSymbol parameters followed by all other parameters
-        // of the attribute constructor.
-        // Multiple attribute class constructors/generic data classes are not yet supported.
-        var argCount = typeArguments.Count + constructorArguments.Count;
-        foreach (var constructor in typeof(TData).GetConstructors())
-        {
-            var parameters = constructor.GetParameters();
-            if (parameters.Length != argCount)
+            var parameterName = GetSimpleValue(attrData, nameof(NotNullIfNotNullAttribute.ParameterName));
+            if (parameterName is null)
                 continue;
 
-            var constructorArgumentValues = constructorArguments.Select(
-                (arg, i) => BuildArgumentValue(arg, parameters[i + typeArguments.Count].ParameterType, argumentSyntax[i], symbolAccessor)
-            );
-            var constructorTypeAndValueArguments = typeArguments.Concat(constructorArgumentValues).ToArray();
-            if (!ValidateParameterTypes(constructorTypeAndValueArguments, parameters))
-                continue;
-
-            return (TData?)Activator.CreateInstance(typeof(TData), constructorTypeAndValueArguments)
-                ?? throw new InvalidOperationException($"Could not create instance of {typeof(TData)}");
+            yield return new NotNullIfNotNullAttribute(parameterName);
         }
-
-        throw new InvalidOperationException(
-            $"{typeof(TData)} does not have a constructor with {argCount} parameters and matchable arguments"
-        );
     }
 
     private static object? BuildArgumentValue(
@@ -664,25 +594,6 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         }
 
         return Enum.ToObject(targetType, arg.Value);
-    }
-
-    private static bool ValidateParameterTypes(object?[] arguments, ParameterInfo[] parameters)
-    {
-        if (arguments.Length != parameters.Length)
-            return false;
-
-        for (var argIdx = 0; argIdx < arguments.Length; argIdx++)
-        {
-            var value = arguments[argIdx];
-            var param = parameters[argIdx];
-            if (value == null && param.ParameterType.IsValueType)
-                return false;
-
-            if (value?.GetType().IsAssignableTo(param.ParameterType) == false)
-                return false;
-        }
-
-        return true;
     }
 
     private AttributeData? GetAttribute<TAttribute>(ISymbol symbol)
