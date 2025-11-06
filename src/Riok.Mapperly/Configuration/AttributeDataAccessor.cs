@@ -401,32 +401,6 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         }
     }
 
-    private static object? BuildArgumentValue(
-        TypedConstant arg,
-        Type targetType,
-        AttributeArgumentSyntax? syntax,
-        SymbolAccessor? symbolAccessor
-    )
-    {
-        return arg.Kind switch
-        {
-            _ when (targetType == typeof(AttributeValue?) || targetType == typeof(AttributeValue)) && syntax != null => new AttributeValue(
-                arg,
-                syntax.Expression
-            ),
-            _ when arg.IsNull => null,
-            _ when targetType == typeof(IMemberPathConfiguration) => CreateMemberPath(arg, syntax, symbolAccessor),
-            _ when targetType == typeof(IMethodReferenceConfiguration) => CreateMethodReference(arg, syntax, symbolAccessor),
-            TypedConstantKind.Enum => GetEnumValue(arg, targetType),
-            TypedConstantKind.Array => BuildArrayValue(arg, targetType, symbolAccessor),
-            TypedConstantKind.Primitive => arg.Value,
-            TypedConstantKind.Type when targetType == typeof(ITypeSymbol) => arg.Value,
-            _ => throw new ArgumentOutOfRangeException(
-                $"{nameof(AttributeDataAccessor)} does not support constructor arguments of kind {arg.Kind.ToString()} or cannot convert it to {targetType}"
-            ),
-        };
-    }
-
     private static IMemberPathConfiguration CreateMemberPath(
         TypedConstant arg,
         AttributeArgumentSyntax? syntax,
@@ -437,10 +411,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
 
         if (arg.Kind == TypedConstantKind.Array)
         {
-            var values = arg
-                .Values.Select(x => (string?)BuildArgumentValue(x, typeof(string), null, symbolAccessor))
-                .WhereNotNull()
-                .ToImmutableEquatableArray();
+            var values = arg.Values.Select(x => (string?)x.Value).WhereNotNull().ToImmutableEquatableArray();
             return new StringMemberPath(values);
         }
 
@@ -570,32 +541,6 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return true;
     }
 
-    private static object?[] BuildArrayValue(TypedConstant arg, Type targetType, SymbolAccessor? symbolAccessor)
-    {
-        if (!targetType.IsGenericType || targetType.GetGenericTypeDefinition() != typeof(IReadOnlyCollection<>))
-            throw new InvalidOperationException($"{nameof(IReadOnlyCollection<object>)} is the only supported array type");
-
-        var elementTargetType = targetType.GetGenericArguments()[0];
-        return arg.Values.Select(x => BuildArgumentValue(x, elementTargetType, null, symbolAccessor)).ToArray();
-    }
-
-    private static object? GetEnumValue(TypedConstant arg, Type targetType)
-    {
-        if (arg.Value == null)
-            return null;
-
-        var enumRoslynType = arg.Type ?? throw new InvalidOperationException("Type is null");
-        if (targetType == typeof(IFieldSymbol))
-            return enumRoslynType.GetFields().First(f => Equals(f.ConstantValue, arg.Value));
-
-        if (targetType.IsConstructedGenericType && targetType.GetGenericTypeDefinition() == typeof(Nullable<>))
-        {
-            targetType = Nullable.GetUnderlyingType(targetType)!;
-        }
-
-        return Enum.ToObject(targetType, arg.Value);
-    }
-
     private AttributeData? GetAttribute<TAttribute>(ISymbol symbol)
         where TAttribute : Attribute
     {
@@ -641,7 +586,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return GetSimpleValue<TValue>(attrData, propertyName) ?? defaultValue;
     }
 
-    public static IFieldSymbol? GetFieldSymbol(AttributeData attrData, string propertyName)
+    private static IFieldSymbol? GetFieldSymbol(AttributeData attrData, string propertyName)
     {
         var nullableTypedConstant = GetTypedConstant(attrData, propertyName);
         if (nullableTypedConstant is not { } typedConstant)
