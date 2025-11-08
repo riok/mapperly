@@ -400,6 +400,172 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         }
     }
 
+    private AttributeData? GetAttribute<TAttribute>(ISymbol symbol)
+        where TAttribute : Attribute
+    {
+        return symbolAccessor.GetAttributes<TAttribute>(symbol).FirstOrDefault();
+    }
+
+    private AttributeData GetRequiredAttribute<TAttribute>(ISymbol symbol)
+        where TAttribute : Attribute
+    {
+        return GetAttribute<TAttribute>(symbol)
+            ?? throw new InvalidOperationException($"Could not find attribute {typeof(TAttribute).FullName} on {symbol}");
+    }
+
+    private IMemberPathConfiguration GetMemberPath(AttributeData attrData, string name)
+    {
+        if (TryGetTypedConstant(attrData, name, out var typedConstant, out var argumentSyntax))
+        {
+            return CreateMemberPath(typedConstant, argumentSyntax);
+        }
+
+        return new StringMemberPath(name.Split(MemberPathConstants.MemberAccessSeparator).ToImmutableEquatableArray());
+    }
+
+    private IMethodReferenceConfiguration? GetMethodReference(AttributeData attrData, string name)
+    {
+        if (TryGetTypedConstant(attrData, name, out var typedConstant, out var argumentSyntax))
+        {
+            return CreateMethodReference(typedConstant, argumentSyntax);
+        }
+
+        return null;
+    }
+
+    private static string? GetSimpleValue(AttributeData attrData, string propertyName)
+    {
+        if (TryGetTypedConstant(attrData, propertyName, out var typedConstant, out _))
+        {
+            return typedConstant.Value as string;
+        }
+
+        return null;
+    }
+
+    private static TValue GetSimpleValueOrDefault<TValue>(AttributeData attrData, string propertyName, TValue defaultValue = default)
+        where TValue : struct
+    {
+        return GetSimpleValue<TValue>(attrData, propertyName) ?? defaultValue;
+    }
+
+    private static IFieldSymbol? GetFieldSymbol(AttributeData attrData, string propertyName)
+    {
+        if (TryGetTypedConstant(attrData, propertyName, out var typedConstant, out _))
+        {
+            var roslynType = typedConstant.Type;
+            return roslynType?.GetFields().FirstOrDefault(f => Equals(f.ConstantValue, typedConstant.Value));
+        }
+
+        return null;
+    }
+
+    private static ITypeSymbol? GetTypeSymbolFromValue(AttributeData attrData, string propertyName)
+    {
+        if (TryGetTypedConstant(attrData, propertyName, out var typedConstant, out _))
+        {
+            return typedConstant.Value as ITypeSymbol;
+        }
+
+        return null;
+    }
+
+    private static ITypeSymbol GetTypeSymbolFromGenericArgument(AttributeData attrData, int index)
+    {
+        return attrData.AttributeClass?.TypeArguments is { Length: > 0 } typeArguments && typeArguments.Length > index
+            ? typeArguments[index]
+            : throw new InvalidOperationException($"Could not get type argument {index} of attribute {attrData.AttributeClass?.Name}");
+    }
+
+    private static TValue? GetSimpleValue<TValue>(AttributeData attrData, string propertyName)
+        where TValue : struct
+    {
+        if (TryGetTypedConstant(attrData, propertyName, out var typedConstant, out _))
+        {
+            var value = typedConstant.Value;
+
+            if (value is null)
+                return null;
+
+            if (typeof(TValue).IsEnum && value is int i)
+            {
+                return (TValue)(object)i;
+            }
+
+            if (value is TValue tValue)
+            {
+                return tValue;
+            }
+        }
+
+        return null;
+    }
+
+    private static AttributeValue? GetAttributeValue(AttributeData attrData, string propertyName) =>
+        TryGetTypedConstant(attrData, propertyName, out var typedConstant, out var syntax)
+            ? new AttributeValue(typedConstant, syntax.Expression)
+            : null;
+
+    private static bool TryGetTypedConstant(
+        AttributeData attrData,
+        string propertyName,
+        out TypedConstant typedConstant,
+        [NotNullWhen(true)] out AttributeArgumentSyntax? syntax
+    )
+    {
+        syntax = null;
+        typedConstant = default;
+        var syntaxes = (AttributeSyntax?)attrData.ApplicationSyntaxReference?.GetSyntax();
+        if (syntaxes?.ArgumentList?.Arguments is not { } argumentSyntaxes)
+        {
+            return false;
+        }
+
+        if (attrData.AttributeConstructor?.Parameters is { } constructorParameters)
+        {
+            for (var index = 0; index < constructorParameters.Length; index++)
+            {
+                var parameter = constructorParameters[index];
+                if (!string.Equals(parameter.Name, propertyName, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (index >= attrData.ConstructorArguments.Length)
+                {
+                    break;
+                }
+
+                typedConstant = attrData.ConstructorArguments[index];
+
+                if (argumentSyntaxes.Count <= index)
+                {
+                    break;
+                }
+
+                syntax = argumentSyntaxes[index];
+                return true;
+            }
+        }
+
+        var argumentSyntaxStartIndex = attrData.AttributeConstructor?.Parameters.Length ?? 0;
+        for (var index = 0; index < attrData.NamedArguments.Length; index++)
+        {
+            var argument = attrData.NamedArguments[index];
+            if (!string.Equals(argument.Key, propertyName, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            typedConstant = argument.Value;
+            syntax = argumentSyntaxes[argumentSyntaxStartIndex + index];
+
+            return true;
+        }
+
+        return false;
+    }
+
     private IMemberPathConfiguration CreateMemberPath(TypedConstant arg, AttributeArgumentSyntax? syntax)
     {
         if (arg.Kind == TypedConstantKind.Array)
@@ -526,198 +692,4 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         configuration = new ExternalInstanceMethodReferenceConfiguration(memberName, field, typeSymbol);
         return true;
     }
-
-    private AttributeData? GetAttribute<TAttribute>(ISymbol symbol)
-        where TAttribute : Attribute
-    {
-        return symbolAccessor.GetAttributes<TAttribute>(symbol).FirstOrDefault();
-    }
-
-    private AttributeData GetRequiredAttribute<TAttribute>(ISymbol symbol)
-        where TAttribute : Attribute
-    {
-        return GetAttribute<TAttribute>(symbol)
-            ?? throw new InvalidOperationException($"Could not find attribute {typeof(TAttribute).FullName} on {symbol.Name}");
-    }
-
-    private IMemberPathConfiguration GetMemberPath(AttributeData attrData, string name)
-    {
-        if (TryGetTypedConstantWithAttributeArgumentSyntax(attrData, name, out var typedConstant, out var argumentSyntax))
-        {
-            return CreateMemberPath(typedConstant.Value, argumentSyntax);
-        }
-
-        return new StringMemberPath(name.Split(MemberPathConstants.MemberAccessSeparator).ToImmutableEquatableArray());
-    }
-
-    private IMethodReferenceConfiguration? GetMethodReference(AttributeData attrData, string name)
-    {
-        if (TryGetTypedConstantWithAttributeArgumentSyntax(attrData, name, out var typedConstant, out var argumentSyntax))
-        {
-            return CreateMethodReference(typedConstant.Value, argumentSyntax);
-        }
-
-        return null;
-    }
-
-    private static string? GetSimpleValue(AttributeData attrData, string propertyName)
-    {
-        var typedConstant = GetTypedConstant(attrData, propertyName);
-        return typedConstant?.Value as string;
-    }
-
-    private static TValue GetSimpleValueOrDefault<TValue>(AttributeData attrData, string propertyName, TValue defaultValue = default)
-        where TValue : struct
-    {
-        return GetSimpleValue<TValue>(attrData, propertyName) ?? defaultValue;
-    }
-
-    private static IFieldSymbol? GetFieldSymbol(AttributeData attrData, string propertyName)
-    {
-        var nullableTypedConstant = GetTypedConstant(attrData, propertyName);
-        if (nullableTypedConstant is not { } typedConstant)
-        {
-            return null;
-        }
-
-        var roslynType = typedConstant.Type;
-        return roslynType?.GetFields().FirstOrDefault(f => Equals(f.ConstantValue, typedConstant.Value));
-    }
-
-    private static ITypeSymbol? GetTypeSymbolFromValue(AttributeData attrData, string propertyName)
-    {
-        var nullableTypedConstant = GetTypedConstant(attrData, propertyName);
-        if (nullableTypedConstant is not { } typedConstant)
-        {
-            return null;
-        }
-
-        return typedConstant.Value as ITypeSymbol;
-    }
-
-    private static ITypeSymbol GetTypeSymbolFromGenericArgument(AttributeData attrData, int index)
-    {
-        return attrData.AttributeClass?.TypeArguments is { Length: > 0 } typeArguments && typeArguments.Length > index
-            ? typeArguments[index]
-            : throw new InvalidOperationException($"Could not get type argument {index} of attribute {attrData.AttributeClass?.Name}");
-    }
-
-    private static TValue? GetSimpleValue<TValue>(AttributeData attrData, string propertyName)
-        where TValue : struct
-    {
-        var nullableTypedConstant = GetTypedConstant(attrData, propertyName);
-        if (nullableTypedConstant is not { } typedConstant)
-        {
-            return null;
-        }
-
-        var value = typedConstant.Value;
-
-        if (value is null)
-            return null;
-
-        if (typeof(TValue).IsEnum && value is int i)
-        {
-            return (TValue)(object)i;
-        }
-
-        if (value is TValue tValue)
-        {
-            return tValue;
-        }
-
-        return null;
-    }
-
-    private static bool TryGetTypedConstantWithAttributeArgumentSyntax(
-        AttributeData attrData,
-        string propertyName,
-        [NotNullWhen(true)] out TypedConstant? typedConstant,
-        [NotNullWhen(true)] out AttributeArgumentSyntax? syntax
-    )
-    {
-        syntax = null;
-        typedConstant = null;
-        var syntaxes = (AttributeSyntax?)attrData.ApplicationSyntaxReference?.GetSyntax();
-        if (syntaxes?.ArgumentList?.Arguments is not { } argumentSyntaxes)
-        {
-            return false;
-        }
-
-        var constructorParameters = attrData.AttributeConstructor?.Parameters;
-        if (constructorParameters is not null)
-        {
-            foreach (var parameter in constructorParameters)
-            {
-                if (!string.Equals(parameter.Name, propertyName, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                var ordinal = parameter.Ordinal;
-                if (ordinal >= attrData.ConstructorArguments.Length)
-                {
-                    break;
-                }
-
-                typedConstant = attrData.ConstructorArguments[ordinal];
-
-                if (argumentSyntaxes.Count <= ordinal)
-                {
-                    break;
-                }
-
-                syntax = argumentSyntaxes[ordinal];
-                return true;
-            }
-        }
-
-        foreach (var argument in attrData.NamedArguments)
-        {
-            if (string.Equals(argument.Key, propertyName, StringComparison.Ordinal))
-            {
-                typedConstant = argument.Value;
-                syntax = argumentSyntaxes.FirstOrDefault(x =>
-                    string.Equals(x.NameEquals?.Name.Identifier.ValueText, propertyName, StringComparison.Ordinal)
-                );
-
-                return syntax is not null;
-            }
-        }
-
-        return false;
-    }
-
-    private static TypedConstant? GetTypedConstant(AttributeData attrData, string propertyName)
-    {
-        var constructorParameters = attrData.AttributeConstructor?.Parameters;
-        if (constructorParameters is not null)
-        {
-            foreach (var parameter in constructorParameters)
-            {
-                if (!string.Equals(parameter.Name, propertyName, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                var ordinal = parameter.Ordinal;
-                return ordinal < attrData.ConstructorArguments.Length ? attrData.ConstructorArguments[ordinal] : null;
-            }
-        }
-
-        foreach (var argument in attrData.NamedArguments)
-        {
-            if (string.Equals(argument.Key, propertyName, StringComparison.Ordinal))
-            {
-                return argument.Value;
-            }
-        }
-
-        return null;
-    }
-
-    private static AttributeValue? GetAttributeValue(AttributeData attrData, string propertyName) =>
-        TryGetTypedConstantWithAttributeArgumentSyntax(attrData, propertyName, out var typedConstant, out var syntax)
-            ? new AttributeValue(typedConstant.Value, syntax.Expression)
-            : null;
 }
