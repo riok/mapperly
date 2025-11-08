@@ -18,7 +18,7 @@ public class SimpleMappingBuilderContext(
     MapperConfigurationReader configurationReader,
     SymbolAccessor symbolAccessor,
     GenericTypeChecker genericTypeChecker,
-    AttributeDataAccessor attributeAccessor,
+    IAttributeDataAccessor attributeAccessor,
     UnsafeAccessorContext unsafeAccessorContext,
     DiagnosticCollection diagnostics,
     MappingBuilder mappingBuilder,
@@ -60,7 +60,7 @@ public class SimpleMappingBuilderContext(
 
     public GenericTypeChecker GenericTypeChecker { get; } = genericTypeChecker;
 
-    public AttributeDataAccessor AttributeAccessor { get; } = attributeAccessor;
+    public IAttributeDataAccessor AttributeAccessor { get; } = attributeAccessor;
 
     public UnsafeAccessorContext UnsafeAccessorContext { get; } = unsafeAccessorContext;
 

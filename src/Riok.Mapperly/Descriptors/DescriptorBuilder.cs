@@ -29,7 +29,7 @@ public class DescriptorBuilder
     private readonly SimpleMappingBuilderContext _builderContext;
     private readonly DiagnosticCollection _diagnostics;
     private readonly UnsafeAccessorContext _unsafeAccessorContext;
-    private readonly AttributeDataAccessor _attributeAccessor;
+    private readonly IAttributeDataAccessor _attributeAccessor;
 
     public DescriptorBuilder(
         CompilationContext compilationContext,
@@ -44,7 +44,7 @@ public class DescriptorBuilder
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
         _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
         _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
-        _attributeAccessor = new AttributeDataAccessor(symbolAccessor);
+        _attributeAccessor = new CachedAttributeDataAccessor(new AttributeDataAccessor(symbolAccessor));
 
         var genericTypeChecker = new GenericTypeChecker(_symbolAccessor, compilationContext.Types);
         var configurationReader = new MapperConfigurationReader(

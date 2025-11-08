@@ -16,7 +16,7 @@ namespace Riok.Mapperly.Configuration;
 /// <summary>
 /// Creates <see cref="Attribute"/> instances by resolving attribute data from provided symbols.
 /// </summary>
-public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
+internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttributeDataAccessor
 {
     private const char FullNameOfPrefix = '@';
 
@@ -387,7 +387,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return string.Equals(GetMappingName(methodSymbol), name, StringComparison.Ordinal);
     }
 
-    internal IEnumerable<NotNullIfNotNullAttribute> ReadNotNullIfNotNullAttributes(IMethodSymbol symbol)
+    public IEnumerable<NotNullIfNotNullConfiguration> ReadNotNullIfNotNullAttributes(IMethodSymbol symbol)
     {
         var attrDataList = symbolAccessor.GetAttributes<NotNullIfNotNullAttribute>(symbol.GetReturnTypeAttributes());
         foreach (var attrData in attrDataList)
@@ -396,7 +396,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             if (parameterName is null)
                 continue;
 
-            yield return new NotNullIfNotNullAttribute(parameterName);
+            yield return new NotNullIfNotNullConfiguration(parameterName);
         }
     }
 

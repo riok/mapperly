@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
-using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration.MethodReferences;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Descriptors.Mappings;
@@ -13,14 +12,14 @@ namespace Riok.Mapperly.Configuration;
 public class MapperConfigurationReader
 {
     private readonly Dictionary<MappingConfigurationReference, MappingConfiguration> _resolvedConfigurations = new();
-    private readonly AttributeDataAccessor _dataAccessor;
+    private readonly IAttributeDataAccessor _dataAccessor;
     private readonly MappingCollection _mappings;
     private readonly GenericTypeChecker _genericTypeChecker;
     private readonly DiagnosticCollection _diagnostics;
     private readonly WellKnownTypes _types;
 
     public MapperConfigurationReader(
-        AttributeDataAccessor dataAccessor,
+        IAttributeDataAccessor dataAccessor,
         MappingCollection mappings,
         GenericTypeChecker genericTypeChecker,
         DiagnosticCollection diagnostics,

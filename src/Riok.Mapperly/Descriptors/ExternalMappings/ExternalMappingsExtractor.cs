@@ -1,6 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Configuration.MethodReferences;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
