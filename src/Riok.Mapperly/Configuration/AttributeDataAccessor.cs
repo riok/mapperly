@@ -123,8 +123,7 @@ internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttribute
 
     public IEnumerable<NestedMembersMappingConfiguration> ReadMapNestedPropertiesAttribute(ISymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<MapNestedPropertiesAttribute>(symbol);
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<MapNestedPropertiesAttribute>(symbol))
         {
             var config = GetMemberPath(attrData, nameof(NestedMembersMappingConfiguration.Source));
             yield return new NestedMembersMappingConfiguration(config);
@@ -167,8 +166,7 @@ internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttribute
 
     public IEnumerable<EnumValueMappingConfiguration> ReadMapEnumValueAttribute(ISymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<MapEnumValueAttribute>(symbol);
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<MapEnumValueAttribute>(symbol))
         {
             var source = GetAttributeValue(attrData, nameof(MapEnumValueAttribute.Source));
             if (source == null)
@@ -183,8 +181,7 @@ internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttribute
 
     public IEnumerable<MapperIgnoreEnumValueConfiguration> ReadMapperIgnoreSourceValueAttribute(ISymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<MapperIgnoreSourceValueAttribute>(symbol);
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<MapperIgnoreSourceValueAttribute>(symbol))
         {
             var fieldSymbol = GetFieldSymbol(attrData, "source");
             if (fieldSymbol is null)
@@ -196,8 +193,7 @@ internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttribute
 
     public IEnumerable<MapperIgnoreEnumValueConfiguration> ReadMapperIgnoreTargetValueAttribute(ISymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<MapperIgnoreTargetValueAttribute>(symbol);
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<MapperIgnoreTargetValueAttribute>(symbol))
         {
             var fieldSymbol = GetFieldSymbol(attrData, "target");
             if (fieldSymbol is null)
@@ -237,8 +233,7 @@ internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttribute
 
     public IEnumerable<MapperIgnoreSourceAttribute> ReadMapperIgnoreSourceAttributes(ISymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<MapperIgnoreSourceAttribute>(symbol);
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<MapperIgnoreSourceAttribute>(symbol))
         {
             var source = GetSimpleValue(attrData, nameof(MapperIgnoreSourceAttribute.Source));
             if (source is null)
@@ -249,8 +244,7 @@ internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttribute
 
     public IEnumerable<MapperIgnoreTargetAttribute> ReadMapperIgnoreTargetAttributes(ISymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<MapperIgnoreTargetAttribute>(symbol);
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<MapperIgnoreTargetAttribute>(symbol))
         {
             var target = GetSimpleValue(attrData, nameof(MapperIgnoreTargetAttribute.Target));
             if (target is null)
@@ -261,8 +255,7 @@ internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttribute
 
     public IEnumerable<MemberValueMappingConfiguration> ReadMapValueAttribute(ISymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<MapValueAttribute>(symbol);
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<MapValueAttribute>(symbol))
         {
             var target = GetMemberPath(attrData, nameof(MapValueAttribute.Target));
             var value = GetAttributeValue(attrData, nameof(MapValueAttribute.Value));
@@ -275,8 +268,7 @@ internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttribute
 
     public IEnumerable<MemberMappingConfiguration> ReadMapPropertyAttributes(ISymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<MapPropertyAttribute>(symbol);
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<MapPropertyAttribute>(symbol))
         {
             var source = GetMemberPath(attrData, nameof(MapPropertyAttribute.Source));
             var target = GetMemberPath(attrData, nameof(MapPropertyAttribute.Target));
@@ -295,8 +287,7 @@ internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttribute
 
     public IEnumerable<IncludeMappingConfiguration> ReadIncludeMappingConfigurationAttributes(ISymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<IncludeMappingConfigurationAttribute>(symbol);
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<IncludeMappingConfigurationAttribute>(symbol))
         {
             var name = GetMethodReference(attrData, nameof(IncludeMappingConfigurationAttribute.Name));
             if (name is null)
@@ -308,8 +299,7 @@ internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttribute
 
     public IEnumerable<DerivedTypeMappingConfiguration> ReadMapDerivedTypeAttributes(ISymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<MapDerivedTypeAttribute>(symbol);
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<MapDerivedTypeAttribute>(symbol))
         {
             var sourceType = GetTypeSymbolFromValue(attrData, nameof(MapDerivedTypeAttribute.SourceType));
             var targetType = GetTypeSymbolFromValue(attrData, nameof(MapDerivedTypeAttribute.TargetType));
@@ -323,8 +313,7 @@ internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttribute
 
     public IEnumerable<DerivedTypeMappingConfiguration> ReadGenericMapDerivedTypeAttributes(ISymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<MapDerivedTypeAttribute<object, object>>(symbol);
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<MapDerivedTypeAttribute<object, object>>(symbol))
         {
             var sourceType = GetTypeSymbolFromGenericArgument(attrData, 0);
             var targetType = GetTypeSymbolFromGenericArgument(attrData, 1);
@@ -335,25 +324,22 @@ internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttribute
 
     public IEnumerable<MemberMappingConfiguration> ReadMapPropertyFromSourceAttributes(ISymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<MapPropertyFromSourceAttribute>(symbol);
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<MapPropertyFromSourceAttribute>(symbol))
         {
             var target = GetMemberPath(attrData, nameof(MapPropertyFromSourceAttribute.Target));
-            var syntaxReference = attrData.ApplicationSyntaxReference?.GetSyntax();
             yield return new MemberMappingConfiguration(StringMemberPath.Empty, target)
             {
                 StringFormat = GetSimpleValue(attrData, nameof(MapPropertyFromSourceAttribute.StringFormat)),
                 FormatProvider = GetSimpleValue(attrData, nameof(MapPropertyFromSourceAttribute.FormatProvider)),
                 Use = GetMethodReference(attrData, nameof(MapPropertyFromSourceAttribute.Use)),
-                SyntaxReference = syntaxReference,
+                SyntaxReference = attrData.ApplicationSyntaxReference?.GetSyntax(),
             };
         }
     }
 
     public IEnumerable<UseStaticMapperConfiguration> ReadUseStaticMapperAttributes(ISymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<UseStaticMapperAttribute>(symbol);
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<UseStaticMapperAttribute>(symbol))
         {
             var type = GetTypeSymbolFromValue(attrData, "mapperType");
             if (type is null)
@@ -365,8 +351,7 @@ internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttribute
 
     public IEnumerable<UseStaticMapperConfiguration> ReadGenericUseStaticMapperAttributes(ISymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<UseStaticMapperAttribute<object>>(symbol);
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<UseStaticMapperAttribute<object>>(symbol))
         {
             var type = GetTypeSymbolFromGenericArgument(attrData, 0);
             yield return new UseStaticMapperConfiguration(type);
@@ -389,8 +374,7 @@ internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttribute
 
     public IEnumerable<NotNullIfNotNullConfiguration> ReadNotNullIfNotNullAttributes(IMethodSymbol symbol)
     {
-        var attrDataList = symbolAccessor.GetAttributes<NotNullIfNotNullAttribute>(symbol.GetReturnTypeAttributes());
-        foreach (var attrData in attrDataList)
+        foreach (var attrData in symbolAccessor.GetAttributes<NotNullIfNotNullAttribute>(symbol.GetReturnTypeAttributes()))
         {
             var parameterName = GetSimpleValue(attrData, nameof(NotNullIfNotNullAttribute.ParameterName));
             if (parameterName is null)
