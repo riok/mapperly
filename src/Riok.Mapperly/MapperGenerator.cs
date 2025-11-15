@@ -121,7 +121,7 @@ public class MapperGenerator : IIncrementalGenerator
             .FirstOrDefault();
         return assemblyMapperDefaultsAttribute == null
             ? MapperConfiguration.Default
-            : AttributeDataAccessor.Access<MapperDefaultsAttribute, MapperConfiguration>(assemblyMapperDefaultsAttribute);
+            : AttributeDataAccessor.ReadMapperDefaultsAttribute(assemblyMapperDefaultsAttribute);
     }
 
     private static IEnumerable<Diagnostic> BuildCompilationDiagnostics(Compilation compilation)

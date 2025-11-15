@@ -1,6 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Configuration.MethodReferences;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
@@ -13,8 +11,8 @@ internal static class ExternalMappingsExtractor
     public static IEnumerable<IUserMapping> ExtractExternalMappings(SimpleMappingBuilderContext ctx, INamedTypeSymbol mapperSymbol)
     {
         var staticExternalMappers = ctx
-            .AttributeAccessor.Access<UseStaticMapperAttribute, UseStaticMapperConfiguration>(mapperSymbol)
-            .Concat(ctx.AttributeAccessor.Access<UseStaticMapperAttribute<object>, UseStaticMapperConfiguration>(mapperSymbol))
+            .AttributeAccessor.ReadUseStaticMapperAttributes(mapperSymbol)
+            .Concat(ctx.AttributeAccessor.ReadGenericUseStaticMapperAttributes(mapperSymbol))
             .SelectMany(x =>
                 UserMethodMappingExtractor.ExtractUserImplementedMappings(
                     ctx,
@@ -27,7 +25,7 @@ internal static class ExternalMappingsExtractor
 
         var externalInstanceMappers = ctx
             .SymbolAccessor.GetAllMembers(mapperSymbol)
-            .Where(x => ctx.AttributeAccessor.HasAttribute<UseMapperAttribute>(x))
+            .Where(x => ctx.AttributeAccessor.HasUseMapperAttribute(x))
             .SelectMany(x => ValidateAndExtractExternalInstanceMappings(ctx, x));
 
         return staticExternalMappers.Concat(externalInstanceMappers);
@@ -45,12 +43,10 @@ internal static class ExternalMappingsExtractor
 
         IEnumerable<IMethodReferenceConfiguration> CollectMemberMappingConfigurations(IMethodSymbol x) =>
             ctx
-                .AttributeAccessor.Access<MapPropertyAttribute, MemberMappingConfiguration>(x)
+                .AttributeAccessor.ReadMapPropertyAttributes(x)
                 .Select(e => e.Use)
-                .Concat(ctx.AttributeAccessor.Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(x).Select(e => e.Use))
-                .Concat(
-                    ctx.AttributeAccessor.Access<IncludeMappingConfigurationAttribute, IncludeMappingConfiguration>(x).Select(e => e.Name)
-                )
+                .Concat(ctx.AttributeAccessor.ReadMapPropertyFromSourceAttributes(x).Select(e => e.Use))
+                .Concat(ctx.AttributeAccessor.ReadIncludeMappingConfigurationAttributes(x).Select(e => e.Name))
                 .Where(e => e?.IsExternal ?? false)
                 .WhereNotNull();
     }
