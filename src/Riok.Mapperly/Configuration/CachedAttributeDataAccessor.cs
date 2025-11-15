@@ -5,7 +5,7 @@ using Riok.Mapperly.Abstractions;
 
 namespace Riok.Mapperly.Configuration;
 
-internal class CachedAttributeDataAccessor(IAttributeDataAccessor attributeDataAccessor) : IAttributeDataAccessor
+public class CachedAttributeDataAccessor(IAttributeDataAccessor attributeDataAccessor) : IAttributeDataAccessor
 {
     private readonly Dictionary<CacheKey, object?> _cache = new();
     private readonly IAttributeDataAccessor _attributeDataAccessor = attributeDataAccessor;

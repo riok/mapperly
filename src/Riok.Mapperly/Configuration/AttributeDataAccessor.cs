@@ -16,7 +16,7 @@ namespace Riok.Mapperly.Configuration;
 /// <summary>
 /// Creates <see cref="Attribute"/> instances by resolving attribute data from provided symbols.
 /// </summary>
-internal class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttributeDataAccessor
+public class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttributeDataAccessor
 {
     private const char FullNameOfPrefix = '@';
 
