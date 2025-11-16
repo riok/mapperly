@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 
