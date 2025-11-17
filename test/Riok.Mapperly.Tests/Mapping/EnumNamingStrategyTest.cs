@@ -301,7 +301,7 @@ public class EnumNamingStrategyTest
                     nameof(global::E.FG1) => global::E.FG1,
                     nameof(global::E.Gh1) => global::E.Gh1,
                     nameof(global::E.Hi_J) => global::E.Hi_J,
-                    _ => System.Enum.Parse<global::E>(source, false),
+                    _ => global::System.Enum.Parse<global::E>(source, false),
                 };
                 """
             );
@@ -329,7 +329,7 @@ public class EnumNamingStrategyTest
                     "fg1" => global::E.FG1,
                     "gh1" => global::E.Gh1,
                     "hiJ" => global::E.Hi_J,
-                    _ => System.Enum.Parse<global::E>(source, false),
+                    _ => global::System.Enum.Parse<global::E>(source, false),
                 };
                 """
             );
@@ -357,7 +357,7 @@ public class EnumNamingStrategyTest
                     "Fg1" => global::E.FG1,
                     "Gh1" => global::E.Gh1,
                     "HiJ" => global::E.Hi_J,
-                    _ => System.Enum.Parse<global::E>(source, false),
+                    _ => global::System.Enum.Parse<global::E>(source, false),
                 };
                 """
             );
@@ -385,7 +385,7 @@ public class EnumNamingStrategyTest
                     "fg1" => global::E.FG1,
                     "gh1" => global::E.Gh1,
                     "hi_j" => global::E.Hi_J,
-                    _ => System.Enum.Parse<global::E>(source, false),
+                    _ => global::System.Enum.Parse<global::E>(source, false),
                 };
                 """
             );
@@ -413,7 +413,7 @@ public class EnumNamingStrategyTest
                     "FG1" => global::E.FG1,
                     "GH1" => global::E.Gh1,
                     "HI_J" => global::E.Hi_J,
-                    _ => System.Enum.Parse<global::E>(source, false),
+                    _ => global::System.Enum.Parse<global::E>(source, false),
                 };
                 """
             );
@@ -441,7 +441,7 @@ public class EnumNamingStrategyTest
                     "fg1" => global::E.FG1,
                     "gh1" => global::E.Gh1,
                     "hi-j" => global::E.Hi_J,
-                    _ => System.Enum.Parse<global::E>(source, false),
+                    _ => global::System.Enum.Parse<global::E>(source, false),
                 };
                 """
             );
@@ -469,7 +469,7 @@ public class EnumNamingStrategyTest
                     "FG1" => global::E.FG1,
                     "GH1" => global::E.Gh1,
                     "HI-J" => global::E.Hi_J,
-                    _ => System.Enum.Parse<global::E>(source, false),
+                    _ => global::System.Enum.Parse<global::E>(source, false),
                 };
                 """
             );
@@ -501,7 +501,7 @@ public class EnumNamingStrategyTest
                     "" => global::E.B,
                     "C" => global::E.C,
                     "D" => global::E.D,
-                    _ => System.Enum.Parse<global::E>(source, false),
+                    _ => global::System.Enum.Parse<global::E>(source, false),
                 };
                 """
             )
@@ -541,7 +541,7 @@ public class EnumNamingStrategyTest
                     "C" => global::E.C,
                     "D" => global::E.D,
                     "E" => global::E.E,
-                    _ => System.Enum.Parse<global::E>(source, false),
+                    _ => global::System.Enum.Parse<global::E>(source, false),
                 };
                 """
             )
@@ -632,7 +632,7 @@ public class EnumNamingStrategyTest
                 {
                     "A1" => global::E.A,
                     "C" => global::E.C,
-                    _ => System.Enum.Parse<global::E>(source, false),
+                    _ => global::System.Enum.Parse<global::E>(source, false),
                 };
                 """
             )
