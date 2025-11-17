@@ -790,6 +790,15 @@ public static class DiagnosticDescriptors
         true
     );
 
+    public static readonly DiagnosticDescriptor CircularMappingWithoutSetter = new(
+        "RMG094",
+        "Circular existing target mapping without setter detected",
+        "A circular reference has been detected in existing target mappings without setter: {0}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT
