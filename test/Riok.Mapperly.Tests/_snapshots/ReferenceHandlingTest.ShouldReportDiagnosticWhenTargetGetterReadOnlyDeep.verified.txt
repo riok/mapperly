@@ -1,0 +1,23 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+{
+    private partial C Map(A source);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,36),
+      Message: A circular reference has been detected in existing target mappings without setter: Parent,
+      Severity: Error,
+      Descriptor: {
+        Id: RMG094,
+        Title: Circular existing target mapping without setter detected,
+        MessageFormat: A circular reference has been detected in existing target mappings without setter: {0},
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}
