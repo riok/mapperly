@@ -92,10 +92,24 @@ internal static class SymbolExtensions
         return namedType.GetMembers(methodName).OfType<IMethodSymbol>().FirstOrDefault(m => m.IsStatic && m.IsGenericMethod);
     }
 
-    internal static bool Implements(this ITypeSymbol t, INamedTypeSymbol interfaceSymbol)
+    internal static bool ExtendsOrImplements(this ITypeSymbol t, ITypeSymbol targetSymbol) =>
+        t.Extends(targetSymbol) || t.Implements((INamedTypeSymbol)targetSymbol);
+
+    internal static bool Implements(this ITypeSymbol t, INamedTypeSymbol interfaceSymbol) =>
+        SymbolEqualityComparer.Default.Equals(t, interfaceSymbol)
+        || t.AllInterfaces.Any(x => SymbolEqualityComparer.Default.Equals(x, interfaceSymbol));
+
+    internal static bool Extends(this ITypeSymbol t, ITypeSymbol targetSymbol)
     {
-        return SymbolEqualityComparer.Default.Equals(t, interfaceSymbol)
-            || t.AllInterfaces.Any(x => SymbolEqualityComparer.Default.Equals(x, interfaceSymbol));
+        for (var baseType = t; baseType != null; baseType = baseType.BaseType)
+        {
+            if (!SymbolEqualityComparer.Default.Equals(baseType, targetSymbol))
+                continue;
+
+            return true;
+        }
+
+        return false;
     }
 
     internal static bool ExtendsOrImplementsGeneric(
@@ -111,12 +125,10 @@ internal static class SymbolExtensions
 
     internal static bool ExtendsGeneric(
         this ITypeSymbol t,
-        INamedTypeSymbol genericSymbol,
+        ITypeSymbol genericSymbol,
         [NotNullWhen(true)] out INamedTypeSymbol? typedGenericSymbol
     )
     {
-        Debug.Assert(genericSymbol.IsGenericType);
-
         if (SymbolEqualityComparer.Default.Equals(t.OriginalDefinition, genericSymbol))
         {
             typedGenericSymbol = (INamedTypeSymbol)t;
