@@ -262,10 +262,7 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
         var strategy = BuilderContext.Configuration.Mapper.PropertyNameMappingStrategy;
         ignoreCase ??= strategy == PropertyNameMappingStrategy.CaseInsensitive;
 
-        var pathCandidates =
-            strategy == PropertyNameMappingStrategy.SnakeCase
-                ? MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMemberName, strategy)
-                : MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMemberName);
+        var pathCandidates = MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMemberName, strategy);
 
         // First, try to find the property on (a sub-path of) the source type itself. (If this is undesired, an Ignore property can be used.)
         if (TryFindSourcePath(pathCandidates, ignoreCase.Value, out sourceMemberPath))

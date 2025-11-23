@@ -1,3 +1,4 @@
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors;
 
 namespace Riok.Mapperly.Tests.Descriptors;
@@ -29,12 +30,18 @@ public class MemberPathCandidateBuilderTest
     )]
     public void BuildMemberPathCandidatesShouldWork(string name, string[] chunks)
     {
-        MemberPathCandidateBuilder.BuildMemberPathCandidates(name).Select(x => x.FullName).ShouldBe(chunks);
+        MemberPathCandidateBuilder
+            .BuildMemberPathCandidates(name, PropertyNameMappingStrategy.CaseSensitive)
+            .Select(x => x.FullName)
+            .ShouldBe(chunks);
     }
 
     [Fact]
     public void BuildMemberPathCandidatesWithPascalCaseShouldLimitPermutations()
     {
-        MemberPathCandidateBuilder.BuildMemberPathCandidates("NOT_A_PASCAL_CASE_STRING").Count().ShouldBe(256);
+        MemberPathCandidateBuilder
+            .BuildMemberPathCandidates("NOT_A_PASCAL_CASE_STRING", PropertyNameMappingStrategy.CaseSensitive)
+            .Count()
+            .ShouldBe(256);
     }
 }

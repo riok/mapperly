@@ -20,4 +20,10 @@ public enum PropertyNameMappingStrategy
     /// For example, "FirstName" would match "first_name".
     /// </summary>
     SnakeCase,
+
+    /// <summary>
+    /// Matches a property by converting both source and target property names to SNAKE_CASE before comparison.
+    /// For example, "FirstName" would match "FIRST_NAME".
+    /// </summary>
+    UpperSnakeCase,
 }
