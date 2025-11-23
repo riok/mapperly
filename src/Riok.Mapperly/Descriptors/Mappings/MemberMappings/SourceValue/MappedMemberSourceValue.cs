@@ -14,7 +14,7 @@ public class MappedMemberSourceValue(
     MemberPathGetter sourceMember,
     bool nullConditionalAccess,
     bool addValuePropertyOnNullable
-) : ISourceValue
+) : ISourceValue, IHasUsedNames
 {
     private readonly MemberPathGetter _sourceMember = sourceMember;
     private readonly INewInstanceMapping _delegateMapping = delegateMapping;
@@ -32,4 +32,6 @@ public class MappedMemberSourceValue(
         );
         return _delegateMapping.Build(ctx);
     }
+
+    public IEnumerable<string> ExtractUsedParameters() => UsedNamesHelpers.ExtractUsedName(_delegateMapping);
 }

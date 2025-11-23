@@ -16,8 +16,9 @@ public class UserImplementedInlinedExpressionMapping(
     UserImplementedMethodMapping userMapping,
     ParameterSyntax sourceParameter,
     IReadOnlyDictionary<SyntaxAnnotation, INewInstanceMapping> mappingInvocations,
-    ExpressionSyntax mappingBody
-) : NewInstanceMapping(userMapping.SourceType, userMapping.TargetType), INewInstanceUserMapping
+    ExpressionSyntax mappingBody,
+    IReadOnlyCollection<string> usedParameters
+) : NewInstanceMapping(userMapping.SourceType, userMapping.TargetType), INewInstanceUserMapping, IHasUsedNames
 {
     public IMethodSymbol Method => userMapping.Method;
     public bool? Default => userMapping.Default;
@@ -69,4 +70,6 @@ public class UserImplementedInlinedExpressionMapping(
             _ => [],
         };
     }
+
+    public IEnumerable<string> ExtractUsedParameters() => usedParameters;
 }

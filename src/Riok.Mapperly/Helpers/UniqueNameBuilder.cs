@@ -13,6 +13,8 @@ public class UniqueNameBuilder()
 
     public void Reserve(string name) => _usedNames.Add(name);
 
+    public void Reserve(IEnumerable<string> names) => _usedNames.AddRange(names);
+
     public UniqueNameBuilder NewScope() => new(this);
 
     public string New(string name)
@@ -38,8 +40,6 @@ public class UniqueNameBuilder()
         _usedNames.Add(uniqueName);
         return uniqueName;
     }
-
-    private void Reserve(IEnumerable<string> names) => _usedNames.AddRange(names);
 
     private bool Contains(string name)
     {

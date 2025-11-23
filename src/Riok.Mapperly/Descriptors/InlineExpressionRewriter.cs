@@ -37,6 +37,8 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
     /// </summary>
     public bool CanBeInlined { get; private set; } = true;
 
+    public List<string> UsedIdentifiers { get; } = new();
+
     public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
     {
         var fullyQualified = FullyQualifiedParentType(node.Type);
@@ -259,6 +261,12 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
             IdentifierName(methodSymbol.Name)
         );
         return node.Update(expression, ArgumentList(CommaSeparatedList(args)));
+    }
+
+    public override SyntaxNode? VisitParameter(ParameterSyntax node)
+    {
+        UsedIdentifiers.Add(node.Identifier.Text);
+        return base.VisitParameter(node);
     }
 
     private IdentifierNameSyntax? FullyQualifiedParentType(TypeSyntax typeSyntax)
