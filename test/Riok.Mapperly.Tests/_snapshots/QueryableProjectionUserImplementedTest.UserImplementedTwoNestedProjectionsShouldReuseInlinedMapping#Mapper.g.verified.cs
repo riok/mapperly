@@ -9,10 +9,10 @@ public static partial class Mapper
 #nullable disable
         return global::System.Linq.Queryable.Select(
             query,
-            x => new global::VendorResponse()
+            x1 => new global::VendorResponse()
             {
-                VendorName = x.VendorName,
-                Countries = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(x.Countries, x => new global::CountryListResponse()
+                VendorName = x1.VendorName,
+                Countries = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(x1.Countries, x => new global::CountryListResponse()
                 {
                     Code = x.Country.Code,
                     Name = global::System.Linq.Enumerable.FirstOrDefault(x.Country.LocalizedNames)!.Name ?? x.Country.Name,

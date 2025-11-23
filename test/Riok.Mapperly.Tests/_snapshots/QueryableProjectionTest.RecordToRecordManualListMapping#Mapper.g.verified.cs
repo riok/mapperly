@@ -9,9 +9,9 @@ public partial class Mapper
 #nullable disable
         return global::System.Linq.Queryable.Select(
             source,
-            x => new global::B(
-                x.Id.ToString(),
-                global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.OrderBy(global::System.Linq.Enumerable.Select(x.Values, x => x.Value), x => x))
+            x1 => new global::B(
+                x1.Id.ToString(),
+                global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.OrderBy(global::System.Linq.Enumerable.Select(x1.Values, x => x.Value), x => x))
             )
         );
 #nullable enable
