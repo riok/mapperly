@@ -12,9 +12,9 @@ public partial class Mapper
             x => new global::B()
             {
                 StringValue = x.StringValue + "-mod",
-                NestedValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(global::System.Linq.Enumerable.OrderBy(x.NestedValues, x => x.Value), x => new global::D()
+                NestedValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(global::System.Linq.Enumerable.OrderBy(x.NestedValues, x1 => x1.Value), x1 => new global::D()
                 {
-                    Value = x.Value + "-mod",
+                    Value = x1.Value + "-mod",
                 })),
             }
         );

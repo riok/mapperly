@@ -11,7 +11,7 @@ public partial class Mapper
             source,
             x => new global::B(
                 x.Id.ToString(),
-                global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.OrderBy(global::System.Linq.Enumerable.Select(x.Values, x => x.Value), x => x))
+                global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.OrderBy(global::System.Linq.Enumerable.Select(x.Values, x1 => x1.Value), x1 => x1))
             )
         );
 #nullable enable

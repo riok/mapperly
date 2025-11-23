@@ -1,5 +1,7 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
@@ -26,6 +28,7 @@ public class UserImplementedInlinedExpressionMapping(
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         var body = InlineUserMappings(ctx, mappingBody);
+        body = RenameLambdaParameters(ctx, body);
         return ReplaceSource(ctx, body);
     }
 
@@ -68,5 +71,107 @@ public class UserImplementedInlinedExpressionMapping(
             ParenthesizedLambdaExpressionSyntax lambda => lambda.ParameterList.Parameters.Select(p => p.Identifier),
             _ => [],
         };
+    }
+
+    private ExpressionSyntax RenameLambdaParameters(TypeMappingBuildContext ctx, ExpressionSyntax body)
+    {
+        var lambdas = body.DescendantNodesAndSelf().OfType<LambdaExpressionSyntax>().ToList();
+        if (lambdas.Count == 0)
+            return body;
+
+        body = body.ReplaceNodes(
+            lambdas,
+            (originalLambda, _) =>
+                originalLambda switch
+                {
+                    SimpleLambdaExpressionSyntax simpleLambda => RenameSimpleLambdaParameters(ctx.NameBuilder, simpleLambda),
+                    ParenthesizedLambdaExpressionSyntax parenthesizedLambda => RenameParenthesizedLambdaParameters(
+                        ctx.NameBuilder,
+                        parenthesizedLambda
+                    ),
+                    _ => originalLambda,
+                }
+        );
+
+        return body;
+    }
+
+    // TODO handle nested shadowing
+    private SimpleLambdaExpressionSyntax RenameSimpleLambdaParameters(
+        UniqueNameBuilder nameBuilder,
+        SimpleLambdaExpressionSyntax originalLambda
+    )
+    {
+        nameBuilder = nameBuilder.NewScope();
+        var oldName = originalLambda.Parameter.Identifier.Text;
+        var newName = nameBuilder.New(oldName, out var renamed);
+        if (!renamed)
+            return originalLambda;
+
+        var newParameter = originalLambda.Parameter.WithIdentifier(SyntaxFactory.Identifier(newName));
+        var newBody = RenameIdentifiersInLambdaBody(
+            originalLambda.Body,
+            new Dictionary<string, string>(StringComparer.Ordinal) { [oldName] = newName }
+        );
+        return originalLambda.WithParameter(newParameter.WithTriviaFrom(originalLambda.Parameter)).WithBody(newBody);
+    }
+
+    private ParenthesizedLambdaExpressionSyntax RenameParenthesizedLambdaParameters(
+        UniqueNameBuilder nameBuilder,
+        ParenthesizedLambdaExpressionSyntax originalLambda
+    )
+    {
+        nameBuilder = nameBuilder.NewScope();
+        var nameMappings = BuildNameMappings(nameBuilder, originalLambda.ParameterList.Parameters);
+        if (nameMappings.Count == 0)
+            return originalLambda;
+
+        var newParameters = originalLambda
+            .ParameterList.Parameters.Select(p =>
+                p.WithIdentifier(
+                    SyntaxFactory
+                        .Identifier(nameMappings.GetValueOrDefault(p.Identifier.Text, p.Identifier.Text))
+                        .WithTriviaFrom(p.Identifier)
+                )
+            )
+            .ToArray();
+        var newParameterList = originalLambda.ParameterList.WithParameters(SyntaxFactory.SeparatedList(newParameters));
+        var newBody = RenameIdentifiersInLambdaBody(originalLambda.Body, nameMappings);
+        return originalLambda.WithParameterList(newParameterList.WithTriviaFrom(originalLambda.ParameterList)).WithBody(newBody);
+    }
+
+    private Dictionary<string, string> BuildNameMappings(UniqueNameBuilder nameBuilder, SeparatedSyntaxList<ParameterSyntax> parameters)
+    {
+        var nameMappings = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var parameter in parameters)
+        {
+            var oldName = parameter.Identifier.Text;
+            var newName = nameBuilder.New(oldName, out var renamed);
+            if (renamed)
+            {
+                nameMappings[oldName] = newName;
+            }
+        }
+
+        return nameMappings;
+    }
+
+    private static CSharpSyntaxNode RenameIdentifiersInLambdaBody(CSharpSyntaxNode body, IReadOnlyDictionary<string, string> nameMappings)
+    {
+        var identifiers = body.DescendantNodesAndSelf()
+            .OfType<IdentifierNameSyntax>()
+            .Where(id => nameMappings.ContainsKey(id.Identifier.Text))
+            .ToList();
+
+        if (identifiers.Count == 0)
+            return body;
+
+        return body.ReplaceNodes(
+            identifiers,
+            (original, _) =>
+                original.WithIdentifier(
+                    SyntaxFactory.Identifier(nameMappings[original.Identifier.Text]).WithTriviaFrom(original.Identifier)
+                )
+        );
     }
 }

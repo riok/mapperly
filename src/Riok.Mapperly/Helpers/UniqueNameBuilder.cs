@@ -15,13 +15,15 @@ public class UniqueNameBuilder()
 
     public UniqueNameBuilder NewScope() => new(this);
 
-    public string New(string name)
+    public string New(string name, out bool renamed)
     {
         var i = 0;
         var uniqueName = name;
+        renamed = false;
         while (Contains(uniqueName))
         {
             i++;
+            renamed = true;
             uniqueName = name + i;
         }
 
@@ -29,6 +31,8 @@ public class UniqueNameBuilder()
 
         return uniqueName;
     }
+
+    public string New(string name) => New(name, out _);
 
     public string New(string name, IEnumerable<string> reservedNames)
     {

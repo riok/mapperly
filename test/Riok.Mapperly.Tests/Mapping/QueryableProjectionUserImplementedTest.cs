@@ -397,4 +397,86 @@ public class QueryableProjectionUserImplementedTest
         );
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task UserImplementedWithLambdaParameterNameConflict()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial IQueryable<BlogDto> ProjectToDto(this IQueryable<Blog> x);
+
+            [MapPropertyFromSource(nameof(BlogDto.Id), Use = nameof(MapId))]
+            public static partial BlogDto BlogMap(Blog x);
+
+            private static int MapId(Blog blog) => blog.Posts.Count(x => x.Id == blog.Posts.Count);
+            """,
+            "public record Blog(List<Post> Posts);",
+            "public record Post(int Id);",
+            "public record BlogDto(int Id);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task UserImplementedWithMultipleLambdaParameterNameConflicts()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial IQueryable<BlogDto> ProjectToDto(this IQueryable<Blog> x);
+
+            [MapPropertyFromSource(nameof(BlogDto.Id), Use = nameof(MapId))]
+            public static partial BlogDto BlogMap(Blog x);
+
+            private static int MapId(Blog blog) => blog.Posts.Where(x => x.Id > 0).Count(x => x.Id == blog.Posts.Count);
+            """,
+            "public record Blog(List<Post> Posts);",
+            "public record Post(int Id);",
+            "public record BlogDto(int Id);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task UserImplementedWithExplicitLambdaParameterLists()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial IQueryable<BlogDto> ProjectToDto(this IQueryable<Blog> x);
+
+            [MapPropertyFromSource(nameof(BlogDto.Id), Use = nameof(MapId))]
+            public static partial BlogDto BlogMap(Blog x);
+
+            private static int MapId(Blog x)
+                => x.Posts.Select((Post p, int i) => p.Id + i + x.Posts.Count);
+            """,
+            "public record Blog(List<Post> Posts);",
+            "public record Post(int Id);",
+            "public record BlogDto(int Id);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task UserImplementedWithExplicitLambdaParameterListsAndNested()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial IQueryable<BlogDto> ProjectToDto(this IQueryable<Blog> x);
+
+            [MapPropertyFromSource(nameof(BlogDto.Id), Use = nameof(MapId))]
+            public static partial BlogDto BlogMap(Blog x);
+
+            private static int MapId(Blog b)
+                => b.Posts.Select((Post p, int i) => p.Id + i + x.Posts.Count(x => x.Id == p.Id));
+            """,
+            "public record Blog(List<Post> Posts);",
+            "public record Post(int Id);",
+            "public record BlogDto(int Id);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }

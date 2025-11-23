@@ -12,7 +12,7 @@ public partial class Mapper
             x => new global::B()
             {
                 StringValue = x.StringValue,
-                NestedValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.OrderBy(x.NestedValues, x => x.Value)),
+                NestedValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.OrderBy(x.NestedValues, x1 => x1.Value)),
             }
         );
 #nullable enable
