@@ -36,6 +36,6 @@ public class NewInstanceObjectMemberMapping(ITypeSymbol sourceType, ITypeSymbol 
 
     public IEnumerable<string> ExtractUsedParameters()
     {
-        return UsedNamesHelpers.ExtractUsedNames(_constructorMemberMappings);
+        return UsedNamesHelpers.ExtractUsedNames(_constructorMemberMappings).Concat(UsedNamesHelpers.ExtractUsedNames(_initMemberMappings));
     }
 }

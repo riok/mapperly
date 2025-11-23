@@ -241,7 +241,7 @@ public class QueryableProjectionTest
     }
 
     [Fact]
-    public async Task ShouldNotCollideVariablesOnConstructorVariables()
+    public async Task ShouldNotCollideVariablesOnConstructorMembers()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -254,6 +254,25 @@ public class QueryableProjectionTest
             """,
             "record A(int[] Sources, int BaseValue);",
             "record B(int Sum)"
+        );
+
+        await TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public async Task ShouldNotCollideVariablesOnInitMembers()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+
+            [MapPropertyFromSource(nameof(B.Sum), Use = nameof(CalcSum))]
+            partial B Map(A source);
+
+            int CalcSum(A source) => a.Sources.Sum(x => x + source.BaseValue);
+            """,
+            "record A(int[] Sources, int BaseValue);",
+            "class B { public int Sum { get; init; } }"
         );
 
         await TestHelper.VerifyGenerator(source);
