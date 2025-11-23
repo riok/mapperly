@@ -1,4 +1,6 @@
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration.PropertyReferences;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
 
@@ -33,6 +35,51 @@ public static class MemberPathCandidateBuilder
         for (var i = 1; i < permutationsCount; i++)
         {
             yield return new StringMemberPath(BuildPermutationParts(name, indices, i));
+        }
+    }
+
+    /// <summary>
+    /// Builds member path candidates based on the specified naming strategy.
+    /// For SnakeCase strategy, generates both PascalCase and snake_case versions to support bidirectional mapping.
+    /// Otherwise, delegates to the default BuildMemberPathCandidates method.
+    /// </summary>
+    /// <param name="name">The name to build candidates from.</param>
+    /// <param name="strategy">The property name mapping strategy.</param>
+    /// <returns>The joined member path groups.</returns>
+    public static IEnumerable<StringMemberPath> BuildMemberPathCandidates(string name, PropertyNameMappingStrategy strategy)
+    {
+        if (strategy == PropertyNameMappingStrategy.SnakeCase)
+        {
+            if (name.Length == 0)
+                yield break;
+
+            // For bidirectional support, yield both versions:
+            // 1. If target is snake_case, convert to PascalCase to find PascalCase source
+            //    e.g., "first_name" -> "FirstName"
+            // 2. If target is PascalCase, convert to snake_case to find snake_case source
+            //    e.g., "FirstName" -> "first_name"
+            var pascalCase = name.ToPascalCase();
+
+            // Yield the converted version first as it's more likely to match
+            if (!string.Equals(name, pascalCase, StringComparison.Ordinal))
+            {
+                yield return new StringMemberPath([pascalCase]);
+            }
+
+            var snakeCase = name.ToSnakeCase();
+
+            if (!string.Equals(name, snakeCase, StringComparison.Ordinal))
+            {
+                yield return new StringMemberPath([snakeCase]);
+            }
+        }
+        else
+        {
+            // Use default behavior for other strategies
+            foreach (var candidate in BuildMemberPathCandidates(name))
+            {
+                yield return candidate;
+            }
         }
     }
 
