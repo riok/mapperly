@@ -101,7 +101,7 @@ internal static class SymbolExtensions
 
     internal static bool Extends(this ITypeSymbol t, ITypeSymbol targetSymbol)
     {
-        for (var baseType = t; baseType != null; baseType = baseType.BaseType)
+        foreach (var baseType in WalkTypeHierarchy(t))
         {
             if (!SymbolEqualityComparer.Default.Equals(baseType, targetSymbol))
                 continue;
