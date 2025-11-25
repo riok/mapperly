@@ -2,7 +2,6 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
-using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 
@@ -32,7 +31,7 @@ public static class EnumMappingBuilder
 
     private static string GetEnumMemberValue(MappingBuilderContext ctx, IFieldSymbol field)
     {
-        var name = ctx.AttributeAccessor.AccessFirstOrDefault<EnumMemberAttribute>(field)?.Value;
+        var name = ctx.AttributeAccessor.ReadEnumMemberAttribute(field)?.Value;
         if (name != null)
             return name;
 
@@ -47,9 +46,7 @@ public static class EnumMappingBuilder
 
     private static string GetComponentModelDescription(MappingBuilderContext ctx, IFieldSymbol field)
     {
-        var name = ctx
-            .AttributeAccessor.AccessFirstOrDefault<DescriptionAttribute, ComponentModelDescriptionAttributeConfiguration>(field)
-            ?.Description;
+        var name = ctx.AttributeAccessor.ReadDescriptionAttribute(field)?.Description;
         if (name != null)
             return name;
 

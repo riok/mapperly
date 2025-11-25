@@ -39,7 +39,7 @@ public static class FormatProviderBuilder
             return null;
         }
 
-        var attribute = ctx.AttributeAccessor.AccessSingle<FormatProviderAttribute>(symbol);
+        var attribute = ctx.AttributeAccessor.ReadFormatProviderAttribute(symbol);
         return new FormatProvider(symbol.Name, attribute.Default, symbol);
     }
 }
