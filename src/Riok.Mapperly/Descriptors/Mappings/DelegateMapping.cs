@@ -14,9 +14,9 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public class DelegateMapping(ITypeSymbol sourceType, ITypeSymbol targetType, INewInstanceMapping delegateMapping)
     : NewInstanceMapping(sourceType, targetType),
-        IHasUsedNames
+        IHasUsedParameters
 {
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx) => delegateMapping.Build(ctx);
 
-    public IEnumerable<string> ExtractUsedParameters() => UsedNamesHelpers.ExtractUsedName(delegateMapping);
+    public IEnumerable<string> ExtractUsedParameters() => UsedParameterHelpers.ExtractUsedParameters(delegateMapping);
 }

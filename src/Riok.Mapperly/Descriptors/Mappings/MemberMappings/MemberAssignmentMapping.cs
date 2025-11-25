@@ -13,7 +13,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 [DebuggerDisplay("MemberAssignmentMapping({_sourceValue} => {_targetPath})")]
 public class MemberAssignmentMapping(MemberPathSetter targetPath, ISourceValue sourceValue, MemberMappingInfo memberInfo)
     : IMemberAssignmentMapping,
-        IHasUsedNames
+        IHasUsedParameters
 {
     public MemberMappingInfo MemberInfo { get; } = memberInfo;
 
@@ -54,5 +54,5 @@ public class MemberAssignmentMapping(MemberPathSetter targetPath, ISourceValue s
 
     public override int GetHashCode() => HashCode.Combine(_sourceValue, _targetPath);
 
-    public IEnumerable<string> ExtractUsedParameters() => UsedNamesHelpers.ExtractUsedName(_sourceValue);
+    public IEnumerable<string> ExtractUsedParameters() => UsedParameterHelpers.ExtractUsedParameters(_sourceValue);
 }

@@ -21,7 +21,7 @@ public class QueryableProjectionMapping(
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {
-        ctx.NameBuilder.Reserve(UsedNamesHelpers.ExtractUsedName(delegateMapping));
+        ctx.NameBuilder.Reserve(UsedParameterHelpers.ExtractUsedParameters(delegateMapping));
 
         // disable nullable reference types for expressions, as for ORMs nullables usually don't apply
         // #nullable disable

@@ -18,7 +18,7 @@ public class UserImplementedInlinedExpressionMapping(
     IReadOnlyDictionary<SyntaxAnnotation, INewInstanceMapping> mappingInvocations,
     ExpressionSyntax mappingBody,
     IReadOnlyCollection<string> usedParameters
-) : NewInstanceMapping(userMapping.SourceType, userMapping.TargetType), INewInstanceUserMapping, IHasUsedNames
+) : NewInstanceMapping(userMapping.SourceType, userMapping.TargetType), INewInstanceUserMapping, IHasUsedParameters
 {
     public IMethodSymbol Method => userMapping.Method;
     public bool? Default => userMapping.Default;

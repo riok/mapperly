@@ -11,7 +11,7 @@ public class ConstructorParameterMapping(
     ISourceValue sourceValue,
     bool selfOrPreviousIsUnmappedOptional,
     MemberMappingInfo memberInfo
-) : IHasUsedNames
+) : IHasUsedParameters
 {
     public MemberMappingInfo MemberInfo { get; } = memberInfo;
 
@@ -54,5 +54,5 @@ public class ConstructorParameterMapping(
         }
     }
 
-    public IEnumerable<string> ExtractUsedParameters() => UsedNamesHelpers.ExtractUsedName(_sourceValue);
+    public IEnumerable<string> ExtractUsedParameters() => UsedParameterHelpers.ExtractUsedParameters(_sourceValue);
 }

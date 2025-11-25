@@ -1,6 +1,6 @@
 ﻿namespace Riok.Mapperly.Descriptors.Mappings;
 
-public interface IHasUsedNames
+public interface IHasUsedParameters
 {
     IEnumerable<string> ExtractUsedParameters();
 }
