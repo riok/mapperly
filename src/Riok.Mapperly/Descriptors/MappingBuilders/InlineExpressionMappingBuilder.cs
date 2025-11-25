@@ -53,7 +53,13 @@ public static class InlineExpressionMappingBuilder
             return null;
         }
 
-        return new UserImplementedInlinedExpressionMapping(mapping, sourceParameter, inlineRewriter.MappingInvocations, bodyExpression);
+        return new UserImplementedInlinedExpressionMapping(
+            mapping,
+            sourceParameter,
+            inlineRewriter.MappingInvocations,
+            bodyExpression,
+            inlineRewriter.UsedIdentifiers
+        );
     }
 
     private static ExpressionSyntax? TryGetBodyExpression(MethodDeclarationSyntax methodDeclaration)
