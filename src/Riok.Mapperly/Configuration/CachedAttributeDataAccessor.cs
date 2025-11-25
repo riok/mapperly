@@ -8,7 +8,6 @@ namespace Riok.Mapperly.Configuration;
 public class CachedAttributeDataAccessor(IAttributeDataAccessor attributeDataAccessor) : IAttributeDataAccessor
 {
     private readonly Dictionary<CacheKey, object?> _cache = new();
-    private readonly IAttributeDataAccessor _attributeDataAccessor = attributeDataAccessor;
 
     public FormatProviderAttribute ReadFormatProviderAttribute(ISymbol symbol)
     {
@@ -74,7 +73,7 @@ public class CachedAttributeDataAccessor(IAttributeDataAccessor attributeDataAcc
 
     public bool HasUseMapperAttribute(ISymbol symbol)
     {
-        return _attributeDataAccessor.HasUseMapperAttribute(symbol);
+        return attributeDataAccessor.HasUseMapperAttribute(symbol);
     }
 
     public IEnumerable<MapperIgnoreSourceAttribute> ReadMapperIgnoreSourceAttributes(ISymbol symbol)
@@ -155,7 +154,7 @@ public class CachedAttributeDataAccessor(IAttributeDataAccessor attributeDataAcc
             return value as T;
         }
 
-        var newValue = createValue(symbol, _attributeDataAccessor);
+        var newValue = createValue(symbol, attributeDataAccessor);
         _cache.Add(key, newValue);
         return newValue;
     }
@@ -172,7 +171,7 @@ public class CachedAttributeDataAccessor(IAttributeDataAccessor attributeDataAcc
             return (IReadOnlyList<T>)value!;
         }
 
-        var newValue = createValue(symbol, _attributeDataAccessor);
+        var newValue = createValue(symbol, attributeDataAccessor);
         var enumerated = newValue.ToList().AsReadOnly();
         _cache.Add(key, enumerated);
         return enumerated;

@@ -107,18 +107,15 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttributeDa
     public MapperIgnoreObsoleteMembersAttribute? ReadMapperIgnoreObsoleteMembersAttribute(ISymbol symbol)
     {
         var attrData = GetAttribute<MapperIgnoreObsoleteMembersAttribute>(symbol);
-        if (attrData == null)
-        {
-            return null;
-        }
-
-        return new MapperIgnoreObsoleteMembersAttribute(
-            GetSimpleValueOrDefault(
-                attrData,
-                nameof(MapperIgnoreObsoleteMembersAttribute.IgnoreObsoleteStrategy),
-                IgnoreObsoleteMembersStrategy.Both
+        return attrData is not null
+            ? new MapperIgnoreObsoleteMembersAttribute(
+                GetSimpleValueOrDefault(
+                    attrData,
+                    nameof(MapperIgnoreObsoleteMembersAttribute.IgnoreObsoleteStrategy),
+                    IgnoreObsoleteMembersStrategy.Both
+                )
             )
-        );
+            : null;
     }
 
     public IEnumerable<NestedMembersMappingConfiguration> ReadMapNestedPropertiesAttribute(ISymbol symbol)
@@ -133,35 +130,36 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttributeDa
     public MapperRequiredMappingAttribute? ReadMapperRequiredMappingAttribute(ISymbol symbol)
     {
         var attrData = GetAttribute<MapperRequiredMappingAttribute>(symbol);
-        if (attrData == null)
-            return null;
-
-        return new MapperRequiredMappingAttribute(
-            GetSimpleValueOrDefault(attrData, nameof(MapperRequiredMappingAttribute.RequiredMappingStrategy), RequiredMappingStrategy.None)
-        );
+        return attrData is not null
+            ? new MapperRequiredMappingAttribute(
+                GetSimpleValueOrDefault(
+                    attrData,
+                    nameof(MapperRequiredMappingAttribute.RequiredMappingStrategy),
+                    RequiredMappingStrategy.None
+                )
+            )
+            : null;
     }
 
     public EnumMemberAttribute? ReadEnumMemberAttribute(ISymbol symbol)
     {
         var attrData = GetAttribute<EnumMemberAttribute>(symbol);
-        if (attrData == null)
-            return null;
-
-        return new EnumMemberAttribute { Value = GetSimpleValue(attrData, nameof(EnumMemberAttribute.Value)) };
+        return attrData is not null
+            ? new EnumMemberAttribute { Value = GetSimpleValue(attrData, nameof(EnumMemberAttribute.Value)) }
+            : null;
     }
 
     public EnumConfiguration? ReadMapEnumAttribute(ISymbol symbol)
     {
         var attrData = GetAttribute<MapEnumAttribute>(symbol);
-        if (attrData == null)
-            return null;
-
-        return new EnumConfiguration(GetSimpleValueOrDefault<EnumMappingStrategy>(attrData, nameof(MapEnumAttribute.Strategy)))
-        {
-            NamingStrategy = GetSimpleValueOrDefault(attrData, nameof(MapEnumAttribute.NamingStrategy), EnumNamingStrategy.MemberName),
-            FallbackValue = GetAttributeValue(attrData, nameof(MapEnumAttribute.FallbackValue)),
-            IgnoreCase = GetSimpleValue<bool>(attrData, nameof(MapEnumAttribute.IgnoreCase)),
-        };
+        return attrData != null
+            ? new EnumConfiguration(GetSimpleValueOrDefault<EnumMappingStrategy>(attrData, nameof(MapEnumAttribute.Strategy)))
+            {
+                NamingStrategy = GetSimpleValueOrDefault(attrData, nameof(MapEnumAttribute.NamingStrategy), EnumNamingStrategy.MemberName),
+                FallbackValue = GetAttributeValue(attrData, nameof(MapEnumAttribute.FallbackValue)),
+                IgnoreCase = GetSimpleValue<bool>(attrData, nameof(MapEnumAttribute.IgnoreCase)),
+            }
+            : null;
     }
 
     public IEnumerable<EnumValueMappingConfiguration> ReadMapEnumValueAttribute(ISymbol symbol)
@@ -206,24 +204,23 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttributeDa
     public ComponentModelDescriptionAttributeConfiguration? ReadDescriptionAttribute(ISymbol symbol)
     {
         var attrData = GetAttribute<DescriptionAttribute>(symbol);
-        if (attrData == null)
-            return null;
-
-        var simpleValue = GetSimpleValue(attrData, nameof(ComponentModelDescriptionAttributeConfiguration.Description));
-        return new ComponentModelDescriptionAttributeConfiguration(simpleValue);
+        return attrData is not null
+            ? new ComponentModelDescriptionAttributeConfiguration(
+                GetSimpleValue(attrData, nameof(ComponentModelDescriptionAttributeConfiguration.Description))
+            )
+            : null;
     }
 
     public UserMappingConfiguration? ReadUserMappingAttribute(ISymbol symbol)
     {
         var attrData = GetAttribute<UserMappingAttribute>(symbol);
-        if (attrData == null)
-            return null;
-
-        return new UserMappingConfiguration
-        {
-            Default = GetSimpleValue<bool>(attrData, nameof(UserMappingAttribute.Default)),
-            Ignore = GetSimpleValue<bool>(attrData, nameof(UserMappingAttribute.Ignore)),
-        };
+        return attrData is not null
+            ? new UserMappingConfiguration
+            {
+                Default = GetSimpleValue<bool>(attrData, nameof(UserMappingAttribute.Default)),
+                Ignore = GetSimpleValue<bool>(attrData, nameof(UserMappingAttribute.Ignore)),
+            }
+            : null;
     }
 
     public bool HasUseMapperAttribute(ISymbol symbol)
@@ -361,10 +358,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttributeDa
     public string GetMappingName(IMethodSymbol methodSymbol)
     {
         var attrData = GetAttribute<NamedMappingAttribute>(methodSymbol);
-        if (attrData == null)
-            return methodSymbol.Name;
-
-        return GetSimpleValue(attrData, nameof(NamedMappingAttribute.Name)) ?? methodSymbol.Name;
+        return attrData != null ? GetSimpleValue(attrData, nameof(NamedMappingAttribute.Name)) ?? methodSymbol.Name : methodSymbol.Name;
     }
 
     public bool IsMappingNameEqualTo(IMethodSymbol methodSymbol, string name)
@@ -425,12 +419,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttributeDa
 
     private static string? GetSimpleValue(AttributeData attrData, string propertyName)
     {
-        if (TryGetTypedConstant(attrData, propertyName, out var typedConstant, out _))
-        {
-            return typedConstant.Value as string;
-        }
-
-        return null;
+        return TryGetTypedConstant(attrData, propertyName, out var typedConstant, out _) ? typedConstant.Value as string : null;
     }
 
     private static TValue GetSimpleValueOrDefault<TValue>(AttributeData attrData, string propertyName, TValue defaultValue = default)
@@ -441,23 +430,14 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttributeDa
 
     private static IFieldSymbol? GetFieldSymbol(AttributeData attrData, string propertyName)
     {
-        if (TryGetTypedConstant(attrData, propertyName, out var typedConstant, out _))
-        {
-            var roslynType = typedConstant.Type;
-            return roslynType?.GetFields().FirstOrDefault(f => Equals(f.ConstantValue, typedConstant.Value));
-        }
-
-        return null;
+        return TryGetTypedConstant(attrData, propertyName, out var typedConstant, out _)
+            ? typedConstant.Type?.GetFields().FirstOrDefault(f => Equals(f.ConstantValue, typedConstant.Value))
+            : null;
     }
 
     private static ITypeSymbol? GetTypeSymbolFromValue(AttributeData attrData, string propertyName)
     {
-        if (TryGetTypedConstant(attrData, propertyName, out var typedConstant, out _))
-        {
-            return typedConstant.Value as ITypeSymbol;
-        }
-
-        return null;
+        return TryGetTypedConstant(attrData, propertyName, out var typedConstant, out _) ? typedConstant.Value as ITypeSymbol : null;
     }
 
     private static ITypeSymbol GetTypeSymbolFromGenericArgument(AttributeData attrData, int index)
@@ -470,22 +450,24 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor) : IAttributeDa
     private static TValue? GetSimpleValue<TValue>(AttributeData attrData, string propertyName)
         where TValue : struct
     {
-        if (TryGetTypedConstant(attrData, propertyName, out var typedConstant, out _))
+        if (!TryGetTypedConstant(attrData, propertyName, out var typedConstant, out _))
         {
-            var value = typedConstant.Value;
+            return null;
+        }
 
-            if (value is null)
-                return null;
+        var value = typedConstant.Value;
 
-            if (typeof(TValue).IsEnum && value is int i)
-            {
-                return (TValue)(object)i;
-            }
+        if (value is null)
+            return null;
 
-            if (value is TValue tValue)
-            {
-                return tValue;
-            }
+        if (typeof(TValue).IsEnum && value is int i)
+        {
+            return (TValue)(object)i;
+        }
+
+        if (value is TValue tValue)
+        {
+            return tValue;
         }
 
         return null;
