@@ -137,4 +137,11 @@ public class MapperAttribute : Attribute
     /// partial methods are discovered.
     /// </summary>
     public bool AutoUserMappings { get; set; } = true;
+
+    /// <summary>
+    /// When set to <c>true</c>, only properties with explicit configurations (via attributes like <c>MapProperty</c>)
+    /// will be mapped. All other properties will be ignored by default.
+    /// This is useful when you want to map only a few specific properties from a class with many properties.
+    /// </summary>
+    public bool OnlyExplicitMappedMembers { get; set; }
 }
