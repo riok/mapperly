@@ -11,6 +11,8 @@ public class CarDto
     public ProducerDto? Producer { get; set; }
 
     public List<TireDto>? Tires { get; set; }
+
+    public string LicensePlate { get; set; } = string.Empty;
 }
 
 // Intentionally use different numeric values for demonstration purposes
