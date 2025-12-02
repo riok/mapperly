@@ -8,13 +8,13 @@ internal sealed abstract partial class BaseMapper
     {
         var target = new global::B();
         target.Value = IntToString(source.Value);
-        target.Value2 = IntToShort(source.Value2);
+        target.Value2 = IntToDouble(source.Value2);
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    protected partial short IntToShort(int value)
+    protected partial double IntToDouble(int value)
     {
-        return (short)value;
+        return (double)value;
     }
 }
