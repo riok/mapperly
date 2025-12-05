@@ -49,6 +49,11 @@ dto.NumberOfSeats.ShouldBe(10);
 
 [Read the docs](https://mapperly.riok.app/docs/getting-started/installation) for any further information.
 
+## Support Policy
+
+Only the latest version released on the stable channel is fully supported.
+We strive to support all .NET versions that are currently supported by Microsoft.
+
 ## Upgrading
 
 Find a list of breaking changes for each major version and upgrade guides [here](https://mapperly.riok.app/docs/category/upgrading/).
@@ -57,6 +62,17 @@ Find a list of breaking changes for each major version and upgrade guides [here]
 
 We would love for you to contribute to Mapperly and help make it even better than it is today!
 Find information on how to contribute [in the docs](https://mapperly.riok.app/docs/contributing/).
+
+## Professional Support
+
+Need assistance with Mapperly or looking for consulting services? The riok team is available to help with:
+
+- Architecture consultation
+- Custom feature development and integration support
+- Enterprise support and training
+- Performance optimization and code reviews
+
+Reach out through [GitHub Discussions](https://github.com/riok/mapperly/discussions) for questions, or contact the riok team directly for professional consulting services at [hello@riok.ch](mailto:hello@riok.ch). You can also support the project and get priority support through [GitHub Sponsors](https://github.com/sponsors/riok).
 
 ## License
 
