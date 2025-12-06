@@ -349,6 +349,19 @@ Property name mapping strategies follow a priority order:
 4. Case variations (for CaseInsensitive strategy)
 :::
 
+:::warning
+When using a non-PascalCase match, a PascalCase fallback is possible. Both naming conventions will be mapped if they exist.
+
+```csharp
+var target = new global::B();
+target.MY_VALUE = source.MY_VALUE;
+target.MyValue = source.MY_VALUE;
+return target;
+```
+
+This is a normal behavior when both the `MY_VALUE` and `MyValue` properties are mapped from the same source property `MY_VALUE`.
+:::
+
 ## Migration from existing strategies
 
 When migrating from `CaseInsensitive` to snake case strategies:
