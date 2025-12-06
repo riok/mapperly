@@ -1091,4 +1091,54 @@ public class ObjectPropertyTest
                 """
             );
     }
+
+    [Fact]
+    public void SnakeCasePropertyNameMappingWithAdditionalParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A source, int userAge);
+            """,
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.SnakeCase },
+            "class A { public string UserName { get; set; } }",
+            "class B { public string user_name { get; set; } public int user_age { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.user_name = source.UserName;
+                target.user_age = userAge;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UpperSnakeCasePropertyNameMappingWithAdditionalParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A source, int userAge);
+            """,
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.UpperSnakeCase },
+            "class A { public string UserName { get; set; } }",
+            "class B { public string USER_NAME { get; set; } public int USER_AGE { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.USER_NAME = source.UserName;
+                target.USER_AGE = userAge;
+                return target;
+                """
+            );
+    }
 }
