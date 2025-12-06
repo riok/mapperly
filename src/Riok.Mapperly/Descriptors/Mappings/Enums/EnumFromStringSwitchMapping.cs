@@ -21,7 +21,7 @@ public class EnumFromStringSwitchMapping(
 {
     private const string IgnoreCaseSwitchDesignatedVariableName = "s";
     private const string StringEqualsMethodName = nameof(string.Equals);
-    private const string StringComparisonFullName = "System.StringComparison.OrdinalIgnoreCase";
+    private const string StringComparisonFullName = "global::System.StringComparison.OrdinalIgnoreCase";
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
     {

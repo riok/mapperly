@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Loggers;
-using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.MSBuild;
@@ -24,27 +23,18 @@ public class SourceGeneratorBenchmarks
     private GeneratorDriver? _largeDriver;
     private Compilation? _largeCompilation;
 
-    public SourceGeneratorBenchmarks()
-    {
-        try
-        {
-            MSBuildLocator.RegisterDefaults();
-        }
-        catch { }
-    }
-
-    private static string GetDirectoryRelativePath(string projectPath, [CallerFilePath] string callerFilePath = default!) =>
+    private static string GetDirectoryRelativePath(string projectPath, [CallerFilePath] string callerFilePath = null!) =>
         Path.Combine(callerFilePath, projectPath);
 
     private async Task<(Compilation, CSharpGeneratorDriver)> SetupAsync(string projectPath)
     {
         _workspace = MSBuildWorkspace.Create();
-        _workspace.WorkspaceFailed += (_, args) =>
+        _workspace.RegisterWorkspaceFailedHandler(args =>
         {
             ConsoleLogger.Default.WriteLineError("-------------------------");
             ConsoleLogger.Default.WriteLineError(args.Diagnostic.ToString());
             ConsoleLogger.Default.WriteLineError("-------------------------");
-        };
+        });
 
         var projectFile = GetDirectoryRelativePath(projectPath);
         if (!File.Exists(projectFile))

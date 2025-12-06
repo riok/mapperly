@@ -43,7 +43,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                     EnumName = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)x.EnumName,
                     EnumRawValue = (byte)x.EnumRawValue,
                     EnumStringValue = (string)x.EnumStringValue.ToString(),
-                    EnumReverseStringValue = System.Enum.Parse<global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName>(x.EnumReverseStringValue, false),
+                    EnumReverseStringValue = global::System.Enum.Parse<global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName>(x.EnumReverseStringValue, false),
                     SubObject = x.SubObject != null ? new global::Riok.Mapperly.IntegrationTests.Dto.InheritanceSubObjectDto()
                     {
                         SubIntValue = x.SubObject.SubIntValue,
@@ -231,7 +231,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value10) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value10,
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value20) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value20,
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value30) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value30,
-                _ => System.Enum.Parse<global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName>(source, false),
+                _ => global::System.Enum.Parse<global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName>(source, false),
             };
         }
 

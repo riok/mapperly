@@ -25,7 +25,7 @@ public class StringToEnumExplicitMapTest
                     "str-e" => global::E.e,
                     nameof(global::E.E) => global::E.E,
                     nameof(global::E.f) => global::E.f,
-                    _ => System.Enum.Parse<global::E>(source, false),
+                    _ => global::System.Enum.Parse<global::E>(source, false),
                 };
                 """
             )
@@ -54,7 +54,7 @@ public class StringToEnumExplicitMapTest
                     "str-e2" => global::E.e,
                     nameof(global::E.E) => global::E.E,
                     nameof(global::E.f) => global::E.f,
-                    _ => System.Enum.Parse<global::E>(source, false),
+                    _ => global::System.Enum.Parse<global::E>(source, false),
                 };
                 """
             )
@@ -81,7 +81,7 @@ public class StringToEnumExplicitMapTest
                     nameof(global::E.d) => global::E.d,
                     "str-e" => global::E.e,
                     nameof(global::E.f) => global::E.f,
-                    _ => System.Enum.Parse<global::E>(source, false),
+                    _ => global::System.Enum.Parse<global::E>(source, false),
                 };
                 """
             )
@@ -114,7 +114,7 @@ public class StringToEnumExplicitMapTest
                     nameof(global::E1.e) => global::E1.e,
                     nameof(global::E1.E) => global::E1.E,
                     nameof(global::E1.f) => global::E1.f,
-                    _ => System.Enum.Parse<global::E1>(source, false),
+                    _ => global::System.Enum.Parse<global::E1>(source, false),
                 };
                 """
             )
@@ -147,7 +147,7 @@ public class StringToEnumExplicitMapTest
                     nameof(global::E1.e) => global::E1.e,
                     nameof(global::E1.E) => global::E1.E,
                     nameof(global::E1.f) => global::E1.f,
-                    _ => System.Enum.Parse<global::E1>(source, false),
+                    _ => global::System.Enum.Parse<global::E1>(source, false),
                 };
                 """
             )

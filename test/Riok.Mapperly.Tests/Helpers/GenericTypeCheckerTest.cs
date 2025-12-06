@@ -61,7 +61,6 @@ public class GenericTypeCheckerTest
             class Target2;
             """,
             buildParameterAndArguments: (m, c) =>
-
                 [
                     (m.Parameters[0].Type, c.GetTypeByMetadataName("Source")!.WithNullableAnnotation(NullableAnnotation.NotAnnotated)),
                     (m.Parameters[1].Type, c.GetTypeByMetadataName("Target")!.WithNullableAnnotation(NullableAnnotation.NotAnnotated)),

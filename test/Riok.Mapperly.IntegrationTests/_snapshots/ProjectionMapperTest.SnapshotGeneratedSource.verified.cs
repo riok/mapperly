@@ -43,7 +43,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                     EnumName = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)x.EnumName,
                     EnumRawValue = (byte)x.EnumRawValue,
                     EnumStringValue = (string)x.EnumStringValue.ToString(),
-                    EnumReverseStringValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)System.Enum.Parse(
+                    EnumReverseStringValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)global::System.Enum.Parse(
                         typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName),
                         x.EnumReverseStringValue,
                         false
@@ -235,7 +235,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value10) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value10,
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value20) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value20,
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value30) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value30,
-                _ => (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)System.Enum.Parse(
+                _ => (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)global::System.Enum.Parse(
                 typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName),
                 source,
                 false
