@@ -51,6 +51,11 @@ For example, Mapperly can report a warning when there is an added property in a 
 - C# language version 9 or later
 - Roslyn 4.0 or later
 
+## Support Policy
+
+Only the latest version released on the stable channel is fully supported.
+We strive to support all .NET versions that are currently supported by Microsoft.
+
 ## Performance
 
 Mapperly is one of the fastest .NET object mapper out there, surpassing even the naive manual mapping approach!
@@ -65,3 +70,12 @@ The benchmark was generated with [Benchmark.netCoreMappers](https://github.com/m
 | ManualMapping |   529.6 ns | 0.52 ns | 0.44 ns | 0.5541 |   1,160 B |
 | Mapster       |   562.1 ns | 1.14 ns | 0.89 ns | 0.9098 |   1,904 B |
 | Mapperly      |   338.5 ns | 0.95 ns | 0.84 ns | 0.4396 |     920 B |
+
+## Professional Support
+
+Need help with Mapperly or looking for consulting services? The riok team is here to assist!
+Whether you need guidance on complex mapping scenarios, architecture consultation, or custom feature development, feel free to reach out:
+
+- **GitHub Discussions**: For questions and community support, visit [GitHub Discussions](https://github.com/riok/mapperly/discussions)
+- **Consulting & Support**: For professional assistance, consulting, or enterprise support, contact the riok team at [hello@riok.ch](mailto:hello@riok.ch)
+- **Sponsorship**: Support the project and get priority support through [GitHub Sponsors](https://github.com/sponsors/riok)

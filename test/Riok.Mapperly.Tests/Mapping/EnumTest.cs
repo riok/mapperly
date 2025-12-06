@@ -293,10 +293,10 @@ public class EnumTest
                 """
                 return source switch
                 {
-                    {} s when s.Equals(nameof(global::E1.A), System.StringComparison.OrdinalIgnoreCase) => global::E1.A,
-                    {} s when s.Equals(nameof(global::E1.B), System.StringComparison.OrdinalIgnoreCase) => global::E1.B,
-                    {} s when s.Equals(nameof(global::E1.C), System.StringComparison.OrdinalIgnoreCase) => global::E1.C,
-                    _ => System.Enum.Parse<global::E1>(source, true),
+                    {} s when s.Equals(nameof(global::E1.A), global::System.StringComparison.OrdinalIgnoreCase) => global::E1.A,
+                    {} s when s.Equals(nameof(global::E1.B), global::System.StringComparison.OrdinalIgnoreCase) => global::E1.B,
+                    {} s when s.Equals(nameof(global::E1.C), global::System.StringComparison.OrdinalIgnoreCase) => global::E1.C,
+                    _ => global::System.Enum.Parse<global::E1>(source, true),
                 };
                 """
             );
@@ -319,7 +319,7 @@ public class EnumTest
                     nameof(global::E1.A) => global::E1.A,
                     nameof(global::E1.B) => global::E1.B,
                     nameof(global::E1.C) => global::E1.C,
-                    _ => System.Enum.Parse<global::E1>(source, false),
+                    _ => global::System.Enum.Parse<global::E1>(source, false),
                 };
                 """
             );

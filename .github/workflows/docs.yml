@@ -53,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "building ${{ inputs.version }} for ${{ inputs.environment }}"
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-dotnet@v5
       - run: dotnet tool restore
       - run: dotnet build

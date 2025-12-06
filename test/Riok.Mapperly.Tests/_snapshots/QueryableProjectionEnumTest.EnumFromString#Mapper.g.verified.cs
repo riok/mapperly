@@ -11,7 +11,7 @@ public partial class Mapper
             source,
             x => new global::B()
             {
-                Value = System.Enum.Parse<global::C>(x.Value, false),
+                Value = global::System.Enum.Parse<global::C>(x.Value, false),
             }
         );
 #nullable enable

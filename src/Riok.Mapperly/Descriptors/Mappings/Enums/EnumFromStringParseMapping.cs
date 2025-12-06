@@ -14,7 +14,7 @@ namespace Riok.Mapperly.Descriptors.Mappings.Enums;
 public class EnumFromStringParseMapping(ITypeSymbol sourceType, ITypeSymbol targetType, bool genericParseMethodSupported, bool ignoreCase)
     : NewInstanceMapping(sourceType, targetType)
 {
-    private const string EnumClassName = "System.Enum";
+    private const string EnumClassName = "global::System.Enum";
     private const string ParseMethodName = "Parse";
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)

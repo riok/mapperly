@@ -397,4 +397,45 @@ public class QueryableProjectionUserImplementedTest
         );
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task UserImplementedInExtensionBlockShouldWork()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            [Mapper]
+            partial class Mapper
+            {
+                [MapProperty(nameof(MyEntity.Id), nameof(MyEntityDto.Id), Use = nameof(IntToInt))]
+                internal partial MyEntityDto MapToDto(MyEntity source);
+
+                internal partial IQueryable<MyEntityDto> ProjectToDto(IQueryable<MyEntity> source);
+
+                private static int IntToInt(int source) => source.WithOneAdded();
+            }
+
+            class MyEntity
+            {
+                public int Id { get; set; }
+            }
+
+            class MyEntityDto
+            {
+                public int Id { get; set; }
+            }
+
+            static class Extensions
+            {
+                extension(int source)
+                {
+                    internal int WithOneAdded() => source + 1;
+                }
+            }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
 }

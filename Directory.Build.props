@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
     <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>

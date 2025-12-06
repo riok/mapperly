@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Symbols.Members;
@@ -234,8 +235,14 @@ public static class ObjectMemberMappingBodyBuilder
         }
 
         var existingTargetMapping = ctx.BuilderContext.FindOrBuildExistingTargetMapping(memberMappingInfo.ToTypeMappingKey());
-        if (existingTargetMapping == null)
+        if (existingTargetMapping is null)
             return false;
+
+        if (HasCircularReference(ctx, existingTargetMapping, targetMemberPath))
+        {
+            ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.CircularMappingWithoutSetter, targetMemberPath.FullName);
+            return false;
+        }
 
         var sourceMemberGetter = sourceMemberPath.MemberPath.BuildGetter(ctx.BuilderContext);
         var targetMemberGetter = targetMemberPath.BuildGetter(ctx.BuilderContext);
@@ -261,5 +268,17 @@ public static class ObjectMemberMappingBodyBuilder
         // it could be defined as new instance mapping.
         var mapping = ctx.BuilderContext.FindExistingTargetNamedMapping(memberMappingInfo.Configuration.Use.FullName);
         return mapping != null;
+    }
+
+    private static bool HasCircularReference(
+        IMembersContainerBuilderContext<IMemberAssignmentTypeMapping> ctx,
+        IExistingTargetMapping existingTargetMapping,
+        NonEmptyMemberPath targetMemberPath
+    )
+    {
+        return !targetMemberPath.Path[^1].CanSet
+            && existingTargetMapping is IMemberAssignmentMappingContainer existingContainer
+            && ctx.Mapping is IMemberAssignmentMappingContainer baseMapping
+            && existingContainer.HasMemberMappingContainer(baseMapping);
     }
 }
