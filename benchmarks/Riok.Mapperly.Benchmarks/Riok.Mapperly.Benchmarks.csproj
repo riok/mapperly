@@ -15,8 +15,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <!--    <PackageReference Include="Microsoft.Build.Locator" Version="1.10.12" ExcludeAssets="runtime" />-->
-    <PackageReference Include="NuGet.Frameworks" Version="7.0.0" />
+    <PackageReference Include="NuGet.Frameworks" Version="7.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Riok.Mapperly\Riok.Mapperly.csproj" />
