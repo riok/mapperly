@@ -199,7 +199,7 @@ public class DerivedTypeTest
     }
 
     [Fact]
-    public Task WithBaseTypeConfigShouldWork()
+    public Task WithBaseTypeMapPropertyShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -219,7 +219,7 @@ public class DerivedTypeTest
     }
 
     [Fact]
-    public Task WithBaseTypeConfigAndSeparateMethodShouldWork()
+    public Task WithBaseTypeMapPropertyAndSeparateMethodShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -238,6 +238,50 @@ public class DerivedTypeTest
             "class ASubType2 : A { public string Value2 { get; set; } }",
             "class BSubType1 : B { public string Value1 { get; set; } }",
             "class BSubType2 : B { public string Value2 { get; set; } }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithBaseTypeMapPropertyFromSourceShouldWork()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapDerivedType<ASubType1, BSubType1>]
+            [MapDerivedType<ASubType2, BSubType2>]
+            [MapPropertyFromSource(nameof(B.Combined), Use = nameof(MapCombined)]
+            public partial B Map(A src);
+
+            public string MapCombined(A src) => $"{src.BaseValueA}{src.BaseValueB}";
+            """,
+            "abstract class A { public string BaseValueA { get; set; } public string BaseValueB { get; set; } }",
+            "abstract class B { public string Combined { get; set; } }",
+            "class ASubType1 : A { public string Value1 { get; set; } }",
+            "class ASubType2 : A { public string Value2 { get; set; } }",
+            "class BSubType1 : B { public string Value1 { get; set; } }",
+            "class BSubType2 : B { public string Value2 { get; set; } }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithInterfaceMapPropertyFromSourceShouldWork()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapDerivedType<ASubType1, BSubType1>]
+            [MapDerivedType<ASubType2, BSubType2>]
+            [MapPropertyFromSource(nameof(B.Combined), Use = nameof(MapCombined)]
+            public partial B Map(A src);
+
+            public string MapCombined(A src) => $"{src.BaseValueA}{src.BaseValueB}";
+            """,
+            "interface A { string BaseValueA { get; set; } string BaseValueB { get; set; } }",
+            "interface B { string Combined { get; set; } }",
+            "class ASubType1 : A { public string BaseValueA { get; set; } public string BaseValueB { get; set; } public string Value1 { get; set; } }",
+            "class ASubType2 : A { public string BaseValueA { get; set; } public string BaseValueB { get; set; } public string Value2 { get; set; } }",
+            "class BSubType1 : B { public string Combined { get; set; } public string Value1 { get; set; } }",
+            "class BSubType2 : B { public string Combined { get; set; } public string Value2 { get; set; } }"
         );
         return TestHelper.VerifyGenerator(source);
     }
