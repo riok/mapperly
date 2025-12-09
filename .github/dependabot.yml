@@ -22,6 +22,6 @@ updates:
     schedule:
       interval: "weekly"
     groups:
-      docusaurus:
+      docs-dependencies:
         patterns:
-          - '@docusaurus*'
+          - "*"
