@@ -12,7 +12,8 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// </summary>
 public class NewInstanceObjectMemberMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
     : NewInstanceMapping(sourceType, targetType),
-        INewInstanceObjectMemberMapping
+        INewInstanceObjectMemberMapping,
+        IHasUsedParameters
 {
     private IInstanceConstructor? _constructor;
     private readonly HashSet<ConstructorParameterMapping> _constructorMemberMappings = [];
@@ -32,4 +33,9 @@ public class NewInstanceObjectMemberMapping(ITypeSymbol sourceType, ITypeSymbol 
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
         Constructor.CreateInstance(ctx, _constructorMemberMappings, _initMemberMappings);
+
+    public IEnumerable<string> ExtractUsedParameters() =>
+        UsedParameterHelpers
+            .ExtractUsedAllParameters(_constructorMemberMappings)
+            .Concat(UsedParameterHelpers.ExtractUsedAllParameters(_initMemberMappings));
 }
