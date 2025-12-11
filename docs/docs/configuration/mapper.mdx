@@ -193,29 +193,188 @@ or by setting the `IgnoreObsoleteMembersStrategy` option of the `MapperAttribute
 ### Property name mapping strategy
 
 By default, property and field names are matched using a case sensitive strategy.
-If all properties/fields differ only in casing, for example `ModelName` on the source
-and `modelName` on the target,
-the `MapperAttribute` can be used with the `PropertyNameMappingStrategy` option.
+If properties/fields differ in naming conventions, the `MapperAttribute` can be used with the `PropertyNameMappingStrategy` option.
+
+Available strategies:
+
+| Name                | Description                                                                                     |
+| ------------------- | ----------------------------------------------------------------------------------------------- |
+| CaseSensitive       | Matches properties by their exact name (default)                                                |
+| CaseInsensitive     | Matches properties ignoring case differences                                                    |
+| SnakeCase           | Matches properties by converting both names to snake_case before comparison                     |
+| UpperSnakeCase      | Matches properties by converting both names to UPPER_SNAKE_CASE before comparison              |
+
+<Tabs>
+    <TabItem value="case-insensitive" label="Case insensitive" default>
+
+        Maps properties that differ only in casing.
+
+        ```csharp
+        // highlight-start
+        [Mapper(PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseInsensitive)]
+        // highlight-end
+        public partial class CarMapper
+        {
+            public partial CarDto ToDto(Car car);
+        }
+
+        public class Car
+        {
+            public string ModelName { get; set; }
+        }
+
+        public class CarDto
+        {
+            public string modelName { get; set; }
+        }
+        ```
+
+    </TabItem>
+
+    <TabItem value="snake-case" label="Snake case">
+
+        Maps properties by converting both source and target property names to snake_case before comparison.
+        For example, `FirstName` would match `first_name`.
+
+        ```csharp
+        // highlight-start
+        [Mapper(PropertyNameMappingStrategy = PropertyNameMappingStrategy.SnakeCase)]
+        // highlight-end
+        public partial class CarMapper
+        {
+            public partial CarDto ToDto(Car car);
+        }
+
+        public class Car
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+        }
+
+        public class CarDto
+        {
+            public string first_name { get; set; }
+            public string last_name { get; set; }
+        }
+        ```
+
+        The snake case strategy also supports nested property flattening:
+
+        ```csharp
+        [Mapper(PropertyNameMappingStrategy = PropertyNameMappingStrategy.SnakeCase)]
+        public partial class CarMapper
+        {
+            public partial CarDto ToDto(Car car);
+        }
+
+        public class Car
+        {
+            public UserInfo user_info { get; set; }
+        }
+
+        public class UserInfo
+        {
+            public string name { get; set; }
+        }
+
+        public class CarDto
+        {
+            public string user_info_name { get; set; }
+        }
+        ```
+
+    </TabItem>
+
+    <TabItem value="upper-snake-case" label="Upper snake case">
+
+        Maps properties by converting both source and target property names to UPPER_SNAKE_CASE before comparison.
+        For example, `FirstName` would match `FIRST_NAME`.
+
+        ```csharp
+        // highlight-start
+        [Mapper(PropertyNameMappingStrategy = PropertyNameMappingStrategy.UpperSnakeCase)]
+        // highlight-end
+        public partial class CarMapper
+        {
+            public partial CarDto ToDto(Car car);
+        }
+
+        public class Car
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+        }
+
+        public class CarDto
+        {
+            public string FIRST_NAME { get; set; }
+            public string LAST_NAME { get; set; }
+        }
+        ```
+
+        The upper snake case strategy also supports nested property flattening:
+
+        ```csharp
+        [Mapper(PropertyNameMappingStrategy = PropertyNameMappingStrategy.UpperSnakeCase)]
+        public partial class CarMapper
+        {
+            public partial CarDto ToDto(Car car);
+        }
+
+        public class Car
+        {
+            public UserInfo USER_INFO { get; set; }
+        }
+
+        public class UserInfo
+        {
+            public string NAME { get; set; }
+        }
+
+        public class CarDto
+        {
+            public string USER_INFO_NAME { get; set; }
+        }
+        ```
+
+    </TabItem>
+
+</Tabs>
+
+:::note
+Property name mapping strategies follow a priority order:
+1. Exact name match (fastest)
+2. Strategy-specific conversions (snake_case, UPPER_SNAKE_CASE)
+3. PascalCase permutations (for backward compatibility)
+4. Case variations (for CaseInsensitive strategy)
+:::
+
+:::warning
+When using a non-PascalCase match, a PascalCase fallback is possible. Both naming conventions will be mapped if they exist.
 
 ```csharp
-// highlight-start
-[Mapper(PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseInsensitive)]
-// highlight-end
-public partial class CarMapper
-{
-    public partial CarDto ToDto(Car car);
-}
-
-public class Car
-{
-    public string ModelName { get; set; }
-}
-
-public class CarDto
-{
-    public string modelName { get; set; }
-}
+var target = new global::B();
+target.MY_VALUE = source.MY_VALUE;
+target.MyValue = source.MY_VALUE;
+return target;
 ```
+
+This is a normal behavior when both the `MY_VALUE` and `MyValue` properties are mapped from the same source property `MY_VALUE`.
+:::
+
+## Migration from existing strategies
+
+When migrating from `CaseInsensitive` to snake case strategies:
+
+- **Before**: `ModelName` → `modelname`
+- **After**: `ModelName` → `model_name` (with SnakeCase) or `MODEL_NAME` (with UpperSnakeCase)
+
+When migrating from `CaseSensitive` to snake case strategies:
+
+- **Before**: Only exact matches work
+- **After**: Automatic conversion between PascalCase and snake_case conventions
+
+For existing mappers using explicit `[MapProperty]` attributes, the new strategies provide fallback mappings while maintaining backward compatibility.
 
 ### `null` values
 
@@ -446,4 +605,3 @@ public partial class CarMapper
     private decimal MapPrice(Car car)
         => car.Price - car.Discount;
 }
-```
