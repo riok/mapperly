@@ -37,7 +37,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public partial int ParseableInt(string value)
         {
-            return int.Parse(value);
+            return int.Parse(value, _formatDeCh);
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
@@ -251,7 +251,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 IntInitOnlyValue = DirectInt(dto.IntInitOnlyValue),
                 RequiredValue = DirectInt(dto.RequiredValue),
             };
-            target.IntValue = DirectInt(dto.IntValue);
+            target.IntValue = int.Parse(dto.FormattedIntValue, _formatEnUs);
             target.StringValue = dto.StringValue;
             target.UnflatteningIdValue = DirectInt(dto.Unflattening.IdValue);
             if (dto.NullableUnflattening != null)
