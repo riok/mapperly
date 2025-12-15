@@ -27,8 +27,8 @@
     "docusaurus-plugin-sass": "0.2.6",
     "prism-react-renderer": "2.4.1",
     "raw-loader": "4.0.2",
-    "react": "19.2.1",
-    "react-dom": "19.2.1"
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
   },
   "devDependencies": {
     "@docusaurus/eslint-plugin": "3.9.2",
