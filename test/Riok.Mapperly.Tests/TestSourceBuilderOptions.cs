@@ -8,6 +8,7 @@ public record TestSourceBuilderOptions(
     string MapperClassName = TestSourceBuilderOptions.DefaultMapperClassName,
     string? MapperBaseClassName = null,
     bool? UseDeepCloning = null,
+    StackCloningStrategy? StackCloningStrategy = null,
     bool? UseReferenceHandling = null,
     bool? ThrowOnMappingNullMismatch = null,
     bool? ThrowOnPropertyMappingNullMismatch = null,

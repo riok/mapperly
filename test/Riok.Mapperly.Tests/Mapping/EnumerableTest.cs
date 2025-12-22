@@ -421,7 +421,7 @@ public class EnumerableTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                target.Value = new global::System.Collections.Generic.Stack<int>(source.Value);
+                target.Value = new global::System.Collections.Generic.Stack<int>(global::System.Linq.Enumerable.Reverse(source.Value));
                 return target;
                 """
             );
@@ -463,7 +463,9 @@ public class EnumerableTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                target.Value = new global::System.Collections.Generic.Stack<long>(global::System.Linq.Enumerable.Select(source.Value, x => (long)x));
+                target.Value = new global::System.Collections.Generic.Stack<long>(
+                    global::System.Linq.Enumerable.Reverse(global::System.Linq.Enumerable.Select(source.Value, x => (long)x))
+                );
                 return target;
                 """
             );

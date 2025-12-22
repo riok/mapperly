@@ -142,6 +142,7 @@ namespace Riok.Mapperly.Abstractions
         public Riok.Mapperly.Abstractions.PropertyNameMappingStrategy PropertyNameMappingStrategy { get; set; }
         public Riok.Mapperly.Abstractions.RequiredMappingStrategy RequiredEnumMappingStrategy { get; set; }
         public Riok.Mapperly.Abstractions.RequiredMappingStrategy RequiredMappingStrategy { get; set; }
+        public Riok.Mapperly.Abstractions.StackCloningStrategy StackCloningStrategy { get; set; }
         public bool ThrowOnMappingNullMismatch { get; set; }
         public bool ThrowOnPropertyMappingNullMismatch { get; set; }
         public bool UseDeepCloning { get; set; }
@@ -275,6 +276,11 @@ namespace Riok.Mapperly.Abstractions
         Both = -1,
         Source = 1,
         Target = 2,
+    }
+    public enum StackCloningStrategy
+    {
+        PreserveOrder = 0,
+        ReverseOrder = 1,
     }
     [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]

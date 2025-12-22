@@ -140,7 +140,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.SpanValue = MapToInt32Array(testObject.SpanValue);
             target.MemoryValue = MapToInt32Array1(testObject.MemoryValue.Span);
             target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Select(testObject.StackValue, x => ParseableInt(x))
+                global::System.Linq.Enumerable.Reverse(
+                    global::System.Linq.Enumerable.Select(testObject.StackValue, x => ParseableInt(x))
+                )
             );
             target.QueueValue = new global::System.Collections.Generic.Queue<int>(
                 global::System.Linq.Enumerable.Select(testObject.QueueValue, x => ParseableInt(x))
@@ -312,7 +314,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             target.MemoryValue = MapToStringArray(dto.MemoryValue.Span);
             target.StackValue = new global::System.Collections.Generic.Stack<string>(
-                global::System.Linq.Enumerable.Select(dto.StackValue, x => x.ToString(_formatDeCh))
+                global::System.Linq.Enumerable.Reverse(
+                    global::System.Linq.Enumerable.Select(dto.StackValue, x => x.ToString(_formatDeCh))
+                )
             );
             target.QueueValue = new global::System.Collections.Generic.Queue<string>(
                 global::System.Linq.Enumerable.Select(dto.QueueValue, x => x.ToString(_formatDeCh))
@@ -466,7 +470,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.SpanValue = MapToInt32Array(source.SpanValue);
             target.MemoryValue = MapToInt32Array1(source.MemoryValue.Span);
             target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Select(source.StackValue, x => ParseableInt(x))
+                global::System.Linq.Enumerable.Reverse(
+                    global::System.Linq.Enumerable.Select(source.StackValue, x => ParseableInt(x))
+                )
             );
             target.QueueValue = new global::System.Collections.Generic.Queue<int>(
                 global::System.Linq.Enumerable.Select(source.QueueValue, x => ParseableInt(x))
@@ -678,7 +684,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.SpanValue = MapToInt32Array(testObject.SpanValue);
             target.MemoryValue = MapToInt32Array1(testObject.MemoryValue.Span);
             target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Select(testObject.StackValue, x => ParseableInt(x))
+                global::System.Linq.Enumerable.Reverse(
+                    global::System.Linq.Enumerable.Select(testObject.StackValue, x => ParseableInt(x))
+                )
             );
             target.QueueValue = new global::System.Collections.Generic.Queue<int>(
                 global::System.Linq.Enumerable.Select(testObject.QueueValue, x => ParseableInt(x))
