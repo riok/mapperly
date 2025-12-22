@@ -26,12 +26,7 @@ public class FieldMember(IFieldSymbol symbol, SymbolAccessor symbolAccessor)
     public bool CanSetDirectly => CanSet && symbolAccessor.IsDirectlyAccessible(Symbol);
     public bool IsInitOnly => false;
 
-    public bool IsRequired
-#if ROSLYN4_4_OR_GREATER
-        => Symbol.IsRequired;
-#else
-        => false;
-#endif
+    public bool IsRequired => Symbol.IsRequired;
 
     public bool IsObsolete => symbolAccessor.HasAttribute<ObsoleteAttribute>(Symbol);
     public bool IsIgnored => symbolAccessor.HasAttribute<MapperIgnoreAttribute>(Symbol);

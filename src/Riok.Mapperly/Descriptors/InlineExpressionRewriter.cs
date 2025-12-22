@@ -197,14 +197,12 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
         return base.VisitBaseExpression(node);
     }
 
-#if ROSLYN4_7_OR_GREATER
     public override SyntaxNode VisitCollectionExpression(CollectionExpressionSyntax node)
     {
         // CS9175
         CanBeInlined = false;
         return node;
     }
-#endif
 
     public override SyntaxNode VisitRangeExpression(RangeExpressionSyntax node)
     {

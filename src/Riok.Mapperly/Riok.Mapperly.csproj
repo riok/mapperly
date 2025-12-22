@@ -16,8 +16,6 @@
     <PackageIcon>logo.png</PackageIcon>
     <!-- default roslyn version and constants, compare 4 numeric part versions -->
     <ROSLYN_VERSION Condition="'$(ROSLYN_VERSION)' == ''">5.0</ROSLYN_VERSION>
-    <DefineConstants Condition="'$(ROSLYN_VERSION).0.0' &gt;= '4.4.0.0'">$(DefineConstants);ROSLYN4_4_OR_GREATER</DefineConstants>
-    <DefineConstants Condition="'$(ROSLYN_VERSION).0.0' &gt;= '4.7.0.0'">$(DefineConstants);ROSLYN4_7_OR_GREATER</DefineConstants>
     <DefineConstants Condition="'$(ROSLYN_VERSION).0.0' &gt;= '5.0.0.0'">$(DefineConstants);ROSLYN5_0_OR_GREATER</DefineConstants>
   </PropertyGroup>
   <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(HUSKY)' != 0 AND '$(CI)' == ''">

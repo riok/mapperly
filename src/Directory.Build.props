@@ -13,11 +13,11 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.253">
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.264">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Meziantou.Polyfill" Version="1.0.62">
+    <PackageReference Include="Meziantou.Polyfill" Version="1.0.71">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

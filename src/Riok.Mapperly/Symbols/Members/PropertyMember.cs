@@ -35,12 +35,7 @@ public class PropertyMember(IPropertySymbol symbol, SymbolAccessor symbolAccesso
 
     public bool IsInitOnly => Symbol.SetMethod?.IsInitOnly == true;
 
-    public bool IsRequired
-#if ROSLYN4_4_OR_GREATER
-        => Symbol.IsRequired;
-#else
-        => false;
-#endif
+    public bool IsRequired => Symbol.IsRequired;
 
     public bool IsObsolete => symbolAccessor.HasAttribute<ObsoleteAttribute>(Symbol);
     public bool IsIgnored => symbolAccessor.HasAttribute<MapperIgnoreAttribute>(Symbol);

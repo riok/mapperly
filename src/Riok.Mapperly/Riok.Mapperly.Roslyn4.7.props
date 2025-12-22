@@ -1,5 +1,0 @@
-<Project>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" PrivateAssets="all" />
-  </ItemGroup>
-</Project>

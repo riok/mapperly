@@ -178,6 +178,7 @@
   DateTimeValue: 2020-01-03 15:10:05 Utc,
   DateTimeValueTargetDateOnly: 2020-01-03 15:10:05 Utc,
   DateTimeValueTargetTimeOnly: 2020-01-03 15:10:05 Utc,
+  ToByteArrayWithInstanceMethod: Guid_1,
   WithCreateMethod: {
     Value: 10
   },

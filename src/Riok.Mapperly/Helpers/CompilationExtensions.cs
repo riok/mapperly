@@ -32,7 +32,6 @@ internal static class CompilationExtensions
     /// <returns>The symbol to use for code analysis; otherwise, <see langword="null"/>.</returns>
     public static INamedTypeSymbol? GetBestTypeByMetadataName(this Compilation compilation, string fullyQualifiedMetadataName)
     {
-#if ROSLYN4_4_OR_GREATER
         INamedTypeSymbol? type = null;
 
         foreach (var currentType in compilation.GetTypesByMetadataName(fullyQualifiedMetadataName))
@@ -57,12 +56,6 @@ internal static class CompilationExtensions
         }
 
         return type;
-#else
-        // RS0030 banned api: GetTypesByMetadataName is not supported for Roslyn < 4.4
-#pragma warning disable RS0030
-        return compilation.GetTypeByMetadataName(fullyQualifiedMetadataName);
-#pragma warning restore RS0030
-#endif
     }
 
     // Copy from https://github.com/dotnet/roslyn/blob/d2ff1d83e8fde6165531ad83f0e5b1ae95908289/src/Workspaces/SharedUtilitiesAndExtensions/Compiler/Core/Extensions/ISymbolExtensions.cs#L28-L73
