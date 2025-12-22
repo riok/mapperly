@@ -138,6 +138,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.DateTimeValue = src.DateTimeValue;
             target.DateTimeValueTargetDateOnly = src.DateTimeValueTargetDateOnly;
             target.DateTimeValueTargetTimeOnly = src.DateTimeValueTargetTimeOnly;
+            target.ToByteArrayWithInstanceMethod = src.ToByteArrayWithInstanceMethod;
             if (src.WithCreateMethod != null)
             {
                 target.WithCreateMethod = global::Riok.Mapperly.IntegrationTests.Models.ConvertWithStaticMethodObject.ToConvertWithStaticMethodObject(src.WithCreateMethod);

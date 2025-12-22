@@ -10,7 +10,7 @@ namespace Riok.Mapperly.IntegrationTests
     public class NestedMapperRecordTest : BaseMapperTest
     {
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0)]
+        [VersionedSnapshot(Versions.NET8_0)]
         public Task SnapshotGeneratedSource()
         {
             var path = GetGeneratedMapperFilePath(

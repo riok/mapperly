@@ -13,7 +13,7 @@ namespace Riok.Mapperly.IntegrationTests
         private readonly UseExternalInstanceMapper _mapper = new();
 
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0 | Versions.NET8_0)]
+        [VersionedSnapshot(Versions.NET8_0)]
         public Task SnapshotGeneratedSource()
         {
             var path = GetGeneratedMapperFilePath(nameof(UseExternalInstanceMapper));

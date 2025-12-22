@@ -1,5 +1,3 @@
-#if ROSLYN4_4_OR_GREATER
-
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -44,4 +42,3 @@ internal static class SyntaxProvider
             .Select((x, _) => x.FirstOrDefault());
     }
 }
-#endif

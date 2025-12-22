@@ -5,7 +5,7 @@ using Riok.Mapperly.Output;
 
 namespace Riok.Mapperly.Helpers;
 
-internal static partial class IncrementalValuesProviderExtensions
+internal static class IncrementalValuesProviderExtensions
 {
     public static IncrementalValuesProvider<TSource> WhereNotNull<TSource>(this IncrementalValuesProvider<TSource?> source)
         where TSource : struct
@@ -15,7 +15,7 @@ internal static partial class IncrementalValuesProviderExtensions
 #nullable enable
     }
 
-    public static IncrementalValuesProvider<TSource> WhereNotNull<TSource>(this IncrementalValuesProvider<TSource?> source)
+    private static IncrementalValuesProvider<TSource> WhereNotNull<TSource>(this IncrementalValuesProvider<TSource?> source)
     {
 #nullable disable
         return source.Where(x => x != null);
