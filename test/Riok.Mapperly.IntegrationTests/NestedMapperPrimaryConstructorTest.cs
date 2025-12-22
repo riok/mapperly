@@ -21,8 +21,8 @@ namespace Riok.Mapperly.IntegrationTests
         [Fact]
         public void RunMappingShouldWork()
         {
-            var v = NestedTestMapperPrimaryConstructor.TestNesting.NestedMapper.ToInt(10.25m);
-            v.ShouldBe(10);
+            var v = NestedTestMapperPrimaryConstructor.TestNesting.NestedMapper.ToDecimal(10);
+            v.ShouldBe(10.00m);
         }
     }
 }

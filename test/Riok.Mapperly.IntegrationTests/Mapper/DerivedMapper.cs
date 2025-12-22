@@ -7,7 +7,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
     {
         public virtual partial long IntToLong(int value);
 
-        public partial short IntToShort(int value);
+        public partial string IntToString(int value);
     }
 
     [Mapper]
@@ -21,6 +21,6 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
     {
         public sealed override partial long IntToLong(int value);
 
-        public new partial short IntToShort(int value);
+        public new partial string IntToString(int value);
     }
 }

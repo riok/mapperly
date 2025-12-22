@@ -8,7 +8,7 @@ public partial class BaseMapper2
     {
         var target = new global::B();
         target.Value = source.Value.ToString();
-        target.Value2 = IntToShort(source.Value2);
+        target.Value2 = IntToDouble(source.Value2);
         return target;
     }
 }

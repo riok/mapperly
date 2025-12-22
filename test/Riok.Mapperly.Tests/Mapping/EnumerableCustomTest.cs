@@ -5,7 +5,12 @@ public class EnumerableCustomTest
     [Fact]
     public void EnumerableToCustomCollection()
     {
-        var source = TestSourceBuilder.Mapping("IEnumerable<long>", "B", "class B : ICollection<int> { public void Add(int item) {} }");
+        var source = TestSourceBuilder.Mapping(
+            "IEnumerable<long>",
+            "B",
+            TestSourceBuilderOptions.AllConversions,
+            "class B : ICollection<int> { public void Add(int item) {} }"
+        );
         TestHelper
             .GenerateMapper(source)
             .Should()
@@ -24,7 +29,12 @@ public class EnumerableCustomTest
     [Fact]
     public void EnumerableToCustomSet()
     {
-        var source = TestSourceBuilder.Mapping("IEnumerable<long>", "B", "class B : ISet<int> { public void Add(int item) {} }");
+        var source = TestSourceBuilder.Mapping(
+            "IEnumerable<long>",
+            "B",
+            TestSourceBuilderOptions.AllConversions,
+            "class B : ISet<int> { public void Add(int item) {} }"
+        );
         TestHelper
             .GenerateMapper(source)
             .Should()
@@ -48,7 +58,7 @@ public class EnumerableCustomTest
             [MapProperty("Count", "MyCount")]
             partial B Map(IReadOnlyCollection<long> source);
             """,
-            "B",
+            TestSourceBuilderOptions.AllConversions,
             "class B : ICollection<int> { public int MyCount { get; set; } public void Add(int item) {} }"
         );
         TestHelper
@@ -73,6 +83,7 @@ public class EnumerableCustomTest
         var source = TestSourceBuilder.Mapping(
             "IEnumerable<long>",
             "B",
+            TestSourceBuilderOptions.AllConversions,
             "class B : ICollection<int> { public void Add(int item) {} public void EnsureCapacity(int capacity) {} }"
         );
         TestHelper
@@ -100,6 +111,7 @@ public class EnumerableCustomTest
         var source = TestSourceBuilder.Mapping(
             "A",
             "B",
+            TestSourceBuilderOptions.AllConversions,
             "class A : IEnumerable<double> { public int Value { get; set; } }",
             "class B : ICollection<int> { public void Add(int item) {} public int Value { get; set; } }"
         );
@@ -269,6 +281,7 @@ public class EnumerableCustomTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "partial void Map(A source, B target);",
+            TestSourceBuilderOptions.AllConversions,
             "class A : IEnumerable<double> { public int Value { get; set; } }",
             "class B : ICollection<int> { public void Add(int item) {} public int Value { get; set; } }"
         );
@@ -291,6 +304,7 @@ public class EnumerableCustomTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """[MapProperty("ValueSource", "ValueTarget")] public partial B Map(A source);""",
+            TestSourceBuilderOptions.AllConversions,
             "class A : IEnumerable<double> { public int ValueSource { get; set; } }",
             "class B : ICollection<int> { public void Add(int item) {} public int ValueTarget { get; set; } }"
         );
@@ -338,6 +352,7 @@ public class EnumerableCustomTest
             [ObjectFactory] B CreateB() => new();
             partial B Map(IEnumerable<long> source);
             """,
+            TestSourceBuilderOptions.AllConversions,
             "class B : ICollection<int> { public void Add(int item) {} }"
         );
         TestHelper
