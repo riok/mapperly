@@ -92,7 +92,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.NullableReadOnlyObjectCollection = null;
             }
             target.MemoryValue = src.MemoryValue.Span.ToArray();
-            target.StackValue = new global::System.Collections.Generic.Stack<string>(src.StackValue);
+            target.StackValue = new global::System.Collections.Generic.Stack<string>(global::System.Linq.Enumerable.Reverse(src.StackValue));
             target.QueueValue = new global::System.Collections.Generic.Queue<string>(src.QueueValue);
             target.ImmutableArrayValue = src.ImmutableArrayValue;
             target.ImmutableListValue = src.ImmutableListValue;

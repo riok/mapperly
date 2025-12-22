@@ -39,6 +39,22 @@ public partial class CarMapper
 Deep cloning is not applied to `IQueryable` projection mappings.
 :::
 
+### Stack cloning strategy
+
+When deep cloning a `Stack<T>`, the order of elements is preserved by default.
+This behavior can be configured via the `StackCloningStrategy` property on the `MapperAttribute`.
+
+- `StackCloningStrategy.PreserveOrder` (default): Preserves the order of elements.
+- `StackCloningStrategy.ReverseOrder`: Reverses the order of elements (legacy behavior).
+
+```csharp
+[Mapper(UseDeepCloning = true, StackCloningStrategy = StackCloningStrategy.ReverseOrder)]
+public partial class MyMapper
+{
+    // ...
+}
+```
+
 ## Properties / fields
 
 On each mapping method declaration, property and field mappings can be customized.
@@ -364,7 +380,7 @@ See also [user-implemented mapping methods](./user-implemented-methods.mdx).
             [MapProperty(nameof(Car.Price), nameof(CarDto.Price), Use = nameof(MapPrice))]
             // highlight-end
             public partial CarDto MapCar(Car source);
-    
+
             // highlight-start
             // set Default = false to not use it for all decimal => string conversions
             // if using AutoUserMappings = false, the UserMapping is not needed.
@@ -372,7 +388,7 @@ See also [user-implemented mapping methods](./user-implemented-methods.mdx).
             private string MapPrice(decimal price)
                 => (price / 100).ToString("C");
             // highlight-end
-    
+
             // generates
             target.Price = MapPrice(source.Price);
         }
