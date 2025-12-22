@@ -15,10 +15,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
     [Mapper(
         IncludedMembers = MemberVisibility.All,
         IncludedConstructors = MemberVisibility.All,
-        EnumMappingStrategy = EnumMappingStrategy.ByValue
+        EnumMappingStrategy = EnumMappingStrategy.ByValue,
+        EnabledConversions = MappingConversionType.All
     )]
 #else
-    [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByValue)]
+    [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByValue, EnabledConversions = MappingConversionType.All)]
 #endif
     public partial class TestMapper
     {

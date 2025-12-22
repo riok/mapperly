@@ -230,7 +230,7 @@ public class UserMethodTest
                 public string MyMapping(int value)
                     => $"my-to-string-{{value}}";
 
-                protected partial short MyIntToShortMapping(int value);
+                protected partial double MyIntToDoubleMapping(int value);
             }
 
             public interface BaseMapper2 : BaseMapper3
@@ -252,7 +252,7 @@ public class UserMethodTest
             }
 
             class A { public int Value { get; set; } public int Value2 { get; set; } public int Value3 { get; set; } public int Value4 { get; set; } }
-            class B { public string Value { get; set; } public long Value2 { get; set; } public decimal Value3 { get; set; } public short Value4 { get; set; } }
+            class B { public string Value { get; set; } public long Value2 { get; set; } public decimal Value3 { get; set; } public double Value4 { get; set; } }
             """
         );
         return TestHelper.VerifyGenerator(source);
@@ -272,7 +272,7 @@ public class UserMethodTest
             {
                 public void MyMapping(List<int> src, List<string> dst) { }
 
-                protected partial void MyIntToShortMapping(List<int> src, List<short> dst);
+                protected partial void MyIntToDoubleMapping(List<int> src, List<double> dst);
             }
 
             public interface BaseMapper2 : BaseMapper3
@@ -292,7 +292,7 @@ public class UserMethodTest
             }
 
             class A { public List<int> Value { get; set; } public int Value2 { get; set; } public C Value3 { get; set; } public List<int> Value4 { get; set; } }
-            class B { public List<string> Value { get; } public long Value2 { get; } public D Value3 { get; } public List<short> Value4 { get; } },
+            class B { public List<string> Value { get; } public long Value2 { get; } public D Value3 { get; } public List<double> Value4 { get; } },
             class C { public int Value { get; set; } },
             class D { public string Value { get; set; } },
             """
@@ -314,13 +314,13 @@ public class UserMethodTest
             {
                 public partial B AToB(A source);
 
-                protected partial short IntToShort(int value);
+                protected partial double IntToDouble(int value);
 
                 protected abstract string IntToString(int value);
             }
 
             class A { public int Value { get; set; } public int Value2 { get; set; } }
-            class B { public string Value { get; set; } public short Value2 { get; set; } }
+            class B { public string Value { get; set; } public double Value2 { get; set; } }
             """
         );
         return TestHelper.VerifyGenerator(source);
@@ -341,7 +341,7 @@ public class UserMethodTest
                 public virtual partial B AToB(A source);
 
                 [UserMapping(Default = true)]
-                public partial short IntToShort(int value);
+                public partial double IntToDouble(int value);
             }
 
             [Mapper]
@@ -355,11 +355,11 @@ public class UserMethodTest
             {
                 public sealed override partial B AToB(A source);
 
-                public new partial short IntToShort(int value);
+                public new partial double IntToDouble(int value);
             }
 
             class A { public int Value { get; set; } public int Value2 { get; set; } }
-            class B { public string Value { get; set; } public short Value2 { get; set; } }
+            class B { public string Value { get; set; } public double Value2 { get; set; } }
             """
         );
         return TestHelper.VerifyGenerator(source);

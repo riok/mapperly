@@ -231,6 +231,7 @@ namespace Riok.Mapperly.Abstractions
         ToTargetMethod = 131072,
         StaticConvertMethods = 262144,
         All = -1,
+        Default = -5,
     }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
