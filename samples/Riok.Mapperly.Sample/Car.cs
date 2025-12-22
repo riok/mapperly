@@ -11,6 +11,8 @@ public class Car
     public Manufacturer? Manufacturer { get; set; }
 
     public List<Tire> Tires { get; } = [];
+
+    public LicensePlate LicensePlate { get; set; }
 }
 
 public enum CarColor
@@ -36,4 +38,16 @@ public class Manufacturer
 public class Tire
 {
     public string Description { get; set; } = string.Empty;
+}
+
+public readonly struct LicensePlate
+{
+    public string Value { get; private init; }
+
+    public static LicensePlate Parse(string value, IFormatProvider? formatProvider)
+    {
+        return new LicensePlate() { Value = value };
+    }
+
+    public override readonly string ToString() => Value;
 }
