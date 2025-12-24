@@ -5,7 +5,7 @@ description: How the documentation of Mapperly is built.
 
 # Documentation
 
-The Mapperly documentation is built using [Docusaurus 2](https://docusaurus.io/)
+The Mapperly documentation is built using [Docusaurus](https://docusaurus.io/)
 and is located in the `docs` directory.
 
 ## Dependencies
