@@ -209,29 +209,16 @@ or by setting the `IgnoreObsoleteMembersStrategy` option of the `MapperAttribute
 ### Property name mapping strategy
 
 By default, property and field names are matched using a case sensitive strategy.
-If all properties/fields differ only in casing, for example `ModelName` on the source
-and `modelName` on the target,
-the `MapperAttribute` can be used with the `PropertyNameMappingStrategy` option.
+If properties/fields differ in naming conventions, the `MapperAttribute` can be used with the `PropertyNameMappingStrategy` option.
 
-```csharp
-// highlight-start
-[Mapper(PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseInsensitive)]
-// highlight-end
-public partial class CarMapper
-{
-    public partial CarDto ToDto(Car car);
-}
+Available strategies:
 
-public class Car
-{
-    public string ModelName { get; set; }
-}
-
-public class CarDto
-{
-    public string modelName { get; set; }
-}
-```
+| Name            | Description                                                              |
+| --------------- | ------------------------------------------------------------------------ |
+| CaseSensitive   | Matches properties by their exact name (default)                         |
+| CaseInsensitive | Matches properties ignoring case differences                             |
+| SnakeCase       | Matches properties by converting to `snake_case` before comparison       |
+| UpperSnakeCase  | Matches properties by converting to `UPPER_SNAKE_CASE` before comparison |
 
 ### `null` values
 
