@@ -68,6 +68,21 @@ public class ReferenceHandlingTest
     }
 
     [Fact]
+    public Task ShouldReportDiagnosticWhenTargetGetterReadOnlyNullable()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B MapToB(A source, [ReferenceHandler] IReferenceHandler refHandler);
+            """,
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A { public A Parent { get; set; } }",
+            "class B { public B? Parent { get; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ShouldReportDiagnosticWhenTargetGetterReadOnlyDeep()
     {
         var source = TestSourceBuilder.Mapping(
