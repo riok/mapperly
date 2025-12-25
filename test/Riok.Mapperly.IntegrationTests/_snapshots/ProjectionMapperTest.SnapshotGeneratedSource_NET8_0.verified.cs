@@ -57,10 +57,10 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                     ManuallyMappedList = global::System.Linq.Enumerable.ToList(
                         global::System.Linq.Enumerable.Select(x.ManuallyMappedList, x1 => x1.Value)
                     ),
-                    IntegerValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.OrderBy(x.IntegerValues, x => x.Value)),
-                    DecimalValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(global::System.Linq.Enumerable.OrderBy(x.DecimalValues, x => x.Value), x => new global::Riok.Mapperly.IntegrationTests.Dto.LongValueDto()
+                    IntegerValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.OrderBy(x.IntegerValues, x1 => x1.Value)),
+                    DecimalValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(global::System.Linq.Enumerable.OrderBy(x.DecimalValues, x1 => x1.Value), x1 => new global::Riok.Mapperly.IntegrationTests.Dto.LongValueDto()
                     {
-                        Value = x.Value,
+                        Value = x1.Value,
                     })),
                 }
             );
