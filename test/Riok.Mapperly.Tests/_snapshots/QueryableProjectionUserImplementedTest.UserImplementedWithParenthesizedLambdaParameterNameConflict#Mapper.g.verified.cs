@@ -11,8 +11,7 @@ public partial class Mapper
             source,
             x => new global::B()
             {
-                StringValue = x.StringValue,
-                NestedValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.OrderBy(x.NestedValues, (x1) => x1.Value)),
+                Nested = new global::D { Value = global::System.Linq.Enumerable.FirstOrDefault(global::System.Linq.Enumerable.Select(x.Nested.Items, (x1, i) => x1 + i))},
             }
         );
 #nullable enable
