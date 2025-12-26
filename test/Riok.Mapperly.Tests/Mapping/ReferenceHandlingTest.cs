@@ -68,7 +68,26 @@ public class ReferenceHandlingTest
     }
 
     [Fact]
-    public Task ShouldReportDiagnosticWhenTargetGetterReadOnlyDeep()
+    public void ShouldReportDiagnosticWhenTargetGetterReadOnlyNullable()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B MapToB(A source, [ReferenceHandler] IReferenceHandler refHandler);
+            """,
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A { public A Parent { get; set; } }",
+            "class B { public B? Parent { get; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.CircularMappingWithoutSetter)
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void ShouldReportDiagnosticWhenTargetGetterReadOnlyDeep()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -80,11 +99,35 @@ public class ReferenceHandlingTest
             "class D { public C DeepParent { get; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.CircularMappingWithoutSetter)
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
-    public Task ShouldReportDiagnosticWhenTargetGetterInitOnlyDeep()
+    public void ShouldReportDiagnosticWhenTargetGetterReadOnlyDeepNullable()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "C",
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A { public B Parent { get; set; } }",
+            "class B { public A? DeepParent { get; set; } }",
+            "class C { public D Parent { get; } }",
+            "class D { public C? DeepParent { get; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.CircularMappingWithoutSetter)
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void ShouldReportDiagnosticWhenTargetGetterInitOnlyDeep()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -96,7 +139,31 @@ public class ReferenceHandlingTest
             "class D { public C DeepParent { get; init; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.CircularMappingWithoutSetter)
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void ShouldReportDiagnosticWhenTargetGetterInitOnlyDeepNullable()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "C",
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A { public B Parent { get; set; } }",
+            "class B { public A? DeepParent { get; set; } }",
+            "class C { public D Parent { get; } }",
+            "class D { public C? DeepParent { get; init; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.CircularMappingWithoutSetter)
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
