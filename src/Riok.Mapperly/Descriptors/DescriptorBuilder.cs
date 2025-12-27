@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
@@ -20,6 +21,7 @@ public class DescriptorBuilder
 {
     private readonly MapperDescriptor _mapperDescriptor;
     private readonly SymbolAccessor _symbolAccessor;
+    private readonly ImmutableArray<UseStaticMapperConfiguration> _globalStaticMappers;
 
     private readonly MappingCollection _mappings = new();
     private readonly InlinedExpressionMappingCollection _inlineMappings = new();
@@ -35,12 +37,14 @@ public class DescriptorBuilder
         CompilationContext compilationContext,
         MapperDeclaration mapperDeclaration,
         SymbolAccessor symbolAccessor,
-        MapperConfiguration defaultMapperConfiguration
+        MapperConfiguration defaultMapperConfiguration,
+        ImmutableArray<UseStaticMapperConfiguration> globalStaticMappers
     )
     {
         var supportedFeatures = SupportedFeatures.Build(compilationContext.Types, symbolAccessor, compilationContext.ParseLanguageVersion);
         _mapperDescriptor = new MapperDescriptor(mapperDeclaration, _methodNameBuilder, supportedFeatures);
         _symbolAccessor = symbolAccessor;
+        _globalStaticMappers = globalStaticMappers;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
         _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
         _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
@@ -187,7 +191,13 @@ public class DescriptorBuilder
 
     private void ExtractExternalMappings()
     {
-        foreach (var externalMapping in ExternalMappingsExtractor.ExtractExternalMappings(_builderContext, _mapperDescriptor.Symbol))
+        foreach (
+            var externalMapping in ExternalMappingsExtractor.ExtractExternalMappings(
+                _globalStaticMappers,
+                _builderContext,
+                _mapperDescriptor.Symbol
+            )
+        )
         {
             AddUserMapping(externalMapping, true);
         }
