@@ -17,7 +17,8 @@ public class MapperGenerator : IIncrementalGenerator
 {
     public static readonly string MapperAttributeName = typeof(MapperAttribute).FullName!;
     public static readonly string MapperDefaultsAttributeName = typeof(MapperDefaultsAttribute).FullName!;
-    public static readonly string UseStaticMapperName = typeof(UseStaticMapperAttribute<>).FullName!;
+    public static readonly string UseStaticMapperName = typeof(UseStaticMapperAttribute).FullName!;
+    public static readonly string UseStaticMapperGenericName = typeof(UseStaticMapperAttribute<>).FullName!;
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
