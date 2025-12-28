@@ -73,5 +73,20 @@ namespace Riok.Mapperly.IntegrationTests
             var dto = UseExternalMapper.ConstantMapExternalString(model);
             dto.IdValue.ShouldBe(13);
         }
+
+        [Fact]
+        public void RunGlobalMappings()
+        {
+            var model = new GloballyMappedModel
+            {
+                Value1 = new GloballyMappedModel1 { Value = 10 },
+                Value2 = new GloballyMappedModel2 { Value = 20 },
+            };
+
+            var dto = UseExternalMapper.ToDto(model);
+
+            dto.Value1.Value.ShouldBe(11);
+            dto.Value2.Value.ShouldBe(22);
+        }
     }
 }
