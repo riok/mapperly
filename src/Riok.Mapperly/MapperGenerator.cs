@@ -159,13 +159,15 @@ public class MapperGenerator : IIncrementalGenerator
         CancellationToken ct
     )
     {
-        var configurations = ImmutableArray.CreateBuilder<UseStaticMapperConfiguration>();
+        if (attributeDataList.IsDefaultOrEmpty)
+        {
+            return ImmutableArray<UseStaticMapperConfiguration>.Empty;
+        }
+
+        var configurations = ImmutableArray.CreateBuilder<UseStaticMapperConfiguration>(attributeDataList.Length);
         foreach (var attributeData in attributeDataList)
         {
-            if (ct.IsCancellationRequested)
-            {
-                return ImmutableArray<UseStaticMapperConfiguration>.Empty;
-            }
+            ct.ThrowIfCancellationRequested();
 
             var config = AttributeDataAccessor.Access<UseStaticMapperAttribute<object>, UseStaticMapperConfiguration>(attributeData);
             configurations.Add(config);

@@ -155,7 +155,7 @@ public class DescriptorBuilder
             }
 
             var name = _attributeAccessor.GetMappingName(userMapping.Method);
-            AddUserMapping(userMapping, false, name);
+            AddUserMapping(userMapping, ignoreDuplicates: false, name);
         }
 
         if (_mapperDescriptor.Static && firstNonStaticUserMapping is not null)
@@ -199,7 +199,7 @@ public class DescriptorBuilder
             )
         )
         {
-            AddUserMapping(externalMapping, true);
+            AddUserMapping(externalMapping, ignoreDuplicates: true);
         }
     }
 
@@ -207,7 +207,7 @@ public class DescriptorBuilder
     {
         foreach (var (name, mapping) in ExternalMappingsExtractor.ExtractExternalNamedMappings(_builderContext, _mapperDescriptor.Symbol))
         {
-            AddUserMapping(mapping, true, name);
+            AddUserMapping(mapping, ignoreDuplicates: true, name);
         }
     }
 

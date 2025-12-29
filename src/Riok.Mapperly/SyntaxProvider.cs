@@ -50,16 +50,8 @@ internal static class SyntaxProvider
             )
             .SelectMany(static (x, _) => x)
             .Collect();
-        return staticMapperAttributes.Combine(genericStaticMapperAttributes).SelectMany((x, _) => x.Left.AddRange(x.Right)).Collect();
 
-        return context
-            .SyntaxProvider.ForAttributeWithMetadataName(
-                MapperGenerator.UseStaticMapperName,
-                static (s, _) => s is CompilationUnitSyntax,
-                static (ctx, _) => ctx.Attributes
-            )
-            .SelectMany(static (x, _) => x)
-            .Collect();
+        return staticMapperAttributes.Combine(genericStaticMapperAttributes).SelectMany((x, _) => x.Left.AddRange(x.Right)).Collect();
     }
 
     public static IncrementalValueProvider<IAssemblySymbol?> GetMapperDefaultDeclarations(IncrementalGeneratorInitializationContext context)

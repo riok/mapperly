@@ -101,6 +101,11 @@ public static class UserMethodMappingExtractor
         bool isExternal
     )
     {
+        // Ignore the mapper type itself.
+        if (SymbolEqualityComparer.Default.Equals(type, ctx.MapperDeclaration.Symbol))
+        {
+            return [];
+        }
         var methods = ctx
             .SymbolAccessor.GetAllMethods(type)
             .Concat(type.AllInterfaces.SelectMany(ctx.SymbolAccessor.GetAllMethods))
