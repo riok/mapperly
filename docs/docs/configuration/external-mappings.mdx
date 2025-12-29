@@ -73,6 +73,37 @@ it will use the provided implementation by the `BananaMapper`.
 Used mappers themselves can be Mapperly backed classes.  
 The [`AutoUserMappings`](./user-implemented-methods.mdx) value also applies to the usage of external mappers.
 
+## Globally available external mappers
+
+It is also possible to configure Mapperly to always consider certain external mappers
+without needing to specify them on each mapper class.  
+This can be done through the `UseStaticMappers` attribute.
+
+<Tabs>
+    <TabItem value="global-typeod" label="With typeof parameter" default>
+
+        ```csharp
+        using Mapperly.Abstractions;
+
+        [assembly: UseStaticMappers(typeof(BananaMapper))]
+        [assembly: UseStaticMappers(typeof(AppleMapper))]
+        ```
+
+    </TabItem>
+    <TabItem value="global-generic" label="With generic argument">
+
+        ```csharp
+        using Mapperly.Abstractions;
+
+        [assembly: UseStaticMappers<BananaMapper>]
+        [assembly: UseStaticMappers<AppleMapper>]
+        ```
+
+    </TabItem>
+</Tabs>
+
+This will make all mappers in the specified assemblies available globally.
+
 ## External method reference
 
 ### Static external method reference
