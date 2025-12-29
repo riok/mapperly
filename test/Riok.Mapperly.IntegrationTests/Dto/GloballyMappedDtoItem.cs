@@ -1,6 +1,6 @@
 ﻿namespace Riok.Mapperly.IntegrationTests.Dto
 {
-    public class GloballyMappedDto1
+    public class GloballyMappedDtoItem
     {
         public int Value { get; set; }
     }

@@ -64,8 +64,14 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial global::Riok.Mapperly.IntegrationTests.Dto.GloballyMappedDto ToDto(global::Riok.Mapperly.IntegrationTests.Models.GloballyMappedModel obj)
         {
             var target = new global::Riok.Mapperly.IntegrationTests.Dto.GloballyMappedDto();
-            target.Value1 = global::Riok.Mapperly.IntegrationTests.Mapper.GlobalMappers1.ToDto(obj.Value1);
-            target.Value2 = global::Riok.Mapperly.IntegrationTests.Mapper.GlobalMappers2.ToDto(obj.Value2);
+            if (obj.Item != null)
+            {
+                target.Item = global::Riok.Mapperly.IntegrationTests.Mapper.GlobalMappers.ToDto(obj.Item);
+            }
+            else
+            {
+                target.Item = null;
+            }
             return target;
         }
     }

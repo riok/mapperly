@@ -77,16 +77,12 @@ namespace Riok.Mapperly.IntegrationTests
         [Fact]
         public void RunGlobalMappings()
         {
-            var model = new GloballyMappedModel
-            {
-                Value1 = new GloballyMappedModel1 { Value = 10 },
-                Value2 = new GloballyMappedModel2 { Value = 20 },
-            };
+            var model = new GloballyMappedModel { Item = new GloballyMappedModelItem { Value = 10 } };
 
             var dto = UseExternalMapper.ToDto(model);
 
-            dto.Value1.Value.ShouldBe(11);
-            dto.Value2.Value.ShouldBe(22);
+            dto.Item.ShouldNotBeNull();
+            dto.Item.Value.ShouldBe(11);
         }
     }
 }
