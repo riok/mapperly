@@ -520,7 +520,7 @@ public class UseStaticMapperTest
         var source = TestSourceBuilder.CSharp(
             """
             using Riok.Mapperly.Abstractions;
-            [assembly:UseStaticMapper<OtherMapper>]
+            [assembly: UseStaticMapper<OtherMapper>]
 
             record A(AExternal Value);
             record B(BExternal Value);
@@ -553,7 +553,7 @@ public class UseStaticMapperTest
         var source = TestSourceBuilder.CSharp(
             """
             using Riok.Mapperly.Abstractions;
-            [assembly:UseStaticMapper(typeof(OtherMapper))]
+            [assembly: UseStaticMapper(typeof(OtherMapper))]
 
             record A(AExternal Value);
             record B(BExternal Value);
@@ -586,8 +586,8 @@ public class UseStaticMapperTest
         var source = TestSourceBuilder.CSharp(
             """
             using Riok.Mapperly.Abstractions;
-            [assembly:UseStaticMapper(typeof(OtherMapper))]
-            [assembly:UseStaticMapper<AnotherMapper>]
+            [assembly: UseStaticMapper(typeof(OtherMapper))]
+            [assembly: UseStaticMapper<AnotherMapper>]
 
             record A(int Value1, long Value2);
             record B(string Value1, string Value2);
@@ -622,7 +622,7 @@ public class UseStaticMapperTest
         var source = TestSourceBuilder.CSharp(
             """
             using Riok.Mapperly.Abstractions;
-            [assembly:UseStaticMapper(typeof(Mapper))]
+            [assembly: UseStaticMapper(typeof(Mapper))]
 
             record A(AExternal Value);
             record B(BExternal Value);
