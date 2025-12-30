@@ -1,6 +1,5 @@
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 using Riok.Mapperly.Output;
 
 namespace Riok.Mapperly.Helpers;
