@@ -73,5 +73,16 @@ namespace Riok.Mapperly.IntegrationTests
             var dto = UseExternalMapper.ConstantMapExternalString(model);
             dto.IdValue.ShouldBe(13);
         }
+
+        [Fact]
+        public void RunAssemblyScopedMappings()
+        {
+            var model = new ExternalItemsModel { Item = new AssemblyScopedModel { Value = 10 } };
+
+            var dto = UseExternalMapper.ToDto(model);
+
+            dto.Item.ShouldNotBeNull();
+            dto.Item.Value.ShouldBe(11);
+        }
     }
 }

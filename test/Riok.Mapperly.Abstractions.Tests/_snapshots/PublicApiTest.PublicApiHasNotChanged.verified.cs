@@ -290,13 +290,13 @@ namespace Riok.Mapperly.Abstractions
     {
         public UseMapperAttribute() { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true)]
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.Class, AllowMultiple=true)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
     public sealed class UseStaticMapperAttribute : System.Attribute
     {
         public UseStaticMapperAttribute(System.Type mapperType) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true)]
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.Class, AllowMultiple=true)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
     public sealed class UseStaticMapperAttribute<T> : System.Attribute
     {

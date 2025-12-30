@@ -35,6 +35,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapValue(nameof(IdObjectDto.IdValue), Use = "Riok.Mapperly.IntegrationTests.Mapper.ExternalMapperMethods.IntValueStatic")]
         public static partial IdObjectDto ConstantMapExternalString(IdObject source);
 
+        public static partial ExternalItemsDto ToDto(ExternalItemsModel obj);
+
         public static class MyOtherMapper
         {
             public static int MapInt(int source) => source * 10;

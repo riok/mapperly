@@ -59,5 +59,20 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.IdValue = global::Riok.Mapperly.IntegrationTests.Mapper.ExternalMapperMethods.IntValueStatic();
             return target;
         }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public static partial global::Riok.Mapperly.IntegrationTests.Dto.ExternalItemsDto ToDto(global::Riok.Mapperly.IntegrationTests.Models.ExternalItemsModel obj)
+        {
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.ExternalItemsDto();
+            if (obj.Item != null)
+            {
+                target.Item = global::Riok.Mapperly.IntegrationTests.Mapper.AssemblyScopedMappers.ToDto(obj.Item);
+            }
+            else
+            {
+                target.Item = null;
+            }
+            return target;
+        }
     }
 }

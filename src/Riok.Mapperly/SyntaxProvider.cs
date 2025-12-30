@@ -30,6 +30,30 @@ internal static class SyntaxProvider
             .Select((x, _) => new MapperDeclaration((INamedTypeSymbol)x.TargetSymbol, x.TargetNode));
     }
 
+    public static IncrementalValueProvider<ImmutableArray<AttributeData>> GetUseStaticMapperDeclarations(
+        IncrementalGeneratorInitializationContext context
+    )
+    {
+        var staticMapperAttributes = context
+            .SyntaxProvider.ForAttributeWithMetadataName(
+                MapperGenerator.UseStaticMapperName,
+                static (s, _) => s is CompilationUnitSyntax,
+                static (ctx, _) => ctx.Attributes
+            )
+            .SelectMany(static (x, _) => x)
+            .Collect();
+        var genericStaticMapperAttributes = context
+            .SyntaxProvider.ForAttributeWithMetadataName(
+                MapperGenerator.UseStaticMapperGenericName,
+                static (s, _) => s is CompilationUnitSyntax,
+                static (ctx, _) => ctx.Attributes
+            )
+            .SelectMany(static (x, _) => x)
+            .Collect();
+
+        return staticMapperAttributes.Combine(genericStaticMapperAttributes).SelectMany((x, _) => x.Left.AddRange(x.Right)).Collect();
+    }
+
     public static IncrementalValueProvider<IAssemblySymbol?> GetMapperDefaultDeclarations(IncrementalGeneratorInitializationContext context)
     {
         return context

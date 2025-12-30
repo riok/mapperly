@@ -73,6 +73,19 @@ it will use the provided implementation by the `BananaMapper`.
 Used mappers themselves can be Mapperly backed classes.  
 The [`AutoUserMappings`](./user-implemented-methods.mdx) value also applies to the usage of external mappers.
 
+## Assembly-level external mappers
+
+It is also possible to configure Mapperly to always consider certain external mappers
+without needing to specify them on each mapper class.  
+This can be done through the `UseStaticMapper` attribute.
+
+```csharp
+[assembly: UseStaticMapper(typeof(BananaMapper))]
+[assembly: UseStaticMapper(typeof(AppleMapper))]
+```
+
+This makes the static mapping methods of the specified mapper classes available to all mappers in the assembly.
+
 ## External method reference
 
 ### Static external method reference
