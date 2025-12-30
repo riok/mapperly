@@ -11,12 +11,12 @@ namespace Riok.Mapperly.Descriptors.ExternalMappings;
 internal static class ExternalMappingsExtractor
 {
     public static IEnumerable<IUserMapping> ExtractExternalMappings(
-        IEnumerable<UseStaticMapperConfiguration> globalStaticMappers,
+        IEnumerable<UseStaticMapperConfiguration> assemblyScopedStaticMappers,
         SimpleMappingBuilderContext ctx,
         INamedTypeSymbol mapperSymbol
     )
     {
-        return ExtractExternalStaticMappings(globalStaticMappers, ctx)
+        return ExtractExternalStaticMappings(assemblyScopedStaticMappers, ctx)
             .Concat(ExtractExternalStaticMappings(ExtractStaticMappersFromAttributes(ctx, mapperSymbol), ctx))
             .Concat(ExtractExternalInstanceMappings(ctx, mapperSymbol));
     }
