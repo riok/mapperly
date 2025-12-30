@@ -85,7 +85,7 @@ public class MapperGenerator : IIncrementalGenerator
         CompilationContext compilationContext,
         MapperDeclaration mapperDeclaration,
         MapperConfiguration mapperDefaults,
-        ImmutableArray<UseStaticMapperConfiguration> globalStaticMappers,
+        ImmutableArray<UseStaticMapperConfiguration> assemblyScopedStaticMappers,
         CancellationToken cancellationToken
     )
     {
@@ -99,7 +99,13 @@ public class MapperGenerator : IIncrementalGenerator
 
         try
         {
-            var builder = new DescriptorBuilder(compilationContext, mapperDeclaration, symbolAccessor, mapperDefaults, globalStaticMappers);
+            var builder = new DescriptorBuilder(
+                compilationContext,
+                mapperDeclaration,
+                symbolAccessor,
+                mapperDefaults,
+                assemblyScopedStaticMappers
+            );
             var (descriptor, diagnostics) = builder.Build(cancellationToken);
             var mapper = new MapperNode(
                 compilationContext.FileNameBuilder.Build(descriptor),

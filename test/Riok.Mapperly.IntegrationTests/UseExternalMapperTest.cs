@@ -75,9 +75,9 @@ namespace Riok.Mapperly.IntegrationTests
         }
 
         [Fact]
-        public void RunGlobalMappings()
+        public void RunAssemblyScopedMappings()
         {
-            var model = new GloballyMappedModel { Item = new GloballyMappedModelItem { Value = 10 } };
+            var model = new ExternalItemsModel { Item = new AssemblyScopedModel { Value = 10 } };
 
             var dto = UseExternalMapper.ToDto(model);
 

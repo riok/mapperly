@@ -61,12 +61,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        public static partial global::Riok.Mapperly.IntegrationTests.Dto.GloballyMappedDto ToDto(global::Riok.Mapperly.IntegrationTests.Models.GloballyMappedModel obj)
+        public static partial global::Riok.Mapperly.IntegrationTests.Dto.ExternalItemsDto ToDto(global::Riok.Mapperly.IntegrationTests.Models.ExternalItemsModel obj)
         {
-            var target = new global::Riok.Mapperly.IntegrationTests.Dto.GloballyMappedDto();
+            var target = new global::Riok.Mapperly.IntegrationTests.Dto.ExternalItemsDto();
             if (obj.Item != null)
             {
-                target.Item = global::Riok.Mapperly.IntegrationTests.Mapper.GlobalMappers.ToDto(obj.Item);
+                target.Item = global::Riok.Mapperly.IntegrationTests.Mapper.AssemblyScopedMappers.ToDto(obj.Item);
             }
             else
             {

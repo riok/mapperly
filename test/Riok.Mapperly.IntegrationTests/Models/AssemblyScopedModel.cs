@@ -1,6 +1,6 @@
 ﻿namespace Riok.Mapperly.IntegrationTests.Models
 {
-    public class GloballyMappedModelItem
+    public class AssemblyScopedModel
     {
         public int Value { get; set; }
     }

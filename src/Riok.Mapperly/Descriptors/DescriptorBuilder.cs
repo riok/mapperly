@@ -21,7 +21,7 @@ public class DescriptorBuilder
 {
     private readonly MapperDescriptor _mapperDescriptor;
     private readonly SymbolAccessor _symbolAccessor;
-    private readonly ImmutableArray<UseStaticMapperConfiguration> _globalStaticMappers;
+    private readonly ImmutableArray<UseStaticMapperConfiguration> _assemblyScopedStaticMappers;
 
     private readonly MappingCollection _mappings = new();
     private readonly InlinedExpressionMappingCollection _inlineMappings = new();
@@ -38,13 +38,13 @@ public class DescriptorBuilder
         MapperDeclaration mapperDeclaration,
         SymbolAccessor symbolAccessor,
         MapperConfiguration defaultMapperConfiguration,
-        ImmutableArray<UseStaticMapperConfiguration> globalStaticMappers
+        ImmutableArray<UseStaticMapperConfiguration> assemblyScopedStaticMappers
     )
     {
         var supportedFeatures = SupportedFeatures.Build(compilationContext.Types, symbolAccessor, compilationContext.ParseLanguageVersion);
         _mapperDescriptor = new MapperDescriptor(mapperDeclaration, _methodNameBuilder, supportedFeatures);
         _symbolAccessor = symbolAccessor;
-        _globalStaticMappers = globalStaticMappers;
+        _assemblyScopedStaticMappers = assemblyScopedStaticMappers;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
         _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
         _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
@@ -193,7 +193,7 @@ public class DescriptorBuilder
     {
         foreach (
             var externalMapping in ExternalMappingsExtractor.ExtractExternalMappings(
-                _globalStaticMappers,
+                _assemblyScopedStaticMappers,
                 _builderContext,
                 _mapperDescriptor.Symbol
             )

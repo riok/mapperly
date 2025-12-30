@@ -106,6 +106,7 @@ public static class UserMethodMappingExtractor
         {
             return [];
         }
+
         var methods = ctx
             .SymbolAccessor.GetAllMethods(type)
             .Concat(type.AllInterfaces.SelectMany(ctx.SymbolAccessor.GetAllMethods))

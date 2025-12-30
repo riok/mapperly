@@ -3,12 +3,12 @@ using Riok.Mapperly.IntegrationTests.Dto;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using Riok.Mapperly.IntegrationTests.Models;
 
-[assembly: UseStaticMapper(typeof(GlobalMappers))]
+[assembly: UseStaticMapper(typeof(AssemblyScopedMappers))]
 
 namespace Riok.Mapperly.IntegrationTests.Mapper
 {
-    public static class GlobalMappers
+    public static class AssemblyScopedMappers
     {
-        public static GloballyMappedDtoItem ToDto(GloballyMappedModelItem obj) => new GloballyMappedDtoItem() { Value = obj.Value + 1 };
+        public static AssemblyScopedDto ToDto(AssemblyScopedModel obj) => new AssemblyScopedDto() { Value = obj.Value + 1 };
     }
 }
