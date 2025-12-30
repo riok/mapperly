@@ -1,6 +1,5 @@
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 using Riok.Mapperly.Output;
 
 namespace Riok.Mapperly.Helpers;
@@ -77,8 +76,8 @@ internal static class IncrementalValuesProviderExtensions
             mappers,
             static (spc, mapper) =>
             {
-                var mapperText = mapper.Body.ToFullString();
-                spc.AddSource(mapper.FileName, SourceText.From(mapperText, Encoding.UTF8));
+                var mapperText = mapper.Body.GetText(Encoding.UTF8);
+                spc.AddSource(mapper.FileName, mapperText);
             }
         );
     }
