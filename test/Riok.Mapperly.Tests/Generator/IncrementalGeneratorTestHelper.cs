@@ -35,6 +35,12 @@ internal static class IncrementalGeneratorTestHelper
             // only assert for the first mapper
             AssertRunReason(runResult, MapperGeneratorStepNames.BuildCompilationContext, reasons.CompilationStep, mapperIndex);
             AssertRunReason(runResult, MapperGeneratorStepNames.BuildMapperDefaults, reasons.BuildMapperDefaultsStep, mapperIndex);
+            AssertRunReason(
+                runResult,
+                MapperGeneratorStepNames.BuildUseStaticMappers,
+                reasons.BuildUseStaticMapperDefaultsStep,
+                mapperIndex
+            );
         }
 
         AssertRunReason(runResult, MapperGeneratorStepNames.ReportDiagnostics, reasons.ReportDiagnosticsStep, mapperIndex);
