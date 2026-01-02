@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Helpers;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
@@ -14,7 +15,7 @@ public class NullDelegateExistingTargetMapping(
     ITypeSymbol nullableSourceType,
     ITypeSymbol nullableTargetType,
     IExistingTargetMapping delegateMapping
-) : ExistingTargetMapping(nullableSourceType, nullableTargetType)
+) : ExistingTargetMapping(nullableSourceType, nullableTargetType), IMemberAssignmentMappingContainer
 {
     private const string NullableValueProperty = nameof(Nullable<>.Value);
 
@@ -50,5 +51,32 @@ public class NullDelegateExistingTargetMapping(
         }
 
         return delegateMapping.Build(ctx, target).ToArray();
+    }
+
+    public bool HasMemberMapping(IMemberAssignmentMapping mapping)
+    {
+        return delegateMapping is IMemberAssignmentMappingContainer container && container.HasMemberMapping(mapping);
+    }
+
+    public void AddMemberMapping(IMemberAssignmentMapping mapping)
+    {
+        if (delegateMapping is IMemberAssignmentMappingContainer container)
+        {
+            container.AddMemberMapping(mapping);
+        }
+    }
+
+    public bool HasMemberMappingContainer(IMemberAssignmentMappingContainer container)
+    {
+        return delegateMapping is IMemberAssignmentMappingContainer delegateContainer
+            && delegateContainer.HasMemberMappingContainer(container);
+    }
+
+    public void AddMemberMappingContainer(IMemberAssignmentMappingContainer container)
+    {
+        if (delegateMapping is IMemberAssignmentMappingContainer delegateContainer)
+        {
+            delegateContainer.AddMemberMappingContainer(container);
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace Riok.Mapperly.IntegrationTests
     public class NullableDisabledMapperTest : BaseMapperTest
     {
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0 | Versions.NET7_0)]
+        [VersionedSnapshot(Versions.NET8_0)]
         public Task SnapshotGeneratedSource()
         {
             var path = GetGeneratedMapperFilePath(nameof(NullableDisabledMapper));

@@ -9,7 +9,7 @@ public static class ParseMappingBuilder
 {
     private const string ParseMethodName = "Parse";
 
-    public static StaticMethodMapping? TryBuildMapping(MappingBuilderContext ctx)
+    public static ParseMethodMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         if (!ctx.IsConversionEnabled(MappingConversionType.ParseMethod))
             return null;
@@ -17,28 +17,59 @@ public static class ParseMappingBuilder
         if (ctx.Source.SpecialType != SpecialType.System_String)
             return null;
 
-        var targetIsNullable = ctx.Target.NonNullable(out var nonNullableTarget);
+        var (formatProvider, formatProviderIsDefault) = ctx.GetFormatProvider(ctx.MappingKey.Configuration.FormatProviderName);
 
-        var parseMethodCandidates = ctx
+        return (formatProvider, formatProviderIsDefault) switch
+        {
+            // Parse(string, IFormatProvider)
+            (not null, _) when FindParseMethod(ctx, true) is { } parseMethod => new ParseMethodMapping(parseMethod, formatProvider.Name),
+
+            // Parse(string)
+            (not null, true) when FindParseMethod(ctx, false) is { } parseMethod => new ParseMethodMapping(parseMethod),
+
+            // Parse(string)
+            (null, _) when FindParseMethod(ctx, false) is { } parseMethod => new ParseMethodMapping(parseMethod),
+
+            // Parse(string, null)
+            (null, _) when FindParseMethodWithNullableParameter(ctx) is { } parseMethod => new ParseMethodMapping(
+                parseMethod,
+                simpleInvocation: false
+            ),
+
+            _ => null,
+        };
+    }
+
+    private static IMethodSymbol? FindParseMethodWithNullableParameter(MappingBuilderContext ctx)
+    {
+        return FindParseMethod(ctx, true) is { } m && m.Parameters[1].NullableAnnotation.IsNullable() ? m : null;
+    }
+
+    private static IMethodSymbol? FindParseMethod(MappingBuilderContext ctx, bool formatProviderParam)
+    {
+        ctx.Target.NonNullable(out var nonNullableTarget);
+        return ctx
             .SymbolAccessor.GetAllMethods(nonNullableTarget, ParseMethodName)
-            .Where(m =>
-                m is { IsStatic: true, ReturnsVoid: false, IsAsync: false, Parameters.Length: 1 }
-                && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type, ctx.Source)
-                && !ctx.SymbolAccessor.HasAttribute<MapperIgnoreAttribute>(m)
-            )
-            .ToList();
+            .FirstOrDefault(m => IsParseMethod(ctx, m, formatProviderParam) && !ctx.SymbolAccessor.HasAttribute<MapperIgnoreAttribute>(m));
 
-        // try to find parse method with equal nullability return type
-        var parseMethod = parseMethodCandidates.Find(x => SymbolEqualityComparer.IncludeNullability.Equals(x.ReturnType, ctx.Target));
+        static bool IsParseMethod(MappingBuilderContext ctx, IMethodSymbol method, bool formatProviderParam)
+        {
+            if (method is not { IsStatic: true, ReturnsVoid: false, IsAsync: false, Parameters.Length: 1 or 2, IsGenericMethod: false })
+            {
+                return false;
+            }
 
-        if (parseMethod != null)
-            return new StaticMethodMapping(parseMethod);
+            if (!SymbolEqualityComparer.Default.Equals(method.Parameters[0].Type, ctx.Source))
+            {
+                return false;
+            }
 
-        if (!targetIsNullable)
-            return null;
-
-        // otherwise try to find parse method ignoring the nullability
-        parseMethod = parseMethodCandidates.Find(x => SymbolEqualityComparer.Default.Equals(x.ReturnType, nonNullableTarget));
-        return parseMethod == null ? null : new StaticMethodMapping(parseMethod);
+            return formatProviderParam switch
+            {
+                true => method.Parameters.Length == 2
+                    && SymbolEqualityComparer.Default.Equals(method.Parameters[1].Type, ctx.Types.Get<IFormatProvider>()),
+                false => method.Parameters.Length == 1,
+            };
+        }
     }
 }

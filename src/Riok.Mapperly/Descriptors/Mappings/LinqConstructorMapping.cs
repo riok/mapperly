@@ -11,9 +11,13 @@ public class LinqConstructorMapping(
     ITypeSymbol sourceType,
     ITypeSymbol targetType,
     INewInstanceMapping elementMapping,
-    string? selectMethod
+    string? selectMethod,
+    bool reverse = false
 ) : NewInstanceMapping(sourceType, targetType)
 {
+    private const string EnumerableType = "global::System.Linq.Enumerable";
+    private const string ReverseMethodName = "Reverse";
+
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         ExpressionSyntax mappedSource;
@@ -29,6 +33,11 @@ public class LinqConstructorMapping(
         else
         {
             mappedSource = elementMapping.Build(ctx);
+        }
+
+        if (reverse)
+        {
+            mappedSource = ctx.SyntaxFactory.Invocation(MemberAccess(EnumerableType, ReverseMethodName), mappedSource);
         }
 
         return ctx.SyntaxFactory.CreateInstance(TargetType, mappedSource);

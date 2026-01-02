@@ -91,6 +91,7 @@ public static class TestSourceBuilder
         var attrs = new[]
         {
             Attribute(options.UseDeepCloning),
+            Attribute(options.StackCloningStrategy),
             Attribute(options.UseReferenceHandling),
             Attribute(options.ThrowOnMappingNullMismatch),
             Attribute(options.ThrowOnPropertyMappingNullMismatch),

@@ -25,7 +25,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-dotnet@v5
       - run: dotnet build /p:TreatWarningsAsErrors=true
       - run: dotnet test --no-build --logger 'junit' /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
@@ -50,17 +50,17 @@ jobs:
   package:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - run: sudo apt update && sudo apt -y install zipmerge # zipmerge is used to merge the multi target nupkg
       - uses: actions/setup-dotnet@v5
       - run: dotnet tool restore
       - run: RELEASE_VERSION="0.0.1-dev.$GITHUB_RUN_ID" ./build/package.sh
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: mapperly-nupkg
           path: artifacts/*.nupkg
       - if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: verify-test-results-package
           path: '**/*.received.*'
@@ -69,10 +69,10 @@ jobs:
     needs: package
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-dotnet@v5
       - run: dotnet tool restore
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: mapperly-nupkg
           path: artifacts
@@ -83,7 +83,7 @@ jobs:
     # use an alpine container to ensure only the dotnet version we want to test is installed,
     # ubuntu-latest already contains several dotnet versions...
     container:
-      image: alpine:3.17
+      image: alpine:3.23
     strategy:
       fail-fast: false
       matrix:
@@ -91,20 +91,18 @@ jobs:
           - '10.0'
           - '9.0'
           - '8.0'
-          - '7.0'
-          - '6.0'
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       # install required dotnet dependencies
       # https://learn.microsoft.com/en-us/dotnet/core/install/linux-alpine#dependencies
-      - run: apk add --no-cache bash icu-libs krb5-libs libgcc libintl libssl1.1 libstdc++ zlib
+      - run: apk add --no-cache bash icu-libs krb5-libs libgcc libintl libssl3 libstdc++ zlib
       # delete global.json since we want to use custom versions here
       - run: rm global.json
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ matrix.dotnet }}
       - run: dotnet --list-sdks
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: mapperly-nupkg
           path: artifacts
@@ -120,7 +118,7 @@ jobs:
       - run: dotnet test --no-build -f net${{ matrix.dotnet }}
         working-directory: ./test/Riok.Mapperly.IntegrationTests
       - if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: verify-test-results-net${{ matrix.dotnet }}
           path: '**/*.received.*'
@@ -129,10 +127,10 @@ jobs:
     needs: package
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       # delete global.json since we want to use custom versions here
       - run: rm global.json
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: mapperly-nupkg
           path: artifacts
@@ -148,7 +146,7 @@ jobs:
       - run: dotnet test --no-build -f net48
         working-directory: ./test/Riok.Mapperly.IntegrationTests
       - if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: verify-test-results-net-framework
           path: '**/*.received.*'
@@ -157,12 +155,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: package
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-dotnet@v5
       - run: dotnet run --project ./samples/Riok.Mapperly.Sample
 
       # run the same again with the real nuget without runtime assets
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: mapperly-nupkg
           path: artifacts

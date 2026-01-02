@@ -21,14 +21,6 @@ namespace Riok.Mapperly.IntegrationTests
 
         static BaseMapperTest()
         {
-#if !NET6_0_OR_GREATER
-            VerifierSettings.AddExtraSettings(settings =>
-            {
-                settings.Converters.Add(new PortableDateOnlyConverter());
-                settings.Converters.Add(new PortableTimeOnlyConverter());
-            });
-#endif
-
             VerifierSettings.DontScrubDateTimes();
             VerifyDiffPlex.Initialize(OutputType.Compact);
 
@@ -44,7 +36,6 @@ namespace Riok.Mapperly.IntegrationTests
 
         protected string GetGeneratedMapperFilePath(string name)
         {
-#if NET8_0_OR_GREATER || NET48_OR_GREATER
             // artifacts output
             return Path.Combine(
                 _solutionDirectory,
@@ -56,18 +47,6 @@ namespace Riok.Mapperly.IntegrationTests
                 "Riok.Mapperly.MapperGenerator",
                 name + ".g.cs"
             );
-#else
-            return Path.Combine(
-                _solutionDirectory,
-                "test",
-                "Riok.Mapperly.IntegrationTests",
-                "obj",
-                "generated",
-                "Riok.Mapperly",
-                "Riok.Mapperly.MapperGenerator",
-                name + ".g.cs"
-            );
-#endif
         }
 
         public static TestObject NewTestObj()
@@ -88,9 +67,7 @@ namespace Riok.Mapperly.IntegrationTests
                 DateTimeValue = new DateTime(2020, 1, 3, 15, 10, 5, DateTimeKind.Utc),
                 DateTimeValueTargetDateOnly = new DateTime(2020, 1, 3, 15, 10, 5, DateTimeKind.Utc),
                 DateTimeValueTargetTimeOnly = new DateTime(2020, 1, 3, 15, 10, 5, DateTimeKind.Utc),
-#if NET5_0_OR_GREATER
                 ToByteArrayWithInstanceMethod = new Guid(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
-#endif
                 WithCreateMethod = ConvertWithStaticMethodObject.Create(10),
                 WithCreateFromMethod = ConvertWithStaticMethodObject.Create(20),
                 WithFromSingleMethod = ConvertWithStaticMethodObject.Create(30),
@@ -211,10 +188,6 @@ namespace Riok.Mapperly.IntegrationTests
             return Versions.NET9_0;
 #elif NET8_0_OR_GREATER
             return Versions.NET8_0;
-#elif NET7_0_OR_GREATER
-            return Versions.NET7_0;
-#elif NET6_0_OR_GREATER
-            return Versions.NET6_0;
 #elif NET48_OR_GREATER
             return Versions.NETFRAMEWORK4_8;
 #else

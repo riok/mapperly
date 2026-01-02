@@ -86,9 +86,9 @@
     IsEmpty: false
   },
   StackValue: [
-    1,
+    3,
     2,
-    3
+    1
   ],
   QueueValue: [
     1,
@@ -178,6 +178,7 @@
   DateTimeValue: 2020-01-03 15:10:05 Utc,
   DateTimeValueTargetDateOnly: 2020-01-03 15:10:05 Utc,
   DateTimeValueTargetTimeOnly: 2020-01-03 15:10:05 Utc,
+  ToByteArrayWithInstanceMethod: Guid_1,
   WithCreateMethod: {
     Value: 10
   },

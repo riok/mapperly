@@ -147,7 +147,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.SpanValue = MapToInt32Array1(src.SpanValue);
             target.MemoryValue = MapToInt32Array2(src.MemoryValue.Span);
             target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Select(src.StackValue, x => ParseableInt(x))
+                global::System.Linq.Enumerable.Reverse(
+                    global::System.Linq.Enumerable.Select(src.StackValue, x => ParseableInt(x))
+                )
             );
             target.QueueValue = new global::System.Collections.Generic.Queue<int>(
                 global::System.Linq.Enumerable.Select(src.QueueValue, x => ParseableInt(x))
@@ -321,7 +323,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.SpanValue = MapToInt32Array1(testObject.SpanValue);
             target.MemoryValue = MapToInt32Array2(testObject.MemoryValue.Span);
             target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Select(testObject.StackValue, x => ParseableInt(x))
+                global::System.Linq.Enumerable.Reverse(
+                    global::System.Linq.Enumerable.Select(testObject.StackValue, x => ParseableInt(x))
+                )
             );
             target.QueueValue = new global::System.Collections.Generic.Queue<int>(
                 global::System.Linq.Enumerable.Select(testObject.QueueValue, x => ParseableInt(x))
@@ -479,7 +483,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             target.MemoryValue = MapToStringArray(dto.MemoryValue.Span);
             target.StackValue = new global::System.Collections.Generic.Stack<string>(
-                global::System.Linq.Enumerable.Select(dto.StackValue, x => x.ToString())
+                global::System.Linq.Enumerable.Reverse(
+                    global::System.Linq.Enumerable.Select(dto.StackValue, x => x.ToString())
+                )
             );
             target.QueueValue = new global::System.Collections.Generic.Queue<string>(
                 global::System.Linq.Enumerable.Select(dto.QueueValue, x => x.ToString())
@@ -619,7 +625,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.SpanValue = MapToInt32Array1(source.SpanValue);
             target.MemoryValue = MapToInt32Array2(source.MemoryValue.Span);
             target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Select(source.StackValue, x => ParseableInt(x))
+                global::System.Linq.Enumerable.Reverse(
+                    global::System.Linq.Enumerable.Select(source.StackValue, x => ParseableInt(x))
+                )
             );
             target.QueueValue = new global::System.Collections.Generic.Queue<int>(
                 global::System.Linq.Enumerable.Select(source.QueueValue, x => ParseableInt(x))
@@ -756,6 +764,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Models.TestObject x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto)) => MapToDto(x),
                 global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestObject)) => MapFromDto(x),
                 global::Riok.Mapperly.IntegrationTests.Models.ConstantValuesObject x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.ConstantValuesDto)) => MapConstantValues(x),
+                global::Riok.Mapperly.IntegrationTests.Models.AssemblyScopedModel x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.AssemblyScopedDto)) => global::Riok.Mapperly.IntegrationTests.Mapper.AssemblyScopedMappers.ToDto(x),
                 global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<string>>> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<int>>>)) => MapNestedLists(x),
                 global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => MapAllDtos(x),
                 object x when targetType.IsAssignableFrom(typeof(object)) => DerivedTypes(x),
@@ -782,6 +791,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Models.TestObject x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto)) => MapToDto(x),
                 global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestObject)) => MapFromDto(x),
                 global::Riok.Mapperly.IntegrationTests.Models.ConstantValuesObject x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.ConstantValuesDto)) => MapConstantValues(x),
+                global::Riok.Mapperly.IntegrationTests.Models.AssemblyScopedModel x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.AssemblyScopedDto)) => global::Riok.Mapperly.IntegrationTests.Mapper.AssemblyScopedMappers.ToDto(x),
                 global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<string>>> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<int>>>)) => MapNestedLists(x),
                 global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => MapAllDtos(x),
                 object x when targetType.IsAssignableFrom(typeof(object)) => DerivedTypes(x),
@@ -809,6 +819,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Models.TestObject x when typeof(TTarget).IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto)) => (TTarget)(object)MapToDto(x),
                 global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto x when typeof(TTarget).IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Models.TestObject)) => (TTarget)(object)MapFromDto(x),
                 global::Riok.Mapperly.IntegrationTests.Models.ConstantValuesObject x when typeof(TTarget).IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.ConstantValuesDto)) => (TTarget)(object)MapConstantValues(x),
+                global::Riok.Mapperly.IntegrationTests.Models.AssemblyScopedModel x when typeof(TTarget).IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.AssemblyScopedDto)) => (TTarget)(object)global::Riok.Mapperly.IntegrationTests.Mapper.AssemblyScopedMappers.ToDto(x),
                 global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<string>>> x when typeof(TTarget).IsAssignableFrom(typeof(global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<int>>>)) => (TTarget)(object)MapNestedLists(x),
                 global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when typeof(TTarget).IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => (TTarget)(object)MapAllDtos(x),
                 object x when typeof(TTarget).IsAssignableFrom(typeof(object)) => (TTarget)(object)DerivedTypes(x),
@@ -1028,7 +1039,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue1) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue1,
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue2) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue2,
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue3) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue3,
-                _ => (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)System.Enum.Parse(
+                _ => (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)global::System.Enum.Parse(
                 typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue),
                 source,
                 false
@@ -1090,7 +1101,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 nameof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10) => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10,
                 nameof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20) => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20,
                 nameof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30) => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
-                _ => (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)System.Enum.Parse(
+                _ => (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)global::System.Enum.Parse(
                 typeof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum),
                 source,
                 false

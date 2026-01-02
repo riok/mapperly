@@ -706,6 +706,28 @@ public class ObjectPropertyUseNamedMappingTest
     }
 
     [Fact]
+    public Task ShouldSupportExternalMappingsWhenAutoUserMappingsDisabled()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(@OtherMapper.ModifyString)]
+            private static partial B Map(A source);
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "record A(string Value);",
+            "record B(string Value);",
+            """
+            class OtherMapper
+            {
+                public static string ModifyString(string source) => source + "-externally-modified";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ShouldSupportExternalMappingsOnString()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

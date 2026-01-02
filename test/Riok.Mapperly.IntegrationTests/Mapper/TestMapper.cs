@@ -15,10 +15,11 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
     [Mapper(
         IncludedMembers = MemberVisibility.All,
         IncludedConstructors = MemberVisibility.All,
-        EnumMappingStrategy = EnumMappingStrategy.ByValue
+        EnumMappingStrategy = EnumMappingStrategy.ByValue,
+        EnabledConversions = MappingConversionType.All
     )]
 #else
-    [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByValue)]
+    [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByValue, EnabledConversions = MappingConversionType.All)]
 #endif
     public partial class TestMapper
     {
@@ -95,6 +96,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapperIgnoreTarget(nameof(TestObject.IgnoredIntValue))]
         [MapperIgnoreSource(nameof(TestObjectDto.IgnoredIntValue))]
         [MapperIgnoreSource(nameof(TestObjectDto.SpanValue))]
+        [MapProperty(nameof(TestObjectDto.FormattedIntValue), nameof(TestObject.IntValue), FormatProvider = nameof(_formatEnUs))]
         public partial TestObject MapFromDto(TestObjectDto dto);
 
         [MapperIgnoreTarget(nameof(TestObjectDto.IgnoredIntValue))]

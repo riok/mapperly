@@ -10,10 +10,8 @@ public readonly struct SupportedFeatures
     {
         return new()
         {
-#if ROSLYN4_4_OR_GREATER
             // nameof(parameter) was introduced in c# 11.0
             NameOfParameter = parseLanguageVersion >= LanguageVersion.CSharp11,
-#endif
 
             NullableAttributes = types.NotNullIfNotNullAttribute != null && accessor.IsDirectlyAccessible(types.NotNullIfNotNullAttribute),
 

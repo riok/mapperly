@@ -247,6 +247,52 @@ public class ObjectPropertyTest
     }
 
     [Fact]
+    public void WithPropertyNameMappingStrategySnakeCaseOnTarget()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.SnakeCase },
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string first_name { get; set; } public string last_name { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.first_name = source.FirstName;
+                target.last_name = source.LastName;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void WithPropertyNameMappingStrategySnakeCaseOnSource()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial A Map(B source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.SnakeCase },
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string first_name { get; set; } public string last_name { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                target.FirstName = source.first_name;
+                target.LastName = source.last_name;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public Task WithPropertyNameMappingStrategyCaseSensitive()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -666,5 +712,433 @@ public class ObjectPropertyTest
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.InvalidMapPropertyAttributeUsage, "Invalid usage of the MapPropertyAttribute")
             .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void WithPropertyNameMappingStrategyUpperSnakeCaseOnTarget()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.UpperSnakeCase },
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string FIRST_NAME { get; set; } public string LAST_NAME { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.FIRST_NAME = source.FirstName;
+                target.LAST_NAME = source.LastName;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void WithPropertyNameMappingStrategyUpperSnakeCaseOnSource()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial A Map(B source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.UpperSnakeCase },
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string FIRST_NAME { get; set; } public string LAST_NAME { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::A();
+                target.FirstName = source.FIRST_NAME;
+                target.LastName = source.LAST_NAME;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void SnakeCaseShouldPreferExactMatchOverPascalCase()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.SnakeCase },
+            "class A { public string my_value_id { get; set; } public string MyValueId { get; set; } }",
+            "class B { public string my_value_id { get; set; } public string MyValueId { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.my_value_id = source.my_value_id;
+                target.MyValueId = source.MyValueId;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UpperSnakeCaseShouldPreferExactMatchOverPascalCase()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.UpperSnakeCase },
+            "class A { public string MY_VALUE_ID { get; set; } public string MyValueId { get; set; } }",
+            "class B { public string MY_VALUE_ID { get; set; } public string MyValueId { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.MY_VALUE_ID = source.MY_VALUE_ID;
+                target.MyValueId = source.MyValueId;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void SnakeCaseShouldMapToPascalCaseWhenNoExactMatch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.SnakeCase },
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string first_name { get; set; } public string last_name { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.first_name = source.FirstName;
+                target.last_name = source.LastName;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UpperSnakeCaseShouldMapToPascalCaseWhenNoExactMatch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.UpperSnakeCase },
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string FIRST_NAME { get; set; } public string LAST_NAME { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.FIRST_NAME = source.FirstName;
+                target.LAST_NAME = source.LastName;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void SnakeCaseShouldSupportNestedPropertyFlattening()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A source);
+            """,
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.SnakeCase },
+            "class A { public C my_object { get; set; } }",
+            "class B { public string my_object_child_value { get; set; } }",
+            "class C { public string child_value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.my_object_child_value = source.my_object.child_value;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UpperSnakeCaseShouldSupportNestedPropertyFlattening()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A source);
+            """,
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.UpperSnakeCase },
+            "class A { public C MY_OBJECT { get; set; } }",
+            "class B { public string MY_OBJECT_CHILD_VALUE { get; set; } }",
+            "class C { public string CHILD_VALUE { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.MY_OBJECT_CHILD_VALUE = source.MY_OBJECT.CHILD_VALUE;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void SnakeCaseShouldMapExactSnakeCaseToSnakeCase()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.SnakeCase },
+            "class A { public string my_property_name { get; set; } public int user_id { get; set; } }",
+            "class B { public string my_property_name { get; set; } public int user_id { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.my_property_name = source.my_property_name;
+                target.user_id = source.user_id;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UpperSnakeCaseShouldMapExactUpperSnakeCaseToUpperSnakeCase()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.UpperSnakeCase },
+            "class A { public string MY_PROPERTY_NAME { get; set; } public int USER_ID { get; set; } }",
+            "class B { public string MY_PROPERTY_NAME { get; set; } public int USER_ID { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.MY_PROPERTY_NAME = source.MY_PROPERTY_NAME;
+                target.USER_ID = source.USER_ID;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void SnakeCaseShouldMapPascalCaseToPascalCaseWhenNoSnakeCaseMatch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.SnakeCase },
+            "class A { public string MyProperty { get; set; } public int UserId { get; set; } }",
+            "class B { public string MyProperty { get; set; } public int UserId { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.MyProperty = source.MyProperty;
+                target.UserId = source.UserId;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UpperSnakeCaseShouldMapPascalCaseToPascalCaseWhenNoUpperSnakeCaseMatch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.UpperSnakeCase },
+            "class A { public string MyProperty { get; set; } public int UserId { get; set; } }",
+            "class B { public string MyProperty { get; set; } public int UserId { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.MyProperty = source.MyProperty;
+                target.UserId = source.UserId;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void SnakeCaseShouldPreferExactMatchEvenWithPascalCaseAvailable()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.SnakeCase },
+            "class A { public string my_value { get; set; } }",
+            "class B { public string my_value { get; set; } public string MyValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.my_value = source.my_value;
+                target.MyValue = source.my_value;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UpperSnakeCaseShouldPreferExactMatchEvenWithPascalCaseAvailable()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.UpperSnakeCase },
+            "class A { public string MY_VALUE { get; set; } }",
+            "class B { public string MY_VALUE { get; set; } public string MyValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.MY_VALUE = source.MY_VALUE;
+                target.MyValue = source.MY_VALUE;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void SnakeCaseShouldSupportComplexNestedPropertyFlattening()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A source);
+            """,
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.SnakeCase },
+            "class A { public C my_user_profile { get; set; } }",
+            "class B { public string my_user_profile_user_name { get; set; } public int my_user_profile_user_age { get; set; } }",
+            "class C { public string user_name { get; set; } public int user_age { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.my_user_profile_user_name = source.my_user_profile.user_name;
+                target.my_user_profile_user_age = source.my_user_profile.user_age;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UpperSnakeCaseShouldSupportComplexNestedPropertyFlattening()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A source);
+            """,
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.UpperSnakeCase },
+            "class A { public C MY_USER_PROFILE { get; set; } }",
+            "class B { public string MY_USER_PROFILE_USER_NAME { get; set; } public int MY_USER_PROFILE_USER_AGE { get; set; } }",
+            "class C { public string USER_NAME { get; set; } public int USER_AGE { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.MY_USER_PROFILE_USER_NAME = source.MY_USER_PROFILE.USER_NAME;
+                target.MY_USER_PROFILE_USER_AGE = source.MY_USER_PROFILE.USER_AGE;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void SnakeCasePropertyNameMappingWithAdditionalParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A source, int userAge);
+            """,
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.SnakeCase },
+            "class A { public string UserName { get; set; } }",
+            "class B { public string user_name { get; set; } public int user_age { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.user_name = source.UserName;
+                target.user_age = userAge;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void UpperSnakeCasePropertyNameMappingWithAdditionalParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A source, int userAge);
+            """,
+            new TestSourceBuilderOptions { PropertyNameMappingStrategy = PropertyNameMappingStrategy.UpperSnakeCase },
+            "class A { public string UserName { get; set; } }",
+            "class B { public string USER_NAME { get; set; } public int USER_AGE { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.USER_NAME = source.UserName;
+                target.USER_AGE = userAge;
+                return target;
+                """
+            );
     }
 }

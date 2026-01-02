@@ -10,27 +10,50 @@ namespace Riok.Mapperly.Descriptors.ExternalMappings;
 
 internal static class ExternalMappingsExtractor
 {
-    public static IEnumerable<IUserMapping> ExtractExternalMappings(SimpleMappingBuilderContext ctx, INamedTypeSymbol mapperSymbol)
+    public static IEnumerable<IUserMapping> ExtractExternalMappings(
+        IEnumerable<UseStaticMapperConfiguration> assemblyScopedStaticMappers,
+        SimpleMappingBuilderContext ctx,
+        INamedTypeSymbol mapperSymbol
+    )
     {
-        var staticExternalMappers = ctx
-            .AttributeAccessor.Access<UseStaticMapperAttribute, UseStaticMapperConfiguration>(mapperSymbol)
-            .Concat(ctx.AttributeAccessor.Access<UseStaticMapperAttribute<object>, UseStaticMapperConfiguration>(mapperSymbol))
-            .SelectMany(x =>
-                UserMethodMappingExtractor.ExtractUserImplementedMappings(
-                    ctx,
-                    x.MapperType,
-                    receiver: x.MapperType.FullyQualifiedIdentifierName(),
-                    isStatic: true,
-                    isExternal: true
-                )
-            );
+        return ExtractExternalStaticMappings(assemblyScopedStaticMappers, ctx)
+            .Concat(ExtractExternalStaticMappings(ExtractStaticMappersFromAttributes(ctx, mapperSymbol), ctx))
+            .Concat(ExtractExternalInstanceMappings(ctx, mapperSymbol));
+    }
 
-        var externalInstanceMappers = ctx
+    private static IEnumerable<UseStaticMapperConfiguration> ExtractStaticMappersFromAttributes(
+        SimpleMappingBuilderContext ctx,
+        INamedTypeSymbol mapperSymbol
+    )
+    {
+        return ctx
+            .AttributeAccessor.Access<UseStaticMapperAttribute, UseStaticMapperConfiguration>(mapperSymbol)
+            .Concat(ctx.AttributeAccessor.Access<UseStaticMapperAttribute<object>, UseStaticMapperConfiguration>(mapperSymbol));
+    }
+
+    private static IEnumerable<IUserMapping> ExtractExternalStaticMappings(
+        IEnumerable<UseStaticMapperConfiguration> staticMappers,
+        SimpleMappingBuilderContext ctx
+    )
+    {
+        var staticExternalMappers = staticMappers.SelectMany(x =>
+            UserMethodMappingExtractor.ExtractUserImplementedMappings(
+                ctx,
+                x.MapperType,
+                receiver: x.MapperType.FullyQualifiedIdentifierName(),
+                isStatic: true,
+                isExternal: true
+            )
+        );
+        return staticExternalMappers;
+    }
+
+    private static IEnumerable<IUserMapping> ExtractExternalInstanceMappings(SimpleMappingBuilderContext ctx, INamedTypeSymbol mapperSymbol)
+    {
+        return ctx
             .SymbolAccessor.GetAllMembers(mapperSymbol)
             .Where(x => ctx.AttributeAccessor.HasAttribute<UseMapperAttribute>(x))
             .SelectMany(x => ValidateAndExtractExternalInstanceMappings(ctx, x));
-
-        return staticExternalMappers.Concat(externalInstanceMappers);
     }
 
     public static IEnumerable<(string Name, IUserMapping Mapping)> ExtractExternalNamedMappings(

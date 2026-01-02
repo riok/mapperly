@@ -8,6 +8,7 @@ public record TestSourceBuilderOptions(
     string MapperClassName = TestSourceBuilderOptions.DefaultMapperClassName,
     string? MapperBaseClassName = null,
     bool? UseDeepCloning = null,
+    StackCloningStrategy? StackCloningStrategy = null,
     bool? UseReferenceHandling = null,
     bool? ThrowOnMappingNullMismatch = null,
     bool? ThrowOnPropertyMappingNullMismatch = null,
@@ -35,7 +36,18 @@ public record TestSourceBuilderOptions(
     );
     public static readonly TestSourceBuilderOptions AsStatic = new(Static: true);
     public static readonly TestSourceBuilderOptions WithDeepCloning = new(UseDeepCloning: true);
+    public static readonly TestSourceBuilderOptions AllConversionsWithDeepCloning = new TestSourceBuilderOptions(
+        UseDeepCloning: true,
+        EnabledConversions: MappingConversionType.All
+    );
+    public static readonly TestSourceBuilderOptions AllConversions = new TestSourceBuilderOptions(
+        EnabledConversions: MappingConversionType.All
+    );
     public static readonly TestSourceBuilderOptions WithReferenceHandling = new(UseReferenceHandling: true);
+    public static readonly TestSourceBuilderOptions AllConversionsWithReferenceHandling = new(
+        UseReferenceHandling: true,
+        EnabledConversions: MappingConversionType.All
+    );
     public static readonly TestSourceBuilderOptions WithDisabledAutoUserMappings = new(AutoUserMappings: false);
 
     public static readonly TestSourceBuilderOptions PreferParameterizedConstructors = new(PreferParameterlessConstructors: false);

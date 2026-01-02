@@ -45,11 +45,14 @@ For example, Mapperly can report a warning when there is an added property in a 
 - No need to write and maintain boilerplate code by hand
 - Mapperly is pluggable: it is always possible to implement mappings for certain types by hand, which get picked up by Mapperly
 
-## Requirements
+## Support
 
-- .NET 5+ or .NET Framework 4.x.
-- C# language version 9 or later
-- Roslyn 4.0 or later
+Need help with Mapperly or looking for consulting services? The riok team is here to assist!
+Whether you need guidance, architecture consultation, or custom feature development, feel free to reach out:
+
+- **GitHub Discussions**: For questions and community support, visit [GitHub Discussions](https://github.com/riok/mapperly/discussions)
+- **Consulting & Support**: For professional assistance, consulting, or enterprise support, contact the riok team at [hello@riok.ch](mailto:hello@riok.ch)
+- **Sponsorship**: Support the project and get priority support through [GitHub Sponsors](https://github.com/sponsors/riok)
 
 ## Performance
 

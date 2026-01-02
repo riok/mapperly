@@ -43,7 +43,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                     EnumName = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)x.EnumName,
                     EnumRawValue = (byte)x.EnumRawValue,
                     EnumStringValue = (string)x.EnumStringValue.ToString(),
-                    EnumReverseStringValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)System.Enum.Parse(
+                    EnumReverseStringValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)global::System.Enum.Parse(
                         typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName),
                         x.EnumReverseStringValue,
                         false
@@ -61,10 +61,10 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                     ManuallyMappedList = global::System.Linq.Enumerable.ToList(
                         global::System.Linq.Enumerable.Select(x.ManuallyMappedList, x1 => x1.Value)
                     ),
-                    IntegerValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.OrderBy(x.IntegerValues, x => x.Value)),
-                    DecimalValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(global::System.Linq.Enumerable.OrderBy(x.DecimalValues, x => x.Value), x => new global::Riok.Mapperly.IntegrationTests.Dto.LongValueDto()
+                    IntegerValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.OrderBy(x.IntegerValues, x1 => x1.Value)),
+                    DecimalValues = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(global::System.Linq.Enumerable.OrderBy(x.DecimalValues, x1 => x1.Value), x1 => new global::Riok.Mapperly.IntegrationTests.Dto.LongValueDto()
                     {
-                        Value = x.Value,
+                        Value = x1.Value,
                     })),
                 }
             );
@@ -235,7 +235,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value10) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value10,
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value20) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value20,
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value30) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName.Value30,
-                _ => (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)System.Enum.Parse(
+                _ => (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)global::System.Enum.Parse(
                 typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName),
                 source,
                 false

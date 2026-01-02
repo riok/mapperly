@@ -244,7 +244,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             memberRefOperation = memberRefOperation.GetFirstChildOperation<IMemberReferenceOperation>();
 
             // if not fullNameOf only consider the last member path segment
-            if (!fullNameOf && memberPath.Count > 1)
+            if (!fullNameOf)
                 break;
         }
 

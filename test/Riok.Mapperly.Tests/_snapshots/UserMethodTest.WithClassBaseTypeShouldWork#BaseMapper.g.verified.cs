@@ -4,8 +4,8 @@
 public partial class BaseMapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    protected partial short MyIntToShortMapping(int value)
+    protected partial double MyIntToDoubleMapping(int value)
     {
-        return (short)value;
+        return (double)value;
     }
 }
