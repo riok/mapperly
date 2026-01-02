@@ -20,7 +20,10 @@ namespace Riok.Mapperly.Descriptors.UnsafeAccess;
 /// <param name="symbol">The symbol of the ctor.</param>
 /// <param name="className">The name of the accessor class.</param>
 /// <param name="methodName">The name of the accessor method.</param>
-public class UnsafeConstructorAccessor(IMethodSymbol symbol, string className, string methodName) : IUnsafeAccessor, IInstanceConstructor
+/// <param name="enableAggressiveInlining">Whether to add MethodImpl.AggressiveInlining attribute.</param>
+public class UnsafeConstructorAccessor(IMethodSymbol symbol, string className, string methodName, bool enableAggressiveInlining)
+    : IUnsafeAccessor,
+        IInstanceConstructor
 {
     public bool SupportsObjectInitializer => false;
 
@@ -29,8 +32,14 @@ public class UnsafeConstructorAccessor(IMethodSymbol symbol, string className, s
         var methodSymbol = symbol.ContainingType.IsGenericType ? symbol.OriginalDefinition : symbol;
         var typeToCreate = IdentifierName(methodSymbol.ContainingType.FullyQualifiedIdentifierName()).AddTrailingSpace();
         var parameters = ParameterList(methodSymbol.Parameters);
-        var attribute = ctx.SyntaxFactory.UnsafeAccessorAttribute(UnsafeAccessorType.Constructor);
-        return ctx.SyntaxFactory.PublicStaticExternMethod(typeToCreate, methodName, parameters, [attribute]);
+        var attributes = new SyntaxList<AttributeListSyntax> { ctx.SyntaxFactory.UnsafeAccessorAttribute(UnsafeAccessorType.Constructor) };
+
+        if (enableAggressiveInlining)
+        {
+            attributes.Add(ctx.SyntaxFactory.MethodImplAttribute());
+        }
+
+        return ctx.SyntaxFactory.PublicStaticExternMethod(typeToCreate, methodName, parameters, attributes);
     }
 
     public ExpressionSyntax CreateInstance(

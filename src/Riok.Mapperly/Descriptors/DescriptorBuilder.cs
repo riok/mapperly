@@ -39,12 +39,19 @@ public class DescriptorBuilder
     )
     {
         var supportedFeatures = SupportedFeatures.Build(compilationContext.Types, symbolAccessor, compilationContext.ParseLanguageVersion);
-        _mapperDescriptor = new MapperDescriptor(mapperDeclaration, _methodNameBuilder, supportedFeatures);
+
+        // Read the mapper attribute to get the merged configuration
+        var attributeAccessor = new AttributeDataAccessor(symbolAccessor);
+        var mapperConfiguration = attributeAccessor.AccessSingle<MapperAttribute, MapperConfiguration>(mapperDeclaration.Symbol);
+        var mergedMapperConfiguration = MapperConfigurationMerger.Merge(mapperConfiguration, defaultMapperConfiguration);
+
+        var aggressiveInliningTypes = mergedMapperConfiguration.AggressiveInliningTypes;
+        _mapperDescriptor = new MapperDescriptor(mapperDeclaration, _methodNameBuilder, supportedFeatures, aggressiveInliningTypes);
         _symbolAccessor = symbolAccessor;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
-        _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
+        _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor, aggressiveInliningTypes);
         _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
-        _attributeAccessor = new AttributeDataAccessor(symbolAccessor);
+        _attributeAccessor = attributeAccessor;
 
         var genericTypeChecker = new GenericTypeChecker(_symbolAccessor, compilationContext.Types);
         var configurationReader = new MapperConfigurationReader(

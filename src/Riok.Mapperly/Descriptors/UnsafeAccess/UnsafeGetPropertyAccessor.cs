@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Emit;
 using Riok.Mapperly.Emit.Syntax;
@@ -10,16 +11,19 @@ using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 namespace Riok.Mapperly.Descriptors.UnsafeAccess;
 
 /// <summary>
-/// Creates an extension method to access an objects non public property using .Net 8's UnsafeAccessor.
+/// Creates an extension method to get a non-public property value using .Net 8's UnsafeAccessor.
 /// <code>
-/// [UnsafeAccessor(UnsafeAccessorKind.Property, Name = "get_value")]
+/// [UnsafeAccessor(UnsafeAccessorKind.Method, Name = "get_Value")]
 /// public extern static int GetValue(this global::MyClass source);
 /// </code>
 /// </summary>
 /// <param name="symbol">The symbol of the property.</param>
 /// <param name="className">The name of the accessor class.</param>
 /// <param name="methodName">The name of the accessor method.</param>
-public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string className, string methodName) : IUnsafeAccessor, IMemberGetter
+/// <param name="enableAggressiveInlining">Whether to add MethodImpl.AggressiveInlining attribute.</param>
+public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string className, string methodName, bool enableAggressiveInlining)
+    : IUnsafeAccessor,
+        IMemberGetter
 {
     private const string DefaultSourceParameterName = "source";
 
@@ -33,16 +37,25 @@ public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string className,
         var source = Parameter(
             propertySymbol.ContainingType.FullyQualifiedIdentifierName(),
             sourceName,
-            !symbol.ContainingType.IsGenericType
+            !propertySymbol.ContainingType.IsGenericType
         );
 
         var parameters = ParameterList(CommaSeparatedList(source));
-        var attribute = ctx.SyntaxFactory.UnsafeAccessorAttribute(UnsafeAccessorType.Method, $"get_{symbol.Name}");
+        var attributes = new SyntaxList<AttributeListSyntax>
+        {
+            ctx.SyntaxFactory.UnsafeAccessorAttribute(UnsafeAccessorType.Method, $"get_{propertySymbol.Name}"),
+        };
+
+        if (enableAggressiveInlining)
+        {
+            attributes.Add(ctx.SyntaxFactory.MethodImplAttribute());
+        }
+
         return ctx.SyntaxFactory.PublicStaticExternMethod(
             IdentifierName(propertySymbol.Type.FullyQualifiedIdentifierName()).AddTrailingSpace(),
             methodName,
             parameters,
-            [attribute]
+            attributes
         );
     }
 

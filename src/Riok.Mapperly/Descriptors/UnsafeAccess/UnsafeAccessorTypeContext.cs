@@ -3,6 +3,7 @@ using System.Globalization;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Emit;
 using Riok.Mapperly.Emit.Syntax;
 using Riok.Mapperly.Helpers;
@@ -12,7 +13,12 @@ using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.UnsafeAccess;
 
-public class UnsafeAccessorTypeContext(UniqueNameBuilder nameBuilder, INamedTypeSymbol type, SymbolAccessor symbolAccessor)
+public class UnsafeAccessorTypeContext(
+    UniqueNameBuilder nameBuilder,
+    INamedTypeSymbol type,
+    SymbolAccessor symbolAccessor,
+    AggressiveInliningTypes aggressiveInliningTypes
+)
 {
     private readonly string _accessorClassName = nameBuilder.New($"{type.Name}Accessor");
     private readonly List<IUnsafeAccessor> _unsafeAccessors = [];
@@ -24,7 +30,7 @@ public class UnsafeAccessorTypeContext(UniqueNameBuilder nameBuilder, INamedType
         return GetOrBuild(
             UnsafeAccessorType.SetProperty,
             member.Symbol,
-            static (m, className, methodName) => new UnsafeSetPropertyAccessor(m, className, methodName)
+            (m, className, methodName) => new UnsafeSetPropertyAccessor(m, className, methodName, ShouldApplyMethodImpl())
         );
     }
 
@@ -33,7 +39,7 @@ public class UnsafeAccessorTypeContext(UniqueNameBuilder nameBuilder, INamedType
         return GetOrBuild(
             UnsafeAccessorType.GetProperty,
             member.Symbol,
-            static (m, className, methodName) => new UnsafeGetPropertyAccessor(m, className, methodName)
+            (m, className, methodName) => new UnsafeGetPropertyAccessor(m, className, methodName, ShouldApplyMethodImpl())
         );
     }
 
@@ -42,7 +48,7 @@ public class UnsafeAccessorTypeContext(UniqueNameBuilder nameBuilder, INamedType
         return GetOrBuild(
             UnsafeAccessorType.GetField,
             member.Symbol,
-            static (m, className, methodName) => new UnsafeFieldAccessor(m, className, methodName)
+            (m, className, methodName) => new UnsafeFieldAccessor(m, className, methodName, ShouldApplyMethodImpl())
         );
     }
 
@@ -51,7 +57,7 @@ public class UnsafeAccessorTypeContext(UniqueNameBuilder nameBuilder, INamedType
         return GetOrBuild(
             UnsafeAccessorType.Constructor,
             ctorSymbol,
-            static (s, className, methodName) => new UnsafeConstructorAccessor(s, className, methodName)
+            (s, className, methodName) => new UnsafeConstructorAccessor(s, className, methodName, ShouldApplyMethodImpl())
         );
     }
 
@@ -76,6 +82,11 @@ public class UnsafeAccessorTypeContext(UniqueNameBuilder nameBuilder, INamedType
 #else
         throw new InvalidOperationException("Unsafe accessors are not supported for Roslyn versions < 4.7");
 #endif
+    }
+
+    private bool ShouldApplyMethodImpl()
+    {
+        return aggressiveInliningTypes == AggressiveInliningTypes.All;
     }
 
     private IEnumerable<MemberDeclarationSyntax> BuildAccessorsSyntax(SourceEmitterContext ctx, CancellationToken cancellationToken)

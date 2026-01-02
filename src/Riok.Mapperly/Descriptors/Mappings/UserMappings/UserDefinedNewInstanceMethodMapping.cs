@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols;
@@ -45,8 +46,10 @@ public class UserDefinedNewInstanceMethodMapping(
         }
     }
 
-    protected internal override SyntaxList<AttributeListSyntax> BuildAttributes(TypeMappingBuildContext ctx) =>
-        DelegateMethodMapping?.BuildAttributes(ctx) ?? base.BuildAttributes(ctx);
+    protected internal override SyntaxList<AttributeListSyntax> BuildAttributes(
+        TypeMappingBuildContext ctx,
+        AggressiveInliningTypes aggressiveInliningTypes
+    ) => DelegateMethodMapping?.BuildAttributes(ctx, aggressiveInliningTypes) ?? base.BuildAttributes(ctx, aggressiveInliningTypes);
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {

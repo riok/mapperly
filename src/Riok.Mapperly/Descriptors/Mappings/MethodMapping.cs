@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Emit;
 using Riok.Mapperly.Emit.Syntax;
 using Riok.Mapperly.Helpers;
@@ -103,7 +104,7 @@ public abstract class MethodMapping : ITypeMapping
         return MethodDeclaration(returnType.AddTrailingSpace(), Identifier(MethodName))
             .WithModifiers(TokenList(BuildModifiers(ctx.IsStatic)))
             .WithParameterList(parameters)
-            .WithAttributeLists(BuildAttributes(typeMappingBuildContext))
+            .WithAttributeLists(BuildAttributes(typeMappingBuildContext, ctx.AggressiveInliningTypes))
             .WithBody(ctx.SyntaxFactory.Block(BuildBody(typeMappingBuildContext.AddIndentation())));
     }
 
@@ -123,8 +124,38 @@ public abstract class MethodMapping : ITypeMapping
         );
     }
 
-    protected internal virtual SyntaxList<AttributeListSyntax> BuildAttributes(TypeMappingBuildContext ctx) =>
-        SingletonList(ctx.SyntaxFactory.GeneratedCodeAttribute());
+    protected internal virtual SyntaxList<AttributeListSyntax> BuildAttributes(
+        TypeMappingBuildContext ctx,
+        AggressiveInliningTypes aggressiveInliningTypes
+    )
+    {
+        var attributes = new SyntaxList<AttributeListSyntax> { ctx.SyntaxFactory.GeneratedCodeAttribute() };
+
+        // Check if MethodImpl attribute should be applied
+        if (ShouldApplyMethodImpl(aggressiveInliningTypes))
+        {
+            attributes.Add(ctx.SyntaxFactory.MethodImplAttribute());
+        }
+
+        return attributes;
+    }
+
+    private bool ShouldApplyMethodImpl(AggressiveInliningTypes aggressiveInliningTypes)
+    {
+        var isValueType = SourceType.IsValueType || TargetType.IsValueType;
+
+        switch (aggressiveInliningTypes)
+        {
+            case AggressiveInliningTypes.None:
+                return false;
+            case AggressiveInliningTypes.All:
+            case AggressiveInliningTypes.ValueTypes when isValueType:
+            case AggressiveInliningTypes.ReferenceTypes when !isValueType:
+                return true;
+            default:
+                return false;
+        }
+    }
 
     protected virtual ParameterListSyntax BuildParameterList() =>
         ParameterList(IsExtensionMethod, [SourceParameter, ReferenceHandlerParameter, .. AdditionalSourceParameters]);

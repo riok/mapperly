@@ -1,12 +1,17 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Emit;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.UnsafeAccess;
 
-public class UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor symbolAccessor) : IUnsafeAccessors
+public class UnsafeAccessorContext(
+    UniqueNameBuilder nameBuilder,
+    SymbolAccessor symbolAccessor,
+    AggressiveInliningTypes aggressiveInliningTypes = AggressiveInliningTypes.None
+) : IUnsafeAccessors
 {
     private readonly Dictionary<ITypeSymbol, UnsafeAccessorTypeContext> _typeContexts = new(SymbolEqualityComparer.Default);
 
@@ -54,6 +59,6 @@ public class UnsafeAccessorContext(UniqueNameBuilder nameBuilder, SymbolAccessor
         if (_typeContexts.TryGetValue(type, out var ctx))
             return ctx;
 
-        return _typeContexts[type] = new UnsafeAccessorTypeContext(_nameBuilder, type, symbolAccessor);
+        return _typeContexts[type] = new UnsafeAccessorTypeContext(_nameBuilder, type, symbolAccessor, aggressiveInliningTypes);
     }
 }

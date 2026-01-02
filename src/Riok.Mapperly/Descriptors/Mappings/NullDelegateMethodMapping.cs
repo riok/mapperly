@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Helpers;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
@@ -38,11 +39,15 @@ public class NullDelegateMethodMapping(
         yield return new TypeMappingKey(delegateMapping, config);
     }
 
-    protected internal override SyntaxList<AttributeListSyntax> BuildAttributes(TypeMappingBuildContext ctx)
+    protected internal override SyntaxList<AttributeListSyntax> BuildAttributes(
+        TypeMappingBuildContext ctx,
+        AggressiveInliningTypes aggressiveInliningTypes
+    )
     {
+        var baseAttributes = base.BuildAttributes(ctx, aggressiveInliningTypes);
         return !nullableAttributesSupported || !TargetType.IsNullable() || !nullFallbackValue.IsNullable(TargetType)
-            ? base.BuildAttributes(ctx)
-            : base.BuildAttributes(ctx).Add(ctx.SyntaxFactory.ReturnNotNullIfNotNullAttribute(ctx.Source));
+            ? baseAttributes
+            : baseAttributes.Add(ctx.SyntaxFactory.ReturnNotNullIfNotNullAttribute(ctx.Source));
     }
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)

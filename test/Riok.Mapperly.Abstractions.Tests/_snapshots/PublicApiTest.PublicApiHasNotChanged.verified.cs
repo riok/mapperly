@@ -1,6 +1,13 @@
 ﻿[assembly: System.Runtime.Versioning.TargetFramework(".NETStandard,Version=v2.0", FrameworkDisplayName=".NET Standard 2.0")]
 namespace Riok.Mapperly.Abstractions
 {
+    public enum AggressiveInliningTypes
+    {
+        None = 0,
+        ValueTypes = 1,
+        ReferenceTypes = 2,
+        All = -1,
+    }
     public enum EnumMappingStrategy
     {
         ByValue = 0,
@@ -129,6 +136,7 @@ namespace Riok.Mapperly.Abstractions
     public class MapperAttribute : System.Attribute
     {
         public MapperAttribute() { }
+        public Riok.Mapperly.Abstractions.AggressiveInliningTypes AggressiveInliningTypes { get; set; }
         public bool AllowNullPropertyAssignment { get; set; }
         public bool AutoUserMappings { get; set; }
         public Riok.Mapperly.Abstractions.MappingConversionType EnabledConversions { get; set; }

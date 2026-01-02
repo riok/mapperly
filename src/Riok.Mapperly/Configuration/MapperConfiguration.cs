@@ -130,4 +130,10 @@ public record MapperConfiguration
     /// Can be overwritten on specific enums via mapping method configurations.
     /// </summary>
     public EnumNamingStrategy? EnumNamingStrategy { get; init; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether add <c>[MethodImpl(MethodImplOptions.AggressiveInlining)]</c> attribute to generated mapping methods.
+    /// Defaults to <see AggressiveInliningTypes.None/>.
+    /// </summary>
+    public AggressiveInliningTypes AggressiveInliningTypes { get; set; } = AggressiveInliningTypes.None;
 }

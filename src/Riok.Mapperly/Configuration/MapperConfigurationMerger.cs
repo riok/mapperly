@@ -75,6 +75,8 @@ public static class MapperConfigurationMerger
         mapper.EnumNamingStrategy =
             mapperConfiguration.EnumNamingStrategy ?? defaultMapperConfiguration.EnumNamingStrategy ?? mapper.EnumNamingStrategy;
 
+        mapper.AggressiveInliningTypes = mapperConfiguration.AggressiveInliningTypes;
+
         return mapper;
     }
 }

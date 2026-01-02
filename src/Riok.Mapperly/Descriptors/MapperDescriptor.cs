@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.UnsafeAccess;
 using Riok.Mapperly.Helpers;
@@ -13,11 +14,17 @@ public class MapperDescriptor
     private readonly MapperDeclaration _declaration;
     private readonly List<MethodMapping> _methodMappings = [];
 
-    public MapperDescriptor(MapperDeclaration declaration, UniqueNameBuilder nameBuilder, SupportedFeatures supportedFeatures)
+    public MapperDescriptor(
+        MapperDeclaration declaration,
+        UniqueNameBuilder nameBuilder,
+        SupportedFeatures supportedFeatures,
+        AggressiveInliningTypes aggressiveInliningTypes = AggressiveInliningTypes.None
+    )
     {
         _declaration = declaration;
         NameBuilder = nameBuilder;
         SupportedFeatures = supportedFeatures;
+        AggressiveInliningTypes = aggressiveInliningTypes;
         Name = BuildName(declaration.Symbol);
 
         if (!Symbol.ContainingNamespace.IsGlobalNamespace)
@@ -31,6 +38,8 @@ public class MapperDescriptor
     public IUnsafeAccessors? UnsafeAccessors { get; set; }
 
     public SupportedFeatures SupportedFeatures { get; }
+
+    public AggressiveInliningTypes AggressiveInliningTypes { get; }
 
     public string Name { get; }
 
