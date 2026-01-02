@@ -46,7 +46,7 @@ public partial class Mapper
         var target = new string?[source.Length];
         for (var i = 0; i < source.Length; i++)
         {
-            target[i] = source[i] == null ? default : source[i]!;
+            target[i] = source[i];
         }
         return target;
     }

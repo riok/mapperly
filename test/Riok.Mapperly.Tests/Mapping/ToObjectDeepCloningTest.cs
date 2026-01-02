@@ -30,7 +30,7 @@ public class ToObjectDeepCloningTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
             .Should()
-            .HaveMapMethodBody("return source == null ? default : source;")
+            .HaveMapMethodBody("return source;")
             .HaveDiagnostic(DiagnosticDescriptors.MappedObjectToObjectWithoutDeepClone)
             .HaveAssertedAllDiagnostics();
     }

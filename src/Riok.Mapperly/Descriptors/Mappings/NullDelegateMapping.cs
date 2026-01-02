@@ -45,6 +45,11 @@ public class NullDelegateMapping : NewInstanceMapping
         if (_delegateMapping.SourceType.IsNullable())
             return _delegateMapping.Build(ctx);
 
+        if (SourceType.IsNullable() && TargetType.IsNullable() && SymbolEqualityComparer.Default.Equals(SourceType, TargetType))
+        {
+            return _delegateMapping.Build(ctx);
+        }
+
         if (!SourceType.IsNullable())
         {
             // if the target type is a nullable value type, there needs to be an additional cast in some cases

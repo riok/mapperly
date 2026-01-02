@@ -27,7 +27,7 @@ public partial class Mapper
         var target = new global::System.Collections.Generic.Dictionary<string, string?>(source.Count);
         foreach (var item in source)
         {
-            target[item.Key] = item.Value == null ? default : item.Value;
+            target[item.Key] = item.Value;
         }
         return target;
     }

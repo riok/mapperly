@@ -13,7 +13,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial int? DirectIntNullable(int? value)
         {
-            return value == null ? default(int?) : value.Value;
+            return value;
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
