@@ -20,7 +20,11 @@ namespace Riok.Mapperly.Descriptors.UnsafeAccess;
 /// <param name="symbol">The symbol of the property.</param>
 /// <param name="className">The name of the accessor class.</param>
 /// <param name="methodName">The name of the accessor method.</param>
-public class UnsafeFieldAccessor(IFieldSymbol symbol, string className, string methodName) : IUnsafeAccessor, IMemberSetter, IMemberGetter
+/// <param name="enableAggressiveInlining">Whether to add MethodImpl.AggressiveInlining attribute.</param>
+public class UnsafeFieldAccessor(IFieldSymbol symbol, string className, string methodName, bool enableAggressiveInlining)
+    : IUnsafeAccessor,
+        IMemberSetter,
+        IMemberGetter
 {
     private const string DefaultTargetParameterName = "target";
 
@@ -36,11 +40,20 @@ public class UnsafeFieldAccessor(IFieldSymbol symbol, string className, string m
         var target = Parameter(fieldSymbol.ContainingType.FullyQualifiedIdentifierName(), targetName, !symbol.ContainingType.IsGenericType);
 
         var parameters = ParameterList(CommaSeparatedList(target));
-        var attribute = ctx.SyntaxFactory.UnsafeAccessorAttribute(UnsafeAccessorType.Field, fieldSymbol.Name);
+        var attributes = new SyntaxList<AttributeListSyntax>
+        {
+            ctx.SyntaxFactory.UnsafeAccessorAttribute(UnsafeAccessorType.Field, fieldSymbol.Name),
+        };
+
+        if (enableAggressiveInlining)
+        {
+            attributes.Add(ctx.SyntaxFactory.MethodImplAttribute());
+        }
+
         var returnType = RefType(IdentifierName(fieldSymbol.Type.FullyQualifiedIdentifierName()).AddTrailingSpace())
             .WithRefKeyword(Token(TriviaList(), SyntaxKind.RefKeyword, TriviaList(Space)));
 
-        return ctx.SyntaxFactory.PublicStaticExternMethod(returnType, methodName, parameters, [attribute]);
+        return ctx.SyntaxFactory.PublicStaticExternMethod(returnType, methodName, parameters, attributes);
     }
 
     public ExpressionSyntax BuildAccess(ExpressionSyntax? baseAccess, bool nullConditional = false)

@@ -1,9 +1,15 @@
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Emit.Syntax;
 using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Emit;
 
-public record SourceEmitterContext(bool IsStatic, UniqueNameBuilder NameBuilder, SyntaxFactoryHelper SyntaxFactory)
+public record SourceEmitterContext(
+    bool IsStatic,
+    UniqueNameBuilder NameBuilder,
+    SyntaxFactoryHelper SyntaxFactory,
+    AggressiveInliningTypes AggressiveInliningTypes = AggressiveInliningTypes.None
+)
 {
     public SourceEmitterContext AddIndentation() => this with { SyntaxFactory = SyntaxFactory.AddIndentation() };
 
