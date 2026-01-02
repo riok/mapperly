@@ -22,7 +22,7 @@ public class EnumMultiSourceMapping(
     {
         if (useYieldReturn)
         {
-            // Generate multiple yield return statements - one for each source enum
+            // Generate yield return statements - one for each source mapping.
             foreach (var sourceMapping in sourceMappings)
             {
                 var switchExpression = BuildSingleSourceSwitch(ctx, sourceMapping);
@@ -31,8 +31,8 @@ public class EnumMultiSourceMapping(
         }
         else
         {
-            // Build cascading switch expression starting with the first source
-            var switchExpression = BuildCascadingSwitch(ctx, sourceMappings, 0);
+            // Build a single switch expression that cascades through sources using an iterative approach.
+            var switchExpression = BuildCascadingSwitch(ctx, sourceMappings);
             yield return ctx.SyntaxFactory.Return(switchExpression);
         }
     }
@@ -41,10 +41,14 @@ public class EnumMultiSourceMapping(
     {
         var parameterAccess = IdentifierName(sourceMapping.Parameter.Name);
 
-        // Build switch arms for the source
-        var arms = sourceMapping.MemberMappings.Select(x => BuildArm(x.Key, x.Value)).ToList();
+        // Build switch arms for the source mappings.
+        var arms = new List<SwitchExpressionArmSyntax>(sourceMapping.MemberMappings.Count + 1);
+        foreach (var (sourceMember, targetMember) in sourceMapping.MemberMappings)
+        {
+            arms.Add(BuildArm(sourceMember, targetMember));
+        }
 
-        // Add fallback arm that throws for this specific source parameter
+        // Add fallback arm that throws for unsupported values.
         var sourceExpression = IdentifierName(sourceMapping.Parameter.Name);
         var fallbackArm = SwitchArm(
             DiscardPattern(),
@@ -55,28 +59,30 @@ public class EnumMultiSourceMapping(
         return ctx.SyntaxFactory.Switch(parameterAccess, arms);
     }
 
-    private ExpressionSyntax BuildCascadingSwitch(TypeMappingBuildContext ctx, IReadOnlyList<EnumSourceMapping> sources, int index)
+    private ExpressionSyntax BuildCascadingSwitch(TypeMappingBuildContext ctx, IReadOnlyList<EnumSourceMapping> sources)
     {
-        var currentSource = sources[index];
-        var parameterAccess = IdentifierName(currentSource.Parameter.Name);
+        var innerExpression = fallback.BuildDiscardArm(ctx).Expression;
 
-        // Build switch arms for current source
-        var arms = currentSource.MemberMappings.Select(x => BuildArm(x.Key, x.Value)).ToList();
-
-        // Add fallback for current source
-        if (index == sources.Count - 1)
+        for (var i = sources.Count - 1; i >= 0; i--)
         {
-            // Last source uses the configured fallback
-            arms.Add(fallback.BuildDiscardArm(ctx));
-        }
-        else
-        {
-            // Non-last source cascades to next source
-            var nextSwitch = BuildCascadingSwitch(ctx, sources, index + 1);
-            arms.Add(SwitchArm(DiscardPattern(), nextSwitch));
+            var currentSource = sources[i];
+            var parameterAccess = IdentifierName(currentSource.Parameter.Name);
+
+            // Collect arms for current source.
+            var arms = new List<SwitchExpressionArmSyntax>(currentSource.MemberMappings.Count + 1);
+            foreach (var (sourceMember, targetMember) in currentSource.MemberMappings)
+            {
+                arms.Add(BuildArm(sourceMember, targetMember));
+            }
+
+            // Add discard arm that cascades to the inner expression (next source or fallback).
+            arms.Add(SwitchArm(DiscardPattern(), innerExpression));
+
+            // Update inner expression for the next (outer) source.
+            innerExpression = ctx.SyntaxFactory.Switch(parameterAccess, arms);
         }
 
-        return ctx.SyntaxFactory.Switch(parameterAccess, arms);
+        return innerExpression;
     }
 
     private static SwitchExpressionArmSyntax BuildArm(IFieldSymbol sourceMemberField, IFieldSymbol targetMemberField)
