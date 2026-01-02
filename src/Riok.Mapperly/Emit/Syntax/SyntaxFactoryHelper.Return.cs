@@ -18,5 +18,17 @@ public partial struct SyntaxFactoryHelper
             );
     }
 
+    public YieldStatementSyntax YieldReturn(ExpressionSyntax expression)
+    {
+        return YieldStatement(
+            SyntaxKind.YieldReturnStatement,
+            default,
+            LeadingLineFeedTrailingSpaceToken(SyntaxKind.YieldKeyword),
+            TrailingSpacedToken(SyntaxKind.ReturnKeyword),
+            expression,
+            Token(SyntaxKind.SemicolonToken)
+        );
+    }
+
     public StatementSyntax ReturnVariable(string identifierName) => Return(IdentifierName(identifierName));
 }
