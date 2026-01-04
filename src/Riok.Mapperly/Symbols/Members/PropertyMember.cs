@@ -44,6 +44,7 @@ public class PropertyMember(IPropertySymbol symbol, SymbolAccessor symbolAccesso
 
     public bool IsObsolete => symbolAccessor.HasAttribute<ObsoleteAttribute>(Symbol);
     public bool IsIgnored => symbolAccessor.HasAttribute<MapperIgnoreAttribute>(Symbol);
+    public bool IsSpecialAdditionalSource { get; } = false;
 
     public bool SupportsCoalesceAssignment => CanSetDirectly;
 

@@ -368,6 +368,27 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     }
 
     internal bool TryFindMemberPath(
+        IEnumerable<ITypeSymbol> types,
+        IEnumerable<StringMemberPath> pathCandidates,
+        IReadOnlyCollection<string> ignoredNames,
+        bool ignoreCase,
+        [NotNullWhen(true)] out MemberPath? memberPath
+    )
+    {
+        var paths = pathCandidates.ToList();
+        foreach (var type in types)
+        {
+            if (TryFindMemberPath(type, paths, ignoredNames, ignoreCase, out memberPath))
+            {
+                return true;
+            }
+        }
+
+        memberPath = null;
+        return false;
+    }
+
+    internal bool TryFindMemberPath(
         ITypeSymbol type,
         IEnumerable<StringMemberPath> pathCandidates,
         IReadOnlyCollection<string> ignoredNames,

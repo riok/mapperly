@@ -41,6 +41,12 @@ namespace Riok.Mapperly.Abstractions
         public IncludeMappingConfigurationAttribute(string name) { }
         public string Name { get; }
     }
+    [System.AttributeUsage(System.AttributeTargets.Parameter)]
+    [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
+    public sealed class MapAdditionalSourceAttribute : System.Attribute
+    {
+        public MapAdditionalSourceAttribute() { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Method, AllowMultiple=true)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
     public sealed class MapDerivedTypeAttribute : System.Attribute

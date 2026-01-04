@@ -62,7 +62,7 @@ public abstract class MethodMapping : ITypeMapping
 
     public IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; init; } = [];
 
-    protected IMethodSymbol? Method { get; }
+    public IMethodSymbol? Method { get; }
 
     protected bool IsExtensionMethod { get; }
 
@@ -89,11 +89,27 @@ public abstract class MethodMapping : ITypeMapping
 
     public virtual MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
     {
+        var filteredAdditionalSourceParameters = AdditionalSourceParameters
+            .Where(p =>
+                Method
+                    ?.Parameters.FirstOrDefault(ps => ps.Ordinal == p.Ordinal)
+                    ?.GetAttributes()
+                    .Any(a =>
+                        string.Equals(
+                            a.AttributeClass?.ToDisplayString(),
+                            "Riok.Mapperly.Abstractions.MapAdditionalSourceAttribute",
+                            StringComparison.Ordinal
+                        )
+                    ) == true
+            )
+            .ToList();
+
         var typeMappingBuildContext = new TypeMappingBuildContext(
             SourceParameter.Name,
             ReferenceHandlerParameter?.Name,
             ctx.NameBuilder.NewScope(),
-            ctx.SyntaxFactory
+            ctx.SyntaxFactory,
+            filteredAdditionalSourceParameters
         );
 
         var parameters = BuildParameterList();

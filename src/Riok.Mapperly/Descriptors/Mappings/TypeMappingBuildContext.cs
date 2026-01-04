@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Emit.Syntax;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
@@ -13,21 +14,30 @@ public readonly record struct TypeMappingBuildContext
         string source,
         string? referenceHandler,
         UniqueNameBuilder nameBuilder,
-        SyntaxFactoryHelper syntaxFactory
+        SyntaxFactoryHelper syntaxFactory,
+        IReadOnlyCollection<MethodParameter>? additionalSources = null
     )
-        : this(IdentifierName(source), referenceHandler == null ? null : IdentifierName(referenceHandler), nameBuilder, syntaxFactory) { }
+        : this(
+            IdentifierName(source),
+            referenceHandler == null ? null : IdentifierName(referenceHandler),
+            nameBuilder,
+            syntaxFactory,
+            additionalSources?.ToDictionary(k => k.Type.Name, v => IdentifierName(v.Name), StringComparer.Ordinal)
+        ) { }
 
     private TypeMappingBuildContext(
         ExpressionSyntax source,
         ExpressionSyntax? referenceHandler,
         UniqueNameBuilder nameBuilder,
-        SyntaxFactoryHelper syntaxFactory
+        SyntaxFactoryHelper syntaxFactory,
+        IReadOnlyDictionary<string, IdentifierNameSyntax>? additionalSources = null
     )
     {
         Source = source;
         ReferenceHandler = referenceHandler;
         NameBuilder = nameBuilder;
         SyntaxFactory = syntaxFactory;
+        AdditionalSources = additionalSources;
     }
 
     public UniqueNameBuilder NameBuilder { get; }
@@ -38,7 +48,10 @@ public readonly record struct TypeMappingBuildContext
 
     public SyntaxFactoryHelper SyntaxFactory { get; }
 
-    public TypeMappingBuildContext AddIndentation() => new(Source, ReferenceHandler, NameBuilder, SyntaxFactory.AddIndentation());
+    public IReadOnlyDictionary<string, IdentifierNameSyntax>? AdditionalSources { get; }
+
+    public TypeMappingBuildContext AddIndentation() =>
+        new(Source, ReferenceHandler, NameBuilder, SyntaxFactory.AddIndentation(), AdditionalSources);
 
     /// <summary>
     /// Creates a new scoped name builder,

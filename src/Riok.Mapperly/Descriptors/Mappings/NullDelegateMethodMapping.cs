@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
@@ -60,8 +61,62 @@ public class NullDelegateMethodMapping(
         // call mapping only if source is not null.
         // if (source == null)
         //   return <null-substitute>;
+
+        // Also check for nullable additional sources with MapAdditionalSource attribute
+        var additionalSourceChecks = GetNullableAdditionalSourceChecks(ctx);
+        if (additionalSourceChecks.Count > 0)
+        {
+            // For combined null checks, use null literal for Default fallback on nullable reference types
+            // to generate idiomatic "return null;" instead of "return default;"
+            var returnExpression = NullSubstitute(TargetType, ctx.Source, nullFallbackValue);
+            var combinedCondition = CombineConditions(ctx.Source, additionalSourceChecks);
+            var ifStatement = ctx.SyntaxFactory.If(combinedCondition, ctx.SyntaxFactory.AddIndentation().Return(returnExpression));
+            return body.Prepend(ifStatement);
+        }
+
         var fallbackExpression = NullSubstitute(TargetType, ctx.Source, nullFallbackValue);
         var ifExpression = ctx.SyntaxFactory.IfNullReturnOrThrow(ctx.Source, fallbackExpression);
         return body.Prepend(ifExpression);
+    }
+
+    private List<(ExpressionSyntax Condition, string ParameterName)> GetNullableAdditionalSourceChecks(TypeMappingBuildContext ctx)
+    {
+        var checks = new List<(ExpressionSyntax Condition, string ParameterName)>();
+
+        // AdditionalSourceParameters are already filtered to only include parameters with MapAdditionalSource attribute
+        foreach (var parameter in AdditionalSourceParameters)
+        {
+            // Check if parameter type is nullable
+            if (!parameter.Type.IsNullable())
+            {
+                continue;
+            }
+
+            var parameterAccess = ctx.AdditionalSources?.TryGetValue(parameter.Name, out var source) is true
+                ? source
+                : IdentifierName(parameter.Name);
+
+            var condition = IsNull(parameterAccess);
+            checks.Add((condition, parameter.Name));
+        }
+
+        return checks;
+    }
+
+    private static ExpressionSyntax CombineConditions(
+        ExpressionSyntax mainSource,
+        List<(ExpressionSyntax Condition, string ParameterName)> additionalChecks
+    )
+    {
+        if (additionalChecks.Count == 0)
+            return IsNull(mainSource);
+
+        var conditions = new List<ExpressionSyntax> { IsNull(mainSource) };
+        foreach (var (_, parameterName) in additionalChecks)
+        {
+            conditions.Add(IsNull(IdentifierName(parameterName)));
+        }
+
+        return Or(conditions);
     }
 }

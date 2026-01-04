@@ -48,6 +48,8 @@ public interface IMappableMember
     /// </summary>
     bool IsIgnored { get; }
 
+    bool IsSpecialAdditionalSource { get; }
+
     IMemberGetter BuildGetter(UnsafeAccessorContext ctx);
     IMemberSetter BuildSetter(UnsafeAccessorContext ctx);
 }

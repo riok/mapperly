@@ -13,7 +13,7 @@ namespace Riok.Mapperly.Symbols.Members;
 /// and is therefore in terms of the mapping the same.
 /// </summary>
 [DebuggerDisplay("{Name}")]
-public class ParameterSourceMember(MethodParameter parameter) : IMappableMember, IMemberGetter
+public class ParameterSourceMember(MethodParameter parameter, bool hasMapAdditionalSource = false) : IMappableMember, IMemberGetter
 {
     public string Name => parameter.Name;
     public ITypeSymbol Type => parameter.Type;
@@ -27,6 +27,8 @@ public class ParameterSourceMember(MethodParameter parameter) : IMappableMember,
     public bool IsRequired => false;
     public bool IsObsolete => false;
     public bool IsIgnored => false;
+
+    public bool IsSpecialAdditionalSource { get; } = hasMapAdditionalSource;
 
     public IMemberGetter BuildGetter(UnsafeAccessorContext ctx) => this;
 

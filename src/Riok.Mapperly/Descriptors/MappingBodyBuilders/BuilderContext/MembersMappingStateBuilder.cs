@@ -1,3 +1,4 @@
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Configuration.PropertyReferences;
 using Riok.Mapperly.Descriptors.Mappings;
@@ -34,7 +35,25 @@ internal static class MembersMappingStateBuilder
         // build all members
         var unmappedSourceMemberNames = GetSourceMemberNames(ctx, mapping);
         var additionalSourceMembers = GetAdditionalSourceMembers(ctx);
-        var unmappedAdditionalSourceMemberNames = new HashSet<string>(additionalSourceMembers.Keys, StringComparer.Ordinal);
+
+        var unmappedAdditionalSourceMemberNames = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var (key, member) in additionalSourceMembers)
+        {
+            if (member.IsSpecialAdditionalSource)
+            {
+                var allAccessibleMappableMembers = ctx
+                    .SymbolAccessor.GetAllAccessibleMappableMembers(member.Type)
+                    .Select(x => x.Name)
+                    .ToHashSet();
+                unmappedAdditionalSourceMemberNames.UnionWith(allAccessibleMappableMembers);
+            }
+            else
+            {
+                // Track regular parameters by their parameter name for unused parameter diagnostics
+                unmappedAdditionalSourceMemberNames.Add(key);
+            }
+        }
+
         var targetMembers = GetTargetMembers(ctx, mapping);
 
         // build ignored members
@@ -69,14 +88,25 @@ internal static class MembersMappingStateBuilder
 
     private static IReadOnlyDictionary<string, IMappableMember> GetAdditionalSourceMembers(MappingBuilderContext ctx)
     {
-        if (ctx.UserMapping is MethodMapping { AdditionalSourceParameters.Count: > 0 } methodMapping)
+        if (ctx.UserMapping is not MethodMapping { AdditionalSourceParameters.Count: > 0, Method: not null } methodMapping)
         {
-            return methodMapping
-                .AdditionalSourceParameters.Select<MethodParameter, IMappableMember>(p => new ParameterSourceMember(p))
-                .ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
+            return new Dictionary<string, IMappableMember>(StringComparer.OrdinalIgnoreCase);
         }
 
-        return new Dictionary<string, IMappableMember>();
+        var methodSymbol = methodMapping.Method;
+        var additionalSourceMembers = new Dictionary<string, IMappableMember>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var parameter in methodMapping.AdditionalSourceParameters)
+        {
+            // Get the original parameter symbol to check for MapAdditionalSource attribute
+            var originalParameterSymbol = methodSymbol.Parameters.FirstOrDefault(p => p.Ordinal == parameter.Ordinal);
+            var hasMapAdditionalSource =
+                originalParameterSymbol != null && ctx.SymbolAccessor.HasAttribute<MapAdditionalSourceAttribute>(originalParameterSymbol);
+
+            additionalSourceMembers[parameter.Name] = new ParameterSourceMember(parameter, hasMapAdditionalSource);
+        }
+
+        return additionalSourceMembers;
     }
 
     private static HashSet<string> GetSourceMemberNames(MappingBuilderContext ctx, IMapping mapping)

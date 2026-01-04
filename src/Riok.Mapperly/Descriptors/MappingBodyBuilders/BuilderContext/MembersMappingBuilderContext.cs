@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
@@ -14,16 +15,28 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// An abstract base implementation of <see cref="IMembersBuilderContext{T}"/>.
 /// </summary>
 /// <typeparam name="T">The type of the mapping.</typeparam>
-public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext builderContext, T mapping) : IMembersBuilderContext<T>
+public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T>
     where T : IMapping
 {
-    private readonly MembersMappingState _state = MembersMappingStateBuilder.Build(builderContext, mapping);
+    private readonly MembersMappingState _state;
 
-    private readonly NestedMappingsContext _nestedMappingsContext = NestedMappingsContext.Create(builderContext);
+    private readonly NestedMappingsContext _nestedMappingsContext;
 
-    public MappingBuilderContext BuilderContext { get; } = builderContext;
+    /// <summary>
+    /// An abstract base implementation of <see cref="IMembersBuilderContext{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the mapping.</typeparam>
+    protected MembersMappingBuilderContext(MappingBuilderContext builderContext, T mapping)
+    {
+        _state = MembersMappingStateBuilder.Build(builderContext, mapping);
+        _nestedMappingsContext = NestedMappingsContext.Create(builderContext, _state.AdditionalSourceMembers);
+        BuilderContext = builderContext;
+        Mapping = mapping;
+    }
 
-    public T Mapping { get; } = mapping;
+    public MappingBuilderContext BuilderContext { get; }
+
+    public T Mapping { get; }
 
     public void AddDiagnostics(bool requiredMembersNeedToBeMapped)
     {
@@ -137,11 +150,13 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
         [NotNullWhen(true)] out SourceMemberPath? sourcePath
     )
     {
+        var stringMemberPaths = pathCandidates.ToList();
+
         // try to match in additional source members
         if (
             BuilderContext.SymbolAccessor.TryFindMemberPath(
                 _state.AdditionalSourceMembers,
-                pathCandidates,
+                stringMemberPaths,
                 ignoreCase,
                 out var sourceMemberPath
             )
@@ -152,7 +167,14 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
         }
 
         // try to match in aliased source members
-        if (BuilderContext.SymbolAccessor.TryFindMemberPath(_state.AliasedSourceMembers, pathCandidates, ignoreCase, out sourceMemberPath))
+        if (
+            BuilderContext.SymbolAccessor.TryFindMemberPath(
+                _state.AliasedSourceMembers,
+                stringMemberPaths,
+                ignoreCase,
+                out sourceMemberPath
+            )
+        )
         {
             sourcePath = new SourceMemberPath(sourceMemberPath, SourceMemberType.MemberAlias);
             return true;
@@ -162,7 +184,7 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
         if (
             BuilderContext.SymbolAccessor.TryFindMemberPath(
                 Mapping.SourceType,
-                pathCandidates,
+                stringMemberPaths,
                 _state.IgnoredSourceMemberNames,
                 ignoreCase,
                 out sourceMemberPath
@@ -170,6 +192,22 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
         )
         {
             sourcePath = new SourceMemberPath(sourceMemberPath, SourceMemberType.Member);
+            return true;
+        }
+
+        // match MapAdditionalSource
+        var types = _state.AdditionalSourceMembers.Where(m => m.Value.IsSpecialAdditionalSource).Select(x => x.Value.Type);
+        if (
+            BuilderContext.SymbolAccessor.TryFindMemberPath(
+                types,
+                stringMemberPaths,
+                _state.IgnoredSourceMemberNames,
+                ignoreCase,
+                out sourceMemberPath
+            )
+        )
+        {
+            sourcePath = new SourceMemberPath(sourceMemberPath, SourceMemberType.AdditionalMappingMethodParameter);
             return true;
         }
 
@@ -236,6 +274,23 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
     {
         if (!BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.SourceType, config.Source, out var sourceMemberPath))
         {
+            var classes = _state.AdditionalSourceMembers.Where(m => m.Value.IsSpecialAdditionalSource).ToList();
+            if (classes.Count > 0)
+            {
+                foreach (var (_, value) in classes)
+                {
+                    if (!BuilderContext.SymbolAccessor.TryFindMemberPath(value.Type, config.Source, out sourceMemberPath))
+                    {
+                        continue;
+                    }
+
+                    sourcePath = new SourceMemberPath(sourceMemberPath, SourceMemberType.AdditionalMappingMethodParameter);
+                    return true;
+                }
+
+                // TODO: If nothing found report diagnostic
+            }
+
             BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.ConfiguredMappingSourceMemberNotFound,
                 config.Source.FullName,
@@ -260,14 +315,18 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
     )
     {
         ignoreCase ??= BuilderContext.Configuration.Mapper.PropertyNameMappingStrategy == PropertyNameMappingStrategy.CaseInsensitive;
-        var pathCandidates = MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMemberName);
+        var pathCandidates = MemberPathCandidateBuilder.BuildMemberPathCandidates(targetMemberName).ToImmutableList();
 
         // First, try to find the property on (a sub-path of) the source type itself. (If this is undesired, an Ignore property can be used.)
         if (TryFindSourcePath(pathCandidates, ignoreCase.Value, out sourceMemberPath))
             return true;
 
-        // Otherwise, search all nested members
-        return _nestedMappingsContext.TryFindNestedSourcePath(pathCandidates, ignoreCase.Value, out sourceMemberPath);
+        // Otherwise, search all nested members in source and in special additional sources
+        if (_nestedMappingsContext.TryFindNestedSourcePath(pathCandidates, ignoreCase.Value, out sourceMemberPath))
+            return true;
+
+        sourceMemberPath = null;
+        return false;
     }
 
     private MemberMappingInfo? TryGetMemberConfigMappingInfo(IMappableMember targetMember, bool ignoreCase)

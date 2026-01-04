@@ -23,9 +23,16 @@ public class MappedMemberSourceValue(
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
+        var baseAccess = ctx.Source;
+
+        if (ctx.AdditionalSources != null && ctx.AdditionalSources.TryGetValue(_sourceMember.MemberPath.RootType.Name, out var source))
+        {
+            baseAccess = source;
+        }
+
         ctx = ctx.WithSource(
             _sourceMember.BuildAccess(
-                ctx.Source,
+                baseAccess,
                 addValuePropertyOnNullable: addValuePropertyOnNullable,
                 nullConditional: nullConditionalAccess
             )

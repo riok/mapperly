@@ -51,12 +51,36 @@ internal static class UserMappingMethodParameterExtractor
             return false;
         }
 
-        // additional parameters should not be attributed as target or ref handler
+        // Validate additional parameters
         var hasInvalidAdditionalParameter = additionalParameterSymbols.Exists(p =>
             p.Type.TypeKind is TypeKind.TypeParameter or TypeKind.Error
             || ctx.SymbolAccessor.HasAttribute<ReferenceHandlerAttribute>(p)
             || ctx.SymbolAccessor.HasAttribute<MappingTargetAttribute>(p)
+            || (
+                ctx.SymbolAccessor.HasAttribute<MapAdditionalSourceAttribute>(p)
+                && (
+                    ctx.SymbolAccessor.HasAttribute<ReferenceHandlerAttribute>(p)
+                    || ctx.SymbolAccessor.HasAttribute<MappingTargetAttribute>(p)
+                )
+            )
         );
+
+        // Check for MapAdditionalSourceAttribute on source, target, or ref handler parameters
+        // We need to check the original parameter symbols, not the wrapped MethodParameter
+        var sourceOrTargetParameterSymbols = new List<IParameterSymbol>();
+        if (sourceParameter.HasValue)
+        {
+            sourceOrTargetParameterSymbols.Add(method.Parameters[sourceParameter.Value.Ordinal]);
+        }
+        if (targetParameter.HasValue)
+        {
+            sourceOrTargetParameterSymbols.Add(method.Parameters[targetParameter.Value.Ordinal]);
+        }
+        if (refHandlerParameter.HasValue)
+        {
+            sourceOrTargetParameterSymbols.Add(method.Parameters[refHandlerParameter.Value.Ordinal]);
+        }
+
         if (hasInvalidAdditionalParameter)
         {
             parameters = null;

@@ -35,6 +35,7 @@ public class FieldMember(IFieldSymbol symbol, SymbolAccessor symbolAccessor)
 
     public bool IsObsolete => symbolAccessor.HasAttribute<ObsoleteAttribute>(Symbol);
     public bool IsIgnored => symbolAccessor.HasAttribute<MapperIgnoreAttribute>(Symbol);
+    public bool IsSpecialAdditionalSource { get; } = false;
     public bool SupportsCoalesceAssignment => true;
 
     public IMemberGetter BuildGetter(UnsafeAccessorContext ctx)
