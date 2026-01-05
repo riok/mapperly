@@ -5,11 +5,13 @@ namespace Riok.Mapperly.Tests.Generator;
 internal record IncrementalGeneratorRunReasons(
     IncrementalStepRunReason CompilationStep,
     IncrementalStepRunReason BuildMapperDefaultsStep,
+    IncrementalStepRunReason BuildUseStaticMapperDefaultsStep,
     IncrementalStepRunReason BuildMappersStep,
     IncrementalStepRunReason ReportDiagnosticsStep
 )
 {
     public static readonly IncrementalGeneratorRunReasons New = new(
+        IncrementalStepRunReason.New,
         IncrementalStepRunReason.New,
         IncrementalStepRunReason.New,
         IncrementalStepRunReason.New,
@@ -20,6 +22,7 @@ internal record IncrementalGeneratorRunReasons(
         // compilation step should always be modified as each time a new compilation is passed
         IncrementalStepRunReason.Modified,
         IncrementalStepRunReason.Unchanged,
+        IncrementalStepRunReason.Cached,
         IncrementalStepRunReason.Cached,
         IncrementalStepRunReason.Cached
     );

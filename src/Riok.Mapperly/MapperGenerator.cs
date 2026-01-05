@@ -59,7 +59,10 @@ public class MapperGenerator : IIncrementalGenerator
             .Select(static (x, _) => BuildDefaults(x.Left, x.Right))
             .WithTrackingName(MapperGeneratorStepNames.BuildMapperDefaults);
 
-        var useStaticMappers = SyntaxProvider.GetUseStaticMapperDeclarations(context).Select(BuildStaticMappers);
+        var useStaticMappers = SyntaxProvider
+            .GetUseStaticMapperDeclarations(context)
+            .Select(BuildStaticMappers)
+            .WithTrackingName(MapperGeneratorStepNames.BuildUseStaticMappers);
 
         // extract the mapper declarations and build the descriptors
         var mappersAndDiagnostics = SyntaxProvider
