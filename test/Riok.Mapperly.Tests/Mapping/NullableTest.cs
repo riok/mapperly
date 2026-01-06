@@ -163,7 +163,7 @@ public class NullableTest
     }
 
     [Fact]
-    public void NonNullableToNullableValueType()
+    public void NullableToNullableType()
     {
         var source = TestSourceBuilder.Mapping("int[]?", "int[]?");
         TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return source;");

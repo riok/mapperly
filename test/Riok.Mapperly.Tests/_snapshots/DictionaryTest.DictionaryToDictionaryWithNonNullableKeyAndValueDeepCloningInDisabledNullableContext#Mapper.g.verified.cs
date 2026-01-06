@@ -12,22 +12,11 @@ public partial class Mapper
         var target = new global::B();
         if (source.Value != null)
         {
-            target.Value = MapToDictionaryOfStringAndString(source.Value);
+            target.Value = new global::System.Collections.Generic.Dictionary<string, string?>(source.Value);
         }
         else
         {
             target.Value = null;
-        }
-        return target;
-    }
-
-    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private global::System.Collections.Generic.Dictionary<string, string?> MapToDictionaryOfStringAndString(global::System.Collections.Generic.IReadOnlyDictionary<string, string?> source)
-    {
-        var target = new global::System.Collections.Generic.Dictionary<string, string?>(source.Count);
-        foreach (var item in source)
-        {
-            target[item.Key] = item.Value;
         }
         return target;
     }

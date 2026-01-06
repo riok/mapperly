@@ -30,24 +30,13 @@ public partial class Mapper
         var target = new global::B();
         if (source.Nested?.Value0 != null)
         {
-            target.Value0 = MapToStringArray(source.Nested.Value0);
+            target.Value0 = (string?[])source.Nested.Value0.Clone();
         }
         else
         {
             target.Value0 = null;
         }
         target.Value = source.Nested?.Value;
-        return target;
-    }
-
-    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    private string?[] MapToStringArray(string?[] source)
-    {
-        var target = new string?[source.Length];
-        for (var i = 0; i < source.Length; i++)
-        {
-            target[i] = source[i];
-        }
         return target;
     }
 }

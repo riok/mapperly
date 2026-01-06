@@ -35,7 +35,15 @@ public class NullDelegateMapping : NewInstanceMapping
         // or the source type is not nullable and the target type is not a nullable value type (otherwise a conversion is needed)).
         IsSynthetic =
             _delegateMapping.IsSynthetic
-            && (_delegateMapping.SourceType.IsNullable() || !SourceType.IsNullable() && !TargetType.IsNullableValueType());
+            && (
+                (_delegateMapping.SourceType.IsNullable() || !SourceType.IsNullable() && !TargetType.IsNullableValueType())
+                || BothNullable()
+            );
+    }
+
+    private bool BothNullable()
+    {
+        return SourceType.IsNullable() && TargetType.IsNullable() && _delegateMapping.IsSynthetic;
     }
 
     public override bool IsSynthetic { get; }
@@ -45,10 +53,8 @@ public class NullDelegateMapping : NewInstanceMapping
         if (_delegateMapping.SourceType.IsNullable())
             return _delegateMapping.Build(ctx);
 
-        if (SourceType.IsNullable() && TargetType.IsNullable() && SymbolEqualityComparer.Default.Equals(SourceType, TargetType))
-        {
+        if (IsSynthetic)
             return _delegateMapping.Build(ctx);
-        }
 
         if (!SourceType.IsNullable())
         {

@@ -39,14 +39,7 @@ public class DictionaryTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                if (source == null)
-                    return default;
-                var target = new global::System.Collections.Generic.Dictionary<string, string?>(source.Count);
-                foreach (var item in source)
-                {
-                    target[item.Key] = item.Value;
-                }
-                return target;
+                return source == null ? default : new global::System.Collections.Generic.Dictionary<string, string?>(source);
                 """
             );
     }
