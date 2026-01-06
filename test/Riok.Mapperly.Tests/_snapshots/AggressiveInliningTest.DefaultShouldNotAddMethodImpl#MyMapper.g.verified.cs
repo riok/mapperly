@@ -8,4 +8,12 @@ public partial class MyMapper
     {
         return (int)value;
     }
+
+    [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+    public partial global::MyDto MapToString(global::MyClass source)
+    {
+        var target = new global::MyDto();
+        target.Name = source.Name;
+        return target;
+    }
 }

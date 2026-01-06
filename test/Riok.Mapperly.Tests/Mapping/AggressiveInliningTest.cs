@@ -3,24 +3,6 @@ namespace Riok.Mapperly.Tests.Mapping;
 public class AggressiveInliningTest
 {
     [Fact]
-    public Task DebugGeneratedCode()
-    {
-        var source = TestSourceBuilder.CSharp(
-            """
-            using Riok.Mapperly.Abstractions;
-
-            [Mapper(AggressiveInliningTypes = AggressiveInliningTypes.ValueTypes)]
-            public partial class MyMapper
-            {
-                public partial int ToInt(double value);
-            }
-            """
-        );
-
-        return TestHelper.VerifyGenerator(source);
-    }
-
-    [Fact]
     public Task AllTypesShouldAddMethodImpl()
     {
         var source = TestSourceBuilder.CSharp(
@@ -30,11 +12,11 @@ public class AggressiveInliningTest
             [Mapper(AggressiveInliningTypes = AggressiveInliningTypes.All)]
             public partial class MyMapper
             {
-                public partial int ToInt(double value);
-                public partial string MapToString(MyClass source);
+                public partial MyDto MapToString(MyClass source);
             }
 
-            public class MyClass { }
+            public class MyClass { public string Name { get; set; } = string.Empty; }
+            public class MyDto { public string Name { get; set; } = string.Empty; }
             """
         );
 
@@ -52,10 +34,11 @@ public class AggressiveInliningTest
             public partial class MyMapper
             {
                 public partial int ToInt(double value);
-                public partial string MapToString(MyClass source);
+                public partial MyDto MapToString(MyClass source);
             }
 
-            public class MyClass { }
+            public class MyClass { public string Name { get; set; } = string.Empty; }
+            public class MyDto { public string Name { get; set; } = string.Empty; }
             """
         );
 
@@ -73,7 +56,11 @@ public class AggressiveInliningTest
             public partial class MyMapper
             {
                 public partial int ToInt(double value);
+                public partial MyDto MapToString(MyClass source);
             }
+
+            public class MyClass { public string Name { get; set; } = string.Empty; }
+            public class MyDto { public string Name { get; set; } = string.Empty; }
             """
         );
 
@@ -91,7 +78,11 @@ public class AggressiveInliningTest
             public partial class MyMapper
             {
                 public partial int ToInt(double value);
+                public partial MyDto MapToString(MyClass source);
             }
+
+            public class MyClass { public string Name { get; set; } = string.Empty; }
+            public class MyDto { public string Name { get; set; } = string.Empty; }
             """
         );
 
@@ -110,10 +101,11 @@ public class AggressiveInliningTest
             {
                 public partial int ToInt(double value);
                 public partial long ToLong(int value);
-                public partial string MapToString(MyClass source);
+                public partial MyDto MapToString(MyClass source);
             }
 
-            public class MyClass { }
+            public class MyClass { public string Name { get; set; } = string.Empty; }
+            public class MyDto { public string Name { get; set; } = string.Empty; }
             """
         );
 

@@ -129,7 +129,7 @@ public abstract class MethodMapping : ITypeMapping
         AggressiveInliningTypes aggressiveInliningTypes
     )
     {
-        var attributes = new SyntaxList<AttributeListSyntax> { ctx.SyntaxFactory.GeneratedCodeAttribute() };
+        var attributes = new List<AttributeListSyntax> { ctx.SyntaxFactory.GeneratedCodeAttribute() };
 
         // Check if MethodImpl attribute should be applied
         if (ShouldApplyMethodImpl(aggressiveInliningTypes))
@@ -137,7 +137,7 @@ public abstract class MethodMapping : ITypeMapping
             attributes.Add(ctx.SyntaxFactory.MethodImplAttribute());
         }
 
-        return attributes;
+        return [.. attributes];
     }
 
     private bool ShouldApplyMethodImpl(AggressiveInliningTypes aggressiveInliningTypes)
