@@ -41,11 +41,6 @@ public class NullDelegateMapping : NewInstanceMapping
             );
     }
 
-    private bool BothNullable()
-    {
-        return SourceType.IsNullable() && TargetType.IsNullable() && _delegateMapping.IsSynthetic;
-    }
-
     public override bool IsSynthetic { get; }
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
@@ -104,5 +99,10 @@ public class NullDelegateMapping : NewInstanceMapping
         }
 
         return Conditional(IsNull(ctx.Source), nullSubstitute, _delegateMapping.Build(ctx.WithSource(nonNullableSourceValue)));
+    }
+
+    private bool BothNullable()
+    {
+        return SourceType.IsNullable() && TargetType.IsNullable() && _delegateMapping.IsSynthetic;
     }
 }
