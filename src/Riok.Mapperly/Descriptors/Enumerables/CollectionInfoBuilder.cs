@@ -168,7 +168,7 @@ public static class CollectionInfoBuilder
             ctx.Types.Get(genericType).Construct(typeArguments).WithNullableAnnotation(NullableAnnotation.NotAnnotated);
     }
 
-    private static CollectionInfo BuildCollectionInfo(
+    public static CollectionInfo BuildCollectionInfo(
         WellKnownTypes wellKnownTypes,
         SymbolAccessor symbolAccessor,
         ITypeSymbol type,
@@ -190,7 +190,7 @@ public static class CollectionInfoBuilder
         );
     }
 
-    private static ITypeSymbol? GetEnumeratedType(WellKnownTypes types, ITypeSymbol type)
+    public static ITypeSymbol? GetEnumeratedType(WellKnownTypes types, ITypeSymbol type)
     {
         // if type is array return element type
         // otherwise using the IEnumerable element type can erase the null annotation for external types
