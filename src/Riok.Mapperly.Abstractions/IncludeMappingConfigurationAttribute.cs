@@ -27,4 +27,6 @@ public sealed class IncludeMappingConfigurationAttribute : Attribute
     /// Gets the name of the mapping configuration to include.
     /// </summary>
     public string Name { get; }
+
+    public bool Reverse { get; set; }
 }

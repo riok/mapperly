@@ -2,4 +2,7 @@
 
 namespace Riok.Mapperly.Configuration;
 
-public record IncludeMappingConfiguration(IMethodReferenceConfiguration Name);
+public record IncludeMappingConfiguration(IMethodReferenceConfiguration Name)
+{
+    public bool? Reverse { get; set; }
+}
