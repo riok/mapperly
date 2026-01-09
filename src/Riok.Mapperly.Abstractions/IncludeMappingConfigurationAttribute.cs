@@ -28,5 +28,12 @@ public sealed class IncludeMappingConfigurationAttribute : Attribute
     /// </summary>
     public string Name { get; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to apply the included mapping configuration in reverse.
+    /// </summary>
+    /// <value>
+    /// <see langword="true"/> to reverse the mapping direction; otherwise, <see langword="false"/>.
+    /// Default is <see langword="false"/>.
+    /// </value>
     public bool Reverse { get; set; }
 }
