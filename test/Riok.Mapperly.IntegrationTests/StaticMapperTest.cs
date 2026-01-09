@@ -14,7 +14,7 @@ namespace Riok.Mapperly.IntegrationTests
     public class StaticMapperTest : BaseMapperTest
     {
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0)]
+        [VersionedSnapshot(Versions.NET8_0)]
         public Task SnapshotGeneratedSource()
         {
             var path = GetGeneratedMapperFilePath(nameof(StaticTestMapper));
@@ -22,7 +22,7 @@ namespace Riok.Mapperly.IntegrationTests
         }
 
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0 | Versions.NET9_0)]
+        [VersionedSnapshot(Versions.NET8_0 | Versions.NET9_0)]
         public Task RunMappingShouldWork()
         {
             var model = NewTestObj();
@@ -31,7 +31,7 @@ namespace Riok.Mapperly.IntegrationTests
         }
 
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0 | Versions.NET9_0)]
+        [VersionedSnapshot(Versions.NET8_0 | Versions.NET9_0)]
         public Task RunExtensionMappingShouldWork()
         {
             var model = NewTestObj();

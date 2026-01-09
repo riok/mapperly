@@ -11,9 +11,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-        public partial short IntToShort(int value)
+        public partial string IntToString(int value)
         {
-            return (short)value;
+            return value.ToString();
         }
     }
 }

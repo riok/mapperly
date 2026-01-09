@@ -12,10 +12,10 @@ public static partial class Mapper
             x => new global::VendorResponse()
             {
                 VendorName = x.VendorName,
-                Countries = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(x.Countries, x => new global::CountryListResponse()
+                Countries = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(x.Countries, x1 => new global::CountryListResponse()
                 {
-                    Code = x.Country.Code,
-                    Name = global::System.Linq.Enumerable.FirstOrDefault(x.Country.LocalizedNames)!.Name ?? x.Country.Name,
+                    Code = x1.Country.Code,
+                    Name = global::System.Linq.Enumerable.FirstOrDefault(x1.Country.LocalizedNames)!.Name ?? x1.Country.Name,
                 })),
             }
         );

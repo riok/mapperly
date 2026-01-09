@@ -32,3 +32,8 @@ Write the mapping for that class manually. You can mix automatically generated m
 Are you using [reference handling](../configuration/reference-handling.md)
 or have you enabled the [preservation of Mapperly attributes at runtime](installation.mdx#preserving-the-attributes-at-runtime)?
 Make sure `ExcludeAssets` on the `PackageReference` does not include `runtime` as these features require runtime assets.
+
+## Can I get professional help or consulting for Mapperly?
+
+Yes! The riok team offers professional consulting and support services for Mapperly.
+Whether you need help with architecture consultation, implementation support, custom feature development the team is here to assist. Reach out through [hello@riok.ch](mailto:hello@riok.ch) for professional services. You can also support the project through [GitHub Sponsors](https://github.com/sponsors/riok) to get priority support.

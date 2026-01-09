@@ -10,7 +10,7 @@ namespace Riok.Mapperly.IntegrationTests
     public class DerivedMapperTest : BaseMapperTest
     {
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0)]
+        [VersionedSnapshot(Versions.NET8_0)]
         public Task SnapshotGeneratedSourceBaseMapper()
         {
             var path = GetGeneratedMapperFilePath(nameof(BaseMapper));
@@ -18,7 +18,7 @@ namespace Riok.Mapperly.IntegrationTests
         }
 
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0)]
+        [VersionedSnapshot(Versions.NET8_0)]
         public Task SnapshotGeneratedSourceDerivedMapper()
         {
             var path = GetGeneratedMapperFilePath(nameof(DerivedMapper));
@@ -26,7 +26,7 @@ namespace Riok.Mapperly.IntegrationTests
         }
 
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0)]
+        [VersionedSnapshot(Versions.NET8_0)]
         public Task SnapshotGeneratedSourceDerivedMapper2()
         {
             var path = GetGeneratedMapperFilePath(nameof(DerivedMapper2));
@@ -37,11 +37,8 @@ namespace Riok.Mapperly.IntegrationTests
         public void RunMappingShouldWork()
         {
             new BaseMapper().IntToLong(10).ShouldBe(10L);
-            new BaseMapper().IntToShort(10).ShouldBe((short)10);
             new DerivedMapper().IntToLong(10).ShouldBe(10L);
-            new DerivedMapper().IntToShort(10).ShouldBe((short)10);
             new DerivedMapper2().IntToLong(10).ShouldBe(10L);
-            new DerivedMapper2().IntToShort(10).ShouldBe((short)10);
         }
     }
 }

@@ -513,4 +513,139 @@ public class UseStaticMapperTest
                 """
             );
     }
+
+    [Fact]
+    public void AssemblyLevelUseStaticGenericMapperStaticMethod()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            [assembly: UseStaticMapper<OtherMapper>]
+
+            record A(AExternal Value);
+            record B(BExternal Value);
+            record AExternal();
+            record BExternal();
+
+            class OtherMapper { public static BExternal ToBExternal(AExternal source) => new BExternal(); }
+
+            [Mapper]
+            public partial class Mapper
+            {
+                partial B Map(A source);
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(global::OtherMapper.ToBExternal(source.Value));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void AssemblyLevelUseStaticMapperStaticMethod()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            [assembly: UseStaticMapper(typeof(OtherMapper))]
+
+            record A(AExternal Value);
+            record B(BExternal Value);
+            record AExternal();
+            record BExternal();
+
+            class OtherMapper { public static BExternal ToBExternal(AExternal source) => new BExternal(); }
+
+            [Mapper]
+            public partial class Mapper
+            {
+                partial B Map(A source);
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(global::OtherMapper.ToBExternal(source.Value));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void CombineAssemblyLevelUseStaticMappers()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            [assembly: UseStaticMapper(typeof(OtherMapper))]
+            [assembly: UseStaticMapper<AnotherMapper>]
+
+            record A(int Value1, long Value2);
+            record B(string Value1, string Value2);
+
+            class OtherMapper { public static string IntToString(int source) => source.ToString(); }
+            class AnotherMapper { public static string LongToString(long source) => source.ToString(); }
+
+            [Mapper]
+            public partial class Mapper
+            {
+                partial B Map(A source);
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(
+                    global::OtherMapper.IntToString(source.Value1),
+                    global::AnotherMapper.LongToString(source.Value2)
+                );
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void SelfReferencingUseStaticMapperStaticMethodNotCauseDiagnostic()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            [assembly: UseStaticMapper(typeof(Mapper))]
+
+            record A(AExternal Value);
+            record B(BExternal Value);
+            record AExternal();
+            record BExternal();
+
+            [Mapper]
+            public partial class Mapper
+            {
+                partial B Map(A source);
+
+                public static BExternal ToBExternal(AExternal source) => new BExternal();
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(ToBExternal(source.Value));
+                return target;
+                """
+            );
+    }
 }

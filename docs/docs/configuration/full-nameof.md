@@ -8,7 +8,7 @@ description: Nameof references
 Mapperly supports a "fullnameof".
 It can be used to configure nested member paths or fully qualified names using `nameof`.
 To determine the correct reference,
-Mapperly tries to inteligently resolve the referenced target.
+Mapperly tries to intelligently resolve the referenced target.
 To use "fullnameof" instead of the regular C# `nameof`, one needs to opt-in by prefixing the member path with `@`.
 
 ```csharp

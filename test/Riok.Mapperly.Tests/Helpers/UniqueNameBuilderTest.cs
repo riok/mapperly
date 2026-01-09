@@ -16,5 +16,11 @@ public class UniqueNameBuilderTest
         builder2.Reserve("Baz");
         builder2.New("FooBar").ShouldBe("FooBar3");
         builder2.New("Baz").ShouldBe("Baz1");
+
+        builder2.NewIfNeeded("NewName", out var n1).ShouldBeFalse();
+        n1.ShouldBe("NewName");
+
+        builder2.NewIfNeeded("FooBar", out var n2).ShouldBeTrue();
+        n2.ShouldBe("FooBar4");
     }
 }

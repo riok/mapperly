@@ -66,10 +66,15 @@ public record MapperConfiguration
     public bool? UseDeepCloning { get; init; }
 
     /// <summary>
+    /// The strategy to use when cloning a <see cref="System.Collections.Generic.Stack{T}"/>.
+    /// </summary>
+    public StackCloningStrategy? StackCloningStrategy { get; init; }
+
+    /// <summary>
     /// Enabled conversions which Mapperly automatically implements.
-    /// By default all supported type conversions are enabled.
+    /// By default, all supported type conversions except explicit casts are enabled.
     /// <example>
-    /// Eg. to disable all automatically implemented conversions:<br />
+    /// E.g. to disable all automatically implemented conversions:<br />
     /// <c>EnabledConversions = MappingConversionType.None</c>
     /// </example>
     /// <example>

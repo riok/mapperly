@@ -54,6 +54,7 @@ public class MapperConfigurationReader
             new MembersMappingConfiguration([], [], [], [], [], mapper.IgnoreObsoleteMembersStrategy, mapper.RequiredMappingStrategy),
             [],
             mapper.UseDeepCloning,
+            mapper.StackCloningStrategy,
             supportedFeatures
         );
     }
@@ -92,6 +93,7 @@ public class MapperConfigurationReader
             membersConfig,
             derivedTypesConfig,
             supportsDeepCloning && MapperConfiguration.Mapper.UseDeepCloning,
+            MapperConfiguration.StackCloningStrategy,
             MapperConfiguration.SupportedFeatures
         );
 

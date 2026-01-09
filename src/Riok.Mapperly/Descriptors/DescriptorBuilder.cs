@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
@@ -20,6 +21,7 @@ public class DescriptorBuilder
 {
     private readonly MapperDescriptor _mapperDescriptor;
     private readonly SymbolAccessor _symbolAccessor;
+    private readonly ImmutableArray<UseStaticMapperConfiguration> _assemblyScopedStaticMappers;
 
     private readonly MappingCollection _mappings = new();
     private readonly InlinedExpressionMappingCollection _inlineMappings = new();
@@ -35,12 +37,14 @@ public class DescriptorBuilder
         CompilationContext compilationContext,
         MapperDeclaration mapperDeclaration,
         SymbolAccessor symbolAccessor,
-        MapperConfiguration defaultMapperConfiguration
+        MapperConfiguration defaultMapperConfiguration,
+        ImmutableArray<UseStaticMapperConfiguration> assemblyScopedStaticMappers
     )
     {
         var supportedFeatures = SupportedFeatures.Build(compilationContext.Types, symbolAccessor, compilationContext.ParseLanguageVersion);
         _mapperDescriptor = new MapperDescriptor(mapperDeclaration, _methodNameBuilder, supportedFeatures);
         _symbolAccessor = symbolAccessor;
+        _assemblyScopedStaticMappers = assemblyScopedStaticMappers;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
         _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
         _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
@@ -151,7 +155,7 @@ public class DescriptorBuilder
             }
 
             var name = _attributeAccessor.GetMappingName(userMapping.Method);
-            AddUserMapping(userMapping, false, name);
+            AddUserMapping(userMapping, ignoreDuplicates: false, name);
         }
 
         if (_mapperDescriptor.Static && firstNonStaticUserMapping is not null)
@@ -187,9 +191,15 @@ public class DescriptorBuilder
 
     private void ExtractExternalMappings()
     {
-        foreach (var externalMapping in ExternalMappingsExtractor.ExtractExternalMappings(_builderContext, _mapperDescriptor.Symbol))
+        foreach (
+            var externalMapping in ExternalMappingsExtractor.ExtractExternalMappings(
+                _assemblyScopedStaticMappers,
+                _builderContext,
+                _mapperDescriptor.Symbol
+            )
+        )
         {
-            AddUserMapping(externalMapping, true);
+            AddUserMapping(externalMapping, ignoreDuplicates: true);
         }
     }
 
@@ -197,7 +207,7 @@ public class DescriptorBuilder
     {
         foreach (var (name, mapping) in ExternalMappingsExtractor.ExtractExternalNamedMappings(_builderContext, _mapperDescriptor.Symbol))
         {
-            AddUserMapping(mapping, true, name);
+            AddUserMapping(mapping, ignoreDuplicates: true, name);
         }
     }
 

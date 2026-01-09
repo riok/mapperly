@@ -37,7 +37,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public partial int ParseableInt(string value)
         {
-            return int.Parse(value);
+            return int.Parse(value, _formatDeCh);
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
@@ -134,7 +134,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.SpanValue = MapToInt32Array(testObject.SpanValue);
             target.MemoryValue = MapToInt32Array1(testObject.MemoryValue.Span);
             target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Select(testObject.StackValue, x => ParseableInt(x))
+                global::System.Linq.Enumerable.Reverse(
+                    global::System.Linq.Enumerable.Select(testObject.StackValue, x => ParseableInt(x))
+                )
             );
             target.QueueValue = new global::System.Collections.Generic.Queue<int>(
                 global::System.Linq.Enumerable.Select(testObject.QueueValue, x => ParseableInt(x))
@@ -251,7 +253,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 IntInitOnlyValue = DirectInt(dto.IntInitOnlyValue),
                 RequiredValue = DirectInt(dto.RequiredValue),
             };
-            target.IntValue = DirectInt(dto.IntValue);
+            target.IntValue = int.Parse(dto.FormattedIntValue, _formatEnUs);
             target.StringValue = dto.StringValue;
             target.UnflatteningIdValue = DirectInt(dto.Unflattening.IdValue);
             if (dto.NullableUnflattening != null)
@@ -299,7 +301,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             target.MemoryValue = MapToStringArray(dto.MemoryValue.Span);
             target.StackValue = new global::System.Collections.Generic.Stack<string>(
-                global::System.Linq.Enumerable.Select(dto.StackValue, x => x.ToString(_formatDeCh))
+                global::System.Linq.Enumerable.Reverse(
+                    global::System.Linq.Enumerable.Select(dto.StackValue, x => x.ToString(_formatDeCh))
+                )
             );
             target.QueueValue = new global::System.Collections.Generic.Queue<string>(
                 global::System.Linq.Enumerable.Select(dto.QueueValue, x => x.ToString(_formatDeCh))
@@ -443,7 +447,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.SpanValue = MapToInt32Array(source.SpanValue);
             target.MemoryValue = MapToInt32Array1(source.MemoryValue.Span);
             target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Select(source.StackValue, x => ParseableInt(x))
+                global::System.Linq.Enumerable.Reverse(
+                    global::System.Linq.Enumerable.Select(source.StackValue, x => ParseableInt(x))
+                )
             );
             target.QueueValue = new global::System.Collections.Generic.Queue<int>(
                 global::System.Linq.Enumerable.Select(source.QueueValue, x => ParseableInt(x))
@@ -648,7 +654,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.SpanValue = MapToInt32Array(testObject.SpanValue);
             target.MemoryValue = MapToInt32Array1(testObject.MemoryValue.Span);
             target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Select(testObject.StackValue, x => ParseableInt(x))
+                global::System.Linq.Enumerable.Reverse(
+                    global::System.Linq.Enumerable.Select(testObject.StackValue, x => ParseableInt(x))
+                )
             );
             target.QueueValue = new global::System.Collections.Generic.Queue<int>(
                 global::System.Linq.Enumerable.Select(testObject.QueueValue, x => ParseableInt(x))
@@ -827,7 +835,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue1) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue1,
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue2) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue2,
                 nameof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue3) => global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue.DtoValue3,
-                _ => (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)System.Enum.Parse(
+                _ => (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)global::System.Enum.Parse(
                 typeof(global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue),
                 source,
                 false
@@ -889,7 +897,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 nameof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10) => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value10,
                 nameof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20) => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value20,
                 nameof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30) => global::Riok.Mapperly.IntegrationTests.Models.TestEnum.Value30,
-                _ => (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)System.Enum.Parse(
+                _ => (global::Riok.Mapperly.IntegrationTests.Models.TestEnum)global::System.Enum.Parse(
                 typeof(global::Riok.Mapperly.IntegrationTests.Models.TestEnum),
                 source,
                 false

@@ -49,9 +49,33 @@ dto.NumberOfSeats.ShouldBe(10);
 
 [Read the docs](https://mapperly.riok.app/docs/getting-started/installation) for any further information.
 
+### Release Channels
+
+Mapperly is distributed through two release channels:
+
+- [**Stable Channel**](https://mapperly.riok.app): Production-ready releases with full support for the latest release. Install the latest stable version for production use. Subject to semantic versioning (breaking changes only in major version bumps).
+- [**Next Channel**](https://next.mapperly.riok.app): Preview releases with upcoming features and improvements. These versions may contain breaking changes and are not subject to semantic versioning. Use for testing and early access to new features.
+
+## Support Policy
+
+Only the latest version released on the stable channel is fully supported.
+We strive to support all .NET versions that are currently supported by Microsoft.
+
 ## Upgrading
 
 Find a list of breaking changes for each major version and upgrade guides [here](https://mapperly.riok.app/docs/category/upgrading/).
+
+## Support
+
+Need assistance with Mapperly or looking for consulting services? The riok team is available to help with:
+
+- Enterprise support and training
+- Architecture consultation
+- Custom feature development and integration support
+- Performance optimization and code reviews
+
+Reach out through [GitHub Discussions](https://github.com/riok/mapperly/discussions) for questions, or contact the riok team directly for professional consulting services at [hello@riok.ch](mailto:hello@riok.ch).
+You can also support the project and get priority support through [GitHub Sponsors](https://github.com/sponsors/riok).
 
 ## How To Contribute
 

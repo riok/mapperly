@@ -86,9 +86,9 @@
     IsEmpty: false
   },
   StackValue: [
-    1,
+    3,
     2,
-    3
+    1
   ],
   QueueValue: [
     1,
@@ -180,8 +180,20 @@
     SubIntValue: 2,
     BaseIntValue: 1
   },
-  DateTimeValueTargetDateOnly: 2020-01-03,
-  DateTimeValueTargetTimeOnly: 3:10 PM,
+  DateTimeValueTargetDateOnly: {
+    Year: 2020,
+    Month: 1,
+    Day: 3,
+    DayOfWeek: Friday,
+    DayOfYear: 3,
+    DayNumber: 737426
+  },
+  DateTimeValueTargetTimeOnly: {
+    Hour: 15,
+    Minute: 10,
+    Second: 5,
+    Ticks: 546050000000
+  },
   WithCreateMethod: 10,
   WithCreateFromMethod: 20,
   WithFromSingleMethod: 30.0,

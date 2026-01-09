@@ -131,8 +131,8 @@ public class QueryableProjectionUserImplementedTest
 
             private partial D MapToD(C source);
 
-            private List<D> Order(List<C> v)
-                => v.OrderBy(x => x.Value).Select(v => MapToD(v)).ToList();
+            private List<D> Order(List<C> x)
+                => x.OrderBy(x => x.Value).Select(x => MapToD(x)).ToList();
             """,
             "class A { public string StringValue { get; set; } public List<C> NestedValues { get; set; } }",
             "class B { public string StringValue { get; set; } public List<D> NestedValues { get; set; } }",
@@ -395,6 +395,105 @@ public class QueryableProjectionUserImplementedTest
             }
             """
         );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task UserImplementedInExtensionBlockShouldWork()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            [Mapper]
+            partial class Mapper
+            {
+                [MapProperty(nameof(MyEntity.Id), nameof(MyEntityDto.Id), Use = nameof(IntToInt))]
+                internal partial MyEntityDto MapToDto(MyEntity source);
+
+                internal partial IQueryable<MyEntityDto> ProjectToDto(IQueryable<MyEntity> source);
+
+                private static int IntToInt(int source) => source.WithOneAdded();
+            }
+
+            class MyEntity
+            {
+                public int Id { get; set; }
+            }
+
+            class MyEntityDto
+            {
+                public int Id { get; set; }
+            }
+
+            static class Extensions
+            {
+                extension(int source)
+                {
+                    internal int WithOneAdded() => source + 1;
+                }
+            }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task UserImplementedWithParenthesizedLambdaParameterNameConflict()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+
+            private D MapToD(C v) => new D { Value = v.Items.Select((x, i) => x + i).FirstOrDefault() };
+            """,
+            "class A { public C Nested { get; set; } }",
+            "class B { public D Nested { get; set; } }",
+            "class C { public System.Collections.Generic.List<string> Items { get; set; } }",
+            "class D { public string Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task UserImplementedWithLambdaParameterNameConflict()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial System.Linq.IQueryable<BlogDto> ProjectToDto(this System.Linq.IQueryable<Blog> q);
+
+            [MapPropertyFromSource(nameof(BlogDto.Id), Use = nameof(MapId))]
+            public static partial BlogDto BlogMap(Blog blog);
+
+            private static int MapId(Blog blog) => blog.Posts.Count(x => x.Id == blog.Posts.Count);
+            """,
+            "public record Blog(System.Collections.Generic.List<Post> Posts);",
+            "public record Post(int Id);",
+            "public record BlogDto(int Id);"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task UserImplementedWithMultipleLambdaParameterNameConflicts()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial System.Linq.IQueryable<BlogDto> ProjectToDto(this System.Linq.IQueryable<Blog> q);
+
+            [MapPropertyFromSource(nameof(BlogDto.Id), Use = nameof(MapId))]
+            public static partial BlogDto BlogMap(Blog blog);
+
+            private static int MapId(Blog blog) => blog.Posts.Where(x => x.Id > 0).Count(x => x.Id == blog.Posts.Count);
+            """,
+            "public record Blog(System.Collections.Generic.List<Post> Posts);",
+            "public record Post(int Id);",
+            "public record BlogDto(int Id);"
+        );
+
         return TestHelper.VerifyGenerator(source);
     }
 }

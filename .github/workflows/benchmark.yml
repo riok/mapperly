@@ -39,13 +39,13 @@ jobs:
           - SourceGeneratorBenchmarks
     name: ${{ matrix.BENCHMARK_NAME }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-dotnet@v5
       - name: Run ${{ matrix.BENCHMARK_NAME }}
         working-directory: ${{ env.BENCHMARKS_PATH }}
         run: dotnet run --exporters json --configuration Release --filter '*${{ matrix.BENCHMARK_NAME }}*'
       - name: Restore baseline results
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         id: cache-baseline-results-restore
         with:
           path: ${{ env.BENCHMARK_BASELINE_DIR }}
@@ -77,7 +77,7 @@ jobs:
       - name: Store baseline results
         id: cache-baseline-results-save
         if: github.ref == 'refs/heads/main'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: ${{ env.BENCHMARK_BASELINE_DIR }}
           key: ${{ steps.cache-baseline-results-restore.outputs.cache-primary-key }}

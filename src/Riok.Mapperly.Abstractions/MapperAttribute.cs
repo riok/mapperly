@@ -68,8 +68,13 @@ public class MapperAttribute : Attribute
     public bool UseDeepCloning { get; set; }
 
     /// <summary>
+    /// The strategy to use when cloning a <see cref="System.Collections.Generic.Stack{T}"/>.
+    /// </summary>
+    public StackCloningStrategy StackCloningStrategy { get; set; } = StackCloningStrategy.PreserveOrder;
+
+    /// <summary>
     /// Enabled conversions which Mapperly automatically implements.
-    /// By default all supported type conversions are enabled.
+    /// By default all supported type conversions except explicit casts are enabled, ie <c>MappingConversionType.All &amp; ~MappingConversionType.ExplicitCast</c>.
     /// <example>
     /// Eg. to disable all automatically implemented conversions:<br />
     /// <c>EnabledConversions = MappingConversionType.None</c>
@@ -79,7 +84,7 @@ public class MapperAttribute : Attribute
     /// <c>EnabledConversions = MappingConversionType.All &amp; ~MappingConversionType.ToStringMethod</c>
     /// </example>
     /// </summary>
-    public MappingConversionType EnabledConversions { get; set; } = MappingConversionType.All;
+    public MappingConversionType EnabledConversions { get; set; } = MappingConversionType.Default;
 
     /// <summary>
     /// Enables the reference handling feature.

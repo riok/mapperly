@@ -17,6 +17,8 @@ public class MapperGenerator : IIncrementalGenerator
 {
     public static readonly string MapperAttributeName = typeof(MapperAttribute).FullName!;
     public static readonly string MapperDefaultsAttributeName = typeof(MapperDefaultsAttribute).FullName!;
+    public static readonly string UseStaticMapperName = typeof(UseStaticMapperAttribute).FullName!;
+    public static readonly string UseStaticMapperGenericName = typeof(UseStaticMapperAttribute<>).FullName!;
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -57,12 +59,18 @@ public class MapperGenerator : IIncrementalGenerator
             .Select(static (x, _) => BuildDefaults(x.Left, x.Right))
             .WithTrackingName(MapperGeneratorStepNames.BuildMapperDefaults);
 
+        var useStaticMappers = SyntaxProvider
+            .GetUseStaticMapperDeclarations(context)
+            .Select(BuildStaticMappers)
+            .WithTrackingName(MapperGeneratorStepNames.BuildUseStaticMappers);
+
         // extract the mapper declarations and build the descriptors
         var mappersAndDiagnostics = SyntaxProvider
             .GetMapperDeclarations(context)
             .Combine(compilationContext)
             .Combine(mapperDefaults)
-            .Select(static (x, ct) => BuildDescriptor(x.Left.Right, x.Left.Left, x.Right, ct))
+            .Combine(useStaticMappers)
+            .Select(static (x, ct) => BuildDescriptor(x.Left.Left.Right, x.Left.Left.Left, x.Left.Right, x.Right, ct))
             .WhereNotNull();
 
         // output the diagnostics
@@ -80,6 +88,7 @@ public class MapperGenerator : IIncrementalGenerator
         CompilationContext compilationContext,
         MapperDeclaration mapperDeclaration,
         MapperConfiguration mapperDefaults,
+        ImmutableArray<UseStaticMapperConfiguration> assemblyScopedStaticMappers,
         CancellationToken cancellationToken
     )
     {
@@ -93,7 +102,13 @@ public class MapperGenerator : IIncrementalGenerator
 
         try
         {
-            var builder = new DescriptorBuilder(compilationContext, mapperDeclaration, symbolAccessor, mapperDefaults);
+            var builder = new DescriptorBuilder(
+                compilationContext,
+                mapperDeclaration,
+                symbolAccessor,
+                mapperDefaults,
+                assemblyScopedStaticMappers
+            );
             var (descriptor, diagnostics) = builder.Build(cancellationToken);
             var mapper = new MapperNode(
                 compilationContext.FileNameBuilder.Build(descriptor),
@@ -146,5 +161,27 @@ public class MapperGenerator : IIncrementalGenerator
                 LanguageVersion.CSharp9.ToDisplayString()
             );
         }
+    }
+
+    private static ImmutableArray<UseStaticMapperConfiguration> BuildStaticMappers(
+        ImmutableArray<AttributeData> attributeDataList,
+        CancellationToken ct
+    )
+    {
+        if (attributeDataList.IsDefaultOrEmpty)
+        {
+            return ImmutableArray<UseStaticMapperConfiguration>.Empty;
+        }
+
+        var configurations = ImmutableArray.CreateBuilder<UseStaticMapperConfiguration>(attributeDataList.Length);
+        foreach (var attributeData in attributeDataList)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            var config = AttributeDataAccessor.Access<UseStaticMapperAttribute<object>, UseStaticMapperConfiguration>(attributeData);
+            configurations.Add(config);
+        }
+
+        return configurations.ToImmutable();
     }
 }

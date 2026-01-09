@@ -1,4 +1,6 @@
 // @ts-check
+/** @typedef {import('@docusaurus/types').Config} Config */
+
 const { themes } = require('prism-react-renderer');
 
 const mapperlyVersion = process.env.MAPPERLY_VERSION || '0.0.1-dev';
@@ -19,7 +21,7 @@ async function createConfig() {
   const rehypeFaq = (await import('./src/plugins/rehype/rehype-faq/index.js'))
     .default;
 
-  /** @type {import('@docusaurus/types').Config} */
+  /** @type {Config} */
   return {
     customFields,
     title: 'Mapperly',
@@ -28,11 +30,15 @@ async function createConfig() {
     url: process.env.DOCUSAURUS_URL || 'https://mapperly.riok.app',
     baseUrl: process.env.DOCUSAURUS_BASE_URL || '/',
     trailingSlash: true,
-    onBrokenLinks: 'throw',
-    onBrokenMarkdownLinks: 'throw',
     favicon: 'img/logo.svg',
     organizationName: 'riok',
     projectName: 'mapperly',
+    markdown: {
+      hooks: {
+        onBrokenMarkdownLinks: 'throw',
+        onBrokenMarkdownImages: 'throw',
+      },
+    },
     i18n: {
       defaultLocale: 'en',
       locales: ['en'],

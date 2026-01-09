@@ -57,7 +57,6 @@ public class UnsafeAccessorTypeContext(UniqueNameBuilder nameBuilder, INamedType
 
     internal MemberDeclarationSyntax BuildSyntax(SourceEmitterContext ctx, CancellationToken cancellationToken)
     {
-#if ROSLYN4_7_OR_GREATER
         var accessorCtx = ctx.AddIndentation();
         var accessors = BuildAccessorsSyntax(accessorCtx, cancellationToken);
         accessors = accessors.SeparateByLineFeed(accessorCtx.SyntaxFactory.Indentation);
@@ -73,9 +72,6 @@ public class UnsafeAccessorTypeContext(UniqueNameBuilder nameBuilder, INamedType
         }
 
         return clazz;
-#else
-        throw new InvalidOperationException("Unsafe accessors are not supported for Roslyn versions < 4.7");
-#endif
     }
 
     private IEnumerable<MemberDeclarationSyntax> BuildAccessorsSyntax(SourceEmitterContext ctx, CancellationToken cancellationToken)

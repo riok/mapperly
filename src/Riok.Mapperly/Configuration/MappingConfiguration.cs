@@ -9,6 +9,7 @@ public record MappingConfiguration(
     MembersMappingConfiguration Members,
     IReadOnlyCollection<DerivedTypeMappingConfiguration> DerivedTypes,
     bool UseDeepCloning,
+    StackCloningStrategy StackCloningStrategy,
     SupportedFeatures SupportedFeatures
 )
 {

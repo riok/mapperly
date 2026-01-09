@@ -1,5 +1,8 @@
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Helpers;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Descriptors.Mappings.UserMappings;
 
@@ -25,48 +28,111 @@ public class UserImplementedInlinedExpressionMapping(
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
-        var body = InlineUserMappings(ctx, mappingBody);
-        return ReplaceSource(ctx, body);
+        var rewriter = new InliningRewriter(ctx, sourceParameter, mappingInvocations, ctx.NameBuilder);
+        return (ExpressionSyntax)rewriter.Visit(mappingBody);
     }
 
-    private ExpressionSyntax InlineUserMappings(TypeMappingBuildContext ctx, ExpressionSyntax body)
+    private class InliningRewriter(
+        TypeMappingBuildContext ctx,
+        ParameterSyntax sourceParameter,
+        IReadOnlyDictionary<SyntaxAnnotation, INewInstanceMapping> mappingInvocations,
+        UniqueNameBuilder nameBuilder,
+        Dictionary<string, string>? replacements = null
+    ) : CSharpSyntaxRewriter
     {
-        var invocations = body.GetAnnotatedNodes(InlineExpressionRewriter.SyntaxAnnotationKindMapperInvocation)
-            .OfType<InvocationExpressionSyntax>();
-        return body.ReplaceNodes(invocations, (invocation, _) => InlineMapping(ctx, invocation));
-    }
+        private readonly Dictionary<string, string> _replacements =
+            replacements != null ? new Dictionary<string, string>(replacements) : new();
 
-    private ExpressionSyntax InlineMapping(TypeMappingBuildContext ctx, InvocationExpressionSyntax invocation)
-    {
-        var annotation = invocation.GetAnnotations(InlineExpressionRewriter.SyntaxAnnotationKindMapperInvocation).FirstOrDefault();
-        if (!mappingInvocations.TryGetValue(annotation, out var mapping))
-            return invocation;
-
-        return mapping.Build(ctx.WithSource(invocation.ArgumentList.Arguments[0].Expression));
-    }
-
-    private ExpressionSyntax ReplaceSource(TypeMappingBuildContext ctx, ExpressionSyntax body)
-    {
-        // include self since the method could just be TTarget MyMapping(TSource source) => source;
-        // do not further descend if the source parameter is hidden
-        var identifierNodes = body.DescendantNodesAndSelf(n => !IsSourceParameterHidden(n))
-            .OfType<IdentifierNameSyntax>()
-            .Where(x => x.Identifier.Text.Equals(sourceParameter.Identifier.Text, StringComparison.Ordinal));
-        return body.ReplaceNodes(identifierNodes, (n, _) => ctx.Source.WithTriviaFrom(n));
-    }
-
-    private bool IsSourceParameterHidden(SyntaxNode node)
-    {
-        return ExtractOverwrittenIdentifiers(node).Any(x => x.Text.Equals(sourceParameter.Identifier.Text, StringComparison.Ordinal));
-    }
-
-    private IEnumerable<SyntaxToken> ExtractOverwrittenIdentifiers(SyntaxNode node)
-    {
-        return node switch
+        public override SyntaxNode VisitSimpleLambdaExpression(SimpleLambdaExpressionSyntax node)
         {
-            SimpleLambdaExpressionSyntax simpleLambda => [simpleLambda.Parameter.Identifier],
-            ParenthesizedLambdaExpressionSyntax lambda => lambda.ParameterList.Parameters.Select(p => p.Identifier),
-            _ => [],
-        };
+            var scopedNameBuilder = nameBuilder.NewScope();
+            var rewriter = new InliningRewriter(ctx, sourceParameter, mappingInvocations, scopedNameBuilder, _replacements);
+
+            var oldName = node.Parameter.Identifier.Text;
+            var isRenamed = scopedNameBuilder.NewIfNeeded(oldName, out var newName);
+            rewriter._replacements[oldName] = newName;
+
+            var newBody = (CSharpSyntaxNode)rewriter.Visit(node.Body);
+            var newNode = node.WithBody(newBody);
+            if (isRenamed)
+            {
+                newNode = newNode.WithParameter(
+                    node.Parameter.WithIdentifier(Identifier(newName).WithTriviaFrom(node.Parameter.Identifier))
+                );
+            }
+
+            return newNode;
+        }
+
+        public override SyntaxNode VisitParenthesizedLambdaExpression(ParenthesizedLambdaExpressionSyntax node)
+        {
+            var scopedNameBuilder = nameBuilder.NewScope();
+            var rewriter = new InliningRewriter(ctx, sourceParameter, mappingInvocations, scopedNameBuilder, _replacements);
+
+            var updatedParameters = new List<ParameterSyntax>(node.ParameterList.Parameters.Count);
+            var anyRenamed = false;
+
+            foreach (var parameter in node.ParameterList.Parameters)
+            {
+                var oldName = parameter.Identifier.Text;
+                var isRenamed = scopedNameBuilder.NewIfNeeded(oldName, out var newName);
+                rewriter._replacements[oldName] = newName;
+
+                if (isRenamed)
+                {
+                    updatedParameters.Add(parameter.WithIdentifier(Identifier(newName).WithTriviaFrom(parameter.Identifier)));
+                    anyRenamed = true;
+                }
+                else
+                {
+                    updatedParameters.Add(parameter);
+                }
+            }
+
+            var newBody = (CSharpSyntaxNode)rewriter.Visit(node.Body);
+
+            var newNode = node.WithBody(newBody);
+            if (anyRenamed)
+            {
+                newNode = newNode.WithParameterList(
+                    node.ParameterList.WithParameters(SeparatedList(updatedParameters, node.ParameterList.Parameters.GetSeparators()))
+                );
+            }
+
+            return newNode;
+        }
+
+        public override SyntaxNode? VisitIdentifierName(IdentifierNameSyntax node)
+        {
+            // replace parameter names
+            if (_replacements.TryGetValue(node.Identifier.Text, out var newName))
+            {
+                if (string.Equals(newName, node.Identifier.Text, StringComparison.Ordinal))
+                    return node;
+
+                return node.WithIdentifier(Identifier(newName).WithTriviaFrom(node.Identifier));
+            }
+
+            // replace source parameter
+            if (node.Identifier.Text.Equals(sourceParameter.Identifier.Text, StringComparison.Ordinal))
+            {
+                return ctx.Source.WithTriviaFrom(node);
+            }
+
+            return base.VisitIdentifierName(node);
+        }
+
+        public override SyntaxNode? VisitInvocationExpression(InvocationExpressionSyntax node)
+        {
+            var annotation = node.GetAnnotations(InlineExpressionRewriter.SyntaxAnnotationKindMapperInvocation).FirstOrDefault();
+            if (annotation == null || !mappingInvocations.TryGetValue(annotation, out var mapping))
+            {
+                return base.VisitInvocationExpression(node);
+            }
+
+            var argument = node.ArgumentList.Arguments[0];
+            var visitedArgument = (ArgumentSyntax)Visit(argument);
+            return mapping.Build(ctx.WithSource(visitedArgument.Expression));
+        }
     }
 }

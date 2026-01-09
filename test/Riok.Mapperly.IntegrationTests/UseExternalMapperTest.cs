@@ -11,7 +11,7 @@ namespace Riok.Mapperly.IntegrationTests
     public class UseExternalMapperTest : BaseMapperTest
     {
         [Fact]
-        [VersionedSnapshot(Versions.NET6_0)]
+        [VersionedSnapshot(Versions.NET8_0)]
         public Task SnapshotGeneratedSource()
         {
             var path = GetGeneratedMapperFilePath(nameof(UseExternalMapper));
@@ -72,6 +72,17 @@ namespace Riok.Mapperly.IntegrationTests
             var model = new IdObject { IdValue = 10 };
             var dto = UseExternalMapper.ConstantMapExternalString(model);
             dto.IdValue.ShouldBe(13);
+        }
+
+        [Fact]
+        public void RunAssemblyScopedMappings()
+        {
+            var model = new ExternalItemsModel { Item = new AssemblyScopedModel { Value = 10 } };
+
+            var dto = UseExternalMapper.ToDto(model);
+
+            dto.Item.ShouldNotBeNull();
+            dto.Item.Value.ShouldBe(11);
         }
     }
 }

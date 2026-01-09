@@ -155,6 +155,12 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
 
         node = methodSymbol switch
         {
+#if ROSLYN5_0_OR_GREATER
+            { AssociatedExtensionImplementation: not null } => VisitExtensionMethodInvocation(
+                node,
+                methodSymbol.AssociatedExtensionImplementation
+            ),
+#endif
             { IsExtensionMethod: true } => VisitExtensionMethodInvocation(node, methodSymbol),
             { IsStatic: true } => VisitStaticMethodInvocation(node, methodSymbol),
             _ => (InvocationExpressionSyntax)base.VisitInvocationExpression(node)!,
@@ -191,14 +197,12 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
         return base.VisitBaseExpression(node);
     }
 
-#if ROSLYN4_7_OR_GREATER
     public override SyntaxNode VisitCollectionExpression(CollectionExpressionSyntax node)
     {
         // CS9175
         CanBeInlined = false;
         return node;
     }
-#endif
 
     public override SyntaxNode VisitRangeExpression(RangeExpressionSyntax node)
     {
@@ -252,7 +256,7 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
         args.Add(Argument(receiverArgument.WithoutTrivia()));
         args.AddRange(arguments.Arguments);
 
-        var extensionMethodContainingType = FullyQualifiedIdentifier(methodSymbol.ReducedFrom!.ReceiverType!);
+        var extensionMethodContainingType = FullyQualifiedIdentifier((methodSymbol.ReducedFrom ?? methodSymbol).ReceiverType!);
         var expression = MemberAccessExpression(
             SyntaxKind.SimpleMemberAccessExpression,
             extensionMethodContainingType,

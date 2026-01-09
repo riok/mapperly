@@ -279,7 +279,9 @@ public static class EnumerableMappingBuilder
     )
     {
         var selectMethod = elementMapping.IsSynthetic ? null : SelectMethodName;
-        return new LinqConstructorMapping(ctx.Source, targetTypeToConstruct, elementMapping, selectMethod);
+        var isStack = ctx.CollectionInfos?.Target.CollectionType.HasFlag(CollectionType.Stack) == true;
+        var reverse = isStack && ctx.Configuration.StackCloningStrategy == StackCloningStrategy.PreserveOrder;
+        return new LinqConstructorMapping(ctx.Source, targetTypeToConstruct, elementMapping, selectMethod, reverse);
     }
 
     private static INewInstanceMapping? BuildCustomTypeMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)

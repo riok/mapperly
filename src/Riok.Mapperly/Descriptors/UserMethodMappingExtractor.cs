@@ -82,7 +82,15 @@ public static class UserMethodMappingExtractor
         }
 
         var methods = ctx.SymbolAccessor.GetAllMethods(type).Where(e => ctx.AttributeAccessor.IsMappingNameEqualTo(e, target.Name));
-        return BuildUserImplementedMappings(ctx, methods, target.GetTargetName(ctx), type.IsStatic, isExternal: true, isDefault: false);
+        return BuildUserImplementedMappings(
+            ctx,
+            methods,
+            target.GetTargetName(ctx),
+            type.IsStatic,
+            isExternal: true,
+            isDefault: false,
+            requireAttribute: false
+        );
     }
 
     internal static IEnumerable<IUserMapping> ExtractUserImplementedMappings(
@@ -93,6 +101,12 @@ public static class UserMethodMappingExtractor
         bool isExternal
     )
     {
+        // Ignore the mapper type itself.
+        if (SymbolEqualityComparer.Default.Equals(type, ctx.MapperDeclaration.Symbol))
+        {
+            return [];
+        }
+
         var methods = ctx
             .SymbolAccessor.GetAllMethods(type)
             .Concat(type.AllInterfaces.SelectMany(ctx.SymbolAccessor.GetAllMethods))
@@ -106,12 +120,13 @@ public static class UserMethodMappingExtractor
         string? receiver,
         bool isStatic,
         bool isExternal,
-        bool? isDefault = null
+        bool? isDefault = null,
+        bool requireAttribute = true
     )
     {
         foreach (var method in methods)
         {
-            if (!IsMappingMethodCandidate(ctx, method))
+            if (!IsMappingMethodCandidate(ctx, method, requireAttribute))
                 continue;
 
             // Partial method declarations are allowed for base classes,
