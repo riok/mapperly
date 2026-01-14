@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using Riok.Mapperly.Output;
 
 namespace Riok.Mapperly.Helpers;
@@ -62,6 +63,9 @@ internal static class IncrementalValuesProviderExtensions
         );
     }
 
+    // UTF-8 encoding without BOM (default for 'charset = utf-8' in .editorconfig)
+    private static readonly Encoding _utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+
     /// <summary>
     /// Registers an implementation source output for the provided mappers.
     /// </summary>
@@ -76,7 +80,40 @@ internal static class IncrementalValuesProviderExtensions
             mappers,
             static (spc, mapper) =>
             {
-                var mapperText = mapper.Body.GetText(Encoding.UTF8);
+                // Respect .editorconfig charset setting
+                // Default to UTF-8 without BOM (most common for source files)
+                var encoding = _utf8NoBom;
+                if (!string.IsNullOrEmpty(mapper.Charset))
+                {
+                    encoding = mapper.Charset switch
+                    {
+                        "utf-8-bom" => Encoding.UTF8, // UTF-8 with BOM
+                        "utf-16be" => Encoding.BigEndianUnicode,
+                        "utf-16le" => Encoding.Unicode,
+                        _ => _utf8NoBom, // utf-8 and others default to no BOM
+                    };
+                }
+
+                var mapperText = mapper.Body.GetText(encoding);
+
+                // Respect .editorconfig end_of_line setting
+                // The syntax tree uses CRLF by default (ElasticCarriageReturnLineFeed)
+                if (!string.IsNullOrEmpty(mapper.EndOfLine) && !string.Equals(mapper.EndOfLine, "crlf", StringComparison.Ordinal))
+                {
+                    var newLine = mapper.EndOfLine switch
+                    {
+                        "lf" => "\n",
+                        "cr" => "\r",
+                        _ => null,
+                    };
+
+                    if (newLine != null)
+                    {
+                        var text = mapperText.ToString().Replace("\r\n", newLine);
+                        mapperText = SourceText.From(text, encoding);
+                    }
+                }
+
                 spc.AddSource(mapper.FileName, mapperText);
             }
         );
