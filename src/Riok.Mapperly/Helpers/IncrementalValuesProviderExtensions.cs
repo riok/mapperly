@@ -66,6 +66,9 @@ internal static class IncrementalValuesProviderExtensions
     // UTF-8 encoding without BOM (default for 'charset = utf-8' in .editorconfig)
     private static readonly Encoding _utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 
+    // UTF-8 encoding with BOM (for 'charset = utf-8-bom' in .editorconfig)
+    private static readonly Encoding _utf8WithBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
+
     /// <summary>
     /// Registers an implementation source output for the provided mappers.
     /// </summary>
@@ -87,14 +90,14 @@ internal static class IncrementalValuesProviderExtensions
                 {
                     encoding = mapper.Charset switch
                     {
-                        "utf-8-bom" => Encoding.UTF8, // UTF-8 with BOM
+                        "utf-8-bom" => _utf8WithBom, // UTF-8 with BOM
                         "utf-16be" => Encoding.BigEndianUnicode,
                         "utf-16le" => Encoding.Unicode,
                         _ => _utf8NoBom, // utf-8 and others default to no BOM
                     };
                 }
 
-                var mapperText = mapper.Body.GetText(encoding);
+                var text = mapper.Body.GetText().ToString();
 
                 // Respect .editorconfig end_of_line setting
                 // The syntax tree uses CRLF by default (ElasticCarriageReturnLineFeed)
@@ -109,12 +112,12 @@ internal static class IncrementalValuesProviderExtensions
 
                     if (newLine != null)
                     {
-                        var text = mapperText.ToString().Replace("\r\n", newLine);
-                        mapperText = SourceText.From(text, encoding);
+                        text = text.Replace("\r\n", newLine, StringComparison.Ordinal);
                     }
                 }
 
-                spc.AddSource(mapper.FileName, mapperText);
+                // Always use SourceText.From to ensure BOM is included when specified
+                spc.AddSource(mapper.FileName, SourceText.From(text, encoding));
             }
         );
     }

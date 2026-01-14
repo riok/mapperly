@@ -118,17 +118,14 @@ public class MapperGenerator : IIncrementalGenerator
             var (descriptor, diagnostics) = builder.Build(cancellationToken);
 
             // Get editorconfig settings from the mapper's source file
-            var syntaxTree = mapperDeclaration.Syntax.SyntaxTree;
-            var configOptions = configOptionsProvider.GetOptions(syntaxTree);
+            // Note: [*.g.cs] patterns are not supported due to Roslyn limitation
+            // Users should configure settings in [*.cs] or [*] sections
+            var generatedFileName = compilationContext.FileNameBuilder.Build(descriptor);
+            var configOptions = configOptionsProvider.GetOptions(mapperDeclaration.Syntax.SyntaxTree);
             configOptions.TryGetValue("end_of_line", out var endOfLine);
             configOptions.TryGetValue("charset", out var charset);
 
-            var mapper = new MapperNode(
-                compilationContext.FileNameBuilder.Build(descriptor),
-                SourceEmitter.Build(descriptor, cancellationToken),
-                endOfLine,
-                charset
-            );
+            var mapper = new MapperNode(generatedFileName, SourceEmitter.Build(descriptor, cancellationToken), endOfLine, charset);
             return new MapperAndDiagnostics(mapper, diagnostics.ToImmutableEquatableArray());
         }
         catch (OperationCanceledException)
