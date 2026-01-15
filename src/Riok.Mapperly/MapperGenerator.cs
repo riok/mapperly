@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors;
@@ -70,7 +71,11 @@ public class MapperGenerator : IIncrementalGenerator
             .Combine(compilationContext)
             .Combine(mapperDefaults)
             .Combine(useStaticMappers)
-            .Select(static (x, ct) => BuildDescriptor(x.Left.Left.Right, x.Left.Left.Left, x.Left.Right, x.Right, ct))
+            .Combine(context.AnalyzerConfigOptionsProvider)
+            .Select(
+                static (x, ct) =>
+                    BuildDescriptor(x.Left.Left.Left.Right, x.Left.Left.Left.Left, x.Left.Left.Right, x.Left.Right, x.Right, ct)
+            )
             .WhereNotNull();
 
         // output the diagnostics
@@ -89,6 +94,7 @@ public class MapperGenerator : IIncrementalGenerator
         MapperDeclaration mapperDeclaration,
         MapperConfiguration mapperDefaults,
         ImmutableArray<UseStaticMapperConfiguration> assemblyScopedStaticMappers,
+        AnalyzerConfigOptionsProvider configOptionsProvider,
         CancellationToken cancellationToken
     )
     {
@@ -110,10 +116,16 @@ public class MapperGenerator : IIncrementalGenerator
                 assemblyScopedStaticMappers
             );
             var (descriptor, diagnostics) = builder.Build(cancellationToken);
-            var mapper = new MapperNode(
-                compilationContext.FileNameBuilder.Build(descriptor),
-                SourceEmitter.Build(descriptor, cancellationToken)
-            );
+
+            // Get editorconfig settings from the mapper's source file
+            // Note: [*.g.cs] patterns are not supported due to Roslyn limitation
+            // Users should configure settings in [*.cs] or [*] sections
+            var generatedFileName = compilationContext.FileNameBuilder.Build(descriptor);
+            var configOptions = configOptionsProvider.GetOptions(mapperDeclaration.Syntax.SyntaxTree);
+            configOptions.TryGetValue("end_of_line", out var endOfLine);
+            configOptions.TryGetValue("charset", out var charset);
+
+            var mapper = new MapperNode(generatedFileName, SourceEmitter.Build(descriptor, cancellationToken), endOfLine, charset);
             return new MapperAndDiagnostics(mapper, diagnostics.ToImmutableEquatableArray());
         }
         catch (OperationCanceledException)

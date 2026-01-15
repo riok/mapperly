@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using Riok.Mapperly.Output;
 
 namespace Riok.Mapperly.Helpers;
@@ -62,6 +63,12 @@ internal static class IncrementalValuesProviderExtensions
         );
     }
 
+    // UTF-8 encoding without BOM (default for 'charset = utf-8' in .editorconfig)
+    private static readonly Encoding _utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+
+    // UTF-8 encoding with BOM (for 'charset = utf-8-bom' in .editorconfig)
+    private static readonly Encoding _utf8WithBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
+
     /// <summary>
     /// Registers an implementation source output for the provided mappers.
     /// </summary>
@@ -76,9 +83,53 @@ internal static class IncrementalValuesProviderExtensions
             mappers,
             static (spc, mapper) =>
             {
-                var mapperText = mapper.Body.GetText(Encoding.UTF8);
-                spc.AddSource(mapper.FileName, mapperText);
+                // Respect .editorconfig charset setting
+                // Default to UTF-8 without BOM (most common for source files)
+                var encoding = _utf8NoBom;
+                if (!string.IsNullOrEmpty(mapper.Charset))
+                {
+                    encoding = mapper.Charset switch
+                    {
+                        "utf-8-bom" => _utf8WithBom, // UTF-8 with BOM
+                        "utf-16be" => Encoding.BigEndianUnicode,
+                        "utf-16le" => Encoding.Unicode,
+                        _ => _utf8NoBom, // utf-8 and others default to no BOM
+                    };
+                }
+
+                // Respect .editorconfig end_of_line setting
+                // The syntax tree uses CRLF by default (ElasticCarriageReturnLineFeed)
+                // For non-CRLF, use streaming replacement to avoid intermediate string allocation
+                var text = GetSourceText(mapper.Body, mapper.EndOfLine);
+
+                // Always use SourceText.From to ensure BOM is included when specified
+                spc.AddSource(mapper.FileName, SourceText.From(text, encoding));
             }
         );
+    }
+
+    private static string GetSourceText(Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax body, string? endOfLine)
+    {
+        var newLine = endOfLine switch
+        {
+            "lf" => "\n",
+            "cr" => "\r",
+            _ => null, // crlf, null, empty, or unknown - no replacement needed
+        };
+
+        if (newLine == null)
+        {
+            return body.GetText().ToString();
+        }
+
+        // Streaming replacement: write to StringBuilder via custom TextWriter
+        // This avoids creating an intermediate CRLF string
+        var sb = new StringBuilder();
+        using (var writer = new LineEndingTextWriter(sb, newLine))
+        {
+            body.WriteTo(writer);
+        }
+
+        return sb.ToString();
     }
 }
