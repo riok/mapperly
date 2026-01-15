@@ -1,4 +1,6 @@
+using System.IO;
 using System.Text;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Riok.Mapperly.Helpers;
 
@@ -18,6 +20,10 @@ internal sealed class LineEndingTextWriter : TextWriter
         _targetLineEnding = targetLineEnding;
     }
 
+    /// <summary>
+    /// Required by <see cref="TextWriter"/> but not used in this implementation.
+    /// Character encoding is handled by <see cref="SourceText"/> after line ending conversion.
+    /// </summary>
     public override Encoding Encoding => Encoding.UTF8;
 
     public override void Write(char value)
@@ -27,7 +33,7 @@ internal sealed class LineEndingTextWriter : TextWriter
             _lastCharWasCr = false;
             if (value == '\n')
             {
-                // CRLF detected - replace with target line ending
+                // CRLF detected - replace it with target line ending
                 _sb.Append(_targetLineEnding);
                 return;
             }
@@ -38,7 +44,7 @@ internal sealed class LineEndingTextWriter : TextWriter
 
         if (value == '\r')
         {
-            // Hold CR - might be start of CRLF
+            // Hold CR - might be the start of CRLF
             _lastCharWasCr = true;
             return;
         }
