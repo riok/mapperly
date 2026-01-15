@@ -16,7 +16,8 @@ public static class SourceEmitter
         var ctx = new SourceEmitterContext(
             descriptor.Static,
             descriptor.NameBuilder,
-            new SyntaxFactoryHelper(descriptor.SupportedFeatures)
+            new SyntaxFactoryHelper(descriptor.SupportedFeatures),
+            descriptor.AggressiveInliningTypes
         );
         var mapper = BuildMapper(ctx, descriptor, cancellationToken);
 
