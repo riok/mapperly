@@ -8,4 +8,10 @@ namespace Riok.Mapperly.Configuration;
 /// </summary>
 /// <param name="Source">The source constant of the enum value mapping.</param>
 /// <param name="Target">The target constant of the enum value mapping.</param>
-public record EnumValueMappingConfiguration(AttributeValue Source, AttributeValue Target);
+public record EnumValueMappingConfiguration(AttributeValue Source, AttributeValue Target) : IReversible<EnumValueMappingConfiguration>
+{
+    public EnumValueMappingConfiguration Reverse()
+    {
+        return new EnumValueMappingConfiguration(Source: Target, Target: Source);
+    }
+}

@@ -6,7 +6,9 @@ using Riok.Mapperly.Descriptors;
 namespace Riok.Mapperly.Configuration;
 
 [DebuggerDisplay("{Source} => {Target}")]
-public record MemberMappingConfiguration(IMemberPathConfiguration Source, IMemberPathConfiguration Target) : HasSyntaxReference
+public record MemberMappingConfiguration(IMemberPathConfiguration Source, IMemberPathConfiguration Target)
+    : HasSyntaxReference,
+        IReversible<MemberMappingConfiguration>
 {
     /// <summary>
     /// Used to adapt from <see cref="Abstractions.MapPropertyFromSourceAttribute"/>
@@ -26,4 +28,10 @@ public record MemberMappingConfiguration(IMemberPathConfiguration Source, IMembe
 
     public TypeMappingConfiguration ToTypeMappingConfiguration() =>
         new(StringFormat, FormatProvider, Use?.FullName, SuppressNullMismatchDiagnostic);
+
+    /// <inheritdoc/>
+    public MemberMappingConfiguration Reverse()
+    {
+        return this with { Source = Target, Target = Source };
+    }
 }
