@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Symbols.Members;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
@@ -17,7 +18,12 @@ internal class EnsureCapacityMethodSetter : IMemberSetter
 
     public bool SupportsCoalesceAssignment => false;
 
-    public ExpressionSyntax BuildAssignment(ExpressionSyntax? baseAccess, ExpressionSyntax valueToAssign, bool coalesceAssignment = false)
+    public ExpressionSyntax BuildAssignment(
+        ExpressionSyntax? baseAccess,
+        ExpressionSyntax valueToAssign,
+        INamedTypeSymbol? containingType = null,
+        bool coalesceAssignment = false
+    )
     {
         if (baseAccess == null)
             throw new ArgumentNullException(nameof(baseAccess));
