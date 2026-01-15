@@ -97,28 +97,46 @@ internal static class IncrementalValuesProviderExtensions
                     };
                 }
 
-                var text = mapper.Body.GetText().ToString();
-
                 // Respect .editorconfig end_of_line setting
                 // The syntax tree uses CRLF by default (ElasticCarriageReturnLineFeed)
-                if (!string.IsNullOrEmpty(mapper.EndOfLine) && !string.Equals(mapper.EndOfLine, "crlf", StringComparison.Ordinal))
-                {
-                    var newLine = mapper.EndOfLine switch
-                    {
-                        "lf" => "\n",
-                        "cr" => "\r",
-                        _ => null,
-                    };
-
-                    if (newLine != null)
-                    {
-                        text = text.Replace("\r\n", newLine, StringComparison.Ordinal);
-                    }
-                }
+                // For non-CRLF, use streaming replacement to avoid intermediate string allocation
+                var text = GetSourceText(mapper.Body, mapper.EndOfLine);
 
                 // Always use SourceText.From to ensure BOM is included when specified
                 spc.AddSource(mapper.FileName, SourceText.From(text, encoding));
             }
         );
+    }
+
+    private static string GetSourceText(Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax body, string? endOfLine)
+    {
+        // Fast path: CRLF or no setting - no replacement needed
+        if (string.IsNullOrEmpty(endOfLine) || string.Equals(endOfLine, "crlf", StringComparison.Ordinal))
+        {
+            return body.GetText().ToString();
+        }
+
+        var newLine = endOfLine switch
+        {
+            "lf" => "\n",
+            "cr" => "\r",
+            _ => null,
+        };
+
+        // Unknown setting - return as-is
+        if (newLine == null)
+        {
+            return body.GetText().ToString();
+        }
+
+        // Streaming replacement: write to StringBuilder via custom TextWriter
+        // This avoids creating an intermediate CRLF string
+        var sb = new System.Text.StringBuilder();
+        using (var writer = new LineEndingTextWriter(sb, newLine))
+        {
+            body.WriteTo(writer);
+        }
+
+        return sb.ToString();
     }
 }
