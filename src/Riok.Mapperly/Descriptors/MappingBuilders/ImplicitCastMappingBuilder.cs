@@ -14,6 +14,9 @@ public static class ImplicitCastMappingBuilder
         if (ctx.Configuration.UseDeepCloning && !ctx.Source.IsImmutable() && !ctx.Target.IsImmutable())
             return null;
 
+        if (ctx.HasUserSymbol && ctx.AttributeAccessor.HasAttribute<MapperUseShallowCloningAttribute>(ctx.UserSymbol!))
+            return null;
+
         // ClassifyConversion does not check if tuple field member names are the same
         // if tuple check isn't done then (A: int, B: int) -> (B: int, A: int) would be mapped
         // return source; instead of return (B: source.A, A: source.B);
