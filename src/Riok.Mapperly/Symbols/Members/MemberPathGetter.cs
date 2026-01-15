@@ -56,7 +56,7 @@ public class MemberPathGetter
         {
             return path.AggregateWithPrevious(
                 baseAccess,
-                (expr, prevProp, prop) => prop.Getter.BuildAccess(expr, prevProp.Member?.IsNullable == true)
+                (expr, prevProp, prop) => prop.Getter.BuildAccess(expr, prop.Member.ContainingType, prevProp.Member?.IsNullable == true)
             );
         }
 
@@ -66,12 +66,12 @@ public class MemberPathGetter
                 baseAccess,
                 (a, b) =>
                     b.Member.Type.IsNullableValueType()
-                        ? MemberAccess(b.Getter.BuildAccess(a), NullableValueProperty)
-                        : b.Getter.BuildAccess(a)
+                        ? MemberAccess(b.Getter.BuildAccess(a, b.Member.ContainingType), NullableValueProperty)
+                        : b.Getter.BuildAccess(a, b.Member.ContainingType)
             );
         }
 
-        return path.Aggregate(baseAccess, (a, b) => b.Getter.BuildAccess(a));
+        return path.Aggregate(baseAccess, (a, b) => b.Getter.BuildAccess(a, b.Member.ContainingType));
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ public class MemberPathGetter
         var conditions = new List<BinaryExpressionSyntax>();
         foreach (var pathPart in nullablePath)
         {
-            access = pathPart.Getter.BuildAccess(access);
+            access = pathPart.Getter.BuildAccess(access, pathPart.Member.ContainingType);
 
             if (!pathPart.Member.IsNullable)
                 continue;

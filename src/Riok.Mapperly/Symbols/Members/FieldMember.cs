@@ -54,13 +54,18 @@ public class FieldMember(IFieldSymbol symbol, SymbolAccessor symbolAccessor)
         return ctx.GetOrBuildFieldGetter(this);
     }
 
-    public ExpressionSyntax BuildAssignment(ExpressionSyntax? baseAccess, ExpressionSyntax valueToAssign, bool coalesceAssignment = false)
+    public ExpressionSyntax BuildAssignment(
+        ExpressionSyntax? baseAccess,
+        ExpressionSyntax valueToAssign,
+        INamedTypeSymbol? containingType = null,
+        bool coalesceAssignment = false
+    )
     {
         var targetMemberRef = BuildAccess(baseAccess);
         return Assignment(targetMemberRef, valueToAssign, coalesceAssignment);
     }
 
-    public ExpressionSyntax BuildAccess(ExpressionSyntax? baseAccess, bool nullConditional = false)
+    public ExpressionSyntax BuildAccess(ExpressionSyntax? baseAccess, INamedTypeSymbol? containingType = null, bool nullConditional = false)
     {
         if (baseAccess == null)
             return SyntaxFactory.IdentifierName(Name);
