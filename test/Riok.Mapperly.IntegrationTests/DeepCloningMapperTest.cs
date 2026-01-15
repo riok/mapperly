@@ -35,5 +35,14 @@ namespace Riok.Mapperly.IntegrationTests
             source.ShouldNotBeSameAs(copy);
             copy.IdValue.ShouldBe(20);
         }
+
+        [Fact]
+        public void RunMappingWithMapperAvoidReturningSourceReference()
+        {
+            var source = new TestObject(255, -1, 7) { RequiredValue = 999 };
+            var copy = AvoidReturningSourceReferenceMapper.Copy(source);
+            source.ShouldNotBeSameAs(copy);
+            copy.RequiredValue.ShouldBe(999);
+        }
     }
 }
