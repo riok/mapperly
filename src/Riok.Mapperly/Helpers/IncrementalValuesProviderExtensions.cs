@@ -110,20 +110,13 @@ internal static class IncrementalValuesProviderExtensions
 
     private static string GetSourceText(Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax body, string? endOfLine)
     {
-        // Fast path: CRLF or no setting - no replacement needed
-        if (string.IsNullOrEmpty(endOfLine) || string.Equals(endOfLine, "crlf", StringComparison.Ordinal))
-        {
-            return body.GetText().ToString();
-        }
-
         var newLine = endOfLine switch
         {
             "lf" => "\n",
             "cr" => "\r",
-            _ => null,
+            _ => null, // crlf, null, empty, or unknown - no replacement needed
         };
 
-        // Unknown setting - return as-is
         if (newLine == null)
         {
             return body.GetText().ToString();
@@ -131,7 +124,7 @@ internal static class IncrementalValuesProviderExtensions
 
         // Streaming replacement: write to StringBuilder via custom TextWriter
         // This avoids creating an intermediate CRLF string
-        var sb = new System.Text.StringBuilder();
+        var sb = new StringBuilder();
         using (var writer = new LineEndingTextWriter(sb, newLine))
         {
             body.WriteTo(writer);
