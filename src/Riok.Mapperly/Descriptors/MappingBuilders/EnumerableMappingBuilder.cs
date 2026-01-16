@@ -96,11 +96,7 @@ public static class EnumerableMappingBuilder
     private static NewInstanceMapping? TryBuildCastMapping(MappingBuilderContext ctx, ITypeMapping elementMapping)
     {
         // cannot cast if the method mapping is synthetic, deep clone is enabled or target is an unknown collection
-        if (
-            !elementMapping.IsSynthetic
-            || ctx.Configuration.UseDeepCloning
-            || ctx.CollectionInfos!.Target.CollectionType == CollectionType.None
-        )
+        if (!elementMapping.IsSynthetic || ctx.UseCloning || ctx.CollectionInfos!.Target.CollectionType == CollectionType.None)
         {
             return null;
         }

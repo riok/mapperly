@@ -89,6 +89,12 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     public IReadOnlyDictionary<TypeMappingKey, INewInstanceMapping> NewInstanceMappings => MappingBuilder.NewInstanceMappings;
 
     /// <summary>
+    /// Determines if mapping code should be emitted in cases where direct assignments or casts could be used instead.
+    /// </summary>
+    // TODO not finished
+    public bool UseCloning => Configuration.UseDeepCloning || (HasUserSymbol && Configuration.Members.UseShallowCloning);
+
+    /// <summary>
     /// Tries to find an existing mapping with the provided name.
     /// If none is found, <c>null</c> is returned.
     /// </summary>

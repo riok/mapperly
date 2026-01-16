@@ -1,4 +1,4 @@
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using Riok.Mapperly.IntegrationTests.Models;
@@ -8,13 +8,13 @@ using Xunit;
 
 namespace Riok.Mapperly.IntegrationTests
 {
-    public class DeepCloningMapperTest : BaseMapperTest
+    public class ShallowCloningMapperTest : BaseMapperTest
     {
         [Fact]
         [VersionedSnapshot(Versions.NET8_0)]
         public Task SnapshotGeneratedSource()
         {
-            var path = GetGeneratedMapperFilePath(nameof(DeepCloningMapper));
+            var path = GetGeneratedMapperFilePath(nameof(ShallowCloningMapper));
             return Verifier.VerifyFile(path);
         }
 
@@ -23,7 +23,7 @@ namespace Riok.Mapperly.IntegrationTests
         public Task RunMappingShouldWork()
         {
             var model = NewTestObj();
-            var dto = DeepCloningMapper.Copy(model);
+            var dto = ShallowCloningMapper.Copy(model);
             return Verifier.Verify(dto);
         }
 
@@ -31,9 +31,18 @@ namespace Riok.Mapperly.IntegrationTests
         public void RunIdMappingShouldWork()
         {
             var source = new IdObject { IdValue = 20 };
-            var copy = DeepCloningMapper.Copy(source);
+            var copy = ShallowCloningMapper.Copy(source);
             source.ShouldNotBeSameAs(copy);
             copy.IdValue.ShouldBe(20);
+        }
+
+        [Fact]
+        public void RunMappingWithMapperAvoidReturningSourceReference()
+        {
+            var source = new TestObject(255, -1, 7) { RequiredValue = 999 };
+            var copy = ShallowCloningMapper.Copy(source);
+            source.ShouldNotBeSameAs(copy);
+            copy.RequiredValue.ShouldBe(999);
         }
     }
 }
