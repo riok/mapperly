@@ -51,7 +51,16 @@ public class MapperConfigurationReader
                 mapper.RequiredEnumMappingStrategy,
                 mapper.EnumNamingStrategy
             ),
-            new MembersMappingConfiguration([], [], [], [], [], mapper.IgnoreObsoleteMembersStrategy, mapper.RequiredMappingStrategy),
+            new MembersMappingConfiguration(
+                [],
+                [],
+                [],
+                [],
+                [],
+                mapper.IgnoreObsoleteMembersStrategy,
+                mapper.RequiredMappingStrategy,
+                UseShallowCloning: false
+            ),
             [],
             mapper.UseDeepCloning,
             mapper.StackCloningStrategy,
@@ -239,10 +248,12 @@ public class MapperConfigurationReader
             .AccessFirstOrDefault<MapperIgnoreObsoleteMembersAttribute>(configRef.Method)
             ?.IgnoreObsoleteStrategy;
         var requiredMapping = _dataAccessor.AccessFirstOrDefault<MapperRequiredMappingAttribute>(configRef.Method)?.RequiredMappingStrategy;
+        var useShallowCloning = _dataAccessor.AccessFirstOrDefault<MapperUseShallowCloningAttribute>(configRef.Method);
 
         // ignore the required mapping / ignore obsolete as the same attribute is used for other mapping types
         // e.g. enum to enum
-        var hasMemberConfigs = ignoredSourceMembers.Count > 0 || ignoredTargetMembers.Count > 0 || memberConfigurations.Count > 0;
+        var hasMemberConfigs =
+            ignoredSourceMembers.Count > 0 || ignoredTargetMembers.Count > 0 || memberConfigurations.Count > 0 || useShallowCloning != null;
         if (hasMemberConfigs && (configRef.Source.IsEnum() || configRef.Target.IsEnum()))
         {
             _diagnostics.ReportDiagnostic(DiagnosticDescriptors.MemberConfigurationOnNonMemberMapping, configRef.Method);
@@ -276,7 +287,8 @@ public class MapperConfigurationReader
             memberConfigurations,
             nestedMembersConfigurations,
             ignoreObsolete,
-            requiredMapping
+            requiredMapping,
+            useShallowCloning != null
         );
     }
 

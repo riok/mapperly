@@ -9,13 +9,12 @@ public static class DirectAssignmentMappingBuilder
 {
     public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
-        if (ctx.HasUserSymbol && ctx.AttributeAccessor.HasAttribute<MapperUseShallowCloningAttribute>(ctx.UserSymbol!))
+        if (ctx.UseCloning && !ctx.Source.IsImmutable())
+        {
             return null;
+        }
 
-        if (
-            !SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, ctx.Target)
-            || (ctx.Configuration.UseDeepCloning && !ctx.Source.IsImmutable())
-        )
+        if (!SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, ctx.Target))
         {
             return null;
         }
