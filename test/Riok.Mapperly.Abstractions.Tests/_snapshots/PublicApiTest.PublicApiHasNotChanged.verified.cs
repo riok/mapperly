@@ -208,6 +208,12 @@ namespace Riok.Mapperly.Abstractions
         public MapperRequiredMappingAttribute(Riok.Mapperly.Abstractions.RequiredMappingStrategy requiredMappingStrategy) { }
         public Riok.Mapperly.Abstractions.RequiredMappingStrategy RequiredMappingStrategy { get; }
     }
+    [System.AttributeUsage(System.AttributeTargets.Method)]
+    [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
+    public sealed class MapperUseShallowCloningAttribute : System.Attribute
+    {
+        public MapperUseShallowCloningAttribute() { }
+    }
     [System.Flags]
     public enum MappingConversionType
     {
