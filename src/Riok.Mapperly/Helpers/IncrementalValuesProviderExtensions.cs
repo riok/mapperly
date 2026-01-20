@@ -86,7 +86,7 @@ internal static class IncrementalValuesProviderExtensions
             {
                 // Respect .editorconfig charset setting
                 // Default to UTF-8 without BOM (most common for source files)
-                var encoding = mapper.Charset switch
+                var encoding = mapper.SourceTextConfig.Charset switch
                 {
                     "utf-8-bom" => _utf8WithBom,
                     "utf-16be" => Encoding.BigEndianUnicode,
@@ -97,7 +97,7 @@ internal static class IncrementalValuesProviderExtensions
                 // Respect .editorconfig end_of_line setting
                 // The syntax tree uses CRLF by default (ElasticCarriageReturnLineFeed)
                 // For non-CRLF, use streaming replacement to avoid intermediate string allocation
-                var text = GetSourceText(mapper.Body, mapper.EndOfLine);
+                var text = GetSourceText(mapper.Body, mapper.SourceTextConfig.EndOfLine);
 
                 // Always use SourceText.From to ensure BOM is included when specified
                 spc.AddSource(mapper.FileName, SourceText.From(text, encoding));

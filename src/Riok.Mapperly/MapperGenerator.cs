@@ -124,8 +124,9 @@ public class MapperGenerator : IIncrementalGenerator
             var configOptions = configOptionsProvider.GetOptions(mapperDeclaration.Syntax.SyntaxTree);
             configOptions.TryGetValue("end_of_line", out var endOfLine);
             configOptions.TryGetValue("charset", out var charset);
+            var sourceTextConfig = new SourceTextConfig(endOfLine, charset);
 
-            var mapper = new MapperNode(generatedFileName, SourceEmitter.Build(descriptor, cancellationToken), endOfLine, charset);
+            var mapper = new MapperNode(generatedFileName, SourceEmitter.Build(descriptor, cancellationToken), sourceTextConfig);
             return new MapperAndDiagnostics(mapper, diagnostics.ToImmutableEquatableArray());
         }
         catch (OperationCanceledException)
