@@ -90,10 +90,10 @@ internal static class IncrementalValuesProviderExtensions
                 {
                     encoding = mapper.Charset switch
                     {
-                        "utf-8-bom" => _utf8WithBom, // UTF-8 with BOM
+                        "utf-8-bom" => _utf8WithBom,
                         "utf-16be" => Encoding.BigEndianUnicode,
                         "utf-16le" => Encoding.Unicode,
-                        _ => _utf8NoBom, // utf-8 and others default to no BOM
+                        _ => _utf8NoBom,
                     };
                 }
 
