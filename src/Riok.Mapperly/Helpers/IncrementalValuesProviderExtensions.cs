@@ -85,17 +85,13 @@ internal static class IncrementalValuesProviderExtensions
             {
                 // Respect .editorconfig charset setting
                 // Default to UTF-8 without BOM (most common for source files)
-                var encoding = _utf8NoBom;
-                if (!string.IsNullOrEmpty(mapper.Charset))
+                var encoding = mapper.Charset switch
                 {
-                    encoding = mapper.Charset switch
-                    {
-                        "utf-8-bom" => _utf8WithBom,
-                        "utf-16be" => Encoding.BigEndianUnicode,
-                        "utf-16le" => Encoding.Unicode,
-                        _ => _utf8NoBom,
-                    };
-                }
+                    "utf-8-bom" => _utf8WithBom,
+                    "utf-16be" => Encoding.BigEndianUnicode,
+                    "utf-16le" => Encoding.Unicode,
+                    _ => _utf8NoBom,
+                };
 
                 // Respect .editorconfig end_of_line setting
                 // The syntax tree uses CRLF by default (ElasticCarriageReturnLineFeed)
