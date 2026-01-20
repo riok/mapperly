@@ -126,12 +126,40 @@ public class MapperGenerator : IIncrementalGenerator
             configOptions.TryGetValue("charset", out var charset);
             var sourceTextConfig = new SourceTextConfig(endOfLine, charset);
 
+            // Validate editorconfig settings and add diagnostics for unknown values
+            var location = mapperDeclaration.Syntax.GetLocation();
+            var allDiagnostics = diagnostics.ToList();
+            ValidateEditorConfigSettings(endOfLine, charset, location, allDiagnostics);
+
             var mapper = new MapperNode(generatedFileName, SourceEmitter.Build(descriptor, cancellationToken), sourceTextConfig);
-            return new MapperAndDiagnostics(mapper, diagnostics.ToImmutableEquatableArray());
+            return new MapperAndDiagnostics(mapper, allDiagnostics.ToImmutableEquatableArray());
         }
         catch (OperationCanceledException)
         {
             return null;
+        }
+    }
+
+    private static readonly HashSet<string> _validCharsets = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "utf-8",
+        "utf-8-bom",
+        "utf-16be",
+        "utf-16le",
+    };
+
+    private static readonly HashSet<string> _validEndOfLineValues = new(StringComparer.OrdinalIgnoreCase) { "lf", "crlf", "cr" };
+
+    private static void ValidateEditorConfigSettings(string? endOfLine, string? charset, Location location, List<Diagnostic> diagnostics)
+    {
+        if (charset is not null and not "" && !_validCharsets.Contains(charset))
+        {
+            diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.UnknownEditorConfigCharset, location, charset));
+        }
+
+        if (endOfLine is not null and not "" && !_validEndOfLineValues.Contains(endOfLine))
+        {
+            diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.UnknownEditorConfigEndOfLine, location, endOfLine));
         }
     }
 
