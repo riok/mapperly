@@ -1,7 +1,3 @@
-using System.Collections.Immutable;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Riok.Mapperly.Tests.Generator;
@@ -43,41 +39,7 @@ public class EndOfLineTest
     private static SourceText GenerateSourceText(string? endOfLine = null, string? charset = null)
     {
         var source = TestSourceBuilder.Mapping("string", "string");
-        var syntaxTree = CSharpSyntaxTree.ParseText(source, CSharpParseOptions.Default);
-        var compilation = TestHelper.BuildCompilation(syntaxTree);
-        var configOptionsProvider = new TestAnalyzerConfigOptionsProvider(endOfLine, charset);
-
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(
-            [new MapperGenerator().AsSourceGenerator()],
-            optionsProvider: configOptionsProvider
-        );
-        driver = driver.RunGenerators(compilation);
-
-        return driver.GetRunResult().GeneratedTrees.First().GetText();
-    }
-
-    private class TestAnalyzerConfigOptionsProvider(string? endOfLine, string? charset) : AnalyzerConfigOptionsProvider
-    {
-        private readonly TestAnalyzerConfigOptions _fileOptions = new(endOfLine, charset);
-
-        // GlobalOptions should NOT contain .editorconfig settings - they're per-file only
-        public override AnalyzerConfigOptions GlobalOptions => new TestAnalyzerConfigOptions(null, null);
-
-        public override AnalyzerConfigOptions GetOptions(SyntaxTree tree) => _fileOptions;
-
-        public override AnalyzerConfigOptions GetOptions(AdditionalText textFile) => _fileOptions;
-    }
-
-    private class TestAnalyzerConfigOptions(string? endOfLine, string? charset) : AnalyzerConfigOptions
-    {
-        private readonly ImmutableDictionary<string, string> _options = new Dictionary<string, string?>
-        {
-            ["end_of_line"] = endOfLine,
-            ["charset"] = charset,
-        }
-            .Where(x => x.Value != null)
-            .ToImmutableDictionary(x => x.Key, x => x.Value!);
-
-        public override bool TryGetValue(string key, out string value) => _options.TryGetValue(key, out value!);
+        var options = TestHelperOptions.Default with { EditorConfigEndOfLine = endOfLine, EditorConfigCharset = charset };
+        return TestHelper.GenerateSourceText(source, options);
     }
 }
