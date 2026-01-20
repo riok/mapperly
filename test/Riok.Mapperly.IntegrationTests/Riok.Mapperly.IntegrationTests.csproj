@@ -32,9 +32,9 @@
   </ItemGroup>
   <!-- ef core tests should only run on newer .NET versions -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" Condition="'$(TargetFramework)' == 'net8.0'" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.7" Condition="'$(TargetFramework)' == 'net9.0'" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.1" Condition="'$(TargetFramework)' == 'net10.0'" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.23" Condition="'$(TargetFramework)' == 'net8.0'" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.12" Condition="'$(TargetFramework)' == 'net9.0'" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.2" Condition="'$(TargetFramework)' == 'net10.0'" />
   </ItemGroup>
   <!-- cannot use source generated polyfills since they require language version 11 -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
