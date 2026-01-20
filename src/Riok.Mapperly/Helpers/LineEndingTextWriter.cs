@@ -1,4 +1,3 @@
-using System.IO;
 using System.Text;
 using Microsoft.CodeAnalysis.Text;
 
@@ -8,7 +7,7 @@ namespace Riok.Mapperly.Helpers;
 /// A TextWriter that replaces CRLF (\r\n) with a target line ending on-the-fly.
 /// This avoids intermediate string allocations when converting line endings.
 /// </summary>
-internal sealed class LineEndingTextWriter : TextWriter
+public sealed class LineEndingTextWriter : TextWriter
 {
     private readonly StringBuilder _sb;
     private readonly string _targetLineEnding;
