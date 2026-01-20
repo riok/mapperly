@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Riok.Mapperly.Output;
 
@@ -104,7 +105,7 @@ internal static class IncrementalValuesProviderExtensions
         );
     }
 
-    private static string GetSourceText(Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax body, string? endOfLine)
+    private static string GetSourceText(CompilationUnitSyntax body, string? endOfLine)
     {
         var newLine = endOfLine switch
         {
