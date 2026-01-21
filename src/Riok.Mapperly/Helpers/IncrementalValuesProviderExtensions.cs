@@ -8,6 +8,12 @@ namespace Riok.Mapperly.Helpers;
 
 internal static class IncrementalValuesProviderExtensions
 {
+    // UTF-8 encoding without BOM (default for 'charset = utf-8' in .editorconfig)
+    private static readonly Encoding _utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+
+    // UTF-8 encoding with BOM (for 'charset = utf-8-bom' in .editorconfig)
+    private static readonly Encoding _utf8WithBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
+
     public static IncrementalValuesProvider<TSource> WhereNotNull<TSource>(this IncrementalValuesProvider<TSource?> source)
         where TSource : struct
     {
@@ -63,12 +69,6 @@ internal static class IncrementalValuesProviderExtensions
             }
         );
     }
-
-    // UTF-8 encoding without BOM (default for 'charset = utf-8' in .editorconfig)
-    private static readonly Encoding _utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
-
-    // UTF-8 encoding with BOM (for 'charset = utf-8-bom' in .editorconfig)
-    private static readonly Encoding _utf8WithBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
 
     /// <summary>
     /// Registers an implementation source output for the provided mappers.
