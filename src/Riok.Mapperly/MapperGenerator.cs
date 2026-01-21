@@ -21,6 +21,16 @@ public class MapperGenerator : IIncrementalGenerator
     public static readonly string UseStaticMapperName = typeof(UseStaticMapperAttribute).FullName!;
     public static readonly string UseStaticMapperGenericName = typeof(UseStaticMapperAttribute<>).FullName!;
 
+    private static readonly HashSet<string> _validCharsets = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "utf-8",
+        "utf-8-bom",
+        "utf-16be",
+        "utf-16le",
+    };
+
+    private static readonly HashSet<string> _validEndOfLineValues = new(StringComparer.OrdinalIgnoreCase) { "lf", "crlf", "cr" };
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
 #if DEBUG_SOURCE_GENERATOR
@@ -139,16 +149,6 @@ public class MapperGenerator : IIncrementalGenerator
             return null;
         }
     }
-
-    private static readonly HashSet<string> _validCharsets = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "utf-8",
-        "utf-8-bom",
-        "utf-16be",
-        "utf-16le",
-    };
-
-    private static readonly HashSet<string> _validEndOfLineValues = new(StringComparer.OrdinalIgnoreCase) { "lf", "crlf", "cr" };
 
     private static void ValidateEditorConfigSettings(string? endOfLine, string? charset, Location location, List<Diagnostic> diagnostics)
     {
