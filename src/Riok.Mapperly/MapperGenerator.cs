@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -21,15 +22,8 @@ public class MapperGenerator : IIncrementalGenerator
     public static readonly string UseStaticMapperName = typeof(UseStaticMapperAttribute).FullName!;
     public static readonly string UseStaticMapperGenericName = typeof(UseStaticMapperAttribute<>).FullName!;
 
-    private static readonly HashSet<string> _validCharsets = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "utf-8",
-        "utf-8-bom",
-        "utf-16be",
-        "utf-16le",
-    };
-
-    private static readonly HashSet<string> _validEndOfLineValues = new(StringComparer.OrdinalIgnoreCase) { "lf", "crlf", "cr" };
+    private static readonly Encoding _utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+    private static readonly Encoding _utf8WithBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -132,17 +126,12 @@ public class MapperGenerator : IIncrementalGenerator
             // Users should configure settings in [*.cs] or [*] sections
             var generatedFileName = compilationContext.FileNameBuilder.Build(descriptor);
             var configOptions = configOptionsProvider.GetOptions(mapperDeclaration.Syntax.SyntaxTree);
-            configOptions.TryGetValue("end_of_line", out var endOfLine);
-            configOptions.TryGetValue("charset", out var charset);
-            var sourceTextConfig = new SourceTextConfig(endOfLine, charset);
 
-            // Validate editorconfig settings and add diagnostics for unknown values
-            var location = mapperDeclaration.Syntax.GetLocation();
-            var allDiagnostics = diagnostics.ToList();
-            ValidateEditorConfigSettings(endOfLine, charset, location, allDiagnostics);
+            // Convert editorconfig values to actual values, reporting diagnostics for unknown values
+            var sourceTextConfig = BuildSourceTextConfig(configOptions, diagnostics);
 
             var mapper = new MapperNode(generatedFileName, SourceEmitter.Build(descriptor, cancellationToken), sourceTextConfig);
-            return new MapperAndDiagnostics(mapper, allDiagnostics.ToImmutableEquatableArray());
+            return new MapperAndDiagnostics(mapper, diagnostics.ToImmutableEquatableArray());
         }
         catch (OperationCanceledException)
         {
@@ -150,17 +139,42 @@ public class MapperGenerator : IIncrementalGenerator
         }
     }
 
-    private static void ValidateEditorConfigSettings(string? endOfLine, string? charset, Location location, List<Diagnostic> diagnostics)
+    private static SourceTextConfig BuildSourceTextConfig(AnalyzerConfigOptions configOptions, DiagnosticCollection diagnostics)
     {
-        if (charset is not null and not "" && !_validCharsets.Contains(charset))
-        {
-            diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.UnknownEditorConfigCharset, location, charset));
-        }
+        configOptions.TryGetValue("end_of_line", out var endOfLineValue);
+        configOptions.TryGetValue("charset", out var charsetValue);
 
-        if (endOfLine is not null and not "" && !_validEndOfLineValues.Contains(endOfLine))
+        var endOfLine = endOfLineValue?.ToLowerInvariant() switch
         {
-            diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.UnknownEditorConfigEndOfLine, location, endOfLine));
-        }
+            null or "" => null,
+            "lf" => "\n",
+            "cr" => "\r",
+            "crlf" => "\r\n",
+            _ => ReportUnknownEndOfLine(endOfLineValue!, diagnostics),
+        };
+
+        var encoding = charsetValue?.ToLowerInvariant() switch
+        {
+            null or "" or "utf-8" => _utf8NoBom,
+            "utf-8-bom" => _utf8WithBom,
+            "utf-16be" => Encoding.BigEndianUnicode,
+            "utf-16le" => Encoding.Unicode,
+            _ => ReportUnknownCharset(charsetValue!, diagnostics),
+        };
+
+        return new SourceTextConfig(endOfLine, encoding);
+    }
+
+    private static string? ReportUnknownEndOfLine(string value, DiagnosticCollection diagnostics)
+    {
+        diagnostics.ReportDiagnostic(DiagnosticDescriptors.UnknownEditorConfigEndOfLine, (Location?)null, value);
+        return null;
+    }
+
+    private static Encoding ReportUnknownCharset(string value, DiagnosticCollection diagnostics)
+    {
+        diagnostics.ReportDiagnostic(DiagnosticDescriptors.UnknownEditorConfigCharset, (Location?)null, value);
+        return _utf8NoBom;
     }
 
     private static MapperConfiguration BuildDefaults(CompilationContext compilationContext, IAssemblySymbol? assemblySymbol)

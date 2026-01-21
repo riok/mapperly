@@ -8,12 +8,6 @@ namespace Riok.Mapperly.Helpers;
 
 internal static class IncrementalValuesProviderExtensions
 {
-    // UTF-8 encoding without BOM (default for 'charset = utf-8' in .editorconfig)
-    private static readonly Encoding _utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
-
-    // UTF-8 encoding with BOM (for 'charset = utf-8-bom' in .editorconfig)
-    private static readonly Encoding _utf8WithBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
-
     public static IncrementalValuesProvider<TSource> WhereNotNull<TSource>(this IncrementalValuesProvider<TSource?> source)
         where TSource : struct
     {
@@ -84,49 +78,25 @@ internal static class IncrementalValuesProviderExtensions
             mappers,
             static (spc, mapper) =>
             {
-                // Respect .editorconfig charset setting
-                // Default to UTF-8 without BOM (most common for source files)
-                var encoding = mapper.SourceTextConfig.Charset switch
-                {
-                    "utf-8-bom" => _utf8WithBom,
-                    "utf-16be" => Encoding.BigEndianUnicode,
-                    "utf-16le" => Encoding.Unicode,
-                    _ => _utf8NoBom,
-                };
-
-                // Respect .editorconfig end_of_line setting
-                // The syntax tree uses CRLF by default (ElasticCarriageReturnLineFeed)
-                // For non-CRLF, use streaming replacement to avoid intermediate string allocation
-                var text = GetSourceText(mapper.Body, mapper.SourceTextConfig.EndOfLine);
-
-                // Always use SourceText.From to ensure BOM is included when specified
-                spc.AddSource(mapper.FileName, SourceText.From(text, encoding));
+                var sourceText = GetSourceText(mapper.Body, mapper.SourceTextConfig);
+                spc.AddSource(mapper.FileName, sourceText);
             }
         );
     }
 
-    private static string GetSourceText(CompilationUnitSyntax body, string? endOfLine)
+    private static SourceText GetSourceText(CompilationUnitSyntax body, SourceTextConfig config)
     {
-        var newLine = endOfLine switch
+        if (config.EndOfLine is null or "\r\n") // No conversion needed
         {
-            "lf" => "\n",
-            "cr" => "\r",
-            _ => null, // crlf, null, empty, or unknown - no replacement needed
-        };
-
-        if (newLine == null)
-        {
-            return body.GetText().ToString();
+            return body.GetText(config.Encoding);
         }
 
-        // Streaming replacement: write to StringBuilder via custom TextWriter
-        // This avoids creating an intermediate CRLF string
         var sb = new StringBuilder();
-        using (var writer = new LineEndingTextWriter(sb, newLine))
+        using (var writer = new LineEndingTextWriter(sb, config.EndOfLine))
         {
             body.WriteTo(writer);
         }
 
-        return sb.ToString();
+        return SourceText.From(sb.ToString(), config.Encoding);
     }
 }
