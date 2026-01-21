@@ -36,5 +36,9 @@ public class ConstructorParameterMember(IParameterSymbol symbol, SymbolAccessor 
     public IMemberSetter BuildSetter(UnsafeAccessorContext ctx) =>
         throw new InvalidOperationException($"Cannot create a setter for {nameof(ParameterSourceMember)}");
 
-    public ExpressionSyntax BuildAccess(ExpressionSyntax? baseAccess, bool nullConditional = false) => IdentifierName(Name);
+    public ExpressionSyntax BuildAccess(
+        ExpressionSyntax? baseAccess,
+        INamedTypeSymbol? containingType = null,
+        bool nullConditional = false
+    ) => IdentifierName(Name);
 }
