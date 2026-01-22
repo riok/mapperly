@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using Riok.Mapperly.Abstractions;
 
 namespace Riok.Mapperly.Tests;
@@ -24,6 +25,16 @@ public static class TestHelper
         }
 
         return verify.ToTask();
+    }
+
+    /// <summary>
+    /// Generates mapper source and returns the first generated SourceText.
+    /// Useful for testing encoding and line ending settings.
+    /// </summary>
+    public static SourceText GenerateSourceText(string source, TestHelperOptions? options = null)
+    {
+        var driver = Generate(source, options);
+        return driver.GetRunResult().GeneratedTrees.First().GetText();
     }
 
     public static MapperGenerationResult GenerateMapper(
@@ -92,6 +103,7 @@ public static class TestHelper
         IReadOnlyCollection<TestAssembly>? additionalAssemblies = null
     )
     {
+        options ??= TestHelperOptions.Default;
         var compilation = BuildCompilation(source, options);
         if (additionalAssemblies != null)
         {
@@ -100,7 +112,13 @@ public static class TestHelper
 
         var generator = new MapperGenerator();
 
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+        // Create options provider for editorconfig settings if specified
+        var optionsProvider =
+            options.EditorConfigEndOfLine != null || options.EditorConfigCharset != null
+                ? new TestAnalyzerConfigOptionsProvider(options.EditorConfigEndOfLine, options.EditorConfigCharset)
+                : null;
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create([generator.AsSourceGenerator()], optionsProvider: optionsProvider);
         return driver.RunGenerators(compilation);
     }
 

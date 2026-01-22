@@ -799,6 +799,24 @@ public static class DiagnosticDescriptors
         true
     );
 
+    public static readonly DiagnosticDescriptor UnknownEditorConfigCharset = new(
+        "RMG095",
+        "Unknown charset in editorconfig",
+        "Unknown charset value '{0}' in editorconfig, valid values are: utf-8, utf-8-bom, utf-16be, utf-16le",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Info,
+        true
+    );
+
+    public static readonly DiagnosticDescriptor UnknownEditorConfigEndOfLine = new(
+        "RMG096",
+        "Unknown end_of_line in editorconfig",
+        "Unknown end_of_line value '{0}' in editorconfig, valid values are: lf, crlf, cr",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Info,
+        true
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT
