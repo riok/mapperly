@@ -21,29 +21,29 @@
     "@docusaurus/core": "3.9.2",
     "@docusaurus/plugin-ideal-image": "3.9.2",
     "@docusaurus/preset-classic": "3.9.2",
-    "@easyops-cn/docusaurus-search-local": "0.52.2",
+    "@easyops-cn/docusaurus-search-local": "0.52.3",
     "@mdx-js/react": "3.1.1",
     "clsx": "2.1.1",
     "docusaurus-plugin-sass": "0.2.6",
     "prism-react-renderer": "2.4.1",
     "raw-loader": "4.0.2",
-    "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@docusaurus/eslint-plugin": "3.9.2",
     "@docusaurus/module-type-aliases": "3.9.2",
     "@docusaurus/tsconfig": "3.9.2",
-    "@types/react": "19.2.8",
-    "@typescript-eslint/eslint-plugin": "8.53.0",
+    "@types/react": "19.2.10",
+    "@typescript-eslint/eslint-plugin": "8.54.0",
     "hast-util-to-html": "9.0.5",
     "marked": "11.2.0",
-    "prettier": "3.7.4",
-    "stylelint": "16.26.1",
-    "stylelint-config-standard": "39.0.1",
+    "prettier": "3.8.1",
+    "stylelint": "17.1.0",
+    "stylelint-config-standard": "40.0.0",
     "ts-node": "10.9.2",
     "typescript": "5.4.5",
-    "unist-util-visit": "5.0.0"
+    "unist-util-visit": "5.1.0"
   },
   "browserslist": {
     "production": [
