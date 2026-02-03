@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Constructors;
 using Riok.Mapperly.Descriptors.Enumerables;
@@ -91,8 +92,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <summary>
     /// Determines if mapping code should be emitted in cases where direct assignments or casts could be used instead.
     /// </summary>
-    // TODO not finished
-    public bool UseCloning => Configuration.UseDeepCloning || (HasUserSymbol && Configuration.Members.UseShallowCloning);
+    public bool UseCloning => Configuration.CloningBehaviour != CloningBehaviour.None;
 
     /// <summary>
     /// Tries to find an existing mapping with the provided name.

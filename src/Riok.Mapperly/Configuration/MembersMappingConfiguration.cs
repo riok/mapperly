@@ -10,8 +10,8 @@ public record MembersMappingConfiguration(
     IReadOnlyCollection<MemberMappingConfiguration> ExplicitMappings,
     IReadOnlyCollection<NestedMembersMappingConfiguration> NestedMappings,
     IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy,
-    RequiredMappingStrategy? RequiredMappingStrategy,
-    bool UseShallowCloning
+    RequiredMappingStrategy? RequiredMappingStrategy
+//CloningBehaviour CloningBehaviour
 )
 {
     public IEnumerable<string> GetMembersWithExplicitConfigurations(MappingSourceTarget sourceTarget)
@@ -36,8 +36,8 @@ public record MembersMappingConfiguration(
             ExplicitMappings.Concat(otherConfiguration?.ExplicitMappings ?? []).ToList(),
             NestedMappings.Concat(otherConfiguration?.NestedMappings ?? []).ToList(),
             IgnoreObsoleteMembersStrategy ?? otherConfiguration?.IgnoreObsoleteMembersStrategy,
-            RequiredMappingStrategy ?? otherConfiguration?.RequiredMappingStrategy,
-            UseShallowCloning || otherConfiguration?.UseShallowCloning == true
+            RequiredMappingStrategy ?? otherConfiguration?.RequiredMappingStrategy
+        //CloningBehaviour // TODO what to do in this case?
         );
     }
 }

@@ -1,6 +1,12 @@
 ﻿[assembly: System.Runtime.Versioning.TargetFramework(".NETStandard,Version=v2.0", FrameworkDisplayName=".NET Standard 2.0")]
 namespace Riok.Mapperly.Abstractions
 {
+    public enum CloningBehaviour
+    {
+        None = 0,
+        DeepCloning = 1,
+        ShallowCloning = 2,
+    }
     public enum EnumMappingStrategy
     {
         ByValue = 0,
@@ -131,6 +137,7 @@ namespace Riok.Mapperly.Abstractions
         public MapperAttribute() { }
         public bool AllowNullPropertyAssignment { get; set; }
         public bool AutoUserMappings { get; set; }
+        public Riok.Mapperly.Abstractions.CloningBehaviour CloningBehaviour { get; set; }
         public Riok.Mapperly.Abstractions.MappingConversionType EnabledConversions { get; set; }
         public bool EnumMappingIgnoreCase { get; set; }
         public Riok.Mapperly.Abstractions.EnumMappingStrategy EnumMappingStrategy { get; set; }
@@ -145,6 +152,7 @@ namespace Riok.Mapperly.Abstractions
         public Riok.Mapperly.Abstractions.StackCloningStrategy StackCloningStrategy { get; set; }
         public bool ThrowOnMappingNullMismatch { get; set; }
         public bool ThrowOnPropertyMappingNullMismatch { get; set; }
+        [System.Obsolete("Please use the property CloningBehaviour")]
         public bool UseDeepCloning { get; set; }
         public bool UseReferenceHandling { get; set; }
     }
@@ -207,12 +215,6 @@ namespace Riok.Mapperly.Abstractions
     {
         public MapperRequiredMappingAttribute(Riok.Mapperly.Abstractions.RequiredMappingStrategy requiredMappingStrategy) { }
         public Riok.Mapperly.Abstractions.RequiredMappingStrategy RequiredMappingStrategy { get; }
-    }
-    [System.AttributeUsage(System.AttributeTargets.Method)]
-    [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
-    public sealed class MapperUseShallowCloningAttribute : System.Attribute
-    {
-        public MapperUseShallowCloningAttribute() { }
     }
     [System.Flags]
     public enum MappingConversionType

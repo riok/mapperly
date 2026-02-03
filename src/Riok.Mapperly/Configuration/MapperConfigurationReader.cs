@@ -51,18 +51,9 @@ public class MapperConfigurationReader
                 mapper.RequiredEnumMappingStrategy,
                 mapper.EnumNamingStrategy
             ),
-            new MembersMappingConfiguration(
-                [],
-                [],
-                [],
-                [],
-                [],
-                mapper.IgnoreObsoleteMembersStrategy,
-                mapper.RequiredMappingStrategy,
-                UseShallowCloning: false
-            ),
+            new MembersMappingConfiguration([], [], [], [], [], mapper.IgnoreObsoleteMembersStrategy, mapper.RequiredMappingStrategy),
             [],
-            mapper.UseDeepCloning,
+            mapper.UseDeepCloning ? CloningBehaviour.DeepCloning : mapper.CloningBehaviour,
             mapper.StackCloningStrategy,
             supportedFeatures
         );
@@ -87,7 +78,11 @@ public class MapperConfigurationReader
     )
     {
         if (reference.Method == null)
-            return supportsDeepCloning ? MapperConfiguration : MapperConfiguration with { UseDeepCloning = false };
+            return supportsDeepCloning ? MapperConfiguration : MapperConfiguration with { CloningBehaviour = CloningBehaviour.None };
+
+        var cloningBehaviour = MapperConfiguration.Mapper.UseDeepCloning
+            ? CloningBehaviour.DeepCloning
+            : MapperConfiguration.Mapper.CloningBehaviour;
 
         var enumConfig = BuildEnumConfig(reference);
         var membersConfig = BuildMembersConfig(reference);
@@ -97,7 +92,7 @@ public class MapperConfigurationReader
             enumConfig,
             membersConfig,
             derivedTypesConfig,
-            supportsDeepCloning && MapperConfiguration.Mapper.UseDeepCloning,
+            supportsDeepCloning ? cloningBehaviour : CloningBehaviour.None,
             MapperConfiguration.StackCloningStrategy,
             MapperConfiguration.SupportedFeatures
         );
@@ -248,12 +243,16 @@ public class MapperConfigurationReader
             .AccessFirstOrDefault<MapperIgnoreObsoleteMembersAttribute>(configRef.Method)
             ?.IgnoreObsoleteStrategy;
         var requiredMapping = _dataAccessor.AccessFirstOrDefault<MapperRequiredMappingAttribute>(configRef.Method)?.RequiredMappingStrategy;
-        var useShallowCloning = _dataAccessor.AccessFirstOrDefault<MapperUseShallowCloningAttribute>(configRef.Method);
+        //var useShallowCloning = _dataAccessor.AccessFirstOrDefault<MapperUseShallowCloningAttribute>(configRef.Method);
 
         // ignore the required mapping / ignore obsolete as the same attribute is used for other mapping types
         // e.g. enum to enum
         var hasMemberConfigs =
-            ignoredSourceMembers.Count > 0 || ignoredTargetMembers.Count > 0 || memberConfigurations.Count > 0 || useShallowCloning != null;
+            ignoredSourceMembers.Count > 0
+            || ignoredTargetMembers.Count > 0
+            || memberConfigurations.Count
+                > 0 /*|| useShallowCloning != null*/
+        ;
         if (hasMemberConfigs && (configRef.Source.IsEnum() || configRef.Target.IsEnum()))
         {
             _diagnostics.ReportDiagnostic(DiagnosticDescriptors.MemberConfigurationOnNonMemberMapping, configRef.Method);
@@ -287,8 +286,8 @@ public class MapperConfigurationReader
             memberConfigurations,
             nestedMembersConfigurations,
             ignoreObsolete,
-            requiredMapping,
-            useShallowCloning != null
+            requiredMapping
+        //useShallowCloning != null
         );
     }
 

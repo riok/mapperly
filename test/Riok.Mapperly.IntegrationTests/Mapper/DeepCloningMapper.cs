@@ -15,4 +15,17 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [MapperIgnoreObsoleteMembers]
         public static partial TestObject Copy(TestObject src);
     }
+
+    [Mapper(CloningBehaviour = CloningBehaviour.DeepCloning)]
+    public static partial class DeepCloningMapperWithCloningBehaviour
+    {
+        public static partial IdObject Copy(IdObject src);
+
+        [MapperIgnoreSource(nameof(TestObject.IgnoredIntValue))]
+        [MapperIgnoreSource(nameof(TestObject.IgnoredStringValue))]
+        [MapperIgnoreSource(nameof(TestObject.ImmutableHashSetValue))]
+        [MapperIgnoreSource(nameof(TestObject.SpanValue))]
+        [MapperIgnoreObsoleteMembers]
+        public static partial TestObject Copy(TestObject src);
+    }
 }

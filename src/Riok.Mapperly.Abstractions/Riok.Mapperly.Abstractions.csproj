@@ -7,4 +7,7 @@
   <ItemGroup>
     <Using Include="Riok.Mapperly.Abstractions" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="MapperUseShallowCloningAttribute.cs" />
+  </ItemGroup>
 </Project>

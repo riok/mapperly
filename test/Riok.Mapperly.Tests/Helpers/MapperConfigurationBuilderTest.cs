@@ -71,6 +71,7 @@ public class MapperConfigurationBuilderTest
         mapper.ThrowOnPropertyMappingNullMismatch.ShouldBeTrue();
         mapper.AllowNullPropertyAssignment.ShouldBeTrue();
         mapper.UseDeepCloning.ShouldBeTrue();
+        mapper.CloningBehaviour.ShouldBe(CloningBehaviour.ShallowCloning);
         mapper.EnabledConversions.ShouldBe(MappingConversionType.Constructor);
         mapper.UseReferenceHandling.ShouldBeTrue();
         mapper.IgnoreObsoleteMembersStrategy.ShouldBe(IgnoreObsoleteMembersStrategy.Source);
@@ -107,6 +108,7 @@ public class MapperConfigurationBuilderTest
             ThrowOnPropertyMappingNullMismatch = true,
             AllowNullPropertyAssignment = true,
             UseDeepCloning = true,
+            CloningBehaviour = CloningBehaviour.ShallowCloning,
             EnabledConversions = MappingConversionType.Constructor,
             UseReferenceHandling = true,
             IgnoreObsoleteMembersStrategy = IgnoreObsoleteMembersStrategy.Source,

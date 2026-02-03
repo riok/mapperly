@@ -65,7 +65,13 @@ public class MapperAttribute : Attribute
     /// when <c>false</c>, the same array is reused.
     /// when <c>true</c>, the array and each person is cloned.
     /// </summary>
+    [Obsolete("Please use the property CloningBehaviour")]
     public bool UseDeepCloning { get; set; }
+
+    /// <summary>
+    /// Specifies whether and how to copy objects of the same type and complex types like collections and spans.
+    /// </summary>
+    public CloningBehaviour CloningBehaviour { get; set; } = CloningBehaviour.None;
 
     /// <summary>
     /// The strategy to use when cloning a <see cref="System.Collections.Generic.Stack{T}"/>.

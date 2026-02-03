@@ -61,6 +61,9 @@ public static class MapperConfigurationMerger
 
         mapper.UseDeepCloning = mapperConfiguration.UseDeepCloning ?? defaultMapperConfiguration.UseDeepCloning ?? mapper.UseDeepCloning;
 
+        mapper.CloningBehaviour =
+            mapperConfiguration.CloningBehaviour ?? defaultMapperConfiguration.CloningBehaviour ?? mapper.CloningBehaviour;
+
         mapper.StackCloningStrategy =
             mapperConfiguration.StackCloningStrategy ?? defaultMapperConfiguration.StackCloningStrategy ?? mapper.StackCloningStrategy;
 
