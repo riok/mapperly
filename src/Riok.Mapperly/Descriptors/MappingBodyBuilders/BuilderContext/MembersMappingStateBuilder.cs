@@ -10,6 +10,9 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
 internal static class MembersMappingStateBuilder
 {
+    private static readonly IReadOnlyDictionary<string, IMappableMember> _emptyAdditionalSourceMembers =
+        new Dictionary<string, IMappableMember>();
+
     public static MembersMappingState Build(MappingBuilderContext ctx, IMapping mapping)
     {
         // build configurations
@@ -69,14 +72,14 @@ internal static class MembersMappingStateBuilder
 
     private static IReadOnlyDictionary<string, IMappableMember> GetAdditionalSourceMembers(MappingBuilderContext ctx)
     {
-        if (ctx.UserMapping is MethodMapping { AdditionalSourceParameters.Count: > 0 } methodMapping)
-        {
-            return methodMapping
-                .AdditionalSourceParameters.Select<MethodParameter, IMappableMember>(p => new ParameterSourceMember(p))
-                .ToDictionary(p => p.Name, p => p, StringComparer.OrdinalIgnoreCase);
-        }
+        if (ctx.UserMapping is not MethodMapping { AdditionalSourceParameters.Count: > 0 } methodMapping)
+            return _emptyAdditionalSourceMembers;
 
-        return new Dictionary<string, IMappableMember>();
+        return methodMapping.AdditionalSourceParameters.ToDictionary<MethodParameter, string, IMappableMember>(
+            x => x.Name.TrimStart('@'), // trim verbatim identifier prefix
+            x => new ParameterSourceMember(x),
+            StringComparer.OrdinalIgnoreCase
+        );
     }
 
     private static HashSet<string> GetSourceMemberNames(MappingBuilderContext ctx, IMapping mapping)
