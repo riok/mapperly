@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Riok.Mapperly.Abstractions;
 
 namespace Riok.Mapperly.Tests;
@@ -105,7 +106,15 @@ public static class TestHelper
 
         var generator = new MapperGenerator();
 
-        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
+        var optionsProvider =
+            options?.AnalyzerConfigOptions != null ? new TestAnalyzerConfigOptionsProvider(options.AnalyzerConfigOptions) : null;
+
+        var driver = CSharpGeneratorDriver.Create(
+            [generator.AsSourceGenerator()],
+            parseOptions: (CSharpParseOptions)compilation.SyntaxTrees.First().Options,
+            optionsProvider: optionsProvider,
+            driverOptions: _enableIncrementalTrackingDriverOptions
+        );
         return driver.RunGenerators(compilation);
     }
 
@@ -165,6 +174,22 @@ public static class TestHelper
             {
                 yield return method;
             }
+        }
+    }
+
+    private class TestAnalyzerConfigOptionsProvider(IReadOnlyDictionary<string, string> options) : AnalyzerConfigOptionsProvider
+    {
+        private readonly AnalyzerConfigOptions _options = new TestAnalyzerConfigOptions(options);
+
+        public override AnalyzerConfigOptions GlobalOptions => _options;
+
+        public override AnalyzerConfigOptions GetOptions(SyntaxTree tree) => _options;
+
+        public override AnalyzerConfigOptions GetOptions(AdditionalText textFile) => _options;
+
+        private class TestAnalyzerConfigOptions(IReadOnlyDictionary<string, string> options) : AnalyzerConfigOptions
+        {
+            public override bool TryGetValue(string key, [NotNullWhen(true)] out string? value) => options.TryGetValue(key, out value);
         }
     }
 }

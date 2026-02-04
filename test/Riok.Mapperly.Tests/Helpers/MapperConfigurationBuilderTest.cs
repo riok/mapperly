@@ -1,3 +1,4 @@
+using System.Reflection;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 
@@ -6,22 +7,48 @@ namespace Riok.Mapperly.Tests.Helpers;
 public class MapperConfigurationBuilderTest
 {
     [Fact]
-    public void ShouldMergeMapperConfigurations()
+    public void ShouldMergeMapperConfigurationObjects()
     {
-        var ignoredProperties = new HashSet<string> { "TypeId" };
-        var properties = typeof(MapperConfiguration).GetProperties();
+        var properties = typeof(MapperConfiguration).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
         var mapperConfiguration = new MapperConfiguration();
         var defaultMapperConfiguration = new MapperConfiguration();
-        foreach (var property in properties.Where(x => !ignoredProperties.Contains(x.Name)))
+        foreach (var property in properties)
         {
             property.SetValue(defaultMapperConfiguration, GetValue(property.PropertyType, false));
             property.SetValue(mapperConfiguration, GetValue(property.PropertyType, true));
         }
 
         var mergedConfiguration = MapperConfigurationMerger.Merge(mapperConfiguration, defaultMapperConfiguration);
-        var attributeProperties = typeof(MapperAttribute).GetProperties();
-        foreach (var property in attributeProperties.Where(x => !ignoredProperties.Contains(x.Name)))
+        foreach (var property in properties)
+        {
+            property
+                .GetValue(mergedConfiguration)
+                .ShouldBe(
+                    GetValue(property.PropertyType, true),
+                    $"the property {property.Name} does not match, is it missing in the merger?"
+                );
+        }
+    }
+
+    [Fact]
+    public void ShouldMergeMapperConfigurations()
+    {
+        var properties = typeof(MapperConfiguration).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+
+        var mapperConfiguration = new MapperConfiguration();
+        var defaultMapperConfiguration = new MapperConfiguration();
+        foreach (var property in properties)
+        {
+            property.SetValue(defaultMapperConfiguration, GetValue(property.PropertyType, false));
+            property.SetValue(mapperConfiguration, GetValue(property.PropertyType, true));
+        }
+
+        var mergedConfiguration = MapperConfigurationMerger.MergeToAttribute(mapperConfiguration, defaultMapperConfiguration);
+        var attributeProperties = typeof(MapperAttribute).GetProperties(
+            BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly
+        );
+        foreach (var property in attributeProperties)
         {
             property
                 .GetValue(mergedConfiguration)
@@ -36,7 +63,7 @@ public class MapperConfigurationBuilderTest
     public void ShouldMergeMapperConfigurationsWithEmptyDefaultMapperConfiguration()
     {
         var mapperConfiguration = NewMapperConfiguration();
-        var mapper = MapperConfigurationMerger.Merge(mapperConfiguration, new());
+        var mapper = MapperConfigurationMerger.MergeToAttribute(mapperConfiguration, new());
         mapper.PropertyNameMappingStrategy.ShouldBe(PropertyNameMappingStrategy.CaseSensitive);
         mapper.EnumMappingStrategy.ShouldBe(EnumMappingStrategy.ByName);
         mapper.EnumMappingIgnoreCase.ShouldBeTrue();
@@ -63,7 +90,7 @@ public class MapperConfigurationBuilderTest
             EnumMappingIgnoreCase = true,
         };
 
-        var mapper = MapperConfigurationMerger.Merge(mapperConfiguration, defaultMapperConfiguration);
+        var mapper = MapperConfigurationMerger.MergeToAttribute(mapperConfiguration, defaultMapperConfiguration);
         mapper.PropertyNameMappingStrategy.ShouldBe(PropertyNameMappingStrategy.CaseInsensitive);
         mapper.EnumMappingStrategy.ShouldBe(EnumMappingStrategy.ByName);
         mapper.EnumMappingIgnoreCase.ShouldBeTrue();

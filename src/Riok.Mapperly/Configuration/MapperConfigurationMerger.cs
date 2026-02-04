@@ -4,7 +4,33 @@ namespace Riok.Mapperly.Configuration;
 
 public static class MapperConfigurationMerger
 {
-    public static MapperAttribute Merge(MapperConfiguration mapperConfiguration, MapperConfiguration defaultMapperConfiguration)
+    public static MapperConfiguration Merge(MapperConfiguration highPriority, MapperConfiguration lowPriority)
+    {
+        return new MapperConfiguration
+        {
+            PropertyNameMappingStrategy = highPriority.PropertyNameMappingStrategy ?? lowPriority.PropertyNameMappingStrategy,
+            EnumMappingStrategy = highPriority.EnumMappingStrategy ?? lowPriority.EnumMappingStrategy,
+            EnumMappingIgnoreCase = highPriority.EnumMappingIgnoreCase ?? lowPriority.EnumMappingIgnoreCase,
+            ThrowOnMappingNullMismatch = highPriority.ThrowOnMappingNullMismatch ?? lowPriority.ThrowOnMappingNullMismatch,
+            ThrowOnPropertyMappingNullMismatch =
+                highPriority.ThrowOnPropertyMappingNullMismatch ?? lowPriority.ThrowOnPropertyMappingNullMismatch,
+            AllowNullPropertyAssignment = highPriority.AllowNullPropertyAssignment ?? lowPriority.AllowNullPropertyAssignment,
+            UseDeepCloning = highPriority.UseDeepCloning ?? lowPriority.UseDeepCloning,
+            StackCloningStrategy = highPriority.StackCloningStrategy ?? lowPriority.StackCloningStrategy,
+            EnabledConversions = highPriority.EnabledConversions ?? lowPriority.EnabledConversions,
+            UseReferenceHandling = highPriority.UseReferenceHandling ?? lowPriority.UseReferenceHandling,
+            IgnoreObsoleteMembersStrategy = highPriority.IgnoreObsoleteMembersStrategy ?? lowPriority.IgnoreObsoleteMembersStrategy,
+            RequiredMappingStrategy = highPriority.RequiredMappingStrategy ?? lowPriority.RequiredMappingStrategy,
+            RequiredEnumMappingStrategy = highPriority.RequiredEnumMappingStrategy ?? lowPriority.RequiredEnumMappingStrategy,
+            IncludedMembers = highPriority.IncludedMembers ?? lowPriority.IncludedMembers,
+            IncludedConstructors = highPriority.IncludedConstructors ?? lowPriority.IncludedConstructors,
+            PreferParameterlessConstructors = highPriority.PreferParameterlessConstructors ?? lowPriority.PreferParameterlessConstructors,
+            AutoUserMappings = highPriority.AutoUserMappings ?? lowPriority.AutoUserMappings,
+            EnumNamingStrategy = highPriority.EnumNamingStrategy ?? lowPriority.EnumNamingStrategy,
+        };
+    }
+
+    public static MapperAttribute MergeToAttribute(MapperConfiguration mapperConfiguration, MapperConfiguration defaultMapperConfiguration)
     {
         var mapper = new MapperAttribute();
         mapper.PropertyNameMappingStrategy =
