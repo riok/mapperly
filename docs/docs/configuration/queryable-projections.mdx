@@ -121,3 +121,63 @@ public static partial class CarMapper
 
 It is important that the types in the user-implemented mapping method match the types of the objects to be mapped exactly.
 Otherwise, Mapperly cannot resolve the user-implemented mapping methods.
+
+## Expression mappings
+
+In addition to `IQueryable<T>` projections, Mapperly also supports generating `Expression<Func<TSource, TTarget>>` directly.
+This is useful when you need the expression tree itself, for example to compose expressions manually or pass to APIs that accept expressions.
+
+<Tabs>
+  <TabItem value="definition" label="Mapper definition">
+  
+  ```csharp
+  [Mapper]
+  public static partial class CarMapper
+  {
+      // highlight-start
+      public static partial Expression<Func<Car, CarDto>> ProjectToDto();
+      // highlight-end
+  }
+  ```
+  
+  </TabItem>
+  <TabItem value="usage" label="Usage">
+  
+  ```csharp
+  // Get the expression tree
+  var expression = CarMapper.ProjectToDto();
+
+  // Use with EF Core
+  var dtos = await DbContext.Cars
+      .Where(...)
+      // highlight-start
+      .Select(expression)
+      // highlight-end
+      .ToListAsync();
+  ```
+  
+  </TabItem>
+</Tabs>
+
+Expression mappings use the same expression tree building logic as `IQueryable<T>` projections,
+so they share the same limitations and support the same features including property configurations and user-implemented mapping methods.
+
+### Property configurations
+
+Similar to `IQueryable<T>` projections, you can configure property mappings using partial methods:
+
+```csharp
+[Mapper]
+public static partial class CarMapper
+{
+    // highlight-start
+    public static partial Expression<Func<Car, CarDto>> ProjectToDto();
+    // highlight-end
+
+    // highlight-start
+    [MapProperty(nameof(Car.Manufacturer), nameof(CarDto.Producer)]
+    // highlight-end
+    private static partial CarDto Map(Car car);
+}
+```
+
