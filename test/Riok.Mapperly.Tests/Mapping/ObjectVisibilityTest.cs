@@ -236,6 +236,40 @@ public class ObjectVisibilityTest
     }
 
     [Fact]
+    public Task PrivatePropertyPublicClassOtherAssemblyShouldMap()
+    {
+        var aSource = TestSourceBuilder.SyntaxTree(
+            """
+            namespace A;
+            public class A
+            {
+                private int PrivateProp { get; set; }
+                public int PrivateGetterProp { private get; set; }
+                public int PrivateSetterProp { get; private set; }
+            }
+            """
+        );
+
+        using var aAssembly = TestHelper.BuildAssembly("A", aSource);
+
+        var source = TestSourceBuilder.Mapping(
+            "A.A",
+            "B",
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            """
+            class B
+            {
+                public int PrivateProp { get; set; }
+                public int PrivateGetterProp { get; set; }
+                public int PrivateSetterProp { get; set; }
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source, additionalAssemblies: [aAssembly]);
+    }
+
+    [Fact]
     public Task PropertyInTheSameClassShouldIgnoreBackingField()
     {
         var source = TestSourceBuilder.CSharp(
