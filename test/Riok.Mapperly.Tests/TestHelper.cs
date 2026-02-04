@@ -13,14 +13,19 @@ public static class TestHelper
         trackIncrementalGeneratorSteps: true
     );
 
-    public static Task<VerifyResult> VerifyGenerator(string source, TestHelperOptions? options = null, params object?[] args)
+    public static Task<VerifyResult> VerifyGenerator(
+        string source,
+        TestHelperOptions? options = null,
+        IReadOnlyCollection<TestAssembly>? additionalAssemblies = null,
+        params object?[] testParams
+    )
     {
-        var driver = Generate(source, options);
+        var driver = Generate(source, options, additionalAssemblies);
         var verify = Verify(driver);
 
-        if (args.Length != 0)
+        if (testParams.Length != 0)
         {
-            verify.UseParameters(args);
+            verify.UseParameters(testParams);
         }
 
         return verify.ToTask();

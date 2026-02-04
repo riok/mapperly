@@ -186,7 +186,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             TypedConstantKind.Enum => GetEnumValue(arg, targetType),
             TypedConstantKind.Array => BuildArrayValue(arg, targetType, symbolAccessor),
             TypedConstantKind.Primitive => arg.Value,
-            TypedConstantKind.Type when targetType == typeof(ITypeSymbol) => arg.Value,
+            TypedConstantKind.Type when typeof(ITypeSymbol).IsAssignableFrom(targetType) => arg.Value,
             _ => throw new ArgumentOutOfRangeException(
                 $"{nameof(AttributeDataAccessor)} does not support constructor arguments of kind {arg.Kind.ToString()} or cannot convert it to {targetType}"
             ),

@@ -34,6 +34,17 @@ internal static class SymbolExtensions
     internal static string FullyQualifiedIdentifierName(this ITypeSymbol typeSymbol) =>
         typeSymbol.ToDisplayString(_fullyQualifiedNullableFormat);
 
+    internal static string FullyQualifiedMetadataName(this INamedTypeSymbol symbol)
+    {
+        var name = symbol.MetadataName;
+        if (symbol.ContainingType is { } containingType)
+        {
+            return containingType.FullyQualifiedMetadataName() + "+" + name;
+        }
+
+        return symbol.ContainingNamespace?.IsGlobalNamespace == false ? symbol.ContainingNamespace.ToDisplayString() + "." + name : name;
+    }
+
     internal static bool IsImmutable(this ISymbol symbol)
     {
         if (symbol is not INamedTypeSymbol namedSymbol)
