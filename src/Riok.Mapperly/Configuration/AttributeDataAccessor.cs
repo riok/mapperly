@@ -26,12 +26,12 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         where TAttribute : Attribute
         where TData : notnull => Access<TAttribute, TData>(symbol).Single();
 
-    public TAttribute? AccessFirstOrDefault<TAttribute>(ISymbol symbol)
-        where TAttribute : Attribute => Access<TAttribute, TAttribute>(symbol).FirstOrDefault();
+    public TAttribute? AccessFirstOrDefault<TAttribute>(ISymbol symbol, bool reverse = false)
+        where TAttribute : Attribute => Access<TAttribute, TAttribute>(symbol, reverse).FirstOrDefault();
 
-    public TData? AccessFirstOrDefault<TAttribute, TData>(ISymbol symbol)
+    public TData? AccessFirstOrDefault<TAttribute, TData>(ISymbol symbol, bool reverse = false)
         where TAttribute : Attribute
-        where TData : notnull => Access<TAttribute, TData>(symbol).FirstOrDefault();
+        where TData : notnull => Access<TAttribute, TData>(symbol, reverse).FirstOrDefault();
 
     public bool HasAttribute<TAttribute>(ISymbol symbol)
         where TAttribute : Attribute => symbolAccessor.HasAttribute<TAttribute>(symbol);
@@ -42,12 +42,12 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     public IEnumerable<TAttribute> TryAccess<TAttribute>(IEnumerable<AttributeData> data)
         where TAttribute : Attribute => TryAccess<TAttribute, TAttribute>(data);
 
-    public IEnumerable<TData> Access<TAttribute, TData>(ISymbol symbol)
+    public IEnumerable<TData> Access<TAttribute, TData>(ISymbol symbol, bool reverse = false)
         where TAttribute : Attribute
         where TData : notnull
     {
         var attrDatas = symbolAccessor.GetAttributes<TAttribute>(symbol);
-        return Access<TAttribute, TData>(attrDatas);
+        return Access<TAttribute, TData>(attrDatas, reverse).ToList();
     }
 
     public IEnumerable<TData> TryAccess<TAttribute, TData>(IEnumerable<AttributeData> attributes)
@@ -69,13 +69,13 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     /// <typeparam name="TData">The type of the data class. If no type parameters are involved, this is usually the same as <see cref="TAttribute"/>.</typeparam>
     /// <returns>The attribute data.</returns>
     /// <exception cref="InvalidOperationException">If a property or ctor argument of <see cref="TData"/> could not be read on the attribute.</exception>
-    public IEnumerable<TData> Access<TAttribute, TData>(IEnumerable<AttributeData> attributes)
+    public IEnumerable<TData> Access<TAttribute, TData>(IEnumerable<AttributeData> attributes, bool reverse = false)
         where TAttribute : Attribute
         where TData : notnull
     {
         foreach (var attrData in symbolAccessor.GetAttributes<TAttribute>(attributes))
         {
-            yield return Access<TAttribute, TData>(attrData, symbolAccessor);
+            yield return Access<TAttribute, TData>(attrData, symbolAccessor, reverse);
         }
     }
 
@@ -90,7 +90,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return string.Equals(GetMappingName(methodSymbol), name, StringComparison.Ordinal);
     }
 
-    internal static TData Access<TAttribute, TData>(AttributeData attrData, SymbolAccessor? symbolAccessor = null)
+    internal static TData Access<TAttribute, TData>(AttributeData attrData, SymbolAccessor? symbolAccessor = null, bool rever = false)
         where TAttribute : Attribute
         where TData : notnull
     {
@@ -119,6 +119,11 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         if (attr is HasSyntaxReference symbolRefHolder)
         {
             symbolRefHolder.SyntaxReference = attrData.ApplicationSyntaxReference?.GetSyntax();
+        }
+
+        if (attr is IReversible<TData> reversible && rever)
+        {
+            attr = reversible.Reverse();
         }
 
         return attr;
