@@ -37,6 +37,7 @@ public class DescriptorBuilder
         CompilationContext compilationContext,
         MapperDeclaration mapperDeclaration,
         SymbolAccessor symbolAccessor,
+        AttributeDataAccessor attributeDataAccessor,
         MapperConfiguration defaultMapperConfiguration,
         ImmutableArray<UseStaticMapperConfiguration> assemblyScopedStaticMappers
     )
@@ -44,11 +45,11 @@ public class DescriptorBuilder
         var supportedFeatures = SupportedFeatures.Build(compilationContext.Types, symbolAccessor, compilationContext.ParseLanguageVersion);
         _mapperDescriptor = new MapperDescriptor(mapperDeclaration, _methodNameBuilder, supportedFeatures);
         _symbolAccessor = symbolAccessor;
+        _attributeAccessor = attributeDataAccessor;
         _assemblyScopedStaticMappers = assemblyScopedStaticMappers;
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
         _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
         _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
-        _attributeAccessor = new AttributeDataAccessor(symbolAccessor);
 
         var genericTypeChecker = new GenericTypeChecker(_symbolAccessor, compilationContext.Types);
         var configurationReader = new MapperConfigurationReader(
