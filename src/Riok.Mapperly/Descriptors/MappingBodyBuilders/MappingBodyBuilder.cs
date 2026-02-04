@@ -41,6 +41,9 @@ public class MappingBodyBuilder(MappingCollection mappings)
                 case UserDefinedNewInstanceMethodMapping mapping:
                     UserMethodMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;
+                case UserDefinedExpressionMethodMapping mapping:
+                    UserMethodMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                    break;
                 case UserDefinedExistingTargetMethodMapping mapping:
                     UserMethodMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;
