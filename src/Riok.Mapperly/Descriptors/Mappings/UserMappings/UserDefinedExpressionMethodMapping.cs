@@ -64,7 +64,7 @@ public class UserDefinedExpressionMethodMapping : NewInstanceMethodMapping, INew
         var typeMappingBuildContext = new TypeMappingBuildContext("source", null, ctx.NameBuilder.NewScope(), ctx.SyntaxFactory);
 
         return MethodDeclaration(SyntaxFactoryHelper.FullyQualifiedIdentifier(TargetType).AddTrailingSpace(), Identifier(_method.Name))
-            .WithModifiers(TokenList(BuildModifiers()))
+            .WithModifiers(BuildModifiers())
             .WithParameterList(ParameterList())
             .WithAttributeLists(BuildAttributes(typeMappingBuildContext))
             .WithBody(ctx.SyntaxFactory.Block(BuildBody(typeMappingBuildContext.AddIndentation())));
