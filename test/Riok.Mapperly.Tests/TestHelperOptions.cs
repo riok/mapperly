@@ -9,13 +9,17 @@ namespace Riok.Mapperly.Tests;
 /// If <c>null</c>, all severities are allowed.
 /// </param>
 /// <param name="IgnoredDiagnostics">Diagnostics which are completely ignored.</param>
+/// <param name="EditorConfigEndOfLine">The end_of_line setting from .editorconfig (lf, crlf, cr).</param>
+/// <param name="EditorConfigCharset">The charset setting from .editorconfig (utf-8, utf-8-bom, utf-16le, utf-16be).</param>
 public record TestHelperOptions(
     NullableContextOptions NullableOption = NullableContextOptions.Enable,
     LanguageVersion LanguageVersion = LanguageVersion.Default,
     IReadOnlySet<DiagnosticSeverity>? AllowedDiagnosticSeverities = null,
     IReadOnlySet<DiagnosticDescriptor>? IgnoredDiagnostics = null,
     string AssemblyName = "Tests",
-    string GeneratedTreeFileName = $"{TestSourceBuilderOptions.DefaultMapperClassName}.g.cs"
+    string GeneratedTreeFileName = $"{TestSourceBuilderOptions.DefaultMapperClassName}.g.cs",
+    string? EditorConfigEndOfLine = null,
+    string? EditorConfigCharset = null
 )
 {
     public static readonly TestHelperOptions Default = new(

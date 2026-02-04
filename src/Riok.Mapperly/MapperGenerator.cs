@@ -1,6 +1,8 @@
 using System.Collections.Immutable;
+using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors;
@@ -19,6 +21,9 @@ public class MapperGenerator : IIncrementalGenerator
     public static readonly string MapperDefaultsAttributeName = typeof(MapperDefaultsAttribute).FullName!;
     public static readonly string UseStaticMapperName = typeof(UseStaticMapperAttribute).FullName!;
     public static readonly string UseStaticMapperGenericName = typeof(UseStaticMapperAttribute<>).FullName!;
+
+    private static readonly Encoding _utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+    private static readonly Encoding _utf8WithBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -70,7 +75,11 @@ public class MapperGenerator : IIncrementalGenerator
             .Combine(compilationContext)
             .Combine(mapperDefaults)
             .Combine(useStaticMappers)
-            .Select(static (x, ct) => BuildDescriptor(x.Left.Left.Right, x.Left.Left.Left, x.Left.Right, x.Right, ct))
+            .Combine(context.AnalyzerConfigOptionsProvider)
+            .Select(
+                static (x, ct) =>
+                    BuildDescriptor(x.Left.Left.Left.Right, x.Left.Left.Left.Left, x.Left.Left.Right, x.Left.Right, x.Right, ct)
+            )
             .WhereNotNull();
 
         // output the diagnostics
@@ -89,6 +98,7 @@ public class MapperGenerator : IIncrementalGenerator
         MapperDeclaration mapperDeclaration,
         MapperConfiguration mapperDefaults,
         ImmutableArray<UseStaticMapperConfiguration> assemblyScopedStaticMappers,
+        AnalyzerConfigOptionsProvider configOptionsProvider,
         CancellationToken cancellationToken
     )
     {
@@ -110,16 +120,61 @@ public class MapperGenerator : IIncrementalGenerator
                 assemblyScopedStaticMappers
             );
             var (descriptor, diagnostics) = builder.Build(cancellationToken);
-            var mapper = new MapperNode(
-                compilationContext.FileNameBuilder.Build(descriptor),
-                SourceEmitter.Build(descriptor, cancellationToken)
-            );
+
+            // Get editorconfig settings from the mapper's source file
+            // Note: [*.g.cs] patterns are not supported due to Roslyn limitation
+            // Users should configure settings in [*.cs] or [*] sections
+            var generatedFileName = compilationContext.FileNameBuilder.Build(descriptor);
+            var configOptions = configOptionsProvider.GetOptions(mapperDeclaration.Syntax.SyntaxTree);
+
+            // Convert editorconfig values to actual values, reporting diagnostics for unknown values
+            var sourceTextConfig = BuildSourceTextConfig(configOptions, diagnostics);
+
+            var mapper = new MapperNode(generatedFileName, SourceEmitter.Build(descriptor, cancellationToken), sourceTextConfig);
             return new MapperAndDiagnostics(mapper, diagnostics.ToImmutableEquatableArray());
         }
         catch (OperationCanceledException)
         {
             return null;
         }
+    }
+
+    private static SourceTextConfig BuildSourceTextConfig(AnalyzerConfigOptions configOptions, DiagnosticCollection diagnostics)
+    {
+        configOptions.TryGetValue("end_of_line", out var endOfLineValue);
+        configOptions.TryGetValue("charset", out var charsetValue);
+
+        var endOfLine = endOfLineValue?.ToLowerInvariant() switch
+        {
+            null or "" => null,
+            "lf" => "\n",
+            "cr" => "\r",
+            "crlf" => "\r\n",
+            _ => ReportUnknownEndOfLine(endOfLineValue!, diagnostics),
+        };
+
+        var encoding = charsetValue?.ToLowerInvariant() switch
+        {
+            null or "" or "utf-8" => _utf8NoBom,
+            "utf-8-bom" => _utf8WithBom,
+            "utf-16be" => Encoding.BigEndianUnicode,
+            "utf-16le" => Encoding.Unicode,
+            _ => ReportUnknownCharset(charsetValue!, diagnostics),
+        };
+
+        return new SourceTextConfig(endOfLine, encoding);
+    }
+
+    private static string? ReportUnknownEndOfLine(string value, DiagnosticCollection diagnostics)
+    {
+        diagnostics.ReportDiagnostic(DiagnosticDescriptors.UnknownEditorConfigEndOfLine, (Location?)null, value);
+        return null;
+    }
+
+    private static Encoding ReportUnknownCharset(string value, DiagnosticCollection diagnostics)
+    {
+        diagnostics.ReportDiagnostic(DiagnosticDescriptors.UnknownEditorConfigCharset, (Location?)null, value);
+        return _utf8NoBom;
     }
 
     private static MapperConfiguration BuildDefaults(CompilationContext compilationContext, IAssemblySymbol? assemblySymbol)
