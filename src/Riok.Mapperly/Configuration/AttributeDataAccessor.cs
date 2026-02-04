@@ -1,3 +1,4 @@
+using System.CodeDom.Compiler;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
@@ -88,6 +89,12 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
     public bool IsMappingNameEqualTo(IMethodSymbol methodSymbol, string name)
     {
         return string.Equals(GetMappingName(methodSymbol), name, StringComparison.Ordinal);
+    }
+
+    public bool IsMapperlyGenerated(IMethodSymbol method)
+    {
+        var generated = AccessFirstOrDefault<GeneratedCodeAttribute>(method);
+        return string.Equals(generated?.Tool, MapperlyGeneratedCodeAttribute.GeneratorToolName, StringComparison.Ordinal);
     }
 
     internal static TData Access<TAttribute, TData>(AttributeData attrData, SymbolAccessor? symbolAccessor = null)
