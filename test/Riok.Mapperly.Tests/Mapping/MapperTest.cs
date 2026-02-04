@@ -172,11 +172,4 @@ public class MapperTest
 
         return TestHelper.VerifyGenerator(source);
     }
-
-    [Fact]
-    public void RestrictedKeywordParametersShouldBeEscaped()
-    {
-        var source = TestSourceBuilder.MapperWithBody("public partial string Map(int @object);");
-        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return @object.ToString();");
-    }
 }

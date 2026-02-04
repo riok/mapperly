@@ -116,8 +116,15 @@ public readonly partial struct SyntaxFactoryHelper(SupportedFeatures supportedFe
         return LocalDeclarationStatement(variableDeclaration).AddLeadingLineFeed(Indentation);
     }
 
-    public static NameColonSyntax SpacedNameColon(string name) =>
-        NameColon(IdentifierName(name), TrailingSpacedToken(SyntaxKind.ColonToken));
+    public static NameColonSyntax SpacedNameColon(string name)
+    {
+        if (SyntaxFacts.GetKeywordKind(name) != SyntaxKind.None)
+        {
+            name = "@" + name;
+        }
+
+        return NameColon(IdentifierName(name), TrailingSpacedToken(SyntaxKind.ColonToken));
+    }
 
     private static IEnumerable<SyntaxNodeOrToken> Join(SyntaxToken sep, bool insertTrailingSeparator, IEnumerable<SyntaxNode> nodes)
     {

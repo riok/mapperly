@@ -210,7 +210,8 @@ internal class MembersMappingState(
                 _unmappedSourceMemberNames.Remove(sourceMember.Name);
                 break;
             case SourceMemberType.AdditionalMappingMethodParameter:
-                _unmappedAdditionalSourceMemberNames.Remove(sourceMember.Name);
+                // trim verbatim identifier prefix
+                _unmappedAdditionalSourceMemberNames.Remove(sourceMember.Name.TrimStart('@'));
                 break;
         }
     }
