@@ -59,6 +59,19 @@ public static class UserMethodMappingBodyBuilder
         var userMapping = ctx.FindMapping(sourceType, targetType) as IUserMapping;
         var inlineCtx = new InlineExpressionMappingBuilderContext(ctx, userMapping, mappingKey);
 
+        // Check if there's a user-implemented method that can be inlined (same as IQueryable)
+        if (userMapping is UserImplementedMethodMapping && inlineCtx.FindMapping(sourceType, targetType) is { } inlinedUserMapping)
+        {
+            var expressionMapping = new ExpressionMapping(
+                sourceType,
+                mapping.TargetType, // The return type (Expression<Func<TSource, TTarget>>)
+                inlinedUserMapping,
+                ctx.Configuration.SupportedFeatures.NullableAttributes
+            );
+            mapping.SetDelegateMapping(expressionMapping);
+            return;
+        }
+
         var delegateMapping = inlineCtx.BuildMapping(mappingKey, MappingBuildingOptions.KeepUserSymbol);
         if (delegateMapping != null)
         {

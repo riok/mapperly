@@ -110,17 +110,11 @@ public override MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
 - ✅ `UserDefinedExpressionMethodMapping` for parameterless methods
 - ✅ Method name preservation fixed
 - ✅ Static mapper test generates correct output
+- ✅ **All 13 tests pass** (snapshots created)
 
 ### Test Status
-- Tests exist in `ExpressionMappingTest.cs`
-- Tests are generating correct output
-- **Snapshot files need to be created** - run with `DiffEngine_Disabled=true` to auto-accept
-
-### To Complete Testing
-```bash
-cd /Users/master/RiderProjects/mapperly
-DiffEngine_Disabled=true dotnet test ./test/Riok.Mapperly.Tests/Riok.Mapperly.Tests.csproj --filter "FullyQualifiedName~ExpressionMappingTest"
-```
+- All tests in `ExpressionMappingTest.cs` pass
+- Snapshot files created and verified
 
 ---
 
@@ -159,19 +153,19 @@ This matches `QueryableProjectionMapping` behavior.
 
 | Test Name | Description | Status |
 |-----------|-------------|--------|
-| `ClassToClass` | Basic class to class mapping | Needs snapshot |
-| `ClassToClassMultipleProperties` | Multiple properties | Needs snapshot |
-| `ClassToClassNested` | Nested object mapping | Needs snapshot |
-| `ClassToClassNestedMemberAttribute` | MapProperty attribute | Needs snapshot |
-| `ClassToClassWithConfigs` | WithMapperOptions config | Needs snapshot |
-| `RecordToRecordManualFlatteningInsideList` | Complex flattening with lists | Needs snapshot |
-| `ReferenceLoopInitProperty` | Handles potential reference loops | Needs snapshot |
-| `NestedWithCtor` | Nested with constructor | Needs snapshot |
-| `CtorShouldSkipUnmatchedOptionalParameters` | Constructor parameter handling | Needs snapshot |
-| `WithReferenceHandlingShouldDiagnostic` | Diagnostic test | Should pass |
-| `TopLevelUserImplemented` | User-implemented mapping | Needs snapshot |
-| `ExpressionWithStringFormat` | StringFormat attribute | Needs snapshot |
-| `StaticMapper` | Static partial class | Needs snapshot |
+| `ClassToClass` | Basic class to class mapping | ✅ Pass |
+| `ClassToClassMultipleProperties` | Multiple properties | ✅ Pass |
+| `ClassToClassNested` | Nested object mapping | ✅ Pass |
+| `ClassToClassNestedMemberAttribute` | MapProperty attribute | ✅ Pass |
+| `ClassToClassWithConfigs` | WithMapperOptions config | ✅ Pass |
+| `RecordToRecordManualFlatteningInsideList` | Complex flattening with lists | ✅ Pass |
+| `ReferenceLoopInitProperty` | Handles potential reference loops | ✅ Pass |
+| `NestedWithCtor` | Nested with constructor | ✅ Pass |
+| `CtorShouldSkipUnmatchedOptionalParameters` | Constructor parameter handling | ✅ Pass |
+| `WithReferenceHandlingShouldDiagnostic` | Diagnostic test | ✅ Pass |
+| `TopLevelUserImplemented` | User-implemented mapping | ✅ Pass |
+| `ExpressionWithStringFormat` | StringFormat attribute | ✅ Pass |
+| `StaticMapper` | Static partial class | ✅ Pass |
 
 ---
 
