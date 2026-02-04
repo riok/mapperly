@@ -17,7 +17,6 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
         ToObjectMappingBuilder.TryBuildMapping,
         DirectAssignmentMappingBuilder.TryBuildMapping,
         QueryableMappingBuilder.TryBuildMapping,
-        ExpressionMappingBuilder.TryBuildMapping,
         DictionaryMappingBuilder.TryBuildMapping,
         SpanMappingBuilder.TryBuildMapping,
         MemoryMappingBuilder.TryBuildMapping,

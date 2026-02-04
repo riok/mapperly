@@ -335,8 +335,9 @@ public static class UserMethodMappingExtractor
         if (methodSymbol.IsGenericMethod)
             return null;
 
-        // Only handle parameterless methods here
-        // Methods with parameters are handled by the normal mapping flow via ExpressionMappingBuilder
+        // Only handle parameterless methods - Expression<Func<TSource, TTarget>> mappings
+        // are meant to be used like IQueryable projections where the source type comes from
+        // the Expression's type arguments, not from method parameters
         if (methodSymbol.Parameters.Length > 0)
             return null;
 
