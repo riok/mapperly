@@ -203,8 +203,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         return mapping switch
         {
             // inline existing mapping
-            UserImplementedMethodMapping implementedMapping => InlineExpressionMappingBuilder.TryBuildMapping(this, implementedMapping)
-                ?? implementedMapping,
+            UserImplementedMethodMapping implementedMapping => InlineOrRebuild(implementedMapping) ?? implementedMapping,
 
             // build an inlined version
             IUserMapping userMapping => BuildMapping(
@@ -216,5 +215,41 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
 
             _ => mapping,
         };
+    }
+
+    private INewInstanceMapping? InlineOrRebuild(UserImplementedMethodMapping mapping)
+    {
+        // Try inline first
+        // If the mapping is external, we don't report diagnostics yet,
+        // because we might be able to rebuild it if inlining fails.
+        var inlined = InlineExpressionMappingBuilder.TryBuildMapping(this, mapping);
+        if (inlined != null)
+            return inlined;
+
+        if (!mapping.IsExternal)
+        {
+            ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, mapping.Method);
+            return null;
+        }
+
+        // If not matched and is external, try rebuild
+        if (mapping.Method.IsPartialDefinition || AttributeAccessor.IsMapperlyGenerated(mapping.Method))
+        {
+            var ctx = ContextForMapping(
+                mapping,
+                new TypeMappingKey(mapping),
+                MappingBuildingOptions.Default,
+                mapping.Method.GetSyntaxLocation()
+            );
+
+            var rebuilt = MappingBuilder.Build(ctx, false);
+            if (rebuilt != null)
+                return rebuilt;
+        }
+
+        // If failed rebuild (or skipped), we need to report diagnostic that we couldn't inline.
+        // (Since we suppressed it in the first call).
+        ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, mapping.Method);
+        return null;
     }
 }
