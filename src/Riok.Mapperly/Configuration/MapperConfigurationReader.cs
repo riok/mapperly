@@ -37,7 +37,7 @@ public class MapperConfigurationReader
         _types = types;
 
         var mapperConfiguration = _dataAccessor.AccessSingle<MapperAttribute, MapperConfiguration>(mapperSymbol);
-        var mapper = MapperConfigurationMerger.Merge(mapperConfiguration, defaultMapperConfiguration);
+        var mapper = MapperConfigurationMerger.MergeToAttribute(mapperConfiguration, defaultMapperConfiguration);
 
         MapperConfiguration = new MappingConfiguration(
             mapper,

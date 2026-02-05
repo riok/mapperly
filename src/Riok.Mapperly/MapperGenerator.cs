@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors;
@@ -54,11 +55,14 @@ public class MapperGenerator : IIncrementalGenerator
 
         // build the assembly default configurations
         var mapperDefaultsAssembly = SyntaxProvider.GetMapperDefaultDeclarations(context);
-        var mapperDefaults = compilationContext
+        var mapperDefaultsAndDiagnostics = compilationContext
             .Combine(mapperDefaultsAssembly)
-            .Select(static (x, _) => BuildDefaults(x.Left, x.Right))
+            .Combine(context.AnalyzerConfigOptionsProvider)
+            .Select(static (x, _) => BuildDefaults(x.Left.Left, x.Left.Right, x.Right.GlobalOptions))
             .WithTrackingName(MapperGeneratorStepNames.BuildMapperDefaults);
+        context.ReportDiagnostics(mapperDefaultsAndDiagnostics.SelectMany(static (x, _) => x.Diagnostics));
 
+        var mapperDefaults = mapperDefaultsAndDiagnostics.Select(static (x, _) => x.MapperConfiguration);
         var useStaticMappers = SyntaxProvider
             .GetUseStaticMapperDeclarations(context)
             .Select(BuildStaticMappers)
@@ -172,21 +176,32 @@ public class MapperGenerator : IIncrementalGenerator
         return staticMappersBuilder.ToImmutable();
     }
 
-    private static MapperConfiguration BuildDefaults(CompilationContext compilationContext, IAssemblySymbol? assemblySymbol)
+    private static (MapperConfiguration MapperConfiguration, ImmutableEquatableArray<Diagnostic> Diagnostics) BuildDefaults(
+        CompilationContext compilationContext,
+        IAssemblySymbol? assemblySymbol,
+        AnalyzerConfigOptions options
+    )
     {
+        var (msbuildMapperConfiguration, diagnostics) = MapperBuildConfigurationReader.Read(options);
+
         if (assemblySymbol == null)
-            return MapperConfiguration.Default;
+            return (msbuildMapperConfiguration, diagnostics);
 
         var mapperDefaultsAttribute = compilationContext.Types.TryGet(MapperDefaultsAttributeName);
         if (mapperDefaultsAttribute == null)
-            return MapperConfiguration.Default;
+            return (msbuildMapperConfiguration, diagnostics);
 
         var assemblyMapperDefaultsAttribute = SymbolAccessor
             .GetAttributesSkipCache(assemblySymbol, mapperDefaultsAttribute)
             .FirstOrDefault();
-        return assemblyMapperDefaultsAttribute == null
-            ? MapperConfiguration.Default
-            : AttributeDataAccessor.Access<MapperDefaultsAttribute, MapperConfiguration>(assemblyMapperDefaultsAttribute);
+        if (assemblyMapperDefaultsAttribute == null)
+            return (msbuildMapperConfiguration, diagnostics);
+
+        var attributeMapperConfiguration = AttributeDataAccessor.Access<MapperDefaultsAttribute, MapperConfiguration>(
+            assemblyMapperDefaultsAttribute
+        );
+        var defaultMapperConfiguration = MapperConfigurationMerger.Merge(attributeMapperConfiguration, msbuildMapperConfiguration);
+        return (defaultMapperConfiguration, diagnostics);
     }
 
     private static IEnumerable<Diagnostic> BuildCompilationDiagnostics(Compilation compilation)

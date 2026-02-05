@@ -18,6 +18,21 @@ The `MapperDefaultsAttribute` allows to set default configurations applied to al
 [assembly: MapperDefaults(EnumMappingIgnoreCase = true)]
 ```
 
+### MSBuild configuration
+
+Mapperly configurations can also be set via MSBuild properties.
+This allows to configure defaults in the project file (e.g. `.csproj`) or `Directory.Build.props`.
+Property names correspond to the `MapperAttribute` properties prefixed with `Mapperly`.
+
+```xml
+<PropertyGroup>
+  <MapperlyEnumMappingIgnoreCase>true</MapperlyEnumMappingIgnoreCase>
+  <MapperlyRequiredMappingStrategy>Both</MapperlyRequiredMappingStrategy>
+</PropertyGroup>
+```
+
+Configurations set via `MapperDefaultsAttribute` take precedence over MSBuild properties.
+
 ## Copy behavior
 
 By default, Mapperly does not create deep copies of objects to improve performance.

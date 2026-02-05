@@ -15,7 +15,8 @@ public record TestHelperOptions(
     IReadOnlySet<DiagnosticSeverity>? AllowedDiagnosticSeverities = null,
     IReadOnlySet<DiagnosticDescriptor>? IgnoredDiagnostics = null,
     string AssemblyName = "Tests",
-    string GeneratedTreeFileName = $"{TestSourceBuilderOptions.DefaultMapperClassName}.g.cs"
+    string GeneratedTreeFileName = $"{TestSourceBuilderOptions.DefaultMapperClassName}.g.cs",
+    IReadOnlyDictionary<string, string>? AnalyzerConfigOptions = null
 )
 {
     public static readonly TestHelperOptions Default = new(
