@@ -92,7 +92,9 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <summary>
     /// Determines if mapping code should be emitted in cases where direct assignments or casts could be used instead.
     /// </summary>
-    public bool UseCloning => Configuration.CloningBehaviour != CloningBehaviour.None;
+    public bool UseCloning =>
+        Configuration.CloningBehaviour == CloningBehaviour.DeepCloning
+        || (HasUserSymbol && Configuration.CloningBehaviour == CloningBehaviour.ShallowCloning);
 
     /// <summary>
     /// Tries to find an existing mapping with the provided name.

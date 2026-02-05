@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Helpers;
 
