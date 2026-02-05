@@ -33,7 +33,11 @@ public class ParameterSourceMember(MethodParameter parameter) : IMappableMember,
     public IMemberSetter BuildSetter(UnsafeAccessorContext ctx) =>
         throw new InvalidOperationException($"Cannot create a setter for {nameof(ParameterSourceMember)}");
 
-    public ExpressionSyntax BuildAccess(ExpressionSyntax? baseAccess, bool nullConditional = false) => IdentifierName(Name);
+    public ExpressionSyntax BuildAccess(
+        ExpressionSyntax? baseAccess,
+        INamedTypeSymbol? containingType = null,
+        bool nullConditional = false
+    ) => IdentifierName(Name);
 
     public override bool Equals(object? obj)
     {

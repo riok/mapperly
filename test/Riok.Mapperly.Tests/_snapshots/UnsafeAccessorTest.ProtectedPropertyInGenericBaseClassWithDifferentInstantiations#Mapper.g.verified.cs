@@ -4,25 +4,25 @@
 public partial class Mapper
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    partial global::B<int> Map(global::A<int> source)
+    partial global::B1 Map1(global::A1 source)
     {
-        var target = new global::B<int>();
-        BAccessor<int>.SetValue(target, AAccessor<int>.GetValue(source));
+        var target = new global::B1();
+        BAccessor<global::IB>.SetValue(target, AAccessor<global::IB>.GetValue(source));
         return target;
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
-    partial global::B<float> Map(global::A<float> source)
+    partial global::B2 Map2(global::A2 source)
     {
-        var target = new global::B<float>();
-        BAccessor<float>.SetValue(target, AAccessor<float>.GetValue(source));
+        var target = new global::B2();
+        BAccessor<global::IC>.SetValue(target, AAccessor<global::IC>.GetValue(source));
         return target;
     }
 }
 
 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
 static file class AAccessor<T>
-    where T : struct
+    where T : global::IA
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "get__value")]
@@ -31,7 +31,7 @@ static file class AAccessor<T>
 
 [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
 static file class BAccessor<T>
-    where T : struct
+    where T : global::IA
 {
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     [global::System.Runtime.CompilerServices.UnsafeAccessor(global::System.Runtime.CompilerServices.UnsafeAccessorKind.Method, Name = "set__value")]
