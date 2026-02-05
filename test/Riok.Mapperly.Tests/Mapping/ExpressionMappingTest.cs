@@ -217,4 +217,53 @@ public class ExpressionMappingTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task RecordToRecordDisabledNullableContext()
+    {
+        // see https://github.com/riok/mapperly/issues/1196
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial System.Linq.Expressions.Expression<System.Func<A, B>> Map();
+            """,
+            "public record A(string Value);",
+            "public record B(string Value);"
+        );
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
+
+    [Fact]
+    public Task RecordToRecordMemberMappingDisabledNullableContext()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial System.Linq.Expressions.Expression<System.Func<A, B>> Map();
+
+            [MapProperty(nameof(A.Value), nameof(B.OtherValue)]
+            private partial B MapPrivate(A source);
+            """,
+            "public record A(string Value);",
+            "public record B(string OtherValue);"
+        );
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
+
+    [Fact]
+    public Task ClassToClassMemberMappingDisabledNullableContext()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial System.Linq.Expressions.Expression<System.Func<A, B>> Map();
+
+            [MapProperty(nameof(A.Value), nameof(B.OtherValue)]
+            private partial B MapPrivate(A source);
+            """,
+            "public class A { public string Value {get; set;} }",
+            "public class B { public string OtherValue {get; set;} }"
+        );
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
 }

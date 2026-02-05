@@ -353,9 +353,11 @@ public static class UserMethodMappingExtractor
         if (!funcType.ExtendsOrImplementsGeneric(ctx.Types.Get(typeof(Func<,>)), out var funcTypeArgs))
             return null;
 
-        // Extract source and target types from the Func<TSource, TTarget> type arguments
-        var sourceType = funcTypeArgs.TypeArguments[0];
-        var targetType = funcTypeArgs.TypeArguments[1];
+        // Extract source and target types from the Func<TSource, TTarget> type arguments.
+        // Unlike IQueryable where inner types are already upgraded via method parameter processing,
+        // here we extract from the raw return type and must upgrade explicitly.
+        var sourceType = ctx.SymbolAccessor.UpgradeNullable(funcTypeArgs.TypeArguments[0]);
+        var targetType = ctx.SymbolAccessor.UpgradeNullable(funcTypeArgs.TypeArguments[1]);
 
         return new UserDefinedExpressionMethodMapping(methodSymbol, sourceType, targetType, ctx.SymbolAccessor.UpgradeNullable(returnType));
     }
