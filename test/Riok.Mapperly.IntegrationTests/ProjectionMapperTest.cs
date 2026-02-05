@@ -24,6 +24,16 @@ namespace Riok.Mapperly.IntegrationTests
             return Verifier.VerifyFile(path);
         }
 
+        [Fact]
+        public Task ExpressionShouldMapObject()
+        {
+            var expression = ProjectionMapper.ProjectToDtoExpression();
+            var compiled = expression.Compile();
+            var source = CreateObject();
+            var result = compiled(source);
+            return Verifier.Verify(result);
+        }
+
 #if NET7_0_OR_GREATER
         [Fact]
         [VersionedSnapshot(Versions.NET8_0 | Versions.NET9_0)]
@@ -33,6 +43,29 @@ namespace Riok.Mapperly.IntegrationTests
             {
                 var query = ctx.Objects.ProjectToDto();
                 return Verifier.Verify(query.ToQueryString(), "sql");
+            });
+        }
+
+        [Fact]
+        [VersionedSnapshot(Versions.NET8_0 | Versions.NET9_0)]
+        public Task ExpressionShouldTranslateToQuery()
+        {
+            return RunWithDatabase(ctx =>
+            {
+                var expression = ProjectionMapper.ProjectToDtoExpression();
+                var query = ctx.Objects.Select(expression);
+                return Verifier.Verify(query.ToQueryString(), "sql");
+            });
+        }
+
+        [Fact]
+        public Task ExpressionShouldTranslateToResult()
+        {
+            return RunWithDatabase(async ctx =>
+            {
+                var expression = ProjectionMapper.ProjectToDtoExpression();
+                var objects = await ctx.Objects.Select(expression).ToListAsync();
+                await Verifier.Verify(objects);
             });
         }
 
@@ -65,22 +98,7 @@ namespace Riok.Mapperly.IntegrationTests
                 await Verifier.Verify(objects);
             });
         }
-
-        private async Task RunWithDatabase(Func<ProjectionDbContext, Task> action)
-        {
-            await using var connection = new SqliteConnection("Data Source=:memory:");
-            await connection.OpenAsync();
-
-            var options = new DbContextOptionsBuilder().UseSqlite(connection).Options;
-
-            await using var ctx = new ProjectionDbContext(options);
-            await ctx.Database.EnsureCreatedAsync();
-            ctx.Objects.Add(CreateObject());
-            ctx.BaseTypeObjects.Add(new TestObjectProjectionTypeA { BaseValue = 10, ValueA = 10 });
-            ctx.BaseTypeObjects.Add(new TestObjectProjectionTypeB { BaseValue = 20, ValueB = 20 });
-            await ctx.SaveChangesAsync();
-            await action(ctx);
-        }
+#endif
 
         private TestObjectProjection CreateObject()
         {
@@ -121,6 +139,23 @@ namespace Riok.Mapperly.IntegrationTests
                 },
                 ManuallyMappedModified = 1,
             };
+        }
+
+#if NET7_0_OR_GREATER
+        private async Task RunWithDatabase(Func<ProjectionDbContext, Task> action)
+        {
+            await using var connection = new SqliteConnection("Data Source=:memory:");
+            await connection.OpenAsync();
+
+            var options = new DbContextOptionsBuilder().UseSqlite(connection).Options;
+
+            await using var ctx = new ProjectionDbContext(options);
+            await ctx.Database.EnsureCreatedAsync();
+            ctx.Objects.Add(CreateObject());
+            ctx.BaseTypeObjects.Add(new TestObjectProjectionTypeA { BaseValue = 10, ValueA = 10 });
+            ctx.BaseTypeObjects.Add(new TestObjectProjectionTypeB { BaseValue = 20, ValueB = 20 });
+            await ctx.SaveChangesAsync();
+            await action(ctx);
         }
 
         class ProjectionDbContext : DbContext
