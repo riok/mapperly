@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Riok.Mapperly.IntegrationTests.Helpers;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using Riok.Mapperly.IntegrationTests.Models;
@@ -43,6 +44,30 @@ namespace Riok.Mapperly.IntegrationTests
             var copy = ShallowCloningMapper.Copy(source);
             source.ShouldNotBeSameAs(copy);
             copy.RequiredValue.ShouldBe(999);
+        }
+
+        [Fact]
+        public void RunMappingWithMapperAvoidCloningChildObjects()
+        {
+            var nested = new TestObjectNested() { IntValue = int.MaxValue };
+
+            var idObject = new IdObject() { IdValue = 7 };
+
+            var source = new TestObject(255, -1, 7)
+            {
+                RequiredValue = 999,
+                NestedNullable = nested,
+                NestedNullableTargetNotNullable = nested,
+                Flattening = idObject,
+            };
+            var copy = ShallowCloningMapper.Copy(source);
+            source.ShouldNotBeSameAs(copy);
+            copy.RequiredValue.ShouldBe(999);
+
+            // check the references are exactly the same
+            copy.Flattening.ShouldBeSameAs(idObject);
+            copy.NestedNullable.ShouldBeSameAs(nested);
+            copy.NestedNullableTargetNotNullable.ShouldBeSameAs(nested);
         }
     }
 }

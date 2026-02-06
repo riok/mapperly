@@ -23,15 +23,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.IntValue = src.IntValue;
             target.StringValue = src.StringValue;
             target.RenamedStringValue = src.RenamedStringValue;
-            target.Flattening = Copy(src.Flattening);
-            if (src.NullableFlattening != null)
-            {
-                target.NullableFlattening = Copy(src.NullableFlattening);
-            }
-            else
-            {
-                target.NullableFlattening = null;
-            }
+            target.Flattening = src.Flattening;
+            target.NullableFlattening = src.NullableFlattening;
             target.UnflatteningIdValue = src.UnflatteningIdValue;
             target.NullableUnflatteningIdValue = src.NullableUnflatteningIdValue;
             target.NestedNullable = src.NestedNullable;
@@ -39,22 +32,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.NestedMember = src.NestedMember;
             target.StringNullableTargetNotNullable = src.StringNullableTargetNotNullable;
             target.TupleValue = src.TupleValue;
-            if (src.RecursiveObject != null)
-            {
-                target.RecursiveObject = Copy(src.RecursiveObject);
-            }
-            else
-            {
-                target.RecursiveObject = null;
-            }
-            if (src.SourceTargetSameObjectType != null)
-            {
-                target.SourceTargetSameObjectType = Copy(src.SourceTargetSameObjectType);
-            }
-            else
-            {
-                target.SourceTargetSameObjectType = null;
-            }
+            target.RecursiveObject = src.RecursiveObject;
+            target.SourceTargetSameObjectType = src.SourceTargetSameObjectType;
             target.NullableReadOnlyObjectCollection = src.NullableReadOnlyObjectCollection;
             target.MemoryValue = src.MemoryValue;
             target.StackValue = src.StackValue;
