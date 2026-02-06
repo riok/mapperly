@@ -1,6 +1,12 @@
 ﻿[assembly: System.Runtime.Versioning.TargetFramework(".NETStandard,Version=v2.0", FrameworkDisplayName=".NET Standard 2.0")]
 namespace Riok.Mapperly.Abstractions
 {
+    public enum CloningStrategy
+    {
+        None = 0,
+        DeepCloning = 1,
+        ShallowCloning = 2,
+    }
     public enum EnumMappingStrategy
     {
         ByValue = 0,
@@ -131,6 +137,7 @@ namespace Riok.Mapperly.Abstractions
         public MapperAttribute() { }
         public bool AllowNullPropertyAssignment { get; set; }
         public bool AutoUserMappings { get; set; }
+        public Riok.Mapperly.Abstractions.CloningStrategy CloningStrategy { get; set; }
         public Riok.Mapperly.Abstractions.MappingConversionType EnabledConversions { get; set; }
         public bool EnumMappingIgnoreCase { get; set; }
         public Riok.Mapperly.Abstractions.EnumMappingStrategy EnumMappingStrategy { get; set; }
@@ -145,6 +152,8 @@ namespace Riok.Mapperly.Abstractions
         public Riok.Mapperly.Abstractions.StackCloningStrategy StackCloningStrategy { get; set; }
         public bool ThrowOnMappingNullMismatch { get; set; }
         public bool ThrowOnPropertyMappingNullMismatch { get; set; }
+        [System.Obsolete("Use \'CloningStrategy\' instead. If this is set to true, `CloningStrategy.DeepClone" +
+            "` is always used.")]
         public bool UseDeepCloning { get; set; }
         public bool UseReferenceHandling { get; set; }
     }

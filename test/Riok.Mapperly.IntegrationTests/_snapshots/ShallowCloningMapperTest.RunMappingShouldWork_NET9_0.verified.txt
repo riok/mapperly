@@ -1,0 +1,223 @@
+﻿{
+  CtorValue: 7,
+  CtorValue2: 100,
+  IntValue: 10,
+  IntInitOnlyValue: 3,
+  RequiredValue: 4,
+  UnmappedValue: 10,
+  StringValue: fooBar,
+  RenamedStringValue: fooBar2,
+  Flattening: {
+    IdValue: 10
+  },
+  NullableFlattening: {
+    IdValue: 100
+  },
+  UnflatteningIdValue: 20,
+  NullableUnflatteningIdValue: 200,
+  NestedNullable: {
+    IntValue: 100
+  },
+  NestedNullableTargetNotNullable: {},
+  NestedMember: {
+    NestedMemberId: 12,
+    NestedMemberObject: {
+      IntValue: 22
+    }
+  },
+  StringNullableTargetNotNullable: fooBar3,
+  TupleValue: {
+    Item1: 10,
+    Item2: 20
+  },
+  RecursiveObject: {
+    CtorValue: 5,
+    CtorValue2: 100,
+    RequiredValue: 4,
+    UnmappedValue: 10,
+    StringValue: ,
+    RenamedStringValue: ,
+    Flattening: {},
+    ImmutableArrayValue: null,
+    ImmutableQueueValue: [],
+    ImmutableStackValue: [],
+    EnumValue: Value10,
+    EnumName: Value30,
+    EnumReverseStringValue: DtoValue3,
+    ExposePrivateValue: 16,
+    ExposeGenericPrivateValue: {
+      ExposedId: 10,
+      ExposedValue: {
+        Value: 3.3
+      }
+    }
+  },
+  SourceTargetSameObjectType: {
+    CtorValue: 8,
+    CtorValue2: 100,
+    IntValue: 99,
+    RequiredValue: 98,
+    UnmappedValue: 10,
+    StringValue: ,
+    RenamedStringValue: ,
+    Flattening: {},
+    NestedMember: {
+      NestedMemberId: 123,
+      NestedMemberObject: {
+        IntValue: 223
+      }
+    },
+    ImmutableArrayValue: null,
+    ImmutableQueueValue: [],
+    ImmutableStackValue: [],
+    EnumReverseStringValue: ,
+    ExposePrivateValue: 19,
+    ExposeGenericPrivateValue: {
+      ExposedId: 10,
+      ExposedValue: {
+        Value: 3.3
+      }
+    }
+  },
+  NullableReadOnlyObjectCollection: [
+    {
+      IntValue: 10
+    },
+    {
+      IntValue: 20
+    }
+  ],
+  MemoryValue: {
+    Length: 3,
+    IsEmpty: false
+  },
+  StackValue: [
+    3,
+    2,
+    1
+  ],
+  QueueValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableArrayValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableListValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableQueueValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableStackValue: [
+    3,
+    2,
+    1
+  ],
+  ImmutableSortedSetValue: [
+    1,
+    2,
+    3
+  ],
+  ImmutableDictionaryValue: {
+    1: 1,
+    2: 2,
+    3: 3
+  },
+  ImmutableSortedDictionaryValue: {
+    1: 1,
+    2: 2,
+    3: 3
+  },
+  ExistingISet: [
+    1,
+    2,
+    3
+  ],
+  ExistingHashSet: [
+    1,
+    2,
+    3
+  ],
+  ExistingSortedSet: [
+    1,
+    2,
+    3
+  ],
+  ExistingList: [
+    1,
+    2,
+    3
+  ],
+  ISet: [
+    1,
+    2,
+    3
+  ],
+  IReadOnlySet: [
+    1,
+    2,
+    3
+  ],
+  HashSet: [
+    1,
+    2,
+    3
+  ],
+  SortedSet: [
+    1,
+    2,
+    3
+  ],
+  EnumValue: Value10,
+  FlagsEnumValue: V1, V4,
+  EnumName: Value10,
+  EnumRawValue: Value20,
+  EnumStringValue: Value30,
+  EnumReverseStringValue: DtoValue3,
+  SubObject: {
+    SubIntValue: 2,
+    BaseIntValue: 1
+  },
+  DateTimeValue: 2020-01-03 15:10:05 Utc,
+  DateTimeValueTargetDateOnly: 2020-01-03 15:10:05 Utc,
+  DateTimeValueTargetTimeOnly: 2020-01-03 15:10:05 Utc,
+  ToByteArrayWithInstanceMethod: Guid_1,
+  WithCreateMethod: {
+    Value: 10
+  },
+  WithCreateFromMethod: {
+    Value: 20
+  },
+  WithFromSingleMethod: {
+    Value: 30
+  },
+  WithCreateParamsMethod: {
+    Value: 40
+  },
+  WithCreateFromParamsMethod: {
+    Value: 50
+  },
+  WithFromShortParamsMethod: {
+    Value: 60
+  },
+  WithToDecimalMethod: {
+    Value: 70
+  },
+  ExposePrivateValue: 18,
+  ExposeGenericPrivateValue: {
+    ExposedId: 10,
+    ExposedValue: {
+      Value: 3.3
+    }
+  },
+  SumComponent1: 32,
+  SumComponent2: 64
+}
