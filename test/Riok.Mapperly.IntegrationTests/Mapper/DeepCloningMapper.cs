@@ -16,8 +16,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial TestObject Copy(TestObject src);
     }
 
-    [Mapper(CloningBehaviour = CloningBehaviour.DeepCloning)]
-    public static partial class DeepCloningMapperWithCloningBehaviour
+    [Mapper(CloningStrategy = CloningStrategy.DeepCloning)]
+    public static partial class DeepCloningMapperWithCloningStrategy
     {
         public static partial IdObject Copy(IdObject src);
 

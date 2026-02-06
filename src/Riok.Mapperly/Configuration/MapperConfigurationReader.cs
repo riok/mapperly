@@ -53,7 +53,7 @@ public class MapperConfigurationReader
             ),
             new MembersMappingConfiguration([], [], [], [], [], mapper.IgnoreObsoleteMembersStrategy, mapper.RequiredMappingStrategy),
             [],
-            mapper.UseDeepCloning ? CloningBehaviour.DeepCloning : mapper.CloningBehaviour,
+            mapper.UseDeepCloning ? CloningStrategy.DeepCloning : mapper.CloningStrategy,
             mapper.StackCloningStrategy,
             supportedFeatures
         );
@@ -78,11 +78,11 @@ public class MapperConfigurationReader
     )
     {
         if (reference.Method == null)
-            return supportsDeepCloning ? MapperConfiguration : MapperConfiguration with { CloningBehaviour = CloningBehaviour.None };
+            return supportsDeepCloning ? MapperConfiguration : MapperConfiguration with { CloningStrategy = CloningStrategy.None };
 
-        var cloningBehaviour = MapperConfiguration.Mapper.UseDeepCloning
-            ? CloningBehaviour.DeepCloning
-            : MapperConfiguration.Mapper.CloningBehaviour;
+        var cloningStrategy = MapperConfiguration.Mapper.UseDeepCloning
+            ? CloningStrategy.DeepCloning
+            : MapperConfiguration.Mapper.CloningStrategy;
 
         var enumConfig = BuildEnumConfig(reference);
         var membersConfig = BuildMembersConfig(reference);
@@ -92,7 +92,7 @@ public class MapperConfigurationReader
             enumConfig,
             membersConfig,
             derivedTypesConfig,
-            supportsDeepCloning ? cloningBehaviour : CloningBehaviour.None,
+            supportsDeepCloning ? cloningStrategy : CloningStrategy.None,
             MapperConfiguration.StackCloningStrategy,
             MapperConfiguration.SupportedFeatures
         );
@@ -282,7 +282,6 @@ public class MapperConfigurationReader
             nestedMembersConfigurations,
             ignoreObsolete,
             requiredMapping
-        //useShallowCloning != null
         );
     }
 

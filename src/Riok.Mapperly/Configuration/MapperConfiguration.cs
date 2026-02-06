@@ -65,7 +65,7 @@ public record MapperConfiguration
     /// </summary>
     public bool? UseDeepCloning { get; init; }
 
-    public CloningBehaviour? CloningBehaviour { get; init; }
+    public CloningStrategy? CloningStrategy { get; init; }
 
     /// <summary>
     /// The strategy to use when cloning a <see cref="System.Collections.Generic.Stack{T}"/>.

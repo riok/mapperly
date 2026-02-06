@@ -11,7 +11,6 @@ public record MembersMappingConfiguration(
     IReadOnlyCollection<NestedMembersMappingConfiguration> NestedMappings,
     IgnoreObsoleteMembersStrategy? IgnoreObsoleteMembersStrategy,
     RequiredMappingStrategy? RequiredMappingStrategy
-//CloningBehaviour CloningBehaviour
 )
 {
     public IEnumerable<string> GetMembersWithExplicitConfigurations(MappingSourceTarget sourceTarget)
@@ -37,7 +36,6 @@ public record MembersMappingConfiguration(
             NestedMappings.Concat(otherConfiguration?.NestedMappings ?? []).ToList(),
             IgnoreObsoleteMembersStrategy ?? otherConfiguration?.IgnoreObsoleteMembersStrategy,
             RequiredMappingStrategy ?? otherConfiguration?.RequiredMappingStrategy
-        //CloningBehaviour // TODO what to do in this case?
         );
     }
 }

@@ -3,7 +3,7 @@ using Riok.Mapperly.IntegrationTests.Models;
 
 namespace Riok.Mapperly.IntegrationTests.Mapper
 {
-    [Mapper(CloningBehaviour = CloningBehaviour.ShallowCloning)]
+    [Mapper(CloningStrategy = CloningStrategy.ShallowCloning)]
     public static partial class ShallowCloningMapper
     {
         public static partial IdObject Copy(IdObject src);

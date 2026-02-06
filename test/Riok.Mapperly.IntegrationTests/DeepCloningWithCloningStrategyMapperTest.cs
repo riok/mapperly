@@ -8,13 +8,13 @@ using Xunit;
 
 namespace Riok.Mapperly.IntegrationTests
 {
-    public class DeepCloningWithCloningBehaviourMapperTest : BaseMapperTest
+    public class DeepCloningWithCloningStrategyMapperTest : BaseMapperTest
     {
         [Fact]
         [VersionedSnapshot(Versions.NET8_0)]
         public Task SnapshotGeneratedSource()
         {
-            var path = GetGeneratedMapperFilePath(nameof(DeepCloningMapperWithCloningBehaviour));
+            var path = GetGeneratedMapperFilePath(nameof(DeepCloningMapperWithCloningStrategy));
             return Verifier.VerifyFile(path);
         }
 
@@ -23,7 +23,7 @@ namespace Riok.Mapperly.IntegrationTests
         public Task RunMappingShouldWork()
         {
             var model = NewTestObj();
-            var dto = DeepCloningMapperWithCloningBehaviour.Copy(model);
+            var dto = DeepCloningMapperWithCloningStrategy.Copy(model);
             return Verifier.Verify(dto);
         }
 
@@ -31,7 +31,7 @@ namespace Riok.Mapperly.IntegrationTests
         public void RunIdMappingShouldWork()
         {
             var source = new IdObject { IdValue = 20 };
-            var copy = DeepCloningMapperWithCloningBehaviour.Copy(source);
+            var copy = DeepCloningMapperWithCloningStrategy.Copy(source);
             source.ShouldNotBeSameAs(copy);
             copy.IdValue.ShouldBe(20);
         }

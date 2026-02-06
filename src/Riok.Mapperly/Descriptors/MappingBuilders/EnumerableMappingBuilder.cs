@@ -198,7 +198,7 @@ public static class EnumerableMappingBuilder
         // use a for loop mapping otherwise.
         if (elementMapping.IsSynthetic)
         {
-            return ctx.Configuration.CloningBehaviour == CloningBehaviour.DeepCloning
+            return ctx.Configuration.CloningStrategy == CloningStrategy.DeepCloning
                 ? new ArrayCloneMapping(ctx.Source, ctx.Target)
                 : new CastMapping(ctx.Source, ctx.Target);
         }
@@ -318,7 +318,7 @@ public static class EnumerableMappingBuilder
         // if the target is an IEnumerable<T> don't collect at all
         // except deep cloning is enabled.
         var targetIsIEnumerable = ctx.CollectionInfos!.Target.CollectionType == CollectionType.IEnumerable;
-        if (targetIsIEnumerable && ctx.Configuration.CloningBehaviour != CloningBehaviour.DeepCloning)
+        if (targetIsIEnumerable && ctx.Configuration.CloningStrategy != CloningStrategy.DeepCloning)
             return (true, null);
 
         // if the target is IReadOnlyCollection<T> or IEnumerable<T>

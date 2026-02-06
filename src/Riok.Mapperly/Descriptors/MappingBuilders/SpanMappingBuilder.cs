@@ -44,7 +44,7 @@ public static class SpanMappingBuilder
             // if the source is Span/ReadOnlySpan or Array and target is Span/ReadOnlySpan
             // and element type is the same, then direct cast
             (CollectionType.Span or CollectionType.ReadOnlySpan or CollectionType.Array, CollectionType.Span or CollectionType.ReadOnlySpan)
-                when elementMapping.IsSynthetic && ctx.Configuration.CloningBehaviour != CloningBehaviour.DeepCloning => new CastMapping(
+                when elementMapping.IsSynthetic && ctx.Configuration.CloningStrategy != CloningStrategy.DeepCloning => new CastMapping(
                 ctx.Source,
                 ctx.Target
             ),

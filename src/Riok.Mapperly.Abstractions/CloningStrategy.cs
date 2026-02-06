@@ -3,7 +3,7 @@
 /// <summary>
 /// Specifies whether and how to copy objects of the same type and complex types like collections and spans.
 /// </summary>
-public enum CloningBehaviour
+public enum CloningStrategy
 {
     /// <summary>
     /// Default behaviour, the original instance will be returned
