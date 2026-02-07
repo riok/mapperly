@@ -354,8 +354,8 @@ public static class UserMethodMappingExtractor
             return null;
 
         // Extract source and target types from the Func<TSource, TTarget> type arguments.
-        // Unlike IQueryable where inner types are already upgraded via method parameter processing,
-        // here we extract from the raw return type and must upgrade explicitly.
+        // Unlike method parameters, type arguments do not go through SymbolAccessor.WrapMethodParameter,
+        // so we need to upgrade nullability explicitly.
         var sourceType = ctx.SymbolAccessor.UpgradeNullable(funcTypeArgs.TypeArguments[0]);
         var targetType = ctx.SymbolAccessor.UpgradeNullable(funcTypeArgs.TypeArguments[1]);
 
