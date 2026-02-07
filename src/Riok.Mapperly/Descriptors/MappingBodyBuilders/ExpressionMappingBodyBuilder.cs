@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
@@ -16,16 +17,7 @@ public static class ExpressionMappingBodyBuilder
         var sourceType = mapping.ExpressionSourceType;
         var targetType = mapping.ExpressionTargetType;
 
-        // if nullable reference types are disabled
-        // and there was no explicit nullable annotation,
-        // the non-nullable variant is used here.
-        // Otherwise, this would lead to a lambda like x => x == null ? throw ... : new ...
-        // which is not expected in this case.
-        // see also https://github.com/riok/mapperly/issues/1196
-        sourceType = ctx.SymbolAccessor.NonNullableIfNullableReferenceTypesDisabled(sourceType, ctx.UserMapping?.SourceType);
-        targetType = ctx.SymbolAccessor.NonNullableIfNullableReferenceTypesDisabled(targetType, ctx.UserMapping?.TargetType);
-
-        var mappingKey = new TypeMappingKey(sourceType, targetType);
+        var mappingKey = TryBuildMappingKey(ctx, sourceType, targetType);
         var userMapping = ctx.FindMapping(sourceType, targetType) as IUserMapping;
         var inlineCtx = new InlineExpressionMappingBuilderContext(ctx, userMapping, mappingKey);
 
@@ -61,5 +53,19 @@ public static class ExpressionMappingBodyBuilder
         }
 
         ctx.ReportDiagnostic(DiagnosticDescriptors.CouldNotCreateMapping, sourceType, targetType);
+    }
+
+    private static TypeMappingKey TryBuildMappingKey(MappingBuilderContext ctx, ITypeSymbol sourceType, ITypeSymbol targetType)
+    {
+        // if nullable reference types are disabled
+        // and there was no explicit nullable annotation,
+        // the non-nullable variant is used here.
+        // Otherwise, this would lead to a select like source.Select(x => x == null ? throw ... : new ...)
+        // which is not expected in this case.
+        // see also https://github.com/riok/mapperly/issues/1196
+        sourceType = ctx.SymbolAccessor.NonNullableIfNullableReferenceTypesDisabled(sourceType, ctx.UserMapping?.SourceType);
+        targetType = ctx.SymbolAccessor.NonNullableIfNullableReferenceTypesDisabled(targetType, ctx.UserMapping?.TargetType);
+
+        return new TypeMappingKey(sourceType, targetType);
     }
 }
