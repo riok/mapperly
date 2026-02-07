@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
@@ -242,6 +243,9 @@ public static class UserMethodMappingExtractor
         if (TryBuildRuntimeTargetTypeMapping(ctx, methodSymbol) is { } userMapping)
             return userMapping;
 
+        if (TryBuildExpressionMapping(ctx, methodSymbol) is { } expressionMapping)
+            return expressionMapping;
+
         if (!UserMappingMethodParameterExtractor.BuildParameters(ctx, methodSymbol, true, out var parameters))
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, methodSymbol, methodSymbol.Name);
@@ -321,6 +325,41 @@ public static class UserMethodMappingExtractor
             GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams),
             ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
         );
+    }
+
+    private static UserDefinedExpressionMethodMapping? TryBuildExpressionMapping(
+        SimpleMappingBuilderContext ctx,
+        IMethodSymbol methodSymbol
+    )
+    {
+        if (methodSymbol.IsGenericMethod)
+            return null;
+
+        // Only handle parameterless methods - Expression<Func<TSource, TTarget>> mappings
+        // are meant to be used like IQueryable projections where the source type comes from
+        // the Expression's type arguments, not from method parameters
+        if (methodSymbol.Parameters.Length > 0)
+            return null;
+
+        // Check if return type is Expression<Func<TSource, TTarget>>
+        var returnType = methodSymbol.ReturnType;
+        if (!returnType.ExtendsOrImplementsGeneric(ctx.Types.Get(typeof(Expression<>)), out var expressionType))
+            return null;
+
+        // Get the Func<TSource, TTarget> type argument
+        if (expressionType.TypeArguments[0] is not INamedTypeSymbol funcType)
+            return null;
+
+        if (!funcType.ExtendsOrImplementsGeneric(ctx.Types.Get(typeof(Func<,>)), out var funcTypeArgs))
+            return null;
+
+        // Extract source and target types from the Func<TSource, TTarget> type arguments.
+        // Unlike method parameters, type arguments do not go through SymbolAccessor.WrapMethodParameter,
+        // so we need to upgrade nullability explicitly.
+        var sourceType = ctx.SymbolAccessor.UpgradeNullable(funcTypeArgs.TypeArguments[0]);
+        var targetType = ctx.SymbolAccessor.UpgradeNullable(funcTypeArgs.TypeArguments[1]);
+
+        return new UserDefinedExpressionMethodMapping(methodSymbol, sourceType, targetType, ctx.SymbolAccessor.UpgradeNullable(returnType));
     }
 
     private static NullFallbackValue? GetTypeSwitchNullArm(IMethodSymbol method, MappingMethodParameters parameters)

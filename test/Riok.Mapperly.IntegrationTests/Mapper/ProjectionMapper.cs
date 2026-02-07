@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.IntegrationTests.Dto;
 using Riok.Mapperly.IntegrationTests.Models;
@@ -12,6 +14,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         public static partial IQueryable<TestObjectDtoProjection> ProjectToDto(this IQueryable<TestObjectProjection> q);
 
         public static partial IQueryable<TestObjectDtoProjectionBaseType> ProjectToDto(this IQueryable<TestObjectProjectionBaseType> q);
+
+        public static partial Expression<Func<TestObjectProjection, TestObjectDtoProjection>> ProjectToDtoExpression();
 
         [MapperIgnoreTarget(nameof(TestObjectDtoProjection.IgnoredStringValue))]
         [MapperIgnoreTarget(nameof(TestObjectDtoProjection.IgnoredIntValue))]

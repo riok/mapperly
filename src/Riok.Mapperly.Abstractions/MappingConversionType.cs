@@ -139,6 +139,13 @@ public enum MappingConversionType
     StaticConvertMethods = 1 << 18,
 
     /// <summary>
+    /// If the target is an <see cref="System.Linq.Expressions.Expression{TDelegate}"/>
+    /// where TDelegate is a <see cref="Func{TSource, TTarget}"/>.
+    /// Only uses object initializers and inlines the mapping code.
+    /// </summary>
+    Expression = 1 << 19,
+
+    /// <summary>
     /// Enables all supported conversions.
     /// </summary>
     All = ~None,

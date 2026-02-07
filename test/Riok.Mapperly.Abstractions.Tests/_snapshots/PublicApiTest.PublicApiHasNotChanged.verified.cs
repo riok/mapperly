@@ -231,6 +231,7 @@ namespace Riok.Mapperly.Abstractions
         EnumUnderlyingType = 65536,
         ToTargetMethod = 131072,
         StaticConvertMethods = 262144,
+        Expression = 524288,
         All = -1,
         Default = -5,
     }
