@@ -444,7 +444,7 @@ public class EnumTest
             $"enum D {{ {targetEnumValues} }}"
         );
 
-        return TestHelper.VerifyGenerator(source, null, testCase);
+        return TestHelper.VerifyGenerator(source, testParams: testCase);
     }
 
     [Theory]
@@ -470,7 +470,7 @@ public class EnumTest
             $"enum D {{ {targetEnumValues} }}"
         );
 
-        return TestHelper.VerifyGenerator(source, null, testCase);
+        return TestHelper.VerifyGenerator(source, testParams: testCase);
     }
 
     [Fact]

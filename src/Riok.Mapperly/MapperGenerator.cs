@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Diagnostics;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors;
@@ -54,11 +55,14 @@ public class MapperGenerator : IIncrementalGenerator
 
         // build the assembly default configurations
         var mapperDefaultsAssembly = SyntaxProvider.GetMapperDefaultDeclarations(context);
-        var mapperDefaults = compilationContext
+        var mapperDefaultsAndDiagnostics = compilationContext
             .Combine(mapperDefaultsAssembly)
-            .Select(static (x, _) => BuildDefaults(x.Left, x.Right))
+            .Combine(context.AnalyzerConfigOptionsProvider)
+            .Select(static (x, _) => BuildDefaults(x.Left.Left, x.Left.Right, x.Right.GlobalOptions))
             .WithTrackingName(MapperGeneratorStepNames.BuildMapperDefaults);
+        context.ReportDiagnostics(mapperDefaultsAndDiagnostics.SelectMany(static (x, _) => x.Diagnostics));
 
+        var mapperDefaults = mapperDefaultsAndDiagnostics.Select(static (x, _) => x.MapperConfiguration);
         var useStaticMappers = SyntaxProvider
             .GetUseStaticMapperDeclarations(context)
             .Select(BuildStaticMappers)
@@ -92,13 +96,41 @@ public class MapperGenerator : IIncrementalGenerator
         CancellationToken cancellationToken
     )
     {
-        var mapperAttributeSymbol = compilationContext.Types.TryGet(MapperAttributeName);
-        if (mapperAttributeSymbol == null)
+        var symbolAccessor = new SymbolAccessor(compilationContext, mapperDeclaration.Symbol);
+        var attributeDataAccessor = new AttributeDataAccessor(symbolAccessor);
+
+        var mapperConfiguration = attributeDataAccessor.AccessFirstOrDefault<MapperAttribute, MapperConfiguration>(
+            mapperDeclaration.Symbol
+        );
+        if (mapperConfiguration == null)
             return null;
 
-        var symbolAccessor = new SymbolAccessor(compilationContext, mapperDeclaration.Symbol);
-        if (!symbolAccessor.HasAttribute<MapperAttribute>(mapperDeclaration.Symbol))
-            return null;
+        // if non-accessible members are included,
+        // the compilation options need to be updated
+        // and all symbols need to be mapped to the new compilation.
+        var neededMetadata = GetNeededMetadataImportOptions(mapperConfiguration, mapperDefaults);
+        if (neededMetadata != MetadataImportOptions.Public && neededMetadata > compilationContext.Compilation.Options.MetadataImportOptions)
+        {
+            // Enable access to private members
+            var advancedOptions = compilationContext.Compilation.Options.WithMetadataImportOptions(neededMetadata);
+            var compilation = compilationContext.Compilation.WithOptions(advancedOptions);
+
+            // map all symbols to the new compilation
+            compilationContext = compilationContext with
+            {
+                Compilation = compilation,
+                Types = new WellKnownTypes(compilation),
+            };
+            assemblyScopedStaticMappers = MapStaticMappers(assemblyScopedStaticMappers, compilation);
+            var mapperDeclarationSymbolFqn = mapperDeclaration.Symbol.FullyQualifiedMetadataName();
+            var mappedMapperSymbol =
+                compilationContext.Compilation.GetBestTypeByMetadataName(mapperDeclarationSymbolFqn)
+                ?? throw new InvalidOperationException($"Could not get type {mapperDeclarationSymbolFqn}");
+
+            mapperDeclaration = mapperDeclaration with { Symbol = mappedMapperSymbol };
+            symbolAccessor = new SymbolAccessor(compilationContext, mappedMapperSymbol);
+            attributeDataAccessor = new AttributeDataAccessor(symbolAccessor);
+        }
 
         try
         {
@@ -106,6 +138,7 @@ public class MapperGenerator : IIncrementalGenerator
                 compilationContext,
                 mapperDeclaration,
                 symbolAccessor,
+                attributeDataAccessor,
                 mapperDefaults,
                 assemblyScopedStaticMappers
             );
@@ -122,21 +155,53 @@ public class MapperGenerator : IIncrementalGenerator
         }
     }
 
-    private static MapperConfiguration BuildDefaults(CompilationContext compilationContext, IAssemblySymbol? assemblySymbol)
+    private static ImmutableArray<UseStaticMapperConfiguration> MapStaticMappers(
+        ImmutableArray<UseStaticMapperConfiguration> staticMappers,
+        CSharpCompilation compilation
+    )
     {
+        if (staticMappers.IsDefaultOrEmpty)
+            return staticMappers;
+
+        var staticMappersBuilder = ImmutableArray.CreateBuilder<UseStaticMapperConfiguration>(staticMappers.Length);
+        foreach (var config in staticMappers)
+        {
+            var mapperTypeFqn = config.MapperType.FullyQualifiedMetadataName();
+            var mappedMapperType =
+                compilation.GetBestTypeByMetadataName(mapperTypeFqn)
+                ?? throw new InvalidOperationException($"Could not get type {mapperTypeFqn}");
+            staticMappersBuilder.Add(new UseStaticMapperConfiguration(mappedMapperType));
+        }
+
+        return staticMappersBuilder.ToImmutable();
+    }
+
+    private static (MapperConfiguration MapperConfiguration, ImmutableEquatableArray<Diagnostic> Diagnostics) BuildDefaults(
+        CompilationContext compilationContext,
+        IAssemblySymbol? assemblySymbol,
+        AnalyzerConfigOptions options
+    )
+    {
+        var (msbuildMapperConfiguration, diagnostics) = MapperBuildConfigurationReader.Read(options);
+
         if (assemblySymbol == null)
-            return MapperConfiguration.Default;
+            return (msbuildMapperConfiguration, diagnostics);
 
         var mapperDefaultsAttribute = compilationContext.Types.TryGet(MapperDefaultsAttributeName);
         if (mapperDefaultsAttribute == null)
-            return MapperConfiguration.Default;
+            return (msbuildMapperConfiguration, diagnostics);
 
         var assemblyMapperDefaultsAttribute = SymbolAccessor
             .GetAttributesSkipCache(assemblySymbol, mapperDefaultsAttribute)
             .FirstOrDefault();
-        return assemblyMapperDefaultsAttribute == null
-            ? MapperConfiguration.Default
-            : AttributeDataAccessor.Access<MapperDefaultsAttribute, MapperConfiguration>(assemblyMapperDefaultsAttribute);
+        if (assemblyMapperDefaultsAttribute == null)
+            return (msbuildMapperConfiguration, diagnostics);
+
+        var attributeMapperConfiguration = AttributeDataAccessor.Access<MapperDefaultsAttribute, MapperConfiguration>(
+            assemblyMapperDefaultsAttribute
+        );
+        var defaultMapperConfiguration = MapperConfigurationMerger.Merge(attributeMapperConfiguration, msbuildMapperConfiguration);
+        return (defaultMapperConfiguration, diagnostics);
     }
 
     private static IEnumerable<Diagnostic> BuildCompilationDiagnostics(Compilation compilation)
@@ -183,5 +248,32 @@ public class MapperGenerator : IIncrementalGenerator
         }
 
         return configurations.ToImmutable();
+    }
+
+    private static MetadataImportOptions GetNeededMetadataImportOptions(
+        MapperConfiguration mapperConfiguration,
+        MapperConfiguration mapperDefaults
+    )
+    {
+        var includedMembers = mapperConfiguration.IncludedMembers ?? mapperDefaults.IncludedMembers ?? MemberVisibility.AllAccessible;
+
+        var includedConstructors =
+            mapperConfiguration.IncludedConstructors ?? mapperDefaults.IncludedConstructors ?? MemberVisibility.AllAccessible;
+
+        if (includedMembers.HasFlag(MemberVisibility.Accessible) && includedConstructors.HasFlag(MemberVisibility.Accessible))
+        {
+            return MetadataImportOptions.Public;
+        }
+
+        var visibility = includedMembers | includedConstructors;
+        if (visibility.HasFlag(MemberVisibility.Private))
+            return MetadataImportOptions.All;
+
+        if (visibility.HasFlag(MemberVisibility.Internal) || visibility.HasFlag(MemberVisibility.Protected))
+        {
+            return MetadataImportOptions.Internal;
+        }
+
+        return MetadataImportOptions.Public;
     }
 }

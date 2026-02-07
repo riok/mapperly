@@ -1,3 +1,4 @@
+using System.CodeDom.Compiler;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
@@ -90,6 +91,12 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         return string.Equals(GetMappingName(methodSymbol), name, StringComparison.Ordinal);
     }
 
+    public bool IsMapperlyGenerated(IMethodSymbol method)
+    {
+        var generated = AccessFirstOrDefault<GeneratedCodeAttribute>(method);
+        return string.Equals(generated?.Tool, MapperlyGeneratedCodeAttribute.GeneratorToolName, StringComparison.Ordinal);
+    }
+
     internal static TData Access<TAttribute, TData>(AttributeData attrData, SymbolAccessor? symbolAccessor = null)
         where TAttribute : Attribute
         where TData : notnull
@@ -179,7 +186,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
             TypedConstantKind.Enum => GetEnumValue(arg, targetType),
             TypedConstantKind.Array => BuildArrayValue(arg, targetType, symbolAccessor),
             TypedConstantKind.Primitive => arg.Value,
-            TypedConstantKind.Type when targetType == typeof(ITypeSymbol) => arg.Value,
+            TypedConstantKind.Type when typeof(ITypeSymbol).IsAssignableFrom(targetType) => arg.Value,
             _ => throw new ArgumentOutOfRangeException(
                 $"{nameof(AttributeDataAccessor)} does not support constructor arguments of kind {arg.Kind.ToString()} or cannot convert it to {targetType}"
             ),

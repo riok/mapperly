@@ -2,7 +2,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
-using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
@@ -56,7 +55,6 @@ public static class InlineExpressionMappingBuilder
     {
         if (mapping.Method.DeclaringSyntaxReferences is not [var methodSyntaxRef])
         {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, mapping.Method);
             return null;
         }
 
@@ -64,14 +62,12 @@ public static class InlineExpressionMappingBuilder
 
         if (methodSyntax is not MethodDeclarationSyntax { ParameterList.Parameters: [var sourceParameter] } methodDeclaration)
         {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, mapping.Method);
             return null;
         }
 
         var bodyExpression = TryGetBodyExpression(methodDeclaration);
         if (bodyExpression == null)
         {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, mapping.Method);
             return null;
         }
 
@@ -85,7 +81,6 @@ public static class InlineExpressionMappingBuilder
         bodyExpression = (ExpressionSyntax?)bodyExpression.Accept(inlineRewriter);
         if (bodyExpression == null || !inlineRewriter.CanBeInlined)
         {
-            ctx.ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, mapping.Method);
             return null;
         }
 

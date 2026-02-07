@@ -648,4 +648,129 @@ public class UseStaticMapperTest
                 """
             );
     }
+
+    [Fact]
+    public Task ProjectionWithUseStaticMapperShouldInlineGenerator()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            public class Maker
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+
+            public class Car
+            {
+                public int Id { get; set; }
+                public string Name { get; set; } = null!;
+                public Maker Make { get; set; } = null!;
+            }
+
+            public record MakerDto
+            {
+                public int Id { get; init; }
+                public string MakerName { get; init; } = null!;
+            }
+
+            public record CarDto
+            {
+                public int Id { get; init; }
+                public string CarName { get; init; } = null!;
+                public MakerDto Maker { get; init; } = null!;
+            }
+
+            [Mapper]
+            public static partial class OtherMapper
+            {
+                public static partial IQueryable<MakerDto> ProjectToMakerDto(this IQueryable<Maker> query);
+
+                [MapperRequiredMapping(RequiredMappingStrategy.Target)]
+                [MapProperty(nameof(Maker.Name), nameof(MakerDto.MakerName))]
+                public static partial MakerDto ToMakerDto(this Maker maker);
+            }
+
+            [Mapper]
+            [UseStaticMapper(typeof(OtherMapper))]
+            public static partial class Mapper
+            {
+                public static partial IQueryable<CarDto> ProjectToCarDto(this IQueryable<Car> query);
+
+                [MapperRequiredMapping(RequiredMappingStrategy.Target)]
+                [MapProperty(nameof(Car.Name), nameof(CarDto.CarName))]
+                [MapProperty(nameof(Car.Make), nameof(CarDto.Maker))]
+                public static partial CarDto MapToCarDto(this Car car);
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void ProjectionWithUseStaticMapperShouldReportDiagnosticWhenInliningFails()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            public class Maker
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+
+            public class Car
+            {
+                public int Id { get; set; }
+                public string Name { get; set; } = null!;
+                public Maker Make { get; set; } = null!;
+            }
+
+            public record MakerDto
+            {
+                public int Id { get; init; }
+                public string MakerName { get; init; } = null!;
+            }
+
+            public record CarDto
+            {
+                public int Id { get; init; }
+                public string CarName { get; init; } = null!;
+                public MakerDto Maker { get; init; } = null!;
+            }
+
+            [Mapper]
+            public static partial class OtherMapper
+            {
+                public static MakerDto ToMakerDto(Maker maker)
+                {
+                    var id = maker.Id;
+                    return new MakerDto { Id = id, MakerName = maker.Name };
+                }
+            }
+
+            [Mapper]
+            [UseStaticMapper(typeof(OtherMapper))]
+            public static partial class Mapper
+            {
+                public static partial IQueryable<CarDto> ProjectToCarDto(this IQueryable<Car> query);
+
+                [MapperRequiredMapping(RequiredMappingStrategy.Target)]
+                [MapProperty(nameof(Car.Name), nameof(CarDto.CarName))]
+                [MapProperty(nameof(Car.Make), nameof(CarDto.Maker))]
+                public static partial CarDto MapToCarDto(this Car car);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline);
+    }
 }

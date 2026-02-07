@@ -8,7 +8,7 @@ import TabItem from '@theme/TabItem';
 
 # Private members
 
-As of .NET 8.0, Mapperly supports mapping members that are normally inaccessible like `private` or `protected` properties.
+Mapperly supports mapping members that are normally inaccessible like `private` or `protected` properties.
 This is made possible by using the [UnsafeAccessorAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.unsafeaccessorattribute) which lets Mapperly access normally inaccessible members with zero overhead while being completely AOT safe.
 
 By default `IncludedMembers` and `IncludedConstructors` is set to `MemberVisibility.AllAccessible` which will configure Mapperly to map members of all accessibility levels as long as they are ordinarily accessible.
@@ -17,6 +17,11 @@ Mapperly will then try to map members of all accessibilities, including ones tha
 
 `IncludedConstructors` can be used separately from `IncludedMembers`.
 This allows you to use inaccessible constructors but only map accessible members or vice versa.
+
+:::info
+For mapping inaccessible members of external types (types defined in another assembly),
+see notes in [external types](#external-types).
+:::
 
 <Tabs>
   <TabItem value="declaration" label="Declaration" default>
@@ -112,3 +117,32 @@ public partial class FruitMapper
     public partial FruitDto ToDto(Fruit source);
 }
 ```
+
+## External types
+
+Mapping private members of external types (types defined in another assembly) is supported.
+However, there is a caveat when referencing projects within the same solution.
+
+### Project references
+
+If you are referencing another project within the same solution, the .NET compiler normally uses [reference assemblies](https://learn.microsoft.com/en-us/dotnet/standard/assembly/reference-assemblies) to speed up compilation.
+Reference assemblies only contain public APIs and strip out private members.
+As a result, Mapperly cannot see the private members and may report a diagnostic that a member was not found.
+
+To fix this, you need to disable reference assembly generation for the referenced project (the project containing the private members) by adding `<ProduceReferenceAssembly>false</ProduceReferenceAssembly>` to its `.csproj` file.
+This forces the compiler to use the implementation assembly which includes private metadata.
+
+```xml
+<PropertyGroup>
+  <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+</PropertyGroup>
+```
+
+:::info
+The build may still work inside IDEs (like Visual Studio or Rider) without this setting, as they often provide nested compilations which include private members.
+However, command line builds (e.g. `dotnet build`) will likely fail if `<ProduceReferenceAssembly>false</ProduceReferenceAssembly>` is not set.
+:::
+
+### NuGet Packages
+
+This is generally not an issue when consuming libraries via NuGet packages, as they typically contain the full implementation assembly.

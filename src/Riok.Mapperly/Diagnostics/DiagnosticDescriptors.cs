@@ -799,6 +799,15 @@ public static class DiagnosticDescriptors
         true
     );
 
+    public static readonly DiagnosticDescriptor ConfiguredMSBuildOptionInvalid = new(
+        "RMG095",
+        "Invalid MSBuild configuration option",
+        "The MSBuild option {0} with value {1} could not be parsed as {2}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        true
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT

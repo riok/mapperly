@@ -87,6 +87,12 @@ public sealed class ImmutableEquatableArray<T> : IEquatable<ImmutableEquatableAr
 
 public static class ImmutableEquatableArray
 {
+    public static ImmutableEquatableArray<T> ToImmutableEquatableArray<T>(this IReadOnlyCollection<T> values)
+        where T : IEquatable<T>
+    {
+        return values.Count == 0 ? ImmutableEquatableArray<T>.Empty : new ImmutableEquatableArray<T>(values);
+    }
+
     public static ImmutableEquatableArray<T> ToImmutableEquatableArray<T>(this IEnumerable<T> values)
         where T : IEquatable<T> => new(values);
 

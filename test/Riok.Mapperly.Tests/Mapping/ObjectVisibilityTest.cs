@@ -1,3 +1,4 @@
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
@@ -210,6 +211,62 @@ public class ObjectVisibilityTest
         );
 
         return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task PrivateFieldPublicClassOtherAssemblyShouldMap()
+    {
+        var aSource = TestSourceBuilder.SyntaxTree(
+            """
+            namespace A;
+            public class A { private int Value; }
+            """
+        );
+
+        using var aAssembly = TestHelper.BuildAssembly("A", aSource);
+
+        var source = TestSourceBuilder.Mapping(
+            "A.A",
+            "B",
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "class B { public int Value; }"
+        );
+
+        return TestHelper.VerifyGenerator(source, additionalAssemblies: [aAssembly]);
+    }
+
+    [Fact]
+    public Task PrivatePropertyPublicClassOtherAssemblyShouldMap()
+    {
+        var aSource = TestSourceBuilder.SyntaxTree(
+            """
+            namespace A;
+            public class A
+            {
+                private int PrivateProp { get; set; }
+                public int PrivateGetterProp { private get; set; }
+                public int PrivateSetterProp { get; private set; }
+            }
+            """
+        );
+
+        using var aAssembly = TestHelper.BuildAssembly("A", aSource);
+
+        var source = TestSourceBuilder.Mapping(
+            "A.A",
+            "B",
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            """
+            class B
+            {
+                public int PrivateProp { get; set; }
+                public int PrivateGetterProp { get; set; }
+                public int PrivateSetterProp { get; set; }
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source, additionalAssemblies: [aAssembly]);
     }
 
     [Fact]

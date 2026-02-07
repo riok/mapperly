@@ -36,3 +36,14 @@ You can use the `DefineConstants` dotnet build or csproj parameter to define the
 For the debugger attachment with JetBrains Rider to work correctly,
 `Generate Shell Scripts` needs to be enabled in the JetBrains ToolBox
 and the generated shell scripts need to be on the path (Mapperly calls `rider attach-to-process {pid} {Mapperly-Sln-File}`).
+
+## CSC warning CS8785 stack trace
+
+If you see the compiler warning `CS8785: Generator 'MapperlyGenerator' failed to generate source`,
+you can get a stack trace from the C# compiler by emitting a compiler error log. The stack trace is included in the SARIF output.
+
+Add the following MSBuild property when you build:
+
+- `/p:ErrorLog=compiler-diagnostics.sarif`
+
+Then open the SARIF file to inspect the generator exception and stack trace.
