@@ -16,6 +16,7 @@ public static class MapperConfigurationMerger
                 highPriority.ThrowOnPropertyMappingNullMismatch ?? lowPriority.ThrowOnPropertyMappingNullMismatch,
             AllowNullPropertyAssignment = highPriority.AllowNullPropertyAssignment ?? lowPriority.AllowNullPropertyAssignment,
             UseDeepCloning = highPriority.UseDeepCloning ?? lowPriority.UseDeepCloning,
+            CloningStrategy = highPriority.CloningStrategy ?? lowPriority.CloningStrategy,
             StackCloningStrategy = highPriority.StackCloningStrategy ?? lowPriority.StackCloningStrategy,
             EnabledConversions = highPriority.EnabledConversions ?? lowPriority.EnabledConversions,
             UseReferenceHandling = highPriority.UseReferenceHandling ?? lowPriority.UseReferenceHandling,
@@ -60,6 +61,9 @@ public static class MapperConfigurationMerger
             ?? mapper.AllowNullPropertyAssignment;
 
         mapper.UseDeepCloning = mapperConfiguration.UseDeepCloning ?? defaultMapperConfiguration.UseDeepCloning ?? mapper.UseDeepCloning;
+
+        mapper.CloningStrategy =
+            mapperConfiguration.CloningStrategy ?? defaultMapperConfiguration.CloningStrategy ?? mapper.CloningStrategy;
 
         mapper.StackCloningStrategy =
             mapperConfiguration.StackCloningStrategy ?? defaultMapperConfiguration.StackCloningStrategy ?? mapper.StackCloningStrategy;

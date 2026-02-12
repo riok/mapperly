@@ -8,7 +8,7 @@ public record MappingConfiguration(
     EnumMappingConfiguration Enum,
     MembersMappingConfiguration Members,
     IReadOnlyCollection<DerivedTypeMappingConfiguration> DerivedTypes,
-    bool UseDeepCloning,
+    CloningStrategy CloningStrategy,
     StackCloningStrategy StackCloningStrategy,
     SupportedFeatures SupportedFeatures
 )

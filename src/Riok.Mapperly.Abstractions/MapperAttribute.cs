@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
 
@@ -65,7 +66,18 @@ public class MapperAttribute : Attribute
     /// when <c>false</c>, the same array is reused.
     /// when <c>true</c>, the array and each person is cloned.
     /// </summary>
+    /// <remarks>
+    /// To maintain compatibility with the previous versions, <see cref="UseDeepCloning"/> will still take precedence over
+    /// <see cref="CloningStrategy"/> until it will be removed.
+    /// </remarks>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("Use 'CloningStrategy' instead. If this is set to true, `CloningStrategy.DeepClone` is always used.")]
     public bool UseDeepCloning { get; set; }
+
+    /// <summary>
+    /// Specifies whether and how to copy objects of the same type and complex types like collections and spans.
+    /// </summary>
+    public CloningStrategy CloningStrategy { get; set; } = CloningStrategy.None;
 
     /// <summary>
     /// The strategy to use when cloning a <see cref="System.Collections.Generic.Stack{T}"/>.

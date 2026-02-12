@@ -8,6 +8,7 @@ public record TestSourceBuilderOptions(
     string MapperClassName = TestSourceBuilderOptions.DefaultMapperClassName,
     string? MapperBaseClassName = null,
     bool? UseDeepCloning = null,
+    CloningStrategy? CloningStrategy = null,
     StackCloningStrategy? StackCloningStrategy = null,
     bool? UseReferenceHandling = null,
     bool? ThrowOnMappingNullMismatch = null,
@@ -36,6 +37,8 @@ public record TestSourceBuilderOptions(
     );
     public static readonly TestSourceBuilderOptions AsStatic = new(Static: true);
     public static readonly TestSourceBuilderOptions WithDeepCloning = new(UseDeepCloning: true);
+
+    public static readonly TestSourceBuilderOptions WithShallowCloning = new(CloningStrategy: Abstractions.CloningStrategy.ShallowCloning);
     public static readonly TestSourceBuilderOptions AllConversionsWithDeepCloning = new TestSourceBuilderOptions(
         UseDeepCloning: true,
         EnabledConversions: MappingConversionType.All

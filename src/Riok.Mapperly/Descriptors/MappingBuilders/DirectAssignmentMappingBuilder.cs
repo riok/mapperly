@@ -8,10 +8,16 @@ public static class DirectAssignmentMappingBuilder
 {
     public static NewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
-        return
-            SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, ctx.Target)
-            && (!ctx.Configuration.UseDeepCloning || ctx.Source.IsImmutable())
-            ? new DirectAssignmentMapping(ctx.Source)
-            : null;
+        if (ctx.UseCloning && !ctx.Source.IsImmutable())
+        {
+            return null;
+        }
+
+        if (!SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, ctx.Target))
+        {
+            return null;
+        }
+
+        return new DirectAssignmentMapping(ctx.Source);
     }
 }

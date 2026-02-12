@@ -11,7 +11,7 @@ public static class ImplicitCastMappingBuilder
         if (!ctx.IsConversionEnabled(MappingConversionType.ImplicitCast))
             return null;
 
-        if (ctx.Configuration.UseDeepCloning && !ctx.Source.IsImmutable() && !ctx.Target.IsImmutable())
+        if (ctx.UseCloning && !ctx.Source.IsImmutable() && !ctx.Target.IsImmutable())
             return null;
 
         // ClassifyConversion does not check if tuple field member names are the same

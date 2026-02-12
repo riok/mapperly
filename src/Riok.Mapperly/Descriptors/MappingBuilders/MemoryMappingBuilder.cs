@@ -106,7 +106,7 @@ public static class MemoryMappingBuilder
 
     private static NewInstanceMapping? BuildSpanToMemoryMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
-        if (elementMapping.IsSynthetic && !ctx.Configuration.UseDeepCloning)
+        if (elementMapping.IsSynthetic && !ctx.UseCloning)
             return new SourceObjectMethodMapping(ctx.Source, ctx.Target, ToArrayMethodName);
 
         var targetArray = ctx.Types.GetArrayType(elementMapping.TargetType);
@@ -117,7 +117,7 @@ public static class MemoryMappingBuilder
 
     private static NewInstanceMapping? BuildMemoryToArrayMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
-        if (!elementMapping.IsSynthetic || ctx.Configuration.UseDeepCloning)
+        if (!elementMapping.IsSynthetic || ctx.UseCloning)
             return BuildSpanToArrayMethodMapping(ctx, elementMapping);
 
         return new SourceObjectMethodMapping(ctx.Source, ctx.Target, ToArrayMethodName);
@@ -125,7 +125,7 @@ public static class MemoryMappingBuilder
 
     private static NewInstanceMapping? BuildMemoryToSpanMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
-        if (!elementMapping.IsSynthetic || ctx.Configuration.UseDeepCloning)
+        if (!elementMapping.IsSynthetic || ctx.UseCloning)
             return BuildMemoryToSpanMethod(ctx, elementMapping);
 
         return new SourceObjectMemberMapping(ctx.Source, ctx.Target, SpanMemberName);
@@ -133,7 +133,7 @@ public static class MemoryMappingBuilder
 
     private static INewInstanceMapping BuildArrayToMemoryMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
-        if (!elementMapping.IsSynthetic || ctx.Configuration.UseDeepCloning)
+        if (!elementMapping.IsSynthetic || ctx.UseCloning)
             return new ArrayForMapping(
                 ctx.Source,
                 ctx.Types.GetArrayType(elementMapping.TargetType),
@@ -155,7 +155,7 @@ public static class MemoryMappingBuilder
 
     private static NewInstanceMapping? BuildMemoryToMemoryMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
     {
-        if (!elementMapping.IsSynthetic || ctx.Configuration.UseDeepCloning)
+        if (!elementMapping.IsSynthetic || ctx.UseCloning)
             return BuildSpanToArrayMethodMapping(ctx, elementMapping);
 
         return new CastMapping(ctx.Source, ctx.Target);
