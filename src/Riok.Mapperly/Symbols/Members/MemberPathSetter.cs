@@ -13,12 +13,19 @@ public class MemberPathSetter
     private readonly NonEmptyMemberPath _memberPath;
     private readonly MemberPathGetter _baseAccessGetter;
     private readonly IMemberSetter _memberSetter;
+    private readonly IMappableMember _member;
 
-    private MemberPathSetter(NonEmptyMemberPath memberPath, MemberPathGetter baseAccessGetter, IMemberSetter memberSetter)
+    private MemberPathSetter(
+        NonEmptyMemberPath memberPath,
+        MemberPathGetter baseAccessGetter,
+        IMemberSetter memberSetter,
+        IMappableMember member
+    )
     {
         _memberPath = memberPath;
         _baseAccessGetter = baseAccessGetter;
         _memberSetter = memberSetter;
+        _member = member;
     }
 
     public bool SupportsCoalesceAssignment => _memberSetter.SupportsCoalesceAssignment;
@@ -30,13 +37,13 @@ public class MemberPathSetter
         var objectPath = MemberPath.Create(path.RootType, path.ObjectPath.ToList());
         var objectGetter = objectPath.BuildGetter(ctx);
         var memberSetter = path.Member.BuildSetter(ctx.UnsafeAccessorContext);
-        return new MemberPathSetter(path, objectGetter, memberSetter);
+        return new MemberPathSetter(path, objectGetter, memberSetter, path.Member);
     }
 
     public ExpressionSyntax BuildAssignment(ExpressionSyntax? baseAccess, ExpressionSyntax valueToAssign, bool coalesceAssignment = false)
     {
         baseAccess = _baseAccessGetter.BuildAccess(baseAccess);
-        return _memberSetter.BuildAssignment(baseAccess, valueToAssign, coalesceAssignment);
+        return _memberSetter.BuildAssignment(baseAccess, valueToAssign, _member.ContainingType, coalesceAssignment);
     }
 
     public override bool Equals(object? obj)

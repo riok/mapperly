@@ -43,7 +43,7 @@ public class UnsafeFieldAccessor(IFieldSymbol symbol, string className, string m
         return ctx.SyntaxFactory.PublicStaticExternMethod(returnType, methodName, parameters, [attribute]);
     }
 
-    public ExpressionSyntax BuildAccess(ExpressionSyntax? baseAccess, bool nullConditional = false)
+    public ExpressionSyntax BuildAccess(ExpressionSyntax? baseAccess, INamedTypeSymbol? containingType = null, bool nullConditional = false)
     {
         if (baseAccess == null)
             throw new ArgumentNullException(nameof(baseAccess));
@@ -54,7 +54,10 @@ public class UnsafeFieldAccessor(IFieldSymbol symbol, string className, string m
             return InvocationWithoutIndention(method);
         }
 
-        var genericClassName = GenericName(className).WithTypeArgumentList(TypeArgumentList(symbol.ContainingType.TypeArguments));
+        // Use the passed containingType for type arguments if provided,
+        // otherwise fall back to the symbol's containing type.
+        var typeArgs = containingType?.TypeArguments ?? symbol.ContainingType.TypeArguments;
+        var genericClassName = GenericName(className).WithTypeArgumentList(TypeArgumentList(typeArgs));
         var invocation = InvocationExpression(MemberAccess(genericClassName, methodName))
             .WithArgumentList(ArgumentListWithoutIndention([baseAccess]));
 
@@ -64,9 +67,14 @@ public class UnsafeFieldAccessor(IFieldSymbol symbol, string className, string m
         return Conditional(IsNotNull(baseAccess), invocation, DefaultLiteral());
     }
 
-    public ExpressionSyntax BuildAssignment(ExpressionSyntax? baseAccess, ExpressionSyntax valueToAssign, bool coalesceAssignment = false)
+    public ExpressionSyntax BuildAssignment(
+        ExpressionSyntax? baseAccess,
+        ExpressionSyntax valueToAssign,
+        INamedTypeSymbol? containingType = null,
+        bool coalesceAssignment = false
+    )
     {
-        var access = BuildAccess(baseAccess);
+        var access = BuildAccess(baseAccess, containingType);
         return Assignment(access, valueToAssign, coalesceAssignment);
     }
 }

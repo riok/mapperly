@@ -64,7 +64,12 @@ public class PropertyMember(IPropertySymbol symbol, SymbolAccessor symbolAccesso
         return ctx.GetOrBuildPropertySetter(this);
     }
 
-    public ExpressionSyntax BuildAssignment(ExpressionSyntax? baseAccess, ExpressionSyntax valueToAssign, bool coalesceAssignment = false)
+    public ExpressionSyntax BuildAssignment(
+        ExpressionSyntax? baseAccess,
+        ExpressionSyntax valueToAssign,
+        INamedTypeSymbol? containingType = null,
+        bool coalesceAssignment = false
+    )
     {
         Debug.Assert(CanSetDirectly);
         ExpressionSyntax targetMember = baseAccess == null ? IdentifierName(Name) : MemberAccess(baseAccess, Name);
@@ -72,7 +77,7 @@ public class PropertyMember(IPropertySymbol symbol, SymbolAccessor symbolAccesso
         return Assignment(targetMember, valueToAssign, coalesceAssignment);
     }
 
-    public ExpressionSyntax BuildAccess(ExpressionSyntax? baseAccess, bool nullConditional = false)
+    public ExpressionSyntax BuildAccess(ExpressionSyntax? baseAccess, INamedTypeSymbol? containingType = null, bool nullConditional = false)
     {
         Debug.Assert(CanGetDirectly);
         if (baseAccess == null)
