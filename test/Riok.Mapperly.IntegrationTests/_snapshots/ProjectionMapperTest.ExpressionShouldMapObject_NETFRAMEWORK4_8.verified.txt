@@ -1,0 +1,44 @@
+﻿{
+  CtorValue: 2,
+  IntInitOnlyValue: 4,
+  RequiredValue: 10,
+  StringValue: fooBar3,
+  RenamedStringValue2: fooBar2,
+  FlatteningIdValue: 10,
+  NullableFlatteningIdValue: 20,
+  NestedNullableTargetNotNullable: {},
+  StringNullableTargetNotNullable: fooBar,
+  EnumValue: DtoValue2,
+  EnumName: 10,
+  EnumRawValue: 30,
+  EnumStringValue: Value10,
+  EnumReverseStringValue: Value10,
+  SubObject: {
+    SubIntValue: 20,
+    BaseIntValue: 10
+  },
+  DateTimeValueTargetDateOnly: {
+    Year: 2018,
+    Month: 11,
+    Day: 29,
+    DayOfWeek: Thursday,
+    DayOfYear: 333,
+    DayNumber: 737026
+  },
+  DateTimeValueTargetTimeOnly: {
+    Hour: 10,
+    Minute: 11,
+    Second: 12,
+    Ticks: 366720000000
+  },
+  ManuallyMapped: {
+    MagicIntValue: 100,
+    StringValue: fooBar5
+  },
+  ManuallyMappedModified: 11,
+  ManuallyMappedNullableToNonNullable: -1,
+  ManuallyMappedList: [
+    Value10,
+    Value20
+  ]
+}
