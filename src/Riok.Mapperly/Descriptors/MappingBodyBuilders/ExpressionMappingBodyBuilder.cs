@@ -6,7 +6,7 @@ using Riok.Mapperly.Diagnostics;
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
 /// <summary>
-/// Mapping body builder for user defined methods returnning Expression<Func<TSource, TTarget>>.
+/// Mapping body builder for user defined methods returning Expression<Func<TSource, TTarget>>.
 /// </summary>
 public static class ExpressionMappingBodyBuilder
 {

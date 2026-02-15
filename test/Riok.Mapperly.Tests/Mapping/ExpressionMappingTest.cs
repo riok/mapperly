@@ -240,7 +240,7 @@ public class ExpressionMappingTest
             """
             public partial System.Linq.Expressions.Expression<System.Func<A, B>> Map();
 
-            [MapProperty(nameof(A.Value), nameof(B.OtherValue)]
+            [MapProperty(nameof(A.Value), nameof(B.OtherValue))]
             private partial B MapPrivate(A source);
             """,
             "public record A(string Value);",
@@ -257,7 +257,7 @@ public class ExpressionMappingTest
             """
             public partial System.Linq.Expressions.Expression<System.Func<A, B>> Map();
 
-            [MapProperty(nameof(A.Value), nameof(B.OtherValue)]
+            [MapProperty(nameof(A.Value), nameof(B.OtherValue))]
             private partial B MapPrivate(A source);
             """,
             "public class A { public string Value {get; set;} }",

@@ -12,29 +12,29 @@ Mapperly does support `IQueryable<T>` projections:
 
 <Tabs>
   <TabItem value="definition" label="Mapper definition">
-  
-  ```csharp
-  [Mapper]
-  public static partial class CarMapper
-  {
-      // highlight-start
-      public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q);
-      // highlight-end
-  }
-  ```
-  
+
+```csharp
+[Mapper]
+public static partial class CarMapper
+{
+    // highlight-start
+    public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q);
+    // highlight-end
+}
+```
+
   </TabItem>
   <TabItem value="usage" label="Usage">
-  
-  ```csharp
-  var dtos = await DbContext.Cars
-      .Where(...)
-      // highlight-start
-      .ProjectToDto()
-      // highlight-end
-      .ToListAsync();
-  ```
-  
+
+```csharp
+var dtos = await DbContext.Cars
+    .Where(...)
+    // highlight-start
+    .ProjectToDto()
+    // highlight-end
+    .ToListAsync();
+```
+
   </TabItem>
 </Tabs>
 
@@ -129,33 +129,33 @@ This is useful when you need the expression tree itself, for example to compose 
 
 <Tabs>
   <TabItem value="definition" label="Mapper definition">
-  
-  ```csharp
-  [Mapper]
-  public static partial class CarMapper
-  {
-      // highlight-start
-      public static partial Expression<Func<Car, CarDto>> ProjectToDto();
-      // highlight-end
-  }
-  ```
-  
+
+```csharp
+[Mapper]
+public static partial class CarMapper
+{
+    // highlight-start
+    public static partial Expression<Func<Car, CarDto>> ProjectToDto();
+    // highlight-end
+}
+```
+
   </TabItem>
   <TabItem value="usage" label="Usage">
-  
-  ```csharp
-  // Get the expression tree
-  var expression = CarMapper.ProjectToDto();
 
-  // Use with EF Core
-  var dtos = await DbContext.Cars
-      .Where(...)
-      // highlight-start
-      .Select(expression)
-      // highlight-end
-      .ToListAsync();
-  ```
-  
+```csharp
+// Get the expression tree
+var expression = CarMapper.ProjectToDto();
+
+// Use with EF Core
+var dtos = await DbContext.Cars
+    .Where(...)
+    // highlight-start
+    .Select(expression)
+    // highlight-end
+    .ToListAsync();
+```
+
   </TabItem>
 </Tabs>
 
@@ -180,4 +180,3 @@ public static partial class CarMapper
     private static partial CarDto Map(Car car);
 }
 ```
-
