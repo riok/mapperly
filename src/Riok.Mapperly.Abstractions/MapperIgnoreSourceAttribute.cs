@@ -22,4 +22,9 @@ public sealed class MapperIgnoreSourceAttribute : Attribute
     /// Gets the source property name which should be ignored from the mapping.
     /// </summary>
     public string Source { get; }
+    
+    /// <summary>
+    /// Gets the justification for ignoring the source property. This is only used for documentation purposes and does not have any effect on the mapping.
+    /// </summary>
+    public string? Justification { get; init; }
 }
