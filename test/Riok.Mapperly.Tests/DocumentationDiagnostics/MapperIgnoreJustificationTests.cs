@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.DocumentationDiagnostics;
@@ -11,6 +12,7 @@ public class MapperIgnoreJustificationTests
             IgnoredDiagnostics = TestHelperOptions
                 .DefaultIgnoredDiagnostics.Except([DiagnosticDescriptors.MapperIgnoreAttributeMissingJustification])
                 .ToImmutableHashSet(),
+            AllowedDiagnosticSeverities = new HashSet<DiagnosticSeverity>() { DiagnosticSeverity.Hidden },
         };
 
     [Fact]
@@ -53,7 +55,7 @@ public class MapperIgnoreJustificationTests
             .Should()
             .HaveDiagnostic(
                 DiagnosticDescriptors.MapperIgnoreAttributeMissingJustification,
-                "The ignored mapping of Value for A does not specify a Justification, consider adding one for documentation purposes."
+                "The ignored mapping of Value does not specify a Justification, consider adding one for documentation purposes"
             )
             .HaveAssertedAllDiagnostics();
     }
