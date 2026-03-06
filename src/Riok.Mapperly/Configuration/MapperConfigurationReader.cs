@@ -217,16 +217,16 @@ public class MapperConfigurationReader
         if (configRef.Method == null)
             return MapperConfiguration.Members;
 
-        var ignoredSourceMembers = _dataAccessor
+        var ignoreSourceMemberAttributes = _dataAccessor
             .Access<MapperIgnoreSourceAttribute>(configRef.Method)
-            .Select(x => x.Source)
-            .WhereNotNull()
+            .WhereNotNullBy(static attr => attr.Source)
             .ToList();
-        var ignoredTargetMembers = _dataAccessor
+        var ignoredSourceMembers = ignoreSourceMemberAttributes.Select(x => x.Source).ToList();
+        var ignoreTargetMemberAttributes = _dataAccessor
             .Access<MapperIgnoreTargetAttribute>(configRef.Method)
-            .Select(x => x.Target)
-            .WhereNotNull()
+            .WhereNotNullBy(static attr => attr.Target)
             .ToList();
+        var ignoredTargetMembers = ignoreTargetMemberAttributes.Select(x => x.Target).ToList();
         var memberValueConfigurations = _dataAccessor.Access<MapValueAttribute, MemberValueMappingConfiguration>(configRef.Method).ToList();
         var memberConfigurations = _dataAccessor
             .Access<MapPropertyAttribute, MemberMappingConfiguration>(configRef.Method)
@@ -257,6 +257,15 @@ public class MapperConfigurationReader
         {
             _diagnostics.ReportDiagnostic(DiagnosticDescriptors.MemberConfigurationOnQueryableProjectionMapping, configRef.Method);
             return MapperConfiguration.Members;
+        }
+
+        foreach (var missingIgnoreSourceJustificationAttribute in ignoreSourceMemberAttributes.Where(attr => attr.Justification is null))
+        {
+            _diagnostics.ReportDiagnostic(
+                DiagnosticDescriptors.MapperIgnoreAttributeMissingJustification,
+                configRef.Method,
+                missingIgnoreSourceJustificationAttribute.Source
+            );
         }
 
         foreach (var invalidMemberConfig in memberValueConfigurations.Where(x => !x.IsValid))

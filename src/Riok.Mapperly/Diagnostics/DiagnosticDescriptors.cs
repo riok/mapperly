@@ -811,7 +811,7 @@ public static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor MapperIgnoreAttributeMissingJustification = new(
         "RMG096",
         "Ignored mapping is missing Justification",
-        "The ignored mapping of {0} for {1} does not specify a Justification, consider adding one for documentation purposes",
+        "The ignored mapping of {0} does not specify a Justification, consider adding one for documentation purposes",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Hidden,
         true
