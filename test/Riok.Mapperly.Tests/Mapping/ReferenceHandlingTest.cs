@@ -436,7 +436,7 @@ public class ReferenceHandlingTest
             """
             public partial B Map(A a);
             private partial D MapD(C source);
-            [MapperIgnoreSource("IntValue")]
+            [MapperIgnoreSource("IntValue", Justification = "IntValue is ignored for testing purposes")]
             [MapperIgnoreTarget("IntValue")]
             [UserMapping(Default = true)]
             private partial D MapDIgnore(C source);
