@@ -24,7 +24,12 @@ public sealed class MapperIgnoreSourceAttribute : Attribute
     public string Source { get; }
     
     /// <summary>
-    /// Gets the justification for ignoring the source property. This is only used for documentation purposes and does not have any effect on the mapping.
+    /// Gets or sets the justification for ignoring the source property.
+    /// This is only used for documentation purposes and does not have any effect on the mapping.
     /// </summary>
-    public string? Justification { get; init; }
+    /// <remarks>
+    /// You can enforce the presence of Justifications by setting the diagnostic severity of <c>RMG096</c> in your
+    /// <c>.editorconfig</c> to any value other than <c>hidden</c>.
+    /// </remarks>
+    public string? Justification { get; set; }
 }
