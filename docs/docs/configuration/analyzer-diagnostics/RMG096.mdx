@@ -1,0 +1,30 @@
+---
+sidebar_label: RMG096
+description: 'Mapperly analyzer diagnostic RMG096 — Ignored mapping is missing Justification'
+---
+
+# RMG096 — Ignored mapping is missing Justification
+
+If Mapperly detects a mapping ignore without a Justification, `RMG096` is emitted.
+
+The following attributes may raise this diagnostic:
+ 
+- `MapperIgnoreSource`
+- `MapperIgnoreTarget`
+- `MapperIgnoreSourceValue`
+- `MapperIgnoreTargetValue`
+
+To fix this, add a Justification to the attribute, for example:
+
+```csharp
+public partial class Mapper {
+	[MapperIgnoreSource(nameof(SourceClass.IgnoredProperty), Justification = "This source member is not relevant for the target mapping")]
+	public partial TargetClass Map(SourceClass source);
+}
+
+class SourceClass {
+	string IgnoredProperty { get; set; }
+}
+
+class TargetClass { }
+```
