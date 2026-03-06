@@ -178,6 +178,7 @@ namespace Riok.Mapperly.Abstractions
     public sealed class MapperIgnoreSourceAttribute : System.Attribute
     {
         public MapperIgnoreSourceAttribute(string source) { }
+        public string? Justification { get; set; }
         public string Source { get; }
     }
     [System.AttributeUsage(System.AttributeTargets.Method, AllowMultiple=true)]

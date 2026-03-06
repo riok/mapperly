@@ -807,13 +807,13 @@ public static class DiagnosticDescriptors
         DiagnosticSeverity.Warning,
         true
     );
-    
-    public static readonly DiagnosticDescriptor ConfiguredMSBuildOptionInvalid = new(
+
+    public static readonly DiagnosticDescriptor MapperIgnoreAttributeMissingJustification = new(
         "RMG096",
         "Ignored mapping is missing Justification",
         "The ignored mapping of {0} for {1} does not specify a Justification, consider adding one for documentation purposes",
         DiagnosticCategories.Mapper,
-        DiagnosticSeverity.Warning,
+        DiagnosticSeverity.Hidden,
         true
     );
 
