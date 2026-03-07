@@ -74,10 +74,7 @@ public class ObjectPropertyInitPropertyTest
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
-                var target = new global::B()
-                {
-                    Value = source.Value ?? throw new global::System.ArgumentNullException(nameof(source.Value)),
-                };
+                var target = new global::B();
                 return target;
                 """
             );
@@ -107,10 +104,7 @@ public class ObjectPropertyInitPropertyTest
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
-                var target = new global::B()
-                {
-                    Value = source.Value ?? "",
-                };
+                var target = new global::B();
                 return target;
                 """
             );
@@ -184,10 +178,7 @@ public class ObjectPropertyInitPropertyTest
             .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
-                var target = new global::B()
-                {
-                    NestedValue = source.Nested?.Value ?? throw new global::System.ArgumentNullException(nameof(source.Nested.Value)),
-                };
+                var target = new global::B();
                 return target;
                 """
             );
@@ -520,5 +511,234 @@ public class ObjectPropertyInitPropertyTest
                 "Required member Value2 on mapping target type B was not found on the mapping source type A"
             )
             .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void InitOnlyPropertyWithNullableSourceAndThrowOnPropertyNullMismatch()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.Default with
+            {
+                ThrowOnPropertyMappingNullMismatch = true,
+            },
+            "class A { public string? Value { get; init; } }",
+            "class B { public string Value { get; init; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Value of A to the target property Value of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    Value = source.Value ?? throw new global::System.ArgumentNullException(nameof(source.Value)),
+                };
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void InitOnlyPropertyWithNullableSourceAndThrowOnPropertyNullMismatchNoThrowOnMapping()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.Default with
+            {
+                ThrowOnPropertyMappingNullMismatch = true,
+                ThrowOnMappingNullMismatch = false,
+            },
+            "class A { public string? Value { get; init; } }",
+            "class B { public string Value { get; init; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Value of A to the target property Value of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    Value = source.Value ?? "",
+                };
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void RequiredInitPropertyWithNullableSourceShouldAlwaysThrow()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string? Value { get; init; } }",
+            "class B { public required string Value { get; init; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Value of A to the target property Value of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    Value = source.Value ?? throw new global::System.ArgumentNullException(nameof(source.Value)),
+                };
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void InitOnlyPropertyMixedNullability()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string? NullableValue { get; init; } public string NonNullableValue { get; init; } }",
+            "class B { public string NullableValue { get; init; } public string NonNullableValue { get; init; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property NullableValue of A to the target property NullableValue of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    NonNullableValue = source.NonNullableValue,
+                };
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void InitOnlyPropertyWithNullableSourceToNullableTarget()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string? Value { get; init; } }",
+            "class B { public string? Value { get; init; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    Value = source.Value,
+                };
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void InitOnlyPropertyWithNullableSourceMultipleProperties()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            """
+            class A
+            {
+                public string? Name { get; init; }
+                public int? Count { get; init; }
+                public string Description { get; init; }
+            }
+            """,
+            """
+            class B
+            {
+                public string Name { get; init; }
+                public int Count { get; init; }
+                public string Description { get; init; }
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostics(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                [
+                    "Mapping the nullable source property Name of A to the target property Name of B which is not nullable",
+                    "Mapping the nullable source property Count of A to the target property Count of B which is not nullable",
+                ]
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    Description = source.Description,
+                };
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void InitOnlyPropertyWithAutoFlattenedNullablePathAndThrowOnPropertyNullMismatch()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.Default with
+            {
+                ThrowOnPropertyMappingNullMismatch = true,
+            },
+            "class A { public C? Nested { get; init; } }",
+            "class B { public string NestedValue { get; init; } }",
+            "class C { public string Value { get; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Nested.Value of A to the target property NestedValue of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B()
+                {
+                    NestedValue = source.Nested?.Value ?? throw new global::System.ArgumentNullException(nameof(source.Nested.Value)),
+                };
+                return target;
+                """
+            );
     }
 }

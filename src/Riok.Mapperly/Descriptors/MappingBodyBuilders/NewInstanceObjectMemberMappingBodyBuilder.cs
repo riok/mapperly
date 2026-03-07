@@ -6,6 +6,7 @@ using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
+using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
@@ -146,10 +147,87 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         if (!ObjectMemberMappingBodyBuilder.ValidateMappingSpecification(ctx, memberInfo, true))
             return;
 
+        // For non-required init members with ThrowOnPropertyMappingNullMismatch disabled
+        // and a nullable source mapped to a non-nullable target:
+        // skip the init mapping entirely to preserve the target's own default initializer.
+        // This is consistent with set properties, which use an if-guard
+        // and skip the assignment when the source is null.
+        if (ShouldSkipNullableInitMember(ctx, memberInfo))
+        {
+            ReportNullMismatchDiagnostic(ctx, memberInfo);
+            ctx.SetMembersMapped(memberInfo);
+            return;
+        }
+
         if (!MemberMappingBuilder.TryBuildAssignment(ctx, memberInfo, out var memberAssignmentMapping))
             return;
 
         ctx.AddInitMemberMapping(memberAssignmentMapping);
+    }
+
+    /// <summary>
+    /// Determines whether a non-required init member should be skipped when the source is nullable
+    /// and the target is non-nullable, and ThrowOnPropertyMappingNullMismatch is disabled.
+    /// Skipping omits the property from the object initializer, preserving the target's own default.
+    /// </summary>
+    private static bool ShouldSkipNullableInitMember(
+        INewInstanceBuilderContext<INewInstanceObjectMemberMapping> ctx,
+        MemberMappingInfo memberInfo
+    )
+    {
+        // Required init members must always be in the object initializer.
+        if (memberInfo.TargetMember.Member.IsRequired)
+            return false;
+
+        // IQueryable<T> projections ignore ThrowOnPropertyMappingNullMismatch.
+        if (ctx.BuilderContext.IsExpression)
+            return false;
+
+        // When ThrowOnPropertyMappingNullMismatch is enabled,
+        // the user expects a throw on null; keep the init mapping.
+        if (ctx.BuilderContext.Configuration.Mapper.ThrowOnPropertyMappingNullMismatch)
+            return false;
+
+        // Only relevant when source is nullable and target is non-nullable.
+        if (!memberInfo.IsSourceNullable || memberInfo.TargetMember.MemberType.IsNullable())
+            return false;
+
+        // If a delegate mapping already handles the null-to-non-null conversion,
+        // no inline null handling would be generated and the init member should be kept.
+        if (memberInfo.SourceMember != null)
+        {
+            var mappingKey = memberInfo.ToTypeMappingKey();
+            var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(
+                mappingKey,
+                diagnosticLocation: memberInfo.Configuration?.Location
+            );
+            if (delegateMapping != null && delegateMapping.SourceType.IsNullable() && !delegateMapping.TargetType.IsNullable())
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static void ReportNullMismatchDiagnostic(
+        INewInstanceBuilderContext<INewInstanceObjectMemberMapping> ctx,
+        MemberMappingInfo memberInfo
+    )
+    {
+        if (memberInfo.Configuration?.SuppressNullMismatchDiagnostic == true)
+            return;
+
+        if (memberInfo.SourceMember == null)
+            return;
+
+        ctx.BuilderContext.ReportDiagnostic(
+            DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+            memberInfo.SourceMember.MemberPath.FullName,
+            memberInfo.SourceMember.MemberPath.RootType.ToDisplayString(),
+            memberInfo.TargetMember.FullName,
+            memberInfo.TargetMember.RootType.ToDisplayString()
+        );
     }
 
     private static bool TryBuildConstructorMapping(
