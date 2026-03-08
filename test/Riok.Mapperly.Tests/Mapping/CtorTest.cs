@@ -145,4 +145,40 @@ public class CtorTest
         );
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void NullableSourceCtorCustomClassWithNullableCtorParam()
+    {
+        var source = TestSourceBuilder.Mapping("string?", "A", "class A { public A(string? x) {} }");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return new global::A(source);");
+    }
+
+    [Fact]
+    public void NullableArraySourceCtorWithNullableArrayParam()
+    {
+        var source = TestSourceBuilder.Mapping("int[]?", "A", "record A(int[]? Value);");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return new global::A(source);");
+    }
+
+    [Fact]
+    public void NullableArraySourceCtorWithNonNullableArrayParamShouldThrow()
+    {
+        var source = TestSourceBuilder.Mapping("int[]?", "A", "class A { public A(int[] x) {} }");
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type int[]? to target of type A which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody("return source == null ? throw new global::System.ArgumentNullException(nameof(source)) : new global::A(source);");
+    }
+
+    [Fact]
+    public void NullableClassSourceCtorWithNullableClassParam()
+    {
+        var source = TestSourceBuilder.Mapping("A?", "B", "class A { }", "class B { public B(A? a) {} }");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return new global::B(source);");
+    }
 }

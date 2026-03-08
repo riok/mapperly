@@ -10,5 +10,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 public class CtorMapping(ITypeSymbol sourceType, ITypeSymbol targetType, IInstanceConstructor constructor)
     : NewInstanceMapping(sourceType, targetType)
 {
-    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) => constructor.CreateInstance(ctx, [ctx.Source]);
+    public IInstanceConstructor Constructor { get; } = constructor;
+
+    public override ExpressionSyntax Build(TypeMappingBuildContext ctx) => Constructor.CreateInstance(ctx, [ctx.Source]);
 }

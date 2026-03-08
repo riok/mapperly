@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Diagnostics;
@@ -9,11 +10,23 @@ public static class NullableMappingBuilder
 {
     public static INewInstanceMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
-        if (!TryBuildNonNullableMappingKey(ctx, out var mappingKey))
+        var sourceIsNullable = ctx.Source.TryGetNonNullable(out var sourceNonNullable);
+        var targetIsNullable = ctx.Target.TryGetNonNullable(out var targetNonNullable);
+        if (!sourceIsNullable && !targetIsNullable)
             return null;
 
+        var mappingKey = new TypeMappingKey(sourceNonNullable ?? ctx.Source, targetNonNullable ?? ctx.Target);
         var delegateMapping = ctx.BuildMapping(mappingKey, MappingBuildingOptions.KeepUserSymbol);
-        return delegateMapping == null ? null : BuildNullDelegateMapping(ctx, delegateMapping);
+        if (delegateMapping == null)
+            return null;
+
+        if (sourceIsNullable && !targetIsNullable && TryBuildMappingWithNullableSource(ctx, delegateMapping) is { } directMapping)
+            return directMapping;
+
+        if (sourceIsNullable && !targetIsNullable)
+            ctx.ReportDiagnostic(DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType, ctx.Source, ctx.Target);
+
+        return BuildNullDelegateMapping(ctx, delegateMapping);
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
@@ -43,6 +56,23 @@ public static class NullableMappingBuilder
         }
 
         return true;
+    }
+
+    private static INewInstanceMapping? TryBuildMappingWithNullableSource(
+        MappingBuilderContext ctx,
+        INewInstanceMapping delegateMapping
+    )
+    {
+        if (
+            delegateMapping is CtorMapping ctorMapping
+            && ctx.Target is INamedTypeSymbol namedTarget
+            && CtorMappingBuilder.CtorAcceptsSourceType(namedTarget, ctx.Source, ctx.SymbolAccessor)
+        )
+        {
+            return new CtorMapping(ctx.Source, ctx.Target, ctorMapping.Constructor);
+        }
+
+        return null;
     }
 
     private static INewInstanceMapping BuildNullDelegateMapping(MappingBuilderContext ctx, INewInstanceMapping mapping)
