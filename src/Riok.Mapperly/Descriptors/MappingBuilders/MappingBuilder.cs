@@ -12,6 +12,7 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
     private static readonly IReadOnlyCollection<BuildMapping> _builders =
     [
         UseNamedMappingBuilder.TryBuildMapping,
+        CtorMappingBuilder.TryBuildNullableMapping,
         NullableMappingBuilder.TryBuildMapping,
         DerivedTypeMappingBuilder.TryBuildMapping,
         ToObjectMappingBuilder.TryBuildMapping,
