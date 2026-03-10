@@ -89,6 +89,29 @@ public class UnsafeAccessorTest
     }
 
     [Fact]
+    public Task ProtectedPropertyInGenericBaseClassWithDifferentInstantiations()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B1 Map1(A1 source);
+            partial B2 Map2(A2 source);
+            """,
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "interface IA { }",
+            "interface IB : IA { }",
+            "interface IC : IA { }",
+            "class A<T> where T : IA { protected T _value { get; set; } }",
+            "class A1 : A<IB> { }",
+            "class A2 : A<IC> { }",
+            "class B<T> where T : IA { protected T _value { get; set; } }",
+            "class B1 : B<IB> { }",
+            "class B2 : B<IC> { }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ProtectedProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

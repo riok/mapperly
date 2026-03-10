@@ -46,7 +46,7 @@ public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string className,
         );
     }
 
-    public ExpressionSyntax BuildAccess(ExpressionSyntax? baseAccess, bool nullConditional = false)
+    public ExpressionSyntax BuildAccess(ExpressionSyntax? baseAccess, INamedTypeSymbol? containingType = null, bool nullConditional = false)
     {
         if (baseAccess == null)
             throw new ArgumentNullException(nameof(baseAccess));
@@ -57,7 +57,12 @@ public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string className,
             return InvocationWithoutIndention(method);
         }
 
-        var genericClassName = GenericName(className).WithTypeArgumentList(TypeArgumentList(symbol.ContainingType.TypeArguments));
+        // Use the passed containingType for type arguments if provided,
+        // otherwise fall back to the symbol's containing type.
+        // This is critical for inherited members where the cached symbol's
+        // type arguments may differ from the actual derived type being mapped.
+        var typeArgs = containingType?.TypeArguments ?? symbol.ContainingType.TypeArguments;
+        var genericClassName = GenericName(className).WithTypeArgumentList(TypeArgumentList(typeArgs));
         var invocation = InvocationExpression(MemberAccess(genericClassName, methodName))
             .WithArgumentList(ArgumentListWithoutIndention([baseAccess]));
 
