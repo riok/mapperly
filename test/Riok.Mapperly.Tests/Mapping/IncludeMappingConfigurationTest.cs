@@ -47,7 +47,7 @@ public class IncludeMappingConfigurationTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [MapperIgnoreSource(nameof(A.Ignored))]
+            [MapperIgnoreSource(nameof(A.Ignored), Justification = "Property is ignored for testing purposes")]
             partial B MapOther(A a);
 
             [IncludeMappingConfiguration(nameof(MapOther))]
