@@ -35,14 +35,14 @@ Configurations set via `MapperDefaultsAttribute` take precedence over MSBuild pr
 
 ## Copy behavior
 
-By default, Mapperly does not create deep copies of objects to improve performance.
+By default, Mapperly does not create copies of objects to improve performance.
 If an object can be directly assigned to the target, it will do so
 (eg. if the source and target type are both `Car[]`, the array and its entries will not be cloned).
-To create deep copies, set the `UseDeepCloning` property on the `MapperAttribute` to `true`.
+To create copies, set the `CloningStrategy` property on the `MapperAttribute` to the desired cloning strategy.
 
 ```csharp
 // highlight-start
-[Mapper(UseDeepCloning = true)]
+[Mapper(CloningStrategy = CloningStrategy.DeepCloning or CloningStrategy.ShallowCloning)]
 // highlight-end
 public partial class CarMapper
 {
@@ -50,8 +50,12 @@ public partial class CarMapper
 }
 ```
 
+Using `CloningStrategy.DeepCloning` will perform deep copies, so all reference types will be cloned recursively,
+meanwhile by using `CloningStrategy.ShallowCloning` a new instance will be returned with all the valued copied 1:1 from
+the source object, without performing any cloning on child properties.
+
 :::note
-Deep cloning is not applied to `IQueryable` projection mappings.
+Cloning is not applied to `IQueryable` projection mappings.
 :::
 
 ### Stack cloning strategy
@@ -63,7 +67,7 @@ This behavior can be configured via the `StackCloningStrategy` property on the `
 - `StackCloningStrategy.ReverseOrder`: Reverses the order of elements (legacy behavior).
 
 ```csharp
-[Mapper(UseDeepCloning = true, StackCloningStrategy = StackCloningStrategy.ReverseOrder)]
+[Mapper(CloningStrategy = CloningStrategy.DeepCloning, StackCloningStrategy = StackCloningStrategy.ReverseOrder)]
 public partial class MyMapper
 {
     // ...
