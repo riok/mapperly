@@ -7,6 +7,27 @@ namespace Riok.Mapperly.Descriptors.MappingBuilders;
 
 public static class CtorMappingBuilder
 {
+    public static CtorMapping? TryBuildNullableMapping(MappingBuilderContext ctx)
+    {
+        if (!ctx.IsConversionEnabled(MappingConversionType.Constructor))
+            return null;
+
+        if (!ctx.Source.TryGetNonNullable(out _))
+            return null;
+
+        if (ctx.Target.TryGetNonNullable(out _))
+            return null;
+
+        if (ctx.Target is not INamedTypeSymbol namedTarget)
+            return null;
+
+        var ctor = FindSingleArgCtor(namedTarget, ctx.Source, ctx.SymbolAccessor);
+        if (ctor == null)
+            return null;
+
+        return new CtorMapping(ctx.Source, ctx.Target, ctx.InstanceConstructors.BuildForConstructor(ctor));
+    }
+
     public static CtorMapping? TryBuildMapping(MappingBuilderContext ctx)
     {
         if (!ctx.IsConversionEnabled(MappingConversionType.Constructor))
@@ -22,9 +43,6 @@ public static class CtorMappingBuilder
 
         return new CtorMapping(ctx.Source, ctx.Target, ctx.InstanceConstructors.BuildForConstructor(ctor));
     }
-
-    internal static bool CtorAcceptsSourceType(INamedTypeSymbol target, ITypeSymbol sourceType, SymbolAccessor symbolAccessor) =>
-        FindSingleArgCtor(target, sourceType, symbolAccessor) != null;
 
     private static IMethodSymbol? FindSingleArgCtor(INamedTypeSymbol target, ITypeSymbol sourceType, SymbolAccessor symbolAccessor) =>
         target
