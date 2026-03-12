@@ -6,6 +6,7 @@ using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
+using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
@@ -149,7 +150,48 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         if (!MemberMappingBuilder.TryBuildAssignment(ctx, memberInfo, out var memberAssignmentMapping))
             return;
 
+        // For non-required init members with ThrowOnPropertyMappingNullMismatch disabled:
+        // if the built mapping has inline null handling (e.g. ?? throw or ?? default),
+        // skip it entirely to preserve the target's own default initializer.
+        // This is consistent with set properties, which use an if-guard
+        // and skip the assignment when the source is null.
+        if (ShouldSkipNullableInitMember(ctx, memberAssignmentMapping))
+        {
+            ctx.SetMembersMapped(memberInfo);
+            return;
+        }
+
         ctx.AddInitMemberMapping(memberAssignmentMapping);
+    }
+
+    /// <summary>
+    /// Determines whether a non-required init member mapping should be skipped
+    /// because it contains inline null handling that should be avoided
+    /// when ThrowOnPropertyMappingNullMismatch is disabled.
+    /// Skipping omits the property from the object initializer, preserving the target's own default.
+    /// </summary>
+    private static bool ShouldSkipNullableInitMember(
+        INewInstanceBuilderContext<INewInstanceObjectMemberMapping> ctx,
+        MemberAssignmentMapping mapping
+    )
+    {
+        // Only skip when the mapping has inline null handling for a non-nullable target.
+        // NullMappedMemberSourceValue with a nullable target uses NullFallbackValue.Default
+        // which just does null-safe access (no coalescing); that should not be skipped.
+        if (!mapping.HasNullFallback || mapping.MemberInfo.TargetMember.MemberType.IsNullable())
+            return false;
+
+        // Required init members must always be in the object initializer.
+        if (mapping.MemberInfo.TargetMember.Member.IsRequired)
+            return false;
+
+        // IQueryable<T> projections ignore ThrowOnPropertyMappingNullMismatch.
+        if (ctx.BuilderContext.IsExpression)
+            return false;
+
+        // When ThrowOnPropertyMappingNullMismatch is enabled,
+        // the user expects a throw on null; keep the init mapping.
+        return !ctx.BuilderContext.Configuration.Mapper.ThrowOnPropertyMappingNullMismatch;
     }
 
     private static bool TryBuildConstructorMapping(

@@ -71,10 +71,7 @@ public class UserMethodAdditionalParametersTest
             .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """
-                var target = new global::B()
-                {
-                    Value = value != null ? value.Value.ToString() : throw new global::System.ArgumentNullException(nameof(value.Value)),
-                };
+                var target = new global::B();
                 target.StringValue = src.StringValue;
                 return target;
                 """
@@ -166,10 +163,7 @@ public class UserMethodAdditionalParametersTest
             .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """
-                var target = new global::B()
-                {
-                    NestedValue = nested != null ? nested.Value.ToString() : throw new global::System.ArgumentNullException(nameof(nested.Value)),
-                };
+                var target = new global::B();
                 target.StringValue = src.StringValue;
                 return target;
                 """
