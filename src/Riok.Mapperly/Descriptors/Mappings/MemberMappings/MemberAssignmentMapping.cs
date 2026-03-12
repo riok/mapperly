@@ -19,6 +19,12 @@ public class MemberAssignmentMapping(MemberPathSetter targetPath, ISourceValue s
     private readonly ISourceValue _sourceValue = sourceValue;
     private readonly MemberPathSetter _targetPath = targetPath;
 
+    /// <summary>
+    /// Whether the source value uses inline null handling with a fallback
+    /// (e.g. <c>source.Value ?? throw</c> or <c>source.Value ?? default</c>).
+    /// </summary>
+    internal bool HasNullFallback => _sourceValue is NullMappedMemberSourceValue;
+
     public bool TryGetMemberAssignmentMappingContainer([NotNullWhen(true)] out IMemberAssignmentMappingContainer? container)
     {
         container = null;
