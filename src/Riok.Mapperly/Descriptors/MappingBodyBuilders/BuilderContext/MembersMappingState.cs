@@ -29,7 +29,8 @@ internal class MembersMappingState(
     Dictionary<string, List<MemberValueMappingConfiguration>> memberValueConfigsByRootTargetName,
     Dictionary<string, List<MemberMappingConfiguration>> memberConfigsByRootTargetName,
     Dictionary<string, List<IMemberPathConfiguration>> configuredTargetMembersByRootName,
-    HashSet<string> ignoredSourceMemberNames
+    HashSet<string> ignoredSourceMemberNames,
+    ParameterScope? parameterScope = null
 )
 {
     private readonly Dictionary<string, IMappableMember> _aliasedSourceMembers = new(StringComparer.OrdinalIgnoreCase);
@@ -48,6 +49,8 @@ internal class MembersMappingState(
     /// All target member names that are not used in a member mapping (yet).
     /// </summary>
     private readonly HashSet<string> _unmappedTargetMemberNames = unmappedTargetMemberNames;
+
+    public ParameterScope? ParameterScope => parameterScope;
 
     public IReadOnlyCollection<string> IgnoredSourceMemberNames => ignoredSourceMemberNames;
 
@@ -210,8 +213,8 @@ internal class MembersMappingState(
                 _unmappedSourceMemberNames.Remove(sourceMember.Name);
                 break;
             case SourceMemberType.AdditionalMappingMethodParameter:
-                // trim verbatim identifier prefix
                 _unmappedAdditionalSourceMemberNames.Remove(sourceMember.Name.TrimStart('@'));
+                parameterScope?.MarkUsed(sourceMember.Name);
                 break;
         }
     }

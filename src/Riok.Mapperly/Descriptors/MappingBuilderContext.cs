@@ -56,9 +56,28 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
             supportsDeepCloning: supportsDeepCloning
         )
     {
+        // Wrap parent scope in a child (delegates MarkUsed upward), or initialize from user mapping.
+        // Only the root scope reports unused parameters in diagnostics.
+        ParameterScope = ctx.ParameterScope is { } parentScope ? new ParameterScope(parentScope) : BuildParameterScope(userMapping);
         if (ignoreDerivedTypes)
         {
             Configuration = Configuration with { DerivedTypes = [] };
+        }
+    }
+
+    private static ParameterScope? BuildParameterScope(IUserMapping? userMapping) =>
+        userMapping is IParameterizedMapping { AdditionalSourceParameters.Count: > 0 } pm
+            ? new ParameterScope(pm.AdditionalSourceParameters)
+            : null;
+
+    private static void MarkAdditionalParametersUsed(ITypeMapping mapping, ParameterScope scope)
+    {
+        if (mapping is not IParameterizedMapping parameterized)
+            return;
+
+        foreach (var param in parameterized.AdditionalSourceParameters)
+        {
+            scope.MarkUsed(param.Name);
         }
     }
 
@@ -82,6 +101,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// Whether the current mapping code is generated for a <see cref="System.Linq.Expressions.Expression"/>.
     /// </summary>
     public virtual bool IsExpression => false;
+
+    public ParameterScope? ParameterScope { get; }
 
     public InstanceConstructorFactory InstanceConstructors { get; }
 
