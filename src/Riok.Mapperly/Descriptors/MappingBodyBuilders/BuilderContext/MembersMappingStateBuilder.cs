@@ -72,21 +72,22 @@ internal static class MembersMappingStateBuilder
         );
     }
 
-    private static ParameterScope BuildParameterScope(MappingBuilderContext ctx)
+    private static (IReadOnlyDictionary<string, IMappableMember> Members, ParameterScope Scope) BuildAdditionalSourceMembersAndScope(
+        MappingBuilderContext ctx
+    )
     {
-        if (ctx.UserMapping is not MethodMapping { AdditionalSourceParameters.Count: > 0 } methodMapping)
-            return ParameterScope.Empty;
+        // The copy-constructor provides the scope: inherited scopes are wrapped as child scopes,
+        // while own scopes (from BuildParameterScope) remain root scopes.
+        if (ctx.ParameterScope is { IsEmpty: false } scope)
+            return (BuildSourceMembersFromParameters(scope.Parameters.Values), scope);
 
-        return new ParameterScope(methodMapping.AdditionalSourceParameters);
+        return (_emptyAdditionalSourceMembers, ParameterScope.Empty);
     }
 
-    private static IReadOnlyDictionary<string, IMappableMember> GetAdditionalSourceMembers(MappingBuilderContext ctx)
+    private static IReadOnlyDictionary<string, IMappableMember> BuildSourceMembersFromParameters(IEnumerable<MethodParameter> parameters)
     {
-        if (ctx.UserMapping is not MethodMapping { AdditionalSourceParameters.Count: > 0 } methodMapping)
-            return _emptyAdditionalSourceMembers;
-
-        return methodMapping.AdditionalSourceParameters.ToDictionary<MethodParameter, string, IMappableMember>(
-            x => x.Name.TrimStart('@'), // trim verbatim identifier prefix
+        return parameters.ToDictionary<MethodParameter, string, IMappableMember>(
+            x => x.NormalizedName,
             x => new ParameterSourceMember(x),
             StringComparer.OrdinalIgnoreCase
         );

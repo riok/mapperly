@@ -119,6 +119,19 @@ public class UserImplementedInlinedExpressionMapping(
                 return ctx.Source.WithTriviaFrom(node);
             }
 
+            // replace additional parameters with their corresponding expressions from the context
+            // Note: ctx.AdditionalParameters uses case-insensitive keys (for descriptor-phase matching),
+            // but syntax replacement must be case-sensitive to avoid replacing unrelated identifiers
+            // (e.g., property name CurrentUserId vs parameter currentUserId).
+            if (ctx.AdditionalParameters != null)
+            {
+                foreach (var (key, value) in ctx.AdditionalParameters)
+                {
+                    if (string.Equals(key, node.Identifier.Text, StringComparison.Ordinal))
+                        return value.WithTriviaFrom(node);
+                }
+            }
+
             return base.VisitIdentifierName(node);
         }
 
