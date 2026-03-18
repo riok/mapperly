@@ -214,3 +214,5 @@ RMG092 | Mapper | Error | Source type is not assignable to the included source t
 RMG093 | Mapper | Error | Target type is not assignable to the included target type
 RMG094 | Mapper | Error | Circular existing target mapping without setter detected
 RMG095 | Mapper | Warning | Invalid MSBuild configuration option
+RMG096 | Mapper | Error   | MapValue Use method parameters cannot be satisfied
+RMG097 | Mapper | Error   | Named mapping additional parameters cannot be satisfied

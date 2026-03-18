@@ -1,0 +1,46 @@
+---
+sidebar_label: RMG096
+description: 'Mapperly analyzer diagnostic RMG096 — MapValue Use method parameters cannot be satisfied'
+---
+
+# RMG096 — MapValue Use method parameters cannot be satisfied
+
+A method referenced by `MapValue(Use = ...)` has parameters that cannot be matched
+from the mapping method's [additional parameters](../additional-mapping-parameters.mdx).
+
+To fix this, ensure the mapping method declares additional parameters with names matching
+the parameters of the `Use` method.
+
+## Example
+
+`GetValue` requires an `int ctx` parameter,
+but the `Map` method does not declare a matching additional parameter.
+
+```csharp
+[Mapper]
+public partial class MyMapper
+{
+    // highlight-start
+    // Error: GetValue requires 'ctx' but Map has no additional parameters
+    [MapValue(nameof(B.Value), Use = nameof(GetValue))]
+    // highlight-end
+    public partial B Map(A source);
+
+    private int GetValue(int ctx) => ctx * 2;
+}
+```
+
+Add the missing parameter to the mapping method:
+
+```csharp
+[Mapper]
+public partial class MyMapper
+{
+    [MapValue(nameof(B.Value), Use = nameof(GetValue))]
+    // highlight-start
+    public partial B Map(A source, int ctx);
+    // highlight-end
+
+    private int GetValue(int ctx) => ctx * 2;
+}
+```

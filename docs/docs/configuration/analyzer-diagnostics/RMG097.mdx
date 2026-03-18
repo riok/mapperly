@@ -1,0 +1,49 @@
+---
+sidebar_label: RMG097
+description: 'Mapperly analyzer diagnostic RMG097 — Named mapping additional parameters cannot be satisfied'
+---
+
+# RMG097 — Named mapping additional parameters cannot be satisfied
+
+A named mapping referenced by `MapProperty(Use = ...)` or `MapPropertyFromSource(Use = ...)`
+has [additional parameters](../additional-mapping-parameters.mdx) that cannot be matched
+from the caller's additional parameters.
+
+To fix this, ensure the calling mapping method declares additional parameters with names matching
+the parameters of the referenced named mapping.
+
+## Example
+
+`Transform` requires an `int multiplier` parameter,
+but the `Map` method does not declare a matching additional parameter.
+
+```csharp
+[Mapper]
+public partial class MyMapper
+{
+    // highlight-start
+    // Error: Transform requires 'multiplier' but Map has no additional parameters
+    [MapProperty(nameof(A.Value), nameof(B.Result), Use = nameof(Transform))]
+    // highlight-end
+    public partial B Map(A source);
+
+    [UserMapping(Default = false)]
+    private partial int Transform(int value, int multiplier);
+}
+```
+
+Add the missing parameter to the calling mapping method:
+
+```csharp
+[Mapper]
+public partial class MyMapper
+{
+    [MapProperty(nameof(A.Value), nameof(B.Result), Use = nameof(Transform))]
+    // highlight-start
+    public partial B Map(A source, int multiplier);
+    // highlight-end
+
+    [UserMapping(Default = false)]
+    private partial int Transform(int value, int multiplier);
+}
+```
