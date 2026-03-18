@@ -123,11 +123,14 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         // inline expression mappings don't reuse the user-defined mappings directly
         // but to apply the same configurations the default mapping user symbol is used
         // if there is no other user symbol.
-        // this makes sure the configuration of the default mapping user symbol is used
-        // for inline expression mappings.
         // This is not needed for regular mappings as these user defined method mappings
         // are directly built (with KeepUserSymbol) and called by the other mappings.
-        userMapping ??= MappingBuilder.Find(mappingKey) as IUserMapping;
+        // When additional parameters are available, only match element mappings whose
+        // parameters all match — don't fall back to a default mapping that ignores the params.
+        userMapping ??= ParameterScope is { IsEmpty: false }
+            ? MappingBuilder.FindUserMappingWithParameters(mappingKey, ParameterScope) as IUserMapping
+            : MappingBuilder.Find(mappingKey) as IUserMapping;
+
         options &= ~MappingBuildingOptions.KeepUserSymbol;
         return BuildMapping(userMapping, mappingKey, options, diagnosticLocation);
     }
