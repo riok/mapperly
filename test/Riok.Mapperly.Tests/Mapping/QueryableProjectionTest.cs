@@ -226,6 +226,37 @@ public class QueryableProjectionTest
     }
 
     [Fact]
+    public Task ClassToClassWithAdditionalParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source, int currentUserId);
+            """,
+            """
+            class A { public string Name { get; set; } }
+            class B { public string Name { get; set; } public int CurrentUserId { get; set; } }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ProjectionWithUserImplementedMethodWithAdditionalParams()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source, int currentUserId);
+            private B MapToB(A source, int currentUserId) => new B { Name = source.Name, CurrentUserId = currentUserId };
+            """,
+            """
+            class A { public string Name { get; set; } }
+            class B { public string Name { get; set; } public int CurrentUserId { get; set; } }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public async Task TopLevelUserImplemented()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
