@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Configuration;
+using Riok.Mapperly.Configuration.MethodReferences;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -158,22 +159,21 @@ internal static class SourceValueBuilder
     {
         var methodReferenceConfiguration = memberMappingInfo.ValueConfiguration!.Use!;
         var targetSymbol = methodReferenceConfiguration.GetTargetType(ctx.BuilderContext);
+        var scope = ctx.BuilderContext.ParameterScope;
         var namedMethodCandidates = targetSymbol is null
             ? []
             : ctx
                 .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(targetSymbol)
                 .Where(m =>
-                    m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
+                    m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false }
+                    && ParameterScope.CanSatisfyParameters(scope, m)
                     && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualTo(m, methodReferenceConfiguration.Name)
                 )
                 .ToList();
 
         if (namedMethodCandidates.Count == 0)
         {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.MapValueReferencedMethodNotFound,
-                methodReferenceConfiguration.FullName
-            );
+            ReportMethodNotFoundDiagnostic(ctx.BuilderContext, targetSymbol, methodReferenceConfiguration);
             sourceValue = null;
             return false;
         }
@@ -204,7 +204,44 @@ internal static class SourceValueBuilder
             return false;
         }
 
-        sourceValue = new MethodProvidedSourceValue(methodSymbol.Name, methodReferenceConfiguration.GetTargetName(ctx.BuilderContext));
+        // Collect additional parameter names and mark them as used
+        var additionalParameterNames = methodSymbol.Parameters.Select(param => param.Name).ToList();
+
+        foreach (var additionalParameterName in additionalParameterNames)
+        {
+            scope?.MarkUsed(additionalParameterName);
+        }
+
+        sourceValue = new MethodProvidedSourceValue(
+            methodSymbol.Name,
+            methodReferenceConfiguration.GetTargetName(ctx.BuilderContext),
+            additionalParameterNames
+        );
         return true;
+    }
+
+    private static void ReportMethodNotFoundDiagnostic(
+        MappingBuilderContext builderCtx,
+        ITypeSymbol? targetSymbol,
+        IMethodReferenceConfiguration methodRef
+    )
+    {
+        // Check if a method by name exists but with unsatisfiable parameters
+        if (
+            targetSymbol is not null
+            && builderCtx
+                .SymbolAccessor.GetAllDirectlyAccessibleMethods(targetSymbol)
+                .Any(m =>
+                    m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: > 0 }
+                    && builderCtx.AttributeAccessor.IsMappingNameEqualTo(m, methodRef.Name)
+                )
+        )
+        {
+            builderCtx.ReportDiagnostic(DiagnosticDescriptors.MapValueMethodParametersUnsatisfied, methodRef.FullName);
+        }
+        else
+        {
+            builderCtx.ReportDiagnostic(DiagnosticDescriptors.MapValueReferencedMethodNotFound, methodRef.FullName);
+        }
     }
 }

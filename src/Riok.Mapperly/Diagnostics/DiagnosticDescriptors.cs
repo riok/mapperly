@@ -818,6 +818,16 @@ public static class DiagnosticDescriptors
         helpLinkUri: BuildHelpUri("RMG096")
     );
 
+    public static readonly DiagnosticDescriptor MapValueMethodParametersUnsatisfied = new(
+        "RMG097",
+        "MapValue Use method parameters cannot be satisfied",
+        "The method {0} referenced by MapValue has parameters that cannot be matched from the mapping's additional parameters",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true,
+        helpLinkUri: BuildHelpUri("RMG097")
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT
