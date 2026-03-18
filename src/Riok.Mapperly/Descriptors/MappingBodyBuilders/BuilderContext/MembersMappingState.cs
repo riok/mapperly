@@ -3,6 +3,7 @@ using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Configuration.PropertyReferences;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
@@ -12,7 +13,6 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// Contains discovered but unmapped members, ignored members, etc.
 /// </summary>
 /// <param name="unmappedSourceMemberNames">Source member names which are not used in a member mapping yet.</param>
-/// <param name="unmappedAdditionalSourceMemberNames">Additional source member names (additional mapping method parameters) which are not used in a member mapping yet.</param>
 /// <param name="unmappedTargetMemberNames">Target member names which are not used in a member mapping yet.</param>
 /// <param name="targetMemberCaseMapping">A dictionary with all members of the target with a case-insensitive key comparer.</param>
 /// <param name="targetMembers">All known target members.</param>
@@ -21,16 +21,14 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// <param name="ignoredSourceMemberNames">All ignored source members names.</param>
 internal class MembersMappingState(
     HashSet<string> unmappedSourceMemberNames,
-    HashSet<string> unmappedAdditionalSourceMemberNames,
     HashSet<string> unmappedTargetMemberNames,
-    IReadOnlyDictionary<string, IMappableMember> additionalSourceMembers,
     IReadOnlyDictionary<string, string> targetMemberCaseMapping,
     Dictionary<string, IMappableMember> targetMembers,
     Dictionary<string, List<MemberValueMappingConfiguration>> memberValueConfigsByRootTargetName,
     Dictionary<string, List<MemberMappingConfiguration>> memberConfigsByRootTargetName,
     Dictionary<string, List<IMemberPathConfiguration>> configuredTargetMembersByRootName,
     HashSet<string> ignoredSourceMemberNames,
-    ParameterScope? parameterScope = null
+    ParameterScope parameterScope
 )
 {
     private readonly Dictionary<string, IMappableMember> _aliasedSourceMembers = new(StringComparer.OrdinalIgnoreCase);
@@ -41,16 +39,11 @@ internal class MembersMappingState(
     private readonly HashSet<string> _unmappedSourceMemberNames = unmappedSourceMemberNames;
 
     /// <summary>
-    /// All additional source member names (additional mapping method parameters) that are not used in a member mapping (yet).
-    /// </summary>
-    private readonly HashSet<string> _unmappedAdditionalSourceMemberNames = unmappedAdditionalSourceMemberNames;
-
-    /// <summary>
     /// All target member names that are not used in a member mapping (yet).
     /// </summary>
     private readonly HashSet<string> _unmappedTargetMemberNames = unmappedTargetMemberNames;
 
-    public ParameterScope? ParameterScope => parameterScope;
+    public ParameterScope ParameterScope => parameterScope;
 
     public IReadOnlyCollection<string> IgnoredSourceMemberNames => ignoredSourceMemberNames;
 
@@ -62,10 +55,12 @@ internal class MembersMappingState(
     /// <inheritdoc cref="_unmappedSourceMemberNames"/>
     public IEnumerable<string> UnmappedSourceMemberNames => _unmappedSourceMemberNames;
 
-    /// <inheritdoc cref="_unmappedAdditionalSourceMemberNames"/>
-    public IEnumerable<string> UnmappedAdditionalSourceMemberNames => _unmappedAdditionalSourceMemberNames;
-
-    public IReadOnlyDictionary<string, IMappableMember> AdditionalSourceMembers => additionalSourceMembers;
+    public IReadOnlyDictionary<string, IMappableMember> AdditionalSourceMembers =>
+        field ??= parameterScope.Parameters.Values.ToDictionary<MethodParameter, string, IMappableMember>(
+            x => x.NormalizedName,
+            x => new ParameterSourceMember(x),
+            StringComparer.OrdinalIgnoreCase
+        );
 
     public IReadOnlyDictionary<string, IMappableMember> AliasedSourceMembers => _aliasedSourceMembers;
 
@@ -213,8 +208,7 @@ internal class MembersMappingState(
                 _unmappedSourceMemberNames.Remove(sourceMember.Name);
                 break;
             case SourceMemberType.AdditionalMappingMethodParameter:
-                _unmappedAdditionalSourceMemberNames.Remove(sourceMember.Name.TrimStart('@'));
-                parameterScope?.MarkUsed(sourceMember.Name);
+                parameterScope.MarkUsed(sourceMember.Name);
                 break;
         }
     }

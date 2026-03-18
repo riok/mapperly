@@ -10,9 +10,6 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
 internal static class MembersMappingStateBuilder
 {
-    private static readonly IReadOnlyDictionary<string, IMappableMember> _emptyAdditionalSourceMembers =
-        new Dictionary<string, IMappableMember>();
-
     public static MembersMappingState Build(MappingBuilderContext ctx, IMapping mapping)
     {
         // build configurations
@@ -36,9 +33,6 @@ internal static class MembersMappingStateBuilder
 
         // build all members
         var unmappedSourceMemberNames = GetSourceMemberNames(ctx, mapping);
-        var additionalSourceMembers = GetAdditionalSourceMembers(ctx);
-        var unmappedAdditionalSourceMemberNames = new HashSet<string>(additionalSourceMembers.Keys, StringComparer.Ordinal);
-        var parameterScope = BuildParameterScope(ctx);
         var targetMembers = GetTargetMembers(ctx, mapping);
 
         // build ignored members
@@ -59,37 +53,14 @@ internal static class MembersMappingStateBuilder
         var unmappedTargetMemberNames = targetMembers.Keys.ToHashSet();
         return new MembersMappingState(
             unmappedSourceMemberNames,
-            unmappedAdditionalSourceMemberNames,
             unmappedTargetMemberNames,
-            additionalSourceMembers,
             targetMemberCaseMapping,
             targetMembers,
             memberValueConfigsByRootTargetName,
             memberConfigsByRootTargetName,
             configuredTargetMembersByRootName.AsDictionary(),
             ignoredSourceMemberNames,
-            parameterScope
-        );
-    }
-
-    private static (IReadOnlyDictionary<string, IMappableMember> Members, ParameterScope Scope) BuildAdditionalSourceMembersAndScope(
-        MappingBuilderContext ctx
-    )
-    {
-        // The copy-constructor provides the scope: inherited scopes are wrapped as child scopes,
-        // while own scopes (from BuildParameterScope) remain root scopes.
-        if (ctx.ParameterScope is { IsEmpty: false } scope)
-            return (BuildSourceMembersFromParameters(scope.Parameters.Values), scope);
-
-        return (_emptyAdditionalSourceMembers, ParameterScope.Empty);
-    }
-
-    private static IReadOnlyDictionary<string, IMappableMember> BuildSourceMembersFromParameters(IEnumerable<MethodParameter> parameters)
-    {
-        return parameters.ToDictionary<MethodParameter, string, IMappableMember>(
-            x => x.NormalizedName,
-            x => new ParameterSourceMember(x),
-            StringComparer.OrdinalIgnoreCase
+            ctx.ParameterScope ?? ParameterScope.Empty
         );
     }
 
