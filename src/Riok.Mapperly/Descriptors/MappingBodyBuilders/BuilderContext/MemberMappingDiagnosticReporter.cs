@@ -56,8 +56,15 @@ internal static class MemberMappingDiagnosticReporter
 
     private static void AddUnmappedAdditionalSourceMembersDiagnostics(MappingBuilderContext ctx, MembersMappingState state)
     {
+        var scope = state.ParameterScope;
+        var unusedInScope = scope != null ? new HashSet<string>(scope.GetUnusedParameterNames(), StringComparer.OrdinalIgnoreCase) : null;
         foreach (var name in state.UnmappedAdditionalSourceMemberNames)
         {
+            // Skip parameters that were consumed via ParameterScope (e.g. by MapValue Use methods)
+            // but not removed from the unmapped additional source members set.
+            if (unusedInScope != null && !unusedInScope.Contains(name))
+                continue;
+
             ctx.ReportDiagnostic(DiagnosticDescriptors.AdditionalParameterNotMapped, name, ctx.UserMapping!.Method.Name);
         }
     }
