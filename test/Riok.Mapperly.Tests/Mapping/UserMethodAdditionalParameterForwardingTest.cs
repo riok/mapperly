@@ -266,4 +266,79 @@ public class UserMethodAdditionalParameterForwardingTest
             )
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public void ExistingTargetWithAdditionalParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial void Update(A src, [MappingTarget] B target, int ctx);
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public int Ctx { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMethodBody(
+                "Update",
+                """
+                target.StringValue = src.StringValue;
+                target.Ctx = ctx;
+                """
+            );
+    }
+
+    [Fact]
+    public void ExistingTargetWithNestedMappingForwarding()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial void Update(A src, [MappingTarget] B target, int ctx);
+            private partial BNested MapNested(ANested src, int ctx);
+            """,
+            """
+            class A { public ANested Nested { get; set; } }
+            class B { public BNested Nested { get; set; } }
+            class ANested { public int ValueA { get; set; } }
+            class BNested { public int ValueA { get; set; } public int Ctx { get; set; } }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMethodBody(
+                "Update",
+                """
+                target.Nested = MapNested(src.Nested, ctx);
+                """
+            );
+    }
+
+    [Fact]
+    public void ExistingTargetWithMapValueUse()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("IntValue", Use = nameof(GetValue))]
+            partial void Update(A src, [MappingTarget] B target, int ctx);
+            private int GetValue(int ctx) => ctx * 2;
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public int IntValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMethodBody(
+                "Update",
+                """
+                target.StringValue = src.StringValue;
+                target.IntValue = GetValue(ctx);
+                """
+            );
+    }
 }
