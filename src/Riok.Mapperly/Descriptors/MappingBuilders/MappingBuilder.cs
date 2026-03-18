@@ -40,6 +40,9 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
 
     public INewInstanceMapping? Find(TypeMappingKey mapping) => mappings.FindNewInstanceMapping(mapping);
 
+    public INewInstanceMapping? FindUserMappingWithParameters(TypeMappingKey key, ParameterScope scope) =>
+        mappings.FindNewInstanceUserMappingWithParameters(key, scope);
+
     public INewInstanceMapping? FindOrResolveNamed(SimpleMappingBuilderContext ctx, string name, out bool ambiguousName)
     {
         if (!ctx.Configuration.Mapper.AutoUserMappings && _resolvedMappingNames.Add(name))

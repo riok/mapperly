@@ -83,6 +83,95 @@ public class UserMethodAdditionalParameterForwardingTest
     }
 
     [Fact]
+    public void NestedMappingWithAdditionalParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A src, int ctx);
+            private partial BNested MapNested(ANested src, int ctx);
+            """,
+            """
+            class A { public ANested Nested { get; set; } }
+            class B { public BNested Nested { get; set; } }
+            class ANested { public int ValueA { get; set; } }
+            class BNested { public int ValueA { get; set; } public int Ctx { get; set; } }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Nested = MapNested(src.Nested, ctx);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NestedMappingFallsBackToParameterlessWhenNoMatchingUserMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A src, int ctx);
+            """,
+            """
+            class A { public ANested Nested { get; set; } }
+            class B { public BNested Nested { get; set; } }
+            class ANested { public int ValueA { get; set; } }
+            class BNested { public int ValueA { get; set; } }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Nested = MapToBNested(src.Nested);
+                return target;
+                """
+            )
+            .HaveDiagnostic(DiagnosticDescriptors.AdditionalParameterNotMapped)
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void ParameterUsedByBothPropertyAndNestedMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("CtxValue", Use = nameof(GetCtx))]
+            partial B Map(A src, int ctx);
+            private int GetCtx(int ctx) => ctx;
+            private partial BNested MapNested(ANested src, int ctx);
+            """,
+            """
+            class A { public ANested Nested { get; set; } }
+            class B { public BNested Nested { get; set; } public int CtxValue { get; set; } }
+            class ANested { public int ValueA { get; set; } }
+            class BNested { public int ValueA { get; set; } public int Ctx { get; set; } }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Nested = MapNested(src.Nested, ctx);
+                target.CtxValue = GetCtx(ctx);
+                return target;
+                """
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
     public void MapValueUseMethodWithUnsatisfiableParametersShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

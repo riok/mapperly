@@ -70,15 +70,21 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
             ? new ParameterScope(pm.AdditionalSourceParameters)
             : null;
 
-    private static void MarkAdditionalParametersUsed(ITypeMapping mapping, ParameterScope scope)
+    private INewInstanceMapping? FindParameterizedUserMapping(TypeMappingKey key)
     {
+        if (ParameterScope is null or { IsEmpty: true })
+            return null;
+
+        var mapping = MappingBuilder.FindUserMappingWithParameters(key, ParameterScope);
         if (mapping is not IParameterizedMapping parameterized)
-            return;
+            return null;
 
         foreach (var param in parameterized.AdditionalSourceParameters)
         {
-            scope.MarkUsed(param.Name);
+            ParameterScope.MarkUsed(param.Name);
         }
+
+        return mapping;
     }
 
     public TypeMappingKey MappingKey { get; }
@@ -186,7 +192,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null
     )
     {
-        return FindMapping(mappingKey)
+        return FindParameterizedUserMapping(mappingKey)
+            ?? FindMapping(mappingKey)
             ?? FindMapping(mappingKey.TargetNonNullable())
             ?? BuildMapping(mappingKey, options, diagnosticLocation);
     }
@@ -208,6 +215,11 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null
     )
     {
+        // Check parameterized user mappings first to ensure MarkUsed is called.
+        // Skip for expression contexts — expressions need the inlining path, not method calls.
+        if (!IsExpression && FindParameterizedUserMapping(key) is { } parameterizedMapping)
+            return parameterizedMapping;
+
         if (FindMapping(key) is INewInstanceUserMapping mapping)
             return mapping;
 
