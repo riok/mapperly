@@ -20,6 +20,9 @@ public static class UseNamedMappingBuilder
             return null;
         }
 
+        if (!ValidateAndMarkAdditionalParameters(ctx, mapping, ctx.MappingKey.Configuration.UseNamedMapping))
+            return null;
+
         var differentSourceType = !SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, mapping.SourceType);
         var differentTargetType = !SymbolEqualityComparer.IncludeNullability.Equals(ctx.Target, mapping.TargetType);
 
@@ -47,6 +50,9 @@ public static class UseNamedMappingBuilder
         var useNamedMapping = ctx.MappingKey.Configuration.UseNamedMapping;
         var existingTargetMapping = ctx.FindExistingTargetNamedMapping(useNamedMapping);
         if (existingTargetMapping is null)
+            return null;
+
+        if (!ValidateAndMarkAdditionalParameters(ctx, existingTargetMapping, useNamedMapping))
             return null;
 
         var source = ctx.Source;
@@ -136,6 +142,26 @@ public static class UseNamedMappingBuilder
         }
 
         return new CompositeMapping(outputMapping, mapping);
+    }
+
+    private static bool ValidateAndMarkAdditionalParameters(MappingBuilderContext ctx, ITypeMapping mapping, string mappingName)
+    {
+        if (mapping is not IParameterizedMapping { AdditionalSourceParameters.Count: > 0 } pm)
+            return true;
+
+        var scope = ctx.ParameterScope;
+        if (scope is null || scope.IsEmpty || !scope.TryMatchParameters(pm.AdditionalSourceParameters, out var matched))
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.NamedMappingParametersUnsatisfied, mappingName);
+            return false;
+        }
+
+        foreach (var param in matched)
+        {
+            scope.MarkUsed(param.Name);
+        }
+
+        return true;
     }
 
     private static INewInstanceMapping? TryMapSource(MappingBuilderContext ctx, INewInstanceMapping mapping)

@@ -19,7 +19,7 @@ public class UserImplementedMethodMapping(
     MethodParameter? referenceHandlerParameter,
     bool isExternal,
     UserImplementedMethodMapping.TargetNullability targetNullability
-) : NewInstanceMapping(sourceParameter.Type, targetType), INewInstanceUserMapping
+) : NewInstanceMapping(sourceParameter.Type, targetType), INewInstanceUserMapping, IParameterizedMapping
 {
     public enum TargetNullability
     {
@@ -33,6 +33,15 @@ public class UserImplementedMethodMapping(
     public bool? Default { get; } = isDefault;
 
     public bool IsExternal { get; } = isExternal;
+
+    public IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; } =
+        method
+            .Parameters.Where(p =>
+                p.Ordinal != sourceParameter.Ordinal
+                && (referenceHandlerParameter is null || p.Ordinal != referenceHandlerParameter.Value.Ordinal)
+            )
+            .Select(p => new MethodParameter(p, p.Type))
+            .ToList();
 
     public override IEnumerable<TypeMappingKey> BuildAdditionalMappingKeys(TypeMappingConfiguration config)
     {
