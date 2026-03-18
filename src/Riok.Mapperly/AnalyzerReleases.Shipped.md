@@ -222,3 +222,5 @@ Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 RMG095 | Mapper | Warning | Invalid MSBuild configuration option
 RMG096 | Mapper | Hidden | A MapperIgnore* attribute does not specify a justification
+RMG097 | Mapper | Error   | MapValue Use method parameters cannot be satisfied
+RMG098 | Mapper | Error   | Named mapping additional parameters cannot be satisfied

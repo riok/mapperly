@@ -122,6 +122,49 @@ public static partial class CarMapper
 It is important that the types in the user-implemented mapping method match the types of the objects to be mapped exactly.
 Otherwise, Mapperly cannot resolve the user-implemented mapping methods.
 
+## Additional parameters
+
+Queryable projection methods can have [additional parameters](./additional-mapping-parameters.mdx).
+The parameters become captured variables in the generated projection lambda expression:
+
+<Tabs>
+  <TabItem value="definition" label="Mapper definition">
+
+```csharp
+[Mapper]
+public static partial class CarMapper
+{
+    // highlight-start
+    public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q, int currentUserId);
+    // highlight-end
+}
+```
+
+  </TabItem>
+  <TabItem value="generated" label="Generated code">
+
+```csharp
+public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q, int currentUserId)
+{
+    return System.Linq.Queryable.Select(
+        q,
+        x => new CarDto()
+        {
+            Brand = x.Brand,
+            // highlight-start
+            CurrentUserId = currentUserId, // captured from outer scope
+            // highlight-end
+        });
+}
+```
+
+  </TabItem>
+</Tabs>
+
+User-implemented mapping methods with additional parameters are inlined into the projection expression.
+The same inlining rules and limitations apply as for
+[regular user-implemented mapping methods](#user-implemented-mapping-methods).
+
 ## Expression mappings
 
 In addition to `IQueryable<T>` projections, Mapperly also supports generating `Expression<Func<TSource, TTarget>>` directly.

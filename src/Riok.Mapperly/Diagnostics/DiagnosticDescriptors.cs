@@ -829,12 +829,13 @@ public static class DiagnosticDescriptors
     );
 
     public static readonly DiagnosticDescriptor NamedMappingParametersUnsatisfied = new(
-        "RMG097",
+        "RMG098",
         "Named mapping additional parameters cannot be satisfied",
         "The named mapping {0} has additional parameters that cannot be matched from the caller's scope",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Error,
-        true
+        true,
+        helpLinkUri: BuildHelpUri("RMG098")
     );
 
     private static string BuildHelpUri(string id)
