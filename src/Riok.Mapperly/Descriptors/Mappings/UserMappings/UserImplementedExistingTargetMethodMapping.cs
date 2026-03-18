@@ -18,13 +18,23 @@ public class UserImplementedExistingTargetMethodMapping(
     MethodParameter targetParameter,
     MethodParameter? referenceHandlerParameter,
     bool isExternal
-) : ExistingTargetMapping(method.Parameters[0].Type, targetParameter.Type), IExistingTargetUserMapping
+) : ExistingTargetMapping(method.Parameters[0].Type, targetParameter.Type), IExistingTargetUserMapping, IParameterizedMapping
 {
     public IMethodSymbol Method { get; } = method;
 
     public bool? Default { get; } = isDefault;
 
     public bool IsExternal { get; } = isExternal;
+
+    public IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; } =
+        method
+            .Parameters.Where(p =>
+                p.Ordinal != sourceParameter.Ordinal
+                && p.Ordinal != targetParameter.Ordinal
+                && (referenceHandlerParameter is null || p.Ordinal != referenceHandlerParameter.Value.Ordinal)
+            )
+            .Select(p => new MethodParameter(p, p.Type))
+            .ToList();
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {

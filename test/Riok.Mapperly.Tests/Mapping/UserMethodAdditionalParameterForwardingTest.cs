@@ -193,4 +193,77 @@ public class UserMethodAdditionalParameterForwardingTest
             )
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public void MapPropertyUseWithAdditionalParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Result), Use = nameof(Transform))]
+            partial B Map(A src, int multiplier);
+            private partial int Transform(int value, int multiplier);
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public int Result { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Result = Transform(src.Value, multiplier);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MapPropertyUseWithMultipleAdditionalParameters()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Result), Use = nameof(Transform))]
+            partial B Map(A src, int multiplier, int offset);
+            private partial int Transform(int value, int multiplier, int offset);
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public int Result { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Result = Transform(src.Value, multiplier, offset);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MapPropertyUseWithUnsatisfiableParametersShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Result), Use = nameof(Transform))]
+            partial B Map(A src);
+            private partial int Transform(int value, int multiplier);
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public int Result { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NamedMappingParametersUnsatisfied,
+                "The named mapping Transform has additional parameters that cannot be matched from the caller's scope"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
 }
