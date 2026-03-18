@@ -165,6 +165,33 @@ User-implemented mapping methods with additional parameters are inlined into the
 The same inlining rules and limitations apply as for
 [regular user-implemented mapping methods](#user-implemented-mapping-methods).
 
+### Property configurations with additional parameters
+
+When a projection has additional parameters and you want to apply [property configurations](#property-configurations),
+the element mapping method must have the **same additional parameters**.
+A projection with additional parameters will only pick up configurations from an element mapping
+whose additional parameters match by name.
+
+```csharp
+[Mapper]
+public static partial class CarMapper
+{
+    // highlight-start
+    public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q, int currentUserId);
+    // highlight-end
+
+    // highlight-start
+    // This element mapping is used for configuration because its additional parameter matches.
+    [MapProperty(nameof(Car.Manufacturer), nameof(CarDto.Producer))]
+    [MapPropertyFromSource(nameof(CarDto.IsLiked), Use = nameof(GetIsLiked))]
+    // highlight-end
+    private static partial CarDto Map(Car car, int currentUserId);
+
+    private static bool GetIsLiked(Car car, int currentUserId)
+        => car.Likes.Any(l => l.UserId == currentUserId);
+}
+```
+
 ## Expression mappings
 
 In addition to `IQueryable<T>` projections, Mapperly also supports generating `Expression<Func<TSource, TTarget>>` directly.
