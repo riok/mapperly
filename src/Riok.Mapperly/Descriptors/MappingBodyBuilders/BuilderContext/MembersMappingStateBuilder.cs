@@ -38,6 +38,7 @@ internal static class MembersMappingStateBuilder
         var unmappedSourceMemberNames = GetSourceMemberNames(ctx, mapping);
         var additionalSourceMembers = GetAdditionalSourceMembers(ctx);
         var unmappedAdditionalSourceMemberNames = new HashSet<string>(additionalSourceMembers.Keys, StringComparer.Ordinal);
+        var parameterScope = BuildParameterScope(ctx);
         var targetMembers = GetTargetMembers(ctx, mapping);
 
         // build ignored members
@@ -66,8 +67,17 @@ internal static class MembersMappingStateBuilder
             memberValueConfigsByRootTargetName,
             memberConfigsByRootTargetName,
             configuredTargetMembersByRootName.AsDictionary(),
-            ignoredSourceMemberNames
+            ignoredSourceMemberNames,
+            parameterScope
         );
+    }
+
+    private static ParameterScope BuildParameterScope(MappingBuilderContext ctx)
+    {
+        if (ctx.UserMapping is not MethodMapping { AdditionalSourceParameters.Count: > 0 } methodMapping)
+            return ParameterScope.Empty;
+
+        return new ParameterScope(methodMapping.AdditionalSourceParameters);
     }
 
     private static IReadOnlyDictionary<string, IMappableMember> GetAdditionalSourceMembers(MappingBuilderContext ctx)

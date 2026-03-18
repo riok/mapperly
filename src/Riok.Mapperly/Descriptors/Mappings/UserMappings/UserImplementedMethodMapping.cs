@@ -58,8 +58,7 @@ public class UserImplementedMethodMapping(
         {
             return ctx.SyntaxFactory.Invocation(
                 receiver == null ? IdentifierName(Method.Name) : MemberAccess(receiver, Method.Name),
-                sourceParameter.WithArgument(ctx.Source),
-                referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+                ctx.BuildArguments(Method, sourceParameter, referenceHandlerParameter)
             );
         }
 
@@ -68,10 +67,6 @@ public class UserImplementedMethodMapping(
             receiver == null ? ThisExpression() : IdentifierName(receiver)
         );
         var methodExpr = MemberAccess(ParenthesizedExpression(castedReceiver), Method.Name);
-        return ctx.SyntaxFactory.Invocation(
-            methodExpr,
-            sourceParameter.WithArgument(ctx.Source),
-            referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
-        );
+        return ctx.SyntaxFactory.Invocation(methodExpr, ctx.BuildArguments(Method, sourceParameter, referenceHandlerParameter));
     }
 }

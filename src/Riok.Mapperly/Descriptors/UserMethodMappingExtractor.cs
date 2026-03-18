@@ -169,7 +169,7 @@ public static class UserMethodMappingExtractor
         var userMappingConfig = GetUserMappingConfig(ctx, method, out var hasAttribute);
         var valid = !method.IsGenericMethod && (allowPartial || !method.IsPartialDefinition) && (!isStatic || method.IsStatic);
 
-        if (!valid || !UserMappingMethodParameterExtractor.BuildParameters(ctx, method, false, out var parameters))
+        if (!valid || !UserMappingMethodParameterExtractor.BuildParameters(ctx, method, true, out var parameters))
         {
             if (!hasAttribute)
                 return null;

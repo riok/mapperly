@@ -15,7 +15,7 @@ namespace Riok.Mapperly.Descriptors.Mappings;
 /// Represents a mapping which is not a single expression but an entire method.
 /// </summary>
 [DebuggerDisplay("{GetType().Name}({SourceType} => {TargetType})")]
-public abstract class MethodMapping : ITypeMapping
+public abstract class MethodMapping : ITypeMapping, IParameterizedMapping
 {
     protected const string DefaultReferenceHandlerParameterName = "refHandler";
     private const string DefaultSourceParameterName = "source";
@@ -81,19 +81,26 @@ public abstract class MethodMapping : ITypeMapping
     public virtual IEnumerable<TypeMappingKey> BuildAdditionalMappingKeys(TypeMappingConfiguration config) => [];
 
     public virtual ExpressionSyntax Build(TypeMappingBuildContext ctx) =>
-        ctx.SyntaxFactory.Invocation(
-            MethodName,
-            SourceParameter.WithArgument(ctx.Source),
-            ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
-        );
+        ctx.SyntaxFactory.Invocation(MethodName, ctx.BuildArguments(Method, SourceParameter, ReferenceHandlerParameter));
 
     public virtual MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)
     {
+        IReadOnlyDictionary<string, ExpressionSyntax>? additionalParams = null;
+        if (AdditionalSourceParameters.Count > 0)
+        {
+            additionalParams = AdditionalSourceParameters.ToDictionary(
+                p => p.NormalizedName,
+                p => (ExpressionSyntax)IdentifierName(p.Name),
+                StringComparer.OrdinalIgnoreCase
+            );
+        }
+
         var typeMappingBuildContext = new TypeMappingBuildContext(
             SourceParameter.Name,
             ReferenceHandlerParameter?.Name,
             ctx.NameBuilder.NewScope(),
-            ctx.SyntaxFactory
+            ctx.SyntaxFactory,
+            additionalParams
         );
 
         var parameters = BuildParameterList();
