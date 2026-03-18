@@ -275,6 +275,102 @@ public class QueryableProjectionTest
     }
 
     [Fact]
+    public Task ProjectionShouldPickUpConfigFromElementMappingWithAdditionalParams()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source, int currentUserId);
+            [MapProperty("SourceValue", "TargetValue")]
+            [MapPropertyFromSource(nameof(B.IsLiked), Use = nameof(GetIsLiked))]
+            private partial B MapToB(A source, int currentUserId);
+            private static bool GetIsLiked(A record, int currentUserId) => record.Likes.Any(l => l.UserId == currentUserId);
+            """,
+            """
+            class A { public string SourceValue { get; set; } public List<Like> Likes { get; set; } }
+            class B { public string TargetValue { get; set; } public bool IsLiked { get; set; } }
+            class Like { public int UserId { get; set; } }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void ProjectionWithParamsShouldNotPickUpElementMappingWithMismatchedParams()
+    {
+        // Projection has 'currentUserId' but element mapping has 'otherParam' — no match.
+        // The MapProperty config should NOT be applied to the projection.
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source, int currentUserId);
+            [MapProperty("SourceValue", "TargetValue")]
+            private partial B MapToB(A source, int otherParam);
+            """,
+            """
+            class A { public string SourceValue { get; set; } public string TargetValue { get; set; } }
+            class B { public string TargetValue { get; set; } public int CurrentUserId { get; set; } }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveMapMethodBody(
+                // SourceValue → TargetValue mapping is NOT applied (no matching element mapping),
+                // instead TargetValue is mapped by name from A.TargetValue, and currentUserId by name.
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            source,
+                            x => new global::B()
+                            {
+                                TargetValue = x.TargetValue,
+                                CurrentUserId = currentUserId,
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
+    public void ProjectionWithoutParamsShouldNotPickUpParameterizedElementMapping()
+    {
+        // Projection has NO additional params, element mapping HAS params.
+        // The default (parameterless) mapping should be used, not the parameterized one.
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+            [MapProperty("SourceValue", "TargetValue")]
+            private partial B MapToB(A source, int someParam);
+            """,
+            """
+            class A { public string SourceValue { get; set; } public string Name { get; set; } }
+            class B { public string Name { get; set; } public string TargetValue { get; set; } }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveMapMethodBody(
+                // MapProperty("SourceValue", "TargetValue") is NOT applied because
+                // the projection has no params and the element mapping is non-default (has params).
+                // SourceValue has no matching target, Name maps by name.
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            source,
+                            x => new global::B()
+                            {
+                                Name = x.Name,
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
     public async Task TopLevelUserImplemented()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

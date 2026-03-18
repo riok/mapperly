@@ -149,6 +149,9 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
     public virtual INewInstanceMapping? FindMapping(TypeMappingKey mappingKey) => MappingBuilder.Find(mappingKey);
 
+    public INewInstanceMapping? FindUserMappingWithParameters(TypeMappingKey mappingKey, ParameterScope scope) =>
+        MappingBuilder.FindUserMappingWithParameters(mappingKey, scope);
+
     /// <summary>
     /// Tries to find an existing mapping for the provided types.
     /// If none is found, a new one is created.
