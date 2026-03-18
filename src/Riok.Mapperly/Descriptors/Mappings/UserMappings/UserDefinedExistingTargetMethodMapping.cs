@@ -46,9 +46,7 @@ public class UserDefinedExistingTargetMethodMapping(
         return ctx.SyntaxFactory.SingleStatement(
             ctx.SyntaxFactory.Invocation(
                 MethodName,
-                SourceParameter.WithArgument(ctx.Source),
-                TargetParameter.WithArgument(target),
-                ReferenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+                ctx.BuildArguments(Method, SourceParameter, ReferenceHandlerParameter, TargetParameter.WithArgument(target))
             )
         );
     }
