@@ -257,6 +257,24 @@ public class QueryableProjectionTest
     }
 
     [Fact]
+    public Task ProjectionWithNestedUserMappingWithAdditionalParams()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source, int currentUserId);
+            private BNested MapNested(ANested src, int currentUserId) => new BNested { Value = src.Value, UserId = currentUserId };
+            """,
+            """
+            class A { public string Name { get; set; } public ANested Nested { get; set; } }
+            class B { public string Name { get; set; } public BNested Nested { get; set; } }
+            class ANested { public int Value { get; set; } }
+            class BNested { public int Value { get; set; } public int UserId { get; set; } }
+            """
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public async Task TopLevelUserImplemented()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

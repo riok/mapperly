@@ -111,6 +111,34 @@ public class UserMethodAdditionalParameterForwardingTest
     }
 
     [Fact]
+    public void NestedMappingWithUserImplementedMethodAndAdditionalParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A src, int ctx);
+            private BNested MapNested(ANested src, int ctx) => new BNested { ValueA = src.ValueA, Ctx = ctx };
+            """,
+            """
+            class A { public ANested Nested { get; set; } }
+            class B { public BNested Nested { get; set; } }
+            class ANested { public int ValueA { get; set; } }
+            class BNested { public int ValueA { get; set; } public int Ctx { get; set; } }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Nested = MapNested(src.Nested, ctx);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void NestedMappingFallsBackToParameterlessWhenNoMatchingUserMethod()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -553,6 +581,244 @@ public class UserMethodAdditionalParameterForwardingTest
                 """
                 var target = new global::B();
                 target.StringValue = src.StringValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MapPropertyFromSourceUseWithUnsatisfiableParametersShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapPropertyFromSource(nameof(B.IsLiked), Use = nameof(GetIsLiked))]
+            partial B Map(A src);
+            private static bool GetIsLiked(A record, int currentUserId) => record.Likes.Any(l => l.UserId == currentUserId);
+            """,
+            """
+            class A { public List<Like> Likes { get; set; } }
+            class B { public bool IsLiked { get; set; } }
+            class Like { public int UserId { get; set; } }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.NamedMappingParametersUnsatisfied)
+            .HaveDiagnostic(DiagnosticDescriptors.CouldNotMapMember)
+            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotMapped)
+            .HaveDiagnostic(DiagnosticDescriptors.SourceMemberNotFound)
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void MapValueUseMethodWithPartiallyMatchingParamsShouldDiagnostic()
+    {
+        // Method has two params (first, second) but scope only has one (first) — should fail
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("IntValue", Use = nameof(Combine))]
+            partial B Map(A src, int first);
+            private int Combine(int first, int second) => first + second;
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public int IntValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.MapValueMethodParametersUnsatisfied,
+                "The method Combine referenced by MapValue has parameters that cannot be matched from the mapping's additional parameters"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.AdditionalParameterNotMapped,
+                "The additional mapping method parameter first of the method Map is not mapped"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void NestedMappingWithMultipleAdditionalParameters()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A src, int ctx, string label);
+            private partial BNested MapNested(ANested src, int ctx, string label);
+            """,
+            """
+            class A { public ANested Nested { get; set; } }
+            class B { public BNested Nested { get; set; } }
+            class ANested { public int ValueA { get; set; } }
+            class BNested { public int ValueA { get; set; } public int Ctx { get; set; } public string Label { get; set; } }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Nested = MapNested(src.Nested, ctx, label);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ExistingTargetWithMapPropertyUse()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Result), Use = nameof(Transform))]
+            partial void Update(A src, [MappingTarget] B target, int multiplier);
+            private partial int Transform(int value, int multiplier);
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public int Result { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMethodBody(
+                "Update",
+                """
+                target.Result = Transform(src.Value, multiplier);
+                """
+            );
+    }
+
+    [Fact]
+    public void MultipleUnusedParametersShouldEmitMultipleDiagnostics()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A src, int unused1, string unused2);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostics(
+                DiagnosticDescriptors.AdditionalParameterNotMapped,
+                "The additional mapping method parameter unused1 of the method Map is not mapped",
+                "The additional mapping method parameter unused2 of the method Map is not mapped"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void InitOnlyPropertyMappedFromAdditionalParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A src, int ctx);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public int Ctx { get; init; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B()
+                {
+                    Ctx = ctx,
+                };
+                target.StringValue = src.StringValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ConstructorParameterMappedFromAdditionalParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A src, int ctx);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public B(int ctx) { Ctx = ctx; } public string StringValue { get; set; } public int Ctx { get; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(ctx);
+                target.StringValue = src.StringValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void CollectionMappingWithUserDefinedElementMapping()
+    {
+        // The auto-generated collection wrapper does not forward additional params directly.
+        // The user-defined MapItem is used as the element mapping within the wrapper.
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A src, int ctx);
+            private partial BItem MapItem(AItem src, int ctx);
+            """,
+            """
+            class A { public List<AItem> Items { get; set; } }
+            class B { public List<BItem> Items { get; set; } }
+            class AItem { public int Value { get; set; } }
+            class BItem { public int Value { get; set; } public int Ctx { get; set; } }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Items = MapToListOfBItem(src.Items);
+                return target;
+                """
+            )
+            .HaveMethodBody(
+                "MapItem",
+                """
+                var target = new global::BItem();
+                target.Value = src.Value;
+                target.Ctx = ctx;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void CollectionMappingWithUserImplementedElementMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A src, int ctx);
+            private BItem MapItem(AItem src, int ctx) => new BItem { Value = src.Value, Ctx = ctx };
+            """,
+            """
+            class A { public List<AItem> Items { get; set; } }
+            class B { public List<BItem> Items { get; set; } }
+            class AItem { public int Value { get; set; } }
+            class BItem { public int Value { get; set; } public int Ctx { get; set; } }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Items = MapToListOfBItem(src.Items);
                 return target;
                 """
             );
