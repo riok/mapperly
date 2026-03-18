@@ -40,9 +40,12 @@ public class UserImplementedExistingTargetMethodMapping(
                 yield return ctx.SyntaxFactory.ExpressionStatement(
                     ctx.SyntaxFactory.Invocation(
                         receiver == null ? IdentifierName(Method.Name) : MemberAccess(receiver, Method.Name),
-                        sourceParameter.WithArgument(ctx.Source),
-                        targetParameter.WithArgument(IdentifierName(targetRefVarName)),
-                        referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+                        ctx.BuildArguments(
+                            Method,
+                            sourceParameter,
+                            referenceHandlerParameter,
+                            targetParameter.WithArgument(IdentifierName(targetRefVarName))
+                        )
                     )
                 );
                 yield return ctx.SyntaxFactory.ExpressionStatement(Assignment(target, IdentifierName(targetRefVarName), false));
@@ -53,9 +56,7 @@ public class UserImplementedExistingTargetMethodMapping(
             yield return ctx.SyntaxFactory.ExpressionStatement(
                 ctx.SyntaxFactory.Invocation(
                     receiver == null ? IdentifierName(Method.Name) : MemberAccess(receiver, Method.Name),
-                    sourceParameter.WithArgument(ctx.Source),
-                    targetParameter.WithArgument(target),
-                    referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+                    ctx.BuildArguments(Method, sourceParameter, referenceHandlerParameter, targetParameter.WithArgument(target))
                 )
             );
             yield break;
@@ -69,9 +70,7 @@ public class UserImplementedExistingTargetMethodMapping(
         yield return ctx.SyntaxFactory.ExpressionStatement(
             ctx.SyntaxFactory.Invocation(
                 methodExpr,
-                sourceParameter.WithArgument(ctx.Source),
-                targetParameter.WithArgument(target),
-                referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+                ctx.BuildArguments(Method, sourceParameter, referenceHandlerParameter, targetParameter.WithArgument(target))
             )
         );
     }
