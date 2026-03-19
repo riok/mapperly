@@ -172,7 +172,9 @@ public class CtorTest
                 "Mapping the nullable source of type int[]? to target of type A which is not nullable"
             )
             .HaveAssertedAllDiagnostics()
-            .HaveSingleMethodBody("return source == null ? throw new global::System.ArgumentNullException(nameof(source)) : new global::A(source);");
+            .HaveSingleMethodBody(
+                "return source == null ? throw new global::System.ArgumentNullException(nameof(source)) : new global::A(source);"
+            );
     }
 
     [Fact]
