@@ -206,11 +206,7 @@ internal static class SourceValueBuilder
 
         // Collect additional parameter names and mark them as used
         var additionalParameterNames = methodSymbol.Parameters.Select(param => param.Name).ToList();
-
-        foreach (var additionalParameterName in additionalParameterNames)
-        {
-            scope?.MarkUsed(additionalParameterName);
-        }
+        scope?.MarkUsed(additionalParameterNames);
 
         sourceValue = new MethodProvidedSourceValue(
             methodSymbol.Name,

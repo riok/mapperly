@@ -84,6 +84,28 @@ public class ParameterScope
         _usedParameters?.Add(NormalizeName(name));
     }
 
+    /// <summary>
+    /// Mark all parameters in the collection as used.
+    /// </summary>
+    public void MarkUsed(IEnumerable<MethodParameter> parameters)
+    {
+        foreach (var param in parameters)
+        {
+            MarkUsed(param.Name);
+        }
+    }
+
+    /// <summary>
+    /// Mark all named parameters as used.
+    /// </summary>
+    public void MarkUsed(IEnumerable<string> names)
+    {
+        foreach (var name in names)
+        {
+            MarkUsed(name);
+        }
+    }
+
     private static string NormalizeName(string name) => name.TrimStart('@');
 
     /// <summary>

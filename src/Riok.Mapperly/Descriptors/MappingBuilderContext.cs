@@ -79,10 +79,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         if (mapping is not IParameterizedMapping parameterized)
             return null;
 
-        foreach (var param in parameterized.AdditionalSourceParameters)
-        {
-            ParameterScope.MarkUsed(param.Name);
-        }
+        ParameterScope.MarkUsed(parameterized.AdditionalSourceParameters);
 
         return mapping;
     }
