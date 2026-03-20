@@ -3,7 +3,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Descriptors.UnsafeAccess;
-using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Symbols.Members;
@@ -21,7 +20,7 @@ public class ConstructorParameterMember(IParameterSymbol symbol, SymbolAccessor 
 {
     public ITypeSymbol Type { get; } = accessor.UpgradeNullable(symbol.Type);
     public INamedTypeSymbol ContainingType { get; } = symbol.ContainingType;
-    public bool IsNullable => Symbol.NullableAnnotation.IsNullable();
+    public bool IsNullable => accessor.IsNullable(Symbol);
     public bool CanGet => false;
     public bool CanGetDirectly => false;
     public bool CanSet => false;

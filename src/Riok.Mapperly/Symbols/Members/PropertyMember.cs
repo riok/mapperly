@@ -4,7 +4,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Descriptors.UnsafeAccess;
-using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
@@ -21,7 +20,7 @@ public class PropertyMember(IPropertySymbol symbol, SymbolAccessor symbolAccesso
 
     public INamedTypeSymbol? ContainingType { get; } = symbol.ContainingType;
 
-    public bool IsNullable => Type.IsNullable();
+    public bool IsNullable => symbolAccessor.IsNullable(Symbol);
 
     public bool CanGet => !Symbol.IsWriteOnly && (Symbol.GetMethod == null || symbolAccessor.IsMemberAccessible(Symbol.GetMethod));
 
