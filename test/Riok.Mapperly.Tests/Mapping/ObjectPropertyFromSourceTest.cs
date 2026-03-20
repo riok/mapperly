@@ -417,4 +417,37 @@ public class ObjectPropertyFromSourceTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void ReturnMaybeNullMethodToMaybeNullTargetProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapPropertyFromSource(nameof(B.Value), Use = nameof(BuildValue))]
+            partial B Map(A source);
+
+            [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+            string BuildValue(A a) => a.Name;
+            """,
+            "class A { public string Name { get; set; } }",
+            """
+            class B
+            {
+                [System.Diagnostics.CodeAnalysis.MaybeNull]
+                public string Value { get; set; } = default!;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = BuildValue(source);
+                return target;
+                """
+            );
+    }
 }

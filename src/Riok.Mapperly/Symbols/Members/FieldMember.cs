@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Descriptors.UnsafeAccess;
-using Riok.Mapperly.Helpers;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Symbols.Members;
@@ -19,7 +18,7 @@ public class FieldMember(IFieldSymbol symbol, SymbolAccessor symbolAccessor)
 {
     public ITypeSymbol Type { get; } = symbolAccessor.UpgradeNullable(symbol.Type);
     public INamedTypeSymbol ContainingType { get; } = symbol.ContainingType;
-    public bool IsNullable => Type.IsNullable();
+    public bool IsNullable => symbolAccessor.IsNullable(Symbol);
     public bool CanGet => true;
     public bool CanGetDirectly => symbolAccessor.IsDirectlyAccessible(Symbol);
     public bool CanSet => !Symbol.IsReadOnly;

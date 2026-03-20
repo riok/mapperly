@@ -35,8 +35,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         // set target member to null if null assignments are allowed
         // and the source is null
         var setMemberToNull =
-            BuilderContext.Configuration.Mapper.AllowNullPropertyAssignment
-            && memberMapping.MemberInfo.TargetMember.Member.Type.IsNullable();
+            BuilderContext.Configuration.Mapper.AllowNullPropertyAssignment && memberMapping.MemberInfo.TargetMember.Member.IsNullable;
 
         // if the member is explicitly set to null,
         // make sure the parent members are initialized/non-null,

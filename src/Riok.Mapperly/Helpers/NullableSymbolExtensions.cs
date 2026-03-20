@@ -109,8 +109,8 @@ public static class NullableSymbolExtensions
         };
     }
 
-    internal static bool IsNullable(this NullableAnnotation nullable) =>
-        nullable is NullableAnnotation.Annotated or NullableAnnotation.None;
+    internal static bool IsNullable(this NullableAnnotation nullable, bool treatNotAnnotatedAsNullable = true) =>
+        nullable == NullableAnnotation.Annotated || nullable == NullableAnnotation.None && treatNotAnnotatedAsNullable;
 
     internal static NullableAnnotation Upgrade(this NullableAnnotation nullable) =>
         nullable.IsNullable() ? NullableAnnotation.Annotated : NullableAnnotation.NotAnnotated;

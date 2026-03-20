@@ -91,6 +91,27 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         };
     }
 
+    public bool IsNullable(ISymbol symbol)
+    {
+        return symbol switch
+        {
+            ITypeSymbol t => t.IsNullable(),
+            IPropertySymbol p => p.Type.IsNullable() || TryHasAttribute<MaybeNullAttribute>(p),
+            IFieldSymbol f => f.Type.IsNullable() || TryHasAttribute<MaybeNullAttribute>(f),
+            IParameterSymbol p => p.Type.IsNullable() || TryHasAttribute<MaybeNullAttribute>(p),
+            _ => false,
+        };
+    }
+
+    public bool MayReturnNull(IMethodSymbol symbol, bool treatUnannotatedAsNullable = true)
+    {
+        // only treat annotated as nullable
+        return symbol.ReturnNullableAnnotation.IsNullable(treatUnannotatedAsNullable)
+            || symbol.ReturnType.IsNullableValueType()
+            || symbol.ReturnType.NullableAnnotation.IsNullable(treatUnannotatedAsNullable)
+            || TryHasAttribute<MaybeNullAttribute>(symbol.GetReturnTypeAttributes());
+    }
+
     public bool HasImplicitConversion(ITypeSymbol source, ITypeSymbol destination) =>
         Compilation.ClassifyConversion(source, destination).IsImplicit && (destination.IsNullable() || !source.IsNullable());
 
@@ -290,6 +311,9 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     internal bool HasAttribute<T>(ISymbol symbol)
         where T : Attribute => GetAttributes<T>(symbol).Any();
+
+    internal bool TryHasAttribute<T>(ISymbol symbol)
+        where T : Attribute => TryGetAttributes<T>(GetAttributesCore(symbol)).Any();
 
     internal bool TryHasAttribute<T>(IEnumerable<AttributeData> symbol)
         where T : Attribute => TryGetAttributes<T>(symbol).Any();

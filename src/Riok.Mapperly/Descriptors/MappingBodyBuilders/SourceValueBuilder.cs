@@ -187,8 +187,8 @@ internal static class SourceValueBuilder
 
         if (!memberMappingInfo.TargetMember.Member.IsNullable)
         {
-            // Only annotated values are treated as nullable; unannotated ones are considered non-nullable.
-            methodCandidates = methodCandidates.Where(m => m.ReturnNullableAnnotation != NullableAnnotation.Annotated);
+            // Filter out methods that may return null when the target is non-nullable.
+            methodCandidates = methodCandidates.Where(m => !ctx.BuilderContext.SymbolAccessor.MayReturnNull(m, false));
         }
 
         var methodSymbol = methodCandidates.FirstOrDefault();
