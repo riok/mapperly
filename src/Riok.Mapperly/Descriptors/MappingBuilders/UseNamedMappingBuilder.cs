@@ -156,10 +156,7 @@ public static class UseNamedMappingBuilder
             return false;
         }
 
-        foreach (var param in matched)
-        {
-            scope.MarkUsed(param.Name);
-        }
+        scope.MarkUsed(matched);
 
         return true;
     }
