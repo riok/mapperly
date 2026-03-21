@@ -166,7 +166,7 @@ internal static class SourceValueBuilder
                 .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(targetSymbol)
                 .Where(m =>
                     m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false }
-                    && ParameterScope.CanSatisfyParameters(scope, m)
+                    && scope.CanSatisfyParameters(m)
                     && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualTo(m, methodReferenceConfiguration.Name)
                 )
                 .ToList();
@@ -206,7 +206,7 @@ internal static class SourceValueBuilder
 
         // Collect additional parameter names and mark them as used
         var additionalParameterNames = methodSymbol.Parameters.Select(param => param.Name).ToList();
-        scope?.MarkUsed(additionalParameterNames);
+        scope.MarkUsed(additionalParameterNames);
 
         sourceValue = new MethodProvidedSourceValue(
             methodSymbol.Name,

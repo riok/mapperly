@@ -60,7 +60,7 @@ internal static class MembersMappingStateBuilder
             memberConfigsByRootTargetName,
             configuredTargetMembersByRootName.AsDictionary(),
             ignoredSourceMemberNames,
-            ctx.ParameterScope ?? ParameterScope.Empty
+            ctx.ParameterScope
         );
     }
 

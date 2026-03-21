@@ -127,9 +127,9 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         // are directly built (with KeepUserSymbol) and called by the other mappings.
         // When additional parameters are available, only match element mappings whose
         // parameters all match — don't fall back to a default mapping that ignores the params.
-        userMapping ??= ParameterScope is { IsEmpty: false }
-            ? MappingBuilder.FindUserMappingWithParameters(mappingKey, ParameterScope) as IUserMapping
-            : MappingBuilder.Find(mappingKey) as IUserMapping;
+        userMapping ??= ParameterScope.IsEmpty
+            ? MappingBuilder.Find(mappingKey) as IUserMapping
+            : MappingBuilder.FindUserMappingWithParameters(mappingKey, ParameterScope) as IUserMapping;
 
         options &= ~MappingBuildingOptions.KeepUserSymbol;
         return BuildMapping(userMapping, mappingKey, options, diagnosticLocation);

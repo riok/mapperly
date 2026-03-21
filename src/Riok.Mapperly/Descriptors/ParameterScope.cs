@@ -63,11 +63,9 @@ public class ParameterScope
 
     /// <summary>
     /// Checks whether all parameters of a method can be satisfied by this scope (by normalized name).
-    /// Returns true for parameterless methods. A null or empty scope can only satisfy parameterless methods.
     /// </summary>
-    public static bool CanSatisfyParameters(ParameterScope? scope, IMethodSymbol method) =>
-        method.Parameters.Length == 0
-        || (scope is { IsEmpty: false } && method.Parameters.All(p => scope._parameters.ContainsKey(NormalizeName(p.Name))));
+    public bool CanSatisfyParameters(IMethodSymbol method) =>
+        method.Parameters.All(p => _parameters.ContainsKey(NormalizeName(p.Name)));
 
     /// <summary>
     /// Mark a parameter as having at least one consumer (idempotent).
