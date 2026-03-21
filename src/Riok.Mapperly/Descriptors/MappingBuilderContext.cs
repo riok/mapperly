@@ -58,21 +58,21 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     {
         // Wrap parent scope in a child (delegates MarkUsed upward), or initialize from user mapping.
         // Only the root scope reports unused parameters in diagnostics.
-        ParameterScope = ctx.ParameterScope is { } parentScope ? new ParameterScope(parentScope) : BuildParameterScope(userMapping);
+        ParameterScope = ctx.ParameterScope.IsEmpty ? BuildParameterScope(userMapping) : new ParameterScope(ctx.ParameterScope);
         if (ignoreDerivedTypes)
         {
             Configuration = Configuration with { DerivedTypes = [] };
         }
     }
 
-    private static ParameterScope? BuildParameterScope(IUserMapping? userMapping) =>
+    private static ParameterScope BuildParameterScope(IUserMapping? userMapping) =>
         userMapping is IParameterizedMapping { AdditionalSourceParameters.Count: > 0 } pm
             ? new ParameterScope(pm.AdditionalSourceParameters)
-            : null;
+            : ParameterScope.Empty;
 
     private INewInstanceMapping? FindParameterizedUserMapping(TypeMappingKey key)
     {
-        if (ParameterScope is null or { IsEmpty: true })
+        if (ParameterScope.IsEmpty)
             return null;
 
         var mapping = MappingBuilder.FindUserMappingWithParameters(key, ParameterScope);
@@ -105,7 +105,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// </summary>
     public virtual bool IsExpression => false;
 
-    public ParameterScope? ParameterScope { get; }
+    public ParameterScope ParameterScope { get; } = ParameterScope.Empty;
 
     public InstanceConstructorFactory InstanceConstructors { get; }
 

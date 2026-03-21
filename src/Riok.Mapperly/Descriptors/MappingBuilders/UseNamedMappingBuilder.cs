@@ -150,7 +150,7 @@ public static class UseNamedMappingBuilder
             return true;
 
         var scope = ctx.ParameterScope;
-        if (scope is null || scope.IsEmpty || !scope.TryMatchParameters(pm.AdditionalSourceParameters, out var matched))
+        if (scope.IsEmpty || !scope.TryMatchParameters(pm.AdditionalSourceParameters, out var matched))
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.NamedMappingParametersUnsatisfied, mappingName);
             return false;
