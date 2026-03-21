@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
@@ -42,30 +43,32 @@ public class ParameterScope
     public IReadOnlyDictionary<string, MethodParameter> Parameters => _parameters;
 
     /// <summary>
-    /// Checks if all requested additional parameters can be satisfied by this scope.
-    /// Matching is by name (case-insensitive). A parameter can be matched by multiple consumers.
+    /// Checks if all requested additional parameters can be satisfied by this scope (by normalized name).
     /// </summary>
-    public bool TryMatchParameters(IReadOnlyCollection<MethodParameter> requested, out IReadOnlyList<MethodParameter> matched)
-    {
-        var result = new List<MethodParameter>(requested.Count);
-        foreach (var param in requested)
-        {
-            if (!_parameters.TryGetValue(param.NormalizedName, out var scopeParam))
-            {
-                matched = [];
-                return false;
-            }
-            result.Add(scopeParam);
-        }
-        matched = result;
-        return true;
-    }
+    public bool CanMatchParameters(IReadOnlyCollection<MethodParameter> requested) =>
+        requested.All(p => _parameters.ContainsKey(p.NormalizedName));
 
     /// <summary>
-    /// Checks whether all parameters of a method can be satisfied by this scope (by normalized name).
+    /// Checks if all parameters of a method can be satisfied by this scope (by normalized name).
     /// </summary>
-    public bool CanSatisfyParameters(IMethodSymbol method) =>
-        method.Parameters.All(p => _parameters.ContainsKey(NormalizeName(p.Name)));
+    public bool CanMatchParameters(IMethodSymbol method) => method.Parameters.All(p => _parameters.ContainsKey(NormalizeName(p.Name)));
+
+    /// <summary>
+    /// If the mapping is parameterized, checks if all its additional parameters can be
+    /// satisfied by this scope and marks them as used. Returns false only when the mapping
+    /// requires parameters that this scope cannot satisfy.
+    /// </summary>
+    public bool TryUseParameters(ITypeMapping? mapping)
+    {
+        if (mapping is not IParameterizedMapping { AdditionalSourceParameters.Count: > 0 } pm)
+            return true;
+
+        if (!CanMatchParameters(pm.AdditionalSourceParameters))
+            return false;
+
+        MarkUsed(pm.AdditionalSourceParameters);
+        return true;
+    }
 
     /// <summary>
     /// Mark a parameter as having at least one consumer (idempotent).
