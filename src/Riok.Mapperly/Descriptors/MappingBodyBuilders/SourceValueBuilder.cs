@@ -166,7 +166,7 @@ internal static class SourceValueBuilder
                 .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(targetSymbol)
                 .Where(m =>
                     m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false }
-                    && scope.CanSatisfyParameters(m)
+                    && scope.CanMatchParameters(m)
                     && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualTo(m, methodReferenceConfiguration.Name)
                 )
                 .ToList();

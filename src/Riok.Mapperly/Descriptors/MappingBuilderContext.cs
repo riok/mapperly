@@ -76,11 +76,10 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
             return null;
 
         var mapping = MappingBuilder.FindUserMappingWithParameters(key, ParameterScope);
-        if (mapping is not IParameterizedMapping parameterized)
+        if (mapping == null)
             return null;
 
-        ParameterScope.MarkUsed(parameterized.AdditionalSourceParameters);
-
+        ParameterScope.TryUseParameters(mapping);
         return mapping;
     }
 

@@ -250,7 +250,7 @@ public class MappingCollection
                     mapping is IParameterizedMapping { AdditionalSourceParameters.Count: > 0 } pm
                     && SymbolEqualityComparer.IncludeNullability.Equals(key.Source, mapping.SourceType)
                     && SymbolEqualityComparer.IncludeNullability.Equals(key.Target, mapping.TargetType)
-                    && scope.TryMatchParameters(pm.AdditionalSourceParameters, out _)
+                    && scope.CanMatchParameters(pm.AdditionalSourceParameters)
                 )
                 {
                     return mapping;
