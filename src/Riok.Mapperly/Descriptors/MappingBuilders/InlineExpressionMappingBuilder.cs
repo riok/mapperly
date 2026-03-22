@@ -22,15 +22,8 @@ public static class InlineExpressionMappingBuilder
         ITypeSymbol targetType
     )
     {
+        var userMapping = ctx.FindMapping(new TypeMappingKey(sourceType, targetType), ctx.ParameterScope) as IUserMapping;
         var mappingKey = BuildMappingKey(ctx, sourceType, targetType);
-
-        // When the projection has additional parameters, only match an element mapping
-        // whose additional parameters all match — don't fall back to a default mapping
-        // that has no knowledge of the additional params.
-        // When the projection has no additional parameters, use the default element mapping.
-        var userMapping = ctx.ParameterScope.IsEmpty
-            ? ctx.FindMapping(sourceType, targetType) as IUserMapping
-            : ctx.FindUserMappingWithParameters(new TypeMappingKey(sourceType, targetType), ctx.ParameterScope) as IUserMapping;
         var inlineCtx = new InlineExpressionMappingBuilderContext(ctx, userMapping, mappingKey);
 
         if (userMapping is UserImplementedMethodMapping && inlineCtx.FindMapping(sourceType, targetType) is { } inlinedUserMapping)

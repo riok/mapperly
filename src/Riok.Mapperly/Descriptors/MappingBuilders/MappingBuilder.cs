@@ -38,10 +38,8 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
     /// <inheritdoc cref="MappingCollection.NewInstanceMappings"/>
     public IReadOnlyDictionary<TypeMappingKey, INewInstanceMapping> NewInstanceMappings => mappings.NewInstanceMappings;
 
-    public INewInstanceMapping? Find(TypeMappingKey mapping) => mappings.FindNewInstanceMapping(mapping);
-
-    public INewInstanceMapping? FindUserMappingWithParameters(TypeMappingKey key, ParameterScope scope) =>
-        mappings.FindNewInstanceUserMappingWithParameters(key, scope);
+    public INewInstanceMapping? Find(TypeMappingKey mapping, ParameterScope? scope = null) =>
+        mappings.FindNewInstanceMapping(mapping, scope);
 
     public INewInstanceMapping? FindOrResolveNamed(SimpleMappingBuilderContext ctx, string name, out bool ambiguousName)
     {
