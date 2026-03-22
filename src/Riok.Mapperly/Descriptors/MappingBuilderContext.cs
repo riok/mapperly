@@ -70,19 +70,6 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
             ? new ParameterScope(pm.AdditionalSourceParameters)
             : ParameterScope.Empty;
 
-    private INewInstanceMapping? FindParameterizedUserMapping(TypeMappingKey key)
-    {
-        if (ParameterScope.IsEmpty)
-            return null;
-
-        var mapping = MappingBuilder.Find(key, ParameterScope);
-        if (mapping == null)
-            return null;
-
-        ParameterScope.TryUseParameters(mapping);
-        return mapping;
-    }
-
     public TypeMappingKey MappingKey { get; }
 
     public ITypeSymbol Source => MappingKey.Source;
@@ -192,8 +179,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null
     )
     {
-        return FindParameterizedUserMapping(mappingKey)
-            ?? FindMapping(mappingKey)
+        return FindMapping(mappingKey, ParameterScope)
             ?? FindMapping(mappingKey.TargetNonNullable())
             ?? BuildMapping(mappingKey, options, diagnosticLocation);
     }
@@ -215,12 +201,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null
     )
     {
-        // Check parameterized user mappings first to ensure MarkUsed is called.
-        // Skip for expression contexts — expressions need the inlining path, not method calls.
-        if (!IsExpression && FindParameterizedUserMapping(key) is { } parameterizedMapping)
-            return parameterizedMapping;
-
-        if (FindMapping(key) is INewInstanceUserMapping mapping)
+        if (FindMapping(key, ParameterScope) is INewInstanceUserMapping mapping)
             return mapping;
 
         // if a user mapping is referenced

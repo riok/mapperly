@@ -264,6 +264,7 @@ public class MappingCollection
                     && scope.CanMatchParameters(pm.AdditionalSourceParameters)
                 )
                 {
+                    scope.MarkUsed(pm.AdditionalSourceParameters);
                     return mapping;
                 }
             }
