@@ -62,10 +62,8 @@ public class MappingCollection
             .Concat(_newInstanceMappings.UsedDuplicatedNonDefaultNonReferencedUserMappings)
             .Concat(_existingTargetMappings.UsedDuplicatedNonDefaultNonReferencedUserMappings);
 
-    public INewInstanceMapping? FindNewInstanceMapping(TypeMappingKey mappingKey) => _newInstanceMappings.Find(mappingKey);
-
-    public INewInstanceMapping? FindNewInstanceUserMappingWithParameters(TypeMappingKey key, ParameterScope scope) =>
-        _newInstanceMappings.FindUserMappingWithParameters(key, scope);
+    public INewInstanceMapping? FindNewInstanceMapping(TypeMappingKey mappingKey, ParameterScope? scope = null) =>
+        _newInstanceMappings.Find(mappingKey, scope);
 
     public INewInstanceUserMapping? FindNewInstanceUserMapping(IMethodSymbol method) => _newInstanceMappings.FindUserMapping(method);
 
@@ -198,7 +196,7 @@ public class MappingCollection
         private readonly HashSet<TypeMappingKey> _explicitDefaultMappingKeys = [];
 
         /// <summary>
-        /// All mapping keys for which <see cref="Find(TypeMappingKey)"/> was called and returned a non-null result.
+        /// All mapping keys for which <see cref="Find(TypeMappingKey, ParameterScope?)"/> was called and returned a non-null result.
         /// </summary>
         private readonly HashSet<TypeMappingKey> _usedMappingKeys = [];
 
@@ -230,8 +228,11 @@ public class MappingCollection
 
         public TUserMapping? FindUserMapping(IMethodSymbol method) => _userMappingsByMethod.GetValueOrDefault(method);
 
-        public T? Find(TypeMappingKey mappingKey)
+        public T? Find(TypeMappingKey mappingKey, ParameterScope? scope = null)
         {
+            if (scope is { IsEmpty: false })
+                return FindByParameters(mappingKey, scope);
+
             if (_defaultMappings.TryGetValue(mappingKey, out var mapping))
             {
                 _usedMappingKeys.Add(mappingKey);
@@ -252,7 +253,7 @@ public class MappingCollection
             return mapping;
         }
 
-        public TUserMapping? FindUserMappingWithParameters(TypeMappingKey key, ParameterScope scope)
+        private TUserMapping? FindByParameters(TypeMappingKey key, ParameterScope scope)
         {
             foreach (var mapping in _userMappings)
             {

@@ -75,7 +75,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         if (ParameterScope.IsEmpty)
             return null;
 
-        var mapping = MappingBuilder.FindUserMappingWithParameters(key, ParameterScope);
+        var mapping = MappingBuilder.Find(key, ParameterScope);
         if (mapping == null)
             return null;
 
@@ -146,10 +146,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// </summary>
     /// <param name="mappingKey">The mapping key.</param>
     /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
-    public virtual INewInstanceMapping? FindMapping(TypeMappingKey mappingKey) => MappingBuilder.Find(mappingKey);
-
-    public INewInstanceMapping? FindUserMappingWithParameters(TypeMappingKey mappingKey, ParameterScope scope) =>
-        MappingBuilder.FindUserMappingWithParameters(mappingKey, scope);
+    public virtual INewInstanceMapping? FindMapping(TypeMappingKey mappingKey, ParameterScope? scope = null) =>
+        MappingBuilder.Find(mappingKey, scope);
 
     /// <summary>
     /// Tries to find an existing mapping for the provided types.
