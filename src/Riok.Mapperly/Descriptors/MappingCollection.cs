@@ -175,10 +175,10 @@ public class MappingCollection
         private readonly Dictionary<IMethodSymbol, TUserMapping> _userMappingsByMethod = new(SymbolEqualityComparer.Default);
 
         /// <summary>
-        /// All user mappings registered in this instance.
+        /// All user mappings registered in this instance, indexed by source/target type pair.
         /// Used as the canonical source for parameterized and diagnostic queries.
         /// </summary>
-        private readonly List<TUserMapping> _userMappings = [];
+        private readonly ListDictionary<TypeMappingKey, TUserMapping> _userMappings = new();
 
         /// <summary>
         /// Named mappings by their names.
@@ -220,9 +220,10 @@ public class MappingCollection
         /// </summary>
         public IEnumerable<TUserMapping> UsedDuplicatedNonDefaultNonReferencedUserMappings =>
             _userMappings
-                .Where(m => !m.IsExternal && !m.Default.HasValue)
-                .GroupBy(m => new TypeMappingKey(m))
-                .Where(g => g.Count() > 1 && _usedMappingKeys.Contains(g.Key) && !_explicitDefaultMappingKeys.Contains(g.Key))
+                .AsDictionary()
+                .Where(g => _usedMappingKeys.Contains(g.Key) && !_explicitDefaultMappingKeys.Contains(g.Key))
+                .Select(g => g.Value.Where(m => !m.IsExternal && !m.Default.HasValue))
+                .Where(g => g.Count() > 1)
                 .SelectMany(g => g.Skip(1))
                 .Where(m => !_referencedNamedMappings.Contains(m));
 
@@ -255,18 +256,12 @@ public class MappingCollection
 
         private TUserMapping? FindByParameters(TypeMappingKey key, ParameterScope scope)
         {
-            foreach (var mapping in _userMappings)
+            var candidates = _userMappings.GetOrEmpty(key).Where(m => m is IParameterizedMapping { AdditionalSourceParameters.Count: > 0 });
+
+            foreach (var mapping in candidates)
             {
-                if (
-                    mapping is IParameterizedMapping { AdditionalSourceParameters.Count: > 0 } pm
-                    && SymbolEqualityComparer.IncludeNullability.Equals(key.Source, mapping.SourceType)
-                    && SymbolEqualityComparer.IncludeNullability.Equals(key.Target, mapping.TargetType)
-                    && scope.CanMatchParameters(pm.AdditionalSourceParameters)
-                )
-                {
-                    scope.MarkUsed(pm.AdditionalSourceParameters);
+                if (scope.TryUseParameters(mapping))
                     return mapping;
-                }
             }
 
             return default;
@@ -304,7 +299,7 @@ public class MappingCollection
         public MappingCollectionAddResult AddUserMapping(TUserMapping mapping, bool? isDefault, string? name)
         {
             AddNamedUserMapping(name, mapping);
-            _userMappings.Add(mapping);
+            _userMappings.Add(new TypeMappingKey(mapping), mapping);
 
             return isDefault switch
             {
