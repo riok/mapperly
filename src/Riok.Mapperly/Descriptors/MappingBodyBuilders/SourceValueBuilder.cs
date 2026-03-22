@@ -3,7 +3,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Configuration;
-using Riok.Mapperly.Configuration.MethodReferences;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -160,20 +159,25 @@ internal static class SourceValueBuilder
         var methodReferenceConfiguration = memberMappingInfo.ValueConfiguration!.Use!;
         var targetSymbol = methodReferenceConfiguration.GetTargetType(ctx.BuilderContext);
         var scope = ctx.BuilderContext.ParameterScope;
-        var namedMethodCandidates = targetSymbol is null
+        var allNamedMethods = targetSymbol is null
             ? []
             : ctx
                 .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(targetSymbol)
                 .Where(m =>
                     m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false }
-                    && scope.CanMatchParameters(m)
                     && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualTo(m, methodReferenceConfiguration.Name)
                 )
                 .ToList();
 
+        var namedMethodCandidates = allNamedMethods.Where(m => scope.CanMatchParameters(m)).ToList();
+
         if (namedMethodCandidates.Count == 0)
         {
-            ReportMethodNotFoundDiagnostic(ctx.BuilderContext, targetSymbol, methodReferenceConfiguration);
+            var descriptor =
+                allNamedMethods.Count > 0
+                    ? DiagnosticDescriptors.MapValueMethodParametersUnsatisfied
+                    : DiagnosticDescriptors.MapValueReferencedMethodNotFound;
+            ctx.BuilderContext.ReportDiagnostic(descriptor, methodReferenceConfiguration.FullName);
             sourceValue = null;
             return false;
         }
@@ -214,30 +218,5 @@ internal static class SourceValueBuilder
             additionalParameterNames
         );
         return true;
-    }
-
-    private static void ReportMethodNotFoundDiagnostic(
-        MappingBuilderContext builderCtx,
-        ITypeSymbol? targetSymbol,
-        IMethodReferenceConfiguration methodRef
-    )
-    {
-        // Check if a method by name exists but with unsatisfiable parameters
-        if (
-            targetSymbol is not null
-            && builderCtx
-                .SymbolAccessor.GetAllDirectlyAccessibleMethods(targetSymbol)
-                .Any(m =>
-                    m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: > 0 }
-                    && builderCtx.AttributeAccessor.IsMappingNameEqualTo(m, methodRef.Name)
-                )
-        )
-        {
-            builderCtx.ReportDiagnostic(DiagnosticDescriptors.MapValueMethodParametersUnsatisfied, methodRef.FullName);
-        }
-        else
-        {
-            builderCtx.ReportDiagnostic(DiagnosticDescriptors.MapValueReferencedMethodNotFound, methodRef.FullName);
-        }
     }
 }
