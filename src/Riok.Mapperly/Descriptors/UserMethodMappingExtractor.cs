@@ -253,16 +253,7 @@ public static class UserMethodMappingExtractor
         }
 
         if (methodSymbol.IsGenericMethod)
-        {
-            return new UserDefinedNewInstanceGenericTypeMapping(
-                methodSymbol,
-                parameters,
-                ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
-                ctx.Configuration.Mapper.UseReferenceHandling,
-                GetTypeSwitchNullArm(methodSymbol, parameters),
-                ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
-            );
-        }
+            return BuildGenericTypeMapping(ctx, methodSymbol, parameters);
 
         if (parameters.Target.HasValue)
         {
@@ -300,6 +291,33 @@ public static class UserMethodMappingExtractor
             AdditionalSourceParameters = parameters.AdditionalParameters,
         };
         return mapping;
+    }
+
+    private static IUserMapping BuildGenericTypeMapping(
+        SimpleMappingBuilderContext ctx,
+        IMethodSymbol methodSymbol,
+        MappingMethodParameters parameters
+    )
+    {
+        if (parameters.Target.HasValue)
+        {
+            return new UserDefinedExistingTargetGenericTypeMapping(
+                methodSymbol,
+                parameters.Source,
+                parameters.Target.Value,
+                parameters.ReferenceHandler,
+                ctx.Configuration.Mapper.UseReferenceHandling
+            );
+        }
+
+        return new UserDefinedNewInstanceGenericTypeMapping(
+            methodSymbol,
+            parameters,
+            ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
+            ctx.Configuration.Mapper.UseReferenceHandling,
+            GetTypeSwitchNullArm(methodSymbol, parameters),
+            ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
+        );
     }
 
     private static UserDefinedNewInstanceRuntimeTargetTypeParameterMapping? TryBuildRuntimeTargetTypeMapping(
