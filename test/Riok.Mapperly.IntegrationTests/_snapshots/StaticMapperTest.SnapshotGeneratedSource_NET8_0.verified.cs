@@ -852,6 +852,50 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        public static partial void MapExistingGeneric<TSource, TTarget>(TSource source, TTarget target)
+        {
+            if (source == null || target == null)
+                return;
+            switch (source, target)
+            {
+                case (global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectTypeA source1, global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectTypeA target1):
+                    MapExistingObjectTypeA(source1, target1);
+                    break;
+                case (global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectTypeB source1, global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectTypeB target1):
+                    MapExistingObjectTypeB(source1, target1);
+                    break;
+                case (global::Riok.Mapperly.IntegrationTests.Dto.IdObjectDto source1, global::Riok.Mapperly.IntegrationTests.Models.IdObject target1):
+                    MapIdTargetExt(target1, source1);
+                    break;
+                case (global::System.Collections.Generic.List<string> source1, global::System.Collections.Generic.List<int> target1):
+                    MapExistingList(source1, target1);
+                    break;
+                case (global::Riok.Mapperly.IntegrationTests.Models.TestObject source1, global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto target1):
+                    UpdateDto(source1, target1);
+                    break;
+                case (global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectBase source1, global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectBase target1):
+                    MapToDerivedExisting(source1, target1);
+                    break;
+                default:
+                    throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {target.GetType()} as there is no known type mapping", nameof(source));
+            }
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static partial void MapExistingObjectTypeA(global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectTypeA source, global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectTypeA target)
+        {
+            target.ValueA = DirectInt(source.ValueA);
+            target.Value = DirectInt(source.Value);
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static partial void MapExistingObjectTypeB(global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectTypeB source, global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectTypeB target)
+        {
+            target.ValueB = DirectInt(source.ValueB);
+            target.Value = DirectInt(source.Value);
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial void MapToDerivedExisting(global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectBase source, global::Riok.Mapperly.IntegrationTests.Models.ExistingObjectBase target)
         {
             switch (source, target)

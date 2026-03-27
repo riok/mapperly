@@ -102,6 +102,12 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
 
         public static partial TTarget MapGeneric<TSource, TTarget>(TSource source);
 
+        public static partial void MapExistingGeneric<TSource, TTarget>(TSource source, TTarget target);
+
+        private static partial void MapExistingObjectTypeA(ExistingObjectTypeA source, ExistingObjectTypeA target);
+
+        private static partial void MapExistingObjectTypeB(ExistingObjectTypeB source, ExistingObjectTypeB target);
+
 #if NET7_0_OR_GREATER
         [MapDerivedType<ExistingObjectTypeA, ExistingObjectTypeA>]
         [MapDerivedType<ExistingObjectTypeB, ExistingObjectTypeB>]
