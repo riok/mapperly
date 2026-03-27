@@ -887,4 +887,195 @@ public class GenericTest
                 """
             );
     }
+
+    [Fact]
+    public Task ExistingTargetWithGenericSourceAndTarget()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial void Map<TSource, TTarget>(TSource source, TTarget target);
+
+            private partial void MapAToB(A source, B target);
+            private partial void MapCToD(C source, D target);
+            """,
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string Value1 { get; set; } }",
+            "class D { public string Value1 { get; set; } }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void ExistingTargetWithGenericSource()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial void Map<TSource>(TSource source, object target);
+
+            private partial void MapAToB(A source, B target);
+            private partial void MapCToD(C source, D target);
+            """,
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string Value1 { get; set; } }",
+            "class D { public string Value1 { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                if (source == null)
+                    return;
+                switch (source, target)
+                {
+                    case (global::A source1, global::B target1):
+                        MapAToB(source1, target1);
+                        break;
+                    case (global::C source1, global::D target1):
+                        MapCToD(source1, target1);
+                        break;
+                    default:
+                        throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {target.GetType()} as there is no known type mapping", nameof(source));
+                }
+                """
+            )
+            .HaveMapMethodWithGenericConstraints(null);
+    }
+
+    [Fact]
+    public void ExistingTargetWithGenericTarget()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial void Map<TTarget>(object source, TTarget target);
+
+            private partial void MapAToB(A source, B target);
+            private partial void MapCToD(C source, D target);
+            """,
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string Value1 { get; set; } }",
+            "class D { public string Value1 { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                if (target == null)
+                    return;
+                switch (source, target)
+                {
+                    case (global::A source1, global::B target1):
+                        MapAToB(source1, target1);
+                        break;
+                    case (global::C source1, global::D target1):
+                        MapCToD(source1, target1);
+                        break;
+                    default:
+                        throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {target.GetType()} as there is no known type mapping", nameof(source));
+                }
+                """
+            )
+            .HaveMapMethodWithGenericConstraints(null);
+    }
+
+    [Fact]
+    public void ExistingTargetWithGenericSourceAndTargetTypeConstraints()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial void Map<TSource, TTarget>(TSource source, TTarget target)
+                where TSource : class
+                where TTarget : class;
+
+            private partial void MapAToB(A source, B target);
+            private partial void MapCToD(C source, D target);
+            """,
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string Value1 { get; set; } }",
+            "class D { public string Value1 { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                if (source == null || target == null)
+                    return;
+                switch (source, target)
+                {
+                    case (global::A source1, global::B target1):
+                        MapAToB(source1, target1);
+                        break;
+                    case (global::C source1, global::D target1):
+                        MapCToD(source1, target1);
+                        break;
+                    default:
+                        throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {target.GetType()} as there is no known type mapping", nameof(source));
+                }
+                """
+            )
+            .HaveMapMethodWithGenericConstraints("where TSource : class where TTarget : class");
+    }
+
+    [Fact]
+    public void ExistingTargetWithGenericSourceAndTargetNullableSourceAndTarget()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial void Map<TSource, TTarget>(TSource? source, TTarget? target)
+                where TSource : class
+                where TTarget : class;
+
+            private partial void MapAToB(A source, B target);
+            private partial void MapCToD(C source, D target);
+            """,
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string Value1 { get; set; } }",
+            "class D { public string Value1 { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                if (source == null || target == null)
+                    return;
+                switch (source, target)
+                {
+                    case (global::A source1, global::B target1):
+                        MapAToB(source1, target1);
+                        break;
+                    case (global::C source1, global::D target1):
+                        MapCToD(source1, target1);
+                        break;
+                    default:
+                        throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {target.GetType()} as there is no known type mapping", nameof(source));
+                }
+                """
+            )
+            .HaveMapMethodWithGenericConstraints("where TSource : class where TTarget : class");
+    }
+
+    [Fact]
+    public void ExistingTargetWithGenericSourceAndTargetNoMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial void Map<TSource, TTarget>(TSource source, TTarget target);
+            """,
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.RuntimeTargetTypeMappingNoContentMappings)
+            .HaveAssertedAllDiagnostics();
+    }
 }

@@ -93,6 +93,16 @@ namespace Riok.Mapperly.IntegrationTests
         }
 
         [Fact]
+        public void GenericExistingTargetShouldWork()
+        {
+            var source = new ExistingObjectTypeA { Value = 10, ValueA = 20 };
+            var target = new ExistingObjectTypeA();
+            StaticTestMapper.MapExistingGeneric(source, target);
+            target.Value.ShouldBe(10);
+            target.ValueA.ShouldBe(20);
+        }
+
+        [Fact]
         public Task ConstantValuesShouldWork()
         {
             var obj = new ConstantValuesObject { CtorMappedValue = 10, MappedValue = 11 };

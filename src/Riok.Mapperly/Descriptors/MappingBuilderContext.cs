@@ -88,6 +88,9 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// <inheritdoc cref="MappingBuilders.MappingBuilder.NewInstanceMappings"/>
     public IReadOnlyDictionary<TypeMappingKey, INewInstanceMapping> NewInstanceMappings => MappingBuilder.NewInstanceMappings;
 
+    /// <inheritdoc cref="MappingBuilders.MappingBuilder.ExistingTargetUserMappings"/>
+    public IEnumerable<IExistingTargetUserMapping> ExistingTargetUserMappings => MappingBuilder.ExistingTargetUserMappings;
+
     /// <summary>
     /// Tries to find an existing mapping with the provided name.
     /// If none is found, <c>null</c> is returned.

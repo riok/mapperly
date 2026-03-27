@@ -53,6 +53,9 @@ public class MappingBodyBuilder(MappingCollection mappings)
                 case UserDefinedNewInstanceGenericTypeMapping mapping:
                     RuntimeTargetTypeMappingBodyBuilder.BuildMappingBody(ctx, mapping);
                     break;
+                case UserDefinedExistingTargetGenericTypeMapping mapping:
+                    RuntimeTargetTypeMappingBodyBuilder.BuildMappingBody(ctx, mapping);
+                    break;
             }
         }
     }
