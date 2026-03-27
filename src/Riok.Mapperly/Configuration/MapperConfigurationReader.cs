@@ -218,15 +218,13 @@ public class MapperConfigurationReader
             return MapperConfiguration.Members;
 
         var ignoreSourceMemberAttributes = _dataAccessor
-            .Access<MapperIgnoreSourceAttribute>(configRef.Method)
-            .WhereNotNullBy(static attr => attr.Source)
+            .Access<MapperIgnoreSourceAttribute, MapperIgnoreMemberConfiguration>(configRef.Method)
             .ToList();
-        var ignoredSourceMembers = ignoreSourceMemberAttributes.Select(x => x.Source).ToList();
+        var ignoredSourceMembers = ignoreSourceMemberAttributes.Select(x => x.Value).WhereNotNull().ToList();
         var ignoreTargetMemberAttributes = _dataAccessor
-            .Access<MapperIgnoreTargetAttribute>(configRef.Method)
-            .WhereNotNullBy(static attr => attr.Target)
+            .Access<MapperIgnoreTargetAttribute, MapperIgnoreMemberConfiguration>(configRef.Method)
             .ToList();
-        var ignoredTargetMembers = ignoreTargetMemberAttributes.Select(x => x.Target).ToList();
+        var ignoredTargetMembers = ignoreTargetMemberAttributes.Select(x => x.Value).WhereNotNull().ToList();
         var memberValueConfigurations = _dataAccessor.Access<MapValueAttribute, MemberValueMappingConfiguration>(configRef.Method).ToList();
         var memberConfigurations = _dataAccessor
             .Access<MapPropertyAttribute, MemberMappingConfiguration>(configRef.Method)
@@ -259,14 +257,8 @@ public class MapperConfigurationReader
             return MapperConfiguration.Members;
         }
 
-        foreach (var missingIgnoreSourceJustificationAttribute in ignoreSourceMemberAttributes.Where(attr => attr.Justification is null))
-        {
-            _diagnostics.ReportDiagnostic(
-                DiagnosticDescriptors.MapperIgnoreAttributeMissingJustification,
-                configRef.Method,
-                missingIgnoreSourceJustificationAttribute.Source
-            );
-        }
+        ReportMissingJustificationDiagnostics(ignoreSourceMemberAttributes, static x => x.Value);
+        ReportMissingJustificationDiagnostics(ignoreTargetMemberAttributes, static x => x.Value);
 
         foreach (var invalidMemberConfig in memberValueConfigurations.Where(x => !x.IsValid))
         {
@@ -296,15 +288,18 @@ public class MapperConfigurationReader
 
         var configData = _dataAccessor.AccessFirstOrDefault<MapEnumAttribute, EnumConfiguration>(configRef.Method);
         var explicitMappings = _dataAccessor.Access<MapEnumValueAttribute, EnumValueMappingConfiguration>(configRef.Method).ToList();
-        var ignoredSources = _dataAccessor
+        var ignoredSourceValueConfigurations = _dataAccessor
             .Access<MapperIgnoreSourceValueAttribute, MapperIgnoreEnumValueConfiguration>(configRef.Method)
-            .Select(x => x.Value)
             .ToList();
-        var ignoredTargets = _dataAccessor
+        var ignoredSources = ignoredSourceValueConfigurations.Select(x => x.Value).ToList();
+        var ignoredTargetValueConfigurations = _dataAccessor
             .Access<MapperIgnoreTargetValueAttribute, MapperIgnoreEnumValueConfiguration>(configRef.Method)
-            .Select(x => x.Value)
             .ToList();
+        var ignoredTargets = ignoredTargetValueConfigurations.Select(x => x.Value).ToList();
         var requiredMapping = _dataAccessor.AccessFirstOrDefault<MapperRequiredMappingAttribute>(configRef.Method)?.RequiredMappingStrategy;
+
+        ReportMissingJustificationDiagnostics(ignoredSourceValueConfigurations, static x => x.Value.Name);
+        ReportMissingJustificationDiagnostics(ignoredTargetValueConfigurations, static x => x.Value.Name);
 
         // ignore the required mapping as the same attribute is used for other mapping types
         // e.g. object to object
@@ -325,5 +320,24 @@ public class MapperConfigurationReader
             requiredMapping ?? MapperConfiguration.Enum.RequiredMappingStrategy,
             configData?.NamingStrategy ?? MapperConfiguration.Enum.NamingStrategy
         );
+    }
+
+    private void ReportMissingJustificationDiagnostics<TConfiguration>(
+        IEnumerable<TConfiguration> ignoreConfigurations,
+        Func<TConfiguration, string?> ignoredNameAccessor
+    )
+        where TConfiguration : MapperIgnoreConfigurationBase
+    {
+        foreach (var ignoreConfiguration in ignoreConfigurations)
+        {
+            if (!string.IsNullOrWhiteSpace(ignoreConfiguration.Justification))
+                continue;
+
+            var ignoredName = ignoredNameAccessor(ignoreConfiguration);
+            if (ignoredName == null)
+                continue;
+
+            _diagnostics.ReportDiagnostic(DiagnosticDescriptors.IgnoreMissingJustification, ignoreConfiguration.Location, ignoredName);
+        }
     }
 }

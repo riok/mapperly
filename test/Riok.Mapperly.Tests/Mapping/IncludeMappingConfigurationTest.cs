@@ -395,7 +395,7 @@ public class IncludeMappingConfigurationTest
             "class BDerived : B { public string DestinationName2 { get; set; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]
@@ -414,7 +414,7 @@ public class IncludeMappingConfigurationTest
             "class C { public string SourceName { get; set; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]
@@ -433,7 +433,7 @@ public class IncludeMappingConfigurationTest
             "class C { public string DestinationName { get; set; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]
@@ -454,7 +454,7 @@ public class IncludeMappingConfigurationTest
             """
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]

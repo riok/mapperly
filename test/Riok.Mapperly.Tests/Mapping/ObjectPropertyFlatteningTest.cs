@@ -744,7 +744,7 @@ public class ObjectPropertyFlatteningTest
             "class C { public C(string arg) {} public string Id { get; set; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]
@@ -757,7 +757,7 @@ public class ObjectPropertyFlatteningTest
             "class C { public C(string arg) {} public string Id { get; set; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]
@@ -770,7 +770,7 @@ public class ObjectPropertyFlatteningTest
             "class C { public C(string arg) {} public string Id { get; set; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]

@@ -1,4 +1,5 @@
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Descriptors.UnsafeAccess;
 
 namespace Riok.Mapperly.Symbols.Members;
@@ -43,10 +44,7 @@ public interface IMappableMember
 
     bool IsObsolete { get; }
 
-    /// <summary>
-    /// Whether this member is attributed with <see cref="Riok.Mapperly.Abstractions.MapperIgnoreAttribute"/>.
-    /// </summary>
-    bool IsIgnored { get; }
+    bool IsIgnored(MappingBuilderContext ctx);
 
     IMemberGetter BuildGetter(UnsafeAccessorContext ctx);
     IMemberSetter BuildSetter(UnsafeAccessorContext ctx);

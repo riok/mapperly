@@ -286,7 +286,7 @@ public class ObjectPropertyInitPropertyTest
             "class C { public string Value { get; init; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]

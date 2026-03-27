@@ -314,7 +314,7 @@ public class ObjectPropertyTest
             "class B { public string StringValue2 { get; set; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]
@@ -326,7 +326,7 @@ public class ObjectPropertyTest
             "class B { public string StringValue2 { get; set; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]
@@ -435,7 +435,7 @@ public class ObjectPropertyTest
             "class B { public DateTime Value { get; set; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]
@@ -479,7 +479,7 @@ public class ObjectPropertyTest
             "class B { public string StringValue2 { get; set; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]

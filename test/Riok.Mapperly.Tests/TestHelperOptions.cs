@@ -19,18 +19,14 @@ public record TestHelperOptions(
     IReadOnlyDictionary<string, string>? AnalyzerConfigOptions = null
 )
 {
-    public static readonly IReadOnlySet<DiagnosticDescriptor> DefaultIgnoredDiagnostics = new HashSet<DiagnosticDescriptor>
-    {
-        // ignore NoMemberMappings as a lot of tests use this for simplicity
-        DiagnosticDescriptors.NoMemberMappings,
-        // ignore missing Justification properties unless specifically tested for,
-        // in which case the diagnostic is removed before using the options.
-        DiagnosticDescriptors.MapperIgnoreAttributeMissingJustification,
-    };
-
     public static readonly TestHelperOptions Default = new(
         AllowedDiagnosticSeverities: new HashSet<DiagnosticSeverity>(),
-        IgnoredDiagnostics: DefaultIgnoredDiagnostics
+        IgnoredDiagnostics: new HashSet<DiagnosticDescriptor>
+        {
+            // ignore NoMemberMappings and IgnoreMissingJustification as a lot of tests use this for simplicity
+            DiagnosticDescriptors.NoMemberMappings,
+            DiagnosticDescriptors.IgnoreMissingJustification,
+        }
     );
 
     public static readonly TestHelperOptions DisabledNullable = Default with { NullableOption = NullableContextOptions.Disable };

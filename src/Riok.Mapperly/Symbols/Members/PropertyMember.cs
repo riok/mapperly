@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Descriptors.UnsafeAccess;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -37,9 +36,10 @@ public class PropertyMember(IPropertySymbol symbol, SymbolAccessor symbolAccesso
     public bool IsRequired => Symbol.IsRequired;
 
     public bool IsObsolete => symbolAccessor.HasAttribute<ObsoleteAttribute>(Symbol);
-    public bool IsIgnored => symbolAccessor.HasAttribute<MapperIgnoreAttribute>(Symbol);
 
     public bool SupportsCoalesceAssignment => CanSetDirectly;
+
+    public bool IsIgnored(MappingBuilderContext ctx) => MapperIgnoreHelper.CheckIgnored(Symbol, Name, ctx);
 
     public IMemberGetter BuildGetter(UnsafeAccessorContext ctx)
     {

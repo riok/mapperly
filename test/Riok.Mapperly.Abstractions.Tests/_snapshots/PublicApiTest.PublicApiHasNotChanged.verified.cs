@@ -165,6 +165,7 @@ namespace Riok.Mapperly.Abstractions
     public sealed class MapperIgnoreAttribute : System.Attribute
     {
         public MapperIgnoreAttribute() { }
+        public string? Justification { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Method)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
@@ -186,6 +187,7 @@ namespace Riok.Mapperly.Abstractions
     public sealed class MapperIgnoreSourceValueAttribute : System.Attribute
     {
         public MapperIgnoreSourceValueAttribute(object source) { }
+        public string? Justification { get; set; }
         public System.Enum? SourceValue { get; }
     }
     [System.AttributeUsage(System.AttributeTargets.Method, AllowMultiple=true)]
@@ -193,6 +195,7 @@ namespace Riok.Mapperly.Abstractions
     public sealed class MapperIgnoreTargetAttribute : System.Attribute
     {
         public MapperIgnoreTargetAttribute(string target) { }
+        public string? Justification { get; set; }
         public string Target { get; }
     }
     [System.AttributeUsage(System.AttributeTargets.Method, AllowMultiple=true)]
@@ -200,6 +203,7 @@ namespace Riok.Mapperly.Abstractions
     public sealed class MapperIgnoreTargetValueAttribute : System.Attribute
     {
         public MapperIgnoreTargetValueAttribute(object target) { }
+        public string? Justification { get; set; }
         public System.Enum? TargetValue { get; }
     }
     [System.AttributeUsage(System.AttributeTargets.Method)]

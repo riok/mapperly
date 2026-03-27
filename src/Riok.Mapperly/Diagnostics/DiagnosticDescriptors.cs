@@ -808,13 +808,14 @@ public static class DiagnosticDescriptors
         true
     );
 
-    public static readonly DiagnosticDescriptor MapperIgnoreAttributeMissingJustification = new(
+    public static readonly DiagnosticDescriptor IgnoreMissingJustification = new(
         "RMG096",
-        "Ignored mapping is missing Justification",
-        "The ignored mapping of {0} does not specify a Justification, consider adding one for documentation purposes",
+        "Ignored mapping is missing justification",
+        "The ignored mapping of {0} does not specify a justification, consider adding one for documentation purposes",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Hidden,
-        true
+        true,
+        helpLinkUri: BuildHelpUri("RMG096")
     );
 
     private static string BuildHelpUri(string id)

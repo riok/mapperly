@@ -18,14 +18,6 @@ public static class EnumerableExtensions
 #nullable restore
     }
 
-    public static IEnumerable<TItem> WhereNotNullBy<TItem, TSelector>(this IEnumerable<TItem> enumerable, Func<TItem, TSelector?> selector)
-        where TSelector : notnull
-    {
-#nullable disable
-        return enumerable.Where(x => selector(x) != null);
-#nullable restore
-    }
-
     public static IEnumerable<T> SkipLast<T>(this IEnumerable<T> enumerable)
     {
         using var enumerator = enumerable.GetEnumerator();

@@ -11,4 +11,15 @@ namespace Riok.Mapperly.Abstractions;
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Method)]
 [Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
-public sealed class MapperIgnoreAttribute : Attribute;
+public sealed class MapperIgnoreAttribute : Attribute
+{
+    /// <summary>
+    /// Gets or sets the justification for ignoring the member or method.
+    /// This is only used for documentation purposes and does not have any effect on the mapping.
+    /// </summary>
+    /// <remarks>
+    /// You can enforce the presence of justifications by setting the diagnostic severity of <c>RMG096</c> in your
+    /// <c>.editorconfig</c> to any value other than <c>hidden</c>.
+    /// </remarks>
+    public string? Justification { get; set; }
+}
