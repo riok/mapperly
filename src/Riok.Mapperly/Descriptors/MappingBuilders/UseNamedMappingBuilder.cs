@@ -20,6 +20,12 @@ public static class UseNamedMappingBuilder
             return null;
         }
 
+        if (!ctx.ParameterScope.TryUseParameters(mapping))
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.NamedMappingParametersUnsatisfied, ctx.MappingKey.Configuration.UseNamedMapping);
+            return null;
+        }
+
         var differentSourceType = !SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, mapping.SourceType);
         var differentTargetType = !SymbolEqualityComparer.IncludeNullability.Equals(ctx.Target, mapping.TargetType);
 
@@ -48,6 +54,12 @@ public static class UseNamedMappingBuilder
         var existingTargetMapping = ctx.FindExistingTargetNamedMapping(useNamedMapping);
         if (existingTargetMapping is null)
             return null;
+
+        if (!ctx.ParameterScope.TryUseParameters(existingTargetMapping))
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.NamedMappingParametersUnsatisfied, useNamedMapping);
+            return null;
+        }
 
         var source = ctx.Source;
         var target = ctx.Target;

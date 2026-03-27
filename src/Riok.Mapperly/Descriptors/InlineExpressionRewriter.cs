@@ -166,7 +166,7 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
             _ => (InvocationExpressionSyntax)base.VisitInvocationExpression(node)!,
         };
 
-        if (node.ArgumentList.Arguments.Count == 1 && mappingResolver.Invoke(methodSymbol) is { } mapping)
+        if (node.ArgumentList.Arguments.Count >= 1 && mappingResolver.Invoke(methodSymbol) is { } mapping)
         {
             var annotation = new SyntaxAnnotation(SyntaxAnnotationKindMapperInvocation);
             _mappingInvocations.Add(annotation, mapping);

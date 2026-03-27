@@ -54,6 +54,28 @@ Make sure the return type exactly matches the target type.
 
 This also works for constructor parameters.
 
+### Using additional mapping parameters
+
+When the mapping method has [additional parameters](./additional-mapping-parameters.mdx),
+they can be passed to `MapValue(Use = ...)` methods.
+The method's parameters are matched by name from the mapping's additional parameters:
+
+<Tabs>
+    <TabItem value="declaration" label="Declaration" default>
+        ```csharp
+        [MapValue(nameof(CarDto.FormattedDate), Use = nameof(FormatDate))]
+        public partial CarDto Map(Car car, string dateFormat);
+
+        string FormatDate(string dateFormat) => DateTime.Now.ToString(dateFormat);
+        ```
+    </TabItem>
+    <TabItem value="generated" label="Generated code" default>
+        ```csharp
+        target.FormattedDate = FormatDate(dateFormat);
+        ```
+    </TabItem>
+</Tabs>
+
 ### Named mapping
 
 The name of the value generator can be overridden by the `NamedMapping` attribute:

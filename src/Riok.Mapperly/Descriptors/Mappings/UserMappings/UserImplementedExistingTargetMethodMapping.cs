@@ -18,13 +18,23 @@ public class UserImplementedExistingTargetMethodMapping(
     MethodParameter targetParameter,
     MethodParameter? referenceHandlerParameter,
     bool isExternal
-) : ExistingTargetMapping(method.Parameters[0].Type, targetParameter.Type), IExistingTargetUserMapping
+) : ExistingTargetMapping(method.Parameters[0].Type, targetParameter.Type), IExistingTargetUserMapping, IParameterizedMapping
 {
     public IMethodSymbol Method { get; } = method;
 
     public bool? Default { get; } = isDefault;
 
     public bool IsExternal { get; } = isExternal;
+
+    public IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; } =
+        method
+            .Parameters.Where(p =>
+                p.Ordinal != sourceParameter.Ordinal
+                && p.Ordinal != targetParameter.Ordinal
+                && (referenceHandlerParameter is null || p.Ordinal != referenceHandlerParameter.Value.Ordinal)
+            )
+            .Select(p => new MethodParameter(p, p.Type))
+            .ToList();
 
     public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
     {
@@ -40,9 +50,12 @@ public class UserImplementedExistingTargetMethodMapping(
                 yield return ctx.SyntaxFactory.ExpressionStatement(
                     ctx.SyntaxFactory.Invocation(
                         receiver == null ? IdentifierName(Method.Name) : MemberAccess(receiver, Method.Name),
-                        sourceParameter.WithArgument(ctx.Source),
-                        targetParameter.WithArgument(IdentifierName(targetRefVarName)),
-                        referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+                        ctx.BuildArguments(
+                            Method,
+                            sourceParameter,
+                            referenceHandlerParameter,
+                            targetParameter.WithArgument(IdentifierName(targetRefVarName))
+                        )
                     )
                 );
                 yield return ctx.SyntaxFactory.ExpressionStatement(Assignment(target, IdentifierName(targetRefVarName), false));
@@ -53,9 +66,7 @@ public class UserImplementedExistingTargetMethodMapping(
             yield return ctx.SyntaxFactory.ExpressionStatement(
                 ctx.SyntaxFactory.Invocation(
                     receiver == null ? IdentifierName(Method.Name) : MemberAccess(receiver, Method.Name),
-                    sourceParameter.WithArgument(ctx.Source),
-                    targetParameter.WithArgument(target),
-                    referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+                    ctx.BuildArguments(Method, sourceParameter, referenceHandlerParameter, targetParameter.WithArgument(target))
                 )
             );
             yield break;
@@ -69,9 +80,7 @@ public class UserImplementedExistingTargetMethodMapping(
         yield return ctx.SyntaxFactory.ExpressionStatement(
             ctx.SyntaxFactory.Invocation(
                 methodExpr,
-                sourceParameter.WithArgument(ctx.Source),
-                targetParameter.WithArgument(target),
-                referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+                ctx.BuildArguments(Method, sourceParameter, referenceHandlerParameter, targetParameter.WithArgument(target))
             )
         );
     }

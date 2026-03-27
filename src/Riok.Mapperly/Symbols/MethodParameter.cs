@@ -13,6 +13,11 @@ public readonly record struct MethodParameter(int Ordinal, string Name, ITypeSym
     public MethodParameter(IParameterSymbol symbol, ITypeSymbol parameterType)
         : this(symbol.Ordinal, symbol.ToDisplayString(_parameterNameFormat), parameterType, symbol.RefKind) { }
 
+    /// <summary>
+    /// The parameter name with the verbatim identifier prefix (<c>@</c>) removed.
+    /// </summary>
+    public string NormalizedName => Name.TrimStart('@');
+
     public MethodArgument WithArgument(ExpressionSyntax? argument) =>
         new(this, argument ?? throw new ArgumentNullException(nameof(argument)));
 }

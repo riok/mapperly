@@ -56,11 +56,19 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
             supportsDeepCloning: supportsDeepCloning
         )
     {
+        // Wrap parent scope in a child (delegates MarkUsed upward), or initialize from user mapping.
+        // Only the root scope reports unused parameters in diagnostics.
+        ParameterScope = ctx.ParameterScope.IsEmpty ? BuildParameterScope(userMapping) : new ParameterScope(ctx.ParameterScope);
         if (ignoreDerivedTypes)
         {
             Configuration = Configuration with { DerivedTypes = [] };
         }
     }
+
+    private static ParameterScope BuildParameterScope(IUserMapping? userMapping) =>
+        userMapping is IParameterizedMapping { AdditionalSourceParameters.Count: > 0 } pm
+            ? new ParameterScope(pm.AdditionalSourceParameters)
+            : ParameterScope.Empty;
 
     public TypeMappingKey MappingKey { get; }
 
@@ -82,6 +90,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// Whether the current mapping code is generated for a <see cref="System.Linq.Expressions.Expression"/>.
     /// </summary>
     public virtual bool IsExpression => false;
+
+    public ParameterScope ParameterScope { get; } = ParameterScope.Empty;
 
     public InstanceConstructorFactory InstanceConstructors { get; }
 
@@ -120,7 +130,8 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// </summary>
     /// <param name="mappingKey">The mapping key.</param>
     /// <returns>The found mapping, or <c>null</c> if none is found.</returns>
-    public virtual INewInstanceMapping? FindMapping(TypeMappingKey mappingKey) => MappingBuilder.Find(mappingKey);
+    public virtual INewInstanceMapping? FindMapping(TypeMappingKey mappingKey, ParameterScope? scope = null) =>
+        MappingBuilder.Find(mappingKey, scope);
 
     /// <summary>
     /// Tries to find an existing mapping for the provided types.
@@ -165,7 +176,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null
     )
     {
-        return FindMapping(mappingKey)
+        return FindMapping(mappingKey, ParameterScope)
             ?? FindMapping(mappingKey.TargetNonNullable())
             ?? BuildMapping(mappingKey, options, diagnosticLocation);
     }
@@ -187,7 +198,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null
     )
     {
-        if (FindMapping(key) is INewInstanceUserMapping mapping)
+        if (FindMapping(key, ParameterScope) is INewInstanceUserMapping mapping)
             return mapping;
 
         // if a user mapping is referenced

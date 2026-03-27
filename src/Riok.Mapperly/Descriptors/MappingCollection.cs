@@ -52,11 +52,13 @@ public class MappingCollection
 
     /// <inheritdoc cref="MappingCollectionInstance{T,TUserMapping}.UsedDuplicatedNonDefaultNonReferencedUserMappings"/>
     public IEnumerable<IUserMapping> UsedDuplicatedNonDefaultNonReferencedUserMappings =>
-        _newInstanceMappings
-            .UsedDuplicatedNonDefaultNonReferencedUserMappings.Cast<IUserMapping>()
+        Enumerable
+            .Empty<IUserMapping>()
+            .Concat(_newInstanceMappings.UsedDuplicatedNonDefaultNonReferencedUserMappings)
             .Concat(_existingTargetMappings.UsedDuplicatedNonDefaultNonReferencedUserMappings);
 
-    public INewInstanceMapping? FindNewInstanceMapping(TypeMappingKey mappingKey) => _newInstanceMappings.Find(mappingKey);
+    public INewInstanceMapping? FindNewInstanceMapping(TypeMappingKey mappingKey, ParameterScope? scope = null) =>
+        _newInstanceMappings.Find(mappingKey, scope);
 
     public INewInstanceUserMapping? FindNewInstanceUserMapping(IMethodSymbol method) => _newInstanceMappings.FindUserMapping(method);
 
@@ -168,6 +170,12 @@ public class MappingCollection
         private readonly Dictionary<IMethodSymbol, TUserMapping> _userMappingsByMethod = new(SymbolEqualityComparer.Default);
 
         /// <summary>
+        /// All user mappings registered in this instance, indexed by source/target type pair.
+        /// Used as the canonical source for parameterized and diagnostic queries.
+        /// </summary>
+        private readonly ListDictionary<TypeMappingKey, TUserMapping> _userMappings = new();
+
+        /// <summary>
         /// Named mappings by their names.
         /// </summary>
         private readonly Dictionary<string, TUserMapping> _namedMappings = new();
@@ -183,13 +191,7 @@ public class MappingCollection
         private readonly HashSet<TypeMappingKey> _explicitDefaultMappingKeys = [];
 
         /// <summary>
-        /// Contains the duplicated user implemented mappings
-        /// for type pairs with no explicit default mapping.
-        /// </summary>
-        private readonly ListDictionary<TypeMappingKey, TUserMapping> _duplicatedNonDefaultUserMappings = new();
-
-        /// <summary>
-        /// All mapping keys for which <see cref="Find(TypeMappingKey)"/> was called and returned a non-null result.
+        /// All mapping keys for which <see cref="Find(TypeMappingKey, ParameterScope?)"/> was called and returned a non-null result.
         /// </summary>
         private readonly HashSet<TypeMappingKey> _usedMappingKeys = [];
 
@@ -201,17 +203,27 @@ public class MappingCollection
         /// <inheritdoc cref="_defaultMappings"/>
         public IReadOnlyDictionary<TypeMappingKey, T> DefaultMappings => _defaultMappings;
 
-        /// <inheritdoc cref="_duplicatedNonDefaultUserMappings"/>
-        /// <remarks>
-        /// Includes only mappings for type-pairs which are actually in use.
-        /// </remarks>
+        /// <summary>
+        /// Returns user mappings that are duplicates (same type pair, no explicit default)
+        /// for type-pairs which are actually in use and not referenced by name.
+        /// Within each group, the first mapping (which won the _defaultMappings race) is excluded.
+        /// </summary>
         public IEnumerable<TUserMapping> UsedDuplicatedNonDefaultNonReferencedUserMappings =>
-            _usedMappingKeys.SelectMany(_duplicatedNonDefaultUserMappings.GetOrEmpty).Where(x => !_referencedNamedMappings.Contains(x));
+            _userMappings
+                .AsDictionary()
+                .Where(g => _usedMappingKeys.Contains(g.Key) && !_explicitDefaultMappingKeys.Contains(g.Key))
+                .Select(g => g.Value.Where(m => !m.IsExternal && !m.Default.HasValue))
+                .Where(g => g.Count() > 1)
+                .SelectMany(g => g.Skip(1))
+                .Where(m => !_referencedNamedMappings.Contains(m));
 
         public TUserMapping? FindUserMapping(IMethodSymbol method) => _userMappingsByMethod.GetValueOrDefault(method);
 
-        public T? Find(TypeMappingKey mappingKey)
+        public T? Find(TypeMappingKey mappingKey, ParameterScope? scope = null)
         {
+            if (scope is { IsEmpty: false })
+                return FindByParameters(mappingKey, scope);
+
             if (_defaultMappings.TryGetValue(mappingKey, out var mapping))
             {
                 _usedMappingKeys.Add(mappingKey);
@@ -230,6 +242,19 @@ public class MappingCollection
             }
 
             return mapping;
+        }
+
+        private TUserMapping? FindByParameters(TypeMappingKey key, ParameterScope scope)
+        {
+            var candidates = _userMappings.GetOrEmpty(key).Where(m => m is IParameterizedMapping { AdditionalSourceParameters.Count: > 0 });
+
+            foreach (var mapping in candidates)
+            {
+                if (scope.TryUseParameters(mapping))
+                    return mapping;
+            }
+
+            return default;
         }
 
         public void AddNamedUserMapping(string? name, TUserMapping mapping)
@@ -264,6 +289,7 @@ public class MappingCollection
         public MappingCollectionAddResult AddUserMapping(TUserMapping mapping, bool? isDefault, string? name)
         {
             AddNamedUserMapping(name, mapping);
+            _userMappings.Add(new TypeMappingKey(mapping), mapping);
 
             return isDefault switch
             {
@@ -277,32 +303,8 @@ public class MappingCollection
 
                 // no default value specified
                 // add it if none exists yet
-                null => TryAddUserMappingAsDefault(mapping),
+                null => TryAddAsDefault(mapping, TypeMappingConfiguration.Default),
             };
-        }
-
-        private MappingCollectionAddResult TryAddUserMappingAsDefault(TUserMapping mapping)
-        {
-            var addResult = TryAddAsDefault(mapping, TypeMappingConfiguration.Default);
-            var mappingKey = new TypeMappingKey(mapping);
-
-            // the mapping was not added due to it being a duplicate,
-            // there is no default mapping declared (yet)
-            // and no duplicate is registered yet
-            // then store this as duplicate
-            // this is needed to report a diagnostic if multiple non-default mappings
-            // are registered for the same type-pair without any default mapping.
-            if (
-                addResult == MappingCollectionAddResult.NotAddedDuplicated
-                && !mapping.IsExternal
-                && !mapping.Default.HasValue
-                && !_explicitDefaultMappingKeys.Contains(mappingKey)
-            )
-            {
-                _duplicatedNonDefaultUserMappings.Add(mappingKey, mapping);
-            }
-
-            return addResult;
         }
 
         private MappingCollectionAddResult AddDefaultUserMapping(T mapping)
@@ -311,7 +313,6 @@ public class MappingCollection
             if (!_explicitDefaultMappingKeys.Add(mappingKey))
                 return MappingCollectionAddResult.NotAddedDuplicated;
 
-            _duplicatedNonDefaultUserMappings.Remove(mappingKey);
             _defaultMappings[mappingKey] = mapping;
             AddAdditionalMappings(mapping, TypeMappingConfiguration.Default);
             return MappingCollectionAddResult.Added;
