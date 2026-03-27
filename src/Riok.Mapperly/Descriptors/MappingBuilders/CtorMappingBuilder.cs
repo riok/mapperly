@@ -18,11 +18,22 @@ public static class CtorMappingBuilder
         if (ctx.Target.TryGetNonNullable(out _))
             return null;
 
+        // If e member mappings are configured (e.g. [MapProperty]),
+        // do not use it as it bypasses property-by-property mapping
+        if (ctx.Configuration.Members.ExplicitMappings.Count > 0)
+            return null;
+
         if (ctx.Target is not INamedTypeSymbol namedTarget)
             return null;
 
+        // resolve ctors which have the source as single argument
         var ctor = FindSingleArgCtor(namedTarget, ctx.Source, ctx.SymbolAccessor);
         if (ctor == null)
+            return null;
+
+        // if another constructor is explicitly marked with [MapperConstructor],
+        // do not use the copy constructor and let the member mapping builder handle it
+        if (HasMapperConstructorOnDifferentCtor(namedTarget, ctor, ctx.SymbolAccessor))
             return null;
 
         return new CtorMapping(ctx.Source, ctx.Target, ctx.InstanceConstructors.BuildForConstructor(ctor));
@@ -36,9 +47,19 @@ public static class CtorMappingBuilder
         if (ctx.Target is not INamedTypeSymbol namedTarget)
             return null;
 
+        // If e member mappings are configured (e.g. [MapProperty]),
+        // do not use it as it bypasses property-by-property mapping
+        if (ctx.Configuration.Members.ExplicitMappings.Count > 0)
+            return null;
+
         // resolve ctors which have the source as single argument
         var ctor = FindSingleArgCtor(namedTarget, ctx.Source, ctx.SymbolAccessor);
         if (ctor == null)
+            return null;
+
+        // if another constructor is explicitly marked with [MapperConstructor],
+        // do not use the copy constructor and let the member mapping builder handle it
+        if (HasMapperConstructorOnDifferentCtor(namedTarget, ctor, ctx.SymbolAccessor))
             return null;
 
         return new CtorMapping(ctx.Source, ctx.Target, ctx.InstanceConstructors.BuildForConstructor(ctor));
@@ -52,4 +73,13 @@ public static class CtorMappingBuilder
                 && SymbolEqualityComparer.Default.Equals(m.Parameters[0].Type.NonNullable(), sourceType.NonNullable())
                 && sourceType.HasSameOrStricterNullability(m.Parameters[0].Type)
             );
+
+    private static bool HasMapperConstructorOnDifferentCtor(
+        INamedTypeSymbol target,
+        IMethodSymbol copyCtor,
+        SymbolAccessor symbolAccessor
+    ) =>
+        target.InstanceConstructors.Any(ctor =>
+            !SymbolEqualityComparer.Default.Equals(ctor, copyCtor) && symbolAccessor.HasAttribute<MapperConstructorAttribute>(ctor)
+        );
 }

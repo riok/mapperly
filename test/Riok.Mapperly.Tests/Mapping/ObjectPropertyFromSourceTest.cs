@@ -137,7 +137,29 @@ public class ObjectPropertyFromSourceTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                return new global::B(source);
+                var target = new global::B(source);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ToConstructorParameterWithProperties()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapPropertyFromSource(\"value\")] partial B Map(A source);",
+            "class A { public int IntValue { get; set; } public int IntValue2 { get; set;} }",
+            "class B { public B(A value, int intValue) { public int IntValue2 { get; set; } } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B(source, source.IntValue);
+                target.IntValue2 = source.IntValue2;
+                return target;
                 """
             );
     }
