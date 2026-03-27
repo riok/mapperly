@@ -228,7 +228,7 @@ public class DerivedTypeTest
             [MapProperty(nameof(A.BaseValueA), nameof(B.BaseValueB)]
             public partial B Map(A src);
 
-            [MapperIgnoreSource(nameof(A.BaseValueA)]
+            [MapperIgnoreSource(nameof(A.BaseValueA), Justification = "BaseValueA is ignored for testing purposes")]
             [MapperIgnoreTarget(nameof(B.BaseValueB)]
             public partial BSubType1 Map(ASubType1 src);
             """,
