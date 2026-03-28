@@ -53,7 +53,7 @@ public class MapperConfigurationReader
             ),
             new MembersMappingConfiguration([], [], [], [], [], mapper.IgnoreObsoleteMembersStrategy, mapper.RequiredMappingStrategy),
             [],
-            mapper.UseDeepCloning,
+            mapper.UseDeepCloning ? CloningStrategy.DeepCloning : mapper.CloningStrategy,
             mapper.StackCloningStrategy,
             supportedFeatures
         );
@@ -78,7 +78,11 @@ public class MapperConfigurationReader
     )
     {
         if (reference.Method == null)
-            return supportsDeepCloning ? MapperConfiguration : MapperConfiguration with { UseDeepCloning = false };
+            return supportsDeepCloning ? MapperConfiguration : MapperConfiguration with { CloningStrategy = CloningStrategy.None };
+
+        var cloningStrategy = MapperConfiguration.Mapper.UseDeepCloning
+            ? CloningStrategy.DeepCloning
+            : MapperConfiguration.Mapper.CloningStrategy;
 
         var enumConfig = BuildEnumConfig(reference);
         var membersConfig = BuildMembersConfig(reference);
@@ -88,7 +92,7 @@ public class MapperConfigurationReader
             enumConfig,
             membersConfig,
             derivedTypesConfig,
-            supportsDeepCloning && MapperConfiguration.Mapper.UseDeepCloning,
+            supportsDeepCloning ? cloningStrategy : CloningStrategy.None,
             MapperConfiguration.StackCloningStrategy,
             MapperConfiguration.SupportedFeatures
         );
@@ -243,6 +247,7 @@ public class MapperConfigurationReader
         // ignore the required mapping / ignore obsolete as the same attribute is used for other mapping types
         // e.g. enum to enum
         var hasMemberConfigs = ignoredSourceMembers.Count > 0 || ignoredTargetMembers.Count > 0 || memberConfigurations.Count > 0;
+
         if (hasMemberConfigs && (configRef.Source.IsEnum() || configRef.Target.IsEnum()))
         {
             _diagnostics.ReportDiagnostic(DiagnosticDescriptors.MemberConfigurationOnNonMemberMapping, configRef.Method);
