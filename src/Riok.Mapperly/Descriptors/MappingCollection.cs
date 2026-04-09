@@ -50,6 +50,11 @@ public class MappingCollection
     /// <inheritdoc cref="MappingCollectionInstance{INewInstanceMapping, INewInstanceUserMapping}.DefaultMappings"/>
     public IReadOnlyDictionary<TypeMappingKey, INewInstanceMapping> NewInstanceMappings => _newInstanceMappings.DefaultMappings;
 
+    /// <summary>
+    /// All existing target user mappings registered by their methods.
+    /// </summary>
+    public IEnumerable<IExistingTargetUserMapping> ExistingTargetUserMappings => _existingTargetMappings.UserMappings;
+
     /// <inheritdoc cref="MappingCollectionInstance{T,TUserMapping}.UsedDuplicatedNonDefaultNonReferencedUserMappings"/>
     public IEnumerable<IUserMapping> UsedDuplicatedNonDefaultNonReferencedUserMappings =>
         _newInstanceMappings
@@ -200,6 +205,11 @@ public class MappingCollection
 
         /// <inheritdoc cref="_defaultMappings"/>
         public IReadOnlyDictionary<TypeMappingKey, T> DefaultMappings => _defaultMappings;
+
+        /// <summary>
+        /// All registered user mappings.
+        /// </summary>
+        public IEnumerable<TUserMapping> UserMappings => _userMappingsByMethod.Values;
 
         /// <inheritdoc cref="_duplicatedNonDefaultUserMappings"/>
         /// <remarks>

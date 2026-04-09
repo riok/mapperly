@@ -1,5 +1,6 @@
 using Riok.Mapperly.Descriptors.MappingBuilders;
 using Riok.Mapperly.Descriptors.Mappings;
+using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
@@ -26,6 +27,23 @@ public static class RuntimeTargetTypeMappingBodyBuilder
         BuildMappingBody(ctx, mapping, mappings);
     }
 
+    public static void BuildMappingBody(MappingBuilderContext ctx, UserDefinedExistingTargetGenericTypeMapping mapping)
+    {
+        // source nulls are filtered out by the type switch arms,
+        // therefore set source type always to non-nullable
+        // as non-nullables are also assignable to nullables.
+        var mappings = GetExistingTargetUserMappingCandidates(ctx)
+            .Where(x =>
+                ctx.GenericTypeChecker.InferAndCheckTypes(
+                    mapping.Method.TypeParameters,
+                    (mapping.SourceType, x.SourceType.NonNullable()),
+                    (mapping.TargetType, x.TargetType)
+                ).Success
+            );
+
+        BuildExistingTargetMappingBody(ctx, mapping, mappings);
+    }
+
     public static void BuildMappingBody(MappingBuilderContext ctx, UserDefinedNewInstanceRuntimeTargetTypeMapping mapping)
     {
         // source nulls are filtered out by the type switch arms,
@@ -45,6 +63,36 @@ public static class RuntimeTargetTypeMappingBodyBuilder
             .NewInstanceMappings.Select(x => x.Value)
             .Where(x => x is not UserDefinedNewInstanceRuntimeTargetTypeMapping)
             .OfType<INewInstanceUserMapping>();
+
+    private static IEnumerable<IExistingTargetUserMapping> GetExistingTargetUserMappingCandidates(MappingBuilderContext ctx) =>
+        ctx.ExistingTargetUserMappings.Where(x => x is not UserDefinedExistingTargetGenericTypeMapping);
+
+    private static void BuildExistingTargetMappingBody(
+        MappingBuilderContext ctx,
+        UserDefinedExistingTargetGenericTypeMapping mapping,
+        IEnumerable<ITypeMapping> childMappings
+    )
+    {
+        // prefer types with a higher inheritance level
+        // over types with a lower inheritance level
+        // in the type switch
+        // to use the most specific mapping
+        var existingTargetMappings = childMappings
+            .OfType<IExistingTargetMapping>()
+            .OrderByDescending(x => x.SourceType.GetInheritanceLevel())
+            .ThenByDescending(x => x.TargetType.GetInheritanceLevel())
+            .ThenBy(x => x.TargetType.IsNullable())
+            .GroupBy(x => new TypeMappingKey(x, includeNullability: false))
+            .Select(x => x.First())
+            .ToList();
+
+        if (existingTargetMappings.Count == 0)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.RuntimeTargetTypeMappingNoContentMappings);
+        }
+
+        mapping.AddMappings(existingTargetMappings);
+    }
 
     private static void BuildMappingBody(
         MappingBuilderContext ctx,

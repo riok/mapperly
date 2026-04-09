@@ -887,4 +887,115 @@ public class GenericTest
                 """
             );
     }
+
+    [Fact]
+    public Task ExistingTargetWithGenericSourceAndTarget()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial void Map<TSource, TTarget>(TSource source, TTarget target);
+
+            private partial void MapAToB(A source, B target);
+            private partial void MapCToD(C source, D target);
+            """,
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string Value1 { get; set; } }",
+            "class D { public string Value1 { get; set; } }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ExistingTargetWithGenericSource()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial void Map<TSource>(TSource source, object target);
+
+            private partial void MapAToB(A source, B target);
+            private partial void MapCToD(C source, D target);
+            """,
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string Value1 { get; set; } }",
+            "class D { public string Value1 { get; set; } }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ExistingTargetWithGenericTarget()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial void Map<TTarget>(object source, TTarget target);
+
+            private partial void MapAToB(A source, B target);
+            private partial void MapCToD(C source, D target);
+            """,
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string Value1 { get; set; } }",
+            "class D { public string Value1 { get; set; } }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ExistingTargetWithGenericSourceAndTargetTypeConstraints()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial void Map<TSource, TTarget>(TSource source, TTarget target)
+                where TSource : class
+                where TTarget : class;
+
+            private partial void MapAToB(A source, B target);
+            private partial void MapCToD(C source, D target);
+            """,
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string Value1 { get; set; } }",
+            "class D { public string Value1 { get; set; } }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ExistingTargetWithGenericSourceAndTargetNullableSourceAndTarget()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial void Map<TSource, TTarget>(TSource? source, TTarget? target)
+                where TSource : class
+                where TTarget : class;
+
+            private partial void MapAToB(A source, B target);
+            private partial void MapCToD(C source, D target);
+            """,
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class C { public string Value1 { get; set; } }",
+            "class D { public string Value1 { get; set; } }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void ExistingTargetWithGenericSourceAndTargetNoMappings()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial void Map<TSource, TTarget>(TSource source, TTarget target);
+            """,
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.RuntimeTargetTypeMappingNoContentMappings)
+            .HaveAssertedAllDiagnostics();
+    }
 }
