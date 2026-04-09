@@ -45,7 +45,7 @@ public class ParameterScope
     /// <summary>
     /// Checks if all requested additional parameters can be satisfied by this scope (by normalized name).
     /// </summary>
-    public bool CanMatchParameters(IReadOnlyCollection<MethodParameter> requested) =>
+    private bool CanMatchParameters(IReadOnlyCollection<MethodParameter> requested) =>
         requested.All(p => _parameters.ContainsKey(p.NormalizedName));
 
     /// <summary>
