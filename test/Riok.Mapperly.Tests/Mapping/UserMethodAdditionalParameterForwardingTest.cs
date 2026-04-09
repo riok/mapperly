@@ -57,7 +57,7 @@ public class UserMethodAdditionalParameterForwardingTest
     }
 
     [Fact]
-    public void MapValueUseMethodWithZeroParamsStillWorks()
+    public void MapValueUseMethodWithZeroParamsWorks()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
