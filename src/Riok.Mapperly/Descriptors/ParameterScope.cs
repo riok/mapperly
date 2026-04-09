@@ -6,7 +6,7 @@ namespace Riok.Mapperly.Descriptors;
 
 public class ParameterScope
 {
-    private static readonly IReadOnlyDictionary<string, MethodParameter> EmptyParameters = new Dictionary<string, MethodParameter>();
+    private static readonly IReadOnlyDictionary<string, MethodParameter> _emptyParameters = new Dictionary<string, MethodParameter>();
 
     private readonly ParameterScope? _parent;
     private readonly IReadOnlyDictionary<string, MethodParameter> _parameters;
@@ -18,7 +18,7 @@ public class ParameterScope
     {
         if (parameters.Count == 0)
         {
-            _parameters = EmptyParameters;
+            _parameters = _emptyParameters;
             return;
         }
 
