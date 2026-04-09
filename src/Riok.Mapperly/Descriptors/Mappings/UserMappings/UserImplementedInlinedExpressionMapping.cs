@@ -120,12 +120,12 @@ public class UserImplementedInlinedExpressionMapping(
             }
 
             // replace additional parameters with their corresponding expressions from the context
-            // Note: ctx.AdditionalParameters uses case-insensitive keys (for descriptor-phase matching),
-            // but syntax replacement must be case-sensitive to avoid replacing unrelated identifiers
-            // (e.g., property name CurrentUserId vs parameter currentUserId).
-            if (ctx.AdditionalParameters != null)
+            // The dictionary uses case-insensitive keys, so ContainsKey serves as a fast negative check.
+            // We then verify exact case to avoid replacing unrelated identifiers
+            // (e.g., property CurrentUserId vs parameter currentUserId).
+            if (ctx.AdditionalParameters is { } additionalParams && additionalParams.ContainsKey(node.Identifier.Text))
             {
-                foreach (var (key, value) in ctx.AdditionalParameters)
+                foreach (var (key, value) in additionalParams)
                 {
                     if (string.Equals(key, node.Identifier.Text, StringComparison.Ordinal))
                         return value.WithTriviaFrom(node);
