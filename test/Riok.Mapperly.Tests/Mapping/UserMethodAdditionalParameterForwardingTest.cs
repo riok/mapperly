@@ -876,4 +876,25 @@ public class UserMethodAdditionalParameterForwardingTest
                 """
             );
     }
+
+    [Fact]
+    public void DuplicateAdditionalParameterNamesCaseInsensitiveShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial B Map(A src, int UserId, int userId);
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public int UserId { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.DuplicateAdditionalParameterCaseInsensitive,
+                "The additional parameters UserId, userId have names that differ only in casing, only the first one is used"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
 }

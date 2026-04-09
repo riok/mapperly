@@ -57,7 +57,20 @@ internal static class UserMappingMethodParameterExtractor
         }
 
         var additionalParameters = additionalParameterSymbols.Select(p => ctx.SymbolAccessor.WrapMethodParameter(p)).ToList();
-        parameters = new MappingMethodParameters(sourceParameter.Value, targetParameter, refHandlerParameter, additionalParameters);
+
+        // detect and deduplicate case-insensitive duplicate additional parameter names (e.g., int UserId, int userId)
+        var parameterGroups = additionalParameters.ToLookup(p => p.NormalizedName, StringComparer.OrdinalIgnoreCase);
+        foreach (var group in parameterGroups.Where(g => g.Count() > 1))
+        {
+            ctx.ReportDiagnostic(
+                DiagnosticDescriptors.DuplicateAdditionalParameterCaseInsensitive,
+                method,
+                string.Join(", ", group.Select(p => p.Name))
+            );
+        }
+
+        var dedupedAdditionalParameters = parameterGroups.Select(g => g.First()).ToList();
+        parameters = new MappingMethodParameters(sourceParameter.Value, targetParameter, refHandlerParameter, dedupedAdditionalParameters);
         return true;
     }
 

@@ -838,6 +838,16 @@ public static class DiagnosticDescriptors
         helpLinkUri: BuildHelpUri("RMG098")
     );
 
+    public static readonly DiagnosticDescriptor DuplicateAdditionalParameterCaseInsensitive = new(
+        "RMG099",
+        "Duplicate additional parameter names differing only in casing",
+        "The additional parameters {0} have names that differ only in casing, only the first one is used",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true,
+        helpLinkUri: BuildHelpUri("RMG099")
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT

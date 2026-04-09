@@ -1,0 +1,36 @@
+---
+sidebar_label: RMG099
+description: 'Mapperly analyzer diagnostic RMG099 — Duplicate additional parameter names differing only in casing'
+---
+
+# RMG099 — Duplicate additional parameter names differing only in casing
+
+A mapping method has multiple [additional parameters](../additional-mapping-parameters.mdx)
+whose names differ only in casing (e.g., `userId` and `UserId`).
+Mapperly matches additional parameters case-insensitively,
+so only the first parameter is used and the others are ignored.
+
+## Example
+
+```csharp
+[Mapper]
+public partial class MyMapper
+{
+    // highlight-start
+    // Error: UserId and userId differ only in casing
+    public partial B Map(A source, int UserId, int userId);
+    // highlight-end
+}
+```
+
+Rename the parameters to have distinct names or delete duplicate ones:
+
+```csharp
+[Mapper]
+public partial class MyMapper
+{
+    // highlight-start
+    public partial B Map(A source, int userId);
+    // highlight-end
+}
+```
