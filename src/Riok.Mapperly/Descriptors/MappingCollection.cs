@@ -223,7 +223,7 @@ public class MappingCollection
                 .AsDictionary()
                 .Where(g => _usedMappingKeys.Contains(g.Key) && !_explicitDefaultMappingKeys.Contains(g.Key))
                 .Select(g => g.Value.Where(m => !m.IsExternal && !m.Default.HasValue))
-                .Where(g => g.Count() > 1)
+                .Where(g => g.Skip(1).Any())
                 .SelectMany(g => g.Skip(1))
                 .Where(m => !_referencedNamedMappings.Contains(m));
 
