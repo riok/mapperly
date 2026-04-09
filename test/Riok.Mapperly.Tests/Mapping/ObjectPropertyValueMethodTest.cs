@@ -592,7 +592,7 @@ public class ObjectPropertyValueMethodTest
             "record B(string Value);"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]
@@ -607,7 +607,7 @@ public class ObjectPropertyValueMethodTest
             "record B(string Value);"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]

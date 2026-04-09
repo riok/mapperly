@@ -17,7 +17,7 @@ public static class ConvertStaticMethodMappingBuilder
         var allTargetMethods = ctx.SymbolAccessor.GetAllMethods(nonNullableTarget).ToList();
 
         var mapping = TryGetStaticMethodMapping(
-            ctx.SymbolAccessor,
+            ctx,
             allTargetMethods,
             GetTargetStaticMethodNames(ctx),
             ctx.Source,
@@ -37,7 +37,7 @@ public static class ConvertStaticMethodMappingBuilder
         }
 
         return TryGetStaticMethodMapping(
-            ctx.SymbolAccessor,
+            ctx,
             allSourceMethods.ToList(),
             GetSourceStaticMethodNames(ctx),
             ctx.Source,
@@ -73,7 +73,7 @@ public static class ConvertStaticMethodMappingBuilder
     }
 
     private static StaticMethodMapping? TryGetStaticMethodMapping(
-        SymbolAccessor symbolAccessor,
+        MappingBuilderContext ctx,
         List<IMethodSymbol> allMethods,
         IEnumerable<string> methodNames,
         ITypeSymbol sourceType,
@@ -87,7 +87,7 @@ public static class ConvertStaticMethodMappingBuilder
         var allMethodCandidates = allMethods
             .Where(m =>
                 m is { IsStatic: true, ReturnsVoid: false, IsAsync: false, Parameters.Length: 1 }
-                && !symbolAccessor.HasAttribute<MapperIgnoreAttribute>(m)
+                && !MapperIgnoreHelper.CheckIgnored(m, m.Name, ctx)
             )
             .GroupBy(x => x.Name, x => x, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(x => x.Key, x => x.ToList(), StringComparer.OrdinalIgnoreCase);
@@ -102,7 +102,7 @@ public static class ConvertStaticMethodMappingBuilder
                 continue;
             }
 
-            var method = candidates.Find(x => symbolAccessor.ValidateSignature(x, nonNullableTargetType, sourceType));
+            var method = candidates.Find(x => ctx.SymbolAccessor.ValidateSignature(x, nonNullableTargetType, sourceType));
 
             if (method != null)
                 return new StaticMethodMapping(method);

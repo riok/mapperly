@@ -18,20 +18,28 @@ public static class ParseMappingBuilder
             return null;
 
         var (formatProvider, formatProviderIsDefault) = ctx.GetFormatProvider(ctx.MappingKey.Configuration.FormatProviderName);
+        ctx.Target.NonNullable(out var nonNullableTarget);
+        var parseMethods = ctx
+            .SymbolAccessor.GetAllMethods(nonNullableTarget, ParseMethodName)
+            .Where(m => !MapperIgnoreHelper.CheckIgnored(m, m.Name, ctx))
+            .ToList();
 
         return (formatProvider, formatProviderIsDefault) switch
         {
             // Parse(string, IFormatProvider)
-            (not null, _) when FindParseMethod(ctx, true) is { } parseMethod => new ParseMethodMapping(parseMethod, formatProvider.Name),
+            (not null, _) when FindParseMethod(ctx, parseMethods, true) is { } parseMethod => new ParseMethodMapping(
+                parseMethod,
+                formatProvider.Name
+            ),
 
             // Parse(string)
-            (not null, true) when FindParseMethod(ctx, false) is { } parseMethod => new ParseMethodMapping(parseMethod),
+            (not null, true) when FindParseMethod(ctx, parseMethods, false) is { } parseMethod => new ParseMethodMapping(parseMethod),
 
             // Parse(string)
-            (null, _) when FindParseMethod(ctx, false) is { } parseMethod => new ParseMethodMapping(parseMethod),
+            (null, _) when FindParseMethod(ctx, parseMethods, false) is { } parseMethod => new ParseMethodMapping(parseMethod),
 
             // Parse(string, null)
-            (null, _) when FindParseMethodWithNullableParameter(ctx) is { } parseMethod => new ParseMethodMapping(
+            (null, _) when FindParseMethodWithNullableParameter(ctx, parseMethods) is { } parseMethod => new ParseMethodMapping(
                 parseMethod,
                 simpleInvocation: false
             ),
@@ -40,17 +48,21 @@ public static class ParseMappingBuilder
         };
     }
 
-    private static IMethodSymbol? FindParseMethodWithNullableParameter(MappingBuilderContext ctx)
+    private static IMethodSymbol? FindParseMethodWithNullableParameter(
+        MappingBuilderContext ctx,
+        IReadOnlyCollection<IMethodSymbol> parseMethods
+    )
     {
-        return FindParseMethod(ctx, true) is { } m && m.Parameters[1].NullableAnnotation.IsNullable() ? m : null;
+        return FindParseMethod(ctx, parseMethods, true) is { } m && m.Parameters[1].NullableAnnotation.IsNullable() ? m : null;
     }
 
-    private static IMethodSymbol? FindParseMethod(MappingBuilderContext ctx, bool formatProviderParam)
+    private static IMethodSymbol? FindParseMethod(
+        MappingBuilderContext ctx,
+        IEnumerable<IMethodSymbol> parseMethods,
+        bool formatProviderParam
+    )
     {
-        ctx.Target.NonNullable(out var nonNullableTarget);
-        return ctx
-            .SymbolAccessor.GetAllMethods(nonNullableTarget, ParseMethodName)
-            .FirstOrDefault(m => IsParseMethod(ctx, m, formatProviderParam) && !ctx.SymbolAccessor.HasAttribute<MapperIgnoreAttribute>(m));
+        return parseMethods.FirstOrDefault(m => IsParseMethod(ctx, m, formatProviderParam));
 
         static bool IsParseMethod(MappingBuilderContext ctx, IMethodSymbol method, bool formatProviderParam)
         {

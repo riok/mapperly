@@ -87,7 +87,7 @@ internal static class IgnoredMembersBuilder
     {
         var type = sourceTarget == MappingSourceTarget.Source ? ctx.Source : ctx.Target;
 
-        return ctx.SymbolAccessor.GetAllAccessibleMappableMembers(type).Where(x => x.IsIgnored).Select(x => x.Name);
+        return ctx.SymbolAccessor.GetAllAccessibleMappableMembers(type).Where(x => x.IsIgnored(ctx)).Select(x => x.Name);
     }
 
     private static IEnumerable<string> GetIgnoredObsoleteMembers(MappingBuilderContext ctx, MappingSourceTarget sourceTarget)

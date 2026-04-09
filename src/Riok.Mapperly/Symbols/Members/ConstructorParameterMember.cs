@@ -28,7 +28,8 @@ public class ConstructorParameterMember(IParameterSymbol symbol, SymbolAccessor 
     public bool IsInitOnly => true;
     public bool IsRequired => !Symbol.IsOptional;
     public bool IsObsolete => false;
-    public bool IsIgnored => false;
+
+    public bool IsIgnored(MappingBuilderContext ctx) => false;
 
     public IMemberGetter BuildGetter(UnsafeAccessorContext ctx) => this;
 

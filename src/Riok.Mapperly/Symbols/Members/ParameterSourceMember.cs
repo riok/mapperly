@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Descriptors.UnsafeAccess;
 using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -26,7 +27,8 @@ public class ParameterSourceMember(MethodParameter parameter) : IMappableMember,
     public bool IsInitOnly => false;
     public bool IsRequired => false;
     public bool IsObsolete => false;
-    public bool IsIgnored => false;
+
+    public bool IsIgnored(MappingBuilderContext ctx) => false;
 
     public IMemberGetter BuildGetter(UnsafeAccessorContext ctx) => this;
 

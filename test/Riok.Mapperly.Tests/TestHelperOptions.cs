@@ -23,8 +23,9 @@ public record TestHelperOptions(
         AllowedDiagnosticSeverities: new HashSet<DiagnosticSeverity>(),
         IgnoredDiagnostics: new HashSet<DiagnosticDescriptor>
         {
-            // ignore NoMemberMappings as a lot of tests use this for simplicity
+            // ignore NoMemberMappings and IgnoreMissingJustification as a lot of tests use this for simplicity
             DiagnosticDescriptors.NoMemberMappings,
+            DiagnosticDescriptors.IgnoreMissingJustification,
         }
     );
 

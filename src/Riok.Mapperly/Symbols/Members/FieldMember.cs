@@ -2,7 +2,6 @@ using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Descriptors.UnsafeAccess;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
@@ -28,8 +27,10 @@ public class FieldMember(IFieldSymbol symbol, SymbolAccessor symbolAccessor)
     public bool IsRequired => Symbol.IsRequired;
 
     public bool IsObsolete => symbolAccessor.HasAttribute<ObsoleteAttribute>(Symbol);
-    public bool IsIgnored => symbolAccessor.HasAttribute<MapperIgnoreAttribute>(Symbol);
+
     public bool SupportsCoalesceAssignment => true;
+
+    public bool IsIgnored(MappingBuilderContext ctx) => MapperIgnoreHelper.CheckIgnored(Symbol, Name, ctx);
 
     public IMemberGetter BuildGetter(UnsafeAccessorContext ctx)
     {

@@ -21,8 +21,18 @@ public static class TestHelper
         params object?[] testParams
     )
     {
+        options ??= TestHelperOptions.Default;
+
         var driver = Generate(source, options, additionalAssemblies);
-        var verify = Verify(driver);
+        var result = driver.GetRunResult();
+
+        if (options.IgnoredDiagnostics is { Count: > 0 } ignored)
+        {
+            var ignoredIds = ignored.Select(x => x.Id).ToHashSet();
+            RunResultDiagnosticsPatcher.FilterRunResultDiagnostics(result, ignoredIds);
+        }
+
+        var verify = Verify(result);
 
         if (testParams.Length != 0)
         {
@@ -98,6 +108,8 @@ public static class TestHelper
         IReadOnlyCollection<TestAssembly>? additionalAssemblies = null
     )
     {
+        options ??= TestHelperOptions.Default;
+
         var compilation = BuildCompilation(source, options);
         if (additionalAssemblies != null)
         {
@@ -106,8 +118,8 @@ public static class TestHelper
 
         var generator = new MapperGenerator();
 
-        var optionsProvider =
-            options?.AnalyzerConfigOptions != null ? new TestAnalyzerConfigOptionsProvider(options.AnalyzerConfigOptions) : null;
+        var analyzerConfigOptions = BuildAnalyzerConfigOptions(options);
+        var optionsProvider = analyzerConfigOptions.Count > 0 ? new TestAnalyzerConfigOptionsProvider(analyzerConfigOptions) : null;
 
         var driver = CSharpGeneratorDriver.Create(
             [generator.AsSourceGenerator()],
@@ -116,6 +128,24 @@ public static class TestHelper
             driverOptions: _enableIncrementalTrackingDriverOptions
         );
         return driver.RunGenerators(compilation);
+    }
+
+    private static IReadOnlyDictionary<string, string> BuildAnalyzerConfigOptions(TestHelperOptions options)
+    {
+        var analyzerConfigOptions =
+            options.AnalyzerConfigOptions != null
+                ? new Dictionary<string, string>(options.AnalyzerConfigOptions)
+                : new Dictionary<string, string>();
+
+        if (options.IgnoredDiagnostics == null)
+            return analyzerConfigOptions;
+
+        foreach (var diagnostic in options.IgnoredDiagnostics)
+        {
+            analyzerConfigOptions[$"dotnet_diagnostic.{diagnostic.Id}.severity"] = "none";
+        }
+
+        return analyzerConfigOptions;
     }
 
     private static CSharpCompilation BuildCompilation(

@@ -47,7 +47,7 @@ public class IncludeMappingConfigurationTest
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
-            [MapperIgnoreSource(nameof(A.Ignored))]
+            [MapperIgnoreSource(nameof(A.Ignored), Justification = "Property is ignored for testing purposes")]
             partial B MapOther(A a);
 
             [IncludeMappingConfiguration(nameof(MapOther))]
@@ -395,7 +395,7 @@ public class IncludeMappingConfigurationTest
             "class BDerived : B { public string DestinationName2 { get; set; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]
@@ -414,7 +414,7 @@ public class IncludeMappingConfigurationTest
             "class C { public string SourceName { get; set; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]
@@ -433,7 +433,7 @@ public class IncludeMappingConfigurationTest
             "class C { public string DestinationName { get; set; } }"
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]
@@ -454,7 +454,7 @@ public class IncludeMappingConfigurationTest
             """
         );
 
-        return TestHelper.VerifyGenerator(source);
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.AllowAndIncludeAllDiagnostics);
     }
 
     [Fact]
