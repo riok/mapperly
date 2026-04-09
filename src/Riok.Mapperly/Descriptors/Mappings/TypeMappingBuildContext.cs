@@ -133,7 +133,7 @@ public readonly record struct TypeMappingBuildContext
                     yield return targetArgument.Value;
                 else if (referenceHandlerParameter is not null && param.Ordinal == referenceHandlerParameter.Value.Ordinal)
                     yield return referenceHandlerParameter.Value.WithArgument(refHandler);
-                else if (additionalParams?.TryGetValue(param.Name.TrimStart('@'), out var expr) == true)
+                else if (additionalParams?.TryGetValue(MethodParameter.NormalizeName(param.Name), out var expr) == true)
                     yield return new MethodParameter(param, param.Type).WithArgument(expr);
             }
         }

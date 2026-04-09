@@ -51,7 +51,8 @@ public class ParameterScope
     /// <summary>
     /// Checks if all parameters of a method can be satisfied by this scope (by normalized name).
     /// </summary>
-    public bool CanMatchParameters(IMethodSymbol method) => method.Parameters.All(p => _parameters.ContainsKey(NormalizeName(p.Name)));
+    public bool CanMatchParameters(IMethodSymbol method) =>
+        method.Parameters.All(p => _parameters.ContainsKey(MethodParameter.NormalizeName(p.Name)));
 
     /// <summary>
     /// If the mapping is parameterized, checks if all its additional parameters can be
@@ -82,7 +83,7 @@ public class ParameterScope
             return;
         }
 
-        _usedParameters?.Add(NormalizeName(name));
+        _usedParameters?.Add(MethodParameter.NormalizeName(name));
     }
 
     /// <summary>
@@ -106,8 +107,6 @@ public class ParameterScope
             MarkUsed(name);
         }
     }
-
-    private static string NormalizeName(string name) => name.TrimStart('@');
 
     /// <summary>
     /// Returns parameter names that were never consumed by any consumer (for diagnostics).
