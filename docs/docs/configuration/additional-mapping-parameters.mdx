@@ -14,7 +14,7 @@ An additional mapping parameter has lower priority than a `MapProperty` mapping,
 but higher than a by-name matched regular member mapping.
 
 <Tabs>
-  <TabItem default label="Declaration" value="declaration">
+  <TabItem value="declaration" label="Declaration" default>
     ```csharp
     [Mapper]
     public partial class CarMapper
@@ -39,7 +39,7 @@ but higher than a by-name matched regular member mapping.
     ```
 
   </TabItem>
-  <TabItem default label="Generated code" value="generated">
+  <TabItem value="generated" label="Generated code">
     ```csharp
     [Mapper]
     public partial class CarMapper
@@ -55,7 +55,7 @@ but higher than a by-name matched regular member mapping.
         target.Name = name;
         // highlight-end
         return target;
-      } 
+      }
     }
     ```
   </TabItem>
@@ -72,7 +72,7 @@ Mapperly will **not** auto-generate mapping methods with additional parameters.
 Only explicitly declared user-defined methods are considered.
 
 <Tabs>
-  <TabItem default label="Declaration" value="nested-declaration">
+  <TabItem value="nested-declaration" label="Declaration" default>
     ```csharp
     [Mapper]
     public partial class OrderMapper
@@ -85,15 +85,19 @@ Only explicitly declared user-defined methods are considered.
     }
     ```
   </TabItem>
-  <TabItem label="Generated code" value="nested-generated">
+  <TabItem value="nested-generated" label="Generated code">
     ```csharp
-    public partial OrderDto Map(Order source, int currentUserId)
+    [Mapper]
+    public partial class OrderMapper
     {
-      var target = new OrderDto();
-      // highlight-start
-      target.Item = MapItem(source.Item, currentUserId);
-      // highlight-end
-      return target;
+      public partial OrderDto Map(Order source, int currentUserId)
+      {
+        var target = new OrderDto();
+        // highlight-start
+        target.Item = MapItem(source.Item, currentUserId);
+        // highlight-end
+        return target;
+      }
     }
     ```
   </TabItem>
@@ -105,7 +109,7 @@ Additional parameters can be passed to methods referenced by `MapValue(Use = ...
 The method's parameters are matched by name from the mapping's additional parameters.
 
 <Tabs>
-  <TabItem default label="Declaration" value="use-declaration">
+  <TabItem value="use-declaration" label="Declaration" default>
     ```csharp
     [Mapper]
     public partial class OrderMapper
@@ -120,16 +124,21 @@ The method's parameters are matched by name from the mapping's additional parame
       // highlight-end
     }
     ```
+
   </TabItem>
-  <TabItem label="Generated code" value="use-generated">
+  <TabItem value="use-generated" label="Generated code">
     ```csharp
-    public partial OrderDto Map(Order source, decimal taxRate)
+    [Mapper]
+    public partial class OrderMapper
     {
-      var target = new OrderDto();
-      // highlight-start
-      target.Total = ComputeTotal(taxRate);
-      // highlight-end
-      return target;
+      public partial OrderDto Map(Order source, decimal taxRate)
+      {
+        var target = new OrderDto();
+        // highlight-start
+        target.Total = ComputeTotal(taxRate);
+        // highlight-end
+        return target;
+      }
     }
     ```
   </TabItem>
@@ -148,25 +157,43 @@ The parameters become captured variables in the generated projection lambda.
 User-implemented methods with additional parameters are inlined following the same rules
 as regular [user-implemented mapping methods in projections](./queryable-projections.mdx#user-implemented-mapping-methods).
 
-```csharp
-[Mapper]
-public static partial class OrderMapper
-{
-  // highlight-start
-  public static partial IQueryable<OrderDto> ProjectToDto(
-    this IQueryable<Order> q,
-    int currentUserId
-  );
-  // highlight-end
-}
-
-// Generated:
-// source.Select(x => new OrderDto()
-// {
-//   ...
-//   CurrentUserId = currentUserId,  // captured from outer scope
-// });
-```
+<Tabs>
+  <TabItem value="projection-declaration" label="Declaration" default>
+    ```csharp
+    [Mapper]
+    public static partial class OrderMapper
+    {
+      public static partial IQueryable<OrderDto> ProjectToDto(
+        this IQueryable<Order> q,
+        // highlight-next-line
+        int currentUserId
+      );
+    }
+    ```
+  </TabItem>
+  <TabItem value="projection-generated" label="Generated code">
+    ```csharp
+    [Mapper]
+    public static partial class OrderMapper
+    {
+      public static partial IQueryable<OrderDto> ProjectToDto(
+        this IQueryable<Order> q,
+        // highlight-next-line
+        int currentUserId
+      )
+      {
+        return q.Select(x => new OrderDto()
+        {
+          // ...
+          // highlight-start
+          CurrentUserId = currentUserId,  // captured from outer scope
+          // highlight-end
+        });
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>
 
 :::info
 Mappings with additional parameters do have some limitations:
@@ -174,7 +201,7 @@ Mappings with additional parameters do have some limitations:
 - Additional parameters are forwarded to user-defined nested mapping methods only (not auto-generated ones).
 - A mapping with additional mapping parameters cannot be the default mapping
   (it is not used by Mapperly when encountering a nested mapping for the given types),
-  see also [default mapping methods](./user-implemented-methods.mdx##default-mapping-methods).
+  see also [default mapping methods](./user-implemented-methods.mdx#default-mapping-methods).
 - Generic and runtime target type mappings do not support additional type parameters.
 - Derived type mappings do not support additional type parameters.
   :::
