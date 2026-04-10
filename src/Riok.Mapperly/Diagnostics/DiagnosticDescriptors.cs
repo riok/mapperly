@@ -818,6 +818,36 @@ public static class DiagnosticDescriptors
         helpLinkUri: BuildHelpUri("RMG096")
     );
 
+    public static readonly DiagnosticDescriptor MapValueMethodParametersUnsatisfied = new(
+        "RMG097",
+        "MapValue Use method parameters cannot be satisfied",
+        "The method {0} referenced by MapValue has parameters that cannot be matched from the mapping's additional parameters",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true,
+        helpLinkUri: BuildHelpUri("RMG097")
+    );
+
+    public static readonly DiagnosticDescriptor NamedMappingParametersUnsatisfied = new(
+        "RMG098",
+        "Named mapping additional parameters cannot be satisfied",
+        "The named mapping {0} has additional parameters that cannot be matched from the caller's scope",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true,
+        helpLinkUri: BuildHelpUri("RMG098")
+    );
+
+    public static readonly DiagnosticDescriptor DuplicateAdditionalParameterCaseInsensitive = new(
+        "RMG099",
+        "Duplicate additional parameter names differing only in casing",
+        "The additional parameters {0} have names that differ only in casing, only the first one is used",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true,
+        helpLinkUri: BuildHelpUri("RMG099")
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT

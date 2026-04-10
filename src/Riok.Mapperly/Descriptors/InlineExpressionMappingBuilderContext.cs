@@ -75,7 +75,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     /// </summary>
     /// <param name="mappingKey">The mapping key.</param>
     /// <returns>The <see cref="INewInstanceMapping"/> if a mapping was found or <c>null</c> if none was found.</returns>
-    public override INewInstanceMapping? FindMapping(TypeMappingKey mappingKey)
+    public override INewInstanceMapping? FindMapping(TypeMappingKey mappingKey, ParameterScope? scope = null)
     {
         var mapping = InlinedMappings.Find(mappingKey, out var isInlined);
         if (mapping == null)
@@ -123,11 +123,10 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         // inline expression mappings don't reuse the user-defined mappings directly
         // but to apply the same configurations the default mapping user symbol is used
         // if there is no other user symbol.
-        // this makes sure the configuration of the default mapping user symbol is used
-        // for inline expression mappings.
         // This is not needed for regular mappings as these user defined method mappings
         // are directly built (with KeepUserSymbol) and called by the other mappings.
-        userMapping ??= MappingBuilder.Find(mappingKey) as IUserMapping;
+        userMapping ??= MappingBuilder.Find(mappingKey, ParameterScope) as IUserMapping;
+
         options &= ~MappingBuildingOptions.KeepUserSymbol;
         return BuildMapping(userMapping, mappingKey, options, diagnosticLocation);
     }

@@ -158,22 +158,26 @@ internal static class SourceValueBuilder
     {
         var methodReferenceConfiguration = memberMappingInfo.ValueConfiguration!.Use!;
         var targetSymbol = methodReferenceConfiguration.GetTargetType(ctx.BuilderContext);
-        var namedMethodCandidates = targetSymbol is null
+        var scope = ctx.BuilderContext.ParameterScope;
+        var allNamedMethods = targetSymbol is null
             ? []
             : ctx
                 .BuilderContext.SymbolAccessor.GetAllDirectlyAccessibleMethods(targetSymbol)
                 .Where(m =>
-                    m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false, Parameters.Length: 0 }
+                    m is { IsAsync: false, ReturnsVoid: false, IsGenericMethod: false }
                     && ctx.BuilderContext.AttributeAccessor.IsMappingNameEqualTo(m, methodReferenceConfiguration.Name)
                 )
                 .ToList();
 
+        var namedMethodCandidates = allNamedMethods.Where(m => scope.CanMatchParameters(m)).ToList();
+
         if (namedMethodCandidates.Count == 0)
         {
-            ctx.BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.MapValueReferencedMethodNotFound,
-                methodReferenceConfiguration.FullName
-            );
+            var descriptor =
+                allNamedMethods.Count > 0
+                    ? DiagnosticDescriptors.MapValueMethodParametersUnsatisfied
+                    : DiagnosticDescriptors.MapValueReferencedMethodNotFound;
+            ctx.BuilderContext.ReportDiagnostic(descriptor, methodReferenceConfiguration.FullName);
             sourceValue = null;
             return false;
         }
@@ -204,7 +208,15 @@ internal static class SourceValueBuilder
             return false;
         }
 
-        sourceValue = new MethodProvidedSourceValue(methodSymbol.Name, methodReferenceConfiguration.GetTargetName(ctx.BuilderContext));
+        // Collect additional parameter names and mark them as used
+        var additionalParameterNames = methodSymbol.Parameters.Select(param => param.Name).ToList();
+        scope.MarkUsed(additionalParameterNames);
+
+        sourceValue = new MethodProvidedSourceValue(
+            methodSymbol.Name,
+            methodReferenceConfiguration.GetTargetName(ctx.BuilderContext),
+            additionalParameterNames
+        );
         return true;
     }
 }

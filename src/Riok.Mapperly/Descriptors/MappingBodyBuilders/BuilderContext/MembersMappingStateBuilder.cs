@@ -10,9 +10,6 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 
 internal static class MembersMappingStateBuilder
 {
-    private static readonly IReadOnlyDictionary<string, IMappableMember> _emptyAdditionalSourceMembers =
-        new Dictionary<string, IMappableMember>();
-
     public static MembersMappingState Build(MappingBuilderContext ctx, IMapping mapping)
     {
         // build configurations
@@ -36,8 +33,6 @@ internal static class MembersMappingStateBuilder
 
         // build all members
         var unmappedSourceMemberNames = GetSourceMemberNames(ctx, mapping);
-        var additionalSourceMembers = GetAdditionalSourceMembers(ctx);
-        var unmappedAdditionalSourceMemberNames = new HashSet<string>(additionalSourceMembers.Keys, StringComparer.Ordinal);
         var targetMembers = GetTargetMembers(ctx, mapping);
 
         // build ignored members
@@ -58,27 +53,14 @@ internal static class MembersMappingStateBuilder
         var unmappedTargetMemberNames = targetMembers.Keys.ToHashSet();
         return new MembersMappingState(
             unmappedSourceMemberNames,
-            unmappedAdditionalSourceMemberNames,
             unmappedTargetMemberNames,
-            additionalSourceMembers,
             targetMemberCaseMapping,
             targetMembers,
             memberValueConfigsByRootTargetName,
             memberConfigsByRootTargetName,
             configuredTargetMembersByRootName.AsDictionary(),
-            ignoredSourceMemberNames
-        );
-    }
-
-    private static IReadOnlyDictionary<string, IMappableMember> GetAdditionalSourceMembers(MappingBuilderContext ctx)
-    {
-        if (ctx.UserMapping is not MethodMapping { AdditionalSourceParameters.Count: > 0 } methodMapping)
-            return _emptyAdditionalSourceMembers;
-
-        return methodMapping.AdditionalSourceParameters.ToDictionary<MethodParameter, string, IMappableMember>(
-            x => x.Name.TrimStart('@'), // trim verbatim identifier prefix
-            x => new ParameterSourceMember(x),
-            StringComparer.OrdinalIgnoreCase
+            ignoredSourceMemberNames,
+            ctx.ParameterScope
         );
     }
 

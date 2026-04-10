@@ -56,7 +56,11 @@ internal static class MemberMappingDiagnosticReporter
 
     private static void AddUnmappedAdditionalSourceMembersDiagnostics(MappingBuilderContext ctx, MembersMappingState state)
     {
-        foreach (var name in state.UnmappedAdditionalSourceMemberNames)
+        // Only root scopes (the original creator of the parameter scope) report unused parameters.
+        if (state.ParameterScope is not { IsRoot: true } scope)
+            return;
+
+        foreach (var name in scope.GetUnusedParameterNames())
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.AdditionalParameterNotMapped, name, ctx.UserMapping!.Method.Name);
         }

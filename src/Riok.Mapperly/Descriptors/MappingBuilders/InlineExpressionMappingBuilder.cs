@@ -22,8 +22,8 @@ public static class InlineExpressionMappingBuilder
         ITypeSymbol targetType
     )
     {
+        var userMapping = ctx.FindMapping(new TypeMappingKey(sourceType, targetType), ctx.ParameterScope) as IUserMapping;
         var mappingKey = BuildMappingKey(ctx, sourceType, targetType);
-        var userMapping = ctx.FindMapping(sourceType, targetType) as IUserMapping;
         var inlineCtx = new InlineExpressionMappingBuilderContext(ctx, userMapping, mappingKey);
 
         if (userMapping is UserImplementedMethodMapping && inlineCtx.FindMapping(sourceType, targetType) is { } inlinedUserMapping)
@@ -61,7 +61,7 @@ public static class InlineExpressionMappingBuilder
 
         var methodSyntax = methodSyntaxRef.GetSyntax();
 
-        if (methodSyntax is not MethodDeclarationSyntax { ParameterList.Parameters: [var sourceParameter] } methodDeclaration)
+        if (methodSyntax is not MethodDeclarationSyntax { ParameterList.Parameters: [var sourceParameter, ..] } methodDeclaration)
         {
             return null;
         }

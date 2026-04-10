@@ -119,6 +119,19 @@ public class UserImplementedInlinedExpressionMapping(
                 return ctx.Source.WithTriviaFrom(node);
             }
 
+            // replace additional parameters with their corresponding expressions from the context
+            // The dictionary uses case-insensitive keys, so ContainsKey serves as a fast negative check.
+            // We then verify exact case to avoid replacing unrelated identifiers
+            // (e.g., property CurrentUserId vs parameter currentUserId).
+            if (ctx.AdditionalParameters is { } additionalParams && additionalParams.ContainsKey(node.Identifier.Text))
+            {
+                foreach (var (key, value) in additionalParams)
+                {
+                    if (string.Equals(key, node.Identifier.Text, StringComparison.Ordinal))
+                        return value.WithTriviaFrom(node);
+                }
+            }
+
             return base.VisitIdentifierName(node);
         }
 

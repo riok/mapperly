@@ -19,7 +19,7 @@ public class UserImplementedMethodMapping(
     MethodParameter? referenceHandlerParameter,
     bool isExternal,
     UserImplementedMethodMapping.TargetNullability targetNullability
-) : NewInstanceMapping(sourceParameter.Type, targetType), INewInstanceUserMapping
+) : NewInstanceMapping(sourceParameter.Type, targetType), INewInstanceUserMapping, IParameterizedMapping
 {
     public enum TargetNullability
     {
@@ -33,6 +33,15 @@ public class UserImplementedMethodMapping(
     public bool? Default { get; } = isDefault;
 
     public bool IsExternal { get; } = isExternal;
+
+    public IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; } =
+        method
+            .Parameters.Where(p =>
+                p.Ordinal != sourceParameter.Ordinal
+                && (referenceHandlerParameter is null || p.Ordinal != referenceHandlerParameter.Value.Ordinal)
+            )
+            .Select(p => new MethodParameter(p, p.Type))
+            .ToList();
 
     public override IEnumerable<TypeMappingKey> BuildAdditionalMappingKeys(TypeMappingConfiguration config)
     {
@@ -58,8 +67,7 @@ public class UserImplementedMethodMapping(
         {
             return ctx.SyntaxFactory.Invocation(
                 receiver == null ? IdentifierName(Method.Name) : MemberAccess(receiver, Method.Name),
-                sourceParameter.WithArgument(ctx.Source),
-                referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
+                ctx.BuildArguments(Method, sourceParameter, referenceHandlerParameter)
             );
         }
 
@@ -68,10 +76,6 @@ public class UserImplementedMethodMapping(
             receiver == null ? ThisExpression() : IdentifierName(receiver)
         );
         var methodExpr = MemberAccess(ParenthesizedExpression(castedReceiver), Method.Name);
-        return ctx.SyntaxFactory.Invocation(
-            methodExpr,
-            sourceParameter.WithArgument(ctx.Source),
-            referenceHandlerParameter?.WithArgument(ctx.ReferenceHandler)
-        );
+        return ctx.SyntaxFactory.Invocation(methodExpr, ctx.BuildArguments(Method, sourceParameter, referenceHandlerParameter));
     }
 }
