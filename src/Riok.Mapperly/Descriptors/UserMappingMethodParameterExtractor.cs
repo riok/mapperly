@@ -60,7 +60,7 @@ internal static class UserMappingMethodParameterExtractor
 
         // detect and deduplicate case-insensitive duplicate additional parameter names (e.g., int UserId, int userId)
         var parameterGroups = additionalParameters.ToLookup(p => p.NormalizedName, StringComparer.OrdinalIgnoreCase);
-        foreach (var group in parameterGroups.Where(g => g.Count() > 1))
+        foreach (var group in parameterGroups.Where(g => g.Skip(1).Any()))
         {
             ctx.ReportDiagnostic(
                 DiagnosticDescriptors.DuplicateAdditionalParameterCaseInsensitive,
