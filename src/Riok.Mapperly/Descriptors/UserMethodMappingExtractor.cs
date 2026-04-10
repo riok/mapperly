@@ -167,7 +167,7 @@ public static class UserMethodMappingExtractor
     )
     {
         var userMappingConfig = GetUserMappingConfig(ctx, method, out var hasAttribute);
-        var valid = !method.IsGenericMethod && (allowPartial || !method.IsPartialDefinition) && (!isStatic || method.IsStatic);
+        var valid = (allowPartial || !method.IsPartialDefinition) && (!isStatic || method.IsStatic);
 
         if (!valid || !UserMappingMethodParameterExtractor.BuildParameters(ctx, method, out var parameters))
         {
@@ -182,6 +182,20 @@ public static class UserMethodMappingExtractor
         if (userMappingConfig.Ignore == true)
             return null;
 
+        // Generic user-implemented methods are stored as templates
+        // that are matched against concrete type pairs during mapping resolution.
+        if (method.IsGenericMethod)
+        {
+            return BuildGenericUserImplementedMapping(
+                ctx,
+                method,
+                receiver,
+                parameters,
+                isExternal,
+                userMappingConfig.Default ?? isDefault
+            );
+        }
+
         if (method.ReturnsVoid)
         {
             return new UserImplementedExistingTargetMethodMapping(
@@ -190,6 +204,8 @@ public static class UserMethodMappingExtractor
                 userMappingConfig.Default ?? isDefault,
                 parameters.Source,
                 parameters.Target!.Value,
+                parameters.Source.Type,
+                parameters.Target!.Value.Type,
                 parameters.ReferenceHandler,
                 isExternal
             );
@@ -200,6 +216,43 @@ public static class UserMethodMappingExtractor
             receiver,
             method,
             userMappingConfig.Default ?? isDefault,
+            parameters.Source,
+            parameters.Source.Type,
+            targetType,
+            parameters.ReferenceHandler,
+            isExternal,
+            targetTypeNullability
+        );
+    }
+
+    private static IUserMapping? BuildGenericUserImplementedMapping(
+        SimpleMappingBuilderContext ctx,
+        IMethodSymbol method,
+        string? receiver,
+        MappingMethodParameters parameters,
+        bool isExternal,
+        bool? isDefault
+    )
+    {
+        if (method.ReturnsVoid)
+        {
+            if (parameters.Target is not { } targetParam)
+                return null;
+
+            return new GenericUserImplementedExistingTargetMethodMapping(
+                receiver,
+                method,
+                parameters.Source,
+                targetParam,
+                parameters.ReferenceHandler,
+                isExternal
+            );
+        }
+
+        var (targetType, targetTypeNullability) = BuildTargetType(ctx, method, parameters.Source.Name);
+        return new GenericUserImplementedNewInstanceMethodMapping(
+            receiver,
+            method,
             parameters.Source,
             targetType,
             parameters.ReferenceHandler,

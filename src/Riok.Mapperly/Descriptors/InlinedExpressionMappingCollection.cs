@@ -1,16 +1,17 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.UserMappings;
+using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
 
-public class InlinedExpressionMappingCollection
+public class InlinedExpressionMappingCollection(GenericTypeChecker genericTypeChecker)
 {
     // use the MappingCollection to re-use
     // the mapping default logic.
     // Added mapping bodies are never built
     // and method mappings are not added to the generated mapper.
-    private readonly MappingCollection _delegate = new();
+    private readonly MappingCollection _delegate = new(genericTypeChecker);
 
     private readonly Dictionary<string, INewInstanceMapping> _namedInlinedMappings = new();
     private readonly Dictionary<TypeMappingKey, INewInstanceMapping> _inlinedMappings = new();

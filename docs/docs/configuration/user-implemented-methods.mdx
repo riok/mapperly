@@ -111,3 +111,46 @@ The mapper will respect the `ref` keyword on the target parameter when using an 
       private static void MapArray([MappingTarget] ref int[] target, int[] second) => target = [.. target, .. second.Except(target)];
   }
 ```
+
+## Generic user-implemented mapping methods
+
+User-implemented mapping methods can be generic.
+Mapperly automatically resolves generic user-implemented mapping methods
+by inferring type arguments from the source and target types.
+
+```csharp
+public record Document(string Title, User CreatedBy, Optional<User> ModifiedBy);
+public record DocumentDto(string Title, UserDto CreatedBy, Optional<UserDto> ModifiedBy);
+
+public record User(string Name);
+public record UserDto(string Name);
+
+[Mapper]
+public partial class MyMapper
+{
+    public partial DocumentDto MapDocument(Document source);
+
+    // highlight-start
+    private Optional<TTarget> MapOptional<TSource, TTarget>(Optional<TSource> source)
+        where TSource : notnull
+        where TTarget : notnull
+        => source.HasValue
+           ? Optional.Of(Map(source.Value))
+           : Optional.Empty();
+    // highlight-end
+
+    private partial TTarget Map<TSource, TTarget>(TSource source)
+        where TSource : notnull
+        where TTarget : notnull;
+
+    private partial UserDto MapUser(User source);
+}
+```
+
+In this example, when Mapperly needs to map `Optional<User>` to `Optional<UserDto>`,
+it will match the `MapOptional` method and invoke it as `MapOptional<User, UserDto>(source.ModifiedBy)`.
+
+:::info
+If a non-generic user-implemented mapping method exists for an exact type pair,
+it takes priority over a generic one.
+:::

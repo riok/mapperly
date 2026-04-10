@@ -7,7 +7,7 @@ using Riok.Mapperly.Helpers;
 
 namespace Riok.Mapperly.Descriptors;
 
-public class MappingCollection
+public class MappingCollection(GenericTypeChecker genericTypeChecker)
 {
     /// <summary>
     /// A list of all method mappings in order of registration/discovery.
@@ -41,6 +41,18 @@ public class MappingCollection
     /// </summary>
     private readonly MappingCollectionInstance<IExistingTargetMapping, IExistingTargetUserMapping> _existingTargetMappings = new();
 
+    /// <summary>
+    /// Generic user-implemented new instance mapping templates.
+    /// These are matched against concrete type pairs during <see cref="FindNewInstanceMapping"/>.
+    /// </summary>
+    private readonly List<GenericUserImplementedNewInstanceMethodMapping> _genericNewInstanceTemplates = [];
+
+    /// <summary>
+    /// Generic user-implemented existing target mapping templates.
+    /// These are matched against concrete type pairs during <see cref="FindExistingInstanceMapping"/>.
+    /// </summary>
+    private readonly List<GenericUserImplementedExistingTargetMethodMapping> _genericExistingTargetTemplates = [];
+
     /// <inheritdoc cref="_methodMappings"/>
     public IReadOnlyCollection<MethodMapping> MethodMappings => _methodMappings;
 
@@ -63,14 +75,15 @@ public class MappingCollection
             .Concat(_existingTargetMappings.UsedDuplicatedNonDefaultNonReferencedUserMappings);
 
     public INewInstanceMapping? FindNewInstanceMapping(TypeMappingKey mappingKey, ParameterScope? scope = null) =>
-        _newInstanceMappings.Find(mappingKey, scope);
+        _newInstanceMappings.Find(mappingKey, scope) ?? TryMatchGenericNewInstanceTemplate(mappingKey);
 
     public INewInstanceUserMapping? FindNewInstanceUserMapping(IMethodSymbol method) => _newInstanceMappings.FindUserMapping(method);
 
     public INewInstanceMapping? FindNamedNewInstanceMapping(string name, out bool ambiguousName) =>
         _newInstanceMappings.FindNamed(name, out ambiguousName);
 
-    public IExistingTargetMapping? FindExistingInstanceMapping(TypeMappingKey mappingKey) => _existingTargetMappings.Find(mappingKey);
+    public IExistingTargetMapping? FindExistingInstanceMapping(TypeMappingKey mappingKey) =>
+        _existingTargetMappings.Find(mappingKey) ?? TryMatchGenericExistingTargetTemplate(mappingKey);
 
     public IExistingTargetMapping? FindExistingInstanceNamedMapping(string name, out bool ambiguousName) =>
         _existingTargetMappings.FindNamed(name, out ambiguousName);
@@ -86,6 +99,17 @@ public class MappingCollection
         if (userMapping is MethodMapping methodMapping)
         {
             _methodMappings.Add(methodMapping);
+        }
+
+        // Generic user-implemented mapping templates are stored separately
+        // and matched lazily during Find operations.
+        if (userMapping is GenericUserImplementedNewInstanceMethodMapping genericNewInstance)
+        {
+            _genericNewInstanceTemplates.Add(genericNewInstance);
+        }
+        else if (userMapping is GenericUserImplementedExistingTargetMethodMapping genericExistingTarget)
+        {
+            _genericExistingTargetTemplates.Add(genericExistingTarget);
         }
 
         return userMapping switch
@@ -156,6 +180,42 @@ public class MappingCollection
             $"Cannot add a named mapping ({name}, {mapping.Method.Name}) after the initial discovery which is a default mapping"
         );
         _existingTargetMappings.AddNamedUserMapping(name, mapping);
+    }
+
+    private INewInstanceMapping? TryMatchGenericNewInstanceTemplate(TypeMappingKey mappingKey)
+    {
+        if (_genericNewInstanceTemplates.Count == 0)
+            return null;
+
+        foreach (var template in _genericNewInstanceTemplates)
+        {
+            if (template.TryCreateConcreteMapping(genericTypeChecker, mappingKey.Source, mappingKey.Target) is not { } mapping)
+                continue;
+
+            // Cache the concrete mapping so subsequent lookups find it directly.
+            _newInstanceMappings.TryAddAsDefault(mapping, mappingKey.Configuration);
+            return mapping;
+        }
+
+        return null;
+    }
+
+    private IExistingTargetMapping? TryMatchGenericExistingTargetTemplate(TypeMappingKey mappingKey)
+    {
+        if (_genericExistingTargetTemplates.Count == 0)
+            return null;
+
+        foreach (var template in _genericExistingTargetTemplates)
+        {
+            if (template.TryCreateConcreteMapping(genericTypeChecker, mappingKey.Source, mappingKey.Target) is not { } mapping)
+                continue;
+
+            // Cache the concrete mapping so subsequent lookups find it directly.
+            _existingTargetMappings.TryAddAsDefault(mapping, mappingKey.Configuration);
+            return mapping;
+        }
+
+        return null;
     }
 
     private class MappingCollectionInstance<T, TUserMapping>

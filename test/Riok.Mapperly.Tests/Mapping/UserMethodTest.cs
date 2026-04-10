@@ -804,4 +804,422 @@ public class UserMethodTest
             .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "Map has an unsupported mapping method signature")
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public void WithGenericSourceTypeConstraintAndUserImplemented()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial To Map(From source);
+
+            public OtherValue PickMe<TSource>(TSource source)
+                where TSource : IValue => new OtherValue { Value = source.Value };
+            """,
+            "public interface IValue { public string Value { get; } }",
+            "public class OtherValue { public string Value { get; set; } }",
+            "public class A : IValue { public string Value { get; set; } }",
+            "public class B : IValue { public string Value { get; set; } }",
+            "public class From { public A AV { get; set; } public B BV { get; set; } }",
+            "public class To { public OtherValue AV { get; set; } public OtherValue BV { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::To();
+                target.AV = PickMe<global::A>(source.AV);
+                target.BV = PickMe<global::B>(source.BV);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void WithGenericSourceAndTargetTypeAndUserImplemented()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial DocumentDto Map(Document source);
+
+            private UserDto MapUser(User source) => new UserDto { Id = source.Id };
+
+            private Optional<TTarget> MapOptional<TSource, TTarget>(Optional<TSource> source)
+                where TSource : notnull
+                where TTarget : notnull
+                => new Optional<TTarget> { Value = MapUser(source.Value) };
+            """,
+            "public class Optional<T> where T : notnull { public T? Value { get; set; } }",
+            "public class User { public string Id { get; set; } }",
+            "public class UserDto { public string Id { get; set; } }",
+            "public class Document { public Optional<User> ModifiedBy { get; set; } }",
+            "public class DocumentDto { public Optional<UserDto> ModifiedBy { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::DocumentDto();
+                target.ModifiedBy = MapOptional<global::User, global::UserDto>(source.ModifiedBy);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public Task WithGenericUserImplementedOptionalSample()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial DocumentDto MapDocument(Document source);
+
+            private Optional<TTarget> MapOptional<TSource, TTarget>(Optional<TSource> source)
+                where TSource : notnull
+                where TTarget : notnull
+                => source.HasValue
+                    ? Optional.Of(Map(source.Value))
+                    : Optional.Empty();
+
+            private partial TTarget Map<TSource, TTarget>(TSource source)
+                where TSource : notnull
+                where TTarget : notnull;
+
+            private partial UserDto MapUser(User source);
+            """,
+            "public record Document(string Title, User CreatedBy, Optional<User> ModifiedBy);",
+            "public record DocumentDto(string Title, UserDto CreatedBy, Optional<UserDto> ModifiedBy);",
+            "public record User(string Name);",
+            "public record UserDto(string Name);",
+            "public readonly record struct EmptyOptional;",
+            "public static class Optional { public static Optional<T> Of<T>(T value) where T : notnull => new(value); public static EmptyOptional Empty() => default; }",
+            "public class Optional<T> where T : notnull { public Optional() {} public Optional(T value) { HasValue = true; Value = value; } public bool HasValue { get; } public T Value { get; } public static implicit operator Optional<T>(EmptyOptional _) => new(); }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void WithGenericSourceTypeConstraintsAndUserImplementedGenericAndNonGeneric()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial To Map(From source);
+
+            public OtherValue PickMeForAAndB<TSource>(TSource source)
+                where TSource : IValue => new OtherValue { Value = source.Value };
+
+            public OtherValue PickMeForIValue(IValue source) => new OtherValue { Value = source.Value };
+            """,
+            "public interface IValue { public string Value { get; } }",
+            "public class OtherValue { public string Value { get; set; } }",
+            "public class A : IValue { public string Value { get; set; } }",
+            "public class B : IValue { public string Value { get; set; } }",
+            "public class From { public A AV { get; set; } public B BV { get; set; } public IValue IV { get; set; } }",
+            "public class To { public OtherValue AV { get; set; } public OtherValue BV { get; set; } public OtherValue IV { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::To();
+                target.AV = PickMeForAAndB<global::A>(source.AV);
+                target.BV = PickMeForAAndB<global::B>(source.BV);
+                target.IV = PickMeForIValue(source.IV);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void WithGenericSourceAndTargetTypeParametersAndUserImplemented()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial ADto Map(A source);
+
+            private TTarget MapGeneric<TSource, TTarget>(TSource source)
+                where TSource : IMyInterface
+                where TTarget : new(), IMyOtherInterface
+                => new TTarget { MyValue = source.MyValue };
+            """,
+            "public interface IMyInterface { public string MyValue { get; } }",
+            "public interface IMyOtherInterface { public string MyValue { get; set; } }",
+            "public class B : IMyInterface { public string MyValue { get; set; } }",
+            "public class BDto : IMyOtherInterface { public string MyValue { get; set; } }",
+            "public class A { public B Nested { get; set; } }",
+            "public class ADto { public BDto Nested { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::ADto();
+                target.Nested = MapGeneric<global::B, global::BDto>(source.Nested);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public Task WithGenericUserImplementedAndReferenceHandling()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial B Map(A a);
+
+            private Optional<TTarget> MapOptional<TSource, TTarget>(Optional<TSource> source)
+                where TSource : notnull
+                where TTarget : notnull
+                => new Optional<TTarget>();
+            """,
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A { public A Parent { get; set; } public Optional<C> Value { get; set; } }",
+            "class B { public B Parent { get; set; } public Optional<D> Value { get; set; } }",
+            "class C { public string StringValue { get; set; } }",
+            "class D { public string StringValue { get; set; } }",
+            "class Optional<T> where T : notnull { public T Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task WithGenericUserImplementedWithReferenceHandlerParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial B Map(A a);
+
+            private Optional<TTarget> MapOptional<TSource, TTarget>(Optional<TSource> source, [ReferenceHandler] IReferenceHandler refHandler)
+                where TSource : notnull
+                where TTarget : notnull
+                => new Optional<TTarget>();
+            """,
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A { public A Parent { get; set; } public Optional<C> Value { get; set; } }",
+            "class B { public B Parent { get; set; } public Optional<D> Value { get; set; } }",
+            "class C { public string StringValue { get; set; } }",
+            "class D { public string StringValue { get; set; } }",
+            "class Optional<T> where T : notnull { public T Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void WithGenericUserImplementedAndAdditionalParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial ADto Map(A source, int ctx);
+
+            private TTarget MapGeneric<TSource, TTarget>(TSource source)
+                where TSource : IEntity
+                where TTarget : new(), IDto
+                => new TTarget { Id = source.Id };
+            """,
+            "public interface IEntity { public int Id { get; } }",
+            "public interface IDto { public int Id { get; set; } }",
+            "public class B : IEntity { public int Id { get; set; } }",
+            "public class BDto : IDto { public int Id { get; set; } }",
+            "public class A { public B Nested { get; set; } }",
+            "public class ADto { public BDto Nested { get; set; } public int Ctx { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::ADto();
+                target.Nested = MapGeneric<global::B, global::BDto>(source.Nested);
+                target.Ctx = ctx;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public Task WithGenericUserImplementedWithReferenceHandlerParameterAndRecursiveType()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial B Map(A a);
+
+            private Wrapper<TTarget> MapWrapper<TSource, TTarget>(Wrapper<TSource> source, [ReferenceHandler] IReferenceHandler refHandler)
+                where TSource : notnull
+                where TTarget : notnull
+                => new Wrapper<TTarget>();
+            """,
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "class A { public A Parent { get; set; } public Wrapper<C> Value { get; set; } }",
+            "class B { public B Parent { get; set; } public Wrapper<D> Value { get; set; } }",
+            "class C { public string StringValue { get; set; } }",
+            "class D { public string StringValue { get; set; } }",
+            "class Wrapper<T> where T : notnull { public T Inner { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void WithGenericUserImplementedExistingTarget()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial ADto Map(A source);
+
+            private void MapGeneric<TSource, TTarget>([MappingTarget] TTarget target, TSource source)
+                where TSource : IEntity
+                where TTarget : IDto
+            {
+                target.Id = source.Id;
+            }
+            """,
+            "public interface IEntity { public int Id { get; } public string Name { get; } }",
+            "public interface IDto { public int Id { get; set; } public string Name { get; set; } }",
+            "public class B : IEntity { public int Id { get; set; } public string Name { get; set; } }",
+            "public class BDto : IDto { public int Id { get; set; } public string Name { get; set; } }",
+            "public class A { public B Nested { get; set; } }",
+            "public class ADto { public BDto Nested { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::ADto();
+                target.Nested = MapToBDto(source.Nested);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public Task WithGenericUserImplementedExistingTargetAndReferenceHandling()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial B Map(A a);
+
+            private void MapGeneric<TSource, TTarget>([MappingTarget] TTarget target, TSource source, [ReferenceHandler] IReferenceHandler refHandler)
+                where TSource : IEntity
+                where TTarget : IDto
+            {
+                target.Id = source.Id;
+            }
+            """,
+            TestSourceBuilderOptions.WithReferenceHandling,
+            "interface IEntity { public int Id { get; } }",
+            "interface IDto { public int Id { get; set; } }",
+            "class C : IEntity { public int Id { get; set; } public C Parent { get; set; } }",
+            "class D : IDto { public int Id { get; set; } public D Parent { get; set; } }",
+            "class A { public A Parent { get; set; } public C Value { get; set; } }",
+            "class B { public B Parent { get; set; } public D Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void WithGenericUserImplementedMultipleTypeParametersPartialMatch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial OuterDto Map(Outer source);
+
+            private Pair<TTarget1, TTarget2> MapPair<TSource1, TSource2, TTarget1, TTarget2>(Pair<TSource1, TSource2> source)
+                where TSource1 : notnull
+                where TSource2 : notnull
+                where TTarget1 : notnull
+                where TTarget2 : notnull
+                => new Pair<TTarget1, TTarget2>();
+            """,
+            "class Pair<T1, T2> where T1 : notnull where T2 : notnull { public T1 Left { get; set; } public T2 Right { get; set; } }",
+            "class X { public string Value { get; set; } }",
+            "class XDto { public string Value { get; set; } }",
+            "class Y { public int Value { get; set; } }",
+            "class YDto { public int Value { get; set; } }",
+            "class Outer { public Pair<X, Y> Items { get; set; } }",
+            "class OuterDto { public Pair<XDto, YDto> Items { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::OuterDto();
+                target.Items = MapPair<global::X, global::Y, global::XDto, global::YDto>(source.Items);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void WithGenericUserImplementedOnStaticMapper()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial ADto Map(A source);
+
+            private static TTarget MapGeneric<TSource, TTarget>(TSource source)
+                where TSource : IEntity
+                where TTarget : new(), IDto
+                => new TTarget { Id = source.Id };
+            """,
+            TestSourceBuilderOptions.AsStatic,
+            "public interface IEntity { public int Id { get; } }",
+            "public interface IDto { public int Id { get; set; } }",
+            "public class B : IEntity { public int Id { get; set; } }",
+            "public class BDto : IDto { public int Id { get; set; } }",
+            "public class A { public B Nested { get; set; } }",
+            "public class ADto { public BDto Nested { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::ADto();
+                target.Nested = MapGeneric<global::B, global::BDto>(source.Nested);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void WithGenericUserImplementedConstraintMismatchShouldNotMatch()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial ADto Map(A source);
+
+            private TTarget MapGeneric<TSource, TTarget>(TSource source)
+                where TSource : ISpecialEntity
+                where TTarget : new(), IDto
+                => new TTarget { Id = source.Id };
+            """,
+            "public interface ISpecialEntity { public int Id { get; } }",
+            "public interface IDto { public int Id { get; set; } }",
+            "public class B { public int Id { get; set; } }",
+            "public class BDto : IDto { public int Id { get; set; } }",
+            "public class A { public B Nested { get; set; } }",
+            "public class ADto { public BDto Nested { get; set; } }"
+        );
+
+        // B does not implement ISpecialEntity, so the generic method should NOT match.
+        // Mapperly should fall back to generating a regular mapping.
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::ADto();
+                target.Nested = MapToBDto(source.Nested);
+                return target;
+                """
+            );
+    }
 }
