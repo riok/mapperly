@@ -23,8 +23,8 @@ public class DescriptorBuilder
     private readonly SymbolAccessor _symbolAccessor;
     private readonly ImmutableArray<UseStaticMapperConfiguration> _assemblyScopedStaticMappers;
 
-    private readonly MappingCollection _mappings = new();
-    private readonly InlinedExpressionMappingCollection _inlineMappings = new();
+    private readonly MappingCollection _mappings;
+    private readonly InlinedExpressionMappingCollection _inlineMappings;
 
     private readonly MethodNameBuilder _methodNameBuilder = new();
     private readonly MappingBodyBuilder _mappingBodyBuilder;
@@ -47,11 +47,14 @@ public class DescriptorBuilder
         _symbolAccessor = symbolAccessor;
         _attributeAccessor = attributeDataAccessor;
         _assemblyScopedStaticMappers = assemblyScopedStaticMappers;
+
+        var genericTypeChecker = new GenericTypeChecker(_symbolAccessor, compilationContext.Types);
+        _mappings = new MappingCollection(genericTypeChecker);
+        _inlineMappings = new InlinedExpressionMappingCollection(genericTypeChecker);
         _mappingBodyBuilder = new MappingBodyBuilder(_mappings);
         _unsafeAccessorContext = new UnsafeAccessorContext(_methodNameBuilder, symbolAccessor);
         _diagnostics = new DiagnosticCollection(mapperDeclaration.Syntax.GetLocation());
 
-        var genericTypeChecker = new GenericTypeChecker(_symbolAccessor, compilationContext.Types);
         var configurationReader = new MapperConfigurationReader(
             _attributeAccessor,
             _mappings,
