@@ -29,7 +29,7 @@ public class GenericDerivedTypeTest
                 """
                 return source switch
                 {
-                    global::Base x when typeof(TTarget).IsAssignableFrom(typeof(global::BaseDto)) => (TTarget)(object)MapDerivedTypes(x),
+                    global::Base x when typeof(global::BaseDto).IsAssignableFrom(typeof(TTarget)) => (TTarget)(object)MapDerivedTypes(x),
                     null => throw new global::System.ArgumentNullException(nameof(source)),
                     _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
                 };
