@@ -92,9 +92,13 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
     protected virtual ExpressionSyntax? BuildSwitchArmWhenClause(ExpressionSyntax runtimeTargetType, RuntimeTargetTypeMapping mapping)
     {
         // targetType.IsAssignableFrom(typeof(ADto))
+        var mappingTargetType = TypeOfExpression(FullyQualifiedIdentifier(mapping.Mapping.TargetType.NonNullable()));
+
+        // If the mapping is a derived type mapping, the runtime target type is the source of the IsAssignableFrom check, otherwise it is the runtime target type.
+        // For example, when we map to ADto which is a BaseDto, it is typeof(BaseDto).IsAssignableFrom(typeof(ADto)).
         return InvocationWithoutIndention(
-            MemberAccess(runtimeTargetType, IsAssignableFromMethodName),
-            TypeOfExpression(FullyQualifiedIdentifier(mapping.Mapping.TargetType.NonNullable()))
+            MemberAccess(mapping.IsDerivedTypeMapping ? mappingTargetType : runtimeTargetType, IsAssignableFromMethodName),
+            mapping.IsDerivedTypeMapping ? runtimeTargetType : mappingTargetType
         );
     }
 
