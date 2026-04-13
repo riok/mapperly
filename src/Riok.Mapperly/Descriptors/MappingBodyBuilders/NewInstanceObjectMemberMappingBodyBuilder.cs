@@ -104,7 +104,7 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
             return;
 
         var initOnlyTargetMembers = includeAllMembers
-            ? ctx.EnumerateUnmappedTargetMembers().ToArray()
+            ? ctx.EnumerateUnmappedTargetMembers().Where(x => x.CanSet).ToArray()
             : ctx.EnumerateUnmappedTargetMembers().Where(x => x.CanOnlySetViaInitializer()).ToArray();
         foreach (var targetMember in initOnlyTargetMembers)
         {

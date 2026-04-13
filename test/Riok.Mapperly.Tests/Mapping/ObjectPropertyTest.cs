@@ -120,6 +120,21 @@ public class ObjectPropertyTest
     }
 
     [Fact]
+    public void ShouldIgnoreReadOnlyPropertyWithProjection()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial System.Linq.IQueryable<B> ProjectToB(System.Linq.IQueryable<A> q);
+            partial B MapToB(A source);
+            """,
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            """class B { public string FirstName { get; set; } public string LastName { get; set; } public string FullName => FirstName + " " + LastName; }"""
+        );
+
+        TestHelper.GenerateMapper(source, TestHelperOptions.AllowAndIncludeAllDiagnostics).Should().HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
     public void ShouldIgnoreIndexedProperty()
     {
         var source = TestSourceBuilder.Mapping(
