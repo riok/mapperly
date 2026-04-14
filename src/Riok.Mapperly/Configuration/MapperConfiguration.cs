@@ -131,6 +131,11 @@ public record MapperConfiguration
     public bool? AutoUserMappings { get; init; }
 
     /// <summary>
+    /// Whether to prevent mapping methods of this mapper from being inlined into expression trees for queryable projection mappings.
+    /// </summary>
+    public bool? NoInlining { get; init; }
+
+    /// <summary>
     /// The default enum naming strategy.
     /// Can be overwritten on specific enums via mapping method configurations.
     /// </summary>
