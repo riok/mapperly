@@ -199,6 +199,9 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
 
     private INewInstanceMapping TryInlineMapping(INewInstanceMapping mapping)
     {
+        if (mapping is IUserMapping userMappingCheck && ShouldSkipInlining(userMappingCheck.Method))
+            return mapping;
+
         return mapping switch
         {
             // inline existing mapping
@@ -214,6 +217,19 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
 
             _ => mapping,
         };
+    }
+
+    private bool ShouldSkipInlining(IMethodSymbol method)
+    {
+        if (SymbolAccessor.HasAttribute<MapperNoInliningAttribute>(method))
+            return true;
+
+        var containingType = method.ContainingType;
+        if (containingType == null)
+            return false;
+
+        var mapperAttribute = AttributeAccessor.AccessFirstOrDefault<MapperAttribute>(containingType);
+        return mapperAttribute?.NoInlining == true;
     }
 
     private INewInstanceMapping? InlineOrRebuild(UserImplementedMethodMapping mapping)
