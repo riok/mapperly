@@ -165,7 +165,7 @@ public class RuntimeTargetTypeMappingTest
                 """
                 return source switch
                 {
-                    global::Base x when targetType.IsAssignableFrom(typeof(global::BaseDto)) => MapDerivedTypes(x),
+                    global::Base x when typeof(global::BaseDto).IsAssignableFrom(targetType) => MapDerivedTypes(x),
                     _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
                 };
                 """

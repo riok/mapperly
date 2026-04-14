@@ -15,12 +15,15 @@ public class UserDefinedNewInstanceMethodMapping(
     MethodParameter sourceParameter,
     MethodParameter? referenceHandlerParameter,
     ITypeSymbol targetType,
-    bool enableReferenceHandling
+    bool enableReferenceHandling,
+    bool isDerivedTypeMapping
 ) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), INewInstanceUserMapping
 {
     private INewInstanceMapping? _delegateMapping;
 
     public new IMethodSymbol Method { get; } = method;
+
+    public bool IsDerivedTypeMapping => isDerivedTypeMapping;
 
     private MethodMapping? DelegateMethodMapping => _delegateMapping as MethodMapping;
 
