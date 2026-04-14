@@ -70,6 +70,20 @@ public partial class MyMapper
 }
 ```
 
+### Inlining
+
+By default, Mapperly inlines mapping methods into expression trees when possible.
+Set `NoInlining` to `true` to prevent mapping methods of this mapper from being inlined into expression trees
+when referenced via `UseStaticMapper`. Defaults to `false`.
+
+```csharp
+[Mapper(NoInlining = true)]
+public partial class CarMapper
+{
+    // ...
+}
+```
+
 ## Properties / fields
 
 On each mapping method declaration, property and field mappings can be customized.
