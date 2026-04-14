@@ -55,13 +55,13 @@ and `Target` for the response mapper (all response fields must be populated).
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Source)]
 public partial class RequestMapper
 {
-    public partial CreateOrderCommand MapRequest(CreateOrderRequest request);
+    public partial CreateOrderCommand MapRequest(CreateOrderRequest source);
 }
 
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public partial class ResponseMapper
 {
-    public partial GetOrderResponse MapResponse(Order order);
+    public partial GetOrderResponse MapResponse(Order source);
 }
 ```
 
