@@ -29,11 +29,11 @@ You can mix generated and [user-implemented mapping methods](../configuration/us
 [Mapper]
 public partial class OrderMapper
 {
-    public partial OrderDto MapOrder(Order order);
+    public partial OrderDto MapOrder(Order source);
 
     // Complex mapping logic is easier to read and maintain when written by hand
-    private MoneyDto MapMoney(Money money)
-        => new MoneyDto { Amount = money.Units + money.Nanos / 1_000_000_000m, Currency = money.CurrencyCode };
+    private MoneyDto MapMoney(Money source)
+        => new MoneyDto { Amount = source.Units + source.Nanos / 1_000_000_000m, Currency = source.CurrencyCode };
 }
 ```
 
