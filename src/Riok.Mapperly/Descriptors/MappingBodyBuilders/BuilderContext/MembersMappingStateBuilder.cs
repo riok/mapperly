@@ -51,6 +51,14 @@ internal static class MembersMappingStateBuilder
             .Keys.GroupBy(x => x, StringComparer.OrdinalIgnoreCase)
             .ToDictionary(x => x.Key, x => x.First(), StringComparer.OrdinalIgnoreCase);
         var unmappedTargetMemberNames = targetMembers.Keys.ToHashSet();
+
+        // Only expose additional parameters as source members when:
+        // 1. The scope is root (this mapping declared the parameters), or
+        // 2. We're in an expression context (inline within the same method scope).
+        // For separate auto-generated method mappings, inherited parent parameters
+        // must not shadow source type members.
+        var parameterScope = ctx.ParameterScope.IsRoot || ctx.IsExpression ? ctx.ParameterScope : ParameterScope.Empty;
+
         return new MembersMappingState(
             unmappedSourceMemberNames,
             unmappedTargetMemberNames,
@@ -60,7 +68,7 @@ internal static class MembersMappingStateBuilder
             memberConfigsByRootTargetName,
             configuredTargetMembersByRootName.AsDictionary(),
             ignoredSourceMemberNames,
-            ctx.ParameterScope
+            parameterScope
         );
     }
 
