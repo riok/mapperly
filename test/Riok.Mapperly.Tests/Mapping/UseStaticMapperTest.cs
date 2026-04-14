@@ -773,4 +773,426 @@ public class UseStaticMapperTest
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline);
     }
+
+    [Fact]
+    public void ProjectionWithUseStaticEnumMapperByNameWithDifferentUnderlyingTypesShouldDiagnose()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            namespace Source
+            {
+                public enum Status : sbyte
+                {
+                    Planned = 0,
+                    Generated = 1,
+                    Paused = 2,
+                    Running = 3,
+                }
+            }
+
+            namespace Target
+            {
+                public enum Status : byte
+                {
+                    Planned = 0,
+                    Generated = 1,
+                    Paused = 2,
+                    Running = 3,
+                }
+            }
+
+            public class Entity
+            {
+                public int Id { get; set; }
+                public Source.Status Status { get; set; }
+            }
+
+            public class Domain
+            {
+                public int Id { get; set; }
+                public Target.Status Status { get; set; }
+            }
+
+            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
+            public static partial class EnumMappingExtensions
+            {
+                public static partial Target.Status MapToStatus(this Source.Status source);
+            }
+
+            [Mapper]
+            [UseStaticMapper(typeof(EnumMappingExtensions))]
+            public static partial class Mapper
+            {
+                public static partial IQueryable<Domain> ProjectToDomain(this IQueryable<Entity> queryable);
+
+                public static partial Domain MapToDomain(this Entity entity);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostics(
+                DiagnosticDescriptors.SourceEnumValueNotMapped,
+                "Enum member Planned (0) on Source.Status not found on target enum Target.Status",
+                "Enum member Generated (1) on Source.Status not found on target enum Target.Status",
+                "Enum member Paused (2) on Source.Status not found on target enum Target.Status",
+                "Enum member Running (3) on Source.Status not found on target enum Target.Status"
+            )
+            .HaveDiagnostics(
+                DiagnosticDescriptors.TargetEnumValueNotMapped,
+                "Enum member Planned (0) on Target.Status not found on source enum Source.Status",
+                "Enum member Generated (1) on Target.Status not found on source enum Source.Status",
+                "Enum member Paused (2) on Target.Status not found on source enum Source.Status",
+                "Enum member Running (3) on Target.Status not found on source enum Source.Status"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void ProjectionWithUseStaticEnumMapperByNameWithNoInliningShouldWork()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            namespace Source
+            {
+                public enum Status : sbyte
+                {
+                    Planned = 0,
+                    Generated = 1,
+                    Paused = 2,
+                    Running = 3,
+                }
+            }
+
+            namespace Target
+            {
+                public enum Status : byte
+                {
+                    Planned = 0,
+                    Generated = 1,
+                    Paused = 2,
+                    Running = 3,
+                }
+            }
+
+            public class Entity
+            {
+                public int Id { get; set; }
+                public Source.Status Status { get; set; }
+            }
+
+            public class Domain
+            {
+                public int Id { get; set; }
+                public Target.Status Status { get; set; }
+            }
+
+            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
+            public static partial class EnumMappingExtensions
+            {
+                [MapperNoInlining]
+                public static partial Target.Status MapToStatus(this Source.Status source);
+            }
+
+            [Mapper]
+            [UseStaticMapper(typeof(EnumMappingExtensions))]
+            public static partial class Mapper
+            {
+                public static partial IQueryable<Domain> ProjectToDomain(this IQueryable<Entity> queryable);
+
+                public static partial Domain MapToDomain(this Entity entity);
+            }
+            """
+        );
+
+        var generated = TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics);
+
+        generated.Diagnostics.ShouldNotContain(x => x.Descriptor.Id == DiagnosticDescriptors.QueryableProjectionMappingCannotInline.Id);
+        generated
+            .Should()
+            .HaveMethodBody(
+                "MapToDomain",
+                """
+                var target = new global::Domain();
+                target.Id = entity.Id;
+                target.Status = global::EnumMappingExtensions.MapToStatus(entity.Status);
+                return target;
+                """
+            )
+            .HaveMethodBody(
+                "ProjectToDomain",
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            queryable,
+                            x => new global::Domain()
+                            {
+                                Id = x.Id,
+                                Status = global::EnumMappingExtensions.MapToStatus(x.Status),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
+    public void MapperNoInliningOnNonProjectionMethodShouldHaveNoEffect()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+
+            namespace Source
+            {
+                public enum Status : sbyte
+                {
+                    Planned = 0,
+                    Generated = 1,
+                    Paused = 2,
+                    Running = 3,
+                }
+            }
+
+            namespace Target
+            {
+                public enum Status : byte
+                {
+                    Planned = 0,
+                    Generated = 1,
+                    Paused = 2,
+                    Running = 3,
+                }
+            }
+
+            public class Entity
+            {
+                public int Id { get; set; }
+                public Source.Status Status { get; set; }
+            }
+
+            public class Domain
+            {
+                public int Id { get; set; }
+                public Target.Status Status { get; set; }
+            }
+
+            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName, NoInlining = true)]
+            public static partial class EnumMappingExtensions
+            {
+                [MapperNoInlining]
+                public static partial Target.Status MapToStatus(this Source.Status source);
+            }
+
+            [Mapper]
+            [UseStaticMapper(typeof(EnumMappingExtensions))]
+            public static partial class Mapper
+            {
+                public static partial Domain MapToDomain(this Entity entity);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMethodBody(
+                "MapToDomain",
+                """
+                var target = new global::Domain();
+                target.Id = entity.Id;
+                target.Status = global::EnumMappingExtensions.MapToStatus(entity.Status);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ProjectionWithUsedMapperNoInliningShouldNotInline()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            namespace Source
+            {
+                public enum Status : sbyte
+                {
+                    Planned = 0,
+                    Generated = 1,
+                    Paused = 2,
+                    Running = 3,
+                }
+            }
+
+            namespace Target
+            {
+                public enum Status : byte
+                {
+                    Planned = 0,
+                    Generated = 1,
+                    Paused = 2,
+                    Running = 3,
+                }
+            }
+
+            public class Entity
+            {
+                public int Id { get; set; }
+                public Source.Status Status { get; set; }
+            }
+
+            public class Domain
+            {
+                public int Id { get; set; }
+                public Target.Status Status { get; set; }
+            }
+
+            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName, NoInlining = true)]
+            public static partial class EnumMappingExtensions
+            {
+                public static partial Target.Status MapToStatus(this Source.Status source);
+            }
+
+            [Mapper]
+            [UseStaticMapper(typeof(EnumMappingExtensions))]
+            public static partial class Mapper
+            {
+                public static partial IQueryable<Domain> ProjectToDomain(this IQueryable<Entity> queryable);
+
+                public static partial Domain MapToDomain(this Entity entity);
+            }
+            """
+        );
+
+        var generated = TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics);
+
+        generated.Diagnostics.ShouldNotContain(x => x.Descriptor.Id == DiagnosticDescriptors.QueryableProjectionMappingCannotInline.Id);
+        generated
+            .Should()
+            .HaveMethodBody(
+                "MapToDomain",
+                """
+                var target = new global::Domain();
+                target.Id = entity.Id;
+                target.Status = global::EnumMappingExtensions.MapToStatus(entity.Status);
+                return target;
+                """
+            )
+            .HaveMethodBody(
+                "ProjectToDomain",
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            queryable,
+                            x => new global::Domain()
+                            {
+                                Id = x.Id,
+                                Status = global::EnumMappingExtensions.MapToStatus(x.Status),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
+    public void ProjectionWithCalledMethodNoInliningShouldNotInline()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            namespace Source
+            {
+                public enum Status : sbyte
+                {
+                    Planned = 0,
+                    Generated = 1,
+                    Paused = 2,
+                    Running = 3,
+                }
+            }
+
+            namespace Target
+            {
+                public enum Status : byte
+                {
+                    Planned = 0,
+                    Generated = 1,
+                    Paused = 2,
+                    Running = 3,
+                }
+            }
+
+            public class Entity
+            {
+                public int Id { get; set; }
+                public Source.Status Status { get; set; }
+            }
+
+            public class Domain
+            {
+                public int Id { get; set; }
+                public Target.Status Status { get; set; }
+            }
+
+            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
+            public static partial class EnumMappingExtensions
+            {
+                [MapperNoInlining]
+                public static partial Target.Status MapToStatus(this Source.Status source);
+            }
+
+            [Mapper]
+            [UseStaticMapper(typeof(EnumMappingExtensions))]
+            public static partial class Mapper
+            {
+                public static partial IQueryable<Domain> ProjectToDomain(this IQueryable<Entity> queryable);
+
+                public static partial Domain MapToDomain(this Entity entity);
+            }
+            """
+        );
+
+        var generated = TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics);
+
+        generated.Diagnostics.ShouldNotContain(x => x.Descriptor.Id == DiagnosticDescriptors.QueryableProjectionMappingCannotInline.Id);
+        generated
+            .Should()
+            .HaveMethodBody(
+                "MapToDomain",
+                """
+                var target = new global::Domain();
+                target.Id = entity.Id;
+                target.Status = global::EnumMappingExtensions.MapToStatus(entity.Status);
+                return target;
+                """
+            )
+            .HaveMethodBody(
+                "ProjectToDomain",
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            queryable,
+                            x => new global::Domain()
+                            {
+                                Id = x.Id,
+                                Status = global::EnumMappingExtensions.MapToStatus(x.Status),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
 }
