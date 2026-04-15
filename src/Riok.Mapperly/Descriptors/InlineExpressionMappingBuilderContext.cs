@@ -224,11 +224,7 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
         if (SymbolAccessor.HasAttribute<MapperNoInliningAttribute>(method))
             return true;
 
-        var containingType = method.ContainingType;
-        if (containingType == null)
-            return false;
-
-        var mapperAttribute = AttributeAccessor.AccessFirstOrDefault<MapperAttribute>(containingType);
+        var mapperAttribute = AttributeAccessor.AccessFirstOrDefault<MapperAttribute>(method.ContainingType);
         return mapperAttribute?.NoInlining == true;
     }
 
