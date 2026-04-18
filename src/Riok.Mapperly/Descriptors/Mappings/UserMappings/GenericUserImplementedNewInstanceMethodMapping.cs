@@ -19,7 +19,8 @@ internal sealed class GenericUserImplementedNewInstanceMethodMapping(
     MethodParameter? referenceHandlerParameter,
     MethodParameter? targetOriginalValueParameter,
     bool isExternal,
-    UserImplementedMethodMapping.TargetNullability targetNullability
+    UserImplementedMethodMapping.TargetNullability targetNullability,
+    bool noInlining
 ) : INewInstanceUserMapping
 {
     public ITypeSymbol SourceType => sourceParameter.Type;
@@ -31,6 +32,8 @@ internal sealed class GenericUserImplementedNewInstanceMethodMapping(
     public bool? Default => false;
 
     public bool IsExternal => isExternal;
+
+    public bool NoInlining => noInlining;
 
     public bool IsSynthetic => false;
 
@@ -77,7 +80,8 @@ internal sealed class GenericUserImplementedNewInstanceMethodMapping(
             referenceHandlerParameter,
             concreteTargetOriginalValueParameter,
             isExternal,
-            targetNullability
+            targetNullability,
+            noInlining
         );
     }
 }

@@ -18,4 +18,7 @@ public interface IUserMapping : ITypeMapping
     /// E.g. base class or imported via <see cref="UseStaticMapperAttribute{T}"/>
     /// </summary>
     bool IsExternal { get; }
+
+    /// <inheritdoc cref="MapperNoInliningAttribute"/>
+    bool NoInlining { get; }
 }
