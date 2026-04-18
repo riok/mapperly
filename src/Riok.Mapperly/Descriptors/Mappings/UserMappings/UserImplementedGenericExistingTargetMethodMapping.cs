@@ -20,7 +20,8 @@ public class UserImplementedGenericExistingTargetMethodMapping(
     ITypeSymbol concreteTargetType,
     IReadOnlyList<ITypeSymbol> typeArguments,
     MethodParameter? referenceHandlerParameter,
-    bool isExternal
+    bool isExternal,
+    bool noInlining
 )
     : UserImplementedExistingTargetMethodMapping(
         receiver,
@@ -31,7 +32,8 @@ public class UserImplementedGenericExistingTargetMethodMapping(
         concreteSourceType,
         concreteTargetType,
         referenceHandlerParameter,
-        isExternal
+        isExternal,
+        noInlining
     )
 {
     protected override SimpleNameSyntax BuildMethodName()
