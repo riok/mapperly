@@ -17,7 +17,8 @@ internal sealed class GenericUserImplementedExistingTargetMethodMapping(
     MethodParameter sourceParameter,
     MethodParameter targetParameter,
     MethodParameter? referenceHandlerParameter,
-    bool isExternal
+    bool isExternal,
+    bool noInlining
 ) : IExistingTargetUserMapping
 {
     public ITypeSymbol SourceType => sourceParameter.Type;
@@ -29,6 +30,8 @@ internal sealed class GenericUserImplementedExistingTargetMethodMapping(
     public bool? Default => false;
 
     public bool IsExternal => isExternal;
+
+    public bool NoInlining => noInlining;
 
     public bool IsSynthetic => false;
 
@@ -68,7 +71,8 @@ internal sealed class GenericUserImplementedExistingTargetMethodMapping(
             concreteTargetType,
             typeArguments,
             referenceHandlerParameter,
-            isExternal
+            isExternal,
+            noInlining
         );
     }
 }
