@@ -122,6 +122,112 @@ public static partial class CarMapper
 It is important that the types in the user-implemented mapping method match the types of the objects to be mapped exactly.
 Otherwise, Mapperly cannot resolve the user-implemented mapping methods.
 
+## Controlling inlining
+
+Mapperly automatically tries to inline referenced mapping methods into expression trees for queryable projections.
+In some cases, this inlining can cause issues — for example, when enum mappings with different underlying types
+produce false diagnostics in expression context.
+
+You can prevent inlining of specific methods using the `MapperNoInlining` attribute,
+or prevent inlining of all methods in a mapper using the `NoInlining` property on the `Mapper` attribute.
+
+### Per-method opt-out
+
+```csharp
+[Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
+public static partial class EnumMapper
+{
+    // highlight-start
+    [MapperNoInlining]
+    // highlight-end
+    public static partial TargetStatus MapToStatus(this SourceStatus source);
+}
+
+[Mapper]
+[UseStaticMapper(typeof(EnumMapper))]
+public static partial class Mapper
+{
+    public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q);
+    public static partial CarDto MapToDto(this Car car);
+}
+```
+
+### Per-mapper opt-out
+
+```csharp
+// highlight-start
+[Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName, NoInlining = true)]
+// highlight-end
+public static partial class EnumMapper
+{
+    public static partial TargetStatus MapToStatus(this SourceStatus source);
+}
+```
+
+### Runtime behavior
+
+The `NoInlining` setting changes how the projection is materialized at runtime.
+
+<Tabs>
+  <TabItem value="inline-true" label="Inlining enabled (default)" default>
+
+With inlining enabled, Mapperly rebuilds the mapping logic directly into the expression tree.
+The entire projection runs in SQL — but the rebuilt expression may produce incorrect results
+for non-trivial type pairs (e.g., enum mappings with different underlying types):
+
+```csharp
+// What runs under the hood:
+var dtos = await dbContext.Cars
+    .Select(x => new CarDto
+    {
+        // highlight-start
+        // Runs entirely in SQL, but the cast may be wrong
+        // for enums with different underlying types
+        Status = (TargetStatus)x.Status,
+        // highlight-end
+    })
+    .ToListAsync();
+```
+
+  </TabItem>
+  <TabItem value="inline-false" label="Inlining disabled (NoInlining = true)">
+
+With inlining disabled, the mapping method call is preserved as-is.
+The ORM cannot translate it to SQL, so Entity Framework will split the query
+into a server-side projection and client-side mapping:
+
+```csharp
+// What runs under the hood:
+var dtos = await dbContext.Cars
+    .Select(x => new
+    {
+        // highlight-start
+        // Only the needed columns are fetched from the database
+        Status = x.Status,
+        // highlight-end
+    })
+    // highlight-start
+    .AsEnumerable() // ← everything before runs in SQL, everything after is client-side
+    // highlight-end
+    .Select(x => new CarDto
+    {
+        // highlight-start
+        Status = EnumMapper.MapToStatus(x.Status), // ← runs in C#
+        // highlight-end
+    })
+    .ToListAsync();
+```
+
+  </TabItem>
+</Tabs>
+
+:::warning
+When inlining is disabled, the mapping method call cannot be translated to SQL.
+Entity Framework will evaluate it client-side, which means the relevant columns are still fetched
+from the database but the mapping logic runs in C# instead of SQL.
+Only use this when the default inlining behavior causes issues.
+:::
+
 ## Additional parameters
 
 Queryable projection methods can have [additional parameters](./additional-mapping-parameters.mdx).

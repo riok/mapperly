@@ -201,6 +201,9 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     {
         return mapping switch
         {
+            // check if NoInline is requested
+            IUserMapping userMapping when ShouldSkipInlining(userMapping.Method) => mapping,
+
             // inline existing mapping
             UserImplementedMethodMapping implementedMapping => InlineOrRebuild(implementedMapping) ?? implementedMapping,
 
@@ -214,6 +217,15 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
 
             _ => mapping,
         };
+    }
+
+    private bool ShouldSkipInlining(IMethodSymbol method)
+    {
+        if (SymbolAccessor.HasAttribute<MapperNoInliningAttribute>(method))
+            return true;
+
+        var mapperAttribute = AttributeAccessor.AccessFirstOrDefault<MapperAttribute>(method.ContainingType);
+        return mapperAttribute?.NoInlining == true;
     }
 
     private INewInstanceMapping? InlineOrRebuild(UserImplementedMethodMapping mapping)
