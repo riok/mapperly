@@ -24,7 +24,8 @@ public class UserDefinedExistingTargetGenericTypeMapping(
     MethodParameter sourceParameter,
     MethodParameter targetParameter,
     MethodParameter? referenceHandlerParameter,
-    bool enableReferenceHandling
+    bool enableReferenceHandling,
+    bool noInlining
 ) : MethodMapping(method, sourceParameter, referenceHandlerParameter, targetParameter.Type), IExistingTargetUserMapping
 {
     private const string SourceName = "source";
@@ -42,6 +43,8 @@ public class UserDefinedExistingTargetGenericTypeMapping(
     public bool? Default => false;
 
     public bool IsExternal => false;
+
+    public bool NoInlining => noInlining;
 
     private MethodParameter TargetParameter { get; } = targetParameter;
 

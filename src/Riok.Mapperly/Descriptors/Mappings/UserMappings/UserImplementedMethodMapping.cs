@@ -20,7 +20,8 @@ public class UserImplementedMethodMapping(
     ITypeSymbol targetType,
     MethodParameter? referenceHandlerParameter,
     bool isExternal,
-    UserImplementedMethodMapping.TargetNullability targetNullability
+    UserImplementedMethodMapping.TargetNullability targetNullability,
+    bool noInlining
 ) : NewInstanceMapping(sourceType, targetType), INewInstanceUserMapping, IParameterizedMapping
 {
     public enum TargetNullability
@@ -35,6 +36,8 @@ public class UserImplementedMethodMapping(
     public bool? Default { get; } = isDefault;
 
     public bool IsExternal { get; } = isExternal;
+
+    public bool NoInlining { get; } = noInlining;
 
     public IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; } =
         method

@@ -20,7 +20,8 @@ public class UserImplementedGenericMethodMapping(
     IReadOnlyList<ITypeSymbol> typeArguments,
     MethodParameter? referenceHandlerParameter,
     bool isExternal,
-    UserImplementedMethodMapping.TargetNullability targetNullability
+    UserImplementedMethodMapping.TargetNullability targetNullability,
+    bool noInlining
 )
     : UserImplementedMethodMapping(
         receiver,
@@ -31,7 +32,8 @@ public class UserImplementedGenericMethodMapping(
         concreteTargetType,
         referenceHandlerParameter,
         isExternal,
-        targetNullability
+        targetNullability,
+        noInlining
     )
 {
     protected override SimpleNameSyntax BuildMethodName()

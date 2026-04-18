@@ -16,7 +16,8 @@ public class UserDefinedNewInstanceMethodMapping(
     MethodParameter? referenceHandlerParameter,
     ITypeSymbol targetType,
     bool enableReferenceHandling,
-    bool isDerivedTypeMapping
+    bool isDerivedTypeMapping,
+    bool noInlining
 ) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), INewInstanceUserMapping
 {
     private INewInstanceMapping? _delegateMapping;
@@ -30,6 +31,8 @@ public class UserDefinedNewInstanceMethodMapping(
     public bool? Default { get; } = isDefault;
 
     public bool IsExternal => false;
+
+    public bool NoInlining { get; } = noInlining;
 
     /// <summary>
     /// The reference handling is enabled but is only internal to this method.
