@@ -199,11 +199,11 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
 
     private INewInstanceMapping TryInlineMapping(INewInstanceMapping mapping)
     {
-        if (mapping is IUserMapping userMappingCheck && ShouldSkipInlining(userMappingCheck.Method))
-            return mapping;
-
         return mapping switch
         {
+            // check if NoInline is requested
+            IUserMapping userMapping when ShouldSkipInlining(userMapping.Method) => mapping,
+
             // inline existing mapping
             UserImplementedMethodMapping implementedMapping => InlineOrRebuild(implementedMapping) ?? implementedMapping,
 
