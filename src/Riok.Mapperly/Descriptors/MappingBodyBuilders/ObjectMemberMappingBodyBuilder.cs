@@ -222,8 +222,10 @@ public static class ObjectMemberMappingBodyBuilder
         // if the member is readonly
         // and the target and source path is readable,
         // we also try to create an existing target mapping
+        var mappingKey = memberMappingInfo.ToTypeMappingKey();
         if (
             !HasExistingTargetNamedMapping(ctx, memberMappingInfo)
+            && !ctx.BuilderContext.HasExistingTargetRefUserMapping(mappingKey)
             && (
                 targetMemberPath.Member is { CanSet: true, IsInitOnly: false }
                 || !targetMemberPath.Path.All(op => op.CanGet)
@@ -234,7 +236,7 @@ public static class ObjectMemberMappingBodyBuilder
             return false;
         }
 
-        var existingTargetMapping = ctx.BuilderContext.FindOrBuildExistingTargetMapping(memberMappingInfo.ToTypeMappingKey());
+        var existingTargetMapping = ctx.BuilderContext.FindOrBuildExistingTargetMapping(mappingKey);
         if (existingTargetMapping is null)
             return false;
 

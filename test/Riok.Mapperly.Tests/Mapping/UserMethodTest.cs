@@ -85,6 +85,118 @@ public class UserMethodTest
     }
 
     [Fact]
+    public void ShouldAutoUseVoidMethodWithRefTargetParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial void Update([MappingTarget] B target, A source);
+            private static void MapOptional(Optional<string> src, ref string target)
+            {
+                if (src.HasValue)
+                    target = src.Value;
+            }
+            """,
+            "public class A { public Optional<string> Name { get; set; } }",
+            "public class B { public string Name { get; set; } }",
+            """
+            public struct Optional<T>
+            {
+                public Optional(T value) { Value = value; HasValue = true; }
+                public bool HasValue { get; }
+                public T Value { get; }
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMethodBody(
+                "Update",
+                """
+                var targetRef = target.Name;
+                MapOptional(source.Name, ref targetRef);
+                target.Name = targetRef;
+                """
+            );
+    }
+
+    [Fact]
+    public void ShouldPreferNewInstanceMappingOverRefMappingForPropertyMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial void Update([MappingTarget] B target, A source);
+            private static string FromOptional(Optional<string> src) => src.HasValue ? src.Value : "";
+            private static void MapOptional(Optional<string> src, ref string target)
+            {
+                if (src.HasValue)
+                    target = src.Value;
+            }
+            """,
+            "public class A { public Optional<string> Name { get; set; } }",
+            "public class B { public string Name { get; set; } }",
+            """
+            public struct Optional<T>
+            {
+                public Optional(T value) { Value = value; HasValue = true; }
+                public bool HasValue { get; }
+                public T Value { get; }
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMethodBody(
+                "Update",
+                """
+                target.Name = FromOptional(source.Name);
+                """
+            );
+    }
+
+    [Fact]
+    public void ShouldPreferExplicitDefaultRefMappingOverNewInstanceMappingForPropertyMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial void Update([MappingTarget] B target, A source);
+            private static string FromOptional(Optional<string> src) => src.HasValue ? src.Value : "";
+            [UserMapping(Default = true)]
+            private static void MapOptional(Optional<string> src, ref string target)
+            {
+                if (src.HasValue)
+                    target = src.Value;
+            }
+            """,
+            "public class A { public Optional<string> Name { get; set; } }",
+            "public class B { public string Name { get; set; } }",
+            """
+            public struct Optional<T>
+            {
+                public Optional(T value) { Value = value; HasValue = true; }
+                public bool HasValue { get; }
+                public T Value { get; }
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMethodBody(
+                "Update",
+                """
+                var targetRef = target.Name;
+                MapOptional(source.Name, ref targetRef);
+                target.Name = targetRef;
+                """
+            );
+    }
+
+    [Fact]
     public void WithExistingInstance()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
