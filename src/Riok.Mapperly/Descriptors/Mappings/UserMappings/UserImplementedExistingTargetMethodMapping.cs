@@ -29,6 +29,8 @@ public class UserImplementedExistingTargetMethodMapping(
 
     public bool IsExternal { get; } = isExternal;
 
+    public bool IsRefTarget => targetParameter.RefKind == RefKind.Ref;
+
     public IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; } =
         method
             .Parameters.Where(p =>

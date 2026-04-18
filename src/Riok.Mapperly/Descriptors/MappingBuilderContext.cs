@@ -286,6 +286,31 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         return mapping;
     }
 
+    public bool HasExistingTargetRefUserMapping(TypeMappingKey mappingKey)
+    {
+        // For same-type mappings, direct assignment is always preferred.
+        // The user should use [MapProperty(Use = nameof(...))] to opt in explicitly.
+        if (SymbolEqualityComparer.Default.Equals(mappingKey.Source, mappingKey.Target))
+            return false;
+
+        var refMapping =
+            ExistingTargetMappingBuilder.Find(mappingKey) as UserImplementedExistingTargetMethodMapping
+            ?? ExistingTargetMappingBuilder.Find(mappingKey.NonNullable()) as UserImplementedExistingTargetMethodMapping;
+
+        if (refMapping is not { IsRefTarget: true })
+            return false;
+
+        // If the ref mapping is explicitly declared as the default, it takes precedence over any new-instance mapping.
+        if (refMapping.Default == true)
+            return true;
+
+        // Otherwise, if a new-instance user mapping already covers these types, prefer that.
+        if (FindMapping(mappingKey) is INewInstanceUserMapping || FindMapping(mappingKey.NonNullable()) is INewInstanceUserMapping)
+            return false;
+
+        return true;
+    }
+
     /// <summary>
     /// Tries to build an existing target instance mapping.
     /// If no mapping is possible for the provided types,
