@@ -128,8 +128,8 @@ Mapperly automatically tries to inline referenced mapping methods into expressio
 In some cases, this inlining can cause issues — for example, when enum mappings with different underlying types
 produce false diagnostics in expression context.
 
-You can prevent inlining of specific methods using the `MapperNoInlining` attribute,
-or prevent inlining of all methods in a mapper using the `NoInlining` property on the `Mapper` attribute.
+You can prevent inlining of specific methods using the `MapperNoExpressionInlining` attribute,
+or prevent inlining of all methods in a mapper using the `NoExpressionInlining` property on the `Mapper` attribute.
 
 ### Per-method opt-out
 
@@ -138,7 +138,7 @@ or prevent inlining of all methods in a mapper using the `NoInlining` property o
 public static partial class EnumMapper
 {
     // highlight-start
-    [MapperNoInlining]
+    [MapperNoExpressionInlining]
     // highlight-end
     public static partial TargetStatus MapToStatus(this SourceStatus source);
 }
@@ -156,7 +156,7 @@ public static partial class Mapper
 
 ```csharp
 // highlight-start
-[Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName, NoInlining = true)]
+[Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName, NoExpressionInlining = true)]
 // highlight-end
 public static partial class EnumMapper
 {
@@ -166,7 +166,7 @@ public static partial class EnumMapper
 
 ### Runtime behavior
 
-The `NoInlining` setting changes how the projection is materialized at runtime.
+The `NoExpressionInlining` setting changes how the projection is materialized at runtime.
 
 <Tabs>
   <TabItem value="inline-true" label="Inlining enabled (default)" default>
@@ -190,7 +190,7 @@ var dtos = await dbContext.Cars
 ```
 
   </TabItem>
-  <TabItem value="inline-false" label="Inlining disabled (NoInlining = true)">
+  <TabItem value="inline-false" label="Inlining disabled (NoExpressionInlining = true)">
 
 With inlining disabled, the mapping method call is preserved as-is.
 The ORM cannot translate it to SQL, so Entity Framework will split the query

@@ -182,7 +182,7 @@ public static class UserMethodMappingExtractor
         if (userMappingConfig.Ignore == true)
             return null;
 
-        var noInlining = GetNoInlining(ctx, method);
+        var noExpressionInlining = GetNoExpressionInlining(ctx, method);
 
         // Generic user-implemented methods are stored as templates
         // that are matched against concrete type pairs during mapping resolution.
@@ -195,7 +195,7 @@ public static class UserMethodMappingExtractor
                 parameters,
                 isExternal,
                 userMappingConfig.Default ?? isDefault,
-                noInlining
+                noExpressionInlining
             );
         }
 
@@ -211,7 +211,7 @@ public static class UserMethodMappingExtractor
                 parameters.Target!.Value.Type,
                 parameters.ReferenceHandler,
                 isExternal,
-                noInlining
+                noExpressionInlining
             );
         }
 
@@ -226,7 +226,7 @@ public static class UserMethodMappingExtractor
             parameters.ReferenceHandler,
             isExternal,
             targetTypeNullability,
-            noInlining
+            noExpressionInlining
         );
     }
 
@@ -237,7 +237,7 @@ public static class UserMethodMappingExtractor
         MappingMethodParameters parameters,
         bool isExternal,
         bool? isDefault,
-        bool noInlining
+        bool noExpressionInlining
     )
     {
         if (method.ReturnsVoid)
@@ -252,7 +252,7 @@ public static class UserMethodMappingExtractor
                 targetParam,
                 parameters.ReferenceHandler,
                 isExternal,
-                noInlining
+                noExpressionInlining
             );
         }
 
@@ -265,7 +265,7 @@ public static class UserMethodMappingExtractor
             parameters.ReferenceHandler,
             isExternal,
             targetTypeNullability,
-            noInlining
+            noExpressionInlining
         );
     }
 
@@ -303,12 +303,12 @@ public static class UserMethodMappingExtractor
             return null;
         }
 
-        var noInlining = GetNoInlining(ctx, methodSymbol);
+        var noExpressionInlining = GetNoExpressionInlining(ctx, methodSymbol);
 
-        if (TryBuildRuntimeTargetTypeMapping(ctx, methodSymbol, noInlining) is { } userMapping)
+        if (TryBuildRuntimeTargetTypeMapping(ctx, methodSymbol, noExpressionInlining) is { } userMapping)
             return userMapping;
 
-        if (TryBuildExpressionMapping(ctx, methodSymbol, noInlining) is { } expressionMapping)
+        if (TryBuildExpressionMapping(ctx, methodSymbol, noExpressionInlining) is { } expressionMapping)
             return expressionMapping;
 
         if (!UserMappingMethodParameterExtractor.BuildParameters(ctx, methodSymbol, out var parameters))
@@ -318,7 +318,7 @@ public static class UserMethodMappingExtractor
         }
 
         if (methodSymbol.IsGenericMethod)
-            return BuildGenericTypeMapping(ctx, methodSymbol, parameters, noInlining);
+            return BuildGenericTypeMapping(ctx, methodSymbol, parameters, noExpressionInlining);
 
         if (parameters.Target.HasValue)
         {
@@ -328,7 +328,7 @@ public static class UserMethodMappingExtractor
                 parameters.Target.Value,
                 parameters.ReferenceHandler,
                 ctx.Configuration.Mapper.UseReferenceHandling,
-                noInlining
+                noExpressionInlining
             )
             {
                 AdditionalSourceParameters = parameters.AdditionalParameters,
@@ -354,7 +354,7 @@ public static class UserMethodMappingExtractor
             ctx.Configuration.Mapper.UseReferenceHandling,
             ctx.AttributeAccessor.HasAttribute<MapDerivedTypeAttribute<object, object>>(methodSymbol)
                 || ctx.AttributeAccessor.HasAttribute<MapDerivedTypeAttribute>(methodSymbol),
-            noInlining
+            noExpressionInlining
         )
         {
             AdditionalSourceParameters = parameters.AdditionalParameters,
@@ -366,7 +366,7 @@ public static class UserMethodMappingExtractor
         SimpleMappingBuilderContext ctx,
         IMethodSymbol methodSymbol,
         MappingMethodParameters parameters,
-        bool noInlining
+        bool noExpressionInlining
     )
     {
         if (parameters.Target.HasValue)
@@ -377,7 +377,7 @@ public static class UserMethodMappingExtractor
                 parameters.Target.Value,
                 parameters.ReferenceHandler,
                 ctx.Configuration.Mapper.UseReferenceHandling,
-                noInlining
+                noExpressionInlining
             );
         }
 
@@ -388,14 +388,14 @@ public static class UserMethodMappingExtractor
             ctx.Configuration.Mapper.UseReferenceHandling,
             GetTypeSwitchNullArm(methodSymbol, parameters),
             ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated),
-            noInlining
+            noExpressionInlining
         );
     }
 
     private static UserDefinedNewInstanceRuntimeTargetTypeParameterMapping? TryBuildRuntimeTargetTypeMapping(
         SimpleMappingBuilderContext ctx,
         IMethodSymbol methodSymbol,
-        bool noInlining
+        bool noExpressionInlining
     )
     {
         if (methodSymbol.IsGenericMethod)
@@ -415,14 +415,14 @@ public static class UserMethodMappingExtractor
             ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
             GetTypeSwitchNullArm(methodSymbol, runtimeTargetTypeParams),
             ctx.Compilation.ObjectType.WithNullableAnnotation(NullableAnnotation.NotAnnotated),
-            noInlining
+            noExpressionInlining
         );
     }
 
     private static UserDefinedExpressionMethodMapping? TryBuildExpressionMapping(
         SimpleMappingBuilderContext ctx,
         IMethodSymbol methodSymbol,
-        bool noInlining
+        bool noExpressionInlining
     )
     {
         if (methodSymbol.IsGenericMethod)
@@ -457,7 +457,7 @@ public static class UserMethodMappingExtractor
             sourceType,
             targetType,
             ctx.SymbolAccessor.UpgradeNullable(returnType),
-            noInlining
+            noExpressionInlining
         );
     }
 
@@ -490,13 +490,13 @@ public static class UserMethodMappingExtractor
         return userMappingAttr ?? new UserMappingConfiguration();
     }
 
-    private static bool GetNoInlining(SimpleMappingBuilderContext ctx, IMethodSymbol method)
+    private static bool GetNoExpressionInlining(SimpleMappingBuilderContext ctx, IMethodSymbol method)
     {
-        if (ctx.SymbolAccessor.HasAttribute<MapperNoInliningAttribute>(method))
+        if (ctx.SymbolAccessor.HasAttribute<MapperNoExpressionInliningAttribute>(method))
             return true;
 
         var mapperAttribute = ctx.AttributeAccessor.AccessFirstOrDefault<MapperAttribute>(method.ContainingType);
-        return mapperAttribute?.NoInlining == true;
+        return mapperAttribute?.NoExpressionInlining == true;
     }
 
     private static IEnumerable<T> ExtractNamedUserImplementedMappings<T>(
