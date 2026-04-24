@@ -21,7 +21,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
     bool enableReferenceHandling,
     NullFallbackValue? nullArm,
     ITypeSymbol objectType,
-    bool noInlining
+    bool noExpressionInlining
 ) : NewInstanceMethodMapping(method, sourceParameter, referenceHandlerParameter, targetType), INewInstanceUserMapping
 {
     private const string IsAssignableFromMethodName = nameof(Type.IsAssignableFrom);
@@ -39,7 +39,7 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
 
     public bool IsExternal => false;
 
-    public bool NoInlining => noInlining;
+    public bool NoExpressionInlining => noExpressionInlining;
 
     /// <summary>
     /// The reference handling is enabled but is only internal to this method.

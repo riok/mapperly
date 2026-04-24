@@ -22,7 +22,7 @@ public class UserImplementedGenericMethodMapping(
     MethodParameter? targetOriginalValueParameter,
     bool isExternal,
     UserImplementedMethodMapping.TargetNullability targetNullability,
-    bool noInlining
+    bool noExpressionInlining
 )
     : UserImplementedMethodMapping(
         receiver,
@@ -35,7 +35,7 @@ public class UserImplementedGenericMethodMapping(
         targetOriginalValueParameter,
         isExternal,
         targetNullability,
-        noInlining
+        noExpressionInlining
     )
 {
     protected override SimpleNameSyntax BuildMethodName()

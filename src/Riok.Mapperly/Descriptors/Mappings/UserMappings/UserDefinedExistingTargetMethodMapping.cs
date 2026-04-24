@@ -18,7 +18,7 @@ public class UserDefinedExistingTargetMethodMapping(
     MethodParameter targetParameter,
     MethodParameter? referenceHandlerParameter,
     bool enableReferenceHandling,
-    bool noInlining
+    bool noExpressionInlining
 ) : MethodMapping(method, sourceParameter, referenceHandlerParameter, targetParameter.Type), IExistingTargetUserMapping
 {
     private IExistingTargetMapping? _delegateMapping;
@@ -29,7 +29,7 @@ public class UserDefinedExistingTargetMethodMapping(
 
     public bool IsExternal => false;
 
-    public bool NoInlining => noInlining;
+    public bool NoExpressionInlining => noExpressionInlining;
 
     private MethodParameter TargetParameter { get; } = targetParameter;
 

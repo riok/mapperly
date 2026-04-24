@@ -26,7 +26,7 @@ public static class MapperConfigurationMerger
             IncludedConstructors = highPriority.IncludedConstructors ?? lowPriority.IncludedConstructors,
             PreferParameterlessConstructors = highPriority.PreferParameterlessConstructors ?? lowPriority.PreferParameterlessConstructors,
             AutoUserMappings = highPriority.AutoUserMappings ?? lowPriority.AutoUserMappings,
-            NoInlining = highPriority.NoInlining ?? lowPriority.NoInlining,
+            NoExpressionInlining = highPriority.NoExpressionInlining ?? lowPriority.NoExpressionInlining,
             EnumNamingStrategy = highPriority.EnumNamingStrategy ?? lowPriority.EnumNamingStrategy,
         };
     }
@@ -102,7 +102,8 @@ public static class MapperConfigurationMerger
         mapper.AutoUserMappings =
             mapperConfiguration.AutoUserMappings ?? defaultMapperConfiguration.AutoUserMappings ?? mapper.AutoUserMappings;
 
-        mapper.NoInlining = mapperConfiguration.NoInlining ?? defaultMapperConfiguration.NoInlining ?? mapper.NoInlining;
+        mapper.NoExpressionInlining =
+            mapperConfiguration.NoExpressionInlining ?? defaultMapperConfiguration.NoExpressionInlining ?? mapper.NoExpressionInlining;
 
         mapper.EnumNamingStrategy =
             mapperConfiguration.EnumNamingStrategy ?? defaultMapperConfiguration.EnumNamingStrategy ?? mapper.EnumNamingStrategy;

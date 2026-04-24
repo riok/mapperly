@@ -148,7 +148,9 @@ public class MapperAttribute : Attribute
     /// into expression trees for queryable projection mappings.
     /// When <c>true</c>, methods from this mapper referenced via <see cref="UseStaticMapperAttribute"/>
     /// will not be inlined or rebuilt in expression context.
+    /// This only applies to expression / queryable projection mappings;
+    /// regular (non-expression) mappings are unaffected.
     /// Defaults to <c>false</c>.
     /// </summary>
-    public bool NoInlining { get; set; }
+    public bool NoExpressionInlining { get; set; }
 }

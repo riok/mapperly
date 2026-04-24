@@ -19,6 +19,6 @@ public interface IUserMapping : ITypeMapping
     /// </summary>
     bool IsExternal { get; }
 
-    /// <inheritdoc cref="MapperNoInliningAttribute"/>
-    bool NoInlining { get; }
+    /// <inheritdoc cref="MapperNoExpressionInliningAttribute"/>
+    bool NoExpressionInlining { get; }
 }
