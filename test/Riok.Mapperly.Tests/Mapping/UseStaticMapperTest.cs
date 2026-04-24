@@ -836,20 +836,11 @@ public class UseStaticMapperTest
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveDiagnostics(
-                DiagnosticDescriptors.SourceEnumValueNotMapped,
-                "Enum member Planned (0) on Source.Status not found on target enum Target.Status",
-                "Enum member Generated (1) on Source.Status not found on target enum Target.Status",
-                "Enum member Paused (2) on Source.Status not found on target enum Target.Status",
-                "Enum member Running (3) on Source.Status not found on target enum Target.Status"
+            .HaveDiagnostic(
+                DiagnosticDescriptors.EnumMappingNotSupportedInProjectionMappings,
+                "The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings to map from Source.Status to Target.Status, consider applying [MapperNoExpressionInlining] to the mapping method or Mapper(NoExpressionInlining = true) to the containing mapper"
             )
-            .HaveDiagnostics(
-                DiagnosticDescriptors.TargetEnumValueNotMapped,
-                "Enum member Planned (0) on Target.Status not found on source enum Source.Status",
-                "Enum member Generated (1) on Target.Status not found on source enum Source.Status",
-                "Enum member Paused (2) on Target.Status not found on source enum Source.Status",
-                "Enum member Running (3) on Target.Status not found on source enum Source.Status"
-            )
+            .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline)
             .HaveAssertedAllDiagnostics();
     }
 
