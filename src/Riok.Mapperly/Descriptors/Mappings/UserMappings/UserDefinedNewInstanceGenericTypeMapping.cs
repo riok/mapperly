@@ -23,7 +23,7 @@ public class UserDefinedNewInstanceGenericTypeMapping(
     bool enableReferenceHandling,
     NullFallbackValue? nullArm,
     ITypeSymbol objectType,
-    bool noInlining
+    bool noExpressionInlining
 )
     : UserDefinedNewInstanceRuntimeTargetTypeMapping(
         method,
@@ -33,7 +33,7 @@ public class UserDefinedNewInstanceGenericTypeMapping(
         enableReferenceHandling,
         nullArm,
         objectType,
-        noInlining
+        noExpressionInlining
     )
 {
     public override MethodDeclarationSyntax BuildMethod(SourceEmitterContext ctx)

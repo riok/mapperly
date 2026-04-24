@@ -133,7 +133,7 @@ public record MapperConfiguration
     /// <summary>
     /// Whether to prevent mapping methods of this mapper from being inlined into expression trees for queryable projection mappings.
     /// </summary>
-    public bool? NoInlining { get; init; }
+    public bool? NoExpressionInlining { get; init; }
 
     /// <summary>
     /// The default enum naming strategy.

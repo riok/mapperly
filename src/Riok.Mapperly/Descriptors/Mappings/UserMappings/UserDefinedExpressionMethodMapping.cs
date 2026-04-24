@@ -15,7 +15,7 @@ public class UserDefinedExpressionMethodMapping(
     ITypeSymbol expressionSourceType,
     ITypeSymbol expressionTargetType,
     ITypeSymbol returnType,
-    bool noInlining
+    bool noExpressionInlining
 ) : NewInstanceMethodMapping(method, CreateSourceParameter(expressionSourceType), null, returnType), INewInstanceUserMapping
 {
     private INewInstanceMapping? _delegateMapping;
@@ -36,7 +36,7 @@ public class UserDefinedExpressionMethodMapping(
 
     public bool IsExternal => false;
 
-    public bool NoInlining => noInlining;
+    public bool NoExpressionInlining => noExpressionInlining;
 
     public void SetDelegateMapping(INewInstanceMapping mapping) => _delegateMapping = mapping;
 

@@ -25,7 +25,7 @@ public class UserImplementedInlinedExpressionMapping(
     public IMethodSymbol Method => userMapping.Method;
     public bool? Default => userMapping.Default;
     public bool IsExternal => userMapping.IsExternal;
-    public bool NoInlining => userMapping.NoInlining;
+    public bool NoExpressionInlining => userMapping.NoExpressionInlining;
 
     public override ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {

@@ -23,6 +23,6 @@
     <CompilerVisibleProperty Include="MapperlyIncludedConstructors" />
     <CompilerVisibleProperty Include="MapperlyPreferParameterlessConstructors" />
     <CompilerVisibleProperty Include="MapperlyAutoUserMappings" />
-    <CompilerVisibleProperty Include="MapperlyNoInlining" />
+    <CompilerVisibleProperty Include="MapperlyNoExpressionInlining" />
   </ItemGroup>
 </Project>
