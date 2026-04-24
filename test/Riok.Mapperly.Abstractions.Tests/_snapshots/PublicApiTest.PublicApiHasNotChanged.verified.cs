@@ -1,4 +1,4 @@
-﻿[assembly: System.Runtime.Versioning.TargetFramework(".NETStandard,Version=v2.0", FrameworkDisplayName=".NET Standard 2.0")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETStandard,Version=v2.0", FrameworkDisplayName=".NET Standard 2.0")]
 namespace Riok.Mapperly.Abstractions
 {
     public enum EnumMappingStrategy
@@ -138,7 +138,7 @@ namespace Riok.Mapperly.Abstractions
         public Riok.Mapperly.Abstractions.IgnoreObsoleteMembersStrategy IgnoreObsoleteMembersStrategy { get; set; }
         public Riok.Mapperly.Abstractions.MemberVisibility IncludedConstructors { get; set; }
         public Riok.Mapperly.Abstractions.MemberVisibility IncludedMembers { get; set; }
-        public bool NoInlining { get; set; }
+        public bool NoExpressionInlining { get; set; }
         public bool PreferParameterlessConstructors { get; set; }
         public Riok.Mapperly.Abstractions.PropertyNameMappingStrategy PropertyNameMappingStrategy { get; set; }
         public Riok.Mapperly.Abstractions.RequiredMappingStrategy RequiredEnumMappingStrategy { get; set; }
@@ -209,9 +209,9 @@ namespace Riok.Mapperly.Abstractions
     }
     [System.AttributeUsage(System.AttributeTargets.Method)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
-    public sealed class MapperNoInliningAttribute : System.Attribute
+    public sealed class MapperNoExpressionInliningAttribute : System.Attribute
     {
-        public MapperNoInliningAttribute() { }
+        public MapperNoExpressionInliningAttribute() { }
     }
     [System.AttributeUsage(System.AttributeTargets.Method)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]

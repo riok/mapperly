@@ -854,7 +854,7 @@ public class UseStaticMapperTest
     }
 
     [Fact]
-    public void ProjectionWithUseStaticEnumMapperByNameWithNoInliningShouldWork()
+    public void ProjectionWithUseStaticEnumMapperByNameWithNoExpressionInliningShouldWork()
     {
         var source = TestSourceBuilder.CSharp(
             """
@@ -898,7 +898,7 @@ public class UseStaticMapperTest
             [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
             public static partial class EnumMappingExtensions
             {
-                [MapperNoInlining]
+                [MapperNoExpressionInlining]
                 public static partial Target.Status MapToStatus(this Source.Status source);
             }
 
@@ -945,7 +945,7 @@ public class UseStaticMapperTest
     }
 
     [Fact]
-    public void MapperNoInliningOnNonProjectionMethodShouldHaveNoEffect()
+    public void MapperNoExpressionInliningOnNonProjectionMethodShouldHaveNoEffect()
     {
         var source = TestSourceBuilder.CSharp(
             """
@@ -985,10 +985,10 @@ public class UseStaticMapperTest
                 public Target.Status Status { get; set; }
             }
 
-            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName, NoInlining = true)]
+            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName, NoExpressionInlining = true)]
             public static partial class EnumMappingExtensions
             {
-                [MapperNoInlining]
+                [MapperNoExpressionInlining]
                 public static partial Target.Status MapToStatus(this Source.Status source);
             }
 
@@ -1016,7 +1016,7 @@ public class UseStaticMapperTest
     }
 
     [Fact]
-    public void ProjectionWithUsedMapperNoInliningShouldNotInline()
+    public void ProjectionWithUsedMapperNoExpressionInliningShouldNotInline()
     {
         var source = TestSourceBuilder.CSharp(
             """
@@ -1057,7 +1057,7 @@ public class UseStaticMapperTest
                 public Target.Status Status { get; set; }
             }
 
-            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName, NoInlining = true)]
+            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName, NoExpressionInlining = true)]
             public static partial class EnumMappingExtensions
             {
                 public static partial Target.Status MapToStatus(this Source.Status source);
@@ -1106,7 +1106,7 @@ public class UseStaticMapperTest
     }
 
     [Fact]
-    public void ProjectionWithCalledMethodNoInliningShouldNotInline()
+    public void ProjectionWithCalledMethodNoExpressionInliningShouldNotInline()
     {
         var source = TestSourceBuilder.CSharp(
             """
@@ -1150,7 +1150,7 @@ public class UseStaticMapperTest
             [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
             public static partial class EnumMappingExtensions
             {
-                [MapperNoInlining]
+                [MapperNoExpressionInlining]
                 public static partial Target.Status MapToStatus(this Source.Status source);
             }
 

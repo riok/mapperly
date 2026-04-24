@@ -17,7 +17,7 @@ public class UserDefinedNewInstanceRuntimeTargetTypeParameterMapping(
     ITypeSymbol targetType,
     NullFallbackValue? nullArm,
     ITypeSymbol objectType,
-    bool noInlining
+    bool noExpressionInlining
 )
     : UserDefinedNewInstanceRuntimeTargetTypeMapping(
         method,
@@ -27,7 +27,7 @@ public class UserDefinedNewInstanceRuntimeTargetTypeParameterMapping(
         enableReferenceHandling,
         nullArm,
         objectType,
-        noInlining
+        noExpressionInlining
     )
 {
     protected override ParameterListSyntax BuildParameterList() =>
