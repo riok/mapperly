@@ -78,7 +78,7 @@ internal static class SourceValueBuilder
         if (
             value.ConstantValue.IsNull
             && memberMappingInfo.TargetMember.MemberType.IsReferenceType
-            && !memberMappingInfo.TargetMember.Member.IsNullable
+            && !memberMappingInfo.TargetMember.Member.Type.IsNullable()
         )
         {
             ctx.BuilderContext.ReportDiagnostic(
@@ -189,7 +189,7 @@ internal static class SourceValueBuilder
             SymbolEqualityComparer.Default.Equals(x.ReturnType.NonNullable(), memberMappingInfo.TargetMember.MemberType.NonNullable())
         );
 
-        if (!memberMappingInfo.TargetMember.Member.IsNullable)
+        if (!memberMappingInfo.TargetMember.Member.Type.IsNullable())
         {
             // Filter out methods that may return null when the target is non-nullable.
             methodCandidates = methodCandidates.Where(m => !ctx.BuilderContext.SymbolAccessor.MayReturnNull(m, false));

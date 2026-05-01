@@ -85,7 +85,7 @@ internal static class MemberMappingBuilder
             return false;
         }
 
-        var memberTargetNullable = memberMappingInfo.TargetMember.MemberType.IsNullable();
+        var memberTargetNullable = memberMappingInfo.TargetMember.Member.Type.IsNullable();
         var delegateTargetNullable = delegateMapping.TargetType.IsNullable();
         var memberSourceNullable = memberMappingInfo.IsSourceNullable;
         var delegateSourceNullable = delegateMapping.SourceType.IsNullable();
@@ -209,7 +209,7 @@ internal static class MemberMappingBuilder
         // access the source in a null save matter (via ?.) but no other special handling required.
         if (
             ctx.BuilderContext.Configuration.Mapper.AllowNullPropertyAssignment
-            && (delegateMapping.SourceType.IsNullable() || delegateMapping.IsSynthetic && targetMember.Member.IsNullable)
+            && (delegateMapping.SourceType.IsNullable() || delegateMapping.IsSynthetic && targetMember.Member.Type.IsNullable())
         )
         {
             return new MappedMemberSourceValue(delegateMapping, sourceGetter, true, false);
