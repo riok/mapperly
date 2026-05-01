@@ -189,7 +189,7 @@ internal static class SourceValueBuilder
             SymbolEqualityComparer.Default.Equals(x.ReturnType.NonNullable(), memberMappingInfo.TargetMember.MemberType.NonNullable())
         );
 
-        if (!memberMappingInfo.TargetMember.Member.Type.IsNullable())
+        if (!memberMappingInfo.TargetMember.Member.IsNullable)
         {
             // Filter out methods that may return null when the target is non-nullable.
             methodCandidates = methodCandidates.Where(m => !ctx.BuilderContext.SymbolAccessor.MayReturnNull(m, false));

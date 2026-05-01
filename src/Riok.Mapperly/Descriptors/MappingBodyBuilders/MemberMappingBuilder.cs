@@ -89,11 +89,12 @@ internal static class MemberMappingBuilder
         var delegateTargetNullable = delegateMapping.TargetType.IsNullable();
         var memberSourceNullable = memberMappingInfo.IsSourceNullable;
         var delegateSourceNullable = delegateMapping.SourceType.IsNullable();
+        var memberTargetAcceptsNull = memberMappingInfo.TargetMember.MemberType.IsNullable();
 
         if (
             memberMappingInfo.Configuration?.SuppressNullMismatchDiagnostic != true
             && memberSourceNullable
-            && !memberTargetNullable
+            && !memberTargetAcceptsNull
             && !(delegateSourceNullable && !delegateTargetNullable)
         )
         {

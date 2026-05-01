@@ -1076,7 +1076,10 @@ public class ObjectPropertyNullableTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                target.Name = source.Name;
+                if (source.Name != null)
+                {
+                    target.Name = source.Name;
+                }
                 return target;
                 """
             );
@@ -1179,10 +1182,6 @@ public class ObjectPropertyNullableTest
                 if (source.Value != null)
                 {
                     target.Value = MapToD(source.Value);
-                }
-                else
-                {
-                    target.Value = null;
                 }
                 return target;
                 """
