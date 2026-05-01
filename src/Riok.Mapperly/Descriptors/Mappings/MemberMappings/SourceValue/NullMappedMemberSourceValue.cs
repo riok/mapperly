@@ -27,7 +27,7 @@ public class NullMappedMemberSourceValue(
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
         // if the source is not nullable, return it directly.
-        if (!_sourceGetter.MemberPath.IsAnyNullable())
+        if (!_sourceGetter.MemberPath.IsAnyReadNullable())
         {
             ctx = ctx.WithSource(_sourceGetter.BuildAccess(ctx.Source));
             return _delegateMapping.Build(ctx);
@@ -49,7 +49,7 @@ public class NullMappedMemberSourceValue(
         // source.A?.B == null ? <null-substitute> : Map(source.A.B.Value)
         // use simplified coalesce expression for synthetic mappings:
         // source.A?.B ?? <null-substitute>
-        if (_delegateMapping.IsSynthetic && (useNullConditionalAccess || !_sourceGetter.MemberPath.IsAnyObjectPathNullable()))
+        if (_delegateMapping.IsSynthetic && (useNullConditionalAccess || !_sourceGetter.MemberPath.IsAnyObjectReadPathNullable()))
         {
             var nullConditionalSourceAccess = _sourceGetter.BuildAccess(ctx.Source, nullConditional: true);
             var nameofSourceAccess = _sourceGetter.BuildAccess(ctx.Source, nullConditional: false);

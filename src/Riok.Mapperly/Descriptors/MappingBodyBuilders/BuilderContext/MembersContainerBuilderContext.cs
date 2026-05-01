@@ -35,8 +35,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         // set target member to null if null assignments are allowed
         // and the source is null
         var setMemberToNull =
-            BuilderContext.Configuration.Mapper.AllowNullPropertyAssignment
-            && memberMapping.MemberInfo.TargetMember.Member.Type.IsNullable();
+            BuilderContext.Configuration.Mapper.AllowNullPropertyAssignment && memberMapping.MemberInfo.TargetMember.Member.IsWriteNullable;
 
         // if the member is explicitly set to null,
         // make sure the parent members are initialized/non-null,
@@ -51,7 +50,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
 
         var nullConditionSourcePath = new NonEmptyMemberPath(
             memberMapping.MemberInfo.SourceMember.MemberPath.RootType,
-            memberMapping.MemberInfo.SourceMember.MemberPath.PathWithoutTrailingNonNullable().ToList()
+            memberMapping.MemberInfo.SourceMember.MemberPath.ReadPathWithoutTrailingNonNullable().ToList()
         );
         var container = GetOrCreateNullDelegateMappingForPath(nullConditionSourcePath);
         AddMemberAssignmentMapping(container, memberMapping);
@@ -77,7 +76,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
 
         // if the source value is a non-nullable value,
         // the target should be non-null after this assignment and can be set as initialized.
-        if (!mapping.MemberInfo.IsSourceNullable && mapping.MemberInfo.TargetMember.Member.Type.IsNullable())
+        if (!mapping.MemberInfo.IsSourceNullable && mapping.MemberInfo.TargetMember.Member.IsWriteNullable)
         {
             _initializedNullableTargetPaths.Add((container, mapping.MemberInfo.TargetMember));
         }
@@ -85,7 +84,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
 
     private void AddNullMemberInitializers(IMemberAssignmentMappingContainer container, MemberPath path)
     {
-        foreach (var nullablePathList in path.ObjectPathNullableSubPaths())
+        foreach (var nullablePathList in path.ObjectReadPathNullableSubPaths())
         {
             var nullablePath = new NonEmptyMemberPath(path.RootType, nullablePathList);
             var type = nullablePath.Member.Type.NonNullable();
@@ -138,7 +137,7 @@ public class MembersContainerBuilderContext<T>(MappingBuilderContext builderCont
         // try to reuse parent path mappings and wrap inside them
         // if the parentMapping is the first nullable path, no need to access the path in the condition in a null-safe way.
         needsNullSafeAccess = false;
-        foreach (var nullablePathList in nullConditionSourcePath.ObjectPathNullableSubPaths().Reverse())
+        foreach (var nullablePathList in nullConditionSourcePath.ObjectReadPathNullableSubPaths().Reverse())
         {
             var nullablePath = new NonEmptyMemberPath(nullConditionSourcePath.RootType, nullablePathList);
             if (_nullDelegateMappings.TryGetValue(nullablePath, out var parentMappingContainer))

@@ -629,15 +629,13 @@ public class ObjectPropertyValueMethodTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::B();
-                target.Value = BuildValue();
-                return target;
-                """
-            );
+            .HaveDiagnostic(
+                DiagnosticDescriptors.MapValueMethodTypeMismatch,
+                "Cannot assign method return type string? of BuildValue() to B.Value of type string"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -713,14 +711,12 @@ public class ObjectPropertyValueMethodTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::B();
-                target.Value = BuildValue();
-                return target;
-                """
-            );
+            .HaveDiagnostic(
+                DiagnosticDescriptors.MapValueMethodTypeMismatch,
+                "Cannot assign method return type string of BuildValue() to B.Value of type string"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 }

@@ -44,29 +44,31 @@ public abstract class MemberPath(ITypeSymbol rootType, IReadOnlyList<IMappableMe
     /// Builds a member path skipping trailing path items which are non-nullable.
     /// </summary>
     /// <returns>The built path.</returns>
-    public IEnumerable<IMappableMember> PathWithoutTrailingNonNullable() => Path.Reverse().SkipWhile(x => !x.IsNullable).Reverse();
+    public IEnumerable<IMappableMember> ReadPathWithoutTrailingNonNullable() => Path.Reverse().SkipWhile(x => !x.IsReadNullable).Reverse();
 
     /// <summary>
     /// Returns an element for each nullable sub-path of the <see cref="ObjectPath"/>.
     /// If the <see cref="Member"/> is nullable, the entire <see cref="Path"/> is not returned.
     /// </summary>
     /// <returns>All nullable sub-paths of the <see cref="ObjectPath"/>.</returns>
-    public IEnumerable<IReadOnlyList<IMappableMember>> ObjectPathNullableSubPaths()
+    public IEnumerable<IReadOnlyList<IMappableMember>> ObjectReadPathNullableSubPaths()
     {
         var pathParts = new List<IMappableMember>(Path.Count);
         foreach (var pathPart in ObjectPath)
         {
             pathParts.Add(pathPart);
-            if (!pathPart.IsNullable)
+            if (!pathPart.IsReadNullable)
                 continue;
 
             yield return pathParts.ToArray();
         }
     }
 
+    public bool IsAnyReadNullable() => Path.Any(x => x.IsReadNullable);
+
     public bool IsAnyNullable() => Path.Any(p => p.IsNullable);
 
-    public bool IsAnyObjectPathNullable() => ObjectPath.Any(p => p.IsNullable);
+    public bool IsAnyObjectReadPathNullable() => ObjectPath.Any(p => p.IsReadNullable);
 
     public MemberPathGetter BuildGetter(SimpleMappingBuilderContext ctx) => MemberPathGetter.Build(ctx, this);
 

@@ -20,6 +20,8 @@ public class ParameterSourceMember(MethodParameter parameter) : IMappableMember,
     public ITypeSymbol Type => parameter.Type;
     public INamedTypeSymbol? ContainingType => null;
     public bool IsNullable => parameter.Type.IsNullable();
+    public bool IsReadNullable => parameter.Type.IsNullable();
+    public bool IsWriteNullable => parameter.Type.IsNullable();
     public bool CanGet => true;
     public bool CanGetDirectly => true;
     public bool CanSet => false;

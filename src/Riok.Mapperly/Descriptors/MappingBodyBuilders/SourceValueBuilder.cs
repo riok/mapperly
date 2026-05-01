@@ -78,7 +78,7 @@ internal static class SourceValueBuilder
         if (
             value.ConstantValue.IsNull
             && memberMappingInfo.TargetMember.MemberType.IsReferenceType
-            && !memberMappingInfo.TargetMember.Member.Type.IsNullable()
+            && !memberMappingInfo.TargetMember.Member.IsWriteNullable
         )
         {
             ctx.BuilderContext.ReportDiagnostic(

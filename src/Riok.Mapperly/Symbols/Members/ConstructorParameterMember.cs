@@ -21,6 +21,8 @@ public class ConstructorParameterMember(IParameterSymbol symbol, SymbolAccessor 
     public ITypeSymbol Type { get; } = accessor.UpgradeNullable(symbol.Type);
     public INamedTypeSymbol ContainingType { get; } = symbol.ContainingType;
     public bool IsNullable => accessor.IsNullable(Symbol);
+    public bool IsReadNullable => accessor.IsReadNullable(Symbol);
+    public bool IsWriteNullable => accessor.IsWriteNullable(Symbol);
     public bool CanGet => false;
     public bool CanGetDirectly => false;
     public bool CanSet => false;
