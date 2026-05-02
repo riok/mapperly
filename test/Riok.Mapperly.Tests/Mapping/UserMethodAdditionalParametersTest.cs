@@ -5,6 +5,50 @@ namespace Riok.Mapperly.Tests.Mapping;
 public class UserMethodAdditionalParametersTest
 {
     [Fact]
+    public Task NullableSourceWithAdditionalParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A? src, int value);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public string Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task NullableSourceAndTargetWithAdditionalParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B? Map(A? src, int value);",
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public string Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void NullableSourceUnusedAdditionalParameterShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A? src, int value2);",
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; init; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType)
+            .HaveDiagnostic(
+                DiagnosticDescriptors.AdditionalParameterNotMapped,
+                "The additional mapping method parameter value2 of the method Map is not mapped"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
     public Task AdditionalIntParameter()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

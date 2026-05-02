@@ -12,7 +12,7 @@ public static class NullableMappingBuilder
         if (!TryBuildNonNullableMappingKey(ctx, out var mappingKey))
             return null;
 
-        var delegateMapping = ctx.BuildMapping(mappingKey, MappingBuildingOptions.KeepUserSymbol);
+        var delegateMapping = ctx.BuildMapping(mappingKey, MappingBuildingOptions.KeepUserSymbol | MappingBuildingOptions.EmbeddedMapping);
         return delegateMapping == null ? null : BuildNullDelegateMapping(ctx, delegateMapping);
     }
 
