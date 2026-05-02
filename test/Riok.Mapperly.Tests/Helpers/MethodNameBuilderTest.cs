@@ -28,7 +28,7 @@ public class MethodNameBuilderTest
         return new MockedMethodMapping(targetTypeMock);
     }
 
-    private class MockedMethodMapping : MethodMapping
+    private sealed class MockedMethodMapping : MethodMapping
     {
         public MockedMethodMapping(ITypeSymbol t)
             : base(t, t) { }

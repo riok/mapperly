@@ -32,7 +32,7 @@ public class UserImplementedInlinedExpressionMapping(
         return (ExpressionSyntax)rewriter.Visit(mappingBody);
     }
 
-    private class InliningRewriter(
+    private sealed class InliningRewriter(
         TypeMappingBuildContext ctx,
         ParameterSyntax sourceParameter,
         IReadOnlyDictionary<SyntaxAnnotation, INewInstanceMapping> mappingInvocations,

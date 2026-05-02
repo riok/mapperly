@@ -207,7 +207,7 @@ public static class TestHelper
         }
     }
 
-    private class TestAnalyzerConfigOptionsProvider(IReadOnlyDictionary<string, string> options) : AnalyzerConfigOptionsProvider
+    private sealed class TestAnalyzerConfigOptionsProvider(IReadOnlyDictionary<string, string> options) : AnalyzerConfigOptionsProvider
     {
         private readonly AnalyzerConfigOptions _options = new TestAnalyzerConfigOptions(options);
 
@@ -217,7 +217,7 @@ public static class TestHelper
 
         public override AnalyzerConfigOptions GetOptions(AdditionalText textFile) => _options;
 
-        private class TestAnalyzerConfigOptions(IReadOnlyDictionary<string, string> options) : AnalyzerConfigOptions
+        private sealed class TestAnalyzerConfigOptions(IReadOnlyDictionary<string, string> options) : AnalyzerConfigOptions
         {
             public override bool TryGetValue(string key, [NotNullWhen(true)] out string? value) => options.TryGetValue(key, out value);
         }

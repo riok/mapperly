@@ -19,7 +19,7 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// <param name="memberValueConfigsByRootTargetName">All value configurations by root target member names, which are not yet consumed.</param>
 /// <param name="memberConfigsByRootTargetName">All configurations by root target member names, which are not yet consumed.</param>
 /// <param name="ignoredSourceMemberNames">All ignored source members names.</param>
-internal class MembersMappingState(
+internal sealed class MembersMappingState(
     HashSet<string> unmappedSourceMemberNames,
     HashSet<string> unmappedTargetMemberNames,
     IReadOnlyDictionary<string, string> targetMemberCaseMapping,

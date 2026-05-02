@@ -278,7 +278,7 @@ public static class EnumToEnumMappingBuilder
         return explicitMappings;
     }
 
-    private record EnumMemberMappings(
+    private sealed record EnumMemberMappings(
         IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> MemberMappings,
         IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> ExplicitMemberMappings,
         IReadOnlyCollection<IFieldSymbol> TargetMembers

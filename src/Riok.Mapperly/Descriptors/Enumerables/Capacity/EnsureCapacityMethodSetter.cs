@@ -8,7 +8,7 @@ namespace Riok.Mapperly.Descriptors.Enumerables.Capacity;
 /// <summary>
 /// Ensures the capacity of a collection by calling `EnsureCapacity(int)`
 /// </summary>
-internal class EnsureCapacityMethodSetter : IMemberSetter
+internal sealed class EnsureCapacityMethodSetter : IMemberSetter
 {
     public static readonly EnsureCapacityMethodSetter Instance = new();
 

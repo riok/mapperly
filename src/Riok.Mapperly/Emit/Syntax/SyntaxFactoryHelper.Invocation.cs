@@ -16,7 +16,7 @@ public partial struct SyntaxFactoryHelper
         params ExpressionSyntax[] arguments
     )
     {
-        var method = GenericName(methodName).WithTypeArgumentList(TypeArgumentList(typeParams.ToArray()));
+        var method = GenericName(methodName).WithTypeArgumentList(TypeArgumentList(typeParams));
         return InvocationExpression(MemberAccess(IdentifierName(receiver), method)).WithArgumentList(ArgumentList(arguments));
     }
 
@@ -26,7 +26,7 @@ public partial struct SyntaxFactoryHelper
         params ExpressionSyntax[] arguments
     )
     {
-        var method = GenericName(methodName).WithTypeArgumentList(TypeArgumentList(typeParams.ToArray()));
+        var method = GenericName(methodName).WithTypeArgumentList(TypeArgumentList(typeParams));
         return InvocationExpression(method).WithArgumentList(ArgumentListWithoutIndention(arguments));
     }
 

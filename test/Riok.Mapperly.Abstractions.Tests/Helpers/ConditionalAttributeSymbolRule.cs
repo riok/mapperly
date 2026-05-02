@@ -4,7 +4,7 @@ using NetArchTest.Rules;
 
 namespace Riok.Mapperly.Abstractions.Tests.Helpers;
 
-internal class ConditionalAttributeSymbolRule(string condition) : ICustomRule
+internal sealed class ConditionalAttributeSymbolRule(string condition) : ICustomRule
 {
     public bool MeetsRule(TypeDefinition type)
     {

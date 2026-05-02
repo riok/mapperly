@@ -22,12 +22,12 @@ public class PreserveReferenceHandlerTest
         myDto.ShouldBe(mySecondDto);
     }
 
-    class MyDto
+    sealed class MyDto
     {
         public int Value { get; set; }
     }
 
-    class MyObj
+    sealed class MyObj
     {
         public int Value { get; set; }
     }

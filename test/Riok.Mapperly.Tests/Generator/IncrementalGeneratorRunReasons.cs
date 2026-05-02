@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Riok.Mapperly.Tests.Generator;
 
-internal record IncrementalGeneratorRunReasons(
+internal sealed record IncrementalGeneratorRunReasons(
     IncrementalStepRunReason CompilationStep,
     IncrementalStepRunReason BuildMapperDefaultsStep,
     IncrementalStepRunReason BuildUseStaticMapperDefaultsStep,

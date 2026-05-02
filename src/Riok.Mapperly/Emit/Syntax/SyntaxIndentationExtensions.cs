@@ -120,7 +120,7 @@ internal static class SyntaxIndentationExtensions
     public static T AddIndentation<T>(this T n)
         where T : SyntaxNode => IndentationRewriter.Rewrite(n);
 
-    private class IndentationRewriter : CSharpSyntaxRewriter
+    private sealed class IndentationRewriter : CSharpSyntaxRewriter
     {
         private static readonly IndentationRewriter _instance = new();
 
