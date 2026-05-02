@@ -99,17 +99,53 @@ which can be changed using the [`.editorconfig`](./analyzer-diagnostics/index.md
 ## Map properties using user-implemented mappings
 
 See [user-implemented property conversions](./mapper.mdx#user-implemented-property-mappings).
-The mapper will respect the `ref` keyword on the target parameter when using an existing target function, allowing the reference to be updated in the caller.
+
+A `void` method with a `ref` target parameter can be used to convert a property value in-place.
+Mapperly respects the `ref` keyword on the target parameter when using an existing target function,
+allowing the reference to be updated in the caller.
+
+When `AutoUserMappings` is enabled (the default), such methods are discovered and used automatically
+for property mapping — no `[MapProperty(Use = ...)]` attribute is required:
 
 ```csharp
-  [Mapper(AllowNullPropertyAssignment = false, UseDeepCloning = true, RequiredMappingStrategy = RequiredMappingStrategy.Source)]
-  public static partial class UseUserMethodWithRef
-  {
-      [MapProperty(nameof(ArrayObject.IntArray), nameof(ArrayObject.IntArray), Use = nameof(MapArray))] // `Use` is required otherwise it will generate it's own
-      public static partial void Merge([MappingTarget] ArrayObject target, ArrayObject second);
+[Mapper]
+public static partial class CarMapper
+{
+    public static partial void Update([MappingTarget] CarDto target, Car source);
 
-      private static void MapArray([MappingTarget] ref int[] target, int[] second) => target = [.. target, .. second.Except(target)];
-  }
+    // highlight-start
+    // automatically discovered and used for Optional<string> => string property conversions
+    private static void MapOptional(Optional<string> src, ref string target)
+    {
+        if (src.HasValue)
+            target = src.Value;
+    }
+    // highlight-end
+
+    // generates:
+    // var targetRef = target.Name;
+    // MapOptional(source.Name, ref targetRef);
+    // target.Name = targetRef;
+}
+```
+
+If a new-instance user method (i.e. a method that returns a value) also exists for the same type pair,
+it takes priority over the `ref` method for property mapping.
+
+To use a `ref` method for a specific property explicitly, or when `AutoUserMappings` is disabled, use
+`[MapProperty(Use = nameof(...))]`:
+
+```csharp
+[Mapper(AllowNullPropertyAssignment = false, UseDeepCloning = true, RequiredMappingStrategy = RequiredMappingStrategy.Source)]
+public static partial class UseUserMethodWithRef
+{
+    // highlight-start
+    [MapProperty(nameof(ArrayObject.IntArray), nameof(ArrayObject.IntArray), Use = nameof(MapArray))]
+    // highlight-end
+    public static partial void Merge([MappingTarget] ArrayObject target, ArrayObject second);
+
+    private static void MapArray([MappingTarget] ref int[] target, int[] second) => target = [.. target, .. second.Except(target)];
+}
 ```
 
 ## Generic user-implemented mapping methods
