@@ -1,0 +1,24 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+{
+    partial B Map(A? src, int value);
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(11,37),
+      Message: Mapping the nullable source of type A? to target of type B which is not nullable,
+      Severity: Info,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG090,
+        Title: Mapping nullable source type to non-nullable target type,
+        MessageFormat: Mapping the nullable source of type {0} to target of type {1} which is not nullable,
+        Category: Mapper,
+        DefaultSeverity: Info,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

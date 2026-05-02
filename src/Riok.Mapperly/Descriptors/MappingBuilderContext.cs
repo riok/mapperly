@@ -44,6 +44,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation,
         TypeMappingKey mappingKey,
         bool ignoreDerivedTypes,
+        bool forceRootParameterScope = false,
         bool supportsDeepCloning = true
     )
         : this(
@@ -56,9 +57,15 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
             supportsDeepCloning: supportsDeepCloning
         )
     {
-        // Wrap parent scope in a child (delegates MarkUsed upward), or initialize from user mapping.
+        // Build a fresh root scope when the mapping is embedded in the parent method body
+        // (EmbeddedMapping option), so additional parameters are exposed and unused-parameter
+        // diagnostics are reported at this level rather than leaking into unrelated nested mappings.
+        // Otherwise, wrap the parent scope in a child (delegates MarkUsed upward).
         // Only the root scope reports unused parameters in diagnostics.
-        ParameterScope = ctx.ParameterScope.IsEmpty ? BuildParameterScope(userMapping) : new ParameterScope(ctx.ParameterScope);
+        ParameterScope =
+            ctx.ParameterScope.IsEmpty || forceRootParameterScope
+                ? BuildParameterScope(userMapping)
+                : new ParameterScope(ctx.ParameterScope);
         if (ignoreDerivedTypes)
         {
             Configuration = Configuration with { DerivedTypes = [] };
@@ -384,7 +391,14 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         Location? diagnosticLocation = null
     )
     {
-        return new(this, userMapping, diagnosticLocation, mappingKey, options.HasFlag(MappingBuildingOptions.IgnoreDerivedTypes));
+        return new(
+            this,
+            userMapping,
+            diagnosticLocation,
+            mappingKey,
+            options.HasFlag(MappingBuildingOptions.IgnoreDerivedTypes),
+            forceRootParameterScope: options.HasFlag(MappingBuildingOptions.EmbeddedMapping)
+        );
     }
 
     protected virtual INewInstanceMapping? BuildMapping(

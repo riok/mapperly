@@ -20,4 +20,11 @@ public enum MappingBuildingOptions
     /// Ignores the derived types of the configuration.
     /// </summary>
     IgnoreDerivedTypes = 1 << 2,
+
+    /// <summary>
+    /// The mapping is embedded in the parent method body (not emitted as a separate method).
+    /// Additional parameters from the user mapping are exposed to the inner mapping's body builder,
+    /// and unused-parameter diagnostics are reported at this level.
+    /// </summary>
+    EmbeddedMapping = 1 << 3,
 }
