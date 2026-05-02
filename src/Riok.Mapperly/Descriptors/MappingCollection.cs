@@ -218,7 +218,7 @@ public class MappingCollection(GenericTypeChecker genericTypeChecker)
         return null;
     }
 
-    private class MappingCollectionInstance<T, TUserMapping>
+    private sealed class MappingCollectionInstance<T, TUserMapping>
         where T : ITypeMapping
         where TUserMapping : T, IUserMapping
     {

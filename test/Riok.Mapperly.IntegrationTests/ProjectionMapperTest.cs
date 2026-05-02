@@ -159,7 +159,7 @@ namespace Riok.Mapperly.IntegrationTests
             await action(ctx);
         }
 
-        class ProjectionDbContext : DbContext
+        sealed class ProjectionDbContext : DbContext
         {
             public ProjectionDbContext(DbContextOptions options)
                 : base(options) { }
