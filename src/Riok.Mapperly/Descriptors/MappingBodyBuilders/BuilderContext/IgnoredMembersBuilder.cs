@@ -30,12 +30,8 @@ internal static class IgnoredMembersBuilder
 
         if (ctx.Configuration.Mapper.OnlyExplicitMappedMembers)
         {
-            var oppositeType = sourceTarget == MappingSourceTarget.Source ? ctx.Target : ctx.Source;
-            var oppositeTypeMembers = ctx.SymbolAccessor.GetAllAccessibleMappableMembers(oppositeType).Select(x => x.Name).ToHashSet();
-
-            var unmatchedMembers = allMembers.Except(oppositeTypeMembers, StringComparer.Ordinal);
-
-            ignoredMembers.UnionWith(unmatchedMembers);
+            var explicitlyMappedMembers = ctx.Configuration.Members.GetMembersWithExplicitConfigurations(sourceTarget).ToHashSet();
+            ignoredMembers.UnionWith(allMembers.Where(m => !explicitlyMappedMembers.Contains(m)));
         }
 
         RemoveAndReportConfiguredIgnoredMembers(ctx, sourceTarget, ignoredMembers);
