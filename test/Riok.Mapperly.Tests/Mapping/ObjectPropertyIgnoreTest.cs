@@ -168,4 +168,96 @@ public class ObjectPropertyIgnoreTest
                 """
             );
     }
+
+    [Fact]
+    public void OnlyExplicitMappedMembersWithNoExplicitMappings()
+    {
+        // With OnlyExplicitMappedMembers=true and no [MapProperty], nothing is mapped (no warnings either)
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "partial B Map(A source);",
+            new TestSourceBuilderOptions(OnlyExplicitMappedMembers: true),
+            "class A { public int Value1 { get; set; } public int Value2 { get; set; } }",
+            "class B { public int Value1 { get; set; } public int Value2 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void OnlyExplicitMappedMembersWithExplicitMapping()
+    {
+        // Only the explicitly declared [MapProperty] member is mapped; Value2 is ignored even though it matches by name
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(nameof(A.Value1), nameof(B.Value1))] partial B Map(A source);",
+            new TestSourceBuilderOptions(OnlyExplicitMappedMembers: true),
+            "class A { public int Value1 { get; set; } public int Value2 { get; set; } }",
+            "class B { public int Value1 { get; set; } public int Value2 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value1 = source.Value1;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void OnlyExplicitMappedMembersWithMultipleExplicitMappings()
+    {
+        // Only the two explicitly declared [MapProperty] members are mapped; unmatched/extra members are silently ignored
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(nameof(A.Value1), nameof(B.Value1))] [MapProperty(nameof(A.Value2), nameof(B.Value2))] partial B Map(A source);",
+            new TestSourceBuilderOptions(OnlyExplicitMappedMembers: true),
+            "class A { public int Value1 { get; set; } public int Value2 { get; set; } public int Value4 { get; set; } }",
+            "class B { public int Value1 { get; set; } public int Value2 { get; set; } public int Value3 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value1 = source.Value1;
+                target.Value2 = source.Value2;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void OnlyExplicitMappedMembersWithMapPropertyFromSource()
+    {
+        // MapPropertyFromSource explicitly maps the whole source to a target member; other target members are ignored
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapPropertyFromSource(nameof(B.Source))] partial B Map(A source);",
+            new TestSourceBuilderOptions(OnlyExplicitMappedMembers: true),
+            "class A { public int Value1 { get; set; } }",
+            "class B { public A Source { get; set; } public int Other { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Source = source;
+                return target;
+                """
+            );
+    }
 }

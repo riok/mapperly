@@ -28,6 +28,12 @@ internal static class IgnoredMembersBuilder
             .. GetIgnoredObsoleteMembers(ctx, sourceTarget),
         ];
 
+        if (ctx.Configuration.Mapper.OnlyExplicitMappedMembers)
+        {
+            var explicitlyMappedMembers = ctx.Configuration.Members.GetMembersWithExplicitConfigurations(sourceTarget).ToHashSet();
+            ignoredMembers.UnionWith(allMembers.Where(m => !explicitlyMappedMembers.Contains(m)));
+        }
+
         RemoveAndReportConfiguredIgnoredMembers(ctx, sourceTarget, ignoredMembers);
         ReportUnmatchedIgnoredMembers(ctx, sourceTarget, ignoredMembers, allMembers);
         return ignoredMembers;
