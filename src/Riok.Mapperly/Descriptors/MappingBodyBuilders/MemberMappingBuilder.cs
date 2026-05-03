@@ -85,11 +85,12 @@ internal static class MemberMappingBuilder
             return false;
         }
 
+        //var memberTargetNullable = memberMappingInfo.TargetMember.Member.Type.IsNullable();
         var memberTargetNullable = memberMappingInfo.TargetMember.Member.IsWriteNullable;
         var delegateTargetNullable = delegateMapping.TargetType.IsNullable();
         var memberSourceNullable = memberMappingInfo.IsSourceNullable;
         var delegateSourceNullable = delegateMapping.SourceType.IsNullable();
-        var memberTargetAcceptsNull = memberMappingInfo.TargetMember.MemberType.IsNullable();
+        var memberTargetAcceptsNull = memberMappingInfo.TargetMember.Member.IsWriteNullable;
 
         if (
             memberMappingInfo.Configuration?.SuppressNullMismatchDiagnostic != true
@@ -133,7 +134,7 @@ internal static class MemberMappingBuilder
             return false;
         }
 
-        sourceValue = BuildInlineNullHandlingMapping(ctx, delegateMapping, sourceMember.MemberPath, targetMember.MemberType);
+        sourceValue = BuildInlineNullHandlingMapping(ctx, delegateMapping, sourceMember.MemberPath, targetMember.MemberWriteType);
         return true;
     }
 

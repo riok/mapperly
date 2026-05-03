@@ -790,8 +790,21 @@ public class ObjectPropertyFlatteningTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Value1.Id100 of A to the target property Value2.Id200 of B which is not nullable"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Value1.Value1.Id1 of A to the target property Value2.Value2.Id2 of B which is not nullable"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Value1.Value1.Id10 of A to the target property Value2.Value2.Id20 of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();

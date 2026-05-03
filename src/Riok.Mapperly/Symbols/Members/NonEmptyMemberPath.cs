@@ -28,6 +28,14 @@ public class NonEmptyMemberPath : MemberPath
     public override ITypeSymbol MemberType =>
         IsAnyReadNullable() ? Member.Type.WithNullableAnnotation(NullableAnnotation.Annotated) : Member.Type;
 
+    //todo - summary
+    public override ITypeSymbol MemberReadType =>
+        IsAnyReadNullable() ? Member.Type.WithNullableAnnotation(NullableAnnotation.Annotated) : Member.Type;
+
+    //todo - summary
+    public override ITypeSymbol MemberWriteType =>
+        IsWriteNullable() ? Member.Type.WithNullableAnnotation(NullableAnnotation.Annotated) : Member.Type;
+
     public MemberPathSetter BuildSetter(SimpleMappingBuilderContext ctx) => MemberPathSetter.Build(ctx, this);
 
     public override string ToDisplayString(bool includeRootType = true, bool includeMemberType = true)

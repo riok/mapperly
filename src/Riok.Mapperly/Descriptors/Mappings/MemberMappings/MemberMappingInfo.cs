@@ -34,7 +34,11 @@ public record MemberMappingInfo(
         if (SourceMember == null)
             throw new InvalidOperationException($"{SourceMember} and {TargetMember} need to be set to create a {nameof(TypeMappingKey)}");
 
-        return new TypeMappingKey(SourceMember.MemberPath.MemberType, TargetMember.MemberType, Configuration?.ToTypeMappingConfiguration());
+        return new TypeMappingKey(
+            SourceMember.MemberPath.MemberReadType,
+            TargetMember.MemberWriteType,
+            Configuration?.ToTypeMappingConfiguration()
+        );
     }
 
     public string DescribeSource()

@@ -1071,8 +1071,13 @@ public class ObjectPropertyNullableTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Name of A to the target property Name of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
@@ -1174,8 +1179,13 @@ public class ObjectPropertyNullableTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Value of A to the target property Value of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
@@ -1217,8 +1227,13 @@ public class ObjectPropertyNullableTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Value of A to the target property Value of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """
                 var target = new global::B();
@@ -1226,6 +1241,40 @@ public class ObjectPropertyNullableTest
                 {
                     target.Value = MapToD(source.Value);
                 }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MaybeNullSourceToAllowNullTargetProperty()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            """
+            class A
+            {
+                [System.Diagnostics.CodeAnalysis.MaybeNull]
+                public string Name { get; set; } = default!;
+            }
+            """,
+            """
+            class B
+            {
+                [System.Diagnostics.CodeAnalysis.AllowNull]
+                public string Name { get; set; } = default!;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Name = source.Name;
                 return target;
                 """
             );

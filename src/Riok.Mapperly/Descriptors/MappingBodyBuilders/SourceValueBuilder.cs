@@ -77,7 +77,7 @@ internal static class SourceValueBuilder
         // but the provided value is null or default (for default IsNullable is also true)
         if (
             value.ConstantValue.IsNull
-            && memberMappingInfo.TargetMember.MemberType.IsReferenceType
+            && memberMappingInfo.TargetMember.MemberWriteType.IsReferenceType
             && !memberMappingInfo.TargetMember.Member.IsWriteNullable
         )
         {
@@ -92,8 +92,8 @@ internal static class SourceValueBuilder
         // target is value type but value is null
         if (
             value.ConstantValue.IsNull
-            && memberMappingInfo.TargetMember.MemberType.IsValueType
-            && !memberMappingInfo.TargetMember.MemberType.IsNullableValueType()
+            && memberMappingInfo.TargetMember.MemberWriteType.IsValueType
+            && !memberMappingInfo.TargetMember.MemberWriteType.IsNullableValueType()
             && value.Expression.IsKind(SyntaxKind.NullLiteralExpression)
         )
         {
@@ -116,7 +116,7 @@ internal static class SourceValueBuilder
 
         // use non-nullable target type to allow non-null value type assignments
         // to nullable value types
-        if (!SymbolEqualityComparer.Default.Equals(value.ConstantValue.Type, memberMappingInfo.TargetMember.MemberType.NonNullable()))
+        if (!SymbolEqualityComparer.Default.Equals(value.ConstantValue.Type, memberMappingInfo.TargetMember.MemberWriteType.NonNullable()))
         {
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.MapValueTypeMismatch,
@@ -137,7 +137,7 @@ internal static class SourceValueBuilder
                 // expand enum member access to fully qualified identifier
                 // use simple member name approach instead of slower visitor pattern on the expression
                 var enumMemberName = ((MemberAccessExpressionSyntax)value.Expression).Name.Identifier.Text;
-                var enumTypeFullName = FullyQualifiedIdentifier(memberMappingInfo.TargetMember.MemberType.NonNullable());
+                var enumTypeFullName = FullyQualifiedIdentifier(memberMappingInfo.TargetMember.MemberWriteType.NonNullable());
                 sourceValue = new ConstantSourceValue(MemberAccess(enumTypeFullName, enumMemberName));
                 return true;
             case TypedConstantKind.Type:
@@ -186,7 +186,7 @@ internal static class SourceValueBuilder
         // to nullable value types
         // nullable is checked with nullable annotation
         var methodCandidates = namedMethodCandidates.Where(x =>
-            SymbolEqualityComparer.Default.Equals(x.ReturnType.NonNullable(), memberMappingInfo.TargetMember.MemberType.NonNullable())
+            SymbolEqualityComparer.Default.Equals(x.ReturnType.NonNullable(), memberMappingInfo.TargetMember.MemberWriteType.NonNullable())
         );
 
         if (!memberMappingInfo.TargetMember.Member.IsNullable)
