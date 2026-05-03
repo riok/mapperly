@@ -7,9 +7,6 @@ namespace Riok.Mapperly.Symbols.Members;
 public class EmptyMemberPath(ITypeSymbol rootType) : MemberPath(rootType, [])
 {
     public override IMappableMember? Member => null;
-
-    public override ITypeSymbol MemberType => RootType; //TODO - was the MayBeNull check not required here?
-
     public override ITypeSymbol MemberReadType => RootType; //after confirmation, add read null
 
     public override ITypeSymbol MemberWriteType => RootType; //after confirmation, add write null

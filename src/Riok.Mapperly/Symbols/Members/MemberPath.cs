@@ -30,12 +30,6 @@ public abstract class MemberPath(ITypeSymbol rootType, IReadOnlyList<IMappableMe
     public abstract IMappableMember? Member { get; }
 
     /// <summary>
-    /// Gets the type of the total path, e.g. that of the <see cref="Member"/> if it exists, or the <see cref="RootType"/> otherwise.
-    /// If any part of the path is nullable, this type will be nullable too.
-    /// </summary>
-    public abstract ITypeSymbol MemberType { get; }
-
-    /// <summary>
     /// Gets the type of the total path in the context of read, e.g. that of the <see cref="Member"/> if it exists, or the <see cref="RootType"/> otherwise.
     /// If any part of the path is nullable, this type will be nullable too.
     /// </summary>
@@ -79,8 +73,6 @@ public abstract class MemberPath(ITypeSymbol rootType, IReadOnlyList<IMappableMe
     public bool IsAnyReadNullable() => Path.Any(x => x.IsReadNullable);
 
     public bool IsWriteNullable() => Path[^1].IsWriteNullable;
-
-    public bool IsAnyNullable() => Path.Any(p => p.IsNullable);
 
     public bool IsAnyObjectReadPathNullable() => ObjectPath.Any(p => p.IsReadNullable);
 

@@ -85,12 +85,10 @@ internal static class MemberMappingBuilder
             return false;
         }
 
-        //var memberTargetNullable = memberMappingInfo.TargetMember.Member.Type.IsNullable();
-        var memberTargetNullable = memberMappingInfo.TargetMember.Member.IsWriteNullable;
+        var memberTargetAcceptsNull = memberMappingInfo.TargetMember.Member.IsWriteNullable;
         var delegateTargetNullable = delegateMapping.TargetType.IsNullable();
         var memberSourceNullable = memberMappingInfo.IsSourceNullable;
         var delegateSourceNullable = delegateMapping.SourceType.IsNullable();
-        var memberTargetAcceptsNull = memberMappingInfo.TargetMember.Member.IsWriteNullable;
 
         if (
             memberMappingInfo.Configuration?.SuppressNullMismatchDiagnostic != true
@@ -109,8 +107,8 @@ internal static class MemberMappingBuilder
         }
 
         if (
-            (memberSourceNullable == delegateSourceNullable && memberTargetNullable == delegateTargetNullable)
-            || (memberSourceNullable && !memberTargetNullable && delegateSourceNullable && !delegateTargetNullable)
+            (memberSourceNullable == delegateSourceNullable && memberTargetAcceptsNull == delegateTargetNullable)
+            || (memberSourceNullable && !memberTargetAcceptsNull && delegateSourceNullable && !delegateTargetNullable)
         )
         {
             sourceValue = new MappedMemberSourceValue(

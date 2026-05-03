@@ -16,8 +16,6 @@ public interface IMappableMember
 
     INamedTypeSymbol? ContainingType { get; }
 
-    bool IsNullable { get; }
-
     bool IsReadNullable { get; }
 
     bool IsWriteNullable { get; }

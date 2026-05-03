@@ -19,8 +19,6 @@ public class PropertyMember(IPropertySymbol symbol, SymbolAccessor symbolAccesso
 
     public INamedTypeSymbol? ContainingType { get; } = symbol.ContainingType;
 
-    public bool IsNullable => symbolAccessor.IsNullable(Symbol);
-
     public bool IsReadNullable => symbolAccessor.IsReadNullable(Symbol);
 
     public bool IsWriteNullable => symbolAccessor.IsWriteNullable(Symbol);
