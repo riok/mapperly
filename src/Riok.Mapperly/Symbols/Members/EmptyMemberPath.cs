@@ -7,9 +7,10 @@ namespace Riok.Mapperly.Symbols.Members;
 public class EmptyMemberPath(ITypeSymbol rootType) : MemberPath(rootType, [])
 {
     public override IMappableMember? Member => null;
-    public override ITypeSymbol MemberReadType => RootType; //after confirmation, add read null
 
-    public override ITypeSymbol MemberWriteType => RootType; //after confirmation, add write null
+    public override ITypeSymbol MemberReadType => RootType;
+
+    public override ITypeSymbol MemberWriteType => RootType;
 
     public override string ToDisplayString(bool includeRootType = true, bool includeMemberType = true) =>
         includeRootType ? RootType.ToDisplayString() : string.Empty;
