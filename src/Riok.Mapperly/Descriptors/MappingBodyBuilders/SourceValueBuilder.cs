@@ -189,7 +189,7 @@ internal static class SourceValueBuilder
             SymbolEqualityComparer.Default.Equals(x.ReturnType.NonNullable(), memberMappingInfo.TargetMember.MemberWriteType.NonNullable())
         );
 
-        if (!memberMappingInfo.TargetMember.Member.IsNullable)
+        if (!memberMappingInfo.TargetMember.Member.IsWriteNullable)
         {
             // Filter out methods that may return null when the target is non-nullable.
             methodCandidates = methodCandidates.Where(m => !ctx.BuilderContext.SymbolAccessor.MayReturnNull(m, false));
@@ -201,7 +201,7 @@ internal static class SourceValueBuilder
             ctx.BuilderContext.ReportDiagnostic(
                 DiagnosticDescriptors.MapValueMethodTypeMismatch,
                 methodReferenceConfiguration.Name,
-                namedMethodCandidates[0].ReturnType.ToDisplayString(),
+                FormattedReturnType(namedMethodCandidates[0]),
                 memberMappingInfo.TargetMember.ToDisplayString()
             );
             sourceValue = null;
@@ -218,5 +218,18 @@ internal static class SourceValueBuilder
             additionalParameterNames
         );
         return true;
+    }
+
+    private static string FormattedReturnType(IMethodSymbol methodSymbol)
+    {
+        bool hasNullableAttribute = methodSymbol
+            .GetReturnTypeAttributes()
+            .Any(a => string.Equals(a.AttributeClass?.Name, nameof(MaybeNullAttribute)));
+
+        var effectiveType = hasNullableAttribute
+            ? methodSymbol.ReturnType.WithNullableAnnotation(NullableAnnotation.Annotated)
+            : methodSymbol.ReturnType;
+
+        return effectiveType.ToDisplayString();
     }
 }

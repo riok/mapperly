@@ -686,7 +686,7 @@ public class ObjectPropertyValueMethodTest
             .Should()
             .HaveDiagnostic(
                 DiagnosticDescriptors.MapValueMethodTypeMismatch,
-                "Cannot assign method return type string of BuildValue() to B.Value of type string"
+                "Cannot assign method return type string? of BuildValue() to B.Value of type string"
             )
             .HaveAssertedAllDiagnostics();
     }
@@ -715,7 +715,7 @@ public class ObjectPropertyValueMethodTest
             .Should()
             .HaveDiagnostic(
                 DiagnosticDescriptors.MapValueMethodTypeMismatch,
-                "Cannot assign method return type string of BuildValue() to B.Value of type string"
+                "Cannot assign method return type string? of BuildValue() to B.Value of type string"
             )
             .HaveAssertedAllDiagnostics();
     }
