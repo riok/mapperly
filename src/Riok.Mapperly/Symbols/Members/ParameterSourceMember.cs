@@ -14,13 +14,15 @@ namespace Riok.Mapperly.Symbols.Members;
 /// and is therefore in terms of the mapping the same.
 /// </summary>
 [DebuggerDisplay("{Name}")]
-public class ParameterSourceMember(MethodParameter parameter) : IMappableMember, IMemberGetter
+public class ParameterSourceMember(MethodParameter parameter, SymbolAccessor symbolAccessor) : IMappableMember, IMemberGetter
 {
     public string Name => parameter.Name;
     public ITypeSymbol Type => parameter.Type;
     public INamedTypeSymbol? ContainingType => null;
-    public bool IsReadNullable => parameter.Type.IsNullable();
-    public bool IsWriteNullable => parameter.Type.IsNullable();
+    public bool IsReadNullable =>
+        parameter.symbol is not null ? symbolAccessor.IsReadNullable(parameter.symbol) : parameter.Type.IsNullable();
+    public bool IsWriteNullable =>
+        parameter.symbol is not null ? symbolAccessor.IsWriteNullable(parameter.symbol) : parameter.Type.IsNullable();
     public bool CanGet => true;
     public bool CanGetDirectly => true;
     public bool CanSet => false;

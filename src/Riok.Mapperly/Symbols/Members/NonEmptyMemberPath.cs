@@ -29,7 +29,7 @@ public class NonEmptyMemberPath : MemberPath
         IsAnyReadNullable() ? Member.Type.WithNullableAnnotation(NullableAnnotation.Annotated) : Member.Type;
 
     /// <summary>
-    /// Gets the type of the <see cref="Member"/> in the context of write. If any part of the path is nullable, this type will be nullable too.
+    /// Gets the type of the <see cref="Member"/> in the context of write. If last part of the path is nullable, this type will be nullable too.
     /// </summary>
     public override ITypeSymbol MemberWriteType =>
         IsWriteNullable() ? Member.Type.WithNullableAnnotation(NullableAnnotation.Annotated) : Member.Type;

@@ -39,7 +39,7 @@ public abstract class MethodMapping : ITypeMapping, IParameterizedMapping
     protected MethodMapping(ITypeSymbol sourceType, ITypeSymbol targetType)
     {
         TargetType = targetType;
-        SourceParameter = new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType);
+        SourceParameter = new MethodParameter(SourceParameterIndex, DefaultSourceParameterName, sourceType, null);
         _returnType = targetType;
     }
 
