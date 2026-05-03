@@ -1049,7 +1049,7 @@ public class ObjectPropertyNullableTest
     }
 
     [Fact]
-    public void MaybeNullSourceToMaybeNullTargetProperty()
+    public void MaybeNullSourceToMaybeNullTargetPropertyShouldDiagnoseNullableSource()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -1155,7 +1155,7 @@ public class ObjectPropertyNullableTest
     }
 
     [Fact]
-    public void MaybeNullSourceClassToMaybeNullTargetClassPropertyShouldSetNull()
+    public void MaybeNullSourceClassToMaybeNullTargetClassPropertyShouldDiagnoseNullableSourceClass()
     {
         var source = TestSourceBuilder.Mapping(
             "A",
@@ -1199,7 +1199,7 @@ public class ObjectPropertyNullableTest
     }
 
     [Fact]
-    public void MaybeNullSourceClassToMaybeNullTargetClassPropertyWithNoNullAssignment()
+    public void MaybeNullSourceClassToMaybeNullTargetClassPropertyWithNoNullAssignmentShouldDiagnoseNullableSourceClass()
     {
         var source = TestSourceBuilder.Mapping(
             "A",

@@ -774,7 +774,7 @@ public class ObjectPropertyFlatteningTest
     }
 
     [Fact]
-    public void ManualNestedPropertyNullablePath()
+    public void ManualNestedPropertyNullablePathShouldDiagnoseNullableProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             "[MapProperty(\"Value1.Value1.Id1\", \"Value2.Value2.Id2\")]"

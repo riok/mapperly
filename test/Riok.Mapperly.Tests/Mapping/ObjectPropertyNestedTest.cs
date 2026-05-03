@@ -31,7 +31,7 @@ public class ObjectPropertyNestedTest
     }
 
     [Fact]
-    public void ManualNullableNestedToNullableNestedProperty()
+    public void ManualNullableNestedToNullableNestedPropertyShouldDiagnoseNullableSourceProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """

@@ -11,7 +11,6 @@ public readonly record struct MethodParameter(
     RefKind RefKind = RefKind.None
 )
 {
-    //todo - has doubt
     private static readonly SymbolDisplayFormat _parameterNameFormat = new(
         parameterOptions: SymbolDisplayParameterOptions.IncludeName,
         miscellaneousOptions: SymbolDisplayMiscellaneousOptions.EscapeKeywordIdentifiers

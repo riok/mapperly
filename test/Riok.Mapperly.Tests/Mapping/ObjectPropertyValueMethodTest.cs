@@ -611,7 +611,7 @@ public class ObjectPropertyValueMethodTest
     }
 
     [Fact]
-    public void MethodToMaybeNullTargetPropertyShouldAllowNullableReturnType()
+    public void ReturnNullableMethodToMaybeNullTargetPropertyShouldDiagnoseNullableReturnType()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -692,7 +692,7 @@ public class ObjectPropertyValueMethodTest
     }
 
     [Fact]
-    public void ReturnMaybeNullMethodToMaybeNullTargetProperty()
+    public void ReturnMaybeNullMethodToMaybeNullTargetPropertyShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
