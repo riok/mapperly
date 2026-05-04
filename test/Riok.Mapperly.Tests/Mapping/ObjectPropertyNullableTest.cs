@@ -1279,4 +1279,118 @@ public class ObjectPropertyNullableTest
                 """
             );
     }
+
+    [Fact]
+    public void NonNullableSourceToAllowNullTargetProperty()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string Name { get; set; } }",
+            """
+            class B
+            {
+                [System.Diagnostics.CodeAnalysis.AllowNull]
+                public string Name { get; set; } = default!;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Name = source.Name;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MaybeNullSourceClassToAllowNullTargetClassPropertyShouldSetNull()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            """
+            class A
+            {
+                [System.Diagnostics.CodeAnalysis.MaybeNull]
+                public C Value { get; set; } = default!;
+            }
+            """,
+            """
+            class B
+            {
+                [System.Diagnostics.CodeAnalysis.AllowNull]
+                public D Value { get; set; } = default!;
+            }
+            """,
+            "class C { public string V { get; set; } }",
+            "class D { public string V { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                if (source.Value != null)
+                {
+                    target.Value = MapToD(source.Value);
+                }
+                else
+                {
+                    target.Value = null;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MaybeNullSourceClassToAllowNullTargetClassPropertyWithNoNullAssignment()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.Default with
+            {
+                AllowNullPropertyAssignment = false,
+            },
+            """
+            class A
+            {
+                [System.Diagnostics.CodeAnalysis.MaybeNull]
+                public C Value { get; set; } = default!;
+            }
+            """,
+            """
+            class B
+            {
+                [System.Diagnostics.CodeAnalysis.AllowNull]
+                public D Value { get; set; } = default!;
+            }
+            """,
+            "class C { public string V { get; set; } }",
+            "class D { public string V { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                if (source.Value != null)
+                {
+                    target.Value = MapToD(source.Value);
+                }
+                return target;
+                """
+            );
+    }
 }

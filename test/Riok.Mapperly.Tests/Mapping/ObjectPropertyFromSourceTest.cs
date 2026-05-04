@@ -441,7 +441,7 @@ public class ObjectPropertyFromSourceTest
     }
 
     [Fact]
-    public void ReturnMaybeNullMethodToMaybeNullTargetProperty()
+    public void ReturnMaybeNullMethodToMaybeNullTargetPropertyShouldDiagnoseNullableSource()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -479,7 +479,7 @@ public class ObjectPropertyFromSourceTest
     }
 
     [Fact]
-    public void ReturnMaybeNullMethodToMaybeNullTargetPropertyv2()
+    public void ReturnMaybeNullMethodToAllowNullTargetProperty()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """

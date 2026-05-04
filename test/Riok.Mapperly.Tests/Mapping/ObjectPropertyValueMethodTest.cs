@@ -719,4 +719,95 @@ public class ObjectPropertyValueMethodTest
             )
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public void MethodToAllowNullTargetPropertyShouldAllowNullableReturnType()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("Value", Use = nameof(BuildValue))] partial B Map(A source);
+            string? BuildValue() => null;
+            """,
+            "class A;",
+            """
+            class B
+            {
+                [System.Diagnostics.CodeAnalysis.AllowNull]
+                public string Value { get; set; } = default!;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = BuildValue();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MethodToAllowTargetPropertyShouldAllowNonNullableReturnType()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("Value", Use = nameof(BuildValue))] partial B Map(A source);
+            string BuildValue() => "hello";
+            """,
+            "class A;",
+            """
+            class B
+            {
+                [System.Diagnostics.CodeAnalysis.AllowNull]
+                public string Value { get; set; } = default!;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = BuildValue();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ReturnMaybeNullMethodToAllowNullTargetProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("Value", Use = nameof(BuildValue))] partial B Map(A source);
+            [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+            string BuildValue() => null!;
+            """,
+            "class A;",
+            """
+            class B
+            {
+                [System.Diagnostics.CodeAnalysis.AllowNull]
+                public string Value { get; set; } = default!;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = BuildValue();
+                return target;
+                """
+            );
+    }
 }
