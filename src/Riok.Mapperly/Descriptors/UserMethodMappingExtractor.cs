@@ -268,6 +268,12 @@ public static class UserMethodMappingExtractor
     )
     {
         var targetType = ctx.SymbolAccessor.UpgradeNullable(method.ReturnType);
+
+        if (ctx.SymbolAccessor.TryHasAttribute<MaybeNullAttribute>(method.GetReturnTypeAttributes()))
+        {
+            targetType = targetType.WithNullableAnnotation(NullableAnnotation.Annotated);
+        }
+
         if (!targetType.IsNullable() || ctx.SymbolAccessor.TryHasAttribute<NotNullAttribute>(method.GetReturnTypeAttributes()))
         {
             return (targetType, UserImplementedMethodMapping.TargetNullability.NeverNull);
