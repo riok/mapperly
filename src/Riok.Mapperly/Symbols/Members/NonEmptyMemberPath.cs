@@ -23,10 +23,16 @@ public class NonEmptyMemberPath : MemberPath
     public string RootName => Path[0].Name;
 
     /// <summary>
-    /// Gets the type of the <see cref="Member"/>. If any part of the path is nullable, this type will be nullable too.
+    /// Gets the type of the <see cref="Member"/> in the context of read. If any part of the path is nullable, this type will be nullable too.
     /// </summary>
-    public override ITypeSymbol MemberType =>
-        IsAnyNullable() ? Member.Type.WithNullableAnnotation(NullableAnnotation.Annotated) : Member.Type;
+    public override ITypeSymbol MemberReadType =>
+        IsAnyReadNullable() ? Member.Type.WithNullableAnnotation(NullableAnnotation.Annotated) : Member.Type;
+
+    /// <summary>
+    /// Gets the type of the <see cref="Member"/> in the context of write. If last part of the path is nullable, this type will be nullable too.
+    /// </summary>
+    public override ITypeSymbol MemberWriteType =>
+        IsWriteNullable() ? Member.Type.WithNullableAnnotation(NullableAnnotation.Annotated) : Member.Type;
 
     public MemberPathSetter BuildSetter(SimpleMappingBuilderContext ctx) => MemberPathSetter.Build(ctx, this);
 

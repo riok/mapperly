@@ -91,7 +91,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         };
     }
 
-    public bool IsNullable(ISymbol symbol)
+    public bool IsReadNullable(ISymbol symbol)
     {
         return symbol switch
         {
@@ -99,6 +99,18 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
             IPropertySymbol p => p.Type.IsNullable() || TryHasAttribute<MaybeNullAttribute>(p),
             IFieldSymbol f => f.Type.IsNullable() || TryHasAttribute<MaybeNullAttribute>(f),
             IParameterSymbol p => p.Type.IsNullable() || TryHasAttribute<MaybeNullAttribute>(p),
+            _ => false,
+        };
+    }
+
+    public bool IsWriteNullable(ISymbol symbol)
+    {
+        return symbol switch
+        {
+            ITypeSymbol t => t.IsNullable(),
+            IPropertySymbol p => p.Type.IsNullable() || TryHasAttribute<AllowNullAttribute>(p),
+            IFieldSymbol f => f.Type.IsNullable() || TryHasAttribute<AllowNullAttribute>(f),
+            IParameterSymbol p => p.Type.IsNullable() || TryHasAttribute<AllowNullAttribute>(p),
             _ => false,
         };
     }

@@ -68,7 +68,8 @@ internal static class MembersMappingStateBuilder
             memberConfigsByRootTargetName,
             configuredTargetMembersByRootName.AsDictionary(),
             ignoredSourceMemberNames,
-            parameterScope
+            parameterScope,
+            ctx.SymbolAccessor
         );
     }
 

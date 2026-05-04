@@ -611,7 +611,7 @@ public class ObjectPropertyValueMethodTest
     }
 
     [Fact]
-    public void MethodToMaybeNullTargetPropertyShouldAllowNullableReturnType()
+    public void ReturnNullableMethodToMaybeNullTargetPropertyShouldDiagnoseNullableReturnType()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -629,15 +629,13 @@ public class ObjectPropertyValueMethodTest
         );
 
         TestHelper
-            .GenerateMapper(source)
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
-            .HaveSingleMethodBody(
-                """
-                var target = new global::B();
-                target.Value = BuildValue();
-                return target;
-                """
-            );
+            .HaveDiagnostic(
+                DiagnosticDescriptors.MapValueMethodTypeMismatch,
+                "Cannot assign method return type string? of BuildValue() to B.Value of type string"
+            )
+            .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
@@ -688,13 +686,13 @@ public class ObjectPropertyValueMethodTest
             .Should()
             .HaveDiagnostic(
                 DiagnosticDescriptors.MapValueMethodTypeMismatch,
-                "Cannot assign method return type string of BuildValue() to B.Value of type string"
+                "Cannot assign method return type string? of BuildValue() to B.Value of type string"
             )
             .HaveAssertedAllDiagnostics();
     }
 
     [Fact]
-    public void ReturnMaybeNullMethodToMaybeNullTargetProperty()
+    public void ReturnMaybeNullMethodToMaybeNullTargetPropertyShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -707,6 +705,95 @@ public class ObjectPropertyValueMethodTest
             class B
             {
                 [System.Diagnostics.CodeAnalysis.MaybeNull]
+                public string Value { get; set; } = default!;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.MapValueMethodTypeMismatch,
+                "Cannot assign method return type string? of BuildValue() to B.Value of type string"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void MethodToAllowNullTargetPropertyShouldAllowNullableReturnType()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("Value", Use = nameof(BuildValue))] partial B Map(A source);
+            string? BuildValue() => null;
+            """,
+            "class A;",
+            """
+            class B
+            {
+                [System.Diagnostics.CodeAnalysis.AllowNull]
+                public string Value { get; set; } = default!;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = BuildValue();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MethodToAllowTargetPropertyShouldAllowNonNullableReturnType()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("Value", Use = nameof(BuildValue))] partial B Map(A source);
+            string BuildValue() => "hello";
+            """,
+            "class A;",
+            """
+            class B
+            {
+                [System.Diagnostics.CodeAnalysis.AllowNull]
+                public string Value { get; set; } = default!;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = BuildValue();
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ReturnMaybeNullMethodToAllowNullTargetProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapValue("Value", Use = nameof(BuildValue))] partial B Map(A source);
+            [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+            string BuildValue() => null!;
+            """,
+            "class A;",
+            """
+            class B
+            {
+                [System.Diagnostics.CodeAnalysis.AllowNull]
                 public string Value { get; set; } = default!;
             }
             """

@@ -85,7 +85,7 @@ internal static class MemberMappingBuilder
             return false;
         }
 
-        var memberTargetNullable = memberMappingInfo.TargetMember.MemberType.IsNullable();
+        var memberTargetAcceptsNull = memberMappingInfo.TargetMember.Member.IsWriteNullable;
         var delegateTargetNullable = delegateMapping.TargetType.IsNullable();
         var memberSourceNullable = memberMappingInfo.IsSourceNullable;
         var delegateSourceNullable = delegateMapping.SourceType.IsNullable();
@@ -93,7 +93,7 @@ internal static class MemberMappingBuilder
         if (
             memberMappingInfo.Configuration?.SuppressNullMismatchDiagnostic != true
             && memberSourceNullable
-            && !memberTargetNullable
+            && !memberTargetAcceptsNull
             && !(delegateSourceNullable && !delegateTargetNullable)
         )
         {
@@ -107,8 +107,8 @@ internal static class MemberMappingBuilder
         }
 
         if (
-            (memberSourceNullable == delegateSourceNullable && memberTargetNullable == delegateTargetNullable)
-            || (memberSourceNullable && !memberTargetNullable && delegateSourceNullable && !delegateTargetNullable)
+            (memberSourceNullable == delegateSourceNullable && memberTargetAcceptsNull == delegateTargetNullable)
+            || (memberSourceNullable && !memberTargetAcceptsNull && delegateSourceNullable && !delegateTargetNullable)
         )
         {
             sourceValue = new MappedMemberSourceValue(
@@ -132,7 +132,7 @@ internal static class MemberMappingBuilder
             return false;
         }
 
-        sourceValue = BuildInlineNullHandlingMapping(ctx, delegateMapping, sourceMember.MemberPath, targetMember.MemberType);
+        sourceValue = BuildInlineNullHandlingMapping(ctx, delegateMapping, sourceMember.MemberPath, targetMember.MemberWriteType);
         return true;
     }
 
@@ -174,7 +174,7 @@ internal static class MemberMappingBuilder
     )
     {
         var nullFallback = NullFallbackValue.Default;
-        if (!delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyNullable())
+        if (!delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyReadNullable())
         {
             nullFallback = ctx.BuilderContext.GetNullFallbackValue(targetMemberType);
         }
@@ -198,7 +198,7 @@ internal static class MemberMappingBuilder
         var sourceGetter = sourceMember.BuildGetter(ctx.BuilderContext);
 
         // no member of the source path is nullable, no null handling needed
-        if (!sourceMember.IsAnyNullable())
+        if (!sourceMember.IsAnyReadNullable())
         {
             return new MappedMemberSourceValue(delegateMapping, sourceGetter, false, true);
         }
@@ -209,7 +209,7 @@ internal static class MemberMappingBuilder
         // access the source in a null save matter (via ?.) but no other special handling required.
         if (
             ctx.BuilderContext.Configuration.Mapper.AllowNullPropertyAssignment
-            && (delegateMapping.SourceType.IsNullable() || delegateMapping.IsSynthetic && targetMember.Member.IsNullable)
+            && (delegateMapping.SourceType.IsNullable() || delegateMapping.IsSynthetic && targetMember.Member.IsWriteNullable)
         )
         {
             return new MappedMemberSourceValue(delegateMapping, sourceGetter, true, false);

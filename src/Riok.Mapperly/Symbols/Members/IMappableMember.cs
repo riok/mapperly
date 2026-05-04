@@ -16,7 +16,9 @@ public interface IMappableMember
 
     INamedTypeSymbol? ContainingType { get; }
 
-    bool IsNullable { get; }
+    bool IsReadNullable { get; }
+
+    bool IsWriteNullable { get; }
 
     /// <summary>
     /// Whether the member can be read using direct access or an unsafe accessor method.

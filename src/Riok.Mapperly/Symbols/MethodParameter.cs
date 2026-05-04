@@ -3,7 +3,13 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Riok.Mapperly.Symbols;
 
-public readonly record struct MethodParameter(int Ordinal, string Name, ITypeSymbol Type, RefKind RefKind = RefKind.None)
+public readonly record struct MethodParameter(
+    int Ordinal,
+    string Name,
+    ITypeSymbol Type,
+    IParameterSymbol? symbol = null,
+    RefKind RefKind = RefKind.None
+)
 {
     private static readonly SymbolDisplayFormat _parameterNameFormat = new(
         parameterOptions: SymbolDisplayParameterOptions.IncludeName,
@@ -11,7 +17,7 @@ public readonly record struct MethodParameter(int Ordinal, string Name, ITypeSym
     );
 
     public MethodParameter(IParameterSymbol symbol, ITypeSymbol parameterType)
-        : this(symbol.Ordinal, symbol.ToDisplayString(_parameterNameFormat), parameterType, symbol.RefKind) { }
+        : this(symbol.Ordinal, symbol.ToDisplayString(_parameterNameFormat), parameterType, symbol, symbol.RefKind) { }
 
     /// <summary>
     /// The parameter name with the verbatim identifier prefix (<c>@</c>) removed.
