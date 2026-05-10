@@ -70,8 +70,34 @@ internal static class UserMappingMethodParameterExtractor
         }
 
         var dedupedAdditionalParameters = parameterGroups.Select(g => g.First()).ToList();
+
+        ValidateMapAdditionalSourceAttribute(ctx, method, sourceParameter.Value, targetParameter, refHandlerParameter);
+
         parameters = new MappingMethodParameters(sourceParameter.Value, targetParameter, refHandlerParameter, dedupedAdditionalParameters);
         return true;
+    }
+
+    private static void ValidateMapAdditionalSourceAttribute(
+        SimpleMappingBuilderContext ctx,
+        IMethodSymbol method,
+        MethodParameter source,
+        MethodParameter? target,
+        MethodParameter? refHandler
+    )
+    {
+        var reservedOrdinals = new HashSet<int> { source.Ordinal };
+        if (target.HasValue)
+            reservedOrdinals.Add(target.Value.Ordinal);
+        if (refHandler.HasValue)
+            reservedOrdinals.Add(refHandler.Value.Ordinal);
+
+        foreach (var p in method.Parameters)
+        {
+            if (reservedOrdinals.Contains(p.Ordinal) && ctx.SymbolAccessor.HasAttribute<MapAdditionalSourceAttribute>(p))
+            {
+                ctx.ReportDiagnostic(DiagnosticDescriptors.MapAdditionalSourceNotApplicable, p, p.Name, method.Name);
+            }
+        }
     }
 
     public static bool BuildRuntimeTargetTypeMappingParameters(
@@ -158,6 +184,7 @@ internal static class UserMappingMethodParameterExtractor
             p.Ordinal != sourceParameter.Ordinal
             && p.Ordinal != refHandlerParameterOrdinal
             && !ctx.SymbolAccessor.HasAttribute<ReferenceHandlerAttribute>(p)
+            && !ctx.SymbolAccessor.HasAttribute<MapAdditionalSourceAttribute>(p)
         );
         return ctx.SymbolAccessor.WrapOptionalMethodParameter(targetParameterSymbol);
     }

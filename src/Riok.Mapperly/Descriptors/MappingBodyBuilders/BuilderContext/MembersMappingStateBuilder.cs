@@ -58,6 +58,12 @@ internal static class MembersMappingStateBuilder
         // For separate auto-generated method mappings, inherited parent parameters
         // must not shadow source type members.
         var parameterScope = ctx.ParameterScope.IsRoot || ctx.IsExpression ? ctx.ParameterScope : ParameterScope.Empty;
+        var additionalSourceNormalizedNames = GetAdditionalSourceNormalizedNames(ctx);
+
+        // [MapAdditionalSource] params contribute their properties directly to the mapping.
+        // Pre-mark them as used so RMG082 is not emitted for them.
+        if (additionalSourceNormalizedNames.Count > 0)
+            parameterScope.MarkUsed(additionalSourceNormalizedNames);
 
         return new MembersMappingState(
             unmappedSourceMemberNames,
@@ -68,8 +74,17 @@ internal static class MembersMappingStateBuilder
             memberConfigsByRootTargetName,
             configuredTargetMembersByRootName.AsDictionary(),
             ignoredSourceMemberNames,
-            parameterScope
+            parameterScope,
+            additionalSourceNormalizedNames
         );
+    }
+
+    private static HashSet<string> GetAdditionalSourceNormalizedNames(MappingBuilderContext ctx)
+    {
+        if (ctx.UserMapping is not MethodMapping { AdditionalSourceMergeParameters.Count: > 0 } methodMapping)
+            return [];
+
+        return methodMapping.AdditionalSourceMergeParameters.Select(p => p.NormalizedName).ToHashSet(StringComparer.OrdinalIgnoreCase);
     }
 
     private static HashSet<string> GetSourceMemberNames(MappingBuilderContext ctx, IMapping mapping)

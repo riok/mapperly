@@ -23,9 +23,20 @@ public class MappedMemberSourceValue(
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
+        // If the root type of this member path belongs to a [MapAdditionalSource] parameter,
+        // redirect the base access to that parameter's identifier instead of the main source.
+        var baseAccess = ctx.Source;
+        if (
+            ctx.AdditionalSources != null
+            && ctx.AdditionalSources.TryGetValue(_sourceMember.MemberPath.RootType.ToDisplayString(), out var additionalSource)
+        )
+        {
+            baseAccess = additionalSource;
+        }
+
         ctx = ctx.WithSource(
             _sourceMember.BuildAccess(
-                ctx.Source,
+                baseAccess,
                 addValuePropertyOnNullable: addValuePropertyOnNullable,
                 nullConditional: nullConditionalAccess
             )

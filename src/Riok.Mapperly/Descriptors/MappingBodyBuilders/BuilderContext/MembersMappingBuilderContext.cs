@@ -14,16 +14,23 @@ namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 /// An abstract base implementation of <see cref="IMembersBuilderContext{T}"/>.
 /// </summary>
 /// <typeparam name="T">The type of the mapping.</typeparam>
-public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext builderContext, T mapping) : IMembersBuilderContext<T>
+public abstract class MembersMappingBuilderContext<T> : IMembersBuilderContext<T>
     where T : IMapping
 {
-    private readonly MembersMappingState _state = MembersMappingStateBuilder.Build(builderContext, mapping);
+    private readonly MembersMappingState _state;
+    private readonly NestedMappingsContext _nestedMappingsContext;
 
-    private readonly NestedMappingsContext _nestedMappingsContext = NestedMappingsContext.Create(builderContext);
+    protected MembersMappingBuilderContext(MappingBuilderContext builderContext, T mapping)
+    {
+        BuilderContext = builderContext;
+        Mapping = mapping;
+        _state = MembersMappingStateBuilder.Build(builderContext, mapping);
+        _nestedMappingsContext = NestedMappingsContext.Create(builderContext, _state.AdditionalSourceMembers);
+    }
 
-    public MappingBuilderContext BuilderContext { get; } = builderContext;
+    public MappingBuilderContext BuilderContext { get; }
 
-    public T Mapping { get; } = mapping;
+    public T Mapping { get; }
 
     public void AddDiagnostics(bool requiredMembersNeedToBeMapped)
     {
@@ -173,6 +180,22 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
             return true;
         }
 
+        // search member properties of [MapAdditionalSource] parameters
+        var additionalSourceTypes = _state.AdditionalSourceMembers.Values.Where(m => m.IsSpecialAdditionalSource).Select(m => m.Type);
+        if (
+            BuilderContext.SymbolAccessor.TryFindMemberPath(
+                additionalSourceTypes,
+                pathCandidates,
+                _state.IgnoredSourceMemberNames,
+                ignoreCase,
+                out sourceMemberPath
+            )
+        )
+        {
+            sourcePath = new SourceMemberPath(sourceMemberPath, SourceMemberType.AdditionalMappingMethodParameter);
+            return true;
+        }
+
         sourcePath = null;
         return false;
     }
@@ -234,23 +257,34 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
 
     private bool ResolveMemberConfigSourcePath(MemberMappingConfiguration config, [NotNullWhen(true)] out SourceMemberPath? sourcePath)
     {
-        if (!BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.SourceType, config.Source, out var sourceMemberPath))
+        if (BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.SourceType, config.Source, out var sourceMemberPath))
         {
-            BuilderContext.ReportDiagnostic(
-                DiagnosticDescriptors.ConfiguredMappingSourceMemberNotFound,
-                config.Source.FullName,
-                Mapping.SourceType
-            );
-
-            // consume this member config and prevent its further usage
-            // as it is invalid, and a diagnostic has already been reported
-            _state.ConsumeMemberConfig(config);
-            sourcePath = null;
-            return false;
+            sourcePath = new SourceMemberPath(sourceMemberPath, SourceMemberType.Member);
+            return true;
         }
 
-        sourcePath = new SourceMemberPath(sourceMemberPath, SourceMemberType.Member);
-        return true;
+        // Try [MapAdditionalSource] parameter types when not found on the main source.
+        var additionalSourceTypes = _state.AdditionalSourceMembers.Values.Where(m => m.IsSpecialAdditionalSource).Select(m => m.Type);
+        foreach (var additionalType in additionalSourceTypes)
+        {
+            if (BuilderContext.SymbolAccessor.TryFindMemberPath(additionalType, config.Source, out sourceMemberPath))
+            {
+                sourcePath = new SourceMemberPath(sourceMemberPath, SourceMemberType.AdditionalMappingMethodParameter);
+                return true;
+            }
+        }
+
+        BuilderContext.ReportDiagnostic(
+            DiagnosticDescriptors.ConfiguredMappingSourceMemberNotFound,
+            config.Source.FullName,
+            Mapping.SourceType
+        );
+
+        // consume this member config and prevent its further usage
+        // as it is invalid, and a diagnostic has already been reported
+        _state.ConsumeMemberConfig(config);
+        sourcePath = null;
+        return false;
     }
 
     private bool TryFindSourcePath(

@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Configuration.PropertyReferences;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Symbols.Members;
@@ -12,18 +13,35 @@ public class NestedMappingsContext
 {
     private readonly MappingBuilderContext _context;
     private readonly IReadOnlyCollection<MemberPath> _paths;
+    private readonly IReadOnlyCollection<(MemberPath Path, ITypeSymbol RootType)> _additionalPaths;
     private readonly HashSet<MemberPath> _unusedPaths;
 
-    private NestedMappingsContext(MappingBuilderContext context, IReadOnlyCollection<MemberPath> paths)
+    private NestedMappingsContext(
+        MappingBuilderContext context,
+        IReadOnlyCollection<MemberPath> paths,
+        IReadOnlyCollection<(MemberPath Path, ITypeSymbol RootType)> additionalPaths
+    )
     {
         _context = context;
         _paths = paths;
+        _additionalPaths = additionalPaths;
         _unusedPaths = new HashSet<MemberPath>(paths, ReferenceEqualityComparer.Instance);
     }
 
-    public static NestedMappingsContext Create(MappingBuilderContext ctx) => new(ctx, ResolveNestedMappings(ctx));
+    public static NestedMappingsContext Create(
+        MappingBuilderContext ctx,
+        IReadOnlyDictionary<string, IMappableMember>? additionalSourceMembers = null
+    )
+    {
+        var paths = ResolveNestedMappings(ctx, additionalSourceMembers);
+        var additionalPaths = ResolveAdditionalNestedMappings(ctx, additionalSourceMembers);
+        return new NestedMappingsContext(ctx, paths, additionalPaths);
+    }
 
-    private static List<MemberPath> ResolveNestedMappings(MappingBuilderContext ctx)
+    private static List<MemberPath> ResolveNestedMappings(
+        MappingBuilderContext ctx,
+        IReadOnlyDictionary<string, IMappableMember>? additionalSourceMembers
+    )
     {
         var nestedMemberPaths = new List<MemberPath>(ctx.Configuration.Members.NestedMappings.Count);
 
@@ -31,11 +49,15 @@ public class NestedMappingsContext
         {
             if (!ctx.SymbolAccessor.TryFindMemberPath(ctx.Source, nestedMemberConfig.Source, out var memberPath))
             {
-                ctx.ReportDiagnostic(
-                    DiagnosticDescriptors.ConfiguredMappingNestedMemberNotFound,
-                    nestedMemberConfig.Source.FullName,
-                    ctx.Source
-                );
+                // If there are additional sources, skip the diagnostic — the path may come from one of them.
+                if (additionalSourceMembers?.Values.Any(m => m.IsSpecialAdditionalSource) != true)
+                {
+                    ctx.ReportDiagnostic(
+                        DiagnosticDescriptors.ConfiguredMappingNestedMemberNotFound,
+                        nestedMemberConfig.Source.FullName,
+                        ctx.Source
+                    );
+                }
                 continue;
             }
 
@@ -43,6 +65,31 @@ public class NestedMappingsContext
         }
 
         return nestedMemberPaths;
+    }
+
+    private static List<(MemberPath Path, ITypeSymbol RootType)> ResolveAdditionalNestedMappings(
+        MappingBuilderContext ctx,
+        IReadOnlyDictionary<string, IMappableMember>? additionalSourceMembers
+    )
+    {
+        if (additionalSourceMembers == null)
+            return [];
+
+        var result = new List<(MemberPath, ITypeSymbol)>();
+
+        foreach (var nestedMemberConfig in ctx.Configuration.Members.NestedMappings)
+        {
+            foreach (var (_, member) in additionalSourceMembers.Where(m => m.Value.IsSpecialAdditionalSource))
+            {
+                if (!ctx.SymbolAccessor.TryFindMemberPath(member.Type, nestedMemberConfig.Source, out var memberPath))
+                    continue;
+
+                result.Add((memberPath, member.Type));
+                break;
+            }
+        }
+
+        return result;
     }
 
     public bool TryFindNestedSourcePath(
@@ -53,7 +100,31 @@ public class NestedMappingsContext
     {
         foreach (var nestedMemberPath in _paths)
         {
-            if (TryFindNestedSourcePath(pathCandidates, ignoreCase, nestedMemberPath, out sourceMemberPath))
+            if (
+                TryFindNestedSourcePath(
+                    pathCandidates,
+                    ignoreCase,
+                    nestedMemberPath,
+                    _context.Source,
+                    SourceMemberType.Member,
+                    out sourceMemberPath
+                )
+            )
+                return true;
+        }
+
+        foreach (var (path, rootType) in _additionalPaths)
+        {
+            if (
+                TryFindNestedSourcePath(
+                    pathCandidates,
+                    ignoreCase,
+                    path,
+                    rootType,
+                    SourceMemberType.AdditionalMappingMethodParameter,
+                    out sourceMemberPath
+                )
+            )
                 return true;
         }
 
@@ -65,6 +136,8 @@ public class NestedMappingsContext
         IEnumerable<StringMemberPath> pathCandidates,
         bool ignoreCase,
         MemberPath nestedMemberPath,
+        ITypeSymbol rootType,
+        SourceMemberType sourceMemberType,
         [NotNullWhen(true)] out SourceMemberPath? sourceMemberPath
     )
     {
@@ -79,8 +152,8 @@ public class NestedMappingsContext
             )
         )
         {
-            var memberPath = new NonEmptyMemberPath(_context.Source, nestedMemberPath.Path.Concat(nestedSourceMemberPath.Path).ToList());
-            sourceMemberPath = new SourceMemberPath(memberPath, SourceMemberType.Member);
+            var memberPath = new NonEmptyMemberPath(rootType, nestedMemberPath.Path.Concat(nestedSourceMemberPath.Path).ToList());
+            sourceMemberPath = new SourceMemberPath(memberPath, sourceMemberType);
             _unusedPaths.Remove(nestedMemberPath);
             return true;
         }

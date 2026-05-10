@@ -31,6 +31,8 @@ public class ConstructorParameterMember(IParameterSymbol symbol, SymbolAccessor 
 
     public bool IsIgnored(MappingBuilderContext ctx) => false;
 
+    public bool IsSpecialAdditionalSource => false;
+
     public IMemberGetter BuildGetter(UnsafeAccessorContext ctx) => this;
 
     public IMemberSetter BuildSetter(UnsafeAccessorContext ctx) =>

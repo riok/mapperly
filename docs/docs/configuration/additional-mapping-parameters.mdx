@@ -205,3 +205,129 @@ Mappings with additional parameters do have some limitations:
 - Generic and runtime target type mappings do not support additional type parameters.
 - Derived type mappings do not support additional type parameters.
   :::
+
+## Map additional sources
+
+Apply `[MapAdditionalSource]` to a parameter to merge its **properties** directly into the destination,
+just like properties from the main source.
+This is useful when you need to combine multiple source objects into a single destination type.
+
+<Tabs>
+  <TabItem value="declaration" label="Declaration" default>
+    ```csharp
+    public class SourceA
+    {
+        public string A { get; set; }
+        public string B { get; set; }
+    }
+
+    public class SourceB
+    {
+        public string C { get; set; }
+        public string D { get; set; }
+    }
+
+    public class Destination
+    {
+        public required string A { get; init; }
+        public required string B { get; init; }
+        public required string C { get; init; }
+        public required string D { get; init; }
+    }
+
+    [Mapper]
+    public partial class MyMapper
+    {
+        // highlight-start
+        public partial Destination Map(SourceA sourceA, [MapAdditionalSource] SourceB sourceB);
+        // highlight-end
+    }
+    ```
+
+  </TabItem>
+  <TabItem value="generated" label="Generated code">
+    ```csharp
+    public partial Destination Map(SourceA sourceA, SourceB sourceB)
+    {
+        var target = new Destination(
+            A: sourceA.A,
+            B: sourceA.B,
+            // highlight-start
+            C: sourceB.C,
+            D: sourceB.D
+            // highlight-end
+        );
+        return target;
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+Unlike a plain additional parameter — which maps the parameter value **itself** to a matching target member by name —
+`[MapAdditionalSource]` maps the parameter's **members** to the destination.
+
+### Priority
+
+When multiple sources have a member with the same name, the first one wins:
+main source > first `[MapAdditionalSource]` parameter > second `[MapAdditionalSource]` parameter > …
+
+### Explicit member mappings
+
+`[MapProperty]` works with additional sources.
+Use the additional source member name directly as the source path — no need to prefix it with the parameter name.
+
+```csharp
+[MapProperty(nameof(SourceB.CustomName), nameof(Destination.MappedName))]
+public partial Destination Map(SourceA sourceA, [MapAdditionalSource] SourceB sourceB);
+```
+
+### Nested properties
+
+`[MapNestedProperties]` also works with additional source parameters:
+
+```csharp
+[MapNestedProperties(nameof(SourceB.Inner))]
+public partial Destination Map(SourceA sourceA, [MapAdditionalSource] SourceB sourceB);
+```
+
+### Nullable additional sources
+
+When the main source or any `[MapAdditionalSource]` parameter is nullable,
+Mapperly guards against all of them together:
+
+<Tabs>
+  <TabItem value="declaration" label="Declaration" default>
+    ```csharp
+    public partial Destination? Map(SourceA? sourceA, [MapAdditionalSource] SourceB? sourceB);
+    ```
+  </TabItem>
+  <TabItem value="generated" label="Generated code">
+    ```csharp
+    public partial Destination? Map(SourceA? sourceA, SourceB? sourceB)
+    {
+        // highlight-start
+        if (sourceA == null || sourceB == null)
+            return default;
+        // highlight-end
+        var target = new Destination();
+        target.A = sourceA.A;
+        target.B = sourceB.B;
+        return target;
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+### Existing target mappings
+
+`[MapAdditionalSource]` works with [existing target](./existing-target.mdx) (void) mappings too.
+Place `[MappingTarget]` on the target parameter when additional source parameters are present
+to help Mapperly identify which parameter is the destination:
+
+```csharp
+public partial void Map(SourceA sourceA, [MapAdditionalSource] SourceB sourceB, [MappingTarget] Destination target);
+```
+
+:::info
+`[MapAdditionalSource]` cannot be applied to the source, target, or reference handler parameter (diagnostic [RMG100](../analyzer-diagnostics/RMG100)).
+:::
