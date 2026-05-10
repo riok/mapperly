@@ -40,6 +40,7 @@ namespace Riok.Mapperly.Abstractions
     {
         public IncludeMappingConfigurationAttribute(string name) { }
         public string Name { get; }
+        public bool Reverse { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Method, AllowMultiple=true)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]

@@ -198,6 +198,36 @@ Additionally, you can also use a string reference of the method. In this case, t
 
 </Tabs>
 
+## Reverse mapping
+
+To apply an existing mapping configuration in the opposite direction, set `Reverse = true` on the `IncludeMappingConfigurationAttribute`.
+This swaps the source and target types and reverses all member configurations automatically.
+
+```csharp
+[MapProperty(nameof(Product.Price), nameof(ProductDto.PriceInEuro))]
+public static partial ProductDto ToDto(this Product source);
+
+// highlight-start
+[IncludeMappingConfiguration(nameof(ToDto), Reverse = true)]
+// highlight-end
+public static partial Product ToProduct(this ProductDto source);
+```
+
+The following configurations are reversed:
+
+| Configuration | Reverse behaviour |
+| --- | --- |
+| `MapProperty` | Source and target member paths are swapped |
+| `MapperIgnoreSource` | Becomes `MapperIgnoreTarget` |
+| `MapperIgnoreTarget` | Becomes `MapperIgnoreSource` |
+| `MapDerivedType` | Source and target types are swapped |
+| `MapEnumValue` | Source and target enum values are swapped |
+| `MapperRequiredMapping` | Source and target strategies are swapped |
+
+:::info
+`MapValue` is not reversed since a constant value has no meaningful inverse.
+:::
+
 ## Restrictions
 
 - The attribute only reuses a mapping if the mapped types are the same or a base type of the mapped type.
