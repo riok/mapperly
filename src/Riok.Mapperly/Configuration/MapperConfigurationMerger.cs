@@ -27,6 +27,7 @@ public static class MapperConfigurationMerger
             PreferParameterlessConstructors = highPriority.PreferParameterlessConstructors ?? lowPriority.PreferParameterlessConstructors,
             AutoUserMappings = highPriority.AutoUserMappings ?? lowPriority.AutoUserMappings,
             EnumNamingStrategy = highPriority.EnumNamingStrategy ?? lowPriority.EnumNamingStrategy,
+            OnlyExplicitMappedMembers = highPriority.OnlyExplicitMappedMembers ?? lowPriority.OnlyExplicitMappedMembers,
         };
     }
 

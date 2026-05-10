@@ -144,9 +144,9 @@ public class MapperAttribute : Attribute
     public bool AutoUserMappings { get; set; } = true;
 
     /// <summary>
-    /// When set to <c>true</c>, only properties with explicit configurations (via attributes like <see cref="MapPropertyAttribute"/>)
-    /// will be mapped. All other properties will be ignored by default.
-    /// This is useful when you want to map only a few specific properties from a class with many properties.
+    /// When set to <c>true</c>, only members with explicit configurations (via attributes like <see cref="MapPropertyAttribute"/>)
+    /// will be mapped. All other members will be ignored by default.
+    /// This is useful when you want to map only a few specific members from a class with many members.
     /// </summary>
     public bool OnlyExplicitMappedMembers { get; set; }
 }

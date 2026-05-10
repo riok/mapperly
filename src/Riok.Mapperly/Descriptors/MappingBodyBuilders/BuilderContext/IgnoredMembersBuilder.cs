@@ -31,6 +31,27 @@ internal static class IgnoredMembersBuilder
         if (ctx.Configuration.Mapper.OnlyExplicitMappedMembers)
         {
             var explicitlyMappedMembers = ctx.Configuration.Members.GetMembersWithExplicitConfigurations(sourceTarget).ToHashSet();
+
+            // MapNestedPropertiesAttribute is an explicit instruction, so its referenced members must not be auto-ignored.
+            // Source: the root member of the nested path is explicitly configured.
+            // Target: the members of the nested source type can be matched to target members.
+            if (sourceTarget == MappingSourceTarget.Source)
+            {
+                explicitlyMappedMembers.UnionWith(ctx.Configuration.Members.NestedMappings.Select(x => x.Source.RootName));
+            }
+            else
+            {
+                foreach (var nestedMapping in ctx.Configuration.Members.NestedMappings)
+                {
+                    if (ctx.SymbolAccessor.TryFindMemberPath(ctx.Source, nestedMapping.Source, out var memberPath))
+                    {
+                        explicitlyMappedMembers.UnionWith(
+                            ctx.SymbolAccessor.GetAllAccessibleMappableMembers(memberPath.MemberType).Select(m => m.Name)
+                        );
+                    }
+                }
+            }
+
             ignoredMembers.UnionWith(allMembers.Where(m => !explicitlyMappedMembers.Contains(m)));
         }
 

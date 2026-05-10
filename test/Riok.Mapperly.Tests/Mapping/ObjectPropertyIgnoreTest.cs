@@ -1,3 +1,4 @@
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
@@ -256,6 +257,53 @@ public class ObjectPropertyIgnoreTest
                 """
                 var target = new global::B();
                 target.Source = source;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void OnlyExplicitMappedMembersWithMapNestedProperties()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapNestedProperties(nameof(A.Value))] partial B Map(A source);",
+            new TestSourceBuilderOptions(OnlyExplicitMappedMembers: true),
+            "class A { public C Value { get; set; } public int Other { get; set; } }",
+            "class B { public string Id { get; set; } }",
+            "class C { public string Id { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Id = source.Value.Id;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void OnlyExplicitMappedMembersWithRequiredMappingBoth()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(nameof(A.Value1), nameof(B.Value1))] partial B Map(A source);",
+            new TestSourceBuilderOptions(OnlyExplicitMappedMembers: true, RequiredMappingStrategy: RequiredMappingStrategy.Both),
+            "class A { public int Value1 { get; set; } public int Value2 { get; set; } }",
+            "class B { public int Value1 { get; set; } public int Value3 { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value1 = source.Value1;
                 return target;
                 """
             );
