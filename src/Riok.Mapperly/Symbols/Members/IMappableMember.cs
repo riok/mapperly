@@ -46,6 +46,12 @@ public interface IMappableMember
 
     bool IsIgnored(MappingBuilderContext ctx);
 
+    /// <summary>
+    /// Whether this member is a method parameter marked with <see cref="Riok.Mapperly.Abstractions.MapAdditionalSourceAttribute"/>,
+    /// meaning its properties are mapped directly to the target rather than the parameter itself.
+    /// </summary>
+    bool IsSpecialAdditionalSource { get; }
+
     IMemberGetter BuildGetter(UnsafeAccessorContext ctx);
     IMemberSetter BuildSetter(UnsafeAccessorContext ctx);
 }

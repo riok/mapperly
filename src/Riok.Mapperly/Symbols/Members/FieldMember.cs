@@ -28,6 +28,8 @@ public class FieldMember(IFieldSymbol symbol, SymbolAccessor symbolAccessor)
 
     public bool IsObsolete => symbolAccessor.HasAttribute<ObsoleteAttribute>(Symbol);
 
+    public bool IsSpecialAdditionalSource => false;
+
     public bool SupportsCoalesceAssignment => true;
 
     public bool IsIgnored(MappingBuilderContext ctx) => MapperIgnoreHelper.CheckIgnored(Symbol, Name, ctx);

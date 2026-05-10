@@ -14,7 +14,7 @@ namespace Riok.Mapperly.Symbols.Members;
 /// and is therefore in terms of the mapping the same.
 /// </summary>
 [DebuggerDisplay("{Name}")]
-public class ParameterSourceMember(MethodParameter parameter) : IMappableMember, IMemberGetter
+public class ParameterSourceMember(MethodParameter parameter, bool isSpecialAdditionalSource = false) : IMappableMember, IMemberGetter
 {
     public string Name => parameter.Name;
     public ITypeSymbol Type => parameter.Type;
@@ -29,6 +29,8 @@ public class ParameterSourceMember(MethodParameter parameter) : IMappableMember,
     public bool IsObsolete => false;
 
     public bool IsIgnored(MappingBuilderContext ctx) => false;
+
+    public bool IsSpecialAdditionalSource => isSpecialAdditionalSource;
 
     public IMemberGetter BuildGetter(UnsafeAccessorContext ctx) => this;
 

@@ -1,0 +1,36 @@
+---
+sidebar_label: RMG100
+description: 'Mapperly analyzer diagnostic RMG100 — MapAdditionalSource attribute cannot be applied to this parameter'
+---
+
+# RMG100 — MapAdditionalSource attribute cannot be applied to this parameter
+
+`[MapAdditionalSource]` was applied to a parameter that cannot act as an additional source:
+the source parameter, the target parameter (in [existing target mappings](../existing-target.mdx)),
+or the reference handler parameter.
+
+## Example
+
+```csharp
+[Mapper]
+public partial class MyMapper
+{
+    // highlight-start
+    // Error: [MapAdditionalSource] on the source parameter has no effect
+    public partial Destination Map([MapAdditionalSource] SourceA sourceA, SourceB sourceB);
+    // highlight-end
+}
+```
+
+Remove `[MapAdditionalSource]` from the source, target, or reference handler parameter.
+Apply it only to the extra parameters you want to merge into the destination:
+
+```csharp
+[Mapper]
+public partial class MyMapper
+{
+    // highlight-start
+    public partial Destination Map(SourceA sourceA, [MapAdditionalSource] SourceB sourceB);
+    // highlight-end
+}
+```

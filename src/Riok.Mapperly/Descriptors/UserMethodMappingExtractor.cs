@@ -308,6 +308,14 @@ public static class UserMethodMappingExtractor
         if (methodSymbol.IsGenericMethod)
             return BuildGenericTypeMapping(ctx, methodSymbol, parameters);
 
+        var additionalSourceMergeParams = parameters
+            .AdditionalParameters.Where(p =>
+            {
+                var sym = methodSymbol.Parameters.FirstOrDefault(ps => ps.Ordinal == p.Ordinal);
+                return sym != null && ctx.SymbolAccessor.HasAttribute<MapAdditionalSourceAttribute>(sym);
+            })
+            .ToList();
+
         if (parameters.Target.HasValue)
         {
             return new UserDefinedExistingTargetMethodMapping(
@@ -319,6 +327,7 @@ public static class UserMethodMappingExtractor
             )
             {
                 AdditionalSourceParameters = parameters.AdditionalParameters,
+                AdditionalSourceMergeParameters = additionalSourceMergeParams,
             };
         }
 
@@ -342,6 +351,7 @@ public static class UserMethodMappingExtractor
         )
         {
             AdditionalSourceParameters = parameters.AdditionalParameters,
+            AdditionalSourceMergeParameters = additionalSourceMergeParams,
         };
         return mapping;
     }

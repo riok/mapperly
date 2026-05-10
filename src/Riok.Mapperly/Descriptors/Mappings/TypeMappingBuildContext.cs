@@ -16,14 +16,16 @@ public readonly record struct TypeMappingBuildContext
         string? referenceHandler,
         UniqueNameBuilder nameBuilder,
         SyntaxFactoryHelper syntaxFactory,
-        IReadOnlyDictionary<string, ExpressionSyntax>? additionalParameters = null
+        IReadOnlyDictionary<string, ExpressionSyntax>? additionalParameters = null,
+        IReadOnlyDictionary<string, IdentifierNameSyntax>? additionalSources = null
     )
         : this(
             IdentifierName(source),
             referenceHandler == null ? null : IdentifierName(referenceHandler),
             nameBuilder,
             syntaxFactory,
-            additionalParameters
+            additionalParameters,
+            additionalSources
         ) { }
 
     private TypeMappingBuildContext(
@@ -31,7 +33,8 @@ public readonly record struct TypeMappingBuildContext
         ExpressionSyntax? referenceHandler,
         UniqueNameBuilder nameBuilder,
         SyntaxFactoryHelper syntaxFactory,
-        IReadOnlyDictionary<string, ExpressionSyntax>? additionalParameters = null
+        IReadOnlyDictionary<string, ExpressionSyntax>? additionalParameters = null,
+        IReadOnlyDictionary<string, IdentifierNameSyntax>? additionalSources = null
     )
     {
         Source = source;
@@ -39,6 +42,7 @@ public readonly record struct TypeMappingBuildContext
         NameBuilder = nameBuilder;
         SyntaxFactory = syntaxFactory;
         AdditionalParameters = additionalParameters;
+        AdditionalSources = additionalSources;
     }
 
     public UniqueNameBuilder NameBuilder { get; }
@@ -51,27 +55,19 @@ public readonly record struct TypeMappingBuildContext
 
     public IReadOnlyDictionary<string, ExpressionSyntax>? AdditionalParameters { get; }
 
-    public TypeMappingBuildContext AddIndentation() =>
-        new(Source, ReferenceHandler, NameBuilder, SyntaxFactory.AddIndentation(), AdditionalParameters);
-
     /// <summary>
-    /// Creates a new scoped name builder,
-    /// builds the name of the source in this new scope
-    /// and creates a new context with the new source.
+    /// Maps type name → identifier expression for parameters marked with <see cref="Riok.Mapperly.Abstractions.MapAdditionalSourceAttribute"/>.
+    /// Used by <see cref="Mappings.MemberMappings.SourceValue.MappedMemberSourceValue"/> to redirect
+    /// member access to the correct source parameter instead of the main source.
     /// </summary>
-    /// <param name="sourceName">The name for the new scoped source.</param>
-    /// <returns>The new context and the scoped name of the source.</returns>
+    public IReadOnlyDictionary<string, IdentifierNameSyntax>? AdditionalSources { get; }
+
+    public TypeMappingBuildContext AddIndentation() =>
+        new(Source, ReferenceHandler, NameBuilder, SyntaxFactory.AddIndentation(), AdditionalParameters, AdditionalSources);
+
     public (TypeMappingBuildContext Context, string SourceName) WithNewScopedSource(string sourceName = DefaultSourceName) =>
         WithNewScopedSource(IdentifierName, sourceName);
 
-    /// <summary>
-    /// Creates a new scoped name builder,
-    /// builds the name of the source in this new scope
-    /// and creates a new context with the new source.
-    /// </summary>
-    /// <param name="sourceBuilder">A function to build the source access for the new context.</param>
-    /// <param name="sourceName">The name for the new scoped source.</param>
-    /// <returns>The new context and the scoped name of the source.</returns>
     public (TypeMappingBuildContext Context, string SourceName) WithNewScopedSource(
         Func<string, ExpressionSyntax> sourceBuilder,
         string sourceName = DefaultSourceName
@@ -84,7 +80,8 @@ public readonly record struct TypeMappingBuildContext
             ReferenceHandler,
             scopedNameBuilder,
             SyntaxFactory,
-            AdditionalParameters
+            AdditionalParameters,
+            AdditionalSources
         );
         return (ctx, scopedSourceName);
     }
@@ -96,17 +93,13 @@ public readonly record struct TypeMappingBuildContext
     }
 
     public TypeMappingBuildContext WithSource(ExpressionSyntax source) =>
-        new(source, ReferenceHandler, NameBuilder, SyntaxFactory, AdditionalParameters);
+        new(source, ReferenceHandler, NameBuilder, SyntaxFactory, AdditionalParameters, AdditionalSources);
 
     public TypeMappingBuildContext WithRefHandler(string refHandler) => WithRefHandler(IdentifierName(refHandler));
 
     public TypeMappingBuildContext WithRefHandler(ExpressionSyntax refHandler) =>
-        new(Source, refHandler, NameBuilder, SyntaxFactory, AdditionalParameters);
+        new(Source, refHandler, NameBuilder, SyntaxFactory, AdditionalParameters, AdditionalSources);
 
-    /// <summary>
-    /// Builds arguments for a user-implemented method call by matching each parameter
-    /// by ordinal to source, target, referenceHandler, or additional parameters.
-    /// </summary>
     public MethodArgument?[] BuildArguments(
         IMethodSymbol? method,
         MethodParameter sourceParameter,

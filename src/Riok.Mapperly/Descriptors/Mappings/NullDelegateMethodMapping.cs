@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Helpers;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.Mappings;
@@ -60,8 +61,40 @@ public class NullDelegateMethodMapping(
         // call mapping only if source is not null.
         // if (source == null)
         //   return <null-substitute>;
+
+        // Also include nullable [MapAdditionalSource] parameters in the null check.
+        var nullableAdditionalSources = GetNullableAdditionalSourceExpressions(ctx);
+        if (nullableAdditionalSources.Count > 0)
+        {
+            var returnExpression = NullSubstitute(TargetType, ctx.Source, nullFallbackValue);
+            var conditions = new List<ExpressionSyntax> { IsNull(ctx.Source) };
+            conditions.AddRange(nullableAdditionalSources);
+            var combined = Or(conditions);
+            var ifStatement = ctx.SyntaxFactory.If(combined, ctx.SyntaxFactory.AddIndentation().Return(returnExpression));
+            return body.Prepend(ifStatement);
+        }
+
         var fallbackExpression = NullSubstitute(TargetType, ctx.Source, nullFallbackValue);
         var ifExpression = ctx.SyntaxFactory.IfNullReturnOrThrow(ctx.Source, fallbackExpression);
         return body.Prepend(ifExpression);
+    }
+
+    private List<ExpressionSyntax> GetNullableAdditionalSourceExpressions(TypeMappingBuildContext ctx)
+    {
+        var result = new List<ExpressionSyntax>();
+
+        foreach (var parameter in AdditionalSourceMergeParameters)
+        {
+            if (!parameter.Type.IsNullable())
+                continue;
+
+            result.Add(
+                ctx.AdditionalSources?.TryGetValue(parameter.Type.ToDisplayString(), out var sourceExpr) == true
+                    ? IsNull(sourceExpr)
+                    : IsNull(IdentifierName(parameter.Name))
+            );
+        }
+
+        return result;
     }
 }

@@ -62,7 +62,9 @@ public abstract class MethodMapping : ITypeMapping, IParameterizedMapping
 
     public IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; init; } = [];
 
-    protected IMethodSymbol? Method { get; }
+    public IReadOnlyCollection<MethodParameter> AdditionalSourceMergeParameters { get; init; } = [];
+
+    public IMethodSymbol? Method { get; }
 
     protected bool IsExtensionMethod { get; }
 
@@ -95,12 +97,25 @@ public abstract class MethodMapping : ITypeMapping, IParameterizedMapping
             );
         }
 
+        // Build a type-FQN → identifier map for [MapAdditionalSource] parameters
+        // so MappedMemberSourceValue can redirect member access to the correct parameter.
+        IReadOnlyDictionary<string, IdentifierNameSyntax>? additionalSources = null;
+        if (AdditionalSourceMergeParameters.Count > 0)
+        {
+            additionalSources = AdditionalSourceMergeParameters.ToDictionary(
+                p => p.Type.ToDisplayString(),
+                p => IdentifierName(p.Name),
+                StringComparer.Ordinal
+            );
+        }
+
         var typeMappingBuildContext = new TypeMappingBuildContext(
             SourceParameter.Name,
             ReferenceHandlerParameter?.Name,
             ctx.NameBuilder.NewScope(),
             ctx.SyntaxFactory,
-            additionalParams
+            additionalParams,
+            additionalSources
         );
 
         var parameters = BuildParameterList();

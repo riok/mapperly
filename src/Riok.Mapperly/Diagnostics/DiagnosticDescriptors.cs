@@ -848,6 +848,16 @@ public static class DiagnosticDescriptors
         helpLinkUri: BuildHelpUri("RMG099")
     );
 
+    public static readonly DiagnosticDescriptor MapAdditionalSourceNotApplicable = new(
+        "RMG100",
+        "MapAdditionalSource attribute cannot be applied to this parameter",
+        "MapAdditionalSource attribute cannot be applied to the parameter {0} of the method {1} because it is the source, target, or reference handler parameter",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        helpLinkUri: BuildHelpUri("RMG100")
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT
