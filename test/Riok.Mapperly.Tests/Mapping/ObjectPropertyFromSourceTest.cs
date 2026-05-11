@@ -441,7 +441,7 @@ public class ObjectPropertyFromSourceTest
     }
 
     [Fact]
-    public void ReturnMaybeNullMethodToMaybeNullTargetProperty()
+    public void ReturnMaybeNullMethodToMaybeNullTargetPropertyShouldDiagnoseNullableSource()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
@@ -456,6 +456,44 @@ public class ObjectPropertyFromSourceTest
             class B
             {
                 [System.Diagnostics.CodeAnalysis.MaybeNull]
+                public string Value { get; set; } = default!;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type string? to target of type string which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = BuildValue(source) ?? throw new global::System.NullReferenceException("BuildValue returned null");
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ReturnMaybeNullMethodToAllowNullTargetProperty()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapPropertyFromSource(nameof(B.Value), Use = nameof(BuildValue))]
+            partial B Map(A source);
+
+            [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+            string BuildValue(A a) => a.Name;
+            """,
+            "class A { public string Name { get; set; } }",
+            """
+            class B
+            {
+                [System.Diagnostics.CodeAnalysis.AllowNull]
                 public string Value { get; set; } = default!;
             }
             """

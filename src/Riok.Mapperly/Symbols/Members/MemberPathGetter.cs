@@ -40,7 +40,7 @@ public class MemberPathGetter
         bool skipTrailingNonNullable = false
     )
     {
-        var path = skipTrailingNonNullable ? PathWithoutTrailingNonNullable() : _path;
+        var path = skipTrailingNonNullable ? ReadPathWithoutTrailingNonNullable() : _path;
         return BuildAccess(baseAccess, path, addValuePropertyOnNullable, nullConditional);
     }
 
@@ -56,7 +56,7 @@ public class MemberPathGetter
         {
             return path.AggregateWithPrevious(
                 baseAccess,
-                (expr, prevProp, prop) => prop.Getter.BuildAccess(expr, prop.Member.ContainingType, prevProp.Member?.IsNullable == true)
+                (expr, prevProp, prop) => prop.Getter.BuildAccess(expr, prop.Member.ContainingType, prevProp.Member?.IsReadNullable == true)
             );
         }
 
@@ -94,14 +94,14 @@ public class MemberPathGetter
 
     private ExpressionSyntax? BuildNonNullConditionWithoutConditionalAccess(ExpressionSyntax baseAccess)
     {
-        var nullablePath = PathWithoutTrailingNonNullable();
+        var nullablePath = ReadPathWithoutTrailingNonNullable();
         var access = baseAccess;
         var conditions = new List<BinaryExpressionSyntax>();
         foreach (var pathPart in nullablePath)
         {
             access = pathPart.Getter.BuildAccess(access, pathPart.Member.ContainingType);
 
-            if (!pathPart.Member.IsNullable)
+            if (!pathPart.Member.IsReadNullable)
                 continue;
 
             conditions.Add(IsNotNull(access));
@@ -110,8 +110,8 @@ public class MemberPathGetter
         return conditions.Count == 0 ? null : And(conditions);
     }
 
-    private IEnumerable<MemberGetterPair> PathWithoutTrailingNonNullable() =>
-        _path.Reverse().SkipWhile(x => !x.Member.IsNullable).Reverse();
+    private IEnumerable<MemberGetterPair> ReadPathWithoutTrailingNonNullable() =>
+        _path.Reverse().SkipWhile(x => !x.Member.IsReadNullable).Reverse();
 
     public override bool Equals(object? obj)
     {

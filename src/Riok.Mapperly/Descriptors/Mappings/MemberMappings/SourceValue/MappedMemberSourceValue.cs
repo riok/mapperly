@@ -19,7 +19,7 @@ public class MappedMemberSourceValue(
     private readonly MemberPathGetter _sourceMember = sourceMember;
     private readonly INewInstanceMapping _delegateMapping = delegateMapping;
 
-    public bool RequiresSourceNullCheck => !nullConditionalAccess && _sourceMember.MemberPath.IsAnyNullable();
+    public bool RequiresSourceNullCheck => !nullConditionalAccess && _sourceMember.MemberPath.IsAnyReadNullable();
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {

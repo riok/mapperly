@@ -28,7 +28,8 @@ internal sealed class MembersMappingState(
     Dictionary<string, List<MemberMappingConfiguration>> memberConfigsByRootTargetName,
     Dictionary<string, List<IMemberPathConfiguration>> configuredTargetMembersByRootName,
     HashSet<string> ignoredSourceMemberNames,
-    ParameterScope parameterScope
+    ParameterScope parameterScope,
+    SymbolAccessor symbolAccessor
 )
 {
     private readonly Dictionary<string, IMappableMember> _aliasedSourceMembers = new(StringComparer.OrdinalIgnoreCase);
@@ -58,7 +59,7 @@ internal sealed class MembersMappingState(
     public IReadOnlyDictionary<string, IMappableMember> AdditionalSourceMembers =>
         field ??= parameterScope.Parameters.Values.ToDictionary<MethodParameter, string, IMappableMember>(
             x => x.NormalizedName,
-            x => new ParameterSourceMember(x),
+            x => new ParameterSourceMember(x, symbolAccessor),
             StringComparer.OrdinalIgnoreCase
         );
 

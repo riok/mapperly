@@ -91,7 +91,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         };
     }
 
-    public bool IsNullable(ISymbol symbol)
+    public bool IsReadNullable(ISymbol symbol)
     {
         return symbol switch
         {
@@ -99,6 +99,18 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
             IPropertySymbol p => p.Type.IsNullable() || TryHasAttribute<MaybeNullAttribute>(p),
             IFieldSymbol f => f.Type.IsNullable() || TryHasAttribute<MaybeNullAttribute>(f),
             IParameterSymbol p => p.Type.IsNullable() || TryHasAttribute<MaybeNullAttribute>(p),
+            _ => false,
+        };
+    }
+
+    public bool IsWriteNullable(ISymbol symbol)
+    {
+        return symbol switch
+        {
+            ITypeSymbol t => t.IsNullable(),
+            IPropertySymbol p => p.Type.IsNullable() || TryHasAttribute<AllowNullAttribute>(p),
+            IFieldSymbol f => f.Type.IsNullable() || TryHasAttribute<AllowNullAttribute>(f),
+            IParameterSymbol p => p.Type.IsNullable() || TryHasAttribute<AllowNullAttribute>(p),
             _ => false,
         };
     }
@@ -133,6 +145,30 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
     public MethodParameter? WrapOptionalMethodParameter(IParameterSymbol? symbol) => symbol == null ? null : WrapMethodParameter(symbol);
 
     public MethodParameter WrapMethodParameter(IParameterSymbol symbol) => new(symbol, UpgradeNullable(symbol.Type));
+
+    public ITypeSymbol UpgradeReturnNullable(IMethodSymbol methodSymbol)
+    {
+        TryUpgradeReturnNullable(methodSymbol, out var upgradedReturnSymbol);
+        return upgradedReturnSymbol ?? methodSymbol.ReturnType;
+    }
+
+    private bool TryUpgradeReturnNullable(IMethodSymbol methodSymbol, [NotNullWhen(true)] out ITypeSymbol? upgradedReturnSymbol)
+    {
+        upgradedReturnSymbol = default;
+
+        if (methodSymbol.ReturnsVoid || methodSymbol.ReturnType.IsValueType)
+        {
+            return false;
+        }
+
+        if (!TryHasAttribute<MaybeNullAttribute>(methodSymbol.GetReturnTypeAttributes()))
+        {
+            return false;
+        }
+
+        upgradedReturnSymbol = methodSymbol.ReturnType.WithNullableAnnotation(NullableAnnotation.Annotated);
+        return true;
+    }
 
     /// <summary>
     /// Upgrade the nullability of a symbol from <see cref="NullableAnnotation.None"/> to <see cref="NullableAnnotation.Annotated"/>.
