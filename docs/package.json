@@ -27,15 +27,15 @@
     "docusaurus-plugin-sass": "0.2.6",
     "prism-react-renderer": "2.4.1",
     "raw-loader": "4.0.2",
-    "react": "19.2.5",
-    "react-dom": "19.2.5"
+    "react": "19.2.6",
+    "react-dom": "19.2.6"
   },
   "devDependencies": {
     "@docusaurus/eslint-plugin": "3.10.1",
     "@docusaurus/module-type-aliases": "3.10.1",
     "@docusaurus/tsconfig": "3.10.1",
     "@types/react": "19.2.14",
-    "@typescript-eslint/eslint-plugin": "8.59.2",
+    "@typescript-eslint/eslint-plugin": "8.59.3",
     "hast-util-to-html": "9.0.5",
     "marked": "18.0.3",
     "prettier": "3.8.3",
