@@ -5,6 +5,27 @@ namespace Riok.Mapperly.Tests.Mapping;
 public class UserMethodAdditionalParametersTest
 {
     [Fact]
+    public Task UserMethodWithAdditionalParameterShouldUseNullableUserMappingForNullableMember()
+    {
+        // Regression test for https://github.com/riok/mapperly/issues/2275
+        // When a mapping method has additional parameters, member mappings with nullable
+        // source/target types should still resolve to user-defined mappings with matching
+        // nullability instead of stripping nullability and adding a null check.
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static string? StringToNullable(string? value) => value;
+            public static string StringToNonNullable(string value) => value;
+            [MapperIgnoreTarget(nameof(B.Extra))] public partial B Map(A src);
+            public partial B Map(A src, string? extra);
+            """,
+            "class A { public string? Value { get; set; } public string NonNullableValue { get; set; } }",
+            "class B { public string? Value { get; set; } public string NonNullableValue { get; set; } public string? Extra { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task NullableSourceWithAdditionalParameter()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
