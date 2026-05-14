@@ -291,8 +291,11 @@ public class MappingCollection(GenericTypeChecker genericTypeChecker)
 
         public T? Find(TypeMappingKey mappingKey, ParameterScope? scope = null)
         {
-            if (scope is { IsEmpty: false })
-                return FindByParameters(mappingKey, scope);
+            if (scope is { IsEmpty: false } && FindByParameters(mappingKey, scope) is { } parameterizedMapping)
+            {
+                _usedMappingKeys.Add(mappingKey);
+                return parameterizedMapping;
+            }
 
             if (_defaultMappings.TryGetValue(mappingKey, out var mapping))
             {
