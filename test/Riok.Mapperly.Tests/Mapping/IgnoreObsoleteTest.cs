@@ -424,4 +424,31 @@ public class IgnoreObsoleteTest
             )
             .HaveAssertedAllDiagnostics();
     }
+
+    [Fact]
+    public void ClassAttributeIgnoreObsoleteBothWithRequiredMappingBoth()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            new TestSourceBuilderOptions(
+                IgnoreObsoleteMembersStrategy: IgnoreObsoleteMembersStrategy.Both,
+                RequiredMappingStrategy: RequiredMappingStrategy.Both
+            ),
+            _classA,
+            _classB
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Value = source.Value;
+                return target;
+                """
+            );
+    }
 }

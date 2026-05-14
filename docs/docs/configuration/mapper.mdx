@@ -221,6 +221,30 @@ or by setting the `IgnoreObsoleteMembersStrategy` option of the `MapperAttribute
 
 </Tabs>
 
+#### Only explicitly mapped members
+
+By default, Mapperly automatically maps all source members that have a matching target member by name.
+Setting `OnlyExplicitMappedMembers` to `true` on the `MapperAttribute` disables this automatic name-based member mapping.
+Only members explicitly configured with attributes such as `MapPropertyAttribute` or `MapNestedPropertiesAttribute` will be mapped;
+all other members are silently ignored without generating diagnostics.
+
+```csharp
+// highlight-start
+[Mapper(OnlyExplicitMappedMembers = true)]
+// highlight-end
+public partial class CarMapper
+{
+    // Only 'Id' is mapped; all other members are silently ignored
+    // highlight-start
+    [MapProperty(nameof(Car.Id), nameof(CarDto.Id))]
+    // highlight-end
+    public partial CarDto MapCar(Car car);
+}
+```
+
+This is useful when working with types that have many members but only a subset needs to be mapped,
+avoiding the need to explicitly ignore every unwanted member.
+
 ### Property name mapping strategy
 
 By default, property and field names are matched using a case sensitive strategy.
