@@ -119,7 +119,11 @@ public static class RuntimeTargetTypeMappingBodyBuilder
             .ThenBy(x => x.TargetType.IsNullable())
             .GroupBy(x => new TypeMappingKey(x, includeNullability: false))
             .Select(x => x.First())
-            .Select(x => new RuntimeTargetTypeMapping(x, ctx.Compilation.HasImplicitConversion(x.TargetType, ctx.Target)))
+            .Select(x => new RuntimeTargetTypeMapping(
+                x,
+                ctx.Compilation.HasImplicitConversion(x.TargetType, ctx.Target),
+                (x as UserDefinedNewInstanceMethodMapping)?.IsDerivedTypeMapping == true
+            ))
             .ToList();
 
         if (runtimeTargetTypeMappings.Count == 0)
