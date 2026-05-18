@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 using MemberGetterPair = (Riok.Mapperly.Symbols.Members.IMappableMember Member, Riok.Mapperly.Symbols.Members.IMemberGetter Getter);
 
@@ -14,6 +15,7 @@ namespace Riok.Mapperly.Symbols.Members;
 [DebuggerDisplay("{MemberPath}")]
 public class MemberPathGetter
 {
+    private const string SelectMethodName = "global::System.Linq.Enumerable.Select";
     private const string NullableValueProperty = nameof(Nullable<>.Value);
 
     public MemberPath MemberPath { get; }
@@ -41,7 +43,46 @@ public class MemberPathGetter
     )
     {
         var path = skipTrailingNonNullable ? ReadPathWithoutTrailingNonNullable() : _path;
+        if (_path.Any(p => p.Member is CollectionElementMember))
+            return BuildSelectAccess(baseAccess, path.ToList(), depth: 1);
+
         return BuildAccess(baseAccess, path, addValuePropertyOnNullable, nullConditional);
+    }
+
+    /// <summary>
+    /// Builds a select access for the path, if it contains a collection element member. For example, for a path like
+    /// "Orders.Select(x => x.OrderLines).Select(x => x.Price)", it will build the access for the "OrderLines" part and
+    /// then wrap it in a select for the "Price" part.
+    /// </summary>
+    /// <param name="baseAccess">The base access expression.</param>
+    /// <param name="path">The path of members to access.</param>
+    /// <param name="depth">The depth of the current select operation.</param>
+    /// <returns>The built select access expression.</returns>
+    private static ExpressionSyntax? BuildSelectAccess(ExpressionSyntax? baseAccess, IReadOnlyList<MemberGetterPair> path, int depth)
+    {
+        var splitIdx = -1;
+        for (var i = 0; i < path.Count; i++)
+        {
+            if (path[i].Member is CollectionElementMember)
+            {
+                splitIdx = i;
+                break;
+            }
+        }
+
+        if (splitIdx < 0)
+            return path.Aggregate(baseAccess, (a, b) => b.Getter.BuildAccess(a, b.Member.ContainingType));
+
+        var collectionExpr = path.Take(splitIdx).Aggregate(baseAccess, (a, b) => b.Getter.BuildAccess(a, b.Member.ContainingType));
+
+        var lambdaParamName = $"x{depth}";
+        var lambdaParamExpr = IdentifierName(lambdaParamName);
+
+        var remainder = path.Skip(splitIdx + 1).ToList();
+        var lambdaBody = BuildSelectAccess(lambdaParamExpr, remainder, depth + 1);
+
+        var lambda = Lambda(lambdaParamName, lambdaBody!);
+        return InvocationWithoutIndention(SelectMethodName, collectionExpr!, lambda);
     }
 
     [return: NotNullIfNotNull(nameof(baseAccess))]
