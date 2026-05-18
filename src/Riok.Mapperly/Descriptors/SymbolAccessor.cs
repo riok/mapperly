@@ -567,14 +567,45 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         {
             // get T if type is Nullable<T>, prevents Value being treated as a member
             var actualType = type.NonNullableValueType() ?? type;
-            if (GetMappableMember(actualType, name, ignoreCase) is not { } member)
-                return false;
+            if (GetMappableMember(actualType, name, ignoreCase) is { } member)
+            {
+                type = member.Type;
+                foundPath.Add(member);
+                continue;
+            }
 
-            type = member.Type;
-            foundPath.Add(member);
+            if (
+                TryGetCollectionElementType(actualType, out var elementType)
+                && GetMappableMember(elementType, name, ignoreCase) is { } elementMember
+            )
+            {
+                foundPath.Add(new CollectionElementMember(actualType, elementType));
+                type = elementMember.Type;
+                foundPath.Add(elementMember);
+                continue;
+            }
+            return false;
         }
-
         return true;
+    }
+
+    private bool TryGetCollectionElementType(ITypeSymbol type, [NotNullWhen(true)] out ITypeSymbol? elementType)
+    {
+        if (
+            type is INamedTypeSymbol { IsGenericType: true } named
+            && SymbolEqualityComparer.Default.Equals(named.OriginalDefinition, EnumerableTypeSymbol)
+        )
+        {
+            elementType = named.TypeArguments[0];
+            return true;
+        }
+        if (type.ImplementsGeneric(EnumerableTypeSymbol, out var impl))
+        {
+            elementType = impl.TypeArguments[0];
+            return true;
+        }
+        elementType = null;
+        return false;
     }
 
     public IMappableMember? GetMappableMember(ITypeSymbol symbol, string name, bool ignoreCase = false)
