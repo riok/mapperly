@@ -21,7 +21,7 @@
     "@docusaurus/core": "3.10.1",
     "@docusaurus/plugin-ideal-image": "3.10.1",
     "@docusaurus/preset-classic": "3.10.1",
-    "@easyops-cn/docusaurus-search-local": "0.55.1",
+    "@easyops-cn/docusaurus-search-local": "0.55.2",
     "@mdx-js/react": "3.1.1",
     "clsx": "2.1.1",
     "docusaurus-plugin-sass": "0.2.6",
@@ -34,12 +34,12 @@
     "@docusaurus/eslint-plugin": "3.10.1",
     "@docusaurus/module-type-aliases": "3.10.1",
     "@docusaurus/tsconfig": "3.10.1",
-    "@types/react": "19.2.14",
-    "@typescript-eslint/eslint-plugin": "8.59.3",
+    "@types/react": "19.2.15",
+    "@typescript-eslint/eslint-plugin": "8.60.0",
     "hast-util-to-html": "9.0.5",
-    "marked": "18.0.3",
+    "marked": "18.0.4",
     "prettier": "3.8.3",
-    "stylelint": "17.11.0",
+    "stylelint": "17.12.0",
     "stylelint-config-standard": "40.0.0",
     "ts-node": "10.9.2",
     "typescript": "5.9.3",
@@ -59,10 +59,5 @@
   },
   "engines": {
     "node": ">=24.12.0"
-  },
-  "overrides": {
-    "serialize-javascript": ">=7.0.3",
-    "minimatch": ">=10.0.3",
-    "brace-expansion": ">=5.0.5"
   }
 }
