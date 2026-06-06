@@ -220,6 +220,7 @@ public static class UserMethodMappingExtractor
             parameters.Source.Type,
             targetType,
             parameters.ReferenceHandler,
+            parameters.TargetOriginalValueParameter,
             isExternal,
             targetTypeNullability
         );
@@ -256,6 +257,7 @@ public static class UserMethodMappingExtractor
             parameters.Source,
             targetType,
             parameters.ReferenceHandler,
+            parameters.TargetOriginalValueParameter,
             isExternal,
             targetTypeNullability
         );
@@ -304,6 +306,12 @@ public static class UserMethodMappingExtractor
         if (!UserMappingMethodParameterExtractor.BuildParameters(ctx, methodSymbol, out var parameters))
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, methodSymbol, methodSymbol.Name);
+            return null;
+        }
+
+        if (parameters.TargetOriginalValueParameter != null)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.MappingOriginalValueNotSupportedForGeneratedMethod, methodSymbol, methodSymbol.Name);
             return null;
         }
 
