@@ -7,5 +7,6 @@ public record MappingMethodParameters(
     MethodParameter Source,
     MethodParameter? Target,
     MethodParameter? ReferenceHandler,
+    MethodParameter? OriginalValueParameter,
     IReadOnlyCollection<MethodParameter> AdditionalParameters
 );

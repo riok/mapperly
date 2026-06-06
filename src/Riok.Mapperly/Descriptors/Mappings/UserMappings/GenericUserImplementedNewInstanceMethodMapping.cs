@@ -17,6 +17,7 @@ internal sealed class GenericUserImplementedNewInstanceMethodMapping(
     MethodParameter sourceParameter,
     ITypeSymbol genericTargetType,
     MethodParameter? referenceHandlerParameter,
+    MethodParameter? originalValueParameter,
     bool isExternal,
     UserImplementedMethodMapping.TargetNullability targetNullability
 ) : INewInstanceUserMapping
@@ -68,6 +69,7 @@ internal sealed class GenericUserImplementedNewInstanceMethodMapping(
             concreteTargetType,
             typeArguments,
             referenceHandlerParameter,
+            originalValueParameter,
             isExternal,
             targetNullability
         );

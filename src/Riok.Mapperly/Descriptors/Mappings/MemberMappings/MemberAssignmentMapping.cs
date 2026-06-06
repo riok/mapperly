@@ -11,13 +11,18 @@ namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 /// (e.g. target.A = source.B or target.A = "fooBar")
 /// </summary>
 [DebuggerDisplay("MemberAssignmentMapping({_sourceValue} => {_targetPath})")]
-public class MemberAssignmentMapping(MemberPathSetter targetPath, ISourceValue sourceValue, MemberMappingInfo memberInfo)
-    : IMemberAssignmentMapping
+public class MemberAssignmentMapping(
+    MemberPathSetter targetPath,
+    ISourceValue sourceValue,
+    MemberMappingInfo memberInfo,
+    MemberPathGetter? targetValueGetter = null
+) : IMemberAssignmentMapping
 {
     public MemberMappingInfo MemberInfo { get; } = memberInfo;
 
     private readonly ISourceValue _sourceValue = sourceValue;
     private readonly MemberPathSetter _targetPath = targetPath;
+    private readonly MemberPathGetter? _targetValueGetter = targetValueGetter;
 
     public bool TryGetMemberAssignmentMappingContainer([NotNullWhen(true)] out IMemberAssignmentMappingContainer? container)
     {
@@ -30,6 +35,9 @@ public class MemberAssignmentMapping(MemberPathSetter targetPath, ISourceValue s
 
     public ExpressionSyntax BuildExpression(TypeMappingBuildContext ctx, ExpressionSyntax? targetAccess)
     {
+        if (_targetValueGetter is not null && targetAccess is not null)
+            ctx = ctx.WithTargetValue(_targetValueGetter.BuildAccess(targetAccess));
+
         var mappedValue = _sourceValue.Build(ctx);
 
         // target.SetValue(source.Value); or target.Value = source.Value;
@@ -48,8 +56,10 @@ public class MemberAssignmentMapping(MemberPathSetter targetPath, ISourceValue s
             return false;
 
         var other = (MemberAssignmentMapping)obj;
-        return _sourceValue.Equals(other._sourceValue) && _targetPath.Equals(other._targetPath);
+        return _sourceValue.Equals(other._sourceValue)
+            && _targetPath.Equals(other._targetPath)
+            && Equals(_targetValueGetter, other._targetValueGetter);
     }
 
-    public override int GetHashCode() => HashCode.Combine(_sourceValue, _targetPath);
+    public override int GetHashCode() => HashCode.Combine(_sourceValue, _targetPath, _targetValueGetter);
 }

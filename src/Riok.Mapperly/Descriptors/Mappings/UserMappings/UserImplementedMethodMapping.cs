@@ -19,6 +19,7 @@ public class UserImplementedMethodMapping(
     ITypeSymbol sourceType,
     ITypeSymbol targetType,
     MethodParameter? referenceHandlerParameter,
+    MethodParameter? originalValueParameter,
     bool isExternal,
     UserImplementedMethodMapping.TargetNullability targetNullability
 ) : NewInstanceMapping(sourceType, targetType), INewInstanceUserMapping, IParameterizedMapping
@@ -36,11 +37,14 @@ public class UserImplementedMethodMapping(
 
     public bool IsExternal { get; } = isExternal;
 
+    public MethodParameter? OriginalValueParameter { get; } = originalValueParameter;
+
     public IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; } =
         method
             .Parameters.Where(p =>
                 p.Ordinal != sourceParameter.Ordinal
                 && (referenceHandlerParameter is null || p.Ordinal != referenceHandlerParameter.Value.Ordinal)
+                && (originalValueParameter is null || p.Ordinal != originalValueParameter.Value.Ordinal)
             )
             .Select(p => new MethodParameter(p, p.Type))
             .ToList();
@@ -73,7 +77,10 @@ public class UserImplementedMethodMapping(
                 receiver == null
                     ? methodName
                     : MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName(receiver), methodName);
-            return ctx.SyntaxFactory.Invocation(methodExpr, ctx.BuildArguments(Method, sourceParameter, referenceHandlerParameter));
+            return ctx.SyntaxFactory.Invocation(
+                methodExpr,
+                ctx.BuildArguments(Method, sourceParameter, referenceHandlerParameter, originalValueParameter: OriginalValueParameter)
+            );
         }
 
         var castedReceiver = CastExpression(
@@ -85,7 +92,10 @@ public class UserImplementedMethodMapping(
             ParenthesizedExpression(castedReceiver),
             methodName
         );
-        return ctx.SyntaxFactory.Invocation(castedMethodExpr, ctx.BuildArguments(Method, sourceParameter, referenceHandlerParameter));
+        return ctx.SyntaxFactory.Invocation(
+            castedMethodExpr,
+            ctx.BuildArguments(Method, sourceParameter, referenceHandlerParameter, originalValueParameter: OriginalValueParameter)
+        );
     }
 
     protected virtual SimpleNameSyntax BuildMethodName() => IdentifierName(Method.Name);

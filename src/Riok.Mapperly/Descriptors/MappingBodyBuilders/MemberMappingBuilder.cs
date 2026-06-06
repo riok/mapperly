@@ -4,6 +4,7 @@ using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
+using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 using Riok.Mapperly.Symbols.Members;
@@ -28,7 +29,7 @@ internal static class MemberMappingBuilder
         [NotNullWhen(true)] out MemberAssignmentMapping? mapping
     )
     {
-        if (!SourceValueBuilder.TryBuildMappedSourceValue(ctx, memberInfo, CodeStyle.Statement, out var mappedSourceValue))
+        if (!SourceValueBuilder.TryBuildMappedSourceValue(ctx, memberInfo, CodeStyle.Statement, out var result))
         {
             mapping = null;
             requiresNullHandling = false;
@@ -36,8 +37,8 @@ internal static class MemberMappingBuilder
         }
 
         var targetPathSetter = memberInfo.TargetMember.BuildSetter(ctx.BuilderContext);
-        requiresNullHandling = mappedSourceValue is MappedMemberSourceValue { RequiresSourceNullCheck: true };
-        mapping = new MemberAssignmentMapping(targetPathSetter, mappedSourceValue, memberInfo);
+        requiresNullHandling = result.SourceValue is MappedMemberSourceValue { RequiresSourceNullCheck: true };
+        mapping = new MemberAssignmentMapping(targetPathSetter, result.SourceValue, memberInfo, result.TargetValueGetter);
         return true;
     }
 
@@ -47,14 +48,14 @@ internal static class MemberMappingBuilder
         [NotNullWhen(true)] out MemberAssignmentMapping? mapping
     )
     {
-        if (!SourceValueBuilder.TryBuildMappedSourceValue(ctx, memberInfo, out var mappedSourceValue))
+        if (!SourceValueBuilder.TryBuildMappedSourceValue(ctx, memberInfo, CodeStyle.Expression, out var result))
         {
             mapping = null;
             return false;
         }
 
         var targetMemberSetter = memberInfo.TargetMember.BuildSetter(ctx.BuilderContext);
-        mapping = new MemberAssignmentMapping(targetMemberSetter, mappedSourceValue, memberInfo);
+        mapping = new MemberAssignmentMapping(targetMemberSetter, result.SourceValue, memberInfo, result.TargetValueGetter);
         return true;
     }
 
@@ -62,7 +63,7 @@ internal static class MemberMappingBuilder
         IMembersBuilderContext<IMapping> ctx,
         MemberMappingInfo memberMappingInfo,
         CodeStyle codeStyle,
-        [NotNullWhen(true)] out ISourceValue? sourceValue
+        [NotNullWhen(true)] out SourceValueBuilder.MappedSourceValue? result
     )
     {
         var mappingKey = memberMappingInfo.ToTypeMappingKey();
@@ -81,7 +82,7 @@ internal static class MemberMappingBuilder
                 sourceMember.MemberPath.ToDisplayString(),
                 targetMember.ToDisplayString()
             );
-            sourceValue = null;
+            result = null;
             return false;
         }
 
@@ -106,35 +107,53 @@ internal static class MemberMappingBuilder
             );
         }
 
+        var targetValueGetter = GetTargetValueGetterIfNeeded(ctx, delegateMapping, memberMappingInfo.TargetMember);
+
         if (
             (memberSourceNullable == delegateSourceNullable && memberTargetAcceptsNull == delegateTargetNullable)
             || (memberSourceNullable && !memberTargetAcceptsNull && delegateSourceNullable && !delegateTargetNullable)
         )
         {
-            sourceValue = new MappedMemberSourceValue(
+            var sourceValue = new MappedMemberSourceValue(
                 delegateMapping,
                 sourceMember.MemberPath.BuildGetter(ctx.BuilderContext),
                 true,
                 false
             );
+            result = new SourceValueBuilder.MappedSourceValue(sourceValue, targetValueGetter);
             return true;
         }
 
         if (codeStyle == CodeStyle.Statement)
         {
-            sourceValue = BuildBlockNullHandlingMapping(ctx, delegateMapping, sourceMember.MemberPath, targetMember);
+            result = new SourceValueBuilder.MappedSourceValue(
+                BuildBlockNullHandlingMapping(ctx, delegateMapping, sourceMember.MemberPath, targetMember),
+                targetValueGetter
+            );
             return true;
         }
 
         if (!ValidateLoopMapping(ctx, delegateMapping, sourceMember.MemberPath, targetMember))
         {
-            sourceValue = null;
+            result = null;
             return false;
         }
 
-        sourceValue = BuildInlineNullHandlingMapping(ctx, delegateMapping, sourceMember.MemberPath, targetMember.MemberWriteType);
+        result = new SourceValueBuilder.MappedSourceValue(
+            BuildInlineNullHandlingMapping(ctx, delegateMapping, sourceMember.MemberPath, targetMember.MemberWriteType),
+            targetValueGetter
+        );
         return true;
     }
+
+    private static MemberPathGetter? GetTargetValueGetterIfNeeded(
+        IMembersBuilderContext<IMapping> ctx,
+        INewInstanceMapping delegateMapping,
+        NonEmptyMemberPath targetMember
+    ) =>
+        delegateMapping is UserImplementedMethodMapping { OriginalValueParameter: not null }
+            ? targetMember.BuildGetter(ctx.BuilderContext)
+            : null;
 
     private static bool ValidateLoopMapping(
         IMembersBuilderContext<IMapping> ctx,
