@@ -20,7 +20,7 @@ public static class SourceEmitter
         );
         var mapper = BuildMapper(ctx, descriptor, cancellationToken);
 
-        var members = new List<MemberDeclarationSyntax>(descriptor.UnsafeAccessors?.Count ?? 0 + 1) { mapper };
+        var members = new List<MemberDeclarationSyntax>((descriptor.UnsafeAccessors?.Count ?? 0) + 1) { mapper };
         members.AddRange(descriptor.UnsafeAccessors?.Build(ctx, cancellationToken) ?? []);
 
         var memberSyntaxes = List(members.SeparateByTrailingLineFeed(ctx.SyntaxFactory.Indentation));
