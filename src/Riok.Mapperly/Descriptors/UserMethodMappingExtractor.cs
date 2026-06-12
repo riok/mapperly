@@ -182,7 +182,7 @@ public static class UserMethodMappingExtractor
         if (userMappingConfig.Ignore == true)
             return null;
 
-        var noExpressionInlining = GetNoExpressionInlining(ctx, method);
+        var noExpressionInlining = GetNoExpressionInlining(ctx, method, isExternal);
 
         // Generic user-implemented methods are stored as templates
         // that are matched against concrete type pairs during mapping resolution.
@@ -303,7 +303,7 @@ public static class UserMethodMappingExtractor
             return null;
         }
 
-        var noExpressionInlining = GetNoExpressionInlining(ctx, methodSymbol);
+        var noExpressionInlining = GetNoExpressionInlining(ctx, methodSymbol, isExternal: false);
 
         if (TryBuildRuntimeTargetTypeMapping(ctx, methodSymbol, noExpressionInlining) is { } userMapping)
             return userMapping;
@@ -490,11 +490,16 @@ public static class UserMethodMappingExtractor
         return userMappingAttr ?? new UserMappingConfiguration();
     }
 
-    private static bool GetNoExpressionInlining(SimpleMappingBuilderContext ctx, IMethodSymbol method)
+    private static bool GetNoExpressionInlining(SimpleMappingBuilderContext ctx, IMethodSymbol method, bool isExternal)
     {
         if (ctx.SymbolAccessor.HasAttribute<MapperNoExpressionInliningAttribute>(method))
             return true;
 
+        if (!isExternal)
+            return ctx.Configuration.Mapper.NoExpressionInlining;
+
+        // the configuration of external mappers is not merged into ctx.Configuration,
+        // read the MapperAttribute of the containing type instead
         var mapperAttribute = ctx.AttributeAccessor.AccessFirstOrDefault<MapperAttribute>(method.ContainingType);
         return mapperAttribute?.NoExpressionInlining == true;
     }
