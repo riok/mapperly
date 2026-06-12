@@ -165,7 +165,39 @@ public class RuntimeTargetTypeMappingTest
                 """
                 return source switch
                 {
-                    global::Base x when targetType.IsAssignableFrom(typeof(global::BaseDto)) => MapDerivedTypes(x),
+                    global::Base x when typeof(global::BaseDto).IsAssignableFrom(targetType) => MapDerivedTypes(x),
+                    _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
+                };
+                """
+            );
+    }
+
+    [Fact]
+    public void WithDerivedTypesUsingTypeOfArgumentsShouldUseBaseType()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial object Map(object source, Type targetType);
+
+            [MapDerivedType(typeof(A), typeof(B))]
+            [MapDerivedType(typeof(C), typeof(D))]
+            partial BaseDto MapDerivedTypes(Base source);
+            """,
+            "class Base {}",
+            "class BaseDto {}",
+            "class A : Base {}",
+            "class B : BaseDto {}",
+            "class C : Base {}",
+            "class D : BaseDto {}"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                return source switch
+                {
+                    global::Base x when typeof(global::BaseDto).IsAssignableFrom(targetType) => MapDerivedTypes(x),
                     _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
                 };
                 """
