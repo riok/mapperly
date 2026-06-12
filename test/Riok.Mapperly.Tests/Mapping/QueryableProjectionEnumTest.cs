@@ -86,6 +86,51 @@ public class QueryableProjectionEnumTest
     }
 
     [Fact]
+    public void EnumToAnotherEnumByNameWithMapperNoExpressionInliningShouldNotInline()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            public class A { public C Value { get; set; } }
+
+            public class B { public D Value { get; set; } }
+
+            public enum C { Value1, Value2 }
+
+            public enum D { Value1, Value2 }
+
+            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName, NoExpressionInlining = true)]
+            public static partial class Mapper
+            {
+                public static partial IQueryable<B> Map(IQueryable<A> q);
+
+                public static partial D MapEnum(C src);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMethodBody(
+                "Map",
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            q,
+                            x => new global::B()
+                            {
+                                Value = MapEnum(x.Value),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
     public Task EnumToString()
     {
         var source = TestSourceBuilder.Mapping(
