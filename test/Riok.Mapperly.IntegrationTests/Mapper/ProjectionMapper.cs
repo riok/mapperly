@@ -8,7 +8,18 @@ using Riok.Mapperly.IntegrationTests.Models;
 
 namespace Riok.Mapperly.IntegrationTests.Mapper
 {
-    [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByValue, AutoUserMappings = false)]
+    [Mapper(NoExpressionInlining = true)]
+    public static partial class EnumProjectionMapper
+    {
+        [MapEnum(EnumMappingStrategy.ByValue)]
+        public static partial TestEnumDtoByValue MapToTestEnumDtoByValue(TestEnum source);
+
+        [MapEnum(EnumMappingStrategy.ByName)]
+        public static partial TestEnumDtoByName MapToTestEnumDtoByName(TestEnum source);
+    }
+
+    [UseStaticMapper(typeof(EnumProjectionMapper))]
+    [Mapper(AutoUserMappings = false)]
     public static partial class ProjectionMapper
     {
         public static partial IQueryable<TestObjectDtoProjection> ProjectToDto(this IQueryable<TestObjectProjection> q);

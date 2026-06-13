@@ -39,8 +39,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                             }
                         )
                     ) : default,
-                    EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)x.EnumValue,
-                    EnumName = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)x.EnumName,
+                    EnumValue = global::Riok.Mapperly.IntegrationTests.Mapper.EnumProjectionMapper.MapToTestEnumDtoByValue(x.EnumValue),
+                    EnumName = global::Riok.Mapperly.IntegrationTests.Mapper.EnumProjectionMapper.MapToTestEnumDtoByName(x.EnumName),
                     EnumRawValue = (byte)x.EnumRawValue,
                     EnumStringValue = (string)x.EnumStringValue.ToString(),
                     EnumReverseStringValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)global::System.Enum.Parse(
@@ -125,8 +125,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                         }
                     )
                 ) : default,
-                EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)x.EnumValue,
-                EnumName = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)x.EnumName,
+                EnumValue = global::Riok.Mapperly.IntegrationTests.Mapper.EnumProjectionMapper.MapToTestEnumDtoByValue(x.EnumValue),
+                EnumName = global::Riok.Mapperly.IntegrationTests.Mapper.EnumProjectionMapper.MapToTestEnumDtoByName(x.EnumName),
                 EnumRawValue = (byte)x.EnumRawValue,
                 EnumStringValue = (string)x.EnumStringValue.ToString(),
                 EnumReverseStringValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)global::System.Enum.Parse(
@@ -195,8 +195,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.NullableReadOnlyObjectCollection = null;
             }
-            target.EnumValue = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByValue)testObject.EnumValue;
-            target.EnumName = (global::Riok.Mapperly.IntegrationTests.Dto.TestEnumDtoByName)testObject.EnumName;
+            target.EnumValue = global::Riok.Mapperly.IntegrationTests.Mapper.EnumProjectionMapper.MapToTestEnumDtoByValue(testObject.EnumValue);
+            target.EnumName = global::Riok.Mapperly.IntegrationTests.Mapper.EnumProjectionMapper.MapToTestEnumDtoByName(testObject.EnumName);
             target.EnumRawValue = (byte)testObject.EnumRawValue;
             target.EnumStringValue = MapToString(testObject.EnumStringValue);
             target.EnumReverseStringValue = MapToTestEnumDtoByName(testObject.EnumReverseStringValue);
