@@ -92,6 +92,6 @@ public class NullDelegateMapping : NewInstanceMapping
             nonNullableSourceValue = MemberAccess(nonNullableSourceValue, NullableValueProperty);
         }
 
-        return Conditional(IsNull(ctx.Source), nullSubstitute, _delegateMapping.Build(ctx.WithSource(nonNullableSourceValue)));
+        return Conditional(IsNull(ctx.Source, SourceType), nullSubstitute, _delegateMapping.Build(ctx.WithSource(nonNullableSourceValue)));
     }
 }

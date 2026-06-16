@@ -80,6 +80,23 @@ internal static class SymbolExtensions
         return level;
     }
 
+    /// <summary>
+    /// Whether the type declares multiple user defined equality (<c>op_Equality</c>) or inequality
+    /// (<c>op_Inequality</c>) operator overloads. Comparing such a type against the bare <c>null</c> literal can be
+    /// ambiguous (CS9342), e.g. when both <c>==(T?, T?)</c> and <c>==(T?, string?)</c> are defined, since the
+    /// <c>null</c> literal is convertible to multiple operand types.
+    /// A single overload (as defined by e.g. <see langword="string"/>) is never ambiguous.
+    /// </summary>
+    internal static bool HasAmbiguousEqualityOperators(this ITypeSymbol symbol)
+    {
+        var nonNullable = symbol.NonNullable();
+        return CountUserDefinedOperators(nonNullable, WellKnownMemberNames.EqualityOperatorName) > 1
+            || CountUserDefinedOperators(nonNullable, WellKnownMemberNames.InequalityOperatorName) > 1;
+
+        static int CountUserDefinedOperators(ITypeSymbol type, string name) =>
+            type.GetMembers(name).Count(m => m is IMethodSymbol { MethodKind: MethodKind.UserDefinedOperator });
+    }
+
     internal static bool IsArrayType(this ITypeSymbol symbol) => symbol.TypeKind == TypeKind.Array;
 
     internal static bool IsArrayType(this ITypeSymbol symbol, [NotNullWhen(true)] out IArrayTypeSymbol? arrayTypeSymbol)

@@ -36,7 +36,8 @@ public class MemberNullDelegateAssignmentMapping(
             nullConditional: needsNullSafeAccess,
             skipTrailingNonNullable: true
         );
-        var condition = IsNotNull(sourceNullConditionalAccess);
+        var leafType = _nullConditionalSourcePath.MemberPath.ReadPathWithoutTrailingNonNullable().LastOrDefault()?.Type;
+        var condition = IsNotNull(sourceNullConditionalAccess, leafType);
         var conditionCtx = ctx.AddIndentation();
         var trueClause = base.Build(conditionCtx, targetAccess);
         var elseClause = BuildElseClause(conditionCtx, targetAccess);
