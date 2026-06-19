@@ -26,7 +26,11 @@ public class MethodMemberNullAssignmentInitializerMapping(
         var setTarget = _targetPathToInitialize.BuildAssignment(targetAccess, newTarget);
 
         // if (target.Value == null) target.Value = new T();
-        var setTargetIfNull = ctx.SyntaxFactory.IfNull(sourcePathToInitialize.BuildAccess(targetAccess), setTarget);
+        var setTargetIfNull = ctx.SyntaxFactory.IfNull(
+            sourcePathToInitialize.BuildAccess(targetAccess),
+            setTarget,
+            sourcePathToInitialize.MemberPath.Member?.Type
+        );
 
         return base.Build(ctx, targetAccess).Prepend(setTargetIfNull);
     }

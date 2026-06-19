@@ -89,7 +89,8 @@ public class MemberPathGetter
 
     private BinaryExpressionSyntax BuildNonNullCondition(ExpressionSyntax baseAccess)
     {
-        return IsNotNull(BuildAccess(baseAccess, nullConditional: true, skipTrailingNonNullable: true));
+        var leafType = ReadPathWithoutTrailingNonNullable().LastOrDefault().Member?.Type;
+        return IsNotNull(BuildAccess(baseAccess, nullConditional: true, skipTrailingNonNullable: true), leafType);
     }
 
     private ExpressionSyntax? BuildNonNullConditionWithoutConditionalAccess(ExpressionSyntax baseAccess)
@@ -104,7 +105,7 @@ public class MemberPathGetter
             if (!pathPart.Member.IsReadNullable)
                 continue;
 
-            conditions.Add(IsNotNull(access));
+            conditions.Add(IsNotNull(access, pathPart.Member.Type));
         }
 
         return conditions.Count == 0 ? null : And(conditions);

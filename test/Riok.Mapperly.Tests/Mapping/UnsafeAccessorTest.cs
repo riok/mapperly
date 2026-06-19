@@ -19,6 +19,36 @@ public class UnsafeAccessorTest
     }
 
     [Fact]
+    public Task PrivateNestedNullablePropertyWithAmbiguousEqualityOperators()
+    {
+        // https://github.com/riok/mapperly/issues/2316
+        // the null check of the generic unsafe accessor receiver needs the cast too.
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("nested.Value", "value")]
+            partial B Map(A source);
+            """,
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "class A { public Code<int>? nested { get; set; } }",
+            "class B { public int value { get; set; } }",
+            """
+            class Code<T>
+            {
+                private T Value { get; set; } = default!;
+                public static bool operator ==(Code<T>? a, Code<T>? b) => Equals(a, b);
+                public static bool operator !=(Code<T>? a, Code<T>? b) => !Equals(a, b);
+                public static bool operator ==(Code<T>? a, string? b) => a?.ToString() == b;
+                public static bool operator !=(Code<T>? a, string? b) => a?.ToString() != b;
+                public override bool Equals(object? o) => ReferenceEquals(this, o);
+                public override int GetHashCode() => 0;
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task PrivatePropertyInNamespacedNestedMapper()
     {
         var source = TestSourceBuilder.CSharp(

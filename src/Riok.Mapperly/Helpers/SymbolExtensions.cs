@@ -80,6 +80,32 @@ internal static class SymbolExtensions
         return level;
     }
 
+    /// <summary>
+    /// Whether comparing the type against the bare <c>null</c> literal using the given operator can be ambiguous
+    /// (CS9342). This is the case when the type declares multiple user defined overloads of the operator,
+    /// e.g. when both <c>==(T?, T?)</c> and <c>==(T?, string?)</c> are defined, since the <c>null</c> literal is
+    /// convertible to multiple operand types. A single overload (as defined by e.g. <see langword="string"/>) is
+    /// never ambiguous.
+    /// The operator may be declared on a base type; per the C# specification only the first type in the hierarchy
+    /// declaring the operator contributes candidates, so the hierarchy is walked until the operator is found.
+    /// </summary>
+    /// <param name="symbol">The type which is compared against <c>null</c>.</param>
+    /// <param name="operatorMetadataName">
+    /// The metadata name of the operator, e.g. <see cref="WellKnownMemberNames.EqualityOperatorName"/> for <c>==</c>
+    /// or <see cref="WellKnownMemberNames.InequalityOperatorName"/> for <c>!=</c>.
+    /// </param>
+    internal static bool HasAmbiguousNullComparisonOperator(this ITypeSymbol symbol, string operatorMetadataName)
+    {
+        foreach (var type in symbol.NonNullable().WalkTypeHierarchy())
+        {
+            var count = type.GetMembers(operatorMetadataName).Count(m => m is IMethodSymbol { MethodKind: MethodKind.UserDefinedOperator });
+            if (count > 0)
+                return count > 1;
+        }
+
+        return false;
+    }
+
     internal static bool IsArrayType(this ITypeSymbol symbol) => symbol.TypeKind == TypeKind.Array;
 
     internal static bool IsArrayType(this ITypeSymbol symbol, [NotNullWhen(true)] out IArrayTypeSymbol? arrayTypeSymbol)

@@ -59,21 +59,32 @@ public partial struct SyntaxFactoryHelper
 
     public static ExpressionSyntax IfNoneNull(params (ITypeSymbol Type, ExpressionSyntax Access)[] values)
     {
-        var conditions = values.Where(x => x.Type.IsNullable()).Select(x => IsNotNull(x.Access));
+        var conditions = values.Where(x => x.Type.IsNullable()).Select(x => IsNotNull(x.Access, x.Type));
         return And(conditions);
     }
 
     public static ExpressionSyntax IfAnyNull(params (ITypeSymbol Type, ExpressionSyntax Access)[] values)
     {
-        var conditions = values.Where(x => x.Type.IsNullable()).Select(x => IsNull(x.Access));
+        var conditions = values.Where(x => x.Type.IsNullable()).Select(x => IsNull(x.Access, x.Type));
         return Or(conditions);
     }
 
-    public static BinaryExpressionSyntax IsNull(ExpressionSyntax expression) =>
-        BinaryExpression(SyntaxKind.EqualsExpression, expression, NullLiteral());
+    public static BinaryExpressionSyntax IsNull(ExpressionSyntax expression, ITypeSymbol? type = null) =>
+        BinaryExpression(SyntaxKind.EqualsExpression, expression, NullLiteral(type, WellKnownMemberNames.EqualityOperatorName));
 
-    public static BinaryExpressionSyntax IsNotNull(ExpressionSyntax expression) =>
-        BinaryExpression(SyntaxKind.NotEqualsExpression, expression, NullLiteral());
+    public static BinaryExpressionSyntax IsNotNull(ExpressionSyntax expression, ITypeSymbol? type = null) =>
+        BinaryExpression(SyntaxKind.NotEqualsExpression, expression, NullLiteral(type, WellKnownMemberNames.InequalityOperatorName));
+
+    /// <summary>
+    /// Builds a <c>null</c> literal. If comparing <paramref name="type"/> against <c>null</c> using the operator
+    /// <paramref name="operatorMetadataName"/> would be ambiguous (multiple user defined overloads), the literal is
+    /// cast to the nullable type (e.g. <c>(global::Code?)null</c>) to avoid an ambiguous operator resolution (CS9342)
+    /// in the generated null check. See https://github.com/riok/mapperly/issues/2316.
+    /// </summary>
+    private static ExpressionSyntax NullLiteral(ITypeSymbol? type, string operatorMetadataName) =>
+        type?.HasAmbiguousNullComparisonOperator(operatorMetadataName) == true
+            ? CastExpression(NullableType(NonNullableIdentifier(type)), NullLiteral())
+            : NullLiteral();
 
     public static BinaryExpressionSyntax Is(ExpressionSyntax left, ExpressionSyntax right) =>
         BinaryExpression(SyntaxKind.IsExpression, left, right);
