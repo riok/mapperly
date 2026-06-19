@@ -91,10 +91,16 @@ public abstract class UserDefinedNewInstanceRuntimeTargetTypeMapping(
 
     protected virtual ExpressionSyntax? BuildSwitchArmWhenClause(ExpressionSyntax runtimeTargetType, RuntimeTargetTypeMapping mapping)
     {
-        // targetType.IsAssignableFrom(typeof(ADto))
+        var mappingTargetType = TypeOfExpression(FullyQualifiedIdentifier(mapping.Mapping.TargetType.NonNullable()));
+
+        // Derived type mapping: A => ADto (runtimeTargetType) or A => BaseDto (runtimeTargetType), BaseDto (mappingTargetType).
+        // typeof(BaseDto).IsAssignableFrom(runtimeTargetType)
+
+        // Non-derived type mapping: A => ADto (runtimeTargetType) or A => BaseDto (runtimeTargetType), ADto (mappingTargetType).
+        // runtimeTargetType.IsAssignableFrom(ADto)
         return InvocationWithoutIndention(
-            MemberAccess(runtimeTargetType, IsAssignableFromMethodName),
-            TypeOfExpression(FullyQualifiedIdentifier(mapping.Mapping.TargetType.NonNullable()))
+            MemberAccess(mapping.IsDerivedTypeMapping ? mappingTargetType : runtimeTargetType, IsAssignableFromMethodName),
+            mapping.IsDerivedTypeMapping ? runtimeTargetType : mappingTargetType
         );
     }
 

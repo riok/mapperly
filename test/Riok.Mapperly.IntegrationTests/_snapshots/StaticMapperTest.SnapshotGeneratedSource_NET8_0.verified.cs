@@ -790,7 +790,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Models.AssemblyScopedModel x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.AssemblyScopedDto)) => global::Riok.Mapperly.IntegrationTests.Mapper.AssemblyScopedMappers.ToDto(x),
                 global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<string>>> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<int>>>)) => MapNestedLists(x),
                 global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => MapAllDtos(x),
-                object x when targetType.IsAssignableFrom(typeof(object)) => DerivedTypes(x),
+                object x when typeof(object).IsAssignableFrom(targetType) => DerivedTypes(x),
                 _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
             };
         }
@@ -817,7 +817,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Models.AssemblyScopedModel x when targetType.IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.AssemblyScopedDto)) => global::Riok.Mapperly.IntegrationTests.Mapper.AssemblyScopedMappers.ToDto(x),
                 global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<string>>> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<int>>>)) => MapNestedLists(x),
                 global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when targetType.IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => MapAllDtos(x),
-                object x when targetType.IsAssignableFrom(typeof(object)) => DerivedTypes(x),
+                object x when typeof(object).IsAssignableFrom(targetType) => DerivedTypes(x),
                 null => default,
                 _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {targetType} as there is no known type mapping", nameof(source)),
             };
@@ -845,7 +845,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 global::Riok.Mapperly.IntegrationTests.Models.AssemblyScopedModel x when typeof(TTarget).IsAssignableFrom(typeof(global::Riok.Mapperly.IntegrationTests.Dto.AssemblyScopedDto)) => (TTarget)(object)global::Riok.Mapperly.IntegrationTests.Mapper.AssemblyScopedMappers.ToDto(x),
                 global::System.Collections.Generic.IReadOnlyCollection<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<string>>> x when typeof(TTarget).IsAssignableFrom(typeof(global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyList<global::System.Collections.Generic.IReadOnlyCollection<int>>>)) => (TTarget)(object)MapNestedLists(x),
                 global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Models.TestObject> x when typeof(TTarget).IsAssignableFrom(typeof(global::System.Collections.Generic.IEnumerable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDto>)) => (TTarget)(object)MapAllDtos(x),
-                object x when typeof(TTarget).IsAssignableFrom(typeof(object)) => (TTarget)(object)DerivedTypes(x),
+                object x when typeof(object).IsAssignableFrom(typeof(TTarget)) => (TTarget)(object)DerivedTypes(x),
                 null => throw new global::System.ArgumentNullException(nameof(source)),
                 _ => throw new global::System.ArgumentException($"Cannot map {source.GetType()} to {typeof(TTarget)} as there is no known type mapping", nameof(source)),
             };

@@ -340,7 +340,9 @@ public static class UserMethodMappingExtractor
             parameters.Source,
             parameters.ReferenceHandler,
             ctx.SymbolAccessor.UpgradeNullable(methodSymbol.ReturnType),
-            ctx.Configuration.Mapper.UseReferenceHandling
+            ctx.Configuration.Mapper.UseReferenceHandling,
+            ctx.AttributeAccessor.HasAttribute<MapDerivedTypeAttribute<object, object>>(methodSymbol)
+                || ctx.AttributeAccessor.HasAttribute<MapDerivedTypeAttribute>(methodSymbol)
         )
         {
             AdditionalSourceParameters = parameters.AdditionalParameters,
