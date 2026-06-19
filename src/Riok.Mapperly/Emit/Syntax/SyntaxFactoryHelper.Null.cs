@@ -60,12 +60,17 @@ public partial struct SyntaxFactoryHelper
         };
     }
 
-    public IfStatementSyntax IfNull(ExpressionSyntax value, ExpressionSyntax body) =>
-        IfNull(value, AddIndentation().ExpressionStatement(body));
+    public IfStatementSyntax IfNull(ExpressionSyntax value, ExpressionSyntax body, ITypeSymbol? type = null) =>
+        IfNull(value, AddIndentation().ExpressionStatement(body), type);
 
-    public IfStatementSyntax IfNull(ExpressionSyntax value, StatementSyntax statement) => If(IsNull(value), statement);
+    public IfStatementSyntax IfNull(ExpressionSyntax value, StatementSyntax statement, ITypeSymbol? type = null) =>
+        If(IsNull(value, type), statement);
 
-    public StatementSyntax IfNullReturnOrThrow(ExpressionSyntax expression, ExpressionSyntax? returnOrThrowExpression = null)
+    public StatementSyntax IfNullReturnOrThrow(
+        ExpressionSyntax expression,
+        ExpressionSyntax? returnOrThrowExpression = null,
+        ITypeSymbol? type = null
+    )
     {
         StatementSyntax ifExpression = returnOrThrowExpression switch
         {
@@ -73,7 +78,7 @@ public partial struct SyntaxFactoryHelper
             _ => AddIndentation().Return(returnOrThrowExpression),
         };
 
-        return IfNull(expression, ifExpression);
+        return IfNull(expression, ifExpression, type);
     }
 
     public static ExpressionSyntax SuppressNullableWarning(ExpressionSyntax expression) =>

@@ -226,12 +226,12 @@ public class UserDefinedExistingTargetGenericTypeMapping(
         var nullChecks = new List<ExpressionSyntax>();
         if (SourceType.IsNullable() || CanBeNull(SourceType))
         {
-            nullChecks.Add(IsNull(ctx.Source));
+            nullChecks.Add(IsNull(ctx.Source, SourceType));
         }
 
         if (TargetType.IsNullable() || CanBeNull(TargetType))
         {
-            nullChecks.Add(IsNull(IdentifierName(TargetParameter.Name)));
+            nullChecks.Add(IsNull(IdentifierName(TargetParameter.Name), TargetType));
         }
 
         return ctx.SyntaxFactory.If(Or(nullChecks), ctx.SyntaxFactory.AddIndentation().Return());

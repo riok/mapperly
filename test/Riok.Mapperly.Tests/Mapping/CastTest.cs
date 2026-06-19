@@ -494,4 +494,54 @@ public class CastTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void NullableSourceWithInheritedEqualityOperatorsShouldCastNullLiteral()
+    {
+        // https://github.com/riok/mapperly/issues/2316
+        // the ambiguous equality operators may be declared on a base type.
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.AllConversions,
+            "class A { public Code? PromoCode { get; set; } }",
+            "class B { public string? PromoCode { get; set; } }",
+            """
+            abstract class ValueObject
+            {
+                public static bool operator ==(ValueObject? a, ValueObject? b) => Equals(a, b);
+                public static bool operator !=(ValueObject? a, ValueObject? b) => !Equals(a, b);
+                public static bool operator ==(ValueObject? a, string? b) => a?.ToString() == b;
+                public static bool operator !=(ValueObject? a, string? b) => a?.ToString() != b;
+                public override bool Equals(object? o) => ReferenceEquals(this, o);
+                public override int GetHashCode() => 0;
+            }
+            """,
+            """
+            class Code : ValueObject
+            {
+                public string Value { get; set; } = string.Empty;
+                public static explicit operator string(Code c) => c.Value;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.PromoCode != (global::Code?)null)
+                {
+                    target.PromoCode = (string)source.PromoCode;
+                }
+                else
+                {
+                    target.PromoCode = null;
+                }
+                return target;
+                """
+            );
+    }
 }

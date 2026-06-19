@@ -61,7 +61,7 @@ public class NullDelegateMethodMapping(
         // if (source == null)
         //   return <null-substitute>;
         var fallbackExpression = NullSubstitute(TargetType, ctx.Source, nullFallbackValue);
-        var ifExpression = ctx.SyntaxFactory.IfNullReturnOrThrow(ctx.Source, fallbackExpression);
+        var ifExpression = ctx.SyntaxFactory.IfNullReturnOrThrow(ctx.Source, fallbackExpression, SourceType);
         return body.Prepend(ifExpression);
     }
 }
