@@ -18,6 +18,13 @@
     <PackageReference Include="NuGet.Frameworks" Version="7.6.0" />
   </ItemGroup>
   <ItemGroup>
+    <!-- CVE-2025-6965 (GHSA-2m69-gcr7-jv3q) affects the SQLite engine bundled by the transitive
+      SQLitePCLRaw.lib.e_sqlite3 pulled in via the Riok.Mapperly.IntegrationTests project reference.
+      This is a benchmark-only dependency, so we are not affected by the malformed-database
+      vulnerability. Suppress the audit warning until EF Core ships a fixed bundle. -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\src\Riok.Mapperly\Riok.Mapperly.csproj" />
     <ProjectReference Include="..\..\src\Riok.Mapperly\Riok.Mapperly.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\src\Riok.Mapperly.Abstractions\Riok.Mapperly.Abstractions.csproj" />
