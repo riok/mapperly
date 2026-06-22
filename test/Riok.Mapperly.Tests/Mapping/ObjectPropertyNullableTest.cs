@@ -1165,6 +1165,142 @@ public class ObjectPropertyNullableTest
     }
 
     [Fact]
+    public void NotNullSourceToNonNullableTargetProperty()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            """
+            class A
+            {
+                [System.Diagnostics.CodeAnalysis.NotNull]
+                public string? Name { get; set; }
+            }
+            """,
+            "class B { public string Name { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Name = source.Name;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NotNullSourceFromExternalAssemblyToNonNullableTargetProperty()
+    {
+        // Roslyn exposes the NotNullAttribute of a property loaded from metadata (referenced assembly)
+        // on the return value of the getter instead of the property itself.
+        var aSource = TestSourceBuilder.SyntaxTree(
+            """
+            using System.Diagnostics.CodeAnalysis;
+            namespace External;
+            public class A
+            {
+                [NotNull]
+                public string? Name { get; set; }
+            }
+            """
+        );
+        using var aAssembly = TestHelper.BuildAssembly("A", aSource);
+
+        var source = TestSourceBuilder.Mapping("External.A", "B", "class B { public string Name { get; set; } }");
+
+        TestHelper
+            .GenerateMapper(source, additionalAssemblies: [aAssembly])
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.Name = source.Name;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableSourceToDisallowNullTargetProperty()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            "class A { public string? Name { get; set; } }",
+            """
+            class B
+            {
+                [System.Diagnostics.CodeAnalysis.DisallowNull]
+                public string? Name { get; set; }
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Name of A to the target property Name of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.Name != null)
+                {
+                    target.Name = source.Name;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableSourceToDisallowNullTargetPropertyFromExternalAssembly()
+    {
+        // Roslyn exposes the DisallowNullAttribute of a property loaded from metadata (referenced assembly)
+        // on the value parameter of the setter instead of the property itself.
+        var bSource = TestSourceBuilder.SyntaxTree(
+            """
+            using System.Diagnostics.CodeAnalysis;
+            namespace External;
+            public class B
+            {
+                [DisallowNull]
+                public string? Name { get; set; }
+            }
+            """
+        );
+        using var bAssembly = TestHelper.BuildAssembly("B", bSource);
+
+        var source = TestSourceBuilder.Mapping("A", "External.B", "class A { public string? Name { get; set; } }");
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics, [bAssembly])
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Name of A to the target property Name of External.B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::External.B();
+                if (source.Name != null)
+                {
+                    target.Name = source.Name;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void MaybeNullSourceToNonNullableTargetProperty()
     {
         var source = TestSourceBuilder.Mapping(
