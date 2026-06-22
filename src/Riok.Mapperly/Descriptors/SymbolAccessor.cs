@@ -93,24 +93,32 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     public bool IsReadNullable(ISymbol symbol)
     {
+        // A nullable typed member can only be narrowed to non-nullable by NotNull,
+        // a non-nullable typed member can only be widened to nullable by MaybeNull,
+        // therefore at most one attribute lookup is required.
         return symbol switch
         {
             ITypeSymbol t => t.IsNullable(),
-            IPropertySymbol p => p.Type.IsNullable() || TryHasGetAttribute<MaybeNullAttribute>(p),
-            IFieldSymbol f => f.Type.IsNullable() || TryHasAttribute<MaybeNullAttribute>(f),
-            IParameterSymbol p => p.Type.IsNullable() || TryHasAttribute<MaybeNullAttribute>(p),
+            IPropertySymbol p => p.Type.IsNullable() ? !TryHasGetAttribute<NotNullAttribute>(p) : TryHasGetAttribute<MaybeNullAttribute>(p),
+            IFieldSymbol f => f.Type.IsNullable() ? !TryHasAttribute<NotNullAttribute>(f) : TryHasAttribute<MaybeNullAttribute>(f),
+            IParameterSymbol p => p.Type.IsNullable() ? !TryHasAttribute<NotNullAttribute>(p) : TryHasAttribute<MaybeNullAttribute>(p),
             _ => false,
         };
     }
 
     public bool IsWriteNullable(ISymbol symbol)
     {
+        // A nullable typed member can only be narrowed to non-nullable by DisallowNull,
+        // a non-nullable typed member can only be widened to nullable by AllowNull,
+        // therefore at most one attribute lookup is required.
         return symbol switch
         {
             ITypeSymbol t => t.IsNullable(),
-            IPropertySymbol p => p.Type.IsNullable() || TryHasSetAttribute<AllowNullAttribute>(p),
-            IFieldSymbol f => f.Type.IsNullable() || TryHasAttribute<AllowNullAttribute>(f),
-            IParameterSymbol p => p.Type.IsNullable() || TryHasAttribute<AllowNullAttribute>(p),
+            IPropertySymbol p => p.Type.IsNullable()
+                ? !TryHasSetAttribute<DisallowNullAttribute>(p)
+                : TryHasSetAttribute<AllowNullAttribute>(p),
+            IFieldSymbol f => f.Type.IsNullable() ? !TryHasAttribute<DisallowNullAttribute>(f) : TryHasAttribute<AllowNullAttribute>(f),
+            IParameterSymbol p => p.Type.IsNullable() ? !TryHasAttribute<DisallowNullAttribute>(p) : TryHasAttribute<AllowNullAttribute>(p),
             _ => false,
         };
     }
