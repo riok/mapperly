@@ -74,16 +74,40 @@ public class MappingCollection(GenericTypeChecker genericTypeChecker)
             .Concat(_newInstanceMappings.UsedDuplicatedNonDefaultNonReferencedUserMappings)
             .Concat(_existingTargetMappings.UsedDuplicatedNonDefaultNonReferencedUserMappings);
 
-    public INewInstanceMapping? FindNewInstanceMapping(TypeMappingKey mappingKey, ParameterScope? scope = null) =>
-        _newInstanceMappings.Find(mappingKey, scope) ?? TryMatchGenericNewInstanceTemplate(mappingKey);
+    public INewInstanceMapping? FindNewInstanceMapping(TypeMappingKey mappingKey, ParameterScope? scope = null)
+    {
+        if (_newInstanceMappings.Find(mappingKey, scope) is { } mapping)
+            return mapping;
+
+        // If an explicit mapping is referenced by name (Use = ...),
+        // do not match generic templates here.
+        // The referenced mapping is resolved later by the UseNamedMappingBuilder,
+        // otherwise a generic template would shadow the explicitly referenced mapping.
+        if (mappingKey.Configuration.UseNamedMapping != null)
+            return null;
+
+        return TryMatchGenericNewInstanceTemplate(mappingKey);
+    }
 
     public INewInstanceUserMapping? FindNewInstanceUserMapping(IMethodSymbol method) => _newInstanceMappings.FindUserMapping(method);
 
     public INewInstanceMapping? FindNamedNewInstanceMapping(string name, out bool ambiguousName) =>
         _newInstanceMappings.FindNamed(name, out ambiguousName);
 
-    public IExistingTargetMapping? FindExistingInstanceMapping(TypeMappingKey mappingKey) =>
-        _existingTargetMappings.Find(mappingKey) ?? TryMatchGenericExistingTargetTemplate(mappingKey);
+    public IExistingTargetMapping? FindExistingInstanceMapping(TypeMappingKey mappingKey)
+    {
+        if (_existingTargetMappings.Find(mappingKey) is { } mapping)
+            return mapping;
+
+        // If an explicit mapping is referenced by name (Use = ...),
+        // do not match generic templates here.
+        // The referenced mapping is resolved later by the UseNamedMappingBuilder,
+        // otherwise a generic template would shadow the explicitly referenced mapping.
+        if (mappingKey.Configuration.UseNamedMapping != null)
+            return null;
+
+        return TryMatchGenericExistingTargetTemplate(mappingKey);
+    }
 
     public IExistingTargetMapping? FindExistingInstanceNamedMapping(string name, out bool ambiguousName) =>
         _existingTargetMappings.FindNamed(name, out ambiguousName);

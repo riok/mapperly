@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
+using Riok.Mapperly.Descriptors.Mappings.UserMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
 
@@ -18,6 +19,23 @@ public static class UseNamedMappingBuilder
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.ReferencedMappingNotFound, ctx.MappingKey.Configuration.UseNamedMapping);
             return null;
+        }
+
+        // if a generic user-implemented mapping is referenced by name,
+        // create a concrete instantiation for the current source and target types
+        if (mapping is GenericUserImplementedNewInstanceMethodMapping genericTemplate)
+        {
+            mapping = genericTemplate.TryCreateConcreteMapping(ctx.GenericTypeChecker, ctx.Source, ctx.Target);
+            if (mapping == null)
+            {
+                ctx.ReportDiagnostic(
+                    DiagnosticDescriptors.ReferencedMappingSourceTypeMismatch,
+                    ctx.MappingKey.Configuration.UseNamedMapping,
+                    genericTemplate.SourceType.ToDisplayString(),
+                    ctx.Source.ToDisplayString()
+                );
+                return null;
+            }
         }
 
         if (!ctx.ParameterScope.TryUseParameters(mapping))
@@ -54,6 +72,23 @@ public static class UseNamedMappingBuilder
         var existingTargetMapping = ctx.FindExistingTargetNamedMapping(useNamedMapping);
         if (existingTargetMapping is null)
             return null;
+
+        // if a generic user-implemented mapping is referenced by name,
+        // create a concrete instantiation for the current source and target types
+        if (existingTargetMapping is GenericUserImplementedExistingTargetMethodMapping genericTemplate)
+        {
+            existingTargetMapping = genericTemplate.TryCreateConcreteMapping(ctx.GenericTypeChecker, ctx.Source, ctx.Target);
+            if (existingTargetMapping == null)
+            {
+                ctx.ReportDiagnostic(
+                    DiagnosticDescriptors.ReferencedMappingSourceTypeMismatch,
+                    useNamedMapping,
+                    genericTemplate.SourceType.ToDisplayString(),
+                    ctx.Source.ToDisplayString()
+                );
+                return null;
+            }
+        }
 
         if (!ctx.ParameterScope.TryUseParameters(existingTargetMapping))
         {
