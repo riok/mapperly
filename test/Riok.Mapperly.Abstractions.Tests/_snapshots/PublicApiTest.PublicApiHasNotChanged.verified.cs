@@ -34,7 +34,7 @@ namespace Riok.Mapperly.Abstractions
         Source = 1,
         Target = 2,
     }
-    [System.AttributeUsage(System.AttributeTargets.Method)]
+    [System.AttributeUsage(System.AttributeTargets.Method, AllowMultiple=true)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
     public sealed class IncludeMappingConfigurationAttribute : System.Attribute
     {
