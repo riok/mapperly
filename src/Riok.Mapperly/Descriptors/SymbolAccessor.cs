@@ -96,7 +96,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         return symbol switch
         {
             ITypeSymbol t => t.IsNullable(),
-            IPropertySymbol p => p.Type.IsNullable() || TryHasAttribute<MaybeNullAttribute>(p),
+            IPropertySymbol p => p.Type.IsNullable() || TryHasGetAttribute<MaybeNullAttribute>(p),
             IFieldSymbol f => f.Type.IsNullable() || TryHasAttribute<MaybeNullAttribute>(f),
             IParameterSymbol p => p.Type.IsNullable() || TryHasAttribute<MaybeNullAttribute>(p),
             _ => false,
@@ -108,7 +108,7 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
         return symbol switch
         {
             ITypeSymbol t => t.IsNullable(),
-            IPropertySymbol p => p.Type.IsNullable() || TryHasAttribute<AllowNullAttribute>(p),
+            IPropertySymbol p => p.Type.IsNullable() || TryHasSetAttribute<AllowNullAttribute>(p),
             IFieldSymbol f => f.Type.IsNullable() || TryHasAttribute<AllowNullAttribute>(f),
             IParameterSymbol p => p.Type.IsNullable() || TryHasAttribute<AllowNullAttribute>(p),
             _ => false,
@@ -353,6 +353,26 @@ public class SymbolAccessor(CompilationContext compilationContext, INamedTypeSym
 
     internal bool TryHasAttribute<T>(IEnumerable<AttributeData> symbol)
         where T : Attribute => TryGetAttributes<T>(symbol).Any();
+
+    /// <summary>
+    /// Whether the property or its getter is annotated with the attribute <typeparamref name="T"/>.
+    /// For properties loaded from metadata (e.g. referenced assemblies) Roslyn exposes flow attributes
+    /// such as <see cref="MaybeNullAttribute"/> on the return value of the getter instead of the property itself,
+    /// therefore both locations need to be checked.
+    /// </summary>
+    internal bool TryHasGetAttribute<T>(IPropertySymbol symbol)
+        where T : Attribute =>
+        TryHasAttribute<T>(symbol) || (symbol.GetMethod != null && TryHasAttribute<T>(symbol.GetMethod.GetReturnTypeAttributes()));
+
+    /// <summary>
+    /// Whether the property or its setter value parameter is annotated with the attribute <typeparamref name="T"/>.
+    /// For properties loaded from metadata (e.g. referenced assemblies) Roslyn exposes flow attributes
+    /// such as <see cref="AllowNullAttribute"/> on the value parameter of the setter instead of the property itself,
+    /// therefore both locations need to be checked.
+    /// </summary>
+    internal bool TryHasSetAttribute<T>(IPropertySymbol symbol)
+        where T : Attribute =>
+        TryHasAttribute<T>(symbol) || (symbol.SetMethod is { Parameters: [var valueParameter, ..] } && TryHasAttribute<T>(valueParameter));
 
     internal IEnumerable<IMethodSymbol> GetAllMethods(ITypeSymbol symbol) => GetAllMembers(symbol).OfType<IMethodSymbol>();
 

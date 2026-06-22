@@ -1091,6 +1091,80 @@ public class ObjectPropertyNullableTest
     }
 
     [Fact]
+    public void MaybeNullSourceFromExternalAssemblyToNonNullableTargetProperty()
+    {
+        // https://github.com/riok/mapperly/issues/2192
+        // Roslyn exposes the MaybeNullAttribute of a property loaded from metadata (referenced assembly)
+        // on the return value of the getter instead of the property itself.
+        var aSource = TestSourceBuilder.SyntaxTree(
+            """
+            using System.Diagnostics.CodeAnalysis;
+            namespace External;
+            public class A
+            {
+                [MaybeNull]
+                public string Name { get; set; } = default!;
+            }
+            """
+        );
+        using var aAssembly = TestHelper.BuildAssembly("A", aSource);
+
+        var source = TestSourceBuilder.Mapping("External.A", "B", "class B { public string Name { get; set; } }");
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics, [aAssembly])
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Name of External.A to the target property Name of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.Name != null)
+                {
+                    target.Name = source.Name;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableSourceToAllowNullTargetPropertyFromExternalAssembly()
+    {
+        // https://github.com/riok/mapperly/issues/2192
+        // Roslyn exposes the AllowNullAttribute of a property loaded from metadata (referenced assembly)
+        // on the value parameter of the setter instead of the property itself.
+        var bSource = TestSourceBuilder.SyntaxTree(
+            """
+            using System.Diagnostics.CodeAnalysis;
+            namespace External;
+            public class B
+            {
+                [AllowNull]
+                public string Name { get; set; } = default!;
+            }
+            """
+        );
+        using var bAssembly = TestHelper.BuildAssembly("B", bSource);
+
+        var source = TestSourceBuilder.Mapping("A", "External.B", "class A { public string? Name { get; set; } }");
+
+        TestHelper
+            .GenerateMapper(source, additionalAssemblies: [bAssembly])
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::External.B();
+                target.Name = source.Name;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void MaybeNullSourceToNonNullableTargetProperty()
     {
         var source = TestSourceBuilder.Mapping(
