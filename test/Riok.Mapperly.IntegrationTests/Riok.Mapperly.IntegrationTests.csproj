@@ -2,8 +2,7 @@
   <PropertyGroup>
     <!-- setting the TargetFramework directly from the cli via -p:TargetFramework=netA.B does not work using a custom msbuild property seems to work -->
     <MapperlyIntegrationTestsTargetFramework Condition="'$(MapperlyIntegrationTestsTargetFramework)' == ''"
-      >net10.0</MapperlyIntegrationTestsTargetFramework
-    >
+      >net10.0</MapperlyIntegrationTestsTargetFramework>
     <TargetFramework>$(MapperlyIntegrationTestsTargetFramework)</TargetFramework>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <CompilerGeneratedFilesOutputPath>$(BaseIntermediateOutputPath)/generated</CompilerGeneratedFilesOutputPath>
@@ -34,7 +33,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.27" Condition="'$(TargetFramework)' == 'net8.0'" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.16" Condition="'$(TargetFramework)' == 'net9.0'" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.8" Condition="'$(TargetFramework)' == 'net10.0'" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" Condition="'$(TargetFramework)' == 'net10.0'" />
   </ItemGroup>
   <ItemGroup>
     <!-- CVE-2025-6965 (GHSA-2m69-gcr7-jv3q) affects the SQLite engine bundled by the transitive
