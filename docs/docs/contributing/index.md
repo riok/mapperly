@@ -34,6 +34,16 @@ If you would like to _implement_ a new feature, please consider the size of the 
 
 - **Small Features** can be crafted and directly [submitted as a Pull Request](#submit-pr).
 
+## Using AI tools
+
+You are welcome to use AI tools to help you contribute to Mapperly.
+However, you are responsible for every line of code you submit.
+Before opening a pull request, please make sure that you did not use AI tools to generate the PR,
+or that you have manually verified that you understand the code, that it is correct, optimal, and follows the project guidelines and architecture.
+
+Low-quality, AI-generated pull requests that have not been reviewed and understood by their author
+will be closed immediately without further explanation.
+
 ## Submission Guidelines
 
 ### <a name="submit-issue"></a> Submitting an issue
