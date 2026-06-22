@@ -6,7 +6,7 @@ namespace Riok.Mapperly.Abstractions;
 /// An attribute used to include the mapping configuration of another mapping method in the attributed method.
 /// Use the other mapping's method name to identify the configuration.
 /// </summary>
-[AttributeUsage(AttributeTargets.Method)]
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 [Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
 public sealed class IncludeMappingConfigurationAttribute : Attribute
 {
