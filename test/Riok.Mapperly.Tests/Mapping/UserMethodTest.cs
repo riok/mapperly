@@ -1222,4 +1222,76 @@ public class UserMethodTest
                 """
             );
     }
+
+    [Fact]
+    public void WithGenericUserImplementedDoesNotOverrideExplicitlyReferencedMapping()
+    {
+        // https://github.com/riok/mapperly/issues/2277
+        // a generic user-implemented mapping must not shadow a mapping
+        // which is explicitly referenced via Use on another member.
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(MapInt))]
+            [MapProperty(nameof(A.Other), nameof(B.Other), Use = nameof(Identity))]
+            partial B Map(A source);
+
+            [UserMapping(Default = false)]
+            private T Identity<T>(T value) => value;
+
+            [UserMapping(Default = false)]
+            private int MapInt(int value) => value + 1;
+            """,
+            "class A { public int Value { get; set; } public int Other { get; set; } }",
+            "class B { public int Value { get; set; } public int Other { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Value = MapInt(source.Value);
+                target.Other = Identity<int>(source.Other);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void WithGenericUserImplementedExistingTargetDoesNotOverrideExplicitlyReferencedMapping()
+    {
+        // https://github.com/riok/mapperly/issues/2277
+        // same as above but for existing target (void) mappings.
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Value), Use = nameof(MapValue))]
+            [MapProperty(nameof(A.Other), nameof(B.Other), Use = nameof(MapGeneric))]
+            partial void Map(A source, B target);
+
+            [UserMapping(Default = false)]
+            private void MapGeneric<TSource, TTarget>(TSource source, [MappingTarget] TTarget target)
+                where TSource : IEntity
+                where TTarget : IDto
+                => target.Id = source.Id;
+
+            [UserMapping(Default = false)]
+            private void MapValue(C source, [MappingTarget] CDto target) => target.Id = source.Id + 1;
+            """,
+            "public interface IEntity { public int Id { get; } }",
+            "public interface IDto { public int Id { get; set; } }",
+            "public class C : IEntity { public int Id { get; set; } }",
+            "public class CDto : IDto { public int Id { get; set; } }",
+            "public class A { public C Value { get; set; } public C Other { get; set; } }",
+            "public class B { public CDto Value { get; set; } public CDto Other { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                MapValue(source.Value, target.Value);
+                MapGeneric<global::C, global::CDto>(source.Other, target.Other);
+                """
+            );
+    }
 }
