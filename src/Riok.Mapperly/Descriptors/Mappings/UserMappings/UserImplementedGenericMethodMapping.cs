@@ -19,6 +19,7 @@ public class UserImplementedGenericMethodMapping(
     ITypeSymbol concreteTargetType,
     IReadOnlyList<ITypeSymbol> typeArguments,
     MethodParameter? referenceHandlerParameter,
+    MethodParameter? originalValueParameter,
     bool isExternal,
     UserImplementedMethodMapping.TargetNullability targetNullability
 )
@@ -30,6 +31,7 @@ public class UserImplementedGenericMethodMapping(
         concreteSourceType,
         concreteTargetType,
         referenceHandlerParameter,
+        originalValueParameter,
         isExternal,
         targetNullability
     )

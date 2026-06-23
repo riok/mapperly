@@ -848,6 +848,24 @@ public static class DiagnosticDescriptors
         helpLinkUri: BuildHelpUri("RMG099")
     );
 
+    public static readonly DiagnosticDescriptor MultipleOriginalValueParameters = new(
+        "RMG100",
+        "Multiple [MappingTargetOriginalValue] parameters",
+        "The mapping method {0} has multiple [MappingTargetOriginalValue] parameters, only one is allowed",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true
+    );
+
+    public static readonly DiagnosticDescriptor MappingOriginalValueNotSupportedForGeneratedMethod = new(
+        "RMG101",
+        "[MappingTargetOriginalValue] is not supported on generated mapping methods",
+        "The [MappingTargetOriginalValue] attribute cannot be used on a generated (partial) mapping method parameter in {0}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT

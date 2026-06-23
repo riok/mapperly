@@ -23,7 +23,7 @@ but higher than a by-name matched regular member mapping.
       public partial CarDto Map(Car source, string name);
       // highlight-end
     }
-    
+
     public class Car
     {
       public string Brand { get; set; } = string.Empty;
@@ -204,4 +204,57 @@ Mappings with additional parameters do have some limitations:
   see also [default mapping methods](./user-implemented-methods.mdx#default-mapping-methods).
 - Generic and runtime target type mappings do not support additional type parameters.
 - Derived type mappings do not support additional type parameters.
+  :::
+
+## Target original value parameter
+
+A user-implemented mapping method can receive the *current value* of the destination member
+being mapped to by marking one parameter with `[MappingTargetOriginalValue]`.
+This lets the method use the existing destination value e.g. as a fallback when the source has no value.
+
+<Tabs>
+  <TabItem value="destvalue-declaration" label="Declaration" default>
+    ```csharp
+    public class Optional<T>
+    {
+        public bool HasValue { get; }
+        public T? Value { get; }
+    }
+
+    [Mapper]
+    public partial class PersonMapper
+    {
+      public partial PersonDto MapToDto(Person source);
+
+      // highlight-start
+      private static int? FromOptional(
+          Optional<int?> source,
+          [MappingTargetOriginalValue] int? destination)
+          => source.HasValue ? source.Value : destination;
+      // highlight-end
+    }
+    ```
+
+  </TabItem>
+  <TabItem value="destvalue-generated" label="Generated code">
+    ```csharp
+    public partial PersonDto MapToDto(Person source)
+    {
+        var target = new PersonDto();
+        // ...
+        // highlight-start
+        target.Age = FromOptional(source.Age, target.Age);
+        // highlight-end
+        return target;
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+:::info
+`[MappingTargetOriginalValue]` has the following limitations:
+
+- Only one `[MappingTargetOriginalValue]` parameter is allowed per method.
+- Only supported on user-implemented (non-`partial`) mapping helper methods. It cannot be used on generated `partial` mapper method declarations.
+- When mapping to a new instance (no `[MappingTarget]`), the destination value is `default(T)` — the type's default — since there is no existing value to read.
   :::

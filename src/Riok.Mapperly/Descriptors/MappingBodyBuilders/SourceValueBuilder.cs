@@ -9,12 +9,15 @@ using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings.SourceValue;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols.Members;
 using static Riok.Mapperly.Emit.Syntax.SyntaxFactoryHelper;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders;
 
 internal static class SourceValueBuilder
 {
+    internal sealed record MappedSourceValue(ISourceValue SourceValue, MemberPathGetter? TargetValueGetter);
+
     /// <summary>
     /// Tries to build an <see cref="ISourceValue"/> instance which serializes as an expression,
     /// with a value that is assignable to the target member requested in the <paramref name="memberMappingInfo"/>.
@@ -23,26 +26,44 @@ internal static class SourceValueBuilder
         IMembersBuilderContext<IMapping> ctx,
         MemberMappingInfo memberMappingInfo,
         [NotNullWhen(true)] out ISourceValue? sourceValue
-    ) => TryBuildMappedSourceValue(ctx, memberMappingInfo, MemberMappingBuilder.CodeStyle.Expression, out sourceValue);
+    )
+    {
+        if (!TryBuildMappedSourceValue(ctx, memberMappingInfo, MemberMappingBuilder.CodeStyle.Expression, out var result))
+        {
+            sourceValue = null;
+            return false;
+        }
+        sourceValue = result.SourceValue;
+        return true;
+    }
 
     /// <summary>
-    /// Tries to build an <see cref="ISourceValue"/> instance,
-    /// with a value that is assignable to the target member requested in the <paramref name="memberMappingInfo"/>.
+    /// Tries to build a <see cref="MappedSourceValue"/> containing the source value assignable to the target member
+    /// requested in the <paramref name="memberMappingInfo"/>, and optionally a target member getter when the delegate
+    /// mapping requires the original target value (i.e. has a <c>[MappingTargetOriginalValue]</c> parameter).
     /// </summary>
     public static bool TryBuildMappedSourceValue(
         IMembersBuilderContext<IMapping> ctx,
         MemberMappingInfo memberMappingInfo,
         MemberMappingBuilder.CodeStyle codeStyle,
-        [NotNullWhen(true)] out ISourceValue? sourceValue
+        [NotNullWhen(true)] out MappedSourceValue? result
     )
     {
         if (memberMappingInfo.ValueConfiguration != null)
-            return TryBuildValue(ctx, memberMappingInfo, out sourceValue);
+        {
+            if (!TryBuildValue(ctx, memberMappingInfo, out var sourceValue))
+            {
+                result = null;
+                return false;
+            }
+            result = new MappedSourceValue(sourceValue, null);
+            return true;
+        }
 
         if (memberMappingInfo.SourceMember != null)
-            return MemberMappingBuilder.TryBuild(ctx, memberMappingInfo, codeStyle, out sourceValue);
+            return MemberMappingBuilder.TryBuild(ctx, memberMappingInfo, codeStyle, out result);
 
-        sourceValue = null;
+        result = null;
         return false;
     }
 

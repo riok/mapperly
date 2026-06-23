@@ -31,7 +31,8 @@ public readonly record struct TypeMappingBuildContext
         ExpressionSyntax? referenceHandler,
         UniqueNameBuilder nameBuilder,
         SyntaxFactoryHelper syntaxFactory,
-        IReadOnlyDictionary<string, ExpressionSyntax>? additionalParameters = null
+        IReadOnlyDictionary<string, ExpressionSyntax>? additionalParameters = null,
+        ExpressionSyntax? targetValueExpression = null
     )
     {
         Source = source;
@@ -39,6 +40,7 @@ public readonly record struct TypeMappingBuildContext
         NameBuilder = nameBuilder;
         SyntaxFactory = syntaxFactory;
         AdditionalParameters = additionalParameters;
+        TargetValueExpression = targetValueExpression;
     }
 
     public UniqueNameBuilder NameBuilder { get; }
@@ -51,8 +53,13 @@ public readonly record struct TypeMappingBuildContext
 
     public IReadOnlyDictionary<string, ExpressionSyntax>? AdditionalParameters { get; }
 
+    public ExpressionSyntax? TargetValueExpression { get; }
+
     public TypeMappingBuildContext AddIndentation() =>
-        new(Source, ReferenceHandler, NameBuilder, SyntaxFactory.AddIndentation(), AdditionalParameters);
+        new(Source, ReferenceHandler, NameBuilder, SyntaxFactory.AddIndentation(), AdditionalParameters, TargetValueExpression);
+
+    public TypeMappingBuildContext WithTargetValue(ExpressionSyntax targetValue) =>
+        new(Source, ReferenceHandler, NameBuilder, SyntaxFactory, AdditionalParameters, targetValue);
 
     /// <summary>
     /// Creates a new scoped name builder,
@@ -84,7 +91,8 @@ public readonly record struct TypeMappingBuildContext
             ReferenceHandler,
             scopedNameBuilder,
             SyntaxFactory,
-            AdditionalParameters
+            AdditionalParameters,
+            TargetValueExpression
         );
         return (ctx, scopedSourceName);
     }
@@ -96,32 +104,34 @@ public readonly record struct TypeMappingBuildContext
     }
 
     public TypeMappingBuildContext WithSource(ExpressionSyntax source) =>
-        new(source, ReferenceHandler, NameBuilder, SyntaxFactory, AdditionalParameters);
+        new(source, ReferenceHandler, NameBuilder, SyntaxFactory, AdditionalParameters, TargetValueExpression);
 
     public TypeMappingBuildContext WithRefHandler(string refHandler) => WithRefHandler(IdentifierName(refHandler));
 
     public TypeMappingBuildContext WithRefHandler(ExpressionSyntax refHandler) =>
-        new(Source, refHandler, NameBuilder, SyntaxFactory, AdditionalParameters);
+        new(Source, refHandler, NameBuilder, SyntaxFactory, AdditionalParameters, TargetValueExpression);
 
     /// <summary>
     /// Builds arguments for a user-implemented method call by matching each parameter
-    /// by ordinal to source, target, referenceHandler, or additional parameters.
+    /// by ordinal to source, target, referenceHandler, originalValue, or additional parameters.
     /// </summary>
     public MethodArgument?[] BuildArguments(
         IMethodSymbol? method,
         MethodParameter sourceParameter,
         MethodParameter? referenceHandlerParameter,
-        MethodArgument? targetArgument = null
+        MethodArgument? targetArgument = null,
+        MethodParameter? originalValueParameter = null
     )
     {
         if (method is null)
             return [sourceParameter.WithArgument(Source), targetArgument, referenceHandlerParameter?.WithArgument(ReferenceHandler)];
 
-        return Arguments(Source, ReferenceHandler, AdditionalParameters).ToArray();
+        return Arguments(Source, ReferenceHandler, TargetValueExpression, AdditionalParameters).ToArray();
 
         IEnumerable<MethodArgument?> Arguments(
             ExpressionSyntax? source,
             ExpressionSyntax? refHandler,
+            ExpressionSyntax? targetValue,
             IReadOnlyDictionary<string, ExpressionSyntax>? additionalParams
         )
         {
@@ -133,6 +143,10 @@ public readonly record struct TypeMappingBuildContext
                     yield return targetArgument.Value;
                 else if (referenceHandlerParameter is not null && param.Ordinal == referenceHandlerParameter.Value.Ordinal)
                     yield return referenceHandlerParameter.Value.WithArgument(refHandler);
+                else if (originalValueParameter is not null && param.Ordinal == originalValueParameter.Value.Ordinal)
+                    yield return originalValueParameter.Value.WithArgument(
+                        targetValue ?? DefaultExpression(SyntaxFactoryHelper.FullyQualifiedIdentifier(originalValueParameter.Value.Type))
+                    );
                 else if (additionalParams?.TryGetValue(MethodParameter.NormalizeName(param.Name), out var expr) == true)
                     yield return new MethodParameter(param, param.Type).WithArgument(expr);
             }
