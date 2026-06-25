@@ -116,7 +116,7 @@ public class UserImplementedInlinedExpressionMapping(
             // replace source parameter
             if (node.Identifier.Text.Equals(sourceParameter.Identifier.Text, StringComparison.Ordinal))
             {
-                return ctx.Source.WithTriviaFrom(node);
+                return ParenthesizeIfNeeded(ctx.Source).WithTriviaFrom(node);
             }
 
             // replace additional parameters with their corresponding expressions from the context
@@ -128,12 +128,17 @@ public class UserImplementedInlinedExpressionMapping(
                 foreach (var (key, value) in additionalParams)
                 {
                     if (string.Equals(key, node.Identifier.Text, StringComparison.Ordinal))
-                        return value.WithTriviaFrom(node);
+                        return ParenthesizeIfNeeded(value).WithTriviaFrom(node);
                 }
             }
 
             return base.VisitIdentifierName(node);
         }
+
+        // A cast that replaces a parameter must be parenthesized to keep the parameter's precedence wherever
+        // it was used: a bare `(T)x.Member` would otherwise bind as `(T)(x.Member)`.
+        private static ExpressionSyntax ParenthesizeIfNeeded(ExpressionSyntax replacement) =>
+            replacement is CastExpressionSyntax ? ParenthesizedExpression(replacement) : replacement;
 
         public override SyntaxNode? VisitInvocationExpression(InvocationExpressionSyntax node)
         {
