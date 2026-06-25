@@ -142,4 +142,15 @@ public class MapperAttribute : Attribute
     /// partial methods are discovered.
     /// </summary>
     public bool AutoUserMappings { get; set; } = true;
+
+    /// <summary>
+    /// Whether to prevent mapping methods of this mapper from being inlined
+    /// into expression trees for queryable projection mappings.
+    /// When <c>true</c>, methods from this mapper referenced via <see cref="UseStaticMapperAttribute"/>
+    /// will not be inlined or rebuilt in expression context.
+    /// This only applies to expression / queryable projection mappings;
+    /// regular (non-expression) mappings are unaffected.
+    /// Defaults to <c>false</c>.
+    /// </summary>
+    public bool NoExpressionInlining { get; set; }
 }
