@@ -8,16 +8,32 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 /// <summary>
 /// An object factory represents a method to instantiate objects of a certain type.
 /// </summary>
-public abstract class ObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol method)
+public abstract class ObjectFactory(SymbolAccessor symbolAccessor, IMethodSymbol method, bool mapToParameters = false)
 {
-    protected IMethodSymbol Method { get; } = method;
+    internal IMethodSymbol Method { get; } = method;
+
+    internal bool MapToParameters { get; } = mapToParameters;
 
     public ExpressionSyntax CreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source) =>
         HandleNull(BuildCreateType(sourceType, targetTypeToCreate, source), targetTypeToCreate);
 
+    public ExpressionSyntax CreateType(
+        ITypeSymbol sourceType,
+        ITypeSymbol targetTypeToCreate,
+        ExpressionSyntax source,
+        IEnumerable<ArgumentSyntax> arguments
+    ) => HandleNull(BuildCreateType(sourceType, targetTypeToCreate, source, arguments), targetTypeToCreate);
+
     public abstract bool CanCreateInstanceOfType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate);
 
     protected abstract ExpressionSyntax BuildCreateType(ITypeSymbol sourceType, ITypeSymbol targetTypeToCreate, ExpressionSyntax source);
+
+    protected virtual ExpressionSyntax BuildCreateType(
+        ITypeSymbol sourceType,
+        ITypeSymbol targetTypeToCreate,
+        ExpressionSyntax source,
+        IEnumerable<ArgumentSyntax> arguments
+    ) => BuildCreateType(sourceType, targetTypeToCreate, source);
 
     /// <summary>
     /// Wraps the <see cref="expression"/> in null handling.

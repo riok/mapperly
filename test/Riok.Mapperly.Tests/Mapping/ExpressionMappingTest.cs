@@ -33,6 +33,23 @@ public class ExpressionMappingTest
     }
 
     [Fact]
+    public Task ClassToClassIgnoresParameterMappedObjectFactory()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial System.Linq.Expressions.Expression<System.Func<A, B>> Map();
+
+            [ObjectFactory(MapToParameters = true)]
+            B CreateB(string missing) => new B();
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ClassToClassNested()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

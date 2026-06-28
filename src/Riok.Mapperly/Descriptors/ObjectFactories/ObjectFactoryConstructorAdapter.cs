@@ -10,9 +10,13 @@ namespace Riok.Mapperly.Descriptors.ObjectFactories;
 /// for a concrete type pair.
 /// </summary>
 public class ObjectFactoryConstructorAdapter(ObjectFactory objectFactory, ITypeSymbol sourceType, ITypeSymbol targetType)
-    : IInstanceConstructor
+    : IParameterMappingInstanceConstructor
 {
     public bool SupportsObjectInitializer => false;
+
+    public bool SupportsParameterMapping => objectFactory.MapToParameters;
+
+    public IMethodSymbol ParameterMappingMethod => objectFactory.Method;
 
     public ExpressionSyntax CreateInstance(
         TypeMappingBuildContext ctx,
@@ -20,6 +24,8 @@ public class ObjectFactoryConstructorAdapter(ObjectFactory objectFactory, ITypeS
         InitializerExpressionSyntax? initializer = null
     )
     {
-        return objectFactory.CreateType(sourceType, targetType, ctx.Source);
+        return objectFactory.MapToParameters
+            ? objectFactory.CreateType(sourceType, targetType, ctx.Source, args)
+            : objectFactory.CreateType(sourceType, targetType, ctx.Source);
     }
 }
