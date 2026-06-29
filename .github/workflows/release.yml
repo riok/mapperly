@@ -5,7 +5,8 @@ on:
     types:
       - published
 
-# required secrets: NUGET_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN
+# required secrets: NUGET_USER, CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN
+# nuget.org publishing uses trusted publishing (OIDC), see https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
   DOTNET_NOLOGO: true
@@ -20,6 +21,7 @@ jobs:
     environment: ${{ github.event.release.prerelease && 'next' || 'stable' }}
     permissions:
       contents: write
+      id-token: write # enable GitHub OIDC token issuance for nuget.org trusted publishing
     outputs:
       version: ${{ steps.extract-version.outputs.RELEASE_VERSION }}
     steps:
@@ -57,8 +59,13 @@ jobs:
           MAPPERLY_ENVIRONMENT: ${{ github.event.release.prerelease && 'next' || 'stable' }}
           RELEASE_NOTES: ${{ steps.release-notes-text.outputs.content }}
           RELEASE_VERSION: ${{ steps.extract-version.outputs.RELEASE_VERSION }}
+      - name: nuget login # exchange the OIDC token for a short-lived nuget.org API key
+        uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: ${{ secrets.NUGET_USER }}
       - name: publish nuget
-        run: dotnet nuget push './artifacts/*.nupkg' --source "$NUGET_SOURCE" --api-key '${{ secrets.NUGET_API_TOKEN }}'
+        run: dotnet nuget push './artifacts/*.nupkg' --source "$NUGET_SOURCE" --api-key '${{ steps.nuget-login.outputs.NUGET_API_KEY }}'
       - name: add release assets
         run: gh release upload "${{ github.event.release.name }}" artifacts/*.nupkg
         env:
