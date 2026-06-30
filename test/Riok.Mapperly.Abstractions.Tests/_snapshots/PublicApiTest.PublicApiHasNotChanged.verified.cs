@@ -242,6 +242,12 @@ namespace Riok.Mapperly.Abstractions
     }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
+    public sealed class MappingTargetOriginalValueAttribute : System.Attribute
+    {
+        public MappingTargetOriginalValueAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter)]
+    [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
     public sealed class MappingTargetAttribute : System.Attribute
     {
         public MappingTargetAttribute() { }
