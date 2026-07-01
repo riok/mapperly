@@ -21,9 +21,10 @@ public static class ObjectFactoryBuilder
 
     private static ObjectFactory? BuildObjectFactory(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol, bool isStatic)
     {
+        var config = ctx.AttributeAccessor.AccessSingle<ObjectFactoryAttribute>(methodSymbol);
         if (
             methodSymbol.IsAsync
-            || methodSymbol.Parameters.Length > 1
+            || (!config.MapToParameters && methodSymbol.Parameters.Length > 1)
             || methodSymbol.IsPartialDefinition
             || methodSymbol.MethodKind != MethodKind.Ordinary
             || methodSymbol.ReturnsVoid
@@ -32,6 +33,13 @@ public static class ObjectFactoryBuilder
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature, methodSymbol, methodSymbol.Name);
             return null;
+        }
+
+        if (config.MapToParameters)
+        {
+            return methodSymbol.IsGenericMethod
+                ? BuildGenericParameterObjectFactory(ctx, methodSymbol)
+                : new ParameterObjectFactory(ctx.SymbolAccessor, methodSymbol);
         }
 
         if (!methodSymbol.IsGenericMethod)
@@ -110,5 +118,59 @@ public static class ObjectFactoryBuilder
         }
 
         return new GenericSourceTargetObjectFactory(ctx.GenericTypeChecker, ctx.SymbolAccessor, methodSymbol, sourceParameterIndex);
+    }
+
+    private static ObjectFactory? BuildGenericParameterObjectFactory(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol)
+    {
+        switch (methodSymbol.TypeParameters.Length)
+        {
+            case 1:
+                return BuildGenericTargetParameterObjectFactory(ctx, methodSymbol);
+
+            case 2:
+                return BuildGenericSourceTargetParameterObjectFactory(ctx, methodSymbol);
+
+            default:
+                ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature, methodSymbol, methodSymbol.Name);
+                return null;
+        }
+    }
+
+    private static ObjectFactory? BuildGenericTargetParameterObjectFactory(SimpleMappingBuilderContext ctx, IMethodSymbol methodSymbol)
+    {
+        var typeParameter = methodSymbol.TypeParameters[0];
+        var returnTypeIsGeneric =
+            methodSymbol.ReturnType.TypeKind == TypeKind.TypeParameter
+            && string.Equals(methodSymbol.ReturnType.Name, typeParameter.Name, StringComparison.Ordinal);
+
+        if (!returnTypeIsGeneric)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature, methodSymbol, methodSymbol.Name);
+            return null;
+        }
+
+        return new GenericTargetParameterObjectFactory(ctx.GenericTypeChecker, ctx.SymbolAccessor, methodSymbol);
+    }
+
+    private static ObjectFactory? BuildGenericSourceTargetParameterObjectFactory(
+        SimpleMappingBuilderContext ctx,
+        IMethodSymbol methodSymbol
+    )
+    {
+        var typeParameterNames = methodSymbol.TypeParameters.Select(tp => tp.Name).ToList();
+        var targetTypeParameterIndex = typeParameterNames.IndexOf(methodSymbol.ReturnType.Name);
+        if (targetTypeParameterIndex == -1)
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature, methodSymbol, methodSymbol.Name);
+            return null;
+        }
+
+        var sourceTypeParameterIndex = (targetTypeParameterIndex + 1) % 2;
+        return new GenericSourceTargetParameterObjectFactory(
+            ctx.GenericTypeChecker,
+            ctx.SymbolAccessor,
+            methodSymbol,
+            sourceTypeParameterIndex
+        );
     }
 }

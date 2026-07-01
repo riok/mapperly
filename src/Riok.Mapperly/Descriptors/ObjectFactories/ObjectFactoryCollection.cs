@@ -13,11 +13,14 @@ public class ObjectFactoryCollection(IReadOnlyCollection<ObjectFactory> objectFa
         if (_concreteObjectFactories.TryGetValue(key, out objectFactory))
             return true;
 
-        objectFactory = objectFactories.FirstOrDefault(f => f.CanCreateInstanceOfType(sourceType, targetType));
+        objectFactory = FindObjectFactories(sourceType, targetType).FirstOrDefault(f => !f.MapToParameters);
         if (objectFactory == null)
             return false;
 
         _concreteObjectFactories[key] = objectFactory;
         return true;
     }
+
+    public IEnumerable<ObjectFactory> FindObjectFactories(ITypeSymbol sourceType, ITypeSymbol targetType) =>
+        objectFactories.Where(f => f.CanCreateInstanceOfType(sourceType, targetType));
 }

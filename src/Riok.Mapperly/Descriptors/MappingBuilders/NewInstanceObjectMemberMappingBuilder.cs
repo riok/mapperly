@@ -32,7 +32,9 @@ public static class NewInstanceObjectMemberMappingBuilder
         if (ctx.Source.IsEnum() || ctx.Target.IsEnum())
             return null;
 
-        if (!ctx.SymbolAccessor.HasAnyAccessibleConstructor(ctx.Target))
+        var hasParameterMappingObjectFactory =
+            !ctx.IsExpression && ctx.InstanceConstructors.HasParameterMappingObjectFactory(ctx.Source, ctx.Target);
+        if (!hasParameterMappingObjectFactory && !ctx.SymbolAccessor.HasAnyAccessibleConstructor(ctx.Target))
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.NoConstructorFound, ctx.Target);
             return new UnimplementedMapping(ctx.Source, ctx.Target);
@@ -43,9 +45,14 @@ public static class NewInstanceObjectMemberMappingBuilder
 
         // inline expressions don't support method property mappings
         // and can only map to properties via object initializers.
-        return ctx.IsExpression
-            ? new NewInstanceObjectMemberMapping(ctx.Source, ctx.Target.NonNullable())
-            : new NewInstanceObjectMemberMethodMapping(ctx.Source, ctx.Target.NonNullable(), ctx.Configuration.Mapper.UseReferenceHandling);
+        if (ctx.IsExpression)
+            return new NewInstanceObjectMemberMapping(ctx.Source, ctx.Target.NonNullable());
+
+        return new NewInstanceObjectMemberMethodMapping(
+            ctx.Source,
+            ctx.Target.NonNullable(),
+            ctx.Configuration.Mapper.UseReferenceHandling
+        );
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)

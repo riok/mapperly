@@ -29,13 +29,22 @@ public class InstanceConstructorFactory(
     {
         if (objectFactories.TryFindObjectFactory(source, target, out var factory))
         {
-            constructor = new ObjectFactoryConstructorAdapter(factory, source, target);
+            constructor = BuildForObjectFactory(factory, source, target);
             return true;
         }
 
         constructor = null;
         return false;
     }
+
+    public bool HasParameterMappingObjectFactory(ITypeSymbol source, ITypeSymbol target) =>
+        objectFactories.FindObjectFactories(source, target).Any(x => x.MapToParameters);
+
+    public IEnumerable<IInstanceConstructor> BuildForObjectFactories(ITypeSymbol source, ITypeSymbol target) =>
+        objectFactories.FindObjectFactories(source, target).Select(factory => BuildForObjectFactory(factory, source, target));
+
+    public IInstanceConstructor BuildForObjectFactory(ObjectFactory factory, ITypeSymbol source, ITypeSymbol target) =>
+        new ObjectFactoryConstructorAdapter(factory, source, target);
 
     /// <summary>
     /// Tries to build a parameterless constructor.

@@ -110,6 +110,186 @@ public class ObjectFactoryTest
     }
 
     [Fact]
+    public void ShouldUseObjectFactoryWithMappedParameters()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [ObjectFactory(MapToParameters = true)]
+            B CreateB(string stringValue, int intValue) => new B(stringValue, intValue);
+
+            partial B Map(A a);
+            """,
+            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
+            "class B { public B(string stringValue, int intValue) { StringValue = stringValue; IntValue = intValue; } public string StringValue { get; } public int IntValue { get; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = CreateB(a.StringValue, a.IntValue);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ShouldUseObjectFactoryWithMappedOptionalParameters()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [ObjectFactory(MapToParameters = true)]
+            B CreateB(string stringValue, int unmapped = 42, int intValue = 0) => new B(stringValue, unmapped, intValue);
+
+            partial B Map(A a);
+            """,
+            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
+            "class B { public B(string stringValue, int unmapped, int intValue) { StringValue = stringValue; Unmapped = unmapped; IntValue = intValue; } public string StringValue { get; } public int Unmapped { get; } public int IntValue { get; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = CreateB(a.StringValue, intValue: a.IntValue);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ShouldFallbackToNextObjectFactoryIfMappedParametersCannotBeMapped()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [ObjectFactory(MapToParameters = true)]
+            B CreateB(string missing) => new B();
+
+            [ObjectFactory]
+            B CreateB() => new B();
+
+            partial B Map(A a);
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = CreateB();
+                target.StringValue = a.StringValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ShouldFallbackToConstructorIfMappedFactoryParametersCannotBeMapped()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [ObjectFactory(MapToParameters = true)]
+            B CreateB(string missing) => new B();
+
+            partial B Map(A a);
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.StringValue = a.StringValue;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ShouldUseGenericTargetObjectFactoryWithMappedParameters()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [ObjectFactory(MapToParameters = true)]
+            T Create<T>(string stringValue, int intValue) where T : B => (T)(object)new B(stringValue, intValue);
+
+            partial B Map(A a);
+            """,
+            "class A { public string StringValue { get; set; } public int IntValue { get; set; } }",
+            "class B { public B(string stringValue, int intValue) { StringValue = stringValue; IntValue = intValue; } public string StringValue { get; } public int IntValue { get; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = Create<global::B>(a.StringValue, a.IntValue);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ShouldUseGenericSourceTargetObjectFactoryWithMappedParametersSourceFirst()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [ObjectFactory(MapToParameters = true)]
+            TTarget Create<TSource, TTarget>(string stringValue) where TTarget : B => (TTarget)(object)new B(stringValue);
+
+            partial B Map(A a);
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public B(string stringValue) { StringValue = stringValue; } public string StringValue { get; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = Create<global::A, global::B>(a.StringValue);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ShouldUseGenericSourceTargetObjectFactoryWithMappedParametersTargetFirst()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [ObjectFactory(MapToParameters = true)]
+            TTarget Create<TTarget, TSource>(string stringValue) where TTarget : B => (TTarget)(object)new B(stringValue);
+
+            partial B Map(A a);
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public B(string stringValue) { StringValue = stringValue; } public string StringValue { get; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = Create<global::B, global::A>(a.StringValue);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void ShouldUseGenericTargetObjectFactory()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
@@ -560,6 +740,25 @@ public class ObjectFactoryTest
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
             """
             [ObjectFactory] B CreateB<T>() => new B();
+            partial B Map(A a);
+            """,
+            "class A { public string StringValue { get; set; } }",
+            "class B { public string StringValue { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.InvalidObjectFactorySignature)
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void InvalidSignatureMapToParametersTypeParameterNotReturnType()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [ObjectFactory(MapToParameters = true)] B CreateB<T>(string stringValue) => new B();
             partial B Map(A a);
             """,
             "class A { public string StringValue { get; set; } }",
