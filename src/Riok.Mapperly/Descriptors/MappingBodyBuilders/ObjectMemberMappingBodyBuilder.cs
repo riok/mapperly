@@ -215,6 +215,14 @@ public static class ObjectMemberMappingBodyBuilder
         if (memberMappingInfo.SourceMember == null)
             return false;
 
+        // if the user explicitly referenced a mapping by name (Use = ...)
+        // which is not an existing target mapping,
+        // respect the configuration and do not build an implicit existing target mapping,
+        // which would silently ignore the referenced new instance mapping.
+        // Usually this leads to a mapping error, which is the expected behavior.
+        if (memberMappingInfo.Configuration?.Use is not null && !HasExistingTargetNamedMapping(ctx, memberMappingInfo))
+            return false;
+
         var sourceMemberPath = memberMappingInfo.SourceMember;
         var targetMemberPath = memberMappingInfo.TargetMember;
 
