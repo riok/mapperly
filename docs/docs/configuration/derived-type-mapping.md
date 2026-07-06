@@ -14,48 +14,48 @@ This can be configured with the `MapDerivedTypeAttribute`:
 
 <Tabs>
   <TabItem value="declaration" label="Declaration" default>
-  
-  ```csharp
-  [Mapper]
-  public static partial class ModelMapper
-  {
-      // highlight-start
-      [MapDerivedType<Banana, BananaDto>] // for c# language level ≥ 11
-      [MapDerivedType(typeof(Apple), typeof(AppleDto))] // for c# language level < 11
-      // highlight-end
-      public static partial FruitDto MapFruit(Fruit source);
-  }
-  
-  abstract class Fruit {}
-  class Banana : Fruit {}
-  class Apple : Fruit {}
-  
-  abstract class FruitDto {}
-  class BananaDto : FruitDto {}
-  class AppleDto : FruitDto {}
-  ```
-  
+
+```csharp
+[Mapper]
+public static partial class ModelMapper
+{
+    // highlight-start
+    [MapDerivedType<Banana, BananaDto>] // for c# language level ≥ 11
+    [MapDerivedType(typeof(Apple), typeof(AppleDto))] // for c# language level < 11
+    // highlight-end
+    public static partial FruitDto MapFruit(Fruit source);
+}
+
+abstract class Fruit {}
+class Banana : Fruit {}
+class Apple : Fruit {}
+
+abstract class FruitDto {}
+class BananaDto : FruitDto {}
+class AppleDto : FruitDto {}
+```
+
   </TabItem>
   <TabItem value="generated" label="Generated code" default>
-  
-  ```csharp
-  [Mapper]
-  public static partial class ModelMapper
-  {
-      public static partial FruitDto MapFruit(Fruit source)
-      {
-          return source switch
-          {
-              Banana x => MapToBananaDto(x),
-              Apple x => MapToAppleDto(x),
-              _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to FruitDto as there is no known derived type mapping", nameof(source)),
-          };
-      }
-  
-      // ... implementations of MapToBananaDto and MapToAppleDto
-  }
-  ```
-  
+
+```csharp
+[Mapper]
+public static partial class ModelMapper
+{
+    public static partial FruitDto MapFruit(Fruit source)
+    {
+        return source switch
+        {
+            Banana x => MapToBananaDto(x),
+            Apple x => MapToAppleDto(x),
+            _ => throw new System.ArgumentException($"Cannot map {source.GetType()} to FruitDto as there is no known derived type mapping", nameof(source)),
+        };
+    }
+
+    // ... implementations of MapToBananaDto and MapToAppleDto
+}
+```
+
   </TabItem>
 </Tabs>
 
