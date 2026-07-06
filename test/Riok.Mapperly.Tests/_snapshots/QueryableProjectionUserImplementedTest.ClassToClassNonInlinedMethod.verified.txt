@@ -9,14 +9,14 @@
 */
  : (11,4)-(11,84),
       Message: Cannot inline user implemented queryable expression mapping,
-      Severity: Info,
+      Severity: Warning,
       WarningLevel: 1,
       Descriptor: {
         Id: RMG068,
         Title: Cannot inline user implemented queryable expression mapping,
         MessageFormat: Cannot inline user implemented queryable expression mapping,
         Category: Mapper,
-        DefaultSeverity: Info,
+        DefaultSeverity: Warning,
         IsEnabledByDefault: true
       }
     }
