@@ -225,3 +225,9 @@ RMG096 | Mapper | Hidden | A MapperIgnore* attribute does not specify a justific
 RMG097 | Mapper | Error   | MapValue Use method parameters cannot be satisfied
 RMG098 | Mapper | Error   | Named mapping additional parameters cannot be satisfied
 RMG099 | Mapper | Error   | Duplicate additional parameter names differing only in casing
+
+### Changed Rules
+
+Rule ID | New Category | New Severity | Old Category | Old Severity | Notes
+--------|--------------|--------------|--------------|--------------|--------------------
+RMG068  | Mapper       | Warning      | Mapper       | Info         | Cannot inline user implemented queryable expression mapping

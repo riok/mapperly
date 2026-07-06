@@ -561,7 +561,7 @@ public static class DiagnosticDescriptors
         "Cannot inline user implemented queryable expression mapping",
         "Cannot inline user implemented queryable expression mapping",
         DiagnosticCategories.Mapper,
-        DiagnosticSeverity.Info,
+        DiagnosticSeverity.Warning,
         true
     );
 
