@@ -164,6 +164,48 @@ public class QueryableProjectionUseNamedMappingTest
     }
 
     [Fact]
+    public Task ShouldUseReferencedMappingWithSupertypeParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial System.Linq.IQueryable<Target> Map(System.Linq.IQueryable<Source> source);
+
+            [MapPropertyFromSource(nameof(Target.Result), Use = nameof(MapResult))]
+            private partial Target Map(Source source);
+
+            private int? MapResult(IBase source) => source.Value;
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "public interface IBase { int? Value { get; } }",
+            "public class Source : IBase { public int Id { get; set; } public int? Value { get; set; } }",
+            "public class Target { public int Id { get; set; } public int? Result { get; set; } }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task ShouldUseReferencedMappingWithExplicitlyImplementedSupertypeParameter()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial System.Linq.IQueryable<Target> Map(System.Linq.IQueryable<Source> source);
+
+            [MapPropertyFromSource(nameof(Target.Result), Use = nameof(MapResult))]
+            private partial Target Map(Source source);
+
+            private int? MapResult(IBase source) => source.Value;
+            """,
+            TestSourceBuilderOptions.WithDisabledAutoUserMappings,
+            "public interface IBase { int? Value { get; } }",
+            // Value is implemented explicitly, so it can only be read through the interface:
+            // the inlined upcast must stay parenthesized or the projection won't compile.
+            "public class Source : IBase { public int Id { get; set; } int? IBase.Value => Id; }",
+            "public class Target { public int Id { get; set; } public int? Result { get; set; } }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task TwoQueryableMappingsWithNamedUsedMappingsAndAmbiguousName()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
