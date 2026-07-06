@@ -5,6 +5,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Riok.Mapperly.IntegrationTests.Mapper;
 using Riok.Mapperly.IntegrationTests.Models;
+using Shouldly;
 using Xunit;
 
 namespace Riok.Mapperly.IntegrationTests
@@ -39,13 +40,13 @@ namespace Riok.Mapperly.IntegrationTests
             // The inserted upcast must resolve each member to its renamed backing column, proving the cast
             // is bound to the mapped property and not to a coincidentally matching name.
             var sql = query.ToQueryString();
-            Assert.Contains("raw_value", sql);
-            Assert.Contains("entity_name", sql);
+            sql.ShouldContain("raw_value");
+            sql.ShouldContain("entity_name");
 
-            var dto = Assert.Single(await query.ToListAsync());
-            Assert.Equal(1, dto.Id);
-            Assert.Equal(42, dto.MappedValue);
-            Assert.Equal("foo", dto.MappedName);
+            var dto = (await query.ToListAsync()).ShouldHaveSingleItem();
+            dto.Id.ShouldBe(1);
+            dto.MappedValue.ShouldBe(42);
+            dto.MappedName.ShouldBe("foo");
         }
 
         sealed class SupertypeProjectionDbContext : DbContext
