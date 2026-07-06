@@ -867,4 +867,82 @@ public class ObjectPropertyUseNamedMappingTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void NewInstanceMappingToSettableCollectionShouldUseReferencedMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Values), Use = nameof(MapValues))]
+            public partial B Map(A source);
+
+            private Dictionary<string, string> MapValues(C source) => source.Values;
+            """,
+            """
+            class A
+            {
+                public C Value { get; set; }
+            }
+            class C
+            {
+                public Dictionary<string, string> Values { get; set; }
+            }
+            """,
+            """
+            class B
+            {
+                public Dictionary<string, string> Values { get; set; }
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Values = MapValues(source.Value);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NewInstanceMappingToReadOnlyCollectionShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(A.Value), nameof(B.Values), Use = nameof(MapValues))]
+            public partial B Map(A source);
+
+            private Dictionary<string, string> MapValues(C source) => source.Values;
+            """,
+            """
+            class A
+            {
+                public C Value { get; set; }
+            }
+            class C
+            {
+                public Dictionary<string, string> Values { get; set; }
+            }
+            """,
+            """
+            class B
+            {
+                public Dictionary<string, string> Values { get; } = new();
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.CannotMapToReadOnlyMember, "Cannot map A.Value to read only member B.Values")
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                return target;
+                """
+            );
+    }
 }
