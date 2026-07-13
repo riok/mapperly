@@ -17,6 +17,7 @@ internal sealed class GenericUserImplementedNewInstanceMethodMapping(
     MethodParameter sourceParameter,
     ITypeSymbol genericTargetType,
     MethodParameter? referenceHandlerParameter,
+    MethodParameter? targetOriginalValueParameter,
     bool isExternal,
     UserImplementedMethodMapping.TargetNullability targetNullability
 ) : INewInstanceUserMapping
@@ -57,7 +58,13 @@ internal sealed class GenericUserImplementedNewInstanceMethodMapping(
         if (!result.Success)
             return null;
 
-        var typeArguments = method.TypeParameters.Select(tp => result.InferredTypes[tp]).ToList();
+        var typeArguments = method.TypeParameters.Select(tp => result.InferredTypes[tp]).ToArray();
+
+        var concreteTargetOriginalValueParameter = targetOriginalValueParameter;
+        if (concreteTargetOriginalValueParameter is { } p)
+        {
+            concreteTargetOriginalValueParameter = p with { Type = method.Construct(typeArguments).Parameters[p.Ordinal].Type };
+        }
 
         return new UserImplementedGenericMethodMapping(
             receiver,
@@ -68,6 +75,7 @@ internal sealed class GenericUserImplementedNewInstanceMethodMapping(
             concreteTargetType,
             typeArguments,
             referenceHandlerParameter,
+            concreteTargetOriginalValueParameter,
             isExternal,
             targetNullability
         );

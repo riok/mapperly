@@ -154,3 +154,48 @@ it will match the `MapOptional` method and invoke it as `MapOptional<User, UserD
 If a non-generic user-implemented mapping method exists for an exact type pair,
 it takes priority over a generic one.
 :::
+
+## Target original value parameter
+
+A user-implemented mapping method can receive the _current value_ of the destination member
+being mapped to by marking one parameter with `[MappingTargetOriginalValue]`.
+This lets the method use the existing destination value e.g. as a fallback when the source has no value.
+
+<Tabs>
+  <TabItem value="destvalue-declaration" label="Declaration" default>
+    ```csharp
+    public class Optional<T>
+    {
+        public bool HasValue { get; }
+        public T? Value { get; }
+    }
+
+    [Mapper]
+    public partial class PersonMapper
+    {
+      public partial PersonDto MapToDto(Person source);
+
+      // highlight-start
+      private static int? FromOptional(
+          Optional<int?> source,
+          [MappingTargetOriginalValue] int? original)
+          => source.HasValue ? source.Value : original;
+      // highlight-end
+    }
+    ```
+
+  </TabItem>
+  <TabItem value="destvalue-generated" label="Generated code">
+    ```csharp
+    public partial PersonDto MapToDto(Person source)
+    {
+        var target = new PersonDto();
+        // ...
+        // highlight-start
+        target.Age = FromOptional(source.Age, target.Age);
+        // highlight-end
+        return target;
+    }
+    ```
+  </TabItem>
+</Tabs>
