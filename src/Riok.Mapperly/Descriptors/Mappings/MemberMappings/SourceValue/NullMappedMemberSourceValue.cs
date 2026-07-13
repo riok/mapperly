@@ -32,7 +32,7 @@ public class NullMappedMemberSourceValue(
         // QueryableProjectionNullHandling.Ignore), emit a straight member access.
         if (_ignoreNullHandling)
         {
-            ctx = ctx.WithSource(_sourceGetter.BuildAccess(ctx.Source));
+            ctx = ctx.WithSource(_sourceGetter.BuildAccess(ctx.Source, addValuePropertyOnNullable: true));
             return _delegateMapping.Build(ctx);
         }
 
