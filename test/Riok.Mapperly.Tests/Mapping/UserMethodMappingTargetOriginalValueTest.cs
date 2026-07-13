@@ -129,6 +129,52 @@ public class UserMethodMappingTargetOriginalValueTest
     }
 
     [Fact]
+    public void TargetOriginalValueParameterOnRuntimeTargetGeneratedMethodShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial object Map(object src, [MappingTargetOriginalValue] System.Type targetType);
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.MappingOriginalValueNotSupportedForGeneratedMethod,
+                "The [MappingTargetOriginalValue] attribute cannot be used on a generated (partial) mapping method parameter in Map"
+            )
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void TargetOriginalValueParameterOnExistingTargetUserImplementedMethodShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UserMapping]
+            private static void MapValue(Optional source, [MappingTarget] OptionalDto target, [MappingTargetOriginalValue] OptionalDto original)
+            {
+            }
+
+            partial B Map(A src);
+            """,
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; set; } }",
+            "class Optional { public int Value { get; set; } }",
+            "class OptionalDto { public int Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, "MapValue has an unsupported mapping method signature")
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
     public void MultipleTargetOriginalValueParametersShouldError()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

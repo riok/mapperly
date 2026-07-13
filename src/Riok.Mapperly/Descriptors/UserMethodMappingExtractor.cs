@@ -182,6 +182,13 @@ public static class UserMethodMappingExtractor
         if (userMappingConfig.Ignore == true)
             return null;
 
+        if (method.ReturnsVoid && parameters.TargetOriginalValueParameter is not null)
+        {
+            var name = receiver == null ? method.Name : receiver + method.Name;
+            ctx.ReportDiagnostic(DiagnosticDescriptors.UnsupportedMappingMethodSignature, method, name);
+            return null;
+        }
+
         // Generic user-implemented methods are stored as templates
         // that are matched against concrete type pairs during mapping resolution.
         if (method.IsGenericMethod)
@@ -290,6 +297,12 @@ public static class UserMethodMappingExtractor
     {
         if (!methodSymbol.IsPartialDefinition)
             return null;
+
+        if (HasTargetOriginalValueParameter(ctx, methodSymbol))
+        {
+            ctx.ReportDiagnostic(DiagnosticDescriptors.MappingOriginalValueNotSupportedForGeneratedMethod, methodSymbol, methodSymbol.Name);
+            return null;
+        }
 
         if (methodSymbol.IsAsync)
         {
@@ -444,6 +457,9 @@ public static class UserMethodMappingExtractor
 
         return new UserDefinedExpressionMethodMapping(methodSymbol, sourceType, targetType, ctx.SymbolAccessor.UpgradeNullable(returnType));
     }
+
+    private static bool HasTargetOriginalValueParameter(SimpleMappingBuilderContext ctx, IMethodSymbol method) =>
+        method.Parameters.Any(p => ctx.SymbolAccessor.HasAttribute<MappingTargetOriginalValueAttribute>(p));
 
     private static NullFallbackValue? GetTypeSwitchNullArm(IMethodSymbol method, MappingMethodParameters parameters)
     {
