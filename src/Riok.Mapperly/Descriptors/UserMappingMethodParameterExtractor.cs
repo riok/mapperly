@@ -15,10 +15,16 @@ internal static class UserMappingMethodParameterExtractor
         [NotNullWhen(true)] out MappingMethodParameters? parameters
     )
     {
-        var refHandlerParameter = FindReferenceHandlerParameter(ctx, method);
-        var refHandlerParameterOrdinal = refHandlerParameter?.Ordinal ?? -1;
+        var matchedParameterOrdinals = new HashSet<int>();
 
-        var sourceParameter = FindSourceParameter(ctx, method, refHandlerParameter);
+        var refHandlerParameter = FindReferenceHandlerParameter(ctx, method);
+        matchedParameterOrdinals.Add(refHandlerParameter?.Ordinal ?? -1);
+
+        var targetOriginalValueParameter = FindTargetOriginalValueParameter(ctx, method, matchedParameterOrdinals);
+        matchedParameterOrdinals.Add(targetOriginalValueParameter?.Ordinal ?? -1);
+
+        var sourceParameter = FindSourceParameter(ctx, method, matchedParameterOrdinals);
+        matchedParameterOrdinals.Add(sourceParameter?.Ordinal ?? -1);
         if (!sourceParameter.HasValue)
         {
             parameters = null;
@@ -30,7 +36,8 @@ internal static class UserMappingMethodParameterExtractor
         MethodParameter? targetParameter = null;
         if (method.ReturnsVoid)
         {
-            targetParameter = FindTargetParameter(ctx, method, sourceParameter.Value, refHandlerParameter);
+            targetParameter = FindTargetParameter(ctx, method, matchedParameterOrdinals);
+            matchedParameterOrdinals.Add(targetParameter?.Ordinal ?? -1);
             if (!targetParameter.HasValue)
             {
                 parameters = null;
@@ -38,17 +45,13 @@ internal static class UserMappingMethodParameterExtractor
             }
         }
 
-        var targetParameterOrdinal = targetParameter?.Ordinal ?? -1;
-        var additionalParameterSymbols = method
-            .Parameters.Where(p =>
-                p.Ordinal != sourceParameter.Value.Ordinal && p.Ordinal != targetParameterOrdinal && p.Ordinal != refHandlerParameterOrdinal
-            )
-            .ToList();
+        var additionalParameterSymbols = method.Parameters.Where(p => !matchedParameterOrdinals.Contains(p.Ordinal)).ToList();
         // additional parameters should not be attributed as target or ref handler
         var hasInvalidAdditionalParameter = additionalParameterSymbols.Exists(p =>
             p.Type.TypeKind is TypeKind.TypeParameter or TypeKind.Error
             || ctx.SymbolAccessor.HasAttribute<ReferenceHandlerAttribute>(p)
             || ctx.SymbolAccessor.HasAttribute<MappingTargetAttribute>(p)
+            || ctx.SymbolAccessor.HasAttribute<MappingTargetOriginalValueAttribute>(p)
         );
         if (hasInvalidAdditionalParameter)
         {
@@ -70,7 +73,13 @@ internal static class UserMappingMethodParameterExtractor
         }
 
         var dedupedAdditionalParameters = parameterGroups.Select(g => g.First()).ToList();
-        parameters = new MappingMethodParameters(sourceParameter.Value, targetParameter, refHandlerParameter, dedupedAdditionalParameters);
+        parameters = new MappingMethodParameters(
+            sourceParameter.Value,
+            targetParameter,
+            refHandlerParameter,
+            targetOriginalValueParameter,
+            dedupedAdditionalParameters
+        );
         return true;
     }
 
@@ -91,13 +100,17 @@ internal static class UserMappingMethodParameterExtractor
         // and runtime target type mappings do not support additional parameters
         var expectedParameterCount = 2;
 
+        var matchedParameterOrdinals = new HashSet<int>();
+
         var refHandlerParameter = FindReferenceHandlerParameter(ctx, method);
+        matchedParameterOrdinals.Add(refHandlerParameter?.Ordinal ?? -1);
         if (refHandlerParameter.HasValue)
         {
             expectedParameterCount++;
         }
 
-        var sourceParameter = FindSourceParameter(ctx, method, refHandlerParameter);
+        var sourceParameter = FindSourceParameter(ctx, method, matchedParameterOrdinals);
+        matchedParameterOrdinals.Add(sourceParameter?.Ordinal ?? -1);
         if (!sourceParameter.HasValue)
         {
             parameters = null;
@@ -106,7 +119,7 @@ internal static class UserMappingMethodParameterExtractor
 
         // the target type param needs to exist
         // and needs to be of type System.Type
-        var targetTypeParameter = FindTargetParameter(ctx, method, sourceParameter.Value, refHandlerParameter);
+        var targetTypeParameter = FindTargetParameter(ctx, method, matchedParameterOrdinals);
         if (!targetTypeParameter.HasValue || !SymbolEqualityComparer.Default.Equals(targetTypeParameter.Value.Type, ctx.Types.Get<Type>()))
         {
             parameters = null;
@@ -126,16 +139,12 @@ internal static class UserMappingMethodParameterExtractor
     private static MethodParameter? FindSourceParameter(
         SimpleMappingBuilderContext ctx,
         IMethodSymbol method,
-        MethodParameter? refHandlerParameter
+        HashSet<int> existingMatchedParameterOrdinals
     )
     {
-        var refHandlerParameterOrdinal = refHandlerParameter?.Ordinal ?? -1;
-
-        // source parameter is the first parameter not annotated as reference handler or mapping target
+        // source parameter is the first not-yet-matched parameter not annotated as mapping target
         var sourceParameterSymbol = method.Parameters.FirstOrDefault(p =>
-            p.Ordinal != refHandlerParameterOrdinal
-            && !ctx.SymbolAccessor.HasAttribute<ReferenceHandlerAttribute>(p)
-            && !ctx.SymbolAccessor.HasAttribute<MappingTargetAttribute>(p)
+            !existingMatchedParameterOrdinals.Contains(p.Ordinal) && !ctx.SymbolAccessor.HasAttribute<MappingTargetAttribute>(p)
         );
         return ctx.SymbolAccessor.WrapOptionalMethodParameter(sourceParameterSymbol);
     }
@@ -143,23 +152,34 @@ internal static class UserMappingMethodParameterExtractor
     private static MethodParameter? FindTargetParameter(
         SimpleMappingBuilderContext ctx,
         IMethodSymbol method,
-        MethodParameter sourceParameter,
-        MethodParameter? refHandlerParameter
+        HashSet<int> existingMatchedParameterOrdinals
     )
     {
-        var refHandlerParameterOrdinal = refHandlerParameter?.Ordinal ?? -1;
-
         // The target parameter is the first parameter,
         // which is not the source parameter,
         // and is not annotated as reference handling parameter.
         // It may be annotated as mapping target
         // (for example, if it is the very first parameter, which is often the case in extension methods).
         var targetParameterSymbol = method.Parameters.FirstOrDefault(p =>
-            p.Ordinal != sourceParameter.Ordinal
-            && p.Ordinal != refHandlerParameterOrdinal
-            && !ctx.SymbolAccessor.HasAttribute<ReferenceHandlerAttribute>(p)
+            !existingMatchedParameterOrdinals.Contains(p.Ordinal) && !ctx.SymbolAccessor.HasAttribute<ReferenceHandlerAttribute>(p)
         );
         return ctx.SymbolAccessor.WrapOptionalMethodParameter(targetParameterSymbol);
+    }
+
+    private static MethodParameter? FindTargetOriginalValueParameter(
+        SimpleMappingBuilderContext ctx,
+        IMethodSymbol method,
+        HashSet<int> existingMatchedParameterOrdinals
+    )
+    {
+        var candidates = method
+            .Parameters.Where(p =>
+                !existingMatchedParameterOrdinals.Contains(p.Ordinal)
+                && ctx.SymbolAccessor.HasAttribute<MappingTargetOriginalValueAttribute>(p)
+            )
+            .ToList();
+
+        return candidates.FirstOrDefault() is { } parameter ? ctx.SymbolAccessor.WrapOptionalMethodParameter(parameter) : null;
     }
 
     private static MethodParameter? FindReferenceHandlerParameter(SimpleMappingBuilderContext ctx, IMethodSymbol method)
