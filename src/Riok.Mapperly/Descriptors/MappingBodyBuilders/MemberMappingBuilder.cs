@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -173,8 +174,12 @@ internal static class MemberMappingBuilder
         ITypeSymbol targetMemberType
     )
     {
+        var ignoreNullHandling =
+            ctx.BuilderContext.IsExpression
+            && ctx.BuilderContext.Configuration.Mapper.QueryableProjectionNullHandling == QueryableProjectionNullHandling.Ignore;
+
         var nullFallback = NullFallbackValue.Default;
-        if (!delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyReadNullable())
+        if (!ignoreNullHandling && !delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyReadNullable())
         {
             nullFallback = ctx.BuilderContext.GetNullFallbackValue(targetMemberType);
         }
@@ -184,7 +189,8 @@ internal static class MemberMappingBuilder
             sourcePath.BuildGetter(ctx.BuilderContext),
             targetMemberType,
             nullFallback,
-            !ctx.BuilderContext.IsExpression
+            !ctx.BuilderContext.IsExpression,
+            ignoreNullHandling
         );
     }
 
