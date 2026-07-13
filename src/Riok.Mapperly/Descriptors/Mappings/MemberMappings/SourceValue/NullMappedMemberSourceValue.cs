@@ -17,15 +17,25 @@ public class NullMappedMemberSourceValue(
     MemberPathGetter sourceGetter,
     ITypeSymbol targetType,
     NullFallbackValue nullFallback,
-    bool useNullConditionalAccess
+    bool useNullConditionalAccess,
+    bool ignoreNullHandling = false
 ) : ISourceValue
 {
     private readonly INewInstanceMapping _delegateMapping = delegateMapping;
     private readonly NullFallbackValue _nullFallback = nullFallback;
     private readonly MemberPathGetter _sourceGetter = sourceGetter;
+    private readonly bool _ignoreNullHandling = ignoreNullHandling;
 
     public ExpressionSyntax Build(TypeMappingBuildContext ctx)
     {
+        // if null handling should be ignored (e.g. queryable projections with
+        // QueryableProjectionNullHandling.Ignore), emit a straight member access.
+        if (_ignoreNullHandling)
+        {
+            ctx = ctx.WithSource(_sourceGetter.BuildAccess(ctx.Source));
+            return _delegateMapping.Build(ctx);
+        }
+
         // if the source is not nullable, return it directly.
         if (!_sourceGetter.MemberPath.IsAnyReadNullable())
         {
@@ -79,8 +89,9 @@ public class NullMappedMemberSourceValue(
         var other = (NullMappedMemberSourceValue)obj;
         return _delegateMapping.Equals(other._delegateMapping)
             && _nullFallback == other._nullFallback
-            && _sourceGetter.Equals(other._sourceGetter);
+            && _sourceGetter.Equals(other._sourceGetter)
+            && _ignoreNullHandling == other._ignoreNullHandling;
     }
 
-    public override int GetHashCode() => HashCode.Combine(_delegateMapping, _nullFallback, _sourceGetter);
+    public override int GetHashCode() => HashCode.Combine(_delegateMapping, _nullFallback, _sourceGetter, _ignoreNullHandling);
 }
