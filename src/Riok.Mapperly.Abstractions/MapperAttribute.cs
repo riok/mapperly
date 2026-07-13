@@ -142,4 +142,10 @@ public class MapperAttribute : Attribute
     /// partial methods are discovered.
     /// </summary>
     public bool AutoUserMappings { get; set; } = true;
+
+    /// <summary>
+    /// Controls how <c>null</c> values are handled in <see cref="System.Linq.IQueryable{T}"/> projection mappings.
+    /// Defaults to <see cref="QueryableProjectionNullHandling.NullSafe"/>.
+    /// </summary>
+    public QueryableProjectionNullHandling QueryableProjectionNullHandling { get; set; } = QueryableProjectionNullHandling.NullSafe;
 }
