@@ -27,6 +27,7 @@ public static class MapperConfigurationMerger
             PreferParameterlessConstructors = highPriority.PreferParameterlessConstructors ?? lowPriority.PreferParameterlessConstructors,
             AutoUserMappings = highPriority.AutoUserMappings ?? lowPriority.AutoUserMappings,
             EnumNamingStrategy = highPriority.EnumNamingStrategy ?? lowPriority.EnumNamingStrategy,
+            QueryableProjectionNullHandling = highPriority.QueryableProjectionNullHandling ?? lowPriority.QueryableProjectionNullHandling,
         };
     }
 
@@ -103,6 +104,11 @@ public static class MapperConfigurationMerger
 
         mapper.EnumNamingStrategy =
             mapperConfiguration.EnumNamingStrategy ?? defaultMapperConfiguration.EnumNamingStrategy ?? mapper.EnumNamingStrategy;
+
+        mapper.QueryableProjectionNullHandling =
+            mapperConfiguration.QueryableProjectionNullHandling
+            ?? defaultMapperConfiguration.QueryableProjectionNullHandling
+            ?? mapper.QueryableProjectionNullHandling;
 
         return mapper;
     }

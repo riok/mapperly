@@ -135,4 +135,7 @@ public record MapperConfiguration
     /// Can be overwritten on specific enums via mapping method configurations.
     /// </summary>
     public EnumNamingStrategy? EnumNamingStrategy { get; init; }
+
+    /// <inheritdoc cref="MapperAttribute.QueryableProjectionNullHandling"/>
+    public QueryableProjectionNullHandling? QueryableProjectionNullHandling { get; init; }
 }

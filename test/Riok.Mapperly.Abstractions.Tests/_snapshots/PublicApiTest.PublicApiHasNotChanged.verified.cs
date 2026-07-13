@@ -140,6 +140,7 @@ namespace Riok.Mapperly.Abstractions
         public Riok.Mapperly.Abstractions.MemberVisibility IncludedMembers { get; set; }
         public bool PreferParameterlessConstructors { get; set; }
         public Riok.Mapperly.Abstractions.PropertyNameMappingStrategy PropertyNameMappingStrategy { get; set; }
+        public Riok.Mapperly.Abstractions.QueryableProjectionNullHandling QueryableProjectionNullHandling { get; set; }
         public Riok.Mapperly.Abstractions.RequiredMappingStrategy RequiredEnumMappingStrategy { get; set; }
         public Riok.Mapperly.Abstractions.RequiredMappingStrategy RequiredMappingStrategy { get; set; }
         public Riok.Mapperly.Abstractions.StackCloningStrategy StackCloningStrategy { get; set; }
@@ -276,6 +277,11 @@ namespace Riok.Mapperly.Abstractions
         CaseInsensitive = 1,
         SnakeCase = 2,
         UpperSnakeCase = 3,
+    }
+    public enum QueryableProjectionNullHandling
+    {
+        NullSafe = 0,
+        Ignore = 1,
     }
     [System.Flags]
     public enum RequiredMappingStrategy
