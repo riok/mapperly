@@ -91,9 +91,7 @@ internal static class MemberMappingBuilder
         var memberSourceNullable = memberMappingInfo.IsSourceNullable;
         var delegateSourceNullable = delegateMapping.SourceType.IsNullable();
 
-        var ignoreProjectionNulls =
-            ctx.BuilderContext.IsExpression
-            && ctx.BuilderContext.Configuration.Mapper.QueryableProjectionNullHandling == QueryableProjectionNullHandling.Ignore;
+        var ignoreProjectionNulls = IsIgnoredProjectionNullHandling(ctx.BuilderContext);
 
         if (
             memberMappingInfo.Configuration?.SuppressNullMismatchDiagnostic != true
@@ -142,6 +140,9 @@ internal static class MemberMappingBuilder
         return true;
     }
 
+    private static bool IsIgnoredProjectionNullHandling(MappingBuilderContext ctx) =>
+        ctx.IsExpression && ctx.Configuration.Mapper.QueryableProjectionNullHandling == QueryableProjectionNullHandling.Ignore;
+
     private static bool ValidateLoopMapping(
         IMembersBuilderContext<IMapping> ctx,
         INewInstanceMapping delegateMapping,
@@ -179,9 +180,7 @@ internal static class MemberMappingBuilder
         ITypeSymbol targetMemberType
     )
     {
-        var ignoreNullHandling =
-            ctx.BuilderContext.IsExpression
-            && ctx.BuilderContext.Configuration.Mapper.QueryableProjectionNullHandling == QueryableProjectionNullHandling.Ignore;
+        var ignoreNullHandling = IsIgnoredProjectionNullHandling(ctx.BuilderContext);
 
         var nullFallback = NullFallbackValue.Default;
         if (!ignoreNullHandling && !delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyReadNullable())
