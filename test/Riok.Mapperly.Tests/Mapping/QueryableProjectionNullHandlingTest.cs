@@ -60,4 +60,55 @@ public class QueryableProjectionNullHandlingTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void IgnoreShouldNotReportNullableSourceDiagnostic()
+    {
+        // https://github.com/riok/mapperly/issues/1293
+        var source = TestSourceBuilder.Mapping(
+            "System.Linq.IQueryable<A>",
+            "System.Linq.IQueryable<B>",
+            TestSourceBuilderOptions.Default with
+            {
+                QueryableProjectionNullHandling = QueryableProjectionNullHandling.Ignore,
+            },
+            "class A { public string? Name { get; set; } }",
+            "class B { public string Name { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            source,
+                            x => new global::B()
+                            {
+                                Name = x.Name,
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
+    public Task IgnoreDisabledNullableContextShouldMatchEnabled()
+    {
+        // https://github.com/riok/mapperly/issues/1293 — output must not depend on the nullable context
+        var source = TestSourceBuilder.Mapping(
+            "System.Linq.IQueryable<A>",
+            "System.Linq.IQueryable<B>",
+            TestSourceBuilderOptions.Default with
+            {
+                QueryableProjectionNullHandling = QueryableProjectionNullHandling.Ignore,
+            },
+            "class A { public string? Name { get; set; } }",
+            "class B { public string Name { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source, TestHelperOptions.DisabledNullable);
+    }
 }

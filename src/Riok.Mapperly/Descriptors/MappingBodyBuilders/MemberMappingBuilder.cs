@@ -92,8 +92,13 @@ internal static class MemberMappingBuilder
         var memberSourceNullable = memberMappingInfo.IsSourceNullable;
         var delegateSourceNullable = delegateMapping.SourceType.IsNullable();
 
+        var ignoreProjectionNulls =
+            ctx.BuilderContext.IsExpression
+            && ctx.BuilderContext.Configuration.Mapper.QueryableProjectionNullHandling == QueryableProjectionNullHandling.Ignore;
+
         if (
             memberMappingInfo.Configuration?.SuppressNullMismatchDiagnostic != true
+            && !ignoreProjectionNulls
             && memberSourceNullable
             && !memberTargetAcceptsNull
             && !(delegateSourceNullable && !delegateTargetNullable)
