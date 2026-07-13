@@ -56,6 +56,59 @@ such mappings have several limitations:
 - Deep cloning is not applied
   :::
 
+## Null handling
+
+By default, Mapperly emits null-safe projections: nullable source members are guarded so mapping a
+`null` value does not throw. When a projection is translated to SQL by a relational provider (such as
+Entity Framework Core), these guards become `CASE WHEN` expressions that can prevent the database from
+using indexes. Mapping a nullable source member to a non-nullable target member additionally reports
+the `RMG089` diagnostic.
+
+If your projections are only ever executed by a relational provider (where the lambda is translated to
+a query and never run in memory), you can skip this null handling with
+`QueryableProjectionNullHandling.Ignore`:
+
+<Tabs>
+  <TabItem value="definition" label="Mapper definition">
+
+```csharp
+// highlight-start
+[Mapper(QueryableProjectionNullHandling = QueryableProjectionNullHandling.Ignore)]
+// highlight-end
+public static partial class CarMapper
+{
+    public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q);
+}
+```
+
+  </TabItem>
+  <TabItem value="generated" label="Generated projection">
+
+```csharp
+// with Ignore: source members are projected directly
+q.Select(x => new CarDto() { OwnerName = x.Owner.Name });
+
+// default (NullSafe): nullable members are guarded
+q.Select(x => new CarDto() { OwnerName = x.Owner != null ? x.Owner.Name : default });
+```
+
+  </TabItem>
+</Tabs>
+
+With `Ignore`, Mapperly projects source members directly, producing cleaner SQL and skipping the
+related nullability diagnostics. The generated projection is then identical regardless of the nullable
+reference type context.
+
+:::warning
+`QueryableProjectionNullHandling.Ignore` assumes source members are non-`null`. Using it with an
+in-memory `IQueryable` (e.g. LINQ to Objects) where a source value is actually `null` throws a
+`NullReferenceException`. Only use it with providers that translate the projection to a query, such as
+Entity Framework Core.
+:::
+
+The default is `QueryableProjectionNullHandling.NullSafe`, which keeps the null-safe behavior described
+above.
+
 ## Property configurations
 
 To configure property mappings add partial mapping method definitions with attributes as needed.
