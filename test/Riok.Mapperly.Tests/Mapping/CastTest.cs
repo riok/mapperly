@@ -544,4 +544,102 @@ public class CastTest
                 """
             );
     }
+
+    [Fact]
+    public void NullableMemberWithNullAcceptingOperatorShouldNotGuard()
+    {
+        // https://github.com/riok/mapperly/issues/2317
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.AllConversions,
+            "class A { public Code? PromoCode { get; set; } }",
+            "class B { public string? PromoCode { get; set; } }",
+            """
+            class Code
+            {
+                public string Value { get; set; } = string.Empty;
+                public static explicit operator string?(Code? c) => c?.Value;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.PromoCode = source.PromoCode == null ? default : (string)source.PromoCode;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableMemberWithNonNullOperatorShouldStillGuard()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.AllConversions,
+            "class A { public Code? PromoCode { get; set; } }",
+            "class B { public string? PromoCode { get; set; } }",
+            """
+            class Code
+            {
+                public string Value { get; set; } = string.Empty;
+                public static explicit operator string(Code c) => c.Value;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.PromoCode != null)
+                {
+                    target.PromoCode = (string)source.PromoCode;
+                }
+                else
+                {
+                    target.PromoCode = null;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableValueTypeMemberWithNullAcceptingOperatorShouldNotGuard()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.AllConversions,
+            "class A { public Code? PromoCode { get; set; } }",
+            "class B { public string? PromoCode { get; set; } }",
+            """
+            struct Code
+            {
+                public string Value { get; set; }
+                public static explicit operator string?(Code? c) => c?.Value;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.PromoCode = source.PromoCode == null ? default : (string)source.PromoCode.Value;
+                return target;
+                """
+            );
+    }
 }
