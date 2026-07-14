@@ -570,7 +570,7 @@ public class CastTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                target.PromoCode = source.PromoCode == null ? default : (string)source.PromoCode;
+                target.PromoCode = (string?)source.PromoCode;
                 return target;
                 """
             );
@@ -637,9 +637,28 @@ public class CastTest
             .HaveSingleMethodBody(
                 """
                 var target = new global::B();
-                target.PromoCode = source.PromoCode == null ? default : (string)source.PromoCode.Value;
+                target.PromoCode = (string?)source.PromoCode;
                 return target;
                 """
             );
+    }
+
+    [Fact]
+    public void NullableSourceWithNullAcceptingOperatorTopLevelShouldNotGuard()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "Code?",
+            "string?",
+            TestSourceBuilderOptions.AllConversions,
+            """
+            class Code
+            {
+                public string Value { get; set; } = string.Empty;
+                public static explicit operator string?(Code? c) => c?.Value;
+            }
+            """
+        );
+
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (string?)source;");
     }
 }
