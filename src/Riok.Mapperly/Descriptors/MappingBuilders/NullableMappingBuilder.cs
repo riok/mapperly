@@ -12,6 +12,14 @@ public static class NullableMappingBuilder
         if (!TryBuildNonNullableMappingKey(ctx, out var mappingKey))
             return null;
 
+        // Honor a null-accepting user-defined conversion operator: build the conversion against the
+        // nullable source so no null guard is wrapped around it (the operator accepts null directly).
+        if (ctx.Source.IsNullable() && ctx.HasNullAcceptingUserDefinedConversion(ctx.Source, ctx.Target))
+        {
+            if ((ImplicitCastMappingBuilder.TryBuildMapping(ctx) ?? ExplicitCastMappingBuilder.TryBuildMapping(ctx)) is { } castMapping)
+                return castMapping;
+        }
+
         var delegateMapping = ctx.BuildMapping(mappingKey, MappingBuildingOptions.KeepUserSymbol | MappingBuildingOptions.EmbeddedMapping);
         return delegateMapping == null ? null : BuildNullDelegateMapping(ctx, delegateMapping);
     }
