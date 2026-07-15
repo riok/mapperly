@@ -34,6 +34,24 @@ Note: To exclude a candidate conversion method (Parse, ToTarget instance methods
 
 This only works when the annotated method is in the same assembly as the mapper unless Mapperly attributes are preserved at runtime; see the ["Ignore a member at definition"](./mapper.mdx#ignore-a-member-at-definition) section in the mapper configuration docs.
 
+## Nullability of cast operators
+
+When mapping a nullable source through an implicit or explicit cast operator, Mapperly honors the operator's nullable reference type annotations. If the operator accepts a nullable parameter, it is considered able to handle `null` and no null check is generated:
+
+```csharp
+// operator accepts null: no null check
+public static explicit operator string?(Code? value) => value?.ToString();
+// generated: target.Code = (string?)source.Code;
+```
+
+If the operator's parameter is non-nullable, Mapperly keeps a null check so the operator is only invoked with a non-null value:
+
+```csharp
+// operator requires a non-null argument: null check is kept
+public static explicit operator string(Code value) => value.ToString();
+// generated: target.Code = source.Code != null ? (string)source.Code : default;
+```
+
 ## Disable all automatic conversions
 
 To disable all conversions supported by Mapperly set `EnabledConversions` to `None`:
