@@ -12,16 +12,25 @@ public static class NullableMappingBuilder
         if (!TryBuildNonNullableMappingKey(ctx, out var mappingKey))
             return null;
 
-        // Honor a null-accepting user-defined conversion operator: build the conversion against the
-        // nullable source so no null guard is wrapped around it (the operator accepts null directly).
-        if (ctx.Source.IsNullable() && ctx.HasNullAcceptingUserDefinedConversion(ctx.Source, ctx.Target))
+        var delegateMapping = ctx.BuildMapping(mappingKey, MappingBuildingOptions.KeepUserSymbol | MappingBuildingOptions.EmbeddedMapping);
+        if (delegateMapping == null)
+            return null;
+
+        // Honor a null-accepting user-defined conversion operator: when the selected conversion is a
+        // cast and the operator accepts null directly, rebuild it against the nullable source so no
+        // null guard is wrapped around it. Only applies when a cast is what the pipeline selected
+        // anyway, so higher-priority structural mappings (ctor/parse/enumerable/...) keep precedence.
+        if (
+            delegateMapping is CastMapping
+            && ctx.Source.IsNullable()
+            && ctx.HasNullAcceptingUserDefinedConversion(ctx.Source, ctx.Target)
+            && (ImplicitCastMappingBuilder.TryBuildMapping(ctx) ?? ExplicitCastMappingBuilder.TryBuildMapping(ctx)) is { } castMapping
+        )
         {
-            if ((ImplicitCastMappingBuilder.TryBuildMapping(ctx) ?? ExplicitCastMappingBuilder.TryBuildMapping(ctx)) is { } castMapping)
-                return castMapping;
+            return castMapping;
         }
 
-        var delegateMapping = ctx.BuildMapping(mappingKey, MappingBuildingOptions.KeepUserSymbol | MappingBuildingOptions.EmbeddedMapping);
-        return delegateMapping == null ? null : BuildNullDelegateMapping(ctx, delegateMapping);
+        return BuildNullDelegateMapping(ctx, delegateMapping);
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
