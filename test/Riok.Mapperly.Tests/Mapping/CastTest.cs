@@ -661,4 +661,164 @@ public class CastTest
 
         TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (string?)source;");
     }
+
+    [Fact]
+    public void NullableSourceWithHigherPriorityMappingAndNullAcceptingOperatorShouldNotUseCast()
+    {
+        // A null-accepting conversion operator must not override a higher-priority conversion (Parse)
+        // for a nullable source. https://github.com/riok/mapperly/issues/2317
+        var source = TestSourceBuilder.Mapping(
+            "string?",
+            "Target",
+            TestSourceBuilderOptions.AllConversions,
+            """
+            class Target
+            {
+                public static Target Parse(string s) => new();
+                public static explicit operator Target(string? s) => new();
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                "return source == null ? throw new global::System.ArgumentNullException(nameof(source)) : global::Target.Parse(source);"
+            );
+    }
+
+    [Fact]
+    public Task NullableNestedMemberWithNullAcceptingOperatorShouldNotGuard()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("Nested.Code", "Code")]
+            partial B Map(A source);
+            """,
+            TestSourceBuilderOptions.AllConversions,
+            "class A { public Nested? Nested { get; set; } }",
+            "class B { public string? Code { get; set; } }",
+            "class Nested { public Code? Code { get; set; } }",
+            """
+            class Code
+            {
+                public string Value { get; set; } = string.Empty;
+                public static explicit operator string?(Code? c) => c?.Value;
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void NullableMemberWithNullAcceptingImplicitOperatorShouldNotGuard()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.AllConversions,
+            "class A { public Code? PromoCode { get; set; } }",
+            "class B { public string? PromoCode { get; set; } }",
+            """
+            class Code
+            {
+                public string Value { get; set; } = string.Empty;
+                public static implicit operator string?(Code? c) => c?.Value;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.PromoCode = (string?)source.PromoCode;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableMemberToNonNullableTargetWithNullAcceptingOperator()
+    {
+        // https://github.com/riok/mapperly/issues/2317
+        // Documents current behavior for a nullable member mapped to a non-nullable target member
+        // through a null-accepting operator: RMG090 (nullable source type to non-nullable target type)
+        // still fires, but RMG089 (nullable source *value* to non-nullable target *value*) is suppressed,
+        // because the delegate mapping selected for this member is itself built against a nullable
+        // source with a non-nullable target (the rebuilt, guard-free cast), which matches the
+        // pre-existing "delegate already handles null" exemption in MemberMappingBuilder. This is
+        // pinned as-is; changing RMG089's suppression behavior is out of scope here.
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.AllConversions,
+            "class A { public Code? PromoCode { get; set; } }",
+            "class B { public string PromoCode { get; set; } }",
+            """
+            class Code
+            {
+                public string Value { get; set; } = string.Empty;
+                public static explicit operator string?(Code? c) => c?.Value;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type Code? to target of type string which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.PromoCode = (string)source.PromoCode;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableValueTypeMemberWithNonNullOperatorShouldStillGuard()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.AllConversions,
+            "class A { public Code? PromoCode { get; set; } }",
+            "class B { public string? PromoCode { get; set; } }",
+            """
+            struct Code
+            {
+                public string Value { get; set; }
+                public static explicit operator string(Code c) => c.Value;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.PromoCode != null)
+                {
+                    target.PromoCode = (string)source.PromoCode.Value;
+                }
+                else
+                {
+                    target.PromoCode = null;
+                }
+                return target;
+                """
+            );
+    }
 }
