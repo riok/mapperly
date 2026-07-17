@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Constructors;
 using Riok.Mapperly.Descriptors.Enumerables;
@@ -217,8 +218,26 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         if (key.Configuration.UseNamedMapping != null)
             return BuildMapping(key, options, diagnosticLocation);
 
+        // Honor a user-defined conversion operator that accepts a nullable parameter:
+        // build against the nullable source so no null guard is emitted (the delegate's
+        // SourceType stays nullable and the existing null-handling logic skips the guard).
+        if (key.Source.IsNullable() && HasNullAcceptingUserDefinedConversion(key.Source, key.Target))
+        {
+            if (BuildMapping(key, options, diagnosticLocation) is { } nullAcceptingMapping)
+                return nullAcceptingMapping;
+        }
+
         return FindOrBuildMapping(key.NonNullable(), options, diagnosticLocation);
     }
+
+    /// <summary>
+    /// Whether a user-defined conversion operator exists from <paramref name="source"/> to
+    /// <paramref name="target"/> whose parameter is nullable-annotated (accepts <c>null</c>).
+    /// Such a conversion does not need a null guard for a nullable source.
+    /// </summary>
+    public bool HasNullAcceptingUserDefinedConversion(ITypeSymbol source, ITypeSymbol target) =>
+        Compilation.ClassifyConversion(source, target)
+            is { IsUserDefined: true, MethodSymbol.Parameters: [{ Type.NullableAnnotation: NullableAnnotation.Annotated }] };
 
     /// <summary>
     /// Builds a new mapping for the provided types and config with the given options.
