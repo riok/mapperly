@@ -207,7 +207,7 @@ var dtos = await dbContext.Cars
         // highlight-end
     })
     // highlight-start
-    .AsEnumerable() // ← everything before runs in SQL, everything after is client-side
+    .AsAsyncEnumerable() // ← everything before runs in SQL, everything after is client-side
     // highlight-end
     .Select(x => new CarDto
     {
