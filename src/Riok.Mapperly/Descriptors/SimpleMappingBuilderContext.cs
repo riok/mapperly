@@ -77,6 +77,8 @@ public class SimpleMappingBuilderContext(
 
     public SemanticModel? GetSemanticModel(SyntaxTree syntaxTree) => _compilationContext.GetSemanticModel(syntaxTree);
 
+    public MapperAttribute BuildMapperConfiguration(ISymbol mapperSymbol) => _configurationReader.BuildMapperConfiguration(mapperSymbol);
+
     public virtual bool IsConversionEnabled(MappingConversionType conversionType) =>
         Configuration.Mapper.EnabledConversions.HasFlag(conversionType);
 

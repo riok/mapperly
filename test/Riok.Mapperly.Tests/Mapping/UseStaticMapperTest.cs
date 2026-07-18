@@ -1099,6 +1099,98 @@ public class UseStaticMapperTest
     }
 
     [Fact]
+    public void ProjectionWithUsedMapperDefaultsNoExpressionInliningShouldNotInline()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            [assembly: MapperDefaults(NoExpressionInlining = true)]
+
+            namespace Source
+            {
+                public enum Status : sbyte
+                {
+                    Planned = 0,
+                    Generated = 1,
+                    Paused = 2,
+                    Running = 3,
+                }
+            }
+
+            namespace Target
+            {
+                public enum Status : byte
+                {
+                    Planned = 0,
+                    Generated = 1,
+                    Paused = 2,
+                    Running = 3,
+                }
+            }
+
+            public class Entity
+            {
+                public int Id { get; set; }
+                public Source.Status Status { get; set; }
+            }
+
+            public class Domain
+            {
+                public int Id { get; set; }
+                public Target.Status Status { get; set; }
+            }
+
+            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
+            public static partial class EnumMappingExtensions
+            {
+                public static partial Target.Status MapToStatus(this Source.Status source);
+            }
+
+            [Mapper(NoExpressionInlining = false)]
+            [UseStaticMapper(typeof(EnumMappingExtensions))]
+            public static partial class Mapper
+            {
+                public static partial IQueryable<Domain> ProjectToDomain(this IQueryable<Entity> queryable);
+
+                public static partial Domain MapToDomain(this Entity entity);
+            }
+            """
+        );
+
+        var generated = TestHelper.GenerateMapper(source, TestHelperOptions.AllowDiagnostics);
+
+        generated.Diagnostics.ShouldNotContain(x => x.Descriptor.Id == DiagnosticDescriptors.QueryableProjectionMappingCannotInline.Id);
+        generated
+            .Should()
+            .HaveMethodBody(
+                "MapToDomain",
+                """
+                var target = new global::Domain();
+                target.Id = entity.Id;
+                target.Status = global::EnumMappingExtensions.MapToStatus(entity.Status);
+                return target;
+                """
+            )
+            .HaveMethodBody(
+                "ProjectToDomain",
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            queryable,
+                            x => new global::Domain()
+                            {
+                                Id = x.Id,
+                                Status = global::EnumMappingExtensions.MapToStatus(x.Status),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
     public void ProjectionWithCalledMethodNoExpressionInliningShouldNotInline()
     {
         var source = TestSourceBuilder.CSharp(

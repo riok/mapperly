@@ -523,9 +523,8 @@ public static class UserMethodMappingExtractor
             return ctx.Configuration.Mapper.NoExpressionInlining;
 
         // the configuration of external mappers is not merged into ctx.Configuration,
-        // read the MapperAttribute of the containing type instead
-        var mapperAttribute = ctx.AttributeAccessor.AccessFirstOrDefault<MapperAttribute>(method.ContainingType);
-        return mapperAttribute?.NoExpressionInlining == true;
+        // build it from the MapperAttribute of the containing type and the default configuration
+        return ctx.BuildMapperConfiguration(method.ContainingType).NoExpressionInlining;
     }
 
     private static IEnumerable<T> ExtractNamedUserImplementedMappings<T>(
