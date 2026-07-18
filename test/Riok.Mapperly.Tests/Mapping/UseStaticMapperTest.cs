@@ -429,20 +429,22 @@ public class UseStaticMapperTest
     {
         var result = ExecuteStaticGenericMapperStaticMethodFromAnotherAssemblyCompilation(asCompilationReference: true);
 
-        result.HaveMethodBody(
-            "ProjectToTarget",
-            """
-            #nullable disable
-                    return global::System.Linq.Queryable.Select(
-                        source,
-                        x => new global::Mapper.Target()
-                        {
-                            DateTime = new global::System.DateTimeOffset(x.DateTime, global::System.TimeSpan.Zero),
-                        }
-                    );
-            #nullable enable
-            """
-        );
+        result
+            .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline)
+            .HaveMethodBody(
+                "ProjectToTarget",
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            source,
+                            x => new global::Mapper.Target()
+                            {
+                                DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
+                            }
+                        );
+                #nullable enable
+                """
+            );
     }
 
     /// <summary>

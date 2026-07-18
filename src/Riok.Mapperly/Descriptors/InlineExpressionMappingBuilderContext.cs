@@ -204,6 +204,14 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
             // check if NoInline is requested
             IUserMapping { NoExpressionInlining: true } => mapping,
 
+            // methods declared in another assembly are never inlined:
+            // whether their syntax is accessible depends on the compilation stage
+            // (available for compilation references, unavailable for compiled assembly references),
+            // treat them always as non-inlinable to generate deterministic code
+            IUserMapping externalAssemblyMapping
+                when !SymbolEqualityComparer.Default.Equals(externalAssemblyMapping.Method.ContainingAssembly, Compilation.Assembly) =>
+                ReportCannotInline(mapping, externalAssemblyMapping.Method),
+
             // inline existing mapping
             UserImplementedMethodMapping implementedMapping => InlineOrRebuild(implementedMapping) ?? implementedMapping,
 
@@ -217,6 +225,12 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
 
             _ => mapping,
         };
+    }
+
+    private INewInstanceMapping ReportCannotInline(INewInstanceMapping mapping, IMethodSymbol method)
+    {
+        ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, method);
+        return mapping;
     }
 
     private INewInstanceMapping? InlineOrRebuild(UserImplementedMethodMapping mapping)
