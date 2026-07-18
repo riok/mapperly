@@ -19,7 +19,10 @@ public class NullDelegateExistingTargetMapping(
 {
     private const string NullableValueProperty = nameof(Nullable<>.Value);
 
-    public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
+    public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target) =>
+        Build(ctx, target, ctx.Source);
+
+    public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target, ExpressionSyntax sourceNullCheckAccess)
     {
         // if the source or target type is nullable, add a null guard.
         if (!SourceType.IsNullable() && !TargetType.IsNullable())
@@ -32,7 +35,7 @@ public class NullDelegateExistingTargetMapping(
             return [];
 
         // if (source != null && target != null) { body }
-        var condition = IfNoneNull((SourceType, ctx.Source), (TargetType, target));
+        var condition = IfNoneNull((SourceType, sourceNullCheckAccess), (TargetType, target));
         var ifStatement = ctx.SyntaxFactory.If(condition, body);
         return [ifStatement];
     }

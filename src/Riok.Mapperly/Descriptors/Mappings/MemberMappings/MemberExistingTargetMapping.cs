@@ -27,6 +27,13 @@ public class MemberExistingTargetMapping(
     {
         var source = sourcePath.BuildAccess(ctx.Source);
         var target = targetPath.BuildAccess(targetAccess);
-        return delegateMapping.Build(ctx.WithSource(source), target);
+        var mappingCtx = ctx.WithSource(source);
+        if (delegateMapping is NullDelegateExistingTargetMapping nullDelegateMapping)
+        {
+            var nullConditionalSource = sourcePath.BuildAccess(ctx.Source, nullConditional: true);
+            return nullDelegateMapping.Build(mappingCtx, target, nullConditionalSource);
+        }
+
+        return delegateMapping.Build(mappingCtx, target);
     }
 }

@@ -1,4 +1,5 @@
 using Riok.Mapperly.Abstractions;
+using Riok.Mapperly.Diagnostics;
 
 namespace Riok.Mapperly.Tests.Mapping;
 
@@ -64,6 +65,76 @@ public class EnumerableExistingTargetTest
                         target.Values.Add(item);
                     }
                 }
+                """
+            );
+    }
+
+    [Fact]
+    public void NestedEnumerableToExistingReadOnlyCollectionInDisabledNullableContext()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(new[] { nameof(Source.Nested), nameof(Nested.Items) }, nameof(Target.Items))] partial Target Map(Source source);",
+            "class Source { public Nested Nested { get; set; } }",
+            "class Nested { public IEnumerable<int> Items { get; set; } }",
+            "class Target { public readonly List<int> Items = []; }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.DisabledNullable)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return default;
+                var target = new global::Target();
+                if (source.Nested?.Items != null && target.Items != null)
+                {
+                    if (global::System.Linq.Enumerable.TryGetNonEnumeratedCount(source.Nested.Items, out var sourceCount))
+                    {
+                        target.Items.EnsureCapacity(sourceCount + target.Items.Count);
+                    }
+                    foreach (var item in source.Nested.Items)
+                    {
+                        target.Items.Add(item);
+                    }
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NestedEnumerableToExistingReadOnlyCollectionWithNullableIntermediateMember()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(new[] { nameof(Source.Nested), nameof(Nested.Items) }, nameof(Target.Items))] partial Target Map(Source source);",
+            "class Source { public Nested? Nested { get; set; } }",
+            "class Nested { public IEnumerable<int> Items { get; set; } = []; }",
+            "class Target { public readonly List<int> Items = []; }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type System.Collections.Generic.IEnumerable<int>? to target of type System.Collections.Generic.List<int> which is not nullable"
+            )
+            .HaveSingleMethodBody(
+                """
+                var target = new global::Target();
+                if (source.Nested?.Items != null)
+                {
+                    if (global::System.Linq.Enumerable.TryGetNonEnumeratedCount(source.Nested.Items, out var sourceCount))
+                    {
+                        target.Items.EnsureCapacity(sourceCount + target.Items.Count);
+                    }
+                    foreach (var item in source.Nested.Items)
+                    {
+                        target.Items.Add(item);
+                    }
+                }
+                return target;
                 """
             );
     }
