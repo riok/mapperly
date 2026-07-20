@@ -34,6 +34,6 @@ jobs:
       - uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
       - run: dotnet build
       - uses: github/codeql-action/analyze@v4
