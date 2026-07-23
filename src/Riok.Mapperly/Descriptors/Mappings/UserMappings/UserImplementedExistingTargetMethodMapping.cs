@@ -20,7 +20,8 @@ public class UserImplementedExistingTargetMethodMapping(
     ITypeSymbol sourceType,
     ITypeSymbol targetType,
     MethodParameter? referenceHandlerParameter,
-    bool isExternal
+    bool isExternal,
+    bool noExpressionInlining
 ) : ExistingTargetMapping(sourceType, targetType), IExistingTargetUserMapping, IParameterizedMapping
 {
     public IMethodSymbol Method { get; } = method;
@@ -28,6 +29,8 @@ public class UserImplementedExistingTargetMethodMapping(
     public bool? Default { get; } = isDefault;
 
     public bool IsExternal { get; } = isExternal;
+
+    public bool NoExpressionInlining { get; } = noExpressionInlining;
 
     public IReadOnlyCollection<MethodParameter> AdditionalSourceParameters { get; } =
         method
