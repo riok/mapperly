@@ -54,10 +54,10 @@ jobs:
     steps:
       - run: echo "building ${{ inputs.version }} for ${{ inputs.environment }}"
       - uses: actions/checkout@v7
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
       - run: dotnet tool restore
       - run: dotnet build
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version-file: './docs/.node-version'
       - run: npm ci
