@@ -11,8 +11,13 @@ If no parameterless constructor is available, Mapperly will try to map to the co
 Alternatively custom object factories can be used to construct or resolve target objects.
 To make use of object factories create an object factory method inside the mapper class
 and set the `Riok.Mapperly.Abstractions.ObjectFactoryAttribute` attribute.
-An object factory method needs to return a non-void type. It may have a single parameter which is the source object.
+An object factory method needs to return a non-void type.
+By default, it may have a single parameter which is the source object.
 The first object factory with a matching signature is used to construct the desired type by Mapperly.
+
+To map source members to factory method parameters, enable `MapToParameters`.
+This uses the same parameter matching rules as constructor mappings.
+Generic factory methods with a generic target return type are supported.
 
 :::info
 If an object factory is used for a certain type,
@@ -30,6 +35,34 @@ public partial class CarMapper
     // highlight-end
 
     public partial CarDto CarToCarDto(Car car);
+}
+```
+
+```csharp title="Map source members to factory parameters"
+[Mapper]
+public partial class CarMapper
+{
+    // highlight-start
+    [ObjectFactory(MapToParameters = true)]
+    private CarDto CreateCarDto(string make, string model)
+        => CarDto.Create(make, model);
+    // highlight-end
+
+    public partial CarDto CarToCarDto(Car car);
+}
+```
+
+```csharp title="Generated code"
+public partial class CarMapper
+{
+    public partial CarDto CarToCarDto(Car car)
+    {
+        // highlight-start
+        var target = CreateCarDto(car.Make, car.Model);
+        // highlight-end
+        // map all other properties...
+        return target;
+    }
 }
 ```
 
@@ -81,6 +114,11 @@ Mapperly supports several object factory method signatures.
 ```csharp title="Supported object factory method signatures"
 TargetType CreateTargetType();
 TargetType CreateTargetType(SourceType source);
+// with MapToParameters = true
+TargetType CreateTargetType(SourceMemberType sourceMember, ...);
+T CreateTargetType<T>(SourceMemberType sourceMember, ...);
+TTarget CreateTargetType<TSource, TTarget>(SourceMemberType sourceMember, ...);
+TTarget CreateTargetType<TTarget, TSource>(SourceMemberType sourceMember, ...);
 TargetType CreateTargetType<S>(S source);
 T CreateTargetType<T>();
 T CreateTargetType<T>(SourceType source);

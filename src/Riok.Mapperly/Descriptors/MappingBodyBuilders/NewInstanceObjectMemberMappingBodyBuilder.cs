@@ -38,7 +38,28 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
     )
     {
         if (ctx.Mapping.HasConstructor)
-            return [];
+        {
+            return TryBuildConstructorMapping(ctx, ctx.Mapping.Constructor, out var parameterMappings) ? parameterMappings : [];
+        }
+
+        foreach (
+            var objectFactoryConstructor in ctx.BuilderContext.InstanceConstructors.BuildForObjectFactories(
+                ctx.Mapping.SourceType,
+                ctx.Mapping.TargetType
+            )
+        )
+        {
+            if (ShouldSkipObjectFactoryConstructor(ctx, objectFactoryConstructor))
+                continue;
+
+            if (!TryBuildConstructorMapping(ctx, objectFactoryConstructor, out var factoryParameterMappings))
+            {
+                continue;
+            }
+
+            ctx.Mapping.Constructor = objectFactoryConstructor;
+            return factoryParameterMappings;
+        }
 
         if (ctx.Mapping.TargetType is not INamedTypeSymbol namedTargetType)
         {
@@ -93,6 +114,38 @@ public static class NewInstanceObjectMemberMappingBodyBuilder
         ctx.BuilderContext.ReportDiagnostic(DiagnosticDescriptors.NoConstructorFound, ctx.BuilderContext.Target);
         ctx.Mapping.Constructor = new InstanceConstructor(namedTargetType);
         return [];
+    }
+
+    private static bool ShouldSkipObjectFactoryConstructor(
+        INewInstanceBuilderContext<INewInstanceObjectMemberMapping> ctx,
+        IInstanceConstructor constructor
+    ) => ctx.BuilderContext.IsExpression && constructor is IParameterMappingInstanceConstructor { SupportsParameterMapping: true };
+
+    private static bool TryBuildConstructorMapping(
+        INewInstanceBuilderContext<INewInstanceObjectMemberMapping> ctx,
+        IInstanceConstructor constructor,
+        [NotNullWhen(true)] out IReadOnlyList<ConstructorParameterMapping>? constructorParameterMappings
+    )
+    {
+        constructorParameterMappings = [];
+
+        if (constructor is not IParameterMappingInstanceConstructor { SupportsParameterMapping: true } parameterMappingConstructor)
+        {
+            return true;
+        }
+
+        if (!TryBuildConstructorMapping(ctx, parameterMappingConstructor.ParameterMappingMethod, out var parameterMappings))
+        {
+            return false;
+        }
+
+        foreach (var mapping in parameterMappings)
+        {
+            ctx.AddConstructorParameterMapping(mapping);
+        }
+
+        constructorParameterMappings = parameterMappings;
+        return true;
     }
 
     public static void BuildInitMemberMappings(

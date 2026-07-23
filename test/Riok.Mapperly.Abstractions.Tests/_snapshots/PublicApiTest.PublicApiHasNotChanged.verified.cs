@@ -275,6 +275,7 @@ namespace Riok.Mapperly.Abstractions
     public sealed class ObjectFactoryAttribute : System.Attribute
     {
         public ObjectFactoryAttribute() { }
+        public bool MapToParameters { get; set; }
     }
     public enum PropertyNameMappingStrategy
     {
