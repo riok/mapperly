@@ -578,4 +578,182 @@ public class IncludeMappingConfigurationTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public Task IncludeMappingConfigurationFromExternalMapperWithUseReferencedMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [IncludeMappingConfiguration(nameof(@OtherMapper.MapOther))]
+            public partial B Map(A source);
+            """,
+            "class A { public string Name { get; set; } }",
+            "class B { public string Name { get; set; } }",
+            """
+            class OtherMapper {
+                [MapProperty(nameof(A.Name), nameof(B.Name), Use = nameof(ModifyString))]
+                public static partial B MapOther(A source);
+
+                [UserMapping(Default = false)]
+                public static string ModifyString(string source) => source + "-modified";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task IncludeMappingConfigurationFromExternalInstanceMapperWithUseReferencedMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            protected OtherMapper MyOtherMapper { get; } = new();
+
+            [IncludeMappingConfiguration(nameof(@MyOtherMapper.MapOther))]
+            public partial B Map(A source);
+            """,
+            "class A { public string Name { get; set; } }",
+            "class B { public string Name { get; set; } }",
+            """
+            class OtherMapper {
+                [MapProperty(nameof(A.Name), nameof(B.Name), Use = nameof(ModifyString))]
+                public partial B MapOther(A source);
+
+                [UserMapping(Default = false)]
+                public string ModifyString(string source) => source + "-modified";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task IncludeMappingConfigurationFromChainedExternalMappersWithUseReferencedMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [IncludeMappingConfiguration(nameof(@MiddleMapper.MapMiddle))]
+            public partial B Map(A source);
+            """,
+            "class A { public string Name { get; set; } }",
+            "class B { public string Name { get; set; } }",
+            """
+            static class MiddleMapper {
+                [IncludeMappingConfiguration(nameof(@InnerMapper.MapInner))]
+                public static partial B MapMiddle(A source);
+            }
+            """,
+            """
+            static class InnerMapper {
+                [MapProperty(nameof(A.Name), nameof(B.Name), Use = nameof(ModifyString))]
+                public static partial B MapInner(A source);
+
+                [UserMapping(Default = false)]
+                public static string ModifyString(string source) => source + "-modified";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task IncludeMappingConfigurationFromExternalMapperWithMapValueUse()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [IncludeMappingConfiguration(nameof(@OtherMapper.MapOther))]
+            public partial B Map(A source);
+            """,
+            "class A { }",
+            "class B { public string Value { get; set; } }",
+            """
+            static class OtherMapper {
+                [MapValue(nameof(B.Value), Use = nameof(GetValue))]
+                public static partial B MapOther(A source);
+
+                public static string GetValue() => "constant";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task IncludeMappingConfigurationFromExternalInstanceMapperWithMapValueUse()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            protected OtherMapper MyOtherMapper { get; } = new();
+
+            [IncludeMappingConfiguration(nameof(@MyOtherMapper.MapOther))]
+            public partial B Map(A source);
+            """,
+            "class A { }",
+            "class B { public string Value { get; set; } }",
+            """
+            class OtherMapper {
+                [MapValue(nameof(B.Value), Use = nameof(GetValue))]
+                public partial B MapOther(A source);
+
+                public string GetValue() => "constant";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task IncludeMappingConfigurationFromExternalMapperWithMapPropertyFromSourceUse()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [IncludeMappingConfiguration(nameof(@OtherMapper.MapOther))]
+            public partial B Map(A source);
+            """,
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string FullName { get; set; } }",
+            """
+            static class OtherMapper {
+                [MapPropertyFromSource(nameof(B.FullName), Use = nameof(ToFullName))]
+                public static partial B MapOther(A source);
+
+                [UserMapping(Default = false)]
+                public static string ToFullName(A source) => $"{source.FirstName} {source.LastName}";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public Task IncludeMappingConfigurationFromExternalInstanceMapperWithMapPropertyFromSourceUse()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            protected OtherMapper MyOtherMapper { get; } = new();
+
+            [IncludeMappingConfiguration(nameof(@MyOtherMapper.MapOther))]
+            public partial B Map(A source);
+            """,
+            "class A { public string FirstName { get; set; } public string LastName { get; set; } }",
+            "class B { public string FullName { get; set; } }",
+            """
+            class OtherMapper {
+                [MapPropertyFromSource(nameof(B.FullName), Use = nameof(ToFullName))]
+                public partial B MapOther(A source);
+
+                [UserMapping(Default = false)]
+                public string ToFullName(A source) => $"{source.FirstName} {source.LastName}";
+            }
+            """
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
 }
