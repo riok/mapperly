@@ -229,6 +229,11 @@ public class MapperConfigurationReader
         var memberConfigurations = _dataAccessor
             .Access<MapPropertyAttribute, MemberMappingConfiguration>(configRef.Method)
             .Concat(_dataAccessor.Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(configRef.Method))
+            .Concat(
+                _dataAccessor
+                    .Access<MapPropertyFromParameterAttribute, ParameterMappingConfiguration>(configRef.Method)
+                    .Select(x => x.ToMemberMappingConfiguration())
+            )
             .ToList();
         var nestedMembersConfigurations = _dataAccessor
             .Access<MapNestedPropertiesAttribute, NestedMembersMappingConfiguration>(configRef.Method)
