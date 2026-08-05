@@ -36,27 +36,34 @@ public static class EnumToEnumMappingBuilder
         if (!ctx.IsConversionEnabled(MappingConversionType.EnumToEnum))
             return null;
 
+        // A cast-based enum mapping in expression context fails to translate
+        // members between enums with different underlying types (e.g. sbyte vs byte)
+        // because boxed value equality across primitive types returns false.
+        // Report RMG032 and bail out instead of cascading RMG037/RMG038.
+        if (ctx.IsExpression && !SymbolEqualityComparer.Default.Equals(sourceEnumType, targetEnumType))
+            return ReportNotSupportedInProjectionMappings(ctx);
+
         // map enums by strategy
         return ctx.Configuration.Enum.Strategy switch
         {
-            EnumMappingStrategy.ByName when ctx.IsExpression => BuildCastMappingAndDiagnostic(ctx),
+            EnumMappingStrategy.ByName when ctx.IsExpression => ReportNotSupportedInProjectionMappings(ctx),
             EnumMappingStrategy.ByValue when ctx is { IsExpression: true, Configuration.Enum.HasExplicitConfigurations: true } =>
-                BuildCastMappingAndDiagnostic(ctx),
-            EnumMappingStrategy.ByValueCheckDefined when ctx.IsExpression => BuildCastMappingAndDiagnostic(ctx),
+                ReportNotSupportedInProjectionMappings(ctx),
+            EnumMappingStrategy.ByValueCheckDefined when ctx.IsExpression => ReportNotSupportedInProjectionMappings(ctx),
             EnumMappingStrategy.ByName => BuildNameMapping(ctx),
             EnumMappingStrategy.ByValueCheckDefined => BuildEnumToEnumCastMapping(ctx, checkTargetDefined: true),
             _ => BuildEnumToEnumCastMapping(ctx),
         };
     }
 
-    private static INewInstanceMapping BuildCastMappingAndDiagnostic(MappingBuilderContext ctx)
+    private static INewInstanceMapping? ReportNotSupportedInProjectionMappings(MappingBuilderContext ctx)
     {
         ctx.ReportDiagnostic(
             DiagnosticDescriptors.EnumMappingNotSupportedInProjectionMappings,
             ctx.Source.ToDisplayString(),
             ctx.Target.ToDisplayString()
         );
-        return BuildEnumToEnumCastMapping(ctx, true);
+        return null;
     }
 
     private static INewInstanceMapping BuildEnumToEnumCastMapping(

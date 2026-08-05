@@ -61,7 +61,7 @@
       ]
     },
     EnumValue: DtoValue2,
-    EnumName: 10,
+    EnumName: Value10,
     EnumStringValue: 0,
     EnumReverseStringValue: Value10,
     ManuallyMapped: {
@@ -82,7 +82,7 @@
     NestedNullableTargetNotNullable: {},
     StringNullableTargetNotNullable: fooBar,
     EnumValue: DtoValue2,
-    EnumName: 10,
+    EnumName: Value10,
     EnumRawValue: 30,
     EnumStringValue: Value10,
     EnumReverseStringValue: Value10,
