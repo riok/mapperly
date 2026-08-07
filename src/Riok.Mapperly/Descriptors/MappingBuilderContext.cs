@@ -343,7 +343,7 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         }
 
         var existingMapping = FindMapping(source, target);
-        return existingMapping == null ? null : new DelegateMapping(Source, Target, existingMapping);
+        return existingMapping is null or IUserMapping ? null : new DelegateMapping(Source, Target, existingMapping);
     }
 
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, params object[] messageArgs) =>

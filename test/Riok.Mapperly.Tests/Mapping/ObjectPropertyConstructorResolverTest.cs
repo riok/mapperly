@@ -386,6 +386,50 @@ public class ObjectPropertyConstructorResolverTest
     }
 
     [Fact]
+    public void RecordToRecordShouldNotDelegateToInexactUserMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial TargetWrapper MapToTargetWrapper(SourceWrapper source);
+
+            private static Target[] CustomMapToTargetArray(ICollection<Source?> sources) =>
+                sources.Where(s => s is not null).Select(s => s!.MapToTarget()).ToArray();
+
+            [MapperIgnoreSource(nameof(Source.B))]
+            private static partial Target MapToTarget(this Source source);
+            """,
+            TestSourceBuilderOptions.Default with
+            {
+                Static = true,
+            },
+            "record Source(string A, string B);",
+            "record SourceWrapper(ICollection<Source?> Values);",
+            "record Target(string A);",
+            "record TargetWrapper(IEnumerable<Target> Values);"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType,
+                "Mapping the nullable source of type Source? to target of type Target which is not nullable"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member B on the mapping source type Source is not mapped to any member on the mapping target type Target"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveMethodBody(
+                "MapToTargetWrapper",
+                """
+                var target = new global::TargetWrapper(MapToTargetArray(source.Values));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void RecordToFlattenedRecordNullablePathNoThrow()
     {
         var source = TestSourceBuilder.Mapping(
