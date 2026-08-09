@@ -140,6 +140,7 @@ namespace Riok.Mapperly.Abstractions
         public Riok.Mapperly.Abstractions.MemberVisibility IncludedMembers { get; set; }
         public bool PreferParameterlessConstructors { get; set; }
         public Riok.Mapperly.Abstractions.PropertyNameMappingStrategy PropertyNameMappingStrategy { get; set; }
+        public bool RequireExplicitMapping { get; set; }
         public Riok.Mapperly.Abstractions.RequiredMappingStrategy RequiredEnumMappingStrategy { get; set; }
         public Riok.Mapperly.Abstractions.RequiredMappingStrategy RequiredMappingStrategy { get; set; }
         public Riok.Mapperly.Abstractions.StackCloningStrategy StackCloningStrategy { get; set; }

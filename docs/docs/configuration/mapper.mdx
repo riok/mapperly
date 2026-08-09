@@ -310,6 +310,27 @@ the `RequiredMappingStrategy` can be used.
 
 </Tabs>
 
+### Require explicit mapping
+
+By default, Mapperly automatically generates mapping methods for nested types.
+To require explicit mapping methods for all nested types, set `RequireExplicitMapping` to `true`.
+
+When enabled, Mapperly will report `RMG101` if a nested type mapping is needed but no explicit mapping method is defined.
+
+```csharp
+// highlight-start
+[Mapper(RequireExplicitMapping = true)]
+// highlight-end
+public partial class CarMapper
+{
+    public partial CarDto ToDto(Car car);
+    // Must also define: public partial MakeDto ToDto(Make make);
+}
+```
+
+This is useful when you want full control over how nested types are mapped
+and want to avoid accidental auto-generated mappings.
+
 ### String format
 
 The string format passed to `ToString` calls when converting to a string can be customized

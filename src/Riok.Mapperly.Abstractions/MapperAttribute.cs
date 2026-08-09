@@ -142,4 +142,11 @@ public class MapperAttribute : Attribute
     /// partial methods are discovered.
     /// </summary>
     public bool AutoUserMappings { get; set; } = true;
+
+    /// <summary>
+    /// When set to <c>true</c>, Mapperly will not automatically generate mapping methods for nested types.
+    /// An explicit mapping method must be defined by the user for each nested type mapping.
+    /// If set to <c>false</c> (default), Mapperly automatically generates mapping methods for nested types.
+    /// </summary>
+    public bool RequireExplicitMapping { get; set; }
 }

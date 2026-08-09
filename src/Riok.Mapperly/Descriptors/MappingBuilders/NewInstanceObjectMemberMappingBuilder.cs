@@ -17,6 +17,20 @@ public static class NewInstanceObjectMemberMappingBuilder
         if (ctx.Source.IsDelegate() || ctx.Target.IsDelegate())
             return null;
 
+        if (ctx.Configuration.Mapper.RequireExplicitMapping)
+        {
+            var existingMapping = ctx.FindMapping(ctx.Source, ctx.Target);
+            if (existingMapping == null)
+            {
+                ctx.ReportDiagnostic(
+                    DiagnosticDescriptors.ExplicitMappingRequired,
+                    ctx.Source.ToDisplayString(),
+                    ctx.Target.ToDisplayString()
+                );
+                return null;
+            }
+        }
+
         if (ctx.InstanceConstructors.TryBuildObjectFactory(ctx.Source, ctx.Target, out var constructor))
         {
             return new NewInstanceObjectMemberMethodMapping(
