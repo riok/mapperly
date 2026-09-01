@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
-using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -92,11 +91,9 @@ internal static class MemberMappingBuilder
         var memberSourceNullable = memberMappingInfo.IsSourceNullable;
         var delegateSourceNullable = delegateMapping.SourceType.IsNullable();
 
-        var ignoreProjectionNulls = IsIgnoredProjectionNullHandling(ctx.BuilderContext);
-
         if (
             memberMappingInfo.Configuration?.SuppressNullMismatchDiagnostic != true
-            && !ignoreProjectionNulls
+            && !ctx.BuilderContext.IgnoreQueryableProjectionNullHandling
             && memberSourceNullable
             && !memberTargetAcceptsNull
             && !(delegateSourceNullable && !delegateTargetNullable)
@@ -159,9 +156,6 @@ internal static class MemberMappingBuilder
             ? targetMember.BuildGetter(ctx.BuilderContext)
             : null;
 
-    private static bool IsIgnoredProjectionNullHandling(MappingBuilderContext ctx) =>
-        ctx.IsExpression && ctx.Configuration.Mapper.QueryableProjectionNullHandling == QueryableProjectionNullHandling.Ignore;
-
     private static bool ValidateLoopMapping(
         IMembersBuilderContext<IMapping> ctx,
         INewInstanceMapping delegateMapping,
@@ -199,7 +193,7 @@ internal static class MemberMappingBuilder
         ITypeSymbol targetMemberType
     )
     {
-        var ignoreNullHandling = IsIgnoredProjectionNullHandling(ctx.BuilderContext);
+        var ignoreNullHandling = ctx.BuilderContext.IgnoreQueryableProjectionNullHandling;
 
         var nullFallback = NullFallbackValue.Default;
         if (!ignoreNullHandling && !delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyReadNullable())

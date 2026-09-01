@@ -183,4 +183,87 @@ public class QueryableProjectionNullHandlingTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void IgnoreShouldSkipNullHandlingForNullableTopLevelElement()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "System.Linq.IQueryable<A?>",
+            "System.Linq.IQueryable<B?>",
+            TestSourceBuilderOptions.Default with
+            {
+                QueryableProjectionNullHandling = QueryableProjectionNullHandling.Ignore,
+            },
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            source,
+                            x => new global::B()
+                            {
+                                Value = x.Value,
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
+    public Task IgnoreShouldSkipNullHandlingForNullableCollectionElement()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "System.Linq.IQueryable<A>",
+            "System.Linq.IQueryable<B>",
+            TestSourceBuilderOptions.Default with
+            {
+                QueryableProjectionNullHandling = QueryableProjectionNullHandling.Ignore,
+            },
+            "class A { public System.Collections.Generic.List<C?> Items { get; set; } }",
+            "class B { public System.Collections.Generic.List<D> Items { get; set; } }",
+            "class C { public int Id { get; set; } }",
+            "class D { public int Id { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void IgnoreShouldUnwrapNullableValueTypeCollectionElement()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "System.Linq.IQueryable<A>",
+            "System.Linq.IQueryable<B>",
+            TestSourceBuilderOptions.Default with
+            {
+                QueryableProjectionNullHandling = QueryableProjectionNullHandling.Ignore,
+            },
+            "class A { public System.Collections.Generic.List<int?> Items { get; set; } }",
+            "class B { public System.Collections.Generic.List<int> Items { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            source,
+                            x => new global::B()
+                            {
+                                Items = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(x.Items, x1 => x1.Value)),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
 }
