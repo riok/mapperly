@@ -1,0 +1,51 @@
+---
+sidebar_label: RMG101
+description: 'Mapperly analyzer diagnostic RMG101 — Explicit mapping required'
+---
+
+# RMG101 — Explicit mapping required
+
+When `RequireExplicitMapping` is set to `true` on the `MapperAttribute`,
+Mapperly will not automatically generate mapping methods for nested types.
+An explicit mapping method must be defined by the user for each nested type mapping.
+
+## Example
+
+The following example will produce `RMG101` because `B` cannot be mapped to `BTarget` automatically:
+
+```csharp
+[Mapper(RequireExplicitMapping = true)]
+public partial class MyMapper
+{
+    public partial ATarget MapToA(A source);
+    // Missing: public partial BTarget MapToB(B source);
+}
+
+public class A { public B B { get; set; } }
+public class ATarget { public BTarget B { get; set; } }
+public class B { }
+public class BTarget { }
+```
+
+## How to fix
+
+Add an explicit mapping method for the nested types:
+
+```csharp
+[Mapper(RequireExplicitMapping = true)]
+public partial class MyMapper
+{
+    public partial ATarget MapToA(A source);
+    public partial BTarget MapToB(B source); // Added
+}
+```
+
+Or disable `RequireExplicitMapping`:
+
+```csharp
+[Mapper(RequireExplicitMapping = false)] // or simply omit it
+public partial class MyMapper
+{
+    public partial ATarget MapToA(A source);
+}
+```

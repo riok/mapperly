@@ -857,6 +857,16 @@ public static class DiagnosticDescriptors
         isEnabledByDefault: true
     );
 
+    public static readonly DiagnosticDescriptor ExplicitMappingRequired = new(
+        "RMG101",
+        "Explicit mapping required",
+        "No explicit mapping found from {0} to {1}. Define an explicit mapping method or set RequireExplicitMapping to false.",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true,
+        helpLinkUri: BuildHelpUri("RMG101")
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT

@@ -135,4 +135,11 @@ public record MapperConfiguration
     /// Can be overwritten on specific enums via mapping method configurations.
     /// </summary>
     public EnumNamingStrategy? EnumNamingStrategy { get; init; }
+
+    /// <summary>
+    /// When set to <c>true</c>, Mapperly will not automatically generate mapping methods for nested types.
+    /// An explicit mapping method must be defined by the user for each nested type mapping.
+    /// If set to <c>false</c> (default), Mapperly automatically generates mapping methods for nested types.
+    /// </summary>
+    public bool? RequireExplicitMapping { get; init; }
 }

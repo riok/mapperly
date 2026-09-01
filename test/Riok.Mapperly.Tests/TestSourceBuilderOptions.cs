@@ -24,7 +24,8 @@ public record TestSourceBuilderOptions(
     MemberVisibility? IncludedConstructors = null,
     bool Static = false,
     bool PreferParameterlessConstructors = true,
-    bool AutoUserMappings = true
+    bool AutoUserMappings = true,
+    bool? RequireExplicitMapping = null
 )
 {
     public const string DefaultMapperClassName = "Mapper";
@@ -49,6 +50,8 @@ public record TestSourceBuilderOptions(
         EnabledConversions: MappingConversionType.All
     );
     public static readonly TestSourceBuilderOptions WithDisabledAutoUserMappings = new(AutoUserMappings: false);
+
+    public static readonly TestSourceBuilderOptions WithRequireExplicitMapping = new(RequireExplicitMapping: true);
 
     public static readonly TestSourceBuilderOptions PreferParameterizedConstructors = new(PreferParameterlessConstructors: false);
 
