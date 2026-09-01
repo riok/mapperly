@@ -44,6 +44,36 @@ public class EnumTest
     }
 
     [Fact]
+    public void EnumToOtherEnumByNameWithDifferentUnderlyingTypesShouldSwitch()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "E1",
+            "E2",
+            TestSourceBuilderOptions.Default with
+            {
+                EnumMappingStrategy = EnumMappingStrategy.ByName,
+            },
+            "enum E1 : short {A, B, C}",
+            "enum E2 : byte {A, B, C}"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                return source switch
+                {
+                    global::E1.A => global::E2.A,
+                    global::E1.B => global::E2.B,
+                    global::E1.C => global::E2.C,
+                    _ => throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported"),
+                };
+                """
+            );
+    }
+
+    [Fact]
     public void CustomClassToEnumWithBaseTypeCastShouldCast()
     {
         var source = TestSourceBuilder.Mapping(
