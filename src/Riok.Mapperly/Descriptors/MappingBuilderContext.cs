@@ -241,12 +241,12 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
 
     /// <summary>
     /// Whether a user-defined conversion operator exists from <paramref name="source"/> to
-    /// <paramref name="target"/> whose parameter is nullable-annotated (accepts <c>null</c>).
+    /// <paramref name="target"/> whose parameter accepts <c>null</c> according to its effective write-nullability.
     /// Such a conversion does not need a null guard for a nullable source.
     /// </summary>
     public bool HasNullAcceptingUserDefinedConversion(ITypeSymbol source, ITypeSymbol target) =>
-        Compilation.ClassifyConversion(source, target)
-            is { IsUserDefined: true, MethodSymbol.Parameters: [{ Type.NullableAnnotation: NullableAnnotation.Annotated }] };
+        Compilation.ClassifyConversion(source, target) is { IsUserDefined: true, MethodSymbol.Parameters: [var parameter] }
+        && SymbolAccessor.IsWriteNullable(parameter);
 
     /// <summary>
     /// Builds a new mapping for the provided types and config with the given options.

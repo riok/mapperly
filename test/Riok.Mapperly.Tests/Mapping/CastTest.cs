@@ -614,6 +614,73 @@ public class CastTest
     }
 
     [Fact]
+    public void NullableMemberWithDisallowNullOperatorShouldStillGuard()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.AllConversions,
+            "class A { public Code? PromoCode { get; set; } }",
+            "class B { public string? PromoCode { get; set; } }",
+            """
+            class Code
+            {
+                public string Value { get; set; } = string.Empty;
+                public static explicit operator string?([System.Diagnostics.CodeAnalysis.DisallowNull] Code? c) => c?.Value;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.PromoCode != null)
+                {
+                    target.PromoCode = (string)source.PromoCode;
+                }
+                else
+                {
+                    target.PromoCode = null;
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableMemberWithAllowNullOperatorShouldNotGuard()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.AllConversions,
+            "class A { public Code? PromoCode { get; set; } }",
+            "class B { public string? PromoCode { get; set; } }",
+            """
+            class Code
+            {
+                public string Value { get; set; } = string.Empty;
+                public static explicit operator string?([System.Diagnostics.CodeAnalysis.AllowNull] Code c) => c?.Value;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                target.PromoCode = (string?)source.PromoCode;
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void NullableValueTypeMemberWithNullAcceptingOperatorShouldNotGuard()
     {
         var source = TestSourceBuilder.Mapping(
