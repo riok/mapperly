@@ -2,6 +2,7 @@ namespace Riok.Mapperly.Abstractions;
 
 /// <summary>
 /// Controls how <c>null</c> values are handled in <see cref="System.Linq.IQueryable{T}"/> projection mappings.
+/// This also applies to standalone <see cref="System.Linq.Expressions.Expression{TDelegate}"/> mappings.
 /// </summary>
 public enum QueryableProjectionNullHandling
 {

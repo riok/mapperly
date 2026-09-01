@@ -64,6 +64,8 @@ Entity Framework Core), these guards become `CASE WHEN` expressions that can pre
 using indexes. Mapping a nullable source member to a non-nullable target member additionally reports
 the `RMG089` diagnostic.
 
+This also applies to standalone [expression mappings](#expression-mappings).
+
 If your projections are only ever executed by a relational provider (where the lambda is translated to
 a query and never run in memory), you can skip this null handling with
 `QueryableProjectionNullHandling.Ignore`:
@@ -282,8 +284,9 @@ var dtos = await DbContext.Cars
   </TabItem>
 </Tabs>
 
-Expression mappings use the same expression tree building logic as `IQueryable<T>` projections,
-so they share the same limitations and support the same features including property configurations and user-implemented mapping methods.
+Expression mappings share the same limitations, features and configuration options as `IQueryable<T>`
+projections, including property configurations, user-implemented mapping methods and
+[null handling](#null-handling).
 
 ### Property configurations
 

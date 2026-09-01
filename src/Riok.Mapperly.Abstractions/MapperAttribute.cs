@@ -145,6 +145,7 @@ public class MapperAttribute : Attribute
 
     /// <summary>
     /// Controls how <c>null</c> values are handled in <see cref="System.Linq.IQueryable{T}"/> projection mappings.
+    /// This also applies to standalone <see cref="System.Linq.Expressions.Expression{TDelegate}"/> mappings.
     /// Defaults to <see cref="QueryableProjectionNullHandling.NullSafe"/>.
     /// </summary>
     public QueryableProjectionNullHandling QueryableProjectionNullHandling { get; set; } = QueryableProjectionNullHandling.NullSafe;
