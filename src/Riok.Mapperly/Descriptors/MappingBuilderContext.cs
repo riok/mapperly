@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Constructors;
 using Riok.Mapperly.Descriptors.Enumerables;
@@ -97,6 +98,14 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// Whether the current mapping code is generated for a <see cref="System.Linq.Expressions.Expression"/>.
     /// </summary>
     public virtual bool IsExpression => false;
+
+    /// <summary>
+    /// Whether null handling should be skipped in the current mapping,
+    /// because it is generated for a queryable projection / expression mapping
+    /// and <see cref="QueryableProjectionNullHandling.Ignore"/> is configured.
+    /// </summary>
+    public bool IgnoreQueryableProjectionNullHandling =>
+        IsExpression && Configuration.Mapper.QueryableProjectionNullHandling == QueryableProjectionNullHandling.Ignore;
 
     public ParameterScope ParameterScope { get; } = ParameterScope.Empty;
 

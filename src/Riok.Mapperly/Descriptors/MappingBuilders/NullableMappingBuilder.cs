@@ -37,7 +37,8 @@ public static class NullableMappingBuilder
 
         mappingKey = new TypeMappingKey(sourceNonNullable ?? ctx.Source, targetNonNullable ?? ctx.Target);
 
-        if (sourceIsNullable && !targetIsNullable)
+        // skip the diagnostic when null handling is ignored as the null guard is intentionally omitted.
+        if (sourceIsNullable && !targetIsNullable && !ctx.IgnoreQueryableProjectionNullHandling)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType, ctx.Source, ctx.Target);
         }
@@ -47,6 +48,11 @@ public static class NullableMappingBuilder
 
     private static INewInstanceMapping BuildNullDelegateMapping(MappingBuilderContext ctx, INewInstanceMapping mapping)
     {
+        // when null handling is ignored, skip the null guard entirely and map the
+        // source directly (still overwriting the nullable types and unwrapping nullable value types).
+        if (ctx.IgnoreQueryableProjectionNullHandling)
+            return new NullBypassDelegateMapping(ctx.Source, ctx.Target, mapping);
+
         var nullFallback = ctx.GetNullFallbackValue();
 
         return mapping switch
