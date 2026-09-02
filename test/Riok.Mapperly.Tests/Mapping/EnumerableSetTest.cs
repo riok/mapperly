@@ -44,6 +44,28 @@ public class EnumerableSetTest
             );
     }
 
+    [Theory]
+    [InlineData("HashSet<int>")]
+    [InlineData("ISet<int>")]
+    [InlineData("IReadOnlySet<int>")]
+    public void ReadOnlyCollectionToSetOfDifferentTypes(string targetType)
+    {
+        var source = TestSourceBuilder.Mapping("IReadOnlyCollection<long>", targetType, TestSourceBuilderOptions.AllConversions);
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::System.Collections.Generic.HashSet<int>(source.Count);
+                foreach (var item in source)
+                {
+                    target.Add((int)item);
+                }
+                return target;
+                """
+            );
+    }
+
     [Fact]
     public void EnumerableToSortedSet()
     {
