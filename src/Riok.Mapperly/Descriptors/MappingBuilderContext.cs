@@ -371,7 +371,9 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         }
 
         var existingMapping = FindMapping(source, target);
-        return existingMapping == null ? null : new DelegateMapping(Source, Target, existingMapping);
+
+        // User mappings require exact type matches and must not be reused through generalized delegation.
+        return existingMapping is null or IUserMapping ? null : new DelegateMapping(Source, Target, existingMapping);
     }
 
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, params object[] messageArgs) =>
