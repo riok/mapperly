@@ -1,4 +1,4 @@
-import { visit } from 'unist-util-visit';
+import { SKIP, visit } from 'unist-util-visit';
 import { toHtml } from 'hast-util-to-html';
 
 /*
@@ -90,11 +90,12 @@ export default function rehypeFaq() {
           question: node.children,
           answer: [],
         };
-        return;
+        return SKIP;
       }
 
       if (currentEntry !== undefined) {
         currentEntry.answer.push(node);
+        return SKIP;
       }
     });
 
