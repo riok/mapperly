@@ -1,43 +1,28 @@
 import React from 'react';
 import { JSX } from 'react';
-import clsx from 'clsx';
-import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
+import Comparison from '@site/src/components/Homepage/Comparison';
+import DocumentationLinks from '@site/src/components/Homepage/DocumentationLinks';
+import HomepageHeader from '@site/src/components/Homepage/HomepageHeader';
+import Performance from '@site/src/components/Homepage/Performance';
+import QuickStart from '@site/src/components/Homepage/QuickStart';
+import SupportedScenarios from '@site/src/components/Homepage/SupportedScenarios';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
-import Heading from '@theme/Heading';
-
-import styles from './index.module.css';
-
-function HomepageHeader() {
-  const { siteConfig } = useDocusaurusContext();
-  return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
-      <div className="container">
-        <Heading as={'h1'} className="hero__title">
-          {siteConfig.title}
-        </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/intro"
-          >
-            Get Started
-          </Link>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 export default function Home(): JSX.Element {
-  const { siteConfig } = useDocusaurusContext();
   return (
-    <Layout description={siteConfig.tagline}>
+    <Layout
+      title="Source-Generated .NET Object Mapping"
+      description="Mapperly generates fast, readable .NET object mapping code at build time, with no runtime reflection and compile-time diagnostics."
+    >
       <HomepageHeader />
       <main>
         <HomepageFeatures />
+        <QuickStart />
+        <Performance />
+        <SupportedScenarios />
+        <Comparison />
+        <DocumentationLinks />
       </main>
     </Layout>
   );

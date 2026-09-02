@@ -129,10 +129,13 @@ async function buildSamples(): Promise<void> {
 
 async function buildRobotsTxt(): Promise<void> {
   const targetFile = 'static/robots.txt';
+  const config = await require('./docusaurus.config.js')();
+  const baseUrl = config.url.endsWith('/') ? config.url : `${config.url}/`;
+  const sitemapUrl = new URL('sitemap.xml', baseUrl).toString();
   const content =
     process.env.ENVIRONMENT === 'next'
       ? 'User-agent: *\nDisallow: /\n'
-      : 'User-agent: *\n';
+      : `User-agent: *\n\nSitemap: ${sitemapUrl}\n`;
   await writeFile(targetFile, content);
 }
 

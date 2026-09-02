@@ -52,6 +52,19 @@ async function createConfig() {
             sidebarPath: require.resolve('./sidebars.js'),
             rehypePlugins: [rehypeFaq],
           },
+          sitemap: {
+            changefreq: null,
+            createSitemapItems: async (params) => {
+              const items = await params.defaultCreateSitemapItems(params);
+              return items.map((item) =>
+                new URL(item.url).pathname.startsWith('/docs/api/')
+                  ? { ...item, priority: 0.1 }
+                  : item,
+              );
+            },
+            ignorePatterns: ['/search/**'],
+            lastmod: 'date',
+          },
           theme: {
             customCss: require.resolve('./src/css/custom.css'),
           },
