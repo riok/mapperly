@@ -143,6 +143,34 @@ public static class EnumerableMappingBuilder
             return BuildEnumerableToListMapping(ctx, elementMapping);
         }
 
+        // use count-aware loops for transformed stacks and order-preserving copies to avoid LINQ allocations
+        if (ctx.CollectionInfos.Target.CollectionType.HasFlag(CollectionType.Stack))
+        {
+            var stackCloningStrategy = ctx.Configuration.StackCloningStrategy;
+
+            // Stack(IEnumerable<T>) is already efficient when no element mapping or order preservation is needed.
+            if (elementMapping.IsSynthetic && stackCloningStrategy == StackCloningStrategy.ReverseOrder)
+                return null;
+
+            var sourceCountAccessor = ctx.CollectionInfos.Source.CountMember.BuildGetter(ctx.UnsafeAccessorContext);
+            if (
+                SourceSupportsIndexAccess(ctx.CollectionInfos.Source.CollectionType)
+                && (elementMapping.IsSynthetic || stackCloningStrategy == StackCloningStrategy.ReverseOrder)
+            )
+            {
+                return new StackForMapping(ctx.Source, ctx.Target, elementMapping, sourceCountAccessor, stackCloningStrategy);
+            }
+
+            return new StackForEachMapping(
+                ctx.Source,
+                ctx.Target,
+                elementMapping,
+                elementMapping.TargetType,
+                sourceCountAccessor,
+                stackCloningStrategy
+            );
+        }
+
         // if target is not an array or a type implemented by array return early
         if (
             ctx.CollectionInfos.Target.CollectionType
@@ -271,6 +299,9 @@ public static class EnumerableMappingBuilder
 
         return null;
     }
+
+    private static bool SourceSupportsIndexAccess(CollectionType sourceCollectionType) =>
+        sourceCollectionType is CollectionType.Array or CollectionType.List;
 
     private static LinqConstructorMapping BuildLinqConstructorMapping(
         MappingBuilderContext ctx,

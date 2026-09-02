@@ -7,7 +7,13 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial global::System.Collections.Generic.Stack<int> Copy(global::System.Collections.Generic.Stack<int> src)
         {
-            return new global::System.Collections.Generic.Stack<int>(global::System.Linq.Enumerable.Reverse(src));
+            var target = new int[src.Count];
+            var i = target.Length;
+            foreach (var item in src)
+            {
+                target[--i] = item;
+            }
+            return new global::System.Collections.Generic.Stack<int>(target);
         }
     }
 }
