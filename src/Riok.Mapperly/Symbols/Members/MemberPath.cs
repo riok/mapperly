@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Configuration.PropertyReferences;
 using Riok.Mapperly.Descriptors;
 using Riok.Mapperly.Helpers;
@@ -72,8 +73,6 @@ public abstract class MemberPath(ITypeSymbol rootType, IReadOnlyList<IMappableMe
 
     public abstract bool IsAnyReadNullable();
 
-    public abstract bool IsWriteNullable();
-
     public bool IsAnyObjectReadPathNullable() => ObjectPath.Any(p => p.IsReadNullable);
 
     public MemberPathGetter BuildGetter(SimpleMappingBuilderContext ctx) => MemberPathGetter.Build(ctx, this);
@@ -127,6 +126,9 @@ public abstract class MemberPath(ITypeSymbol rootType, IReadOnlyList<IMappableMe
 
         return hc;
     }
+
+    public string ToVariableName(ExpressionSyntax source) =>
+        (source + FullName).Replace(MemberAccessSeparator, string.Empty, StringComparison.Ordinal).ToCamelCase();
 
     public string ToDebugString() => ToDisplayString();
 

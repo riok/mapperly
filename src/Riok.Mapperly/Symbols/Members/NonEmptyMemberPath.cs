@@ -42,7 +42,7 @@ public class NonEmptyMemberPath : MemberPath
 
     public override bool IsAnyReadNullable() => Path.Any(x => x.IsReadNullable);
 
-    public override bool IsWriteNullable() => Path[^1].IsWriteNullable;
+    protected virtual bool IsWriteNullable() => Path[^1].IsWriteNullable;
 
     public override string ToDisplayString(bool includeRootType = true, bool includeMemberType = true)
     {

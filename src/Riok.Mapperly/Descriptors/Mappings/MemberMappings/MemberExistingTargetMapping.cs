@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
 using Riok.Mapperly.Symbols.Members;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 
@@ -25,8 +26,18 @@ public class MemberExistingTargetMapping(
 
     public IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax targetAccess)
     {
-        var source = sourcePath.BuildAccess(ctx.Source);
         var target = targetPath.BuildAccess(targetAccess);
-        return delegateMapping.Build(ctx.WithSource(source), target);
+        if (!sourcePath.MemberPath.IsAnyObjectReadPathNullable())
+        {
+            var directSource = sourcePath.BuildAccess(ctx.Source);
+            return delegateMapping.Build(ctx.WithSource(directSource), target);
+        }
+
+        var sourceVariableName = ctx.NameBuilder.New(sourcePath.MemberPath.ToVariableName(ctx.Source));
+        var sourceDeclaration = ctx.SyntaxFactory.DeclareLocalVariable(
+            sourceVariableName,
+            sourcePath.BuildAccess(ctx.Source, nullConditional: true)
+        );
+        return delegateMapping.Build(ctx.WithSource(IdentifierName(sourceVariableName)), target).Prepend(sourceDeclaration);
     }
 }

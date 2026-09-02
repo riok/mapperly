@@ -69,6 +69,18 @@ public class EnumerableExistingTargetTest
     }
 
     [Fact]
+    public Task NestedNullableEnumerableToExistingCollection()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapProperty(\"Nested.Values\", nameof(B.Values))] partial B Map(A source);",
+            "class A { public C? Nested { get; } }",
+            "class B { public List<int>? Values { get; } = []; }",
+            "class C { public IEnumerable<int>? Values { get; } }"
+        );
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task MapToExistingCollectionShouldWork()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
