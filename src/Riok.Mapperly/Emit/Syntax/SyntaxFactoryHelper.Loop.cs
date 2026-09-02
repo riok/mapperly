@@ -49,4 +49,29 @@ public partial struct SyntaxFactoryHelper
             Block(expressions)
         );
     }
+
+    public ForStatementSyntax DecrementalForLoop(
+        string counterName,
+        ExpressionSyntax maxValueExclusive,
+        params ExpressionSyntax[] expressions
+    )
+    {
+        var maxValueInclusive = BinaryExpression(SyntaxKind.SubtractExpression, maxValueExclusive, IntLiteral(1));
+        var counterDeclaration = DeclareVariable(counterName, maxValueInclusive);
+        var counterDecrement = PostfixUnaryExpression(SyntaxKind.PostDecrementExpression, IdentifierName(counterName));
+        var condition = BinaryExpression(SyntaxKind.GreaterThanOrEqualExpression, IdentifierName(counterName), IntLiteral(0));
+        return ForStatement(
+            default,
+            LeadingLineFeedTrailingSpaceToken(SyntaxKind.ForKeyword),
+            Token(SyntaxKind.OpenParenToken),
+            counterDeclaration,
+            default,
+            TrailingSpacedToken(SyntaxKind.SemicolonToken),
+            condition,
+            TrailingSpacedToken(SyntaxKind.SemicolonToken),
+            SingletonSeparatedList<ExpressionSyntax>(counterDecrement),
+            Token(SyntaxKind.CloseParenToken),
+            Block(expressions)
+        );
+    }
 }

@@ -139,11 +139,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             target.SpanValue = MapToInt32Array(testObject.SpanValue);
             target.MemoryValue = MapToInt32Array1(testObject.MemoryValue.Span);
-            target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Reverse(
-                    global::System.Linq.Enumerable.Select(testObject.StackValue, x => ParseableInt(x))
-                )
-            );
+            target.StackValue = MapToStackOfInt32(testObject.StackValue);
             target.QueueValue = new global::System.Collections.Generic.Queue<int>(
                 global::System.Linq.Enumerable.Select(testObject.QueueValue, x => ParseableInt(x))
             );
@@ -312,11 +308,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.NullableReadOnlyObjectCollection = null;
             }
             target.MemoryValue = MapToStringArray(dto.MemoryValue.Span);
-            target.StackValue = new global::System.Collections.Generic.Stack<string>(
-                global::System.Linq.Enumerable.Reverse(
-                    global::System.Linq.Enumerable.Select(dto.StackValue, x => x.ToString(_formatDeCh))
-                )
-            );
+            target.StackValue = MapToStackOfString(dto.StackValue);
             target.QueueValue = new global::System.Collections.Generic.Queue<string>(
                 global::System.Linq.Enumerable.Select(dto.QueueValue, x => x.ToString(_formatDeCh))
             );
@@ -467,11 +459,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             target.SpanValue = MapToInt32Array(source.SpanValue);
             target.MemoryValue = MapToInt32Array1(source.MemoryValue.Span);
-            target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Reverse(
-                    global::System.Linq.Enumerable.Select(source.StackValue, x => ParseableInt(x))
-                )
-            );
+            target.StackValue = MapToStackOfInt32(source.StackValue);
             target.QueueValue = new global::System.Collections.Generic.Queue<int>(
                 global::System.Linq.Enumerable.Select(source.QueueValue, x => ParseableInt(x))
             );
@@ -680,11 +668,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             target.SpanValue = MapToInt32Array(testObject.SpanValue);
             target.MemoryValue = MapToInt32Array1(testObject.MemoryValue.Span);
-            target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Reverse(
-                    global::System.Linq.Enumerable.Select(testObject.StackValue, x => ParseableInt(x))
-                )
-            );
+            target.StackValue = MapToStackOfInt32(testObject.StackValue);
             target.QueueValue = new global::System.Collections.Generic.Queue<int>(
                 global::System.Linq.Enumerable.Select(testObject.QueueValue, x => ParseableInt(x))
             );
@@ -864,6 +848,18 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private global::System.Collections.Generic.Stack<int> MapToStackOfInt32(global::System.Collections.Generic.Stack<string> source)
+        {
+            var target = new int[source.Count];
+            var i = target.Length;
+            foreach (var item in source)
+            {
+                target[--i] = ParseableInt(item);
+            }
+            return new global::System.Collections.Generic.Stack<int>(target);
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         private string MapToString(global::Riok.Mapperly.IntegrationTests.Models.TestEnum source)
         {
             return source switch
@@ -931,6 +927,18 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target[i] = source[i].ToString(_formatDeCh);
             }
             return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private global::System.Collections.Generic.Stack<string> MapToStackOfString(global::System.Collections.Generic.Stack<int> source)
+        {
+            var target = new string[source.Count];
+            var i = target.Length;
+            foreach (var item in source)
+            {
+                target[--i] = item.ToString(_formatDeCh);
+            }
+            return new global::System.Collections.Generic.Stack<string>(target);
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
