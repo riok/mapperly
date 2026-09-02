@@ -386,6 +386,38 @@ public class ObjectPropertyConstructorResolverTest
     }
 
     [Fact]
+    public void RecordToRecordShouldNotDelegateToInexactUserMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public static partial TargetWrapper MapToTargetWrapper(SourceWrapper source);
+
+            private static Target[] CustomMapToTargetArray(ICollection<Source> sources) =>
+                sources.Select(s => new Target(s.Value)).ToArray();
+            """,
+            TestSourceBuilderOptions.Default with
+            {
+                Static = true,
+            },
+            "record Source(string Value);",
+            "record SourceWrapper(ICollection<Source> Values);",
+            "record Target(string Value);",
+            "record TargetWrapper(IEnumerable<Target> Values);"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMethodBody(
+                "MapToTargetWrapper",
+                """
+                var target = new global::TargetWrapper(MapToTargetArray(source.Values));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void RecordToFlattenedRecordNullablePathNoThrow()
     {
         var source = TestSourceBuilder.Mapping(
