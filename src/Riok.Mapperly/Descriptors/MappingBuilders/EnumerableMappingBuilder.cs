@@ -149,6 +149,11 @@ public static class EnumerableMappingBuilder
             return BuildEnumerableToHashSetMapping(ctx, elementMapping);
         }
 
+        if (ctx.CollectionInfos.Target.CollectionType == CollectionType.Queue)
+        {
+            return BuildEnumerableToQueueMapping(ctx, elementMapping);
+        }
+
         // use count-aware loops for transformed stacks and order-preserving copies to avoid LINQ allocations
         if (ctx.CollectionInfos.Target.CollectionType.HasFlag(CollectionType.Stack))
         {
@@ -241,6 +246,33 @@ public static class EnumerableMappingBuilder
         var collectionInfos = new CollectionInfos(
             BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source),
             CollectionInfoBuilder.BuildGenericCollectionInfo(ctx, CollectionType.HashSet, ctx.CollectionInfos.Target)
+        );
+        var existingMapping = ctx.BuildDelegatedMapping(collectionInfos.Source.Type, collectionInfos.Target.Type);
+        if (existingMapping != null)
+            return new DelegateMapping(ctx.Source, ctx.Target, existingMapping);
+
+        return new ForEachAddEnumerableMapping(
+            null,
+            collectionInfos,
+            elementMapping,
+            ctx.Configuration.Mapper.UseReferenceHandling,
+            collectionInfos.Target.AddMethodName!
+        );
+    }
+
+    /// <summary>
+    /// Tries to build a mapping for a source for which the count is known and a queue target.
+    /// </summary>
+    private static INewInstanceMapping? BuildEnumerableToQueueMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    {
+        // Queue(IEnumerable<T>) is already efficient when no element mapping is needed.
+        if (elementMapping.IsSynthetic)
+            return null;
+
+        // try to reuse an ICollection<S> => Queue<T> mapping
+        var collectionInfos = new CollectionInfos(
+            BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source),
+            CollectionInfoBuilder.BuildGenericCollectionInfo(ctx, CollectionType.Queue, ctx.CollectionInfos.Target)
         );
         var existingMapping = ctx.BuildDelegatedMapping(collectionInfos.Source.Type, collectionInfos.Target.Type);
         if (existingMapping != null)

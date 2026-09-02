@@ -140,9 +140,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.SpanValue = MapToInt32Array(testObject.SpanValue);
             target.MemoryValue = MapToInt32Array1(testObject.MemoryValue.Span);
             target.StackValue = MapToStackOfInt32(testObject.StackValue);
-            target.QueueValue = new global::System.Collections.Generic.Queue<int>(
-                global::System.Linq.Enumerable.Select(testObject.QueueValue, x => ParseableInt(x))
-            );
+            target.QueueValue = MapToQueueOfInt32(testObject.QueueValue);
             target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(
                 global::System.Linq.Enumerable.Select(testObject.ImmutableArrayValue, x => ParseableInt(x))
             );
@@ -304,9 +302,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             target.MemoryValue = MapToStringArray(dto.MemoryValue.Span);
             target.StackValue = MapToStackOfString(dto.StackValue);
-            target.QueueValue = new global::System.Collections.Generic.Queue<string>(
-                global::System.Linq.Enumerable.Select(dto.QueueValue, x => x.ToString(_formatDeCh))
-            );
+            target.QueueValue = MapToQueueOfString(dto.QueueValue);
             target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(
                 global::System.Linq.Enumerable.Select(dto.ImmutableArrayValue, x => x.ToString(_formatDeCh))
             );
@@ -450,9 +446,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.SpanValue = MapToInt32Array(source.SpanValue);
             target.MemoryValue = MapToInt32Array1(source.MemoryValue.Span);
             target.StackValue = MapToStackOfInt32(source.StackValue);
-            target.QueueValue = new global::System.Collections.Generic.Queue<int>(
-                global::System.Linq.Enumerable.Select(source.QueueValue, x => ParseableInt(x))
-            );
+            target.QueueValue = MapToQueueOfInt32(source.QueueValue);
             target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(
                 global::System.Linq.Enumerable.Select(source.ImmutableArrayValue, x => ParseableInt(x))
             );
@@ -654,9 +648,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             target.SpanValue = MapToInt32Array(testObject.SpanValue);
             target.MemoryValue = MapToInt32Array1(testObject.MemoryValue.Span);
             target.StackValue = MapToStackOfInt32(testObject.StackValue);
-            target.QueueValue = new global::System.Collections.Generic.Queue<int>(
-                global::System.Linq.Enumerable.Select(testObject.QueueValue, x => ParseableInt(x))
-            );
+            target.QueueValue = MapToQueueOfInt32(testObject.QueueValue);
             target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(
                 global::System.Linq.Enumerable.Select(testObject.ImmutableArrayValue, x => ParseableInt(x))
             );
@@ -840,6 +832,17 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private global::System.Collections.Generic.Queue<int> MapToQueueOfInt32(global::System.Collections.Generic.IReadOnlyCollection<string> source)
+        {
+            var target = new global::System.Collections.Generic.Queue<int>(DirectInt(source.Count));
+            foreach (var item in source)
+            {
+                target.Enqueue(ParseableInt(item));
+            }
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         private global::System.Collections.Generic.HashSet<int> MapToHashSetOfInt32(global::System.Collections.Generic.ICollection<string> source)
         {
             var target = new global::System.Collections.Generic.HashSet<int>(DirectInt(source.Count));
@@ -954,6 +957,17 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target[--i] = item.ToString(_formatDeCh);
             }
             return new global::System.Collections.Generic.Stack<string>(target);
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private global::System.Collections.Generic.Queue<string> MapToQueueOfString(global::System.Collections.Generic.IReadOnlyCollection<int> source)
+        {
+            var target = new global::System.Collections.Generic.Queue<string>(DirectInt(source.Count));
+            foreach (var item in source)
+            {
+                target.Enqueue(item.ToString(_formatDeCh));
+            }
+            return target;
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
