@@ -262,8 +262,12 @@ If no such constructor exists an `ArgumentNullException` is thrown.
 If `ThrowOnMappingNullMismatch` is `true` (default), an `ArgumentNullException` is thrown.
 
 :::info
-`AllowNullPropertyAssignment`, `ThrowOnPropertyMappingNullMismatch` and `ThrowOnMappingNullMismatch`
-are ignored for required init properties and `IQueryable<T>` projection mappings.
+For init-only and required target properties, which Mapperly assigns in an object initializer,
+`AllowNullPropertyAssignment` and `ThrowOnPropertyMappingNullMismatch` are ignored.
+Null source values use the expression-based fallback configured by `ThrowOnMappingNullMismatch`.
+Mapperly cannot conditionally omit an object initializer assignment to preserve the target property's initializer.
+
+All three options are ignored for `IQueryable<T>` projection mappings.
 :::
 
 ### One side strict property mappings
