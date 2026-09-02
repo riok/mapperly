@@ -182,12 +182,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.ExistingList.Add(ParseableInt(item3));
             }
-            target.ISet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(testObject.ISet, x => ParseableInt(x))
-            );
-            target.HashSet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(testObject.HashSet, x => ParseableInt(x))
-            );
+            target.ISet = MapToHashSetOfInt32(testObject.ISet);
+            target.HashSet = MapToHashSetOfInt321(testObject.HashSet);
             target.SortedSet = new global::System.Collections.Generic.SortedSet<int>(
                 global::System.Linq.Enumerable.Select(testObject.SortedSet, x => ParseableInt(x))
             );
@@ -345,12 +341,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.ExistingList.Add(item3.ToString(_formatDeCh));
             }
-            target.ISet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(dto.ISet, x => x.ToString(_formatDeCh))
-            );
-            target.HashSet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(dto.HashSet, x => x.ToString(_formatDeCh))
-            );
+            target.ISet = MapToHashSetOfString(dto.ISet);
+            target.HashSet = MapToHashSetOfString1(dto.HashSet);
             target.SortedSet = new global::System.Collections.Generic.SortedSet<string>(
                 global::System.Linq.Enumerable.Select(dto.SortedSet, x => x.ToString(_formatDeCh))
             );
@@ -487,12 +479,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.ExistingList.Add(ParseableInt(item3));
             }
-            target.ISet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(source.ISet, x => ParseableInt(x))
-            );
-            target.HashSet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(source.HashSet, x => ParseableInt(x))
-            );
+            target.ISet = MapToHashSetOfInt32(source.ISet);
+            target.HashSet = MapToHashSetOfInt321(source.HashSet);
             target.SortedSet = new global::System.Collections.Generic.SortedSet<int>(
                 global::System.Linq.Enumerable.Select(source.SortedSet, x => ParseableInt(x))
             );
@@ -690,12 +678,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.ExistingList.Add(ParseableInt(item3));
             }
-            target.ISet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(testObject.ISet, x => ParseableInt(x))
-            );
-            target.HashSet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(testObject.HashSet, x => ParseableInt(x))
-            );
+            target.ISet = MapToHashSetOfInt32(testObject.ISet);
+            target.HashSet = MapToHashSetOfInt321(testObject.HashSet);
             target.SortedSet = new global::System.Collections.Generic.SortedSet<int>(
                 global::System.Linq.Enumerable.Select(testObject.SortedSet, x => ParseableInt(x))
             );
@@ -812,6 +796,28 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private global::System.Collections.Generic.HashSet<int> MapToHashSetOfInt32(global::System.Collections.Generic.ICollection<string> source)
+        {
+            var target = new global::System.Collections.Generic.HashSet<int>(DirectInt(source.Count));
+            foreach (var item in source)
+            {
+                target.Add(ParseableInt(item));
+            }
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private global::System.Collections.Generic.HashSet<int> MapToHashSetOfInt321(global::System.Collections.Generic.IReadOnlyCollection<string> source)
+        {
+            var target = new global::System.Collections.Generic.HashSet<int>(DirectInt(source.Count));
+            foreach (var item in source)
+            {
+                target.Add(ParseableInt(item));
+            }
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         private string MapToString(global::Riok.Mapperly.IntegrationTests.Models.TestEnum source)
         {
             return source switch
@@ -895,6 +901,28 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target[--i] = item.ToString(_formatDeCh);
             }
             return new global::System.Collections.Generic.Stack<string>(target);
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private global::System.Collections.Generic.HashSet<string> MapToHashSetOfString(global::System.Collections.Generic.ICollection<int> source)
+        {
+            var target = new global::System.Collections.Generic.HashSet<string>(DirectInt(source.Count));
+            foreach (var item in source)
+            {
+                target.Add(item.ToString(_formatDeCh));
+            }
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private global::System.Collections.Generic.HashSet<string> MapToHashSetOfString1(global::System.Collections.Generic.IReadOnlyCollection<int> source)
+        {
+            var target = new global::System.Collections.Generic.HashSet<string>(DirectInt(source.Count));
+            foreach (var item in source)
+            {
+                target.Add(item.ToString(_formatDeCh));
+            }
+            return target;
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

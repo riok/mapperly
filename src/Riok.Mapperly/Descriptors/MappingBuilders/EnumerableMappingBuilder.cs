@@ -143,6 +143,12 @@ public static class EnumerableMappingBuilder
             return BuildEnumerableToListMapping(ctx, elementMapping);
         }
 
+        // if target is a set or type implemented by HashSet
+        if (ctx.CollectionInfos.Target.CollectionType is CollectionType.HashSet or CollectionType.ISet or CollectionType.IReadOnlySet)
+        {
+            return BuildEnumerableToHashSetMapping(ctx, elementMapping);
+        }
+
         // use count-aware loops for transformed stacks and order-preserving copies to avoid LINQ allocations
         if (ctx.CollectionInfos.Target.CollectionType.HasFlag(CollectionType.Stack))
         {
@@ -206,6 +212,35 @@ public static class EnumerableMappingBuilder
         var collectionInfos = new CollectionInfos(
             BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source),
             CollectionInfoBuilder.BuildGenericCollectionInfo(ctx, CollectionType.List, ctx.CollectionInfos.Target)
+        );
+        var existingMapping = ctx.BuildDelegatedMapping(collectionInfos.Source.Type, collectionInfos.Target.Type);
+        if (existingMapping != null)
+            return new DelegateMapping(ctx.Source, ctx.Target, existingMapping);
+
+        return new ForEachAddEnumerableMapping(
+            null,
+            collectionInfos,
+            elementMapping,
+            ctx.Configuration.Mapper.UseReferenceHandling,
+            collectionInfos.Target.AddMethodName!
+        );
+    }
+
+    /// <summary>
+    /// Tries to build a mapping for a source for which the count is known and
+    /// a target type assignable from a hash set.
+    /// </summary>
+    private static INewInstanceMapping? BuildEnumerableToHashSetMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    {
+        // the existing LINQ path already avoids projection overhead for synthetic mappings
+        if (elementMapping.IsSynthetic)
+            return null;
+
+        // assume the mapped elements have the same deduplicated count as the source elements
+        // try to reuse an ICollection<S> => HashSet<T> mapping
+        var collectionInfos = new CollectionInfos(
+            BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source),
+            CollectionInfoBuilder.BuildGenericCollectionInfo(ctx, CollectionType.HashSet, ctx.CollectionInfos.Target)
         );
         var existingMapping = ctx.BuildDelegatedMapping(collectionInfos.Source.Type, collectionInfos.Target.Type);
         if (existingMapping != null)
