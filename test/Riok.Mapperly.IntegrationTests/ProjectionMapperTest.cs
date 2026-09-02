@@ -37,7 +37,7 @@ namespace Riok.Mapperly.IntegrationTests
 
 #if NET7_0_OR_GREATER
         [Fact]
-        [VersionedSnapshot(Versions.NET8_0 | Versions.NET9_0)]
+        [VersionedSnapshot(Versions.NET8_0 | Versions.NET9_0 | Versions.NET11_0)]
         public Task ProjectionShouldTranslateToQuery()
         {
             return RunWithDatabase(ctx =>
@@ -48,7 +48,7 @@ namespace Riok.Mapperly.IntegrationTests
         }
 
         [Fact]
-        [VersionedSnapshot(Versions.NET8_0 | Versions.NET9_0)]
+        [VersionedSnapshot(Versions.NET8_0 | Versions.NET9_0 | Versions.NET11_0)]
         public Task ExpressionShouldTranslateToQuery()
         {
             return RunWithDatabase(ctx =>
