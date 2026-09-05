@@ -1,0 +1,69 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+{
+    [MapPropertyFromParameter(nameof(@ParentDomain.Id), "child")]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial ParentDomain Map(ParentDto parent, ChildDomain child);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(12,69),
+      Message: Could not map member ChildDomain.child of type ChildDomain to ParentDomain.Id of type int,
+      Severity: Error,
+      Descriptor: {
+        Id: RMG007,
+        Title: Could not map member,
+        MessageFormat: Could not map member {0} to {1},
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    [MapPropertyFromParameter(nameof(@ParentDomain.Id), "child")]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial ParentDomain Map(ParentDto parent, ChildDomain child);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(12,69),
+      Message: The member Id on the mapping target type ParentDomain was not found on the mapping source type ParentDto,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG012,
+        Title: Source member was not found for target member,
+        MessageFormat: The member {0} on the mapping target type {1} was not found on the mapping source type {2},
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    [MapPropertyFromParameter(nameof(@ParentDomain.Id), "child")]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial ParentDomain Map(ParentDto parent, ChildDomain child);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(12,69),
+      Message: The additional mapping method parameter child of the method Map is not mapped,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG082,
+        Title: An additional mapping method parameter is not mapped,
+        MessageFormat: The additional mapping method parameter {0} of the method {1} is not mapped,
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}
