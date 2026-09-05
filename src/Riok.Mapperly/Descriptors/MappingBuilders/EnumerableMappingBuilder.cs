@@ -143,6 +143,45 @@ public static class EnumerableMappingBuilder
             return BuildEnumerableToListMapping(ctx, elementMapping);
         }
 
+        // if target is a set or type implemented by HashSet
+        if (ctx.CollectionInfos.Target.CollectionType is CollectionType.HashSet or CollectionType.ISet or CollectionType.IReadOnlySet)
+        {
+            return BuildEnumerableToHashSetMapping(ctx, elementMapping);
+        }
+
+        if (ctx.CollectionInfos.Target.CollectionType == CollectionType.Queue)
+        {
+            return BuildEnumerableToQueueMapping(ctx, elementMapping);
+        }
+
+        // use count-aware loops for transformed stacks and order-preserving copies to avoid LINQ allocations
+        if (ctx.CollectionInfos.Target.CollectionType.HasFlag(CollectionType.Stack))
+        {
+            var stackCloningStrategy = ctx.Configuration.StackCloningStrategy;
+
+            // Stack(IEnumerable<T>) is already efficient when no element mapping or order preservation is needed.
+            if (elementMapping.IsSynthetic && stackCloningStrategy == StackCloningStrategy.ReverseOrder)
+                return null;
+
+            var sourceCountAccessor = ctx.CollectionInfos.Source.CountMember.BuildGetter(ctx.UnsafeAccessorContext);
+            if (
+                SourceSupportsIndexAccess(ctx.CollectionInfos.Source.CollectionType)
+                && (elementMapping.IsSynthetic || stackCloningStrategy == StackCloningStrategy.ReverseOrder)
+            )
+            {
+                return new StackForMapping(ctx.Source, ctx.Target, elementMapping, sourceCountAccessor, stackCloningStrategy);
+            }
+
+            return new StackForEachMapping(
+                ctx.Source,
+                ctx.Target,
+                elementMapping,
+                elementMapping.TargetType,
+                sourceCountAccessor,
+                stackCloningStrategy
+            );
+        }
+
         // if target is not an array or a type implemented by array return early
         if (
             ctx.CollectionInfos.Target.CollectionType
@@ -178,6 +217,62 @@ public static class EnumerableMappingBuilder
         var collectionInfos = new CollectionInfos(
             BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source),
             CollectionInfoBuilder.BuildGenericCollectionInfo(ctx, CollectionType.List, ctx.CollectionInfos.Target)
+        );
+        var existingMapping = ctx.BuildDelegatedMapping(collectionInfos.Source.Type, collectionInfos.Target.Type);
+        if (existingMapping != null)
+            return new DelegateMapping(ctx.Source, ctx.Target, existingMapping);
+
+        return new ForEachAddEnumerableMapping(
+            null,
+            collectionInfos,
+            elementMapping,
+            ctx.Configuration.Mapper.UseReferenceHandling,
+            collectionInfos.Target.AddMethodName!
+        );
+    }
+
+    /// <summary>
+    /// Tries to build a mapping for a source for which the count is known and
+    /// a target type assignable from a hash set.
+    /// </summary>
+    private static INewInstanceMapping? BuildEnumerableToHashSetMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    {
+        // the existing LINQ path already avoids projection overhead for synthetic mappings
+        if (elementMapping.IsSynthetic)
+            return null;
+
+        // assume the mapped elements have the same deduplicated count as the source elements
+        // try to reuse an ICollection<S> => HashSet<T> mapping
+        var collectionInfos = new CollectionInfos(
+            BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source),
+            CollectionInfoBuilder.BuildGenericCollectionInfo(ctx, CollectionType.HashSet, ctx.CollectionInfos.Target)
+        );
+        var existingMapping = ctx.BuildDelegatedMapping(collectionInfos.Source.Type, collectionInfos.Target.Type);
+        if (existingMapping != null)
+            return new DelegateMapping(ctx.Source, ctx.Target, existingMapping);
+
+        return new ForEachAddEnumerableMapping(
+            null,
+            collectionInfos,
+            elementMapping,
+            ctx.Configuration.Mapper.UseReferenceHandling,
+            collectionInfos.Target.AddMethodName!
+        );
+    }
+
+    /// <summary>
+    /// Tries to build a mapping for a source for which the count is known and a queue target.
+    /// </summary>
+    private static INewInstanceMapping? BuildEnumerableToQueueMapping(MappingBuilderContext ctx, INewInstanceMapping elementMapping)
+    {
+        // Queue(IEnumerable<T>) is already efficient when no element mapping is needed.
+        if (elementMapping.IsSynthetic)
+            return null;
+
+        // try to reuse an ICollection<S> => Queue<T> mapping
+        var collectionInfos = new CollectionInfos(
+            BuildCollectionTypeForICollection(ctx, ctx.CollectionInfos!.Source),
+            CollectionInfoBuilder.BuildGenericCollectionInfo(ctx, CollectionType.Queue, ctx.CollectionInfos.Target)
         );
         var existingMapping = ctx.BuildDelegatedMapping(collectionInfos.Source.Type, collectionInfos.Target.Type);
         if (existingMapping != null)
@@ -271,6 +366,9 @@ public static class EnumerableMappingBuilder
 
         return null;
     }
+
+    private static bool SourceSupportsIndexAccess(CollectionType sourceCollectionType) =>
+        sourceCollectionType is CollectionType.Array or CollectionType.List;
 
     private static LinqConstructorMapping BuildLinqConstructorMapping(
         MappingBuilderContext ctx,

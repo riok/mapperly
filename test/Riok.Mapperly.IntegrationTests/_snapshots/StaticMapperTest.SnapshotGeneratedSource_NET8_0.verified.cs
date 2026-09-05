@@ -146,14 +146,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             target.SpanValue = MapToInt32Array1(src.SpanValue);
             target.MemoryValue = MapToInt32Array2(src.MemoryValue.Span);
-            target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Reverse(
-                    global::System.Linq.Enumerable.Select(src.StackValue, x => ParseableInt(x))
-                )
-            );
-            target.QueueValue = new global::System.Collections.Generic.Queue<int>(
-                global::System.Linq.Enumerable.Select(src.QueueValue, x => ParseableInt(x))
-            );
+            target.StackValue = MapToStackOfInt32(src.StackValue);
+            target.QueueValue = MapToQueueOfInt32(src.QueueValue);
             target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(
                 global::System.Linq.Enumerable.Select(src.ImmutableArrayValue, x => ParseableInt(x))
             );
@@ -196,13 +190,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.ExistingSortedSet.Add(ParseableInt(item2));
             }
             MapExistingList(src.ExistingList, target.ExistingList);
-            target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(src.ISet, x => ParseableInt(x)));
-            target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(src.IReadOnlySet, x => ParseableInt(x))
-            );
-            target.HashSet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(src.HashSet, x => ParseableInt(x))
-            );
+            target.ISet = MapToHashSetOfInt32(src.ISet);
+            target.IReadOnlySet = MapToHashSetOfInt321(src.IReadOnlySet);
+            target.HashSet = MapToHashSetOfInt321(src.HashSet);
             target.SortedSet = new global::System.Collections.Generic.SortedSet<int>(
                 global::System.Linq.Enumerable.Select(src.SortedSet, x => ParseableInt(x))
             );
@@ -327,14 +317,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             target.SpanValue = MapToInt32Array1(testObject.SpanValue);
             target.MemoryValue = MapToInt32Array2(testObject.MemoryValue.Span);
-            target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Reverse(
-                    global::System.Linq.Enumerable.Select(testObject.StackValue, x => ParseableInt(x))
-                )
-            );
-            target.QueueValue = new global::System.Collections.Generic.Queue<int>(
-                global::System.Linq.Enumerable.Select(testObject.QueueValue, x => ParseableInt(x))
-            );
+            target.StackValue = MapToStackOfInt32(testObject.StackValue);
+            target.QueueValue = MapToQueueOfInt32(testObject.QueueValue);
             target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(
                 global::System.Linq.Enumerable.Select(testObject.ImmutableArrayValue, x => ParseableInt(x))
             );
@@ -377,15 +361,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.ExistingSortedSet.Add(ParseableInt(item2));
             }
             MapExistingList(testObject.ExistingList, target.ExistingList);
-            target.ISet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(testObject.ISet, x => ParseableInt(x))
-            );
-            target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(testObject.IReadOnlySet, x => ParseableInt(x))
-            );
-            target.HashSet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(testObject.HashSet, x => ParseableInt(x))
-            );
+            target.ISet = MapToHashSetOfInt32(testObject.ISet);
+            target.IReadOnlySet = MapToHashSetOfInt321(testObject.IReadOnlySet);
+            target.HashSet = MapToHashSetOfInt321(testObject.HashSet);
             target.SortedSet = new global::System.Collections.Generic.SortedSet<int>(
                 global::System.Linq.Enumerable.Select(testObject.SortedSet, x => ParseableInt(x))
             );
@@ -492,14 +470,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.NullableReadOnlyObjectCollection = null;
             }
             target.MemoryValue = MapToStringArray(dto.MemoryValue.Span);
-            target.StackValue = new global::System.Collections.Generic.Stack<string>(
-                global::System.Linq.Enumerable.Reverse(
-                    global::System.Linq.Enumerable.Select(dto.StackValue, x => x.ToString())
-                )
-            );
-            target.QueueValue = new global::System.Collections.Generic.Queue<string>(
-                global::System.Linq.Enumerable.Select(dto.QueueValue, x => x.ToString())
-            );
+            target.StackValue = MapToStackOfString(dto.StackValue);
+            target.QueueValue = MapToQueueOfString(dto.QueueValue);
             target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(
                 global::System.Linq.Enumerable.Select(dto.ImmutableArrayValue, x => x.ToString())
             );
@@ -546,11 +518,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             {
                 target.ExistingList.Add(item3.ToString());
             }
-            target.ISet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.ISet, x => x.ToString()));
-            target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(dto.IReadOnlySet, x => x.ToString())
-            );
-            target.HashSet = global::System.Linq.Enumerable.ToHashSet(global::System.Linq.Enumerable.Select(dto.HashSet, x => x.ToString()));
+            target.ISet = MapToHashSetOfString(dto.ISet);
+            target.IReadOnlySet = MapToHashSetOfString1(dto.IReadOnlySet);
+            target.HashSet = MapToHashSetOfString1(dto.HashSet);
             target.SortedSet = new global::System.Collections.Generic.SortedSet<string>(
                 global::System.Linq.Enumerable.Select(dto.SortedSet, x => x.ToString())
             );
@@ -642,14 +612,8 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             }
             target.SpanValue = MapToInt32Array1(source.SpanValue);
             target.MemoryValue = MapToInt32Array2(source.MemoryValue.Span);
-            target.StackValue = new global::System.Collections.Generic.Stack<int>(
-                global::System.Linq.Enumerable.Reverse(
-                    global::System.Linq.Enumerable.Select(source.StackValue, x => ParseableInt(x))
-                )
-            );
-            target.QueueValue = new global::System.Collections.Generic.Queue<int>(
-                global::System.Linq.Enumerable.Select(source.QueueValue, x => ParseableInt(x))
-            );
+            target.StackValue = MapToStackOfInt32(source.StackValue);
+            target.QueueValue = MapToQueueOfInt32(source.QueueValue);
             target.ImmutableArrayValue = global::System.Collections.Immutable.ImmutableArray.ToImmutableArray(
                 global::System.Linq.Enumerable.Select(source.ImmutableArrayValue, x => ParseableInt(x))
             );
@@ -692,15 +656,9 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.ExistingSortedSet.Add(ParseableInt(item2));
             }
             MapExistingList(source.ExistingList, target.ExistingList);
-            target.ISet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(source.ISet, x => ParseableInt(x))
-            );
-            target.IReadOnlySet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(source.IReadOnlySet, x => ParseableInt(x))
-            );
-            target.HashSet = global::System.Linq.Enumerable.ToHashSet(
-                global::System.Linq.Enumerable.Select(source.HashSet, x => ParseableInt(x))
-            );
+            target.ISet = MapToHashSetOfInt32(source.ISet);
+            target.IReadOnlySet = MapToHashSetOfInt321(source.IReadOnlySet);
+            target.HashSet = MapToHashSetOfInt321(source.HashSet);
             target.SortedSet = new global::System.Collections.Generic.SortedSet<int>(
                 global::System.Linq.Enumerable.Select(source.SortedSet, x => ParseableInt(x))
             );
@@ -1087,6 +1045,51 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static global::System.Collections.Generic.Stack<int> MapToStackOfInt32(global::System.Collections.Generic.Stack<string> source)
+        {
+            var target = new int[source.Count];
+            var i = target.Length;
+            foreach (var item in source)
+            {
+                target[--i] = ParseableInt(item);
+            }
+            return new global::System.Collections.Generic.Stack<int>(target);
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static global::System.Collections.Generic.Queue<int> MapToQueueOfInt32(global::System.Collections.Generic.IReadOnlyCollection<string> source)
+        {
+            var target = new global::System.Collections.Generic.Queue<int>(DirectInt(source.Count));
+            foreach (var item in source)
+            {
+                target.Enqueue(ParseableInt(item));
+            }
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static global::System.Collections.Generic.HashSet<int> MapToHashSetOfInt32(global::System.Collections.Generic.ICollection<string> source)
+        {
+            var target = new global::System.Collections.Generic.HashSet<int>(DirectInt(source.Count));
+            foreach (var item in source)
+            {
+                target.Add(ParseableInt(item));
+            }
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static global::System.Collections.Generic.HashSet<int> MapToHashSetOfInt321(global::System.Collections.Generic.IReadOnlyCollection<string> source)
+        {
+            var target = new global::System.Collections.Generic.HashSet<int>(DirectInt(source.Count));
+            foreach (var item in source)
+            {
+                target.Add(ParseableInt(item));
+            }
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         private static string MapToString(global::Riok.Mapperly.IntegrationTests.Models.TestEnum source)
         {
             return source switch
@@ -1152,6 +1155,51 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
             for (var i = 0; i < source.Length; i++)
             {
                 target[i] = source[i].ToString();
+            }
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static global::System.Collections.Generic.Stack<string> MapToStackOfString(global::System.Collections.Generic.Stack<int> source)
+        {
+            var target = new string[source.Count];
+            var i = target.Length;
+            foreach (var item in source)
+            {
+                target[--i] = item.ToString();
+            }
+            return new global::System.Collections.Generic.Stack<string>(target);
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static global::System.Collections.Generic.Queue<string> MapToQueueOfString(global::System.Collections.Generic.IReadOnlyCollection<int> source)
+        {
+            var target = new global::System.Collections.Generic.Queue<string>(DirectInt(source.Count));
+            foreach (var item in source)
+            {
+                target.Enqueue(item.ToString());
+            }
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static global::System.Collections.Generic.HashSet<string> MapToHashSetOfString(global::System.Collections.Generic.ICollection<int> source)
+        {
+            var target = new global::System.Collections.Generic.HashSet<string>(DirectInt(source.Count));
+            foreach (var item in source)
+            {
+                target.Add(item.ToString());
+            }
+            return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static global::System.Collections.Generic.HashSet<string> MapToHashSetOfString1(global::System.Collections.Generic.IReadOnlyCollection<int> source)
+        {
+            var target = new global::System.Collections.Generic.HashSet<string>(DirectInt(source.Count));
+            foreach (var item in source)
+            {
+                target.Add(item.ToString());
             }
             return target;
         }

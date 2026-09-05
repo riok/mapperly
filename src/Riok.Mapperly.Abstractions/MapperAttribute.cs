@@ -46,7 +46,8 @@ public class MapperAttribute : Attribute
     /// Specifies the behaviour in the case when the mapper tries to set a non-nullable property to a <c>null</c> value.
     /// If set to <c>true</c> an <see cref="ArgumentNullException"/> is thrown.
     /// If set to <c>false</c> the property assignment is ignored.
-    /// This is ignored for required init properties and <see cref="IQueryable{T}"/> projection mappings.
+    /// This is ignored for init-only and required target properties and <see cref="IQueryable{T}"/> projection mappings.
+    /// For init-only and required target properties, <see cref="ThrowOnMappingNullMismatch"/> determines the fallback value.
     /// </summary>
     public bool ThrowOnPropertyMappingNullMismatch { get; set; }
 
@@ -55,7 +56,8 @@ public class MapperAttribute : Attribute
     /// If <c>true</c> (default), the source is <c>null</c>, and the target does allow <c>null</c> values,
     /// <c>null</c> is assigned.
     /// If <c>false</c>, <c>null</c> values are never assigned to the target property.
-    /// This is ignored for required init properties and <see cref="IQueryable{T}"/> projection mappings.
+    /// This is ignored for init-only and required target properties and <see cref="IQueryable{T}"/> projection mappings.
+    /// For init-only and required target properties, <see cref="ThrowOnMappingNullMismatch"/> determines the fallback value.
     /// </summary>
     public bool AllowNullPropertyAssignment { get; set; } = true;
 
@@ -142,4 +144,11 @@ public class MapperAttribute : Attribute
     /// partial methods are discovered.
     /// </summary>
     public bool AutoUserMappings { get; set; } = true;
+
+    /// <summary>
+    /// Controls how <c>null</c> values are handled in <see cref="System.Linq.IQueryable{T}"/> projection mappings.
+    /// This also applies to standalone <see cref="System.Linq.Expressions.Expression{TDelegate}"/> mappings.
+    /// Defaults to <see cref="QueryableProjectionNullHandling.NullSafe"/>.
+    /// </summary>
+    public QueryableProjectionNullHandling QueryableProjectionNullHandling { get; set; } = QueryableProjectionNullHandling.NullSafe;
 }

@@ -92,7 +92,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 target.NullableReadOnlyObjectCollection = null;
             }
             target.MemoryValue = src.MemoryValue.Span.ToArray();
-            target.StackValue = new global::System.Collections.Generic.Stack<string>(global::System.Linq.Enumerable.Reverse(src.StackValue));
+            target.StackValue = MapToStackOfString(src.StackValue);
             target.QueueValue = new global::System.Collections.Generic.Queue<string>(src.QueueValue);
             target.ImmutableArrayValue = src.ImmutableArrayValue;
             target.ImmutableListValue = src.ImmutableListValue;
@@ -242,6 +242,18 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                 i++;
             }
             return target;
+        }
+
+        [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
+        private static global::System.Collections.Generic.Stack<string> MapToStackOfString(global::System.Collections.Generic.Stack<string> source)
+        {
+            var target = new string[source.Count];
+            var i = target.Length;
+            foreach (var item in source)
+            {
+                target[--i] = item;
+            }
+            return new global::System.Collections.Generic.Stack<string>(target);
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

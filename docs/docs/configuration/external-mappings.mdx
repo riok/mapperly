@@ -31,7 +31,7 @@ In order for Mapperly to find the mappings, they must be made known with `UseMap
         public static class BananaMapper
         {
             public static Banana MapBanana(BananaDto dto)
-            => new Banana(dto.Weight);
+              => new Banana(dto.Weight);
         }
         ```
 
@@ -55,7 +55,7 @@ In order for Mapperly to find the mappings, they must be made known with `UseMap
         public static class BananaMapper
         {
             public static Banana MapBanana(BananaDto dto)
-            => new Banana(dto.Weight);
+              => new Banana(dto.Weight);
         }
         ```
 
@@ -150,7 +150,7 @@ and `MapValue`. It is also possible to use a string reference of the type. In th
         public static class PriceMapper
         {
             public static string MapPrice(decimal price)
-            => (price / 100).ToString("C");
+              => (price / 100).ToString("C");
 
             public static string MapPriceFromSource(Car source)
             => (source.Price / 100).ToString("C");

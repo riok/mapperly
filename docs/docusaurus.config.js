@@ -52,6 +52,19 @@ async function createConfig() {
             sidebarPath: require.resolve('./sidebars.js'),
             rehypePlugins: [rehypeFaq],
           },
+          sitemap: {
+            changefreq: null,
+            createSitemapItems: async (params) => {
+              const items = await params.defaultCreateSitemapItems(params);
+              return items.map((item) =>
+                new URL(item.url).pathname.startsWith('/docs/api/')
+                  ? { ...item, priority: 0.1 }
+                  : item,
+              );
+            },
+            ignorePatterns: ['/search/**'],
+            lastmod: 'date',
+          },
           theme: {
             customCss: require.resolve('./src/css/custom.css'),
           },
@@ -62,10 +75,19 @@ async function createConfig() {
     themeConfig:
       /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
       ({
+        image: 'img/logo.png',
         metadata: [
           {
             name: 'keywords',
             content: '.NET, SourceGenerator, Mapping, Roslyn, dotnet',
+          },
+          {
+            property: 'og:type',
+            content: 'website',
+          },
+          {
+            property: 'og:site_name',
+            content: 'Mapperly',
           },
         ],
         colorMode: {
@@ -83,21 +105,18 @@ async function createConfig() {
               docId: 'intro',
               position: 'left',
               label: 'Documentation',
-              sidebarId: 'docs',
             },
             {
               type: 'doc',
               docId: '/category/api',
               position: 'left',
               label: 'API',
-              sidebarId: 'api',
             },
             {
               type: 'doc',
               docId: 'contributing/index',
               position: 'left',
               label: 'Contributing',
-              sidebarId: 'contributing',
             },
             {
               type: 'custom-coffeeNavbarItem',
