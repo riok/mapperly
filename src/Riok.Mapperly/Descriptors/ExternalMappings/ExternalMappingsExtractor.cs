@@ -72,6 +72,9 @@ internal static class ExternalMappingsExtractor
                 .Select(e => e.Use)
                 .Concat(ctx.AttributeAccessor.Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(x).Select(e => e.Use))
                 .Concat(
+                    ctx.AttributeAccessor.Access<MapPropertyFromParameterAttribute, ParameterMappingConfiguration>(x).Select(e => e.Use)
+                )
+                .Concat(
                     ctx.AttributeAccessor.Access<IncludeMappingConfigurationAttribute, IncludeMappingConfiguration>(x).Select(e => e.Name)
                 )
                 .Where(e => e?.IsExternal ?? false)

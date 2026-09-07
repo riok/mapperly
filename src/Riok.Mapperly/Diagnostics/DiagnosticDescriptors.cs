@@ -857,6 +857,16 @@ public static class DiagnosticDescriptors
         isEnabledByDefault: true
     );
 
+    public static readonly DiagnosticDescriptor ConfiguredMappingParameterNotFound = new(
+        "RMG101",
+        "Mapping source parameter not found",
+        "The specified parameter {0} was not found on the mapping method {1}",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Error,
+        true,
+        helpLinkUri: BuildHelpUri("RMG101")
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT

@@ -1,0 +1,42 @@
+---
+sidebar_label: RMG101
+description: 'Mapperly analyzer diagnostic RMG101 — The mapping parameter referenced by MapPropertyFromParameter was not found'
+---
+
+# RMG101 — The mapping parameter referenced by `MapPropertyFromParameter` was not found
+
+A `MapPropertyFromParameter` attribute references an [additional mapping parameter](../additional-mapping-parameters.mdx)
+that is not declared on the mapping method.
+
+To fix this, either add a matching additional parameter to the mapping method
+or correct the parameter name in the attribute.
+
+## Example
+
+The `Map` method declares the additional parameter `id`,
+but the attribute references a parameter named `parentId`:
+
+```csharp
+[Mapper]
+public partial class ParentMapper
+{
+    // highlight-start
+    // Error: the mapping method has no parameter named 'parentId'
+    [MapPropertyFromParameter(nameof(ParentDomain.Id), "parentId")]
+    // highlight-end
+    public partial ParentDomain Map(ParentDto source, string id);
+}
+```
+
+Rename the referenced parameter to match the declared one:
+
+```csharp
+[Mapper]
+public partial class ParentMapper
+{
+    // highlight-start
+    [MapPropertyFromParameter(nameof(ParentDomain.Id), "id")]
+    // highlight-end
+    public partial ParentDomain Map(ParentDto source, string id);
+}
+```
