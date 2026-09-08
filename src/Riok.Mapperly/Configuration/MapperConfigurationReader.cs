@@ -71,17 +71,36 @@ public class MapperConfigurationReader
         return BuildWithIncludedMappings([], reference, supportsDeepCloning);
     }
 
+    /// <summary>
+    /// Builds a mapping configuration with included mappings.
+    /// </summary>
+    /// <param name="visitedMethods">
+    ///     Methods already visited on the current include chain, used to detect and report circular
+    ///     <c>IncludeMappingConfiguration</c> references. The set is cumulative across the whole traversal
+    ///     (never unwound), so it also guards against including the same method more than once.
+    /// </param>
+    /// <param name="reference">Reference to the method whose configuration is being built.</param>
+    /// <param name="supportsDeepCloning">
+    ///     Whether the caller allows deep cloning for this mapping; when false, <c>UseDeepCloning</c> is disabled.
+    /// </param>
+    /// <param name="includeRef">
+    ///     The IncludeMappingConfiguration reference that pulled in this method, or null when building
+    ///     the mapper's own method. It carries the receiver (type for static, member for instance) needed
+    ///     to rewrite local MapValue(Use=...) refs so they resolve against the external mapper.
+    /// </param>
+    /// <returns>The built mapping configuration.</returns>
     private MappingConfiguration BuildWithIncludedMappings(
         HashSet<IMethodSymbol> visitedMethods,
         MappingConfigurationReference reference,
-        bool supportsDeepCloning
+        bool supportsDeepCloning,
+        IMethodReferenceConfiguration? includeRef = null
     )
     {
         if (reference.Method == null)
             return supportsDeepCloning ? MapperConfiguration : MapperConfiguration with { UseDeepCloning = false };
 
         var enumConfig = BuildEnumConfig(reference);
-        var membersConfig = BuildMembersConfig(reference);
+        var membersConfig = BuildMembersConfig(reference, includeRef);
         var derivedTypesConfig = BuildDerivedTypeConfigs(reference.Method);
         var configuration = new MappingConfiguration(
             MapperConfiguration.Mapper,
@@ -147,7 +166,7 @@ public class MapperConfigurationReader
         var includedReference = new MappingConfigurationReference(methodSymbol, typeMapping.SourceType, typeMapping.TargetType);
         if (!_resolvedConfigurations.TryGetValue(includedReference, out var config))
         {
-            config = BuildWithIncludedMappings(visitedMethods, includedReference, supportsDeepCloning);
+            config = BuildWithIncludedMappings(visitedMethods, includedReference, supportsDeepCloning, name);
         }
 
         return config;
@@ -212,7 +231,10 @@ public class MapperConfigurationReader
             .ToList();
     }
 
-    private MembersMappingConfiguration BuildMembersConfig(MappingConfigurationReference configRef)
+    private MembersMappingConfiguration BuildMembersConfig(
+        MappingConfigurationReference configRef,
+        IMethodReferenceConfiguration? includeRef
+    )
     {
         if (configRef.Method == null)
             return MapperConfiguration.Members;
@@ -226,6 +248,19 @@ public class MapperConfigurationReader
             .ToList();
         var ignoredTargetMembers = ignoreTargetMemberAttributes.Select(x => x.Value).WhereNotNull().ToList();
         var memberValueConfigurations = _dataAccessor.Access<MapValueAttribute, MemberValueMappingConfiguration>(configRef.Method).ToList();
+
+        // When including config from an external method, rewrite local Use refs
+        // so SourceValueBuilder resolves them against the external type, not the main mapper.
+        if (includeRef != null)
+        {
+            foreach (var mvc in memberValueConfigurations)
+            {
+                if (mvc.Use is { IsExternal: false })
+                {
+                    mvc.Use = new IncludedLocalUseValueMethodReference(mvc.Use.Name, includeRef);
+                }
+            }
+        }
         var memberConfigurations = _dataAccessor
             .Access<MapPropertyAttribute, MemberMappingConfiguration>(configRef.Method)
             .Concat(_dataAccessor.Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(configRef.Method))
@@ -339,5 +374,20 @@ public class MapperConfigurationReader
 
             _diagnostics.ReportDiagnostic(DiagnosticDescriptors.IgnoreMissingJustification, ignoreConfiguration.Location, ignoredName);
         }
+    }
+
+    /// <summary>
+    /// A method reference for a MapValue Use target that is local to an included external method.
+    /// Delegates receiver resolution to the include reference.
+    /// </summary>
+    private record IncludedLocalUseValueMethodReference(string Name, IMethodReferenceConfiguration IncludeRef)
+        : IMethodReferenceConfiguration
+    {
+        public string FullName => Name;
+        public bool IsExternal => true;
+
+        public INamedTypeSymbol? GetTargetType(SimpleMappingBuilderContext ctx) => IncludeRef.GetTargetType(ctx);
+
+        public string? GetTargetName(SimpleMappingBuilderContext ctx) => IncludeRef.GetTargetName(ctx);
     }
 }
