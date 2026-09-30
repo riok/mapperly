@@ -93,6 +93,7 @@ internal static class MemberMappingBuilder
 
         if (
             memberMappingInfo.Configuration?.SuppressNullMismatchDiagnostic != true
+            && !ctx.BuilderContext.IgnoreQueryableProjectionNullHandling
             && memberSourceNullable
             && !memberTargetAcceptsNull
             && !(delegateSourceNullable && !delegateTargetNullable)
@@ -192,8 +193,10 @@ internal static class MemberMappingBuilder
         ITypeSymbol targetMemberType
     )
     {
+        var ignoreNullHandling = ctx.BuilderContext.IgnoreQueryableProjectionNullHandling;
+
         var nullFallback = NullFallbackValue.Default;
-        if (!delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyReadNullable())
+        if (!ignoreNullHandling && !delegateMapping.SourceType.IsNullable() && sourcePath.IsAnyReadNullable())
         {
             nullFallback = ctx.BuilderContext.GetNullFallbackValue(targetMemberType);
         }
@@ -203,7 +206,8 @@ internal static class MemberMappingBuilder
             sourcePath.BuildGetter(ctx.BuilderContext),
             targetMemberType,
             nullFallback,
-            !ctx.BuilderContext.IsExpression
+            !ctx.BuilderContext.IsExpression,
+            ignoreNullHandling
         );
     }
 

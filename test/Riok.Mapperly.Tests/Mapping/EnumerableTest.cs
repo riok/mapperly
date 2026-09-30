@@ -493,6 +493,25 @@ public class EnumerableTest
     }
 
     [Fact]
+    public void ReadOnlyCollectionToCreatedQueueOfCastedTypes()
+    {
+        var source = TestSourceBuilder.Mapping("IReadOnlyCollection<int>", "Queue<long>");
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::System.Collections.Generic.Queue<long>(source.Count);
+                foreach (var item in source)
+                {
+                    target.Enqueue((long)item);
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public Task ArrayToReadOnlyCollectionShouldUpgradeNullability()
     {
         var source = TestSourceBuilder.Mapping(

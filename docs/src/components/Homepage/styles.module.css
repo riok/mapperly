@@ -1,0 +1,176 @@
+.heroBanner {
+  padding: 4rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+@media screen and (width <= 996px) {
+  .heroBanner {
+    padding: 2rem;
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.secondaryButton {
+  border: 1px solid rgb(255 255 255 / 80%);
+  background: transparent;
+  color: #fff;
+}
+
+.buttons .secondaryButton:hover,
+.buttons .secondaryButton:focus-visible {
+  border-color: #fff;
+  background: #fff;
+  color: var(--ifm-color-primary-darkest);
+}
+
+.heroSubtitle {
+  max-width: 760px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.section {
+  padding: 4rem 0;
+}
+
+.sectionMuted {
+  background: var(--ifm-color-emphasis-100);
+}
+
+.sectionHeading {
+  max-width: 780px;
+  margin-bottom: 2rem;
+}
+
+.sectionHeading h2 {
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+}
+
+.sectionHeading > p:last-child {
+  color: var(--ifm-color-emphasis-700);
+  font-size: 1.1rem;
+}
+
+.eyebrow {
+  margin-bottom: 0.5rem;
+  color: var(--ifm-color-primary-darkest);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.codeGrid,
+.benefitGrid,
+.scenarioGrid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.codeGrid {
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+}
+
+.codeGrid > * {
+  min-width: 0;
+}
+
+.codeBlock,
+.codeBlock pre {
+  background: var(--ifm-background-surface-color) !important;
+}
+
+.benefitGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.scenarioGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.card,
+.codeBlock {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: var(--ifm-card-border-radius);
+  box-shadow: var(--ifm-global-shadow-lw);
+}
+
+.card {
+  padding: 1.5rem;
+  background: var(--ifm-background-surface-color);
+}
+
+.card h3 {
+  font-size: 1.2rem;
+}
+
+.sectionLink {
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.comparisonTable {
+  display: table;
+  width: 100%;
+  margin-bottom: 0;
+  background: var(--ifm-background-surface-color);
+}
+
+.comparisonTable th,
+.comparisonTable td {
+  min-width: 150px;
+  padding: 1rem;
+  text-align: left;
+}
+
+.comparisonTable th:first-child {
+  min-width: 190px;
+}
+
+.finalSection {
+  text-align: center;
+}
+
+.finalSection .sectionHeading {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.docLinks {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+@media screen and (width <= 996px) {
+  .benefitGrid,
+  .scenarioGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media screen and (width <= 700px) {
+  .section {
+    padding: 3rem 0;
+  }
+
+  .codeGrid,
+  .benefitGrid,
+  .scenarioGrid {
+    grid-template-columns: 1fr;
+  }
+}

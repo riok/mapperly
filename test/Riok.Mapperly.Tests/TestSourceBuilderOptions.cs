@@ -24,7 +24,8 @@ public record TestSourceBuilderOptions(
     MemberVisibility? IncludedConstructors = null,
     bool Static = false,
     bool PreferParameterlessConstructors = true,
-    bool AutoUserMappings = true
+    bool AutoUserMappings = true,
+    QueryableProjectionNullHandling? QueryableProjectionNullHandling = null
 )
 {
     public const string DefaultMapperClassName = "Mapper";

@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Riok.Mapperly.Abstractions;
 using Riok.Mapperly.Configuration;
 using Riok.Mapperly.Descriptors.Constructors;
 using Riok.Mapperly.Descriptors.Enumerables;
@@ -97,6 +99,14 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
     /// Whether the current mapping code is generated for a <see cref="System.Linq.Expressions.Expression"/>.
     /// </summary>
     public virtual bool IsExpression => false;
+
+    /// <summary>
+    /// Whether null handling should be skipped in the current mapping,
+    /// because it is generated for a queryable projection / expression mapping
+    /// and <see cref="QueryableProjectionNullHandling.Ignore"/> is configured.
+    /// </summary>
+    public bool IgnoreQueryableProjectionNullHandling =>
+        IsExpression && Configuration.Mapper.QueryableProjectionNullHandling == QueryableProjectionNullHandling.Ignore;
 
     public ParameterScope ParameterScope { get; } = ParameterScope.Empty;
 
@@ -217,8 +227,26 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         if (key.Configuration.UseNamedMapping != null)
             return BuildMapping(key, options, diagnosticLocation);
 
+        // Honor a user-defined conversion operator that accepts a nullable parameter:
+        // build against the nullable source so no null guard is emitted (the delegate's
+        // SourceType stays nullable and the existing null-handling logic skips the guard).
+        if (key.Source.IsNullable() && HasNullAcceptingUserDefinedConversion(key.Source, key.Target))
+        {
+            if (BuildMapping(key, options, diagnosticLocation) is { } nullAcceptingMapping)
+                return nullAcceptingMapping;
+        }
+
         return FindOrBuildMapping(key.NonNullable(), options, diagnosticLocation);
     }
+
+    /// <summary>
+    /// Whether a user-defined conversion operator exists from <paramref name="source"/> to
+    /// <paramref name="target"/> whose parameter accepts <c>null</c> according to its effective write-nullability.
+    /// Such a conversion does not need a null guard for a nullable source.
+    /// </summary>
+    public bool HasNullAcceptingUserDefinedConversion(ITypeSymbol source, ITypeSymbol target) =>
+        Compilation.ClassifyConversion(source, target) is { IsUserDefined: true, MethodSymbol.Parameters: [var parameter] }
+        && SymbolAccessor.IsWriteNullable(parameter);
 
     /// <summary>
     /// Builds a new mapping for the provided types and config with the given options.
@@ -343,7 +371,9 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         }
 
         var existingMapping = FindMapping(source, target);
-        return existingMapping == null ? null : new DelegateMapping(Source, Target, existingMapping);
+
+        // User mappings require exact type matches and must not be reused through generalized delegation.
+        return existingMapping is null or IUserMapping ? null : new DelegateMapping(Source, Target, existingMapping);
     }
 
     public void ReportDiagnostic(DiagnosticDescriptor descriptor, params object[] messageArgs) =>

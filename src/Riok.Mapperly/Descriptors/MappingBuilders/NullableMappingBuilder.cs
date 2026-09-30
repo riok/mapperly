@@ -13,7 +13,24 @@ public static class NullableMappingBuilder
             return null;
 
         var delegateMapping = ctx.BuildMapping(mappingKey, MappingBuildingOptions.KeepUserSymbol | MappingBuildingOptions.EmbeddedMapping);
-        return delegateMapping == null ? null : BuildNullDelegateMapping(ctx, delegateMapping);
+        if (delegateMapping == null)
+            return null;
+
+        // Honor a null-accepting user-defined conversion operator: when the selected conversion is a
+        // cast and the operator accepts null directly, rebuild it against the nullable source so no
+        // null guard is wrapped around it. Only applies when a cast is what the pipeline selected
+        // anyway, so higher-priority structural mappings (ctor/parse/enumerable/...) keep precedence.
+        if (
+            delegateMapping is CastMapping
+            && ctx.Source.IsNullable()
+            && ctx.HasNullAcceptingUserDefinedConversion(ctx.Source, ctx.Target)
+            && (ImplicitCastMappingBuilder.TryBuildMapping(ctx) ?? ExplicitCastMappingBuilder.TryBuildMapping(ctx)) is { } castMapping
+        )
+        {
+            return castMapping;
+        }
+
+        return BuildNullDelegateMapping(ctx, delegateMapping);
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
@@ -37,7 +54,8 @@ public static class NullableMappingBuilder
 
         mappingKey = new TypeMappingKey(sourceNonNullable ?? ctx.Source, targetNonNullable ?? ctx.Target);
 
-        if (sourceIsNullable && !targetIsNullable)
+        // skip the diagnostic when null handling is ignored as the null guard is intentionally omitted.
+        if (sourceIsNullable && !targetIsNullable && !ctx.IgnoreQueryableProjectionNullHandling)
         {
             ctx.ReportDiagnostic(DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType, ctx.Source, ctx.Target);
         }
@@ -47,6 +65,11 @@ public static class NullableMappingBuilder
 
     private static INewInstanceMapping BuildNullDelegateMapping(MappingBuilderContext ctx, INewInstanceMapping mapping)
     {
+        // when null handling is ignored, skip the null guard entirely and map the
+        // source directly (still overwriting the nullable types and unwrapping nullable value types).
+        if (ctx.IgnoreQueryableProjectionNullHandling)
+            return new NullBypassDelegateMapping(ctx.Source, ctx.Target, mapping);
+
         var nullFallback = ctx.GetNullFallbackValue();
 
         return mapping switch

@@ -36,7 +36,7 @@
     "@docusaurus/module-type-aliases": "3.10.2",
     "@docusaurus/tsconfig": "3.10.2",
     "@types/react": "19.2.18",
-    "@typescript-eslint/eslint-plugin": "8.66.0",
+    "@typescript-eslint/eslint-plugin": "8.68.0",
     "hast-util-to-html": "9.0.5",
     "marked": "18.0.4",
     "prettier": "3.9.6",
