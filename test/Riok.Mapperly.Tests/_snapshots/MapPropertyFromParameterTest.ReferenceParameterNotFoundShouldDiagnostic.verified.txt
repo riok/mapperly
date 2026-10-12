@@ -1,0 +1,26 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+{
+    [MapPropertyFromParameter(nameof(@ParentDomain.Id), "parentId")]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial ParentDomain Map(ParentDto parent, string id);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(12,61),
+      Message: The specified parameter parentId was not found on the mapping method Map,
+      Severity: Error,
+      Descriptor: {
+        Id: RMG101,
+        Title: Mapping source parameter not found,
+        HelpLink: https://localhost:3000/docs/configuration/analyzer-diagnostics/RMG101,
+        MessageFormat: The specified parameter {0} was not found on the mapping method {1},
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

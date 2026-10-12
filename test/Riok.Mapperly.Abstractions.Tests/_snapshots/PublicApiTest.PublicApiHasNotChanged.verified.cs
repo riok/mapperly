@@ -101,6 +101,20 @@ namespace Riok.Mapperly.Abstractions
     }
     [System.AttributeUsage(System.AttributeTargets.Method, AllowMultiple=true)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
+    public sealed class MapPropertyFromParameterAttribute : System.Attribute
+    {
+        public MapPropertyFromParameterAttribute(string target, string parameter) { }
+        public MapPropertyFromParameterAttribute(string[] target, string parameter) { }
+        public string? FormatProvider { get; set; }
+        public string Parameter { get; }
+        public string? StringFormat { get; set; }
+        public bool SuppressNullMismatchDiagnostic { get; set; }
+        public System.Collections.Generic.IReadOnlyCollection<string> Target { get; }
+        public string TargetFullName { get; }
+        public string? Use { get; set; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method, AllowMultiple=true)]
+    [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
     public sealed class MapPropertyFromSourceAttribute : System.Attribute
     {
         public MapPropertyFromSourceAttribute(string target) { }
