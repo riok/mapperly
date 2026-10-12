@@ -27,4 +27,10 @@ public sealed class IncludeMappingConfigurationAttribute : Attribute
     /// Gets the name of the mapping configuration to include.
     /// </summary>
     public string Name { get; }
+
+    /// <summary>
+    /// Whether to apply the included mapping configuration in reverse.
+    /// Reverses member configurations and swaps source and target types.
+    /// </summary>
+    public bool Reverse { get; set; }
 }
