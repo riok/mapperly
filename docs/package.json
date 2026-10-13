@@ -39,7 +39,7 @@
     "@typescript-eslint/eslint-plugin": "8.71.1",
     "hast-util-to-html": "9.0.5",
     "marked": "18.0.4",
-    "prettier": "3.9.9",
+    "prettier": "3.9.10",
     "stylelint": "17.16.0",
     "stylelint-config-standard": "40.0.0",
     "ts-node": "10.9.2",
