@@ -109,6 +109,44 @@ public class QueryableProjectionEnumTest
     }
 
     [Fact]
+    public void EnumToAnotherEnumByNameWithNoExpressionInliningShouldInvoke()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> q);
+
+            [MapperNoExpressionInlining]
+            partial D MapEnum(C src);
+            """,
+            TestSourceBuilderOptions.Default with
+            {
+                EnumMappingStrategy = EnumMappingStrategy.ByName,
+            },
+            "class A { public C Value { get; set; } }",
+            "class B { public D Value { get; set; } }",
+            "enum C { Value1, Value2 }",
+            "enum D { Value1, Value2 }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            q,
+                            x => new global::B()
+                            {
+                                Value = MapEnum(x.Value),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
     public Task EnumToString()
     {
         var source = TestSourceBuilder.Mapping(

@@ -201,6 +201,9 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     {
         return mapping switch
         {
+            // excluded from inlining, the method is invoked instead
+            IUserMapping { NoExpressionInlining: true } => mapping,
+
             // inline existing mapping
             UserImplementedMethodMapping implementedMapping => InlineOrRebuild(implementedMapping) ?? implementedMapping,
 
