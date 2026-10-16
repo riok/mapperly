@@ -209,6 +209,12 @@ namespace Riok.Mapperly.Abstractions
     }
     [System.AttributeUsage(System.AttributeTargets.Method)]
     [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
+    public sealed class MapperNoExpressionInliningAttribute : System.Attribute
+    {
+        public MapperNoExpressionInliningAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method)]
+    [System.Diagnostics.Conditional("MAPPERLY_ABSTRACTIONS_SCOPE_RUNTIME")]
     public sealed class MapperRequiredMappingAttribute : System.Attribute
     {
         public MapperRequiredMappingAttribute(Riok.Mapperly.Abstractions.RequiredMappingStrategy requiredMappingStrategy) { }
