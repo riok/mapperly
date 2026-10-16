@@ -151,4 +151,13 @@ public class MapperAttribute : Attribute
     /// Defaults to <see cref="QueryableProjectionNullHandling.NullSafe"/>.
     /// </summary>
     public QueryableProjectionNullHandling QueryableProjectionNullHandling { get; set; } = QueryableProjectionNullHandling.NullSafe;
+
+    /// <summary>
+    /// If <c>true</c>, the mapping methods of this mapper are not inlined into the expression trees
+    /// of <see cref="System.Linq.IQueryable{T}"/> projection and <see cref="System.Linq.Expressions.Expression{TDelegate}"/> mappings
+    /// but invoked instead.
+    /// Defaults to <c>false</c>.
+    /// <seealso cref="MapperNoExpressionInliningAttribute"/> for per-method control.
+    /// </summary>
+    public bool NoExpressionInlining { get; set; }
 }
