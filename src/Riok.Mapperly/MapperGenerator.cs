@@ -170,7 +170,9 @@ public class MapperGenerator : IIncrementalGenerator
             var mappedMapperType =
                 compilation.GetBestTypeByMetadataName(mapperTypeFqn)
                 ?? throw new InvalidOperationException($"Could not get type {mapperTypeFqn}");
-            staticMappersBuilder.Add(new UseStaticMapperConfiguration(mappedMapperType));
+            staticMappersBuilder.Add(
+                new UseStaticMapperConfiguration(mappedMapperType) { NoExpressionInlining = config.NoExpressionInlining }
+            );
         }
 
         return staticMappersBuilder.ToImmutable();
