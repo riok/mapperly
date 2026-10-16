@@ -140,4 +140,7 @@ public record MapperConfiguration
 
     /// <inheritdoc cref="MapperAttribute.QueryableProjectionNullHandling"/>
     public QueryableProjectionNullHandling? QueryableProjectionNullHandling { get; init; }
+
+    /// <inheritdoc cref="MapperAttribute.NoExpressionInlining"/>
+    public bool? NoExpressionInlining { get; init; }
 }
