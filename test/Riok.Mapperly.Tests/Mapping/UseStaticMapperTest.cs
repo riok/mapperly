@@ -397,7 +397,8 @@ public class UseStaticMapperTest
     }
 
     private MapperGenerationResultAssertions ExecuteStaticGenericMapperStaticMethodFromAnotherAssemblyCompilation(
-        bool asCompilationReference
+        bool asCompilationReference,
+        bool noExpressionInlining = false
     )
     {
         var testDependencySource = TestSourceBuilder.SyntaxTree(
@@ -423,14 +424,14 @@ public class UseStaticMapperTest
         );
 
         var source = TestSourceBuilder.CSharp(
-            """
+            $$"""
             using System;
             using System.Linq;
             using Riok.Mapperly.Abstractions;
             using Riok.Mapperly.TestDependency.Mapper;
 
             [Mapper]
-            [UseStaticMapper(typeof(DateTimeMapper))]
+            [UseStaticMapper(typeof(DateTimeMapper){{(noExpressionInlining ? ", NoExpressionInlining = true" : "")}})]
             public static partial class Mapper
             {
                 public static partial IQueryable<Target> ProjectToTarget(IQueryable<Source> source);
@@ -463,20 +464,50 @@ public class UseStaticMapperTest
     {
         var result = ExecuteStaticGenericMapperStaticMethodFromAnotherAssemblyCompilation(asCompilationReference: true);
 
-        result.HaveMethodBody(
-            "ProjectToTarget",
-            """
-            #nullable disable
-                    return global::System.Linq.Queryable.Select(
-                        source,
-                        x => new global::Mapper.Target()
-                        {
-                            DateTime = new global::System.DateTimeOffset(x.DateTime, global::System.TimeSpan.Zero),
-                        }
-                    );
-            #nullable enable
-            """
+        result
+            .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline)
+            .HaveMethodBody(
+                "ProjectToTarget",
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            source,
+                            x => new global::Mapper.Target()
+                            {
+                                DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void UseStaticGenericMapperStaticMethodFromAnotherAssemblyWithNoExpressionInlining(bool asCompilationReference)
+    {
+        var result = ExecuteStaticGenericMapperStaticMethodFromAnotherAssemblyCompilation(
+            asCompilationReference,
+            noExpressionInlining: true
         );
+
+        result
+            .HaveAssertedAllDiagnostics()
+            .HaveMethodBody(
+                "ProjectToTarget",
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            source,
+                            x => new global::Mapper.Target()
+                            {
+                                DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
+                            }
+                        );
+                #nullable enable
+                """
+            );
     }
 
     /// <summary>

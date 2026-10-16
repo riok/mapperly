@@ -559,7 +559,7 @@ public static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor QueryableProjectionMappingCannotInline = new(
         "RMG068",
         "Cannot inline user implemented queryable expression mapping",
-        "Cannot inline user implemented queryable expression mapping",
+        "Cannot inline user implemented queryable expression mapping, use [MapperNoExpressionInlining], MapperAttribute.NoExpressionInlining or UseStaticMapper/UseMapper(NoExpressionInlining = true) to invoke the method instead",
         DiagnosticCategories.Mapper,
         DiagnosticSeverity.Warning,
         true
