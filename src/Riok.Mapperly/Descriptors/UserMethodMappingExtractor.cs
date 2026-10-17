@@ -175,7 +175,7 @@ public static class UserMethodMappingExtractor
 
         if (!valid || !UserMappingMethodParameterExtractor.BuildParameters(ctx, method, out var parameters))
         {
-            if (!hasAttribute)
+            if (!hasAttribute || userMappingConfig.Ignore == true)
                 return null;
 
             var name = receiver == null ? method.Name : receiver + method.Name;
