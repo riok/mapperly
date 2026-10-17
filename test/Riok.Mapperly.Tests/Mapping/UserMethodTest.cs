@@ -885,6 +885,103 @@ public class UserMethodTest
     }
 
     [Fact]
+    public void StaticAbstractInterfaceMappingMethodShouldBeIgnored()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial B Map(A source);
+            static D IBaseMapper<Mapper>.BaseMapping(C source) => new D(source.Value + 10);
+            """,
+            TestSourceBuilderOptions.WithBaseClass("IBaseMapper<Mapper>"),
+            """
+            public interface IBaseMapper<TSelf> where TSelf : IBaseMapper<TSelf>
+            {
+                static abstract D BaseMapping(C source);
+            }
+            """,
+            "record A(C NestedValue);",
+            "record B(D NestedValue);",
+            "record C(int Value);",
+            "record D(int Value);"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(MapToD(source.NestedValue));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void StaticVirtualInterfaceMappingMethodShouldBeIgnored()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.WithBaseClass("IBaseMapper<Mapper>"),
+            """
+            public interface IBaseMapper<TSelf> where TSelf : IBaseMapper<TSelf>
+            {
+                static virtual D BaseMapping(C source) => new D(source.Value + 10);
+            }
+            """,
+            "record A(C NestedValue);",
+            "record B(D NestedValue);",
+            "record C(int Value);",
+            "record D(int Value);"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(MapToD(source.NestedValue));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void StaticAbstractInterfaceMappingMethodWithUserMappingAttributeShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial B Map(A source);
+            static D IBaseMapper<Mapper>.BaseMapping(C source) => new D(source.Value + 10);
+            """,
+            TestSourceBuilderOptions.WithBaseClass("IBaseMapper<Mapper>"),
+            """
+            public interface IBaseMapper<TSelf> where TSelf : IBaseMapper<TSelf>
+            {
+                [UserMapping]
+                static abstract D BaseMapping(C source);
+            }
+            """,
+            "record A(C NestedValue);",
+            "record B(D NestedValue);",
+            "record C(int Value);",
+            "record D(int Value);"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.UnsupportedMappingMethodSignature,
+                "BaseMapping has an unsupported mapping method signature"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(MapToD(source.NestedValue));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void MappingMethodWithSingleTargetParameterShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes("public partial B Map([MappingTarget] A source);", "record A;", "record b;");

@@ -167,7 +167,11 @@ public static class UserMethodMappingExtractor
     )
     {
         var userMappingConfig = GetUserMappingConfig(ctx, method, out var hasAttribute);
-        var valid = (allowPartial || !method.IsPartialDefinition) && (!isStatic || method.IsStatic);
+        // static abstract and static virtual interface members can only be accessed through a type parameter
+        var valid =
+            (allowPartial || !method.IsPartialDefinition)
+            && (!isStatic || method.IsStatic)
+            && method is not { IsStatic: true, IsAbstract: true } and not { IsStatic: true, IsVirtual: true };
 
         if (!valid || !UserMappingMethodParameterExtractor.BuildParameters(ctx, method, out var parameters))
         {
