@@ -21,6 +21,36 @@ public class QueryableProjectionEnumTest
     }
 
     [Fact]
+    public void EnumToAnotherEnumWithDifferentUnderlyingType()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "System.Linq.IQueryable<A>",
+            "System.Linq.IQueryable<B>",
+            "class A { public C Value { get; set; } }",
+            "class B { public D Value { get; set; } }",
+            "enum C : short { Value1, Value2 }",
+            "enum D : byte { Value1, Value2 }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            source,
+                            x => new global::B()
+                            {
+                                Value = (global::D)x.Value,
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
     public void EnumToAnotherEnumByNameShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping(
