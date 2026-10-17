@@ -233,9 +233,9 @@ public static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor EnumMappingNotSupportedInProjectionMappings = new(
         "RMG032",
         "The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings",
-        "The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings to map from {0} to {1}",
+        "The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings to map from {0} to {1}, use [MapperNoExpressionInlining], MapperAttribute.NoExpressionInlining or UseStaticMapper/UseMapper(NoExpressionInlining = true) to invoke a mapping method instead",
         DiagnosticCategories.Mapper,
-        DiagnosticSeverity.Warning,
+        DiagnosticSeverity.Error,
         true
     );
 

@@ -49,14 +49,14 @@ public static class EnumToEnumMappingBuilder
         };
     }
 
-    private static INewInstanceMapping BuildCastMappingAndDiagnostic(MappingBuilderContext ctx)
+    private static INewInstanceMapping? BuildCastMappingAndDiagnostic(MappingBuilderContext ctx)
     {
         ctx.ReportDiagnostic(
             DiagnosticDescriptors.EnumMappingNotSupportedInProjectionMappings,
             ctx.Source.ToDisplayString(),
             ctx.Target.ToDisplayString()
         );
-        return BuildEnumToEnumCastMapping(ctx, true);
+        return null;
     }
 
     private static INewInstanceMapping BuildEnumToEnumCastMapping(
