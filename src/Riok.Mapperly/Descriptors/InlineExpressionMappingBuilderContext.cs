@@ -201,6 +201,16 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
     {
         return mapping switch
         {
+            // excluded from inlining, the method is invoked instead
+            IUserMapping { NoExpressionInlining: true } => mapping,
+
+            // the syntax of methods declared in other assemblies is only available for compilation references,
+            // never inline them to generate the same code in the IDE and the build
+            IUserMapping userMapping when !IsDeclaredInCurrentAssembly(userMapping.Method) => ReportCannotInline(
+                mapping,
+                userMapping.Method
+            ),
+
             // inline existing mapping
             UserImplementedMethodMapping implementedMapping => InlineOrRebuild(implementedMapping) ?? implementedMapping,
 
@@ -214,6 +224,15 @@ public class InlineExpressionMappingBuilderContext : MappingBuilderContext
 
             _ => mapping,
         };
+    }
+
+    private bool IsDeclaredInCurrentAssembly(IMethodSymbol method) =>
+        SymbolEqualityComparer.Default.Equals(method.ContainingAssembly, Compilation.Assembly);
+
+    private INewInstanceMapping ReportCannotInline(INewInstanceMapping mapping, IMethodSymbol method)
+    {
+        ReportDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline, method);
+        return mapping;
     }
 
     private INewInstanceMapping? InlineOrRebuild(UserImplementedMethodMapping mapping)

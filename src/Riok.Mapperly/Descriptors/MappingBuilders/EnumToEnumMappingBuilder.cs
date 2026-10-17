@@ -49,28 +49,19 @@ public static class EnumToEnumMappingBuilder
         };
     }
 
-    private static INewInstanceMapping BuildCastMappingAndDiagnostic(MappingBuilderContext ctx)
+    private static INewInstanceMapping? BuildCastMappingAndDiagnostic(MappingBuilderContext ctx)
     {
         ctx.ReportDiagnostic(
             DiagnosticDescriptors.EnumMappingNotSupportedInProjectionMappings,
             ctx.Source.ToDisplayString(),
             ctx.Target.ToDisplayString()
         );
-        return BuildEnumToEnumCastMapping(ctx, true);
+        return null;
     }
 
-    private static INewInstanceMapping BuildEnumToEnumCastMapping(
-        MappingBuilderContext ctx,
-        bool ignoreExplicitAndIgnoredMappings = false,
-        bool checkTargetDefined = false
-    )
+    private static INewInstanceMapping BuildEnumToEnumCastMapping(MappingBuilderContext ctx, bool checkTargetDefined = false)
     {
-        var enumMemberMappings = BuildEnumMemberMappings(
-            ctx,
-            ignoreExplicitAndIgnoredMappings,
-            static x => x.ConstantValue!,
-            EqualityComparer<object>.Default
-        );
+        var enumMemberMappings = BuildEnumMemberMappings(ctx, static x => x.ConstantValue!, EqualityComparer<object>.Default);
         var fallbackMapping = BuildFallbackMapping(ctx);
         if (fallbackMapping.FallbackExpression is not null && !checkTargetDefined)
         {
@@ -111,8 +102,8 @@ public static class EnumToEnumMappingBuilder
     {
         var fallbackMapping = BuildFallbackMapping(ctx);
         var enumMemberMappings = ctx.Configuration.Enum.IgnoreCase
-            ? BuildEnumMemberMappings(ctx, false, static x => x.Name, StringComparer.Ordinal, StringComparer.OrdinalIgnoreCase)
-            : BuildEnumMemberMappings(ctx, false, static x => x.Name, StringComparer.Ordinal);
+            ? BuildEnumMemberMappings(ctx, static x => x.Name, StringComparer.Ordinal, StringComparer.OrdinalIgnoreCase)
+            : BuildEnumMemberMappings(ctx, static x => x.Name, StringComparer.Ordinal);
 
         if (enumMemberMappings.MemberMappings.Count == 0)
         {
@@ -124,21 +115,14 @@ public static class EnumToEnumMappingBuilder
 
     private static EnumMemberMappings BuildEnumMemberMappings<T>(
         MappingBuilderContext ctx,
-        bool ignoreExplicitAndIgnoredMappings,
         Func<IFieldSymbol, T> propertySelector,
         params IEqualityComparer<T>[] propertyComparer
     )
         where T : notnull
     {
-        var ignoredSourceMembers = ignoreExplicitAndIgnoredMappings
-            ? new HashSet<IFieldSymbol>(SymbolEqualityComparer.Default)
-            : ctx.Configuration.Enum.IgnoredSourceMembers.ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
-        var ignoredTargetMembers = ignoreExplicitAndIgnoredMappings
-            ? new HashSet<IFieldSymbol>(SymbolEqualityComparer.Default)
-            : ctx.Configuration.Enum.IgnoredTargetMembers.ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
-        var explicitMappings = ignoreExplicitAndIgnoredMappings
-            ? new Dictionary<IFieldSymbol, IFieldSymbol>(SymbolEqualityComparer.Default)
-            : BuildExplicitValueMappings(ctx);
+        var ignoredSourceMembers = ctx.Configuration.Enum.IgnoredSourceMembers.ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
+        var ignoredTargetMembers = ctx.Configuration.Enum.IgnoredTargetMembers.ToHashSet(SymbolTypeEqualityComparer.FieldDefault);
+        var explicitMappings = BuildExplicitValueMappings(ctx);
         var sourceMembers = ctx.SymbolAccessor.GetFieldsExcept(ctx.Source, ignoredSourceMembers);
         var targetMembers = ctx.SymbolAccessor.GetFieldsExcept(ctx.Target, ignoredTargetMembers);
 
