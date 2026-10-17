@@ -31,6 +31,33 @@ public class UseMapperTest
     }
 
     [Fact]
+    public void UseMapperWithStaticInterfaceMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UseMapper]
+            private readonly OtherMapper _otherMapper = new();
+            partial B Map(A source);
+            """,
+            "record A(AExternal Value);",
+            "record B(BExternal Value);",
+            "record AExternal();",
+            "record BExternal();",
+            "interface IOtherMapper { static BExternal ToBExternal(AExternal source) => new BExternal(); }",
+            "class OtherMapper : IOtherMapper;"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B(global::IOtherMapper.ToBExternal(source.Value));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void UsePropertyMapper()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(

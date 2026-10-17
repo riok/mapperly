@@ -795,6 +795,96 @@ public class UserMethodTest
     }
 
     [Fact]
+    public void StaticInterfaceMappingMethodShouldBeInvokedOnInterfaceType()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.WithBaseClass("IBaseMapper"),
+            """
+            public interface IBaseMapper
+            {
+                public static D BaseMapping(C source)
+                    => new D(source.Value + 10);
+            }
+            """,
+            "record A(C NestedValue);",
+            "record B(D NestedValue);",
+            "record C(int Value);",
+            "record D(int Value);"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(global::IBaseMapper.BaseMapping(source.NestedValue));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void StaticInterfaceExistingTargetMappingMethodShouldBeInvokedOnInterfaceType()
+    {
+        var source = TestSourceBuilder.Mapping(
+            "A",
+            "B",
+            TestSourceBuilderOptions.WithBaseClass("IBaseMapper"),
+            """
+            public interface IBaseMapper
+            {
+                public static void BaseMapping(C source, D target)
+                    => target.Value = source.Value + 10;
+            }
+            """,
+            "class A { public C NestedValue { get; set; } }",
+            "class B { public D NestedValue { get; } = new(); }",
+            "class C { public int Value { get; set; } }",
+            "class D { public int Value { get; set; } }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                global::IBaseMapper.BaseMapping(source.NestedValue, target.NestedValue);
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void StaticInterfaceMappingMethodShouldBeInvokedOnInterfaceTypeInStaticMappingMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "public static partial B Map(A source);",
+            TestSourceBuilderOptions.WithBaseClass("IBaseMapper"),
+            """
+            public interface IBaseMapper
+            {
+                public static D BaseMapping(C source)
+                    => new D(source.Value + 10);
+            }
+            """,
+            "record A(C NestedValue);",
+            "record B(D NestedValue);",
+            "record C(int Value);",
+            "record D(int Value);"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(global::IBaseMapper.BaseMapping(source.NestedValue));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void MappingMethodWithSingleTargetParameterShouldDiagnostic()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes("public partial B Map([MappingTarget] A source);", "record A;", "record b;");

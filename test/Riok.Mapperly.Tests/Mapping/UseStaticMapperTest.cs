@@ -71,6 +71,40 @@ public class UseStaticMapperTest
     }
 
     [Fact]
+    public void UseStaticTypeOfMapperStaticInterfaceMethod()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+
+            record A(AExternal Value);
+            record B(BExternal Value);
+            record AExternal();
+            record BExternal();
+
+            interface IOtherMapper { static BExternal ToBExternal(AExternal source) => new BExternal(); }
+            class OtherMapper : IOtherMapper;
+
+            [Mapper]
+            [UseStaticMapper(typeof(OtherMapper))]
+            public partial class Mapper
+            {
+                partial B Map(A source);
+            }
+            """
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(global::IOtherMapper.ToBExternal(source.Value));
+                return target;
+                """
+            );
+    }
+
+    [Fact]
     public void UseStaticGenericMapperStaticMethodInStaticMapper()
     {
         var source = TestSourceBuilder.CSharp(

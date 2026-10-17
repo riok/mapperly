@@ -88,17 +88,19 @@ public class UserImplementedMethodMapping(
             );
         }
 
-        var castedReceiver = CastExpression(
-            FullyQualifiedIdentifier(Method.ReceiverType!),
-            receiver == null ? ThisExpression() : IdentifierName(receiver)
-        );
-        var castedMethodExpr = MemberAccessExpression(
-            SyntaxKind.SimpleMemberAccessExpression,
-            ParenthesizedExpression(castedReceiver),
-            methodName
-        );
+        // static interface members cannot be accessed through an instance,
+        // they are invoked on the interface type instead
+        ExpressionSyntax interfaceReceiver = Method.IsStatic
+            ? FullyQualifiedIdentifier(Method.ReceiverType!)
+            : ParenthesizedExpression(
+                CastExpression(
+                    FullyQualifiedIdentifier(Method.ReceiverType!),
+                    receiver == null ? ThisExpression() : IdentifierName(receiver)
+                )
+            );
+        var interfaceMethodExpr = MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, interfaceReceiver, methodName);
         return ctx.SyntaxFactory.Invocation(
-            castedMethodExpr,
+            interfaceMethodExpr,
             ctx.BuildArguments(
                 Method,
                 sourceParameter,
