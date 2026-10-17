@@ -934,6 +934,59 @@ public class UseStaticMapperTest
     }
 
     [Fact]
+    public void ProjectionWithUseStaticMapperEnumByNameWithoutNoExpressionInliningShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            class A { public C Status { get; set; } }
+            class B { public D Status { get; set; } }
+            enum C { Value1, Value2 }
+            enum D { Value1, Value2 }
+
+            [Mapper]
+            public static partial class EnumMapper
+            {
+                [MapEnum(EnumMappingStrategy.ByName)]
+                public static partial D MapToStatus(C s);
+            }
+
+            [Mapper]
+            [UseStaticMapper(typeof(EnumMapper))]
+            public static partial class Mapper
+            {
+                public static partial IQueryable<B> Map(IQueryable<A> q);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.EnumMappingNotSupportedInProjectionMappings,
+                "The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings to map from C to D, use [MapperNoExpressionInlining], MapperAttribute.NoExpressionInlining or UseStaticMapper/UseMapper(NoExpressionInlining = true) to invoke a mapping method instead"
+            )
+            .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline)
+            .HaveAssertedAllDiagnostics()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            q,
+                            x => new global::B()
+                            {
+                                Status = global::EnumMapper.MapToStatus(x.Status),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
     public void ProjectionWithUseStaticMapperShouldIgnoreNoExpressionInliningOfReferencedMapper()
     {
         var source = TestSourceBuilder.CSharp(
