@@ -96,6 +96,29 @@ If multiple mappings exist for the same type-pair without a default mapping, `RM
 By default `RMG060` has a severity of warning,
 which can be changed using the [`.editorconfig`](./analyzer-diagnostics/index.mdx#editorconfig).
 
+## Base classes and interfaces
+
+User-implemented mapping methods are also discovered in the base classes and interfaces of a mapper.
+Static interface methods are invoked on the interface type.
+Static abstract and static virtual interface members are not used,
+since they can only be accessed through a type parameter.
+
+```csharp
+public interface ICarMapperBase
+{
+    // highlight-start
+    // invoked as global::ICarMapperBase.TimeSpanToHours(...)
+    static int TimeSpanToHours(TimeSpan t) => t.Hours;
+    // highlight-end
+}
+
+[Mapper]
+public partial class CarMapper : ICarMapperBase
+{
+    public partial CarDto CarToCarDto(Car car);
+}
+```
+
 ## Map properties using user-implemented mappings
 
 See [user-implemented property conversions](./mapper.mdx#user-implemented-property-mappings).
