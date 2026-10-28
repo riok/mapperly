@@ -181,6 +181,11 @@ public class DescriptorBuilder
     {
         foreach (var userMapping in _mappings.UserMappings)
         {
+            // External mappings already have an implementation. Do not read their
+            // configuration or report diagnostics while preparing local mapping bodies.
+            if (userMapping.IsExternal)
+                continue;
+
             var ctx = new MappingBuilderContext(
                 _builderContext,
                 constructorFactory,
