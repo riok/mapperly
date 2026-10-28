@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -68,8 +69,8 @@ public static class EnumToEnumMappingBuilder
         var enumMemberMappings = BuildEnumMemberMappings(
             ctx,
             ignoreExplicitAndIgnoredMappings,
-            static x => x.ConstantValue!,
-            EqualityComparer<object>.Default
+            GetEnumValue,
+            EqualityComparer<decimal>.Default
         );
         var fallbackMapping = BuildFallbackMapping(ctx);
         if (fallbackMapping.FallbackExpression is not null && !checkTargetDefined)
@@ -93,7 +94,7 @@ public static class EnumToEnumMappingBuilder
             fallbackMapping
         );
         var differentValueExplicitEnumMappings = enumMemberMappings
-            .ExplicitMemberMappings.Where(x => x.Key.ConstantValue?.Equals(x.Value.ConstantValue) != true)
+            .ExplicitMemberMappings.Where(x => GetEnumValue(x.Key) != GetEnumValue(x.Value))
             .ToDictionary(x => x.Key, x => x.Value, SymbolTypeEqualityComparer.FieldDefault);
 
         if (differentValueExplicitEnumMappings.Count == 0)
@@ -277,6 +278,10 @@ public static class EnumToEnumMappingBuilder
 
         return explicitMappings;
     }
+
+    // constant values are boxed as the enum's underlying type,
+    // decimal can exactly represent all of them, which allows comparing values of enums with different underlying types
+    private static decimal GetEnumValue(IFieldSymbol field) => Convert.ToDecimal(field.ConstantValue, CultureInfo.InvariantCulture);
 
     private sealed record EnumMemberMappings(
         IReadOnlyDictionary<IFieldSymbol, IFieldSymbol> MemberMappings,

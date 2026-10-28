@@ -24,23 +24,77 @@ public class EnumTest
     public void EnumToOtherEnumTypeShouldCast()
     {
         var source = TestSourceBuilder.Mapping("E1", "E2", "enum E1 : short {A, B, C}", "enum E2 : byte {A, B, C}");
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E2)source;");
+    }
+
+    [Fact]
+    public void EnumToOtherEnumTypeWithMissingValueShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.Mapping("E1", "E2", "enum E1 : short {A, B, C = 300}", "enum E2 : byte {A, B, D = 200}");
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member C (300) on E1 not found on target enum E2")
+            .HaveDiagnostic(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member D (200) on E2 not found on source enum E1")
+            .HaveAssertedAllDiagnostics()
+            .HaveSingleMethodBody("return (global::E2)source;");
+    }
+
+    [Fact]
+    public void EnumToOtherEnumTypeShouldCompareValuesIncludingSign()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial E2 MapSigned8(E1 source);
+            partial E4 MapSigned64(E3 source);
+            """,
+            "enum E1 : sbyte {A = -1, B = 0, C = 127}",
+            "enum E2 : byte {A = 255, B = 0, C = 127}",
+            "enum E3 : long {A = -1, B = 0, C = long.MaxValue}",
+            "enum E4 : ulong {A = ulong.MaxValue, B = 0, C = long.MaxValue}"
+        );
         TestHelper
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostics(
                 DiagnosticDescriptors.SourceEnumValueNotMapped,
-                "Enum member A (0) on E1 not found on target enum E2",
-                "Enum member B (1) on E1 not found on target enum E2",
-                "Enum member C (2) on E1 not found on target enum E2"
+                "Enum member A (-1) on E1 not found on target enum E2",
+                "Enum member A (-1) on E3 not found on target enum E4"
             )
             .HaveDiagnostics(
                 DiagnosticDescriptors.TargetEnumValueNotMapped,
-                "Enum member A (0) on E2 not found on source enum E1",
-                "Enum member B (1) on E2 not found on source enum E1",
-                "Enum member C (2) on E2 not found on source enum E1"
+                "Enum member A (255) on E2 not found on source enum E1",
+                "Enum member A (18446744073709551615) on E4 not found on source enum E3"
             )
-            .HaveAssertedAllDiagnostics()
-            .HaveSingleMethodBody("return (global::E2)source;");
+            .HaveAssertedAllDiagnostics();
+    }
+
+    [Fact]
+    public void EnumToOtherEnumTypeWithExplicitSameValueMappingShouldCast()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnumValue(E1.A, E2.A)] partial E2 Map(E1 source);",
+            "enum E1 : int {A = 1, B = 2}",
+            "enum E2 : long {A = 1, B = 2}"
+        );
+        TestHelper.GenerateMapper(source).Should().HaveSingleMethodBody("return (global::E2)source;");
+    }
+
+    [Fact]
+    public void EnumToOtherEnumTypeByValueCheckDefinedShouldCast()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "[MapEnum(EnumMappingStrategy.ByValueCheckDefined)] partial E2 Map(E1 source);",
+            "enum E1 : ushort {A = 10, B = 20}",
+            "enum E2 : int {A = 10, B = 20}"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """return (global::E2)source is global::E2.A or global::E2.B ? (global::E2)source : throw new global::System.ArgumentOutOfRangeException(nameof(source), source, "The value of enum E1 is not supported");"""
+            );
     }
 
     [Fact]
