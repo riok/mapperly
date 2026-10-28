@@ -82,7 +82,7 @@ jobs:
       id-token: write
     environment:
       name: docs-${{ inputs.environment }}
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.deployment-url }}
     concurrency:
       group: pages
       cancel-in-progress: true
@@ -105,11 +105,9 @@ jobs:
       - name: Version not set
         if: ${{ inputs.version == '' || inputs.version == '0.0.1-dev' }}
         run: exit 1
-      - uses: cloudflare/pages-action@v1
+      - uses: cloudflare/wrangler-action@v3
         id: deployment
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: mapperly
-          branch: ${{ steps.cf-pages-branch-name.outputs.result }}
-          directory: 'docs/build'
+          command: pages deploy docs/build --project-name=mapperly --branch=${{ steps.cf-pages-branch-name.outputs.result }}
