@@ -1,3 +1,5 @@
+using Riok.Mapperly.Diagnostics;
+
 namespace Riok.Mapperly.Tests.Mapping;
 
 public class QueryableProjectionUserImplementedTest
@@ -84,6 +86,53 @@ public class QueryableProjectionUserImplementedTest
         );
 
         return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
+    public void ClassToClassNonInlinedStaticInterfaceMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            "private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);",
+            TestSourceBuilderOptions.WithBaseClass("IBaseMapper"),
+            """
+            public interface IBaseMapper
+            {
+                public static D MapToD(C v)
+                {
+                    var dest = new D();
+                    dest.Value = v.Value + "-mapped";
+                    return dest;
+                }
+            }
+            """,
+            "class A { public string StringValue { get; set; } public C NestedValue { get; set; } }",
+            "class B { public string StringValue { get; set; } public D NestedValue { get; set; } }",
+            "class C { public string Value { get; set; } }",
+            "class D { public string Value { get; set; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.QueryableProjectionMappingCannotInline,
+                "Cannot inline user implemented queryable expression mapping"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            source,
+                            x => new global::B()
+                            {
+                                StringValue = x.StringValue,
+                                NestedValue = global::IBaseMapper.MapToD(x.NestedValue),
+                            }
+                        );
+                #nullable enable
+                """
+            );
     }
 
     [Fact]

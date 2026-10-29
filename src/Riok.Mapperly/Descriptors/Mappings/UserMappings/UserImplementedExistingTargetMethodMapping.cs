@@ -82,18 +82,20 @@ public class UserImplementedExistingTargetMethodMapping(
                     : MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, IdentifierName(receiver), methodName);
         }
 
-        var castedThis = CastExpression(
-            FullyQualifiedIdentifier(Method.ReceiverType!),
-            receiver != null ? IdentifierName(receiver) : ThisExpression()
-        );
-        var castedMethodExpr = MemberAccessExpression(
-            SyntaxKind.SimpleMemberAccessExpression,
-            ParenthesizedExpression(castedThis),
-            methodName
-        );
+        // static interface members cannot be accessed through an instance,
+        // they are invoked on the interface type instead
+        ExpressionSyntax interfaceReceiver = Method.IsStatic
+            ? FullyQualifiedIdentifier(Method.ReceiverType!)
+            : ParenthesizedExpression(
+                CastExpression(
+                    FullyQualifiedIdentifier(Method.ReceiverType!),
+                    receiver != null ? IdentifierName(receiver) : ThisExpression()
+                )
+            );
+        var interfaceMethodExpr = MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, interfaceReceiver, methodName);
         yield return ctx.SyntaxFactory.ExpressionStatement(
             ctx.SyntaxFactory.Invocation(
-                castedMethodExpr,
+                interfaceMethodExpr,
                 ctx.BuildArguments(Method, sourceParameter, referenceHandlerParameter, targetParameter.WithArgument(target))
             )
         );
