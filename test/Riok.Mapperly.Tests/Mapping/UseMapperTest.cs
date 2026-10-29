@@ -457,4 +457,36 @@ public class UseMapperTest
                 """
             );
     }
+
+    [Fact]
+    public void ProjectionWithUseMapperNoExpressionInliningShouldInvoke()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [UseMapper(NoExpressionInlining = true)]
+            private readonly OtherMapper _other = new();
+            partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> q);
+            """,
+            "class A { public string Value { get; set; } }",
+            "class B { public string Value { get; set; } }",
+            "class OtherMapper { public string MapValue(string value) => value.ToUpper(); }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            q,
+                            x => new global::B()
+                            {
+                                Value = _other.MapValue(x.Value),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
 }

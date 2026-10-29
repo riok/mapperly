@@ -397,7 +397,8 @@ public class UseStaticMapperTest
     }
 
     private MapperGenerationResultAssertions ExecuteStaticGenericMapperStaticMethodFromAnotherAssemblyCompilation(
-        bool asCompilationReference
+        bool asCompilationReference,
+        bool noExpressionInlining = false
     )
     {
         var testDependencySource = TestSourceBuilder.SyntaxTree(
@@ -423,14 +424,14 @@ public class UseStaticMapperTest
         );
 
         var source = TestSourceBuilder.CSharp(
-            """
+            $$"""
             using System;
             using System.Linq;
             using Riok.Mapperly.Abstractions;
             using Riok.Mapperly.TestDependency.Mapper;
 
             [Mapper]
-            [UseStaticMapper(typeof(DateTimeMapper))]
+            [UseStaticMapper(typeof(DateTimeMapper){{(noExpressionInlining ? ", NoExpressionInlining = true" : "")}})]
             public static partial class Mapper
             {
                 public static partial IQueryable<Target> ProjectToTarget(IQueryable<Source> source);
@@ -463,20 +464,50 @@ public class UseStaticMapperTest
     {
         var result = ExecuteStaticGenericMapperStaticMethodFromAnotherAssemblyCompilation(asCompilationReference: true);
 
-        result.HaveMethodBody(
-            "ProjectToTarget",
-            """
-            #nullable disable
-                    return global::System.Linq.Queryable.Select(
-                        source,
-                        x => new global::Mapper.Target()
-                        {
-                            DateTime = new global::System.DateTimeOffset(x.DateTime, global::System.TimeSpan.Zero),
-                        }
-                    );
-            #nullable enable
-            """
+        result
+            .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline)
+            .HaveMethodBody(
+                "ProjectToTarget",
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            source,
+                            x => new global::Mapper.Target()
+                            {
+                                DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void UseStaticGenericMapperStaticMethodFromAnotherAssemblyWithNoExpressionInlining(bool asCompilationReference)
+    {
+        var result = ExecuteStaticGenericMapperStaticMethodFromAnotherAssemblyCompilation(
+            asCompilationReference,
+            noExpressionInlining: true
         );
+
+        result
+            .HaveAssertedAllDiagnostics()
+            .HaveMethodBody(
+                "ProjectToTarget",
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            source,
+                            x => new global::Mapper.Target()
+                            {
+                                DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
+                            }
+                        );
+                #nullable enable
+                """
+            );
     }
 
     /// <summary>
@@ -544,6 +575,52 @@ public class UseStaticMapperTest
                 """
                 var target = new global::B(global::ExternalMapper.ExplicitMap(source.Value));
                 return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void ProjectionWithAssemblyLevelUseStaticMapperNoExpressionInliningShouldInvoke()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            [assembly: UseStaticMapper(typeof(OtherMapper), NoExpressionInlining = true)]
+
+            class A { public AExternal Value { get; set; } }
+            class B { public string Value { get; set; } }
+            class AExternal { public string Name { get; set; } }
+
+            static class OtherMapper
+            {
+                public static string ToName(AExternal s) => s.Name;
+            }
+
+            // non-public included members remap the assembly-level static mappers to a new compilation
+            [Mapper(IncludedMembers = MemberVisibility.All)]
+            public static partial class Mapper
+            {
+                public static partial IQueryable<B> Map(IQueryable<A> q);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            q,
+                            x => new global::B()
+                            {
+                                Value = global::OtherMapper.ToName(x.Value),
+                            }
+                        );
+                #nullable enable
                 """
             );
     }
@@ -806,5 +883,152 @@ public class UseStaticMapperTest
             .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
             .Should()
             .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline);
+    }
+
+    [Theory]
+    [InlineData("[UseStaticMapper(typeof(EnumMapper), NoExpressionInlining = true)]")]
+    [InlineData("[UseStaticMapper<EnumMapper>(NoExpressionInlining = true)]")]
+    public void ProjectionWithUseStaticMapperNoExpressionInliningShouldInvoke(string useStaticMapperAttribute)
+    {
+        var source = TestSourceBuilder.CSharp(
+            $$"""
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            class A { public C Status { get; set; } }
+            class B { public D Status { get; set; } }
+            enum C { Value1, Value2 }
+            enum D { Value1, Value2 }
+
+            [Mapper(EnumMappingStrategy = EnumMappingStrategy.ByName)]
+            public static partial class EnumMapper
+            {
+                public static partial D MapToStatus(C s);
+            }
+
+            [Mapper]
+            {{useStaticMapperAttribute}}
+            public static partial class Mapper
+            {
+                public static partial IQueryable<B> Map(IQueryable<A> q);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            q,
+                            x => new global::B()
+                            {
+                                Status = global::EnumMapper.MapToStatus(x.Status),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
+    public void ProjectionWithUseStaticMapperEnumByNameWithoutNoExpressionInliningShouldDiagnostic()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            class A { public C Status { get; set; } }
+            class B { public D Status { get; set; } }
+            enum C { Value1, Value2 }
+            enum D { Value1, Value2 }
+
+            [Mapper]
+            public static partial class EnumMapper
+            {
+                [MapEnum(EnumMappingStrategy.ByName)]
+                public static partial D MapToStatus(C s);
+            }
+
+            [Mapper]
+            [UseStaticMapper(typeof(EnumMapper))]
+            public static partial class Mapper
+            {
+                public static partial IQueryable<B> Map(IQueryable<A> q);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.EnumMappingNotSupportedInProjectionMappings,
+                "The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings to map from C to D, use [MapperNoExpressionInlining], MapperAttribute.NoExpressionInlining or UseStaticMapper/UseMapper(NoExpressionInlining = true) to invoke a mapping method instead"
+            )
+            .HaveDiagnostic(DiagnosticDescriptors.QueryableProjectionMappingCannotInline)
+            .HaveAssertedAllDiagnostics()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            q,
+                            x => new global::B()
+                            {
+                                Status = global::EnumMapper.MapToStatus(x.Status),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
+    public void ProjectionWithUseStaticMapperShouldIgnoreNoExpressionInliningOfReferencedMapper()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            class A { public AExternal Value { get; set; } }
+            class B { public string Value { get; set; } }
+            class AExternal { public string Name { get; set; } }
+
+            [Mapper(NoExpressionInlining = true)]
+            public static class OtherMapper
+            {
+                [MapperNoExpressionInlining]
+                public static string ToName(AExternal s) => s.Name;
+            }
+
+            [Mapper]
+            [UseStaticMapper(typeof(OtherMapper))]
+            public static partial class Mapper
+            {
+                public static partial IQueryable<B> Map(IQueryable<A> q);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            q,
+                            x => new global::B()
+                            {
+                                Value = x.Value.Name,
+                            }
+                        );
+                #nullable enable
+                """
+            );
     }
 }

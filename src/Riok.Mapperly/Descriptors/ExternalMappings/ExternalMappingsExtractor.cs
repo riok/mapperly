@@ -42,7 +42,8 @@ internal static class ExternalMappingsExtractor
                 x.MapperType,
                 receiver: x.MapperType.FullyQualifiedIdentifierName(),
                 isStatic: true,
-                isExternal: true
+                isExternal: true,
+                noExpressionInlining: x.NoExpressionInlining
             )
         );
         return staticExternalMappers;
@@ -91,7 +92,17 @@ internal static class ExternalMappingsExtractor
             return [];
 
         if (nullableAnnotation != NullableAnnotation.Annotated)
-            return UserMethodMappingExtractor.ExtractUserImplementedMappings(ctx, type, name, isStatic: false, isExternal: true);
+        {
+            var noExpressionInlining = ctx.AttributeAccessor.AccessSingle<UseMapperAttribute>(symbol).NoExpressionInlining;
+            return UserMethodMappingExtractor.ExtractUserImplementedMappings(
+                ctx,
+                type,
+                name,
+                isStatic: false,
+                isExternal: true,
+                noExpressionInlining
+            );
+        }
 
         ctx.ReportDiagnostic(DiagnosticDescriptors.ExternalMapperMemberCannotBeNullable, symbol, symbol.ToDisplayString());
         return [];
