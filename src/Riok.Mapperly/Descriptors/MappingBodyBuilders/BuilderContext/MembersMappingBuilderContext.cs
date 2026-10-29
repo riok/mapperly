@@ -6,6 +6,7 @@ using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
 using Riok.Mapperly.Diagnostics;
 using Riok.Mapperly.Helpers;
+using Riok.Mapperly.Symbols;
 using Riok.Mapperly.Symbols.Members;
 
 namespace Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
@@ -234,6 +235,29 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
 
     private bool ResolveMemberConfigSourcePath(MemberMappingConfiguration config, [NotNullWhen(true)] out SourceMemberPath? sourcePath)
     {
+        if (config.SourceIsParameter)
+        {
+            // the source is an additional mapping method parameter
+            // which takes precedence over a source type member with the same name.
+            if (TryFindSourceParameter(config) is { } parameterMemberPath)
+            {
+                sourcePath = new SourceMemberPath(parameterMemberPath, SourceMemberType.AdditionalMappingMethodParameter);
+                return true;
+            }
+
+            BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.ConfiguredMappingParameterNotFound,
+                config.Source.FullName,
+                BuilderContext.UserMapping?.Method.Name ?? string.Empty
+            );
+
+            // consume this member config and prevent its further usage
+            // as it is invalid, and a diagnostic has already been reported
+            _state.ConsumeMemberConfig(config);
+            sourcePath = null;
+            return false;
+        }
+
         if (!BuilderContext.SymbolAccessor.TryFindMemberPath(Mapping.SourceType, config.Source, out var sourceMemberPath))
         {
             BuilderContext.ReportDiagnostic(
@@ -251,6 +275,20 @@ public abstract class MembersMappingBuilderContext<T>(MappingBuilderContext buil
 
         sourcePath = new SourceMemberPath(sourceMemberPath, SourceMemberType.Member);
         return true;
+    }
+
+    private MemberPath? TryFindSourceParameter(MemberMappingConfiguration config)
+    {
+        return
+            config.SourceIsParameter
+            && BuilderContext.SymbolAccessor.TryFindMemberPath(
+                _state.AdditionalSourceMembers,
+                [new StringMemberPath([MethodParameter.NormalizeName(config.Source.RootName)])],
+                false,
+                out var memberPath
+            )
+            ? memberPath
+            : null;
     }
 
     private bool TryFindSourcePath(

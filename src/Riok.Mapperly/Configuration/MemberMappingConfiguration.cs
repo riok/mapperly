@@ -22,6 +22,11 @@ public record MemberMappingConfiguration(IMemberPathConfiguration Source, IMembe
 
     public bool SuppressNullMismatchDiagnostic { get; set; }
 
+    /// <summary>
+    /// Whether the <see cref="Source"/> refers to an additional mapping method parameter instead of a source type member.
+    /// </summary>
+    public bool SourceIsParameter { get; set; }
+
     public bool IsValid => Use == null || FormatProvider == null && StringFormat == null;
 
     public TypeMappingConfiguration ToTypeMappingConfiguration() =>

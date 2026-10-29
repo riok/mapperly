@@ -1,0 +1,51 @@
+﻿{
+  Diagnostics: [
+    {
+      Location: /*
+{
+    [MapPropertyFromParameter(nameof(@ParentDomain.Id), "parentId")]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[MapProperty(nameof(ParentDto.Id), nameof(ParentDomain.Id))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial ParentDomain Map(ParentDto parent, string parentId);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(13,67),
+      Message: Multiple mappings are configured for the same target member ParentDomain.Id,
+      Severity: Error,
+      Descriptor: {
+        Id: RMG074,
+        Title: Multiple mappings are configured for the same target member,
+        MessageFormat: Multiple mappings are configured for the same target member {0}.{1},
+        Category: Mapper,
+        DefaultSeverity: Error,
+        IsEnabledByDefault: true
+      }
+    },
+    {
+      Location: /*
+{
+    [MapPropertyFromParameter(nameof(@ParentDomain.Id), "parentId")]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[MapProperty(nameof(ParentDto.Id), nameof(ParentDomain.Id))]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+public partial ParentDomain Map(ParentDto parent, string parentId);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+}
+*/
+ : (11,4)-(13,67),
+      Message: The additional mapping method parameter parentId of the method Map is not mapped,
+      Severity: Warning,
+      WarningLevel: 1,
+      Descriptor: {
+        Id: RMG082,
+        Title: An additional mapping method parameter is not mapped,
+        MessageFormat: The additional mapping method parameter {0} of the method {1} is not mapped,
+        Category: Mapper,
+        DefaultSeverity: Warning,
+        IsEnabledByDefault: true
+      }
+    }
+  ]
+}

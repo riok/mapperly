@@ -61,6 +61,56 @@ but higher than a by-name matched regular member mapping.
   </TabItem>
 </Tabs>
 
+## Mapping nested target members from parameters
+
+Additional parameters are matched to flat target members by their (case-insensitive) name.
+To map an additional parameter to a nested target member, or to a target member with a
+different name, use the `MapPropertyFromParameter` attribute:
+
+<Tabs>
+  <TabItem value="parameter-declaration" label="Declaration" default>
+    ```csharp
+    [Mapper]
+    public static partial class ParentMapper
+    {
+      // highlight-start
+      [MapPropertyFromParameter(nameof(ParentDomain.Id), "parentId")]
+      [MapPropertyFromParameter(nameof(@ParentDomain.Child.Id), "childId")]
+      // highlight-end
+      public static partial ParentDomain ToDomain(ParentDto parent, string parentId, string childId);
+    }
+    ```
+  </TabItem>
+  <TabItem value="parameter-generated" label="Generated code">
+    ```csharp
+    [Mapper]
+    public static partial class ParentMapper
+    {
+      public static partial ParentDomain ToDomain(ParentDto parent, string parentId, string childId)
+      {
+        var target = new ParentDomain();
+        // highlight-start
+        target.Id = parentId;
+        target.Child.Id = childId;
+        // highlight-end
+        return target;
+      }
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+:::note
+To reference a nested target member, the full `nameof` syntax must be used
+(e.g. `nameof(@ParentDomain.Child.Id)`). For a top-level target member
+`nameof(ParentDomain.Id)` and `nameof(@ParentDomain.Id)` are equivalent.
+:::
+
+The source of this mapping can be either the mapping's source object or an additional
+parameter, but a target member can only be mapped once. If a target member is configured
+by both `MapPropertyFromParameter` and `MapProperty`, Mapperly reports a duplicate
+configuration diagnostic.
+
 ## Forwarding parameters to nested mappings
 
 Additional parameters can be forwarded to user-defined nested mapping methods.
