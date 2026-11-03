@@ -71,7 +71,16 @@ public class QueryableProjectionEnumTest
             .Should()
             .HaveDiagnostic(
                 DiagnosticDescriptors.EnumMappingNotSupportedInProjectionMappings,
-                "The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings to map from C to D"
+                "The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings to map from C to D, use [MapperNoExpressionInlining], MapperAttribute.NoExpressionInlining or UseStaticMapper/UseMapper(NoExpressionInlining = true) to invoke a mapping method instead"
+            )
+            .HaveDiagnostic(DiagnosticDescriptors.CouldNotMapMember, "Could not map member A.Value of type C to B.Value of type D")
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotMapped,
+                "The member Value on the mapping source type A is not mapped to any member on the mapping target type B"
+            )
+            .HaveDiagnostic(
+                DiagnosticDescriptors.SourceMemberNotFound,
+                "The member Value on the mapping target type B was not found on the mapping source type A"
             )
             .HaveAssertedAllDiagnostics();
     }
@@ -101,11 +110,60 @@ public class QueryableProjectionEnumTest
             .Should()
             .HaveDiagnostic(
                 DiagnosticDescriptors.EnumMappingNotSupportedInProjectionMappings,
-                "The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings to map from C to D"
+                "The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings to map from C to D, use [MapperNoExpressionInlining], MapperAttribute.NoExpressionInlining or UseStaticMapper/UseMapper(NoExpressionInlining = true) to invoke a mapping method instead"
             )
-            .HaveDiagnostic(DiagnosticDescriptors.TargetEnumValueNotMapped, "Enum member Value2 (200) on D not found on source enum C")
-            .HaveDiagnostic(DiagnosticDescriptors.SourceEnumValueNotMapped, "Enum member Value2 (100) on C not found on target enum D")
-            .HaveAssertedAllDiagnostics();
+            .HaveAssertedAllDiagnostics()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            q,
+                            x => new global::B()
+                            {
+                                Value = MapEnum(x.Value),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
+    public void EnumToAnotherEnumByNameWithNoExpressionInliningShouldInvoke()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> q);
+
+            [MapperNoExpressionInlining]
+            partial D MapEnum(C src);
+            """,
+            TestSourceBuilderOptions.Default with
+            {
+                EnumMappingStrategy = EnumMappingStrategy.ByName,
+            },
+            "class A { public C Value { get; set; } }",
+            "class B { public D Value { get; set; } }",
+            "enum C { Value1, Value2 }",
+            "enum D { Value1, Value2 }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            q,
+                            x => new global::B()
+                            {
+                                Value = MapEnum(x.Value),
+                            }
+                        );
+                #nullable enable
+                """
+            );
     }
 
     [Fact]

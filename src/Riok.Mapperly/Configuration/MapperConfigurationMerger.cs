@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Riok.Mapperly.Abstractions;
 
 namespace Riok.Mapperly.Configuration;
@@ -28,9 +29,11 @@ public static class MapperConfigurationMerger
             AutoUserMappings = highPriority.AutoUserMappings ?? lowPriority.AutoUserMappings,
             EnumNamingStrategy = highPriority.EnumNamingStrategy ?? lowPriority.EnumNamingStrategy,
             QueryableProjectionNullHandling = highPriority.QueryableProjectionNullHandling ?? lowPriority.QueryableProjectionNullHandling,
+            NoExpressionInlining = highPriority.NoExpressionInlining ?? lowPriority.NoExpressionInlining,
         };
     }
 
+    [SuppressMessage("Meziantou.Analyzer", "MA0051:MethodIsTooLong")]
     public static MapperAttribute MergeToAttribute(MapperConfiguration mapperConfiguration, MapperConfiguration defaultMapperConfiguration)
     {
         var mapper = new MapperAttribute();
@@ -109,6 +112,9 @@ public static class MapperConfigurationMerger
             mapperConfiguration.QueryableProjectionNullHandling
             ?? defaultMapperConfiguration.QueryableProjectionNullHandling
             ?? mapper.QueryableProjectionNullHandling;
+
+        mapper.NoExpressionInlining =
+            mapperConfiguration.NoExpressionInlining ?? defaultMapperConfiguration.NoExpressionInlining ?? mapper.NoExpressionInlining;
 
         return mapper;
     }

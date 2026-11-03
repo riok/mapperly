@@ -73,6 +73,10 @@ it will use the provided implementation by the `BananaMapper`.
 Used mappers themselves can be Mapperly backed classes.  
 The [`AutoUserMappings`](./user-implemented-methods.mdx) value also applies to the usage of external mappers.
 
+In `IQueryable` projections and expression mappings, imported mapping methods are inlined by default.
+Set `NoExpressionInlining = true` on `UseMapper` / `UseStaticMapper` to invoke them instead,
+see [disable inlining](./queryable-projections.mdx#disable-inlining).
+
 ## Assembly-level external mappers
 
 It is also possible to configure Mapperly to always consider certain external mappers

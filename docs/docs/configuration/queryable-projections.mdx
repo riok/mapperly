@@ -50,7 +50,7 @@ such mappings have several limitations:
 - Constructors with unmatched optional parameters are ignored
 - `ThrowOnPropertyMappingNullMismatch` is ignored
 - `AllowNullPropertyAssignment` is ignored
-- Enum mappings do not support the `ByName` strategy
+- Enum mappings do not support the `ByName` strategy unless [inlining is disabled](#disable-inlining)
 - Reference handling is not supported
 - Nullable reference types are disabled
 - Deep cloning is not applied
@@ -177,6 +177,66 @@ public static partial class CarMapper
 It is important that the types in the user-implemented mapping method match the types of the objects to be mapped exactly.
 Otherwise, Mapperly cannot resolve the user-implemented mapping methods.
 
+## Disable inlining
+
+Some mappings cannot be expressed in an expression tree.
+Enum mappings using `EnumMappingStrategy.ByName`, `EnumMappingStrategy.ByValueCheckDefined`,
+explicit `MapEnumValue` mappings or ignored enum values report `RMG032` in projections.
+To use such a mapping anyway, annotate the mapping method with `MapperNoExpressionInlining`.
+Mapperly then invokes the method from the projection instead of inlining it:
+
+```csharp
+[Mapper]
+public static partial class CarMapper
+{
+    public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q);
+
+    // highlight-start
+    [MapEnum(EnumMappingStrategy.ByName)]
+    [MapperNoExpressionInlining]
+    private static partial CarStatusDto MapStatus(CarStatus status);
+    // highlight-end
+}
+```
+
+To disable inlining for all mapping methods declared in a mapper, set `NoExpressionInlining` on the `MapperAttribute`,
+on `MapperDefaults` or via the `MapperlyNoExpressionInlining` MSBuild property:
+
+```csharp
+// highlight-start
+[Mapper(NoExpressionInlining = true)]
+// highlight-end
+public static partial class CarMapper
+{
+    public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q);
+}
+```
+
+Both settings apply to the mapping methods of the mapper, including inherited base class and interface methods,
+but not to methods imported via `UseMapper` / `UseStaticMapper`.
+For imported methods, the importing mapper decides with the `NoExpressionInlining` property of the `UseMapper` / `UseStaticMapper` attribute:
+
+```csharp
+[Mapper]
+// highlight-start
+[UseStaticMapper(typeof(EnumMapper), NoExpressionInlining = true)]
+// highlight-end
+public static partial class CarMapper
+{
+    public static partial IQueryable<CarDto> ProjectToDto(this IQueryable<Car> q);
+}
+```
+
+Mapping methods declared in another assembly are never inlined and report `RMG068`.
+`NoExpressionInlining` keeps the invocation and silences `RMG068` for all methods it applies to.
+Regular (non-projection) mappings are not affected by these settings.
+
+:::warning
+A non-inlined method invocation cannot be translated to SQL.
+Entity Framework Core evaluates it on the client, which is only supported in the top-level `Select` projection.
+The source members referenced by the method are still loaded from the database.
+:::
+
 ## Additional parameters
 
 Queryable projection methods can have [additional parameters](./additional-mapping-parameters.mdx).
@@ -285,8 +345,8 @@ var dtos = await DbContext.Cars
 </Tabs>
 
 Expression mappings share the same limitations, features and configuration options as `IQueryable<T>`
-projections, including property configurations, user-implemented mapping methods and
-[null handling](#null-handling).
+projections, including property configurations, user-implemented mapping methods,
+[null handling](#null-handling) and [disabled inlining](#disable-inlining).
 
 ### Property configurations
 

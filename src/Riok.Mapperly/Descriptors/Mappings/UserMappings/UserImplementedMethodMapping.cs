@@ -21,7 +21,8 @@ public class UserImplementedMethodMapping(
     MethodParameter? referenceHandlerParameter,
     MethodParameter? targetOriginalValueParameter,
     bool isExternal,
-    UserImplementedMethodMapping.TargetNullability targetNullability
+    UserImplementedMethodMapping.TargetNullability targetNullability,
+    bool noExpressionInlining
 ) : NewInstanceMapping(sourceType, targetType), INewInstanceUserMapping, IParameterizedMapping
 {
     public enum TargetNullability
@@ -36,6 +37,8 @@ public class UserImplementedMethodMapping(
     public bool? Default { get; } = isDefault;
 
     public bool IsExternal { get; } = isExternal;
+
+    public bool NoExpressionInlining { get; } = noExpressionInlining;
 
     public MethodParameter? TargetOriginalValueParameter { get; } = targetOriginalValueParameter;
 

@@ -232,3 +232,4 @@ RMG100 | Mapper | Error   | [MappingTargetOriginalValue] is not supported on gen
 Rule ID | New Category | New Severity | Old Category | Old Severity | Notes
 --------|--------------|--------------|--------------|--------------|--------------------
 RMG068  | Mapper       | Warning      | Mapper       | Info         | Cannot inline user implemented queryable expression mapping
+RMG032  | Mapper       | Error        | Mapper       | Warning      | The enum mapping strategy ByName, ByValueCheckDefined, explicit enum mappings and ignored enum values cannot be used in projection mappings
