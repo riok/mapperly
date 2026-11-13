@@ -105,7 +105,7 @@ jobs:
       - name: Version not set
         if: ${{ inputs.version == '' || inputs.version == '0.0.1-dev' }}
         run: exit 1
-      - uses: cloudflare/wrangler-action@v3
+      - uses: cloudflare/wrangler-action@v4
         id: deployment
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
