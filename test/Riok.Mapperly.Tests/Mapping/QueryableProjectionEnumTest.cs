@@ -167,6 +167,63 @@ public class QueryableProjectionEnumTest
     }
 
     [Fact]
+    public void TopLevelEnumByNameWithMethodNoExpressionInliningShouldInvoke()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial System.Linq.IQueryable<D> Map(System.Linq.IQueryable<C> q);
+
+            [MapperNoExpressionInlining]
+            [MapEnum(EnumMappingStrategy.ByName)]
+            partial D MapEnum(C source);
+            """,
+            "enum C { Value1 = 1, Value2 = 2 }",
+            "enum D { Value1 = 10, Value2 = 20 }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(q, x => MapEnum(x));
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
+    public void TopLevelEnumByNameWithMapperNoExpressionInliningShouldInvoke()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial System.Linq.IQueryable<D> Map(System.Linq.IQueryable<C> q);
+
+            [MapEnum(EnumMappingStrategy.ByName)]
+            partial D MapEnum(C source);
+            """,
+            TestSourceBuilderOptions.Default with
+            {
+                NoExpressionInlining = true,
+            },
+            "enum C { Value1 = 1, Value2 = 2 }",
+            "enum D { Value1 = 10, Value2 = 20 }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(q, x => MapEnum(x));
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
     public Task EnumToString()
     {
         var source = TestSourceBuilder.Mapping(

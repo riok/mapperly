@@ -69,7 +69,8 @@ public static class UserMethodMappingExtractor
 
     internal static IEnumerable<IUserMapping> ExtractNamedUserImplementedMappings(
         SimpleMappingBuilderContext ctx,
-        IMethodReferenceConfiguration? target
+        IMethodReferenceConfiguration? target,
+        bool noExpressionInlining
     )
     {
         if (target is null || !target.IsExternal)
@@ -90,7 +91,7 @@ public static class UserMethodMappingExtractor
             target.GetTargetName(ctx),
             type.IsStatic,
             isExternal: true,
-            noExpressionInlining: false,
+            noExpressionInlining: noExpressionInlining,
             isDefault: false,
             requireAttribute: false
         );

@@ -933,6 +933,62 @@ public class UseStaticMapperTest
             );
     }
 
+    [Theory]
+    [InlineData("[UseStaticMapper(typeof(EnumMapper), NoExpressionInlining = true)]", "")]
+    [InlineData("[UseStaticMapper<EnumMapper>(NoExpressionInlining = true)]", "")]
+    [InlineData("", "[assembly: UseStaticMapper(typeof(EnumMapper), NoExpressionInlining = true)]")]
+    [InlineData("", "[assembly: UseStaticMapper<EnumMapper>(NoExpressionInlining = true)]")]
+    public void ProjectionWithQualifiedUseStaticMapperNoExpressionInliningShouldInvoke(string mapperAttribute, string assemblyAttribute)
+    {
+        var source = TestSourceBuilder.CSharp(
+            $$"""
+            using Riok.Mapperly.Abstractions;
+            using System.Linq;
+
+            {{assemblyAttribute}}
+
+            class A { public C Value { get; set; } }
+            class B { public D Value { get; set; } }
+            enum C { Value1 = 1, Value2 = 2 }
+            enum D { Value1 = 10, Value2 = 20 }
+
+            [Mapper]
+            public static partial class EnumMapper
+            {
+                [MapEnum(EnumMappingStrategy.ByName)]
+                public static partial D MapEnum(C source);
+            }
+
+            [Mapper]
+            {{mapperAttribute}}
+            public static partial class Mapper
+            {
+                public static partial IQueryable<B> Map(IQueryable<A> q);
+
+                [MapProperty("Value", "Value", Use = nameof(@EnumMapper.MapEnum))]
+                public static partial B MapObject(A source);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            q,
+                            x => new global::B()
+                            {
+                                Value = global::EnumMapper.MapEnum(x.Value),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
     [Fact]
     public void ProjectionWithUseStaticMapperEnumByNameWithoutNoExpressionInliningShouldDiagnostic()
     {

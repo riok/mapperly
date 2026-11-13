@@ -25,13 +25,7 @@ public class QueryableProjectionNoExpressionInliningTest
             .HaveMapMethodBody(
                 """
                 #nullable disable
-                        return global::System.Linq.Queryable.Select(
-                            q,
-                            x => new global::B()
-                            {
-                                Value = MapValue(x.Value),
-                            }
-                        );
+                        return global::System.Linq.Queryable.Select(q, x => MapSingle(x));
                 #nullable enable
                 """
             )

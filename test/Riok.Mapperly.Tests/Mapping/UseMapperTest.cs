@@ -458,6 +458,52 @@ public class UseMapperTest
             );
     }
 
+    [Theory]
+    [InlineData("private readonly OtherMapper _other = new();")]
+    [InlineData("private OtherMapper _other { get; } = new();")]
+    public void ProjectionWithQualifiedUseMapperNoExpressionInliningShouldInvoke(string mapperMember)
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            $"""
+            [UseMapper(NoExpressionInlining = true)]
+            {mapperMember}
+            partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> q);
+
+            [MapProperty("Value", "Value", Use = nameof(@_other.MapEnum))]
+            partial B MapObject(A source);
+            """,
+            "class A { public C Value { get; set; } }",
+            "class B { public D Value { get; set; } }",
+            "enum C { Value1 = 1, Value2 = 2 }",
+            "enum D { Value1 = 10, Value2 = 20 }",
+            """
+            [Mapper]
+            partial class OtherMapper
+            {
+                [MapEnum(EnumMappingStrategy.ByName)]
+                public partial D MapEnum(C source);
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(
+                            q,
+                            x => new global::B()
+                            {
+                                Value = _other.MapEnum(x.Value),
+                            }
+                        );
+                #nullable enable
+                """
+            );
+    }
+
     [Fact]
     public void ProjectionWithUseMapperNoExpressionInliningShouldInvoke()
     {

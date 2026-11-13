@@ -5,6 +5,63 @@ namespace Riok.Mapperly.Tests.Mapping;
 public class ExpressionMappingTest
 {
     [Fact]
+    public void TopLevelEnumByNameWithMethodNoExpressionInliningShouldInvoke()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial System.Linq.Expressions.Expression<System.Func<C, D>> Map();
+
+            [MapperNoExpressionInlining]
+            [MapEnum(EnumMappingStrategy.ByName)]
+            partial D MapEnum(C source);
+            """,
+            "enum C { Value1 = 1, Value2 = 2 }",
+            "enum D { Value1 = 10, Value2 = 20 }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return x => MapEnum(x);
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
+    public void TopLevelEnumByNameWithMapperNoExpressionInliningShouldInvoke()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            partial System.Linq.Expressions.Expression<System.Func<C, D>> Map();
+
+            [MapEnum(EnumMappingStrategy.ByName)]
+            partial D MapEnum(C source);
+            """,
+            TestSourceBuilderOptions.Default with
+            {
+                NoExpressionInlining = true,
+            },
+            "enum C { Value1 = 1, Value2 = 2 }",
+            "enum D { Value1 = 10, Value2 = 20 }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return x => MapEnum(x);
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
     public Task ClassToClass()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
