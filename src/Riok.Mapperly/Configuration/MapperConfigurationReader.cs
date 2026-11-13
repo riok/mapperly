@@ -74,15 +74,16 @@ public class MapperConfigurationReader
     private MappingConfiguration BuildWithIncludedMappings(
         HashSet<IMethodSymbol> visitedMethods,
         MappingConfigurationReference reference,
-        bool supportsDeepCloning
+        bool supportsDeepCloning,
+        bool reverse = false
     )
     {
         if (reference.Method == null)
             return supportsDeepCloning ? MapperConfiguration : MapperConfiguration with { UseDeepCloning = false };
 
-        var enumConfig = BuildEnumConfig(reference);
-        var membersConfig = BuildMembersConfig(reference);
-        var derivedTypesConfig = BuildDerivedTypeConfigs(reference.Method);
+        var enumConfig = BuildEnumConfig(reference, reverse);
+        var membersConfig = BuildMembersConfig(reference, reverse);
+        var derivedTypesConfig = BuildDerivedTypeConfigs(reference.Method, reverse);
         var configuration = new MappingConfiguration(
             MapperConfiguration.Mapper,
             enumConfig,
@@ -110,7 +111,7 @@ public class MapperConfigurationReader
         );
         foreach (var includedCfg in includedMappingConfigs)
         {
-            var cfgToInclude = BuildConfigToInclude(includedCfg.Name, reference, visitedMethods, supportsDeepCloning);
+            var cfgToInclude = BuildConfigToInclude(includedCfg.Name, reference, visitedMethods, supportsDeepCloning, includedCfg.Reverse);
             if (cfgToInclude == null)
             {
                 continue;
@@ -126,14 +127,15 @@ public class MapperConfigurationReader
         IMethodReferenceConfiguration name,
         MappingConfigurationReference configRef,
         HashSet<IMethodSymbol> visitedMethods,
-        bool supportsDeepCloning
+        bool supportsDeepCloning,
+        bool reverse = false
     )
     {
         var typeMapping =
             (ITypeMapping?)_mappings.FindNamedNewInstanceMapping(name.FullName, out var ambiguousName)
             ?? _mappings.FindExistingInstanceNamedMapping(name.FullName, out ambiguousName);
         var methodSymbol = (typeMapping as IUserMapping)?.Method;
-        if (!ValidateIncludedConfig(ambiguousName, configRef, name.FullName, typeMapping, methodSymbol))
+        if (!ValidateIncludedConfig(ambiguousName, configRef, name.FullName, typeMapping, methodSymbol, reverse))
         {
             return null;
         }
@@ -144,10 +146,12 @@ public class MapperConfigurationReader
             return null;
         }
 
-        var includedReference = new MappingConfigurationReference(methodSymbol, typeMapping.SourceType, typeMapping.TargetType);
+        var sourceType = reverse ? typeMapping.TargetType : typeMapping.SourceType;
+        var targetType = reverse ? typeMapping.SourceType : typeMapping.TargetType;
+        var includedReference = new MappingConfigurationReference(methodSymbol, sourceType, targetType);
         if (!_resolvedConfigurations.TryGetValue(includedReference, out var config))
         {
-            config = BuildWithIncludedMappings(visitedMethods, includedReference, supportsDeepCloning);
+            config = BuildWithIncludedMappings(visitedMethods, includedReference, supportsDeepCloning, reverse);
         }
 
         return config;
@@ -158,7 +162,8 @@ public class MapperConfigurationReader
         MappingConfigurationReference configRef,
         string mappingToIncludeName,
         [NotNullWhen(true)] ITypeMapping? mappingToInclude,
-        [NotNullWhen(true)] IMethodSymbol? mappingToIncludeMethodSymbol
+        [NotNullWhen(true)] IMethodSymbol? mappingToIncludeMethodSymbol,
+        bool reverse = false
     )
     {
         if (ambiguousName)
@@ -173,10 +178,13 @@ public class MapperConfigurationReader
             return false;
         }
 
+        var sourceType = reverse ? mappingToInclude.TargetType : mappingToInclude.SourceType;
+        var targetType = reverse ? mappingToInclude.SourceType : mappingToInclude.TargetType;
+
         var typeCheckerResult = _genericTypeChecker.InferAndCheckTypes(
             configRef.Method!.TypeParameters,
-            (mappingToInclude.SourceType, configRef.Source),
-            (mappingToInclude.TargetType, configRef.Target)
+            (sourceType, configRef.Source),
+            (targetType, configRef.Target)
         );
 
         if (typeCheckerResult.Success)
@@ -188,7 +196,7 @@ public class MapperConfigurationReader
                 DiagnosticDescriptors.SourceTypeIsNotAssignableToTheIncludedSourceType,
                 configRef.Method,
                 configRef.Source,
-                mappingToInclude.SourceType
+                sourceType
             );
         }
         else
@@ -197,22 +205,22 @@ public class MapperConfigurationReader
                 DiagnosticDescriptors.TargetTypeIsNotAssignableToTheIncludedTargetType,
                 configRef.Method,
                 configRef.Target,
-                mappingToInclude.TargetType
+                targetType
             );
         }
 
         return false;
     }
 
-    private IReadOnlyCollection<DerivedTypeMappingConfiguration> BuildDerivedTypeConfigs(IMethodSymbol method)
+    private IReadOnlyCollection<DerivedTypeMappingConfiguration> BuildDerivedTypeConfigs(IMethodSymbol method, bool reverse = false)
     {
         return _dataAccessor
-            .Access<MapDerivedTypeAttribute, DerivedTypeMappingConfiguration>(method)
-            .Concat(_dataAccessor.Access<MapDerivedTypeAttribute<object, object>, DerivedTypeMappingConfiguration>(method))
+            .Access<MapDerivedTypeAttribute, DerivedTypeMappingConfiguration>(method, reverse)
+            .Concat(_dataAccessor.Access<MapDerivedTypeAttribute<object, object>, DerivedTypeMappingConfiguration>(method, reverse))
             .ToList();
     }
 
-    private MembersMappingConfiguration BuildMembersConfig(MappingConfigurationReference configRef)
+    private MembersMappingConfiguration BuildMembersConfig(MappingConfigurationReference configRef, bool reverse = false)
     {
         if (configRef.Method == null)
             return MapperConfiguration.Members;
@@ -220,14 +228,22 @@ public class MapperConfigurationReader
         var ignoreSourceMemberAttributes = _dataAccessor
             .Access<MapperIgnoreSourceAttribute, MapperIgnoreMemberConfiguration>(configRef.Method)
             .ToList();
-        var ignoredSourceMembers = ignoreSourceMemberAttributes.Select(x => x.Value).WhereNotNull().ToList();
         var ignoreTargetMemberAttributes = _dataAccessor
             .Access<MapperIgnoreTargetAttribute, MapperIgnoreMemberConfiguration>(configRef.Method)
             .ToList();
-        var ignoredTargetMembers = ignoreTargetMemberAttributes.Select(x => x.Value).WhereNotNull().ToList();
+
+        var ignoredSourceMembers = (reverse ? ignoreTargetMemberAttributes : ignoreSourceMemberAttributes)
+            .Select(x => x.Value)
+            .WhereNotNull()
+            .ToList();
+        var ignoredTargetMembers = (reverse ? ignoreSourceMemberAttributes : ignoreTargetMemberAttributes)
+            .Select(x => x.Value)
+            .WhereNotNull()
+            .ToList();
+
         var memberValueConfigurations = _dataAccessor.Access<MapValueAttribute, MemberValueMappingConfiguration>(configRef.Method).ToList();
         var memberConfigurations = _dataAccessor
-            .Access<MapPropertyAttribute, MemberMappingConfiguration>(configRef.Method)
+            .Access<MapPropertyAttribute, MemberMappingConfiguration>(configRef.Method, reverse)
             .Concat(_dataAccessor.Access<MapPropertyFromSourceAttribute, MemberMappingConfiguration>(configRef.Method))
             .ToList();
         var nestedMembersConfigurations = _dataAccessor
@@ -236,7 +252,9 @@ public class MapperConfigurationReader
         var ignoreObsolete = _dataAccessor
             .AccessFirstOrDefault<MapperIgnoreObsoleteMembersAttribute>(configRef.Method)
             ?.IgnoreObsoleteStrategy;
-        var requiredMapping = _dataAccessor.AccessFirstOrDefault<MapperRequiredMappingAttribute>(configRef.Method)?.RequiredMappingStrategy;
+        var requiredMapping = _dataAccessor
+            .AccessFirstOrDefault<MapperRequiredMappingAttribute, MapperRequiredMappingConfiguration>(configRef.Method, reverse)
+            ?.RequiredMappingStrategy;
 
         // ignore the required mapping / ignore obsolete as the same attribute is used for other mapping types
         // e.g. enum to enum
@@ -281,22 +299,28 @@ public class MapperConfigurationReader
         );
     }
 
-    private EnumMappingConfiguration BuildEnumConfig(MappingConfigurationReference configRef)
+    private EnumMappingConfiguration BuildEnumConfig(MappingConfigurationReference configRef, bool reverse = false)
     {
         if (configRef.Method == null)
             return MapperConfiguration.Enum;
 
         var configData = _dataAccessor.AccessFirstOrDefault<MapEnumAttribute, EnumConfiguration>(configRef.Method);
-        var explicitMappings = _dataAccessor.Access<MapEnumValueAttribute, EnumValueMappingConfiguration>(configRef.Method).ToList();
+        var explicitMappings = _dataAccessor
+            .Access<MapEnumValueAttribute, EnumValueMappingConfiguration>(configRef.Method, reverse)
+            .ToList();
         var ignoredSourceValueConfigurations = _dataAccessor
             .Access<MapperIgnoreSourceValueAttribute, MapperIgnoreEnumValueConfiguration>(configRef.Method)
             .ToList();
-        var ignoredSources = ignoredSourceValueConfigurations.Select(x => x.Value).ToList();
         var ignoredTargetValueConfigurations = _dataAccessor
             .Access<MapperIgnoreTargetValueAttribute, MapperIgnoreEnumValueConfiguration>(configRef.Method)
             .ToList();
-        var ignoredTargets = ignoredTargetValueConfigurations.Select(x => x.Value).ToList();
-        var requiredMapping = _dataAccessor.AccessFirstOrDefault<MapperRequiredMappingAttribute>(configRef.Method)?.RequiredMappingStrategy;
+
+        var ignoredSources = (reverse ? ignoredTargetValueConfigurations : ignoredSourceValueConfigurations).Select(x => x.Value).ToList();
+        var ignoredTargets = (reverse ? ignoredSourceValueConfigurations : ignoredTargetValueConfigurations).Select(x => x.Value).ToList();
+
+        var requiredMapping = _dataAccessor
+            .AccessFirstOrDefault<MapperRequiredMappingAttribute, MapperRequiredMappingConfiguration>(configRef.Method, reverse)
+            ?.RequiredMappingStrategy;
 
         ReportMissingJustificationDiagnostics(ignoredSourceValueConfigurations, static x => x.Value.Name);
         ReportMissingJustificationDiagnostics(ignoredTargetValueConfigurations, static x => x.Value.Name);
