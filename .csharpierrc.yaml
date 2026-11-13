@@ -9,4 +9,5 @@ preprocessorSymbolSets:
   - "NET8_0_OR_GREATER"
   - "NET9_0_OR_GREATER"
   - "NET10_0_OR_GREATER"
+  - "NET11_0_OR_GREATER"
   - "ROSLYN5_0_OR_GREATER"
