@@ -116,7 +116,7 @@ public class QueryableProjectionUserImplementedTest
             .Should()
             .HaveDiagnostic(
                 DiagnosticDescriptors.QueryableProjectionMappingCannotInline,
-                "Cannot inline user implemented queryable expression mapping"
+                "Cannot inline user implemented queryable expression mapping, use [MapperNoExpressionInlining], MapperAttribute.NoExpressionInlining or UseStaticMapper/UseMapper(NoExpressionInlining = true) to invoke the method instead"
             )
             .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(

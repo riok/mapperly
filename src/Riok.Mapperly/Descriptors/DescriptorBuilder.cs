@@ -21,7 +21,7 @@ public class DescriptorBuilder
 {
     private readonly MapperDescriptor _mapperDescriptor;
     private readonly SymbolAccessor _symbolAccessor;
-    private readonly ImmutableArray<UseStaticMapperConfiguration> _assemblyScopedStaticMappers;
+    private readonly ExternalMappingsExtractor _externalMappingsExtractor;
 
     private readonly MappingCollection _mappings;
     private readonly InlinedExpressionMappingCollection _inlineMappings;
@@ -46,7 +46,6 @@ public class DescriptorBuilder
         _mapperDescriptor = new MapperDescriptor(mapperDeclaration, _methodNameBuilder, supportedFeatures);
         _symbolAccessor = symbolAccessor;
         _attributeAccessor = attributeDataAccessor;
-        _assemblyScopedStaticMappers = assemblyScopedStaticMappers;
 
         var genericTypeChecker = new GenericTypeChecker(_symbolAccessor, compilationContext.Types);
         _mappings = new MappingCollection(genericTypeChecker);
@@ -80,6 +79,7 @@ public class DescriptorBuilder
             _inlineMappings,
             mapperDeclaration.Syntax.GetLocation()
         );
+        _externalMappingsExtractor = new ExternalMappingsExtractor(_builderContext, assemblyScopedStaticMappers);
     }
 
     public (MapperDescriptor descriptor, DiagnosticCollection diagnostics) Build(CancellationToken cancellationToken)
@@ -200,13 +200,7 @@ public class DescriptorBuilder
 
     private void ExtractExternalMappings()
     {
-        foreach (
-            var externalMapping in ExternalMappingsExtractor.ExtractExternalMappings(
-                _assemblyScopedStaticMappers,
-                _builderContext,
-                _mapperDescriptor.Symbol
-            )
-        )
+        foreach (var externalMapping in _externalMappingsExtractor.ExtractExternalMappings())
         {
             AddUserMapping(externalMapping, ignoreDuplicates: true);
         }
@@ -214,7 +208,7 @@ public class DescriptorBuilder
 
     private void ExtractExternalNamedMappings()
     {
-        foreach (var (name, mapping) in ExternalMappingsExtractor.ExtractExternalNamedMappings(_builderContext, _mapperDescriptor.Symbol))
+        foreach (var (name, mapping) in _externalMappingsExtractor.ExtractExternalNamedMappings())
         {
             AddUserMapping(mapping, ignoreDuplicates: true, name);
         }

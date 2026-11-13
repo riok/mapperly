@@ -25,7 +25,8 @@ public record TestSourceBuilderOptions(
     bool Static = false,
     bool PreferParameterlessConstructors = true,
     bool AutoUserMappings = true,
-    QueryableProjectionNullHandling? QueryableProjectionNullHandling = null
+    QueryableProjectionNullHandling? QueryableProjectionNullHandling = null,
+    bool? NoExpressionInlining = null
 )
 {
     public const string DefaultMapperClassName = "Mapper";

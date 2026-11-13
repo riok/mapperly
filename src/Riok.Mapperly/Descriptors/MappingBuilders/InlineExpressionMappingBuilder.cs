@@ -26,7 +26,10 @@ public static class InlineExpressionMappingBuilder
         var mappingKey = BuildMappingKey(ctx, sourceType, targetType);
         var inlineCtx = new InlineExpressionMappingBuilderContext(ctx, userMapping, mappingKey);
 
-        if (userMapping is UserImplementedMethodMapping && inlineCtx.FindMapping(sourceType, targetType) is { } inlinedUserMapping)
+        if (
+            userMapping is UserImplementedMethodMapping or { NoExpressionInlining: true }
+            && inlineCtx.FindMapping(sourceType, targetType) is { } inlinedUserMapping
+        )
         {
             return inlinedUserMapping;
         }
