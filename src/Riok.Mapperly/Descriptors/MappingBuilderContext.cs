@@ -154,6 +154,12 @@ public class MappingBuilderContext : SimpleMappingBuilderContext
         MappingBuilder.Find(mappingKey, scope);
 
     /// <summary>
+    /// Finds a user-implemented mapping without marking rejected mappings or their additional parameters as used.
+    /// </summary>
+    public UserImplementedMethodMapping? FindUserImplementedMapping(TypeMappingKey mappingKey) =>
+        MappingBuilder.FindUserImplemented(mappingKey, ParameterScope);
+
+    /// <summary>
     /// Tries to find an existing mapping for the provided types.
     /// If none is found, a new one is created.
     /// If no mapping is possible for the provided types,

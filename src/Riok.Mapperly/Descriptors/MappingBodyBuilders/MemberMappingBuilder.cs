@@ -66,11 +66,7 @@ internal static class MemberMappingBuilder
         [NotNullWhen(true)] out SourceValueBuilder.MappedValue? result
     )
     {
-        var mappingKey = memberMappingInfo.ToTypeMappingKey();
-        var delegateMapping = ctx.BuilderContext.FindOrBuildLooseNullableMapping(
-            mappingKey,
-            diagnosticLocation: memberMappingInfo.Configuration?.Location
-        );
+        var delegateMapping = FindDelegateMapping(ctx.BuilderContext, memberMappingInfo);
 
         var sourceMember = memberMappingInfo.SourceMember!;
         var targetMember = memberMappingInfo.TargetMember;
@@ -145,6 +141,34 @@ internal static class MemberMappingBuilder
             targetValueGetter
         );
         return true;
+    }
+
+    private static INewInstanceMapping? FindDelegateMapping(MappingBuilderContext ctx, MemberMappingInfo memberMappingInfo)
+    {
+        var mappingKey = memberMappingInfo.ToTypeMappingKey();
+
+        // Null-conditional access lifts a value type leaf to Nullable<T> when a parent is nullable.
+        // Only prefer an existing user implementation; otherwise retain the usual mapping and null handling.
+        // Expression trees cannot use the null-conditional access emitted for these mappings.
+        if (
+            !ctx.IsExpression
+            && memberMappingInfo.IsSourceNullable
+            && mappingKey.Source.IsValueType
+            && !mappingKey.Source.IsRefLikeType
+            && !mappingKey.Source.IsNullableValueType()
+            && mappingKey.Configuration.UseNamedMapping == null
+        )
+        {
+            var nullableSource = ctx
+                .Types.Get(typeof(Nullable<>))
+                .Construct(mappingKey.Source.NonNullable())
+                .WithNullableAnnotation(NullableAnnotation.Annotated);
+            var nullableKey = new TypeMappingKey(nullableSource, mappingKey.Target, mappingKey.Configuration);
+            if (ctx.FindUserImplementedMapping(nullableKey) is { } mapping)
+                return mapping;
+        }
+
+        return ctx.FindOrBuildLooseNullableMapping(mappingKey, diagnosticLocation: memberMappingInfo.Configuration?.Location);
     }
 
     private static MemberPathGetter? GetTargetValueGetterIfNeeded(

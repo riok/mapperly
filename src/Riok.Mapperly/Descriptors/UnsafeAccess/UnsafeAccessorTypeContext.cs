@@ -55,6 +55,31 @@ public class UnsafeAccessorTypeContext(UniqueNameBuilder nameBuilder, INamedType
         );
     }
 
+    internal static ExpressionSyntax BuildNullConditionalAccess(
+        ISymbol member,
+        INamedTypeSymbol containingType,
+        ExpressionSyntax receiver,
+        ExpressionSyntax access
+    )
+    {
+        // Accessors are cached by the original definition, so resolve the member type
+        // on the actual containing type before lifting value types to Nullable<T>.
+        var constructedMember = containingType
+            .GetMembers(member.Name)
+            .First(m => SymbolEqualityComparer.Default.Equals(m.OriginalDefinition, member.OriginalDefinition));
+        var memberType = constructedMember switch
+        {
+            IPropertySymbol property => property.Type,
+            IFieldSymbol field => field.Type,
+            _ => throw new ArgumentException("Only properties and fields support null-conditional unsafe access", nameof(member)),
+        };
+        ExpressionSyntax nullValue =
+            memberType.IsValueType && !memberType.IsNullableValueType() && !memberType.IsRefLikeType
+                ? CastExpression(NullableType(NonNullableIdentifier(memberType)), NullLiteral())
+                : DefaultLiteral();
+        return Conditional(IsNotNull(receiver, containingType), access, nullValue);
+    }
+
     internal MemberDeclarationSyntax BuildSyntax(SourceEmitterContext ctx, CancellationToken cancellationToken)
     {
         var accessorCtx = ctx.AddIndentation();

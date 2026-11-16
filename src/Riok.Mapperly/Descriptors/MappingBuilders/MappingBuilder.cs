@@ -45,6 +45,9 @@ public class MappingBuilder(MappingCollection mappings, MapperDeclaration mapper
     public INewInstanceMapping? Find(TypeMappingKey mapping, ParameterScope? scope = null) =>
         mappings.FindNewInstanceMapping(mapping, scope);
 
+    public UserImplementedMethodMapping? FindUserImplemented(TypeMappingKey mapping, ParameterScope? scope = null) =>
+        mappings.FindNewInstanceUserImplementedMapping(mapping, scope);
+
     public INewInstanceMapping? FindOrResolveNamed(SimpleMappingBuilderContext ctx, string name, out bool ambiguousName)
     {
         if (!ctx.Configuration.Mapper.AutoUserMappings && _resolvedMappingNames.Add(name))

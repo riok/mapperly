@@ -945,4 +945,41 @@ public class ObjectPropertyUseNamedMappingTest
                 """
             );
     }
+
+    [Fact]
+    public void NullableParentShouldKeepExplicitMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("Item.Value", "Value", Use = nameof(MapNonNullable))]
+            partial B Map(A source);
+            int MapNullable(int? source) => source ?? -1;
+            int MapNonNullable(int source) => source + 1;
+            """,
+            TestSourceBuilderOptions.Default with
+            {
+                ThrowOnMappingNullMismatch = true,
+            },
+            "record A(C? Item);",
+            "record C(int Value);",
+            "record B(int Value);"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Item.Value of A to the target property Value of B which is not nullable"
+            )
+            .HaveAssertedAllDiagnostics()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(
+                    source.Item != null ? MapNonNullable(source.Item.Value) : throw new global::System.ArgumentNullException(nameof(source.Item.Value))
+                );
+                return target;
+                """
+            );
+    }
 }

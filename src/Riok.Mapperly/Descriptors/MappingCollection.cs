@@ -91,6 +91,19 @@ public class MappingCollection(GenericTypeChecker genericTypeChecker)
 
     public INewInstanceUserMapping? FindNewInstanceUserMapping(IMethodSymbol method) => _newInstanceMappings.FindUserMapping(method);
 
+    public UserImplementedMethodMapping? FindNewInstanceUserImplementedMapping(TypeMappingKey mappingKey, ParameterScope? scope = null)
+    {
+        if (
+            _newInstanceMappings.Find(mappingKey, scope, static m => m is UserImplementedMethodMapping)
+            is UserImplementedMethodMapping mapping
+        )
+        {
+            return mapping;
+        }
+
+        return mappingKey.Configuration.UseNamedMapping == null ? TryMatchGenericNewInstanceTemplate(mappingKey) : null;
+    }
+
     public INewInstanceMapping? FindNamedNewInstanceMapping(string name, out bool ambiguousName) =>
         _newInstanceMappings.FindNamed(name, out ambiguousName);
 
@@ -206,7 +219,7 @@ public class MappingCollection(GenericTypeChecker genericTypeChecker)
         _existingTargetMappings.AddNamedUserMapping(name, mapping);
     }
 
-    private INewInstanceMapping? TryMatchGenericNewInstanceTemplate(TypeMappingKey mappingKey)
+    private UserImplementedGenericMethodMapping? TryMatchGenericNewInstanceTemplate(TypeMappingKey mappingKey)
     {
         if (_genericNewInstanceTemplates.Count == 0)
             return null;
@@ -313,19 +326,18 @@ public class MappingCollection(GenericTypeChecker genericTypeChecker)
 
         public TUserMapping? FindUserMapping(IMethodSymbol method) => _userMappingsByMethod.GetValueOrDefault(method);
 
-        public T? Find(TypeMappingKey mappingKey, ParameterScope? scope = null)
+        public T? Find(TypeMappingKey mappingKey, ParameterScope? scope = null, Func<T, bool>? filter = null)
         {
-            if (scope is { IsEmpty: false } && FindByParameters(mappingKey, scope) is { } parameterizedMapping)
+            if (scope is { IsEmpty: false } && FindByParameters(mappingKey, scope, filter) is { } parameterizedMapping)
             {
                 _usedMappingKeys.Add(mappingKey);
                 return parameterizedMapping;
             }
 
-            if (_defaultMappings.TryGetValue(mappingKey, out var mapping))
-            {
-                _usedMappingKeys.Add(mappingKey);
-            }
+            if (!_defaultMappings.TryGetValue(mappingKey, out var mapping) || filter?.Invoke(mapping) == false)
+                return default;
 
+            _usedMappingKeys.Add(mappingKey);
             return mapping;
         }
 
@@ -341,13 +353,13 @@ public class MappingCollection(GenericTypeChecker genericTypeChecker)
             return mapping;
         }
 
-        private TUserMapping? FindByParameters(TypeMappingKey key, ParameterScope scope)
+        private TUserMapping? FindByParameters(TypeMappingKey key, ParameterScope scope, Func<T, bool>? filter)
         {
             var candidates = _userMappings.GetOrEmpty(key).Where(m => m is IParameterizedMapping { AdditionalSourceParameters.Count: > 0 });
 
             foreach (var mapping in candidates)
             {
-                if (scope.TryUseParameters(mapping))
+                if (filter?.Invoke(mapping) != false && scope.TryUseParameters(mapping))
                     return mapping;
             }
 

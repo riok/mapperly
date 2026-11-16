@@ -1087,4 +1087,131 @@ public class UseStaticMapperTest
                 """
             );
     }
+
+    [Fact]
+    public void NullableStructParentShouldUseGenericNullableConverter()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+
+            record Source(SourceItem? Item);
+            record struct SourceItem(int FirstInt, int SecondInt, long LongValue);
+            record Target(int FirstInt, int SecondInt, long LongValue);
+
+            [Mapper(ThrowOnPropertyMappingNullMismatch = true, ThrowOnMappingNullMismatch = true)]
+            [UseStaticMapper(typeof(WhenNull))]
+            partial class Mapper
+            {
+                [MapProperty("Item.FirstInt", "FirstInt")]
+                [MapProperty("Item.SecondInt", "SecondInt")]
+                [MapProperty("Item.LongValue", "LongValue")]
+                public partial Target Map(Source source);
+            }
+
+            static class WhenNull
+            {
+                public static T Convert<T>(T? value) where T : struct => value ?? default;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::Target(
+                    global::WhenNull.Convert<int>(source.Item?.FirstInt),
+                    global::WhenNull.Convert<int>(source.Item?.SecondInt),
+                    global::WhenNull.Convert<long>(source.Item?.LongValue)
+                );
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableParentProjectionShouldKeepNullHandling()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using System.Linq;
+            using Riok.Mapperly.Abstractions;
+
+            record A(C? Item);
+            record C(int Value);
+            record B(int ItemValue);
+
+            [Mapper(QueryableProjectionNullHandling = QueryableProjectionNullHandling.NullSafe)]
+            [UseStaticMapper(typeof(WhenNull))]
+            partial class Mapper
+            {
+                public partial IQueryable<B> Map(IQueryable<A> source);
+            }
+
+            static class WhenNull
+            {
+                public static int Convert(int? value) => value ?? -1;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue)
+            .HaveAssertedAllDiagnostics()
+            .HaveMapMethodBody(
+                """
+                #nullable disable
+                        return global::System.Linq.Queryable.Select(source, x => new global::B(x.Item != null ? x.Item.Value : default));
+                #nullable enable
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableParentShouldUseNullableConverterForPropertiesWithNoNullAssignment()
+    {
+        var source = TestSourceBuilder.CSharp(
+            """
+            using Riok.Mapperly.Abstractions;
+
+            record SourceItem(int? SourceNumber, int SourceId);
+            record Source(SourceItem? Item);
+            class Target
+            {
+                public int TargetNumber { get; set; }
+                public int TargetId { get; set; }
+            }
+
+            [Mapper(AllowNullPropertyAssignment = false, ThrowOnPropertyMappingNullMismatch = true)]
+            [UseStaticMapper<WhenNull>]
+            partial class Mapper
+            {
+                [MapProperty("Item.SourceNumber", "TargetNumber")]
+                [MapProperty("Item.SourceId", "TargetId")]
+                public partial Target Map(Source source);
+            }
+
+            class WhenNull
+            {
+                public static int Convert(int? value) => value ?? 0;
+            }
+            """
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::Target();
+                target.TargetNumber = global::WhenNull.Convert(source.Item?.SourceNumber);
+                target.TargetId = global::WhenNull.Convert(source.Item?.SourceId);
+                return target;
+                """
+            );
+    }
 }
