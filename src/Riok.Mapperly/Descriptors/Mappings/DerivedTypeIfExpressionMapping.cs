@@ -20,9 +20,8 @@ public class DerivedTypeIfExpressionMapping(
         // source is A x ? MapToA(x) : <other cases>
         var typeExpressions = typeMappings
             .Reverse()
-            .Aggregate<INewInstanceMapping, ExpressionSyntax>(
-                DefaultLiteral(),
-                (aggregate, current) => BuildConditional(ctx, aggregate, current)
+            .Aggregate<INewInstanceMapping, ExpressionSyntax>(DefaultLiteral(), (aggregate, current) =>
+                BuildConditional(ctx, aggregate, current)
             );
 
         // cast to target type, to ensure the compiler picks the correct type

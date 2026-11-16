@@ -129,8 +129,7 @@ public class MapperConfigurationReader
         bool supportsDeepCloning
     )
     {
-        var typeMapping =
-            (ITypeMapping?)_mappings.FindNamedNewInstanceMapping(name.FullName, out var ambiguousName)
+        var typeMapping = (ITypeMapping?)_mappings.FindNamedNewInstanceMapping(name.FullName, out var ambiguousName)
             ?? _mappings.FindExistingInstanceNamedMapping(name.FullName, out ambiguousName);
         var methodSymbol = (typeMapping as IUserMapping)?.Method;
         if (!ValidateIncludedConfig(ambiguousName, configRef, name.FullName, typeMapping, methodSymbol))

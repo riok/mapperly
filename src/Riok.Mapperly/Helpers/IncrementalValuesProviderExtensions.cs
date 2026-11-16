@@ -50,16 +50,13 @@ internal static class IncrementalValuesProviderExtensions
         IncrementalValuesProvider<ImmutableEquatableArray<Diagnostic>> diagnostics
     )
     {
-        context.RegisterSourceOutput(
-            diagnostics,
-            static (context, diagnostics) =>
+        context.RegisterSourceOutput(diagnostics, static (context, diagnostics) =>
+        {
+            foreach (var diagnostic in diagnostics)
             {
-                foreach (var diagnostic in diagnostics)
-                {
-                    context.ReportDiagnostic(diagnostic);
-                }
+                context.ReportDiagnostic(diagnostic);
             }
-        );
+        });
     }
 
     /// <summary>
@@ -72,13 +69,10 @@ internal static class IncrementalValuesProviderExtensions
         IncrementalValuesProvider<MapperNode> mappers
     )
     {
-        context.RegisterImplementationSourceOutput(
-            mappers,
-            static (spc, mapper) =>
-            {
-                var mapperText = mapper.Body.GetText(Encoding.UTF8);
-                spc.AddSource(mapper.FileName, mapperText);
-            }
-        );
+        context.RegisterImplementationSourceOutput(mappers, static (spc, mapper) =>
+        {
+            var mapperText = mapper.Body.GetText(Encoding.UTF8);
+            spc.AddSource(mapper.FileName, mapperText);
+        });
     }
 }

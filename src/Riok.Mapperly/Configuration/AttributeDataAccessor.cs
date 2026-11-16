@@ -105,8 +105,7 @@ public class AttributeDataAccessor(SymbolAccessor symbolAccessor)
         var dataType = typeof(TData);
 
         var syntax = (AttributeSyntax?)attrData.ApplicationSyntaxReference?.GetSyntax();
-        var syntaxArguments =
-            (IReadOnlyList<AttributeArgumentSyntax>?)syntax?.ArgumentList?.Arguments
+        var syntaxArguments = (IReadOnlyList<AttributeArgumentSyntax>?)syntax?.ArgumentList?.Arguments
             ?? new AttributeArgumentSyntax[attrData.ConstructorArguments.Length + attrData.NamedArguments.Length];
         var typeArguments = (IReadOnlyCollection<ITypeSymbol>?)attrData.AttributeClass?.TypeArguments ?? [];
         var attr = Create<TData>(typeArguments, attrData.ConstructorArguments, syntaxArguments, symbolAccessor);

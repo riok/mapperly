@@ -100,8 +100,7 @@ public class MapperGenerationResultAssertions
             return this;
         }
 
-        var matchingIdDiagnostic =
-            _notAssertedDiagnostics.FirstOrDefault(x => x.Descriptor.Equals(descriptor))
+        var matchingIdDiagnostic = _notAssertedDiagnostics.FirstOrDefault(x => x.Descriptor.Equals(descriptor))
             ?? _mapper.Diagnostics.First(x => x.Descriptor.Equals(descriptor));
         matchingIdDiagnostic.GetMessage().ShouldBe(message, $"message of {descriptor.Id} should match");
         return this;

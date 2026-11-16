@@ -54,20 +54,17 @@ public class MemberPathGetter
     {
         if (nullConditional)
         {
-            return path.AggregateWithPrevious(
-                baseAccess,
-                (expr, prevProp, prop) => prop.Getter.BuildAccess(expr, prop.Member.ContainingType, prevProp.Member?.IsReadNullable == true)
+            return path.AggregateWithPrevious(baseAccess, (expr, prevProp, prop) =>
+                prop.Getter.BuildAccess(expr, prop.Member.ContainingType, prevProp.Member?.IsReadNullable == true)
             );
         }
 
         if (addValuePropertyOnNullable)
         {
-            return path.Aggregate(
-                baseAccess,
-                (a, b) =>
-                    b.Member.Type.IsNullableValueType()
-                        ? MemberAccess(b.Getter.BuildAccess(a, b.Member.ContainingType), NullableValueProperty)
-                        : b.Getter.BuildAccess(a, b.Member.ContainingType)
+            return path.Aggregate(baseAccess, (a, b) =>
+                b.Member.Type.IsNullableValueType()
+                    ? MemberAccess(b.Getter.BuildAccess(a, b.Member.ContainingType), NullableValueProperty)
+                    : b.Getter.BuildAccess(a, b.Member.ContainingType)
             );
         }
 
