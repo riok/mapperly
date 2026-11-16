@@ -826,4 +826,64 @@ public class UnsafeAccessorTest
 
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void NullableGenericParentWithInheritedPrivatePropertyShouldPassNullToUserMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("Item.Value", "Value")]
+            partial B Map(A source);
+            int MapNullable(int? source) => source ?? -1;
+            """,
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "class A { public D<int>? Item { get; set; } }",
+            "class B { public int Value { get; set; } }",
+            "class C<T> { private T Value { get; set; } }",
+            "class D<T> : C<T> { }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Value = MapNullable(
+                    source.Item != null ? CAccessor<int>.GetValue(source.Item) : (int?)null
+                );
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableGenericParentWithInheritedPrivateFieldShouldPassNullToUserMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("Item.Value", "Value")]
+            partial B Map(A source);
+            int MapNullable(int? source) => source ?? -1;
+            """,
+            TestSourceBuilderOptions.WithMemberVisibility(MemberVisibility.All),
+            "class A { public D<int>? Item { get; set; } }",
+            "class B { public int Value { get; set; } }",
+            "class C<T> { private T Value; }",
+            "class D<T> : C<T> { }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B();
+                target.Value = MapNullable(
+                    source.Item != null ? CAccessor<int>.GetValue(source.Item) : (int?)null
+                );
+                return target;
+                """
+            );
+    }
 }

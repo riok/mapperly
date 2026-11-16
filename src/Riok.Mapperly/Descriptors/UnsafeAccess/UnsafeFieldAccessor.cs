@@ -64,7 +64,12 @@ public class UnsafeFieldAccessor(IFieldSymbol symbol, string className, string m
         if (!nullConditional)
             return invocation;
 
-        return Conditional(IsNotNull(baseAccess, containingType ?? symbol.ContainingType), invocation, DefaultLiteral());
+        return UnsafeAccessorTypeContext.BuildNullConditionalAccess(
+            symbol,
+            containingType ?? symbol.ContainingType,
+            baseAccess,
+            invocation
+        );
     }
 
     public ExpressionSyntax BuildAssignment(

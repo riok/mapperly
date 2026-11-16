@@ -69,6 +69,11 @@ public class UnsafeGetPropertyAccessor(IPropertySymbol symbol, string className,
         if (!nullConditional)
             return invocation;
 
-        return Conditional(IsNotNull(baseAccess, containingType ?? symbol.ContainingType), invocation, DefaultLiteral());
+        return UnsafeAccessorTypeContext.BuildNullConditionalAccess(
+            symbol,
+            containingType ?? symbol.ContainingType,
+            baseAccess,
+            invocation
+        );
     }
 }

@@ -1603,4 +1603,73 @@ public class ObjectPropertyNullableTest
                 """
             );
     }
+
+    [Fact]
+    public void NullableParentShouldPreferNullableUserMapping()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("NullableItem.Value", "NullableValue")]
+            [MapProperty("Item.Value", "Value")]
+            partial B Map(A source);
+            int MapNullable(int? source) => source ?? -1;
+            int MapNonNullable(int source) => source + 1;
+            """,
+            "record A(C? NullableItem, C Item);",
+            "record C(int Value);",
+            "class B { public int NullableValue { get; init; } public int Value { get; init; } }"
+        );
+
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B()
+                {
+                    NullableValue = MapNullable(source.NullableItem?.Value),
+                    Value = MapNonNullable(source.Item.Value),
+                };
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void NullableParentWithGeneratedNullableMappingsShouldKeepNullFallback()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty("Item.Value", "Value")]
+            partial B Map(A source);
+            private partial int MapNullable(int? source);
+            private partial int OtherNullable(int? source);
+            """,
+            TestSourceBuilderOptions.Default with
+            {
+                ThrowOnMappingNullMismatch = true,
+            },
+            "record A(C? Item);",
+            "record C(int Value);",
+            "record B(int Value);"
+        );
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(
+                DiagnosticDescriptors.NullableSourceValueToNonNullableTargetValue,
+                "Mapping the nullable source property Item.Value of A to the target property Value of B which is not nullable"
+            )
+            .HaveDiagnostic(DiagnosticDescriptors.NullableSourceTypeToNonNullableTargetType)
+            .HaveAssertedAllDiagnostics()
+            .HaveMapMethodBody(
+                """
+                var target = new global::B(
+                    source.Item?.Value ?? throw new global::System.ArgumentNullException(nameof(source.Item.Value))
+                );
+                return target;
+                """
+            );
+    }
 }

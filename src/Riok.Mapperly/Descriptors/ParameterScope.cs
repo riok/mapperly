@@ -4,6 +4,11 @@ using Riok.Mapperly.Symbols;
 
 namespace Riok.Mapperly.Descriptors;
 
+/// <summary>
+/// Manages additional source parameters available to mappings and tracks their usage.
+/// Child scopes share their parent's parameters and delegate usage tracking to the root scope
+/// for unused-parameter diagnostics.
+/// </summary>
 public class ParameterScope
 {
     private static readonly IReadOnlyDictionary<string, MethodParameter> _emptyParameters = new Dictionary<string, MethodParameter>();
