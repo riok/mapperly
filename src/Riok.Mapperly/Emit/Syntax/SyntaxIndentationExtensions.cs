@@ -98,21 +98,18 @@ internal static class SyntaxIndentationExtensions
 
     public static SyntaxTriviaList AddLineFeedAndIndentation(this SyntaxTriviaList trivia, int indentation)
     {
-        var triviaToInsert = _indentationLineFeedSyntaxTriviaCache.GetOrAdd(
-            indentation,
-            static indentationLevel =>
+        var triviaToInsert = _indentationLineFeedSyntaxTriviaCache.GetOrAdd(indentation, static indentationLevel =>
+        {
+            // +1 for the new line at the beginning of the indentation
+            var toInsert = new SyntaxTrivia[indentationLevel + 1];
+            toInsert[0] = ElasticCarriageReturnLineFeed;
+            for (var i = 1; i < toInsert.Length; i++)
             {
-                // +1 for the new line at the beginning of the indentation
-                var toInsert = new SyntaxTrivia[indentationLevel + 1];
-                toInsert[0] = ElasticCarriageReturnLineFeed;
-                for (var i = 1; i < toInsert.Length; i++)
-                {
-                    toInsert[i] = _indentation;
-                }
-
-                return toInsert;
+                toInsert[i] = _indentation;
             }
-        );
+
+            return toInsert;
+        });
 
         return trivia.InsertRange(0, triviaToInsert);
     }

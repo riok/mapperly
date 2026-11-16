@@ -116,15 +116,10 @@ public class MapperGenerator : IIncrementalGenerator
             var compilation = compilationContext.Compilation.WithOptions(advancedOptions);
 
             // map all symbols to the new compilation
-            compilationContext = compilationContext with
-            {
-                Compilation = compilation,
-                Types = new WellKnownTypes(compilation),
-            };
+            compilationContext = compilationContext with { Compilation = compilation, Types = new WellKnownTypes(compilation) };
             assemblyScopedStaticMappers = MapStaticMappers(assemblyScopedStaticMappers, compilation);
             var mapperDeclarationSymbolFqn = mapperDeclaration.Symbol.FullyQualifiedMetadataName();
-            var mappedMapperSymbol =
-                compilationContext.Compilation.GetBestTypeByMetadataName(mapperDeclarationSymbolFqn)
+            var mappedMapperSymbol = compilationContext.Compilation.GetBestTypeByMetadataName(mapperDeclarationSymbolFqn)
                 ?? throw new InvalidOperationException($"Could not get type {mapperDeclarationSymbolFqn}");
 
             mapperDeclaration = mapperDeclaration with { Symbol = mappedMapperSymbol };
@@ -167,8 +162,7 @@ public class MapperGenerator : IIncrementalGenerator
         foreach (var config in staticMappers)
         {
             var mapperTypeFqn = config.MapperType.FullyQualifiedMetadataName();
-            var mappedMapperType =
-                compilation.GetBestTypeByMetadataName(mapperTypeFqn)
+            var mappedMapperType = compilation.GetBestTypeByMetadataName(mapperTypeFqn)
                 ?? throw new InvalidOperationException($"Could not get type {mapperTypeFqn}");
             staticMappersBuilder.Add(
                 new UseStaticMapperConfiguration(mappedMapperType) { NoExpressionInlining = config.NoExpressionInlining }
@@ -259,8 +253,9 @@ public class MapperGenerator : IIncrementalGenerator
     {
         var includedMembers = mapperConfiguration.IncludedMembers ?? mapperDefaults.IncludedMembers ?? MemberVisibility.AllAccessible;
 
-        var includedConstructors =
-            mapperConfiguration.IncludedConstructors ?? mapperDefaults.IncludedConstructors ?? MemberVisibility.AllAccessible;
+        var includedConstructors = mapperConfiguration.IncludedConstructors
+            ?? mapperDefaults.IncludedConstructors
+            ?? MemberVisibility.AllAccessible;
 
         if (includedMembers.HasFlag(MemberVisibility.Accessible) && includedConstructors.HasFlag(MemberVisibility.Accessible))
         {

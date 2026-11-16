@@ -21,37 +21,29 @@ public class UnsafeAccessorTypeContext(UniqueNameBuilder nameBuilder, INamedType
 
     public UnsafeSetPropertyAccessor GetOrBuildPropertySetter(PropertyMember member)
     {
-        return GetOrBuild(
-            UnsafeAccessorType.SetProperty,
-            member.Symbol,
-            static (m, className, methodName) => new UnsafeSetPropertyAccessor(m, className, methodName)
+        return GetOrBuild(UnsafeAccessorType.SetProperty, member.Symbol, static (m, className, methodName) =>
+            new UnsafeSetPropertyAccessor(m, className, methodName)
         );
     }
 
     public UnsafeGetPropertyAccessor GetOrBuildPropertyGetter(PropertyMember member)
     {
-        return GetOrBuild(
-            UnsafeAccessorType.GetProperty,
-            member.Symbol,
-            static (m, className, methodName) => new UnsafeGetPropertyAccessor(m, className, methodName)
+        return GetOrBuild(UnsafeAccessorType.GetProperty, member.Symbol, static (m, className, methodName) =>
+            new UnsafeGetPropertyAccessor(m, className, methodName)
         );
     }
 
     public UnsafeFieldAccessor GetOrBuildFieldGetter(FieldMember member)
     {
-        return GetOrBuild(
-            UnsafeAccessorType.GetField,
-            member.Symbol,
-            static (m, className, methodName) => new UnsafeFieldAccessor(m, className, methodName)
+        return GetOrBuild(UnsafeAccessorType.GetField, member.Symbol, static (m, className, methodName) =>
+            new UnsafeFieldAccessor(m, className, methodName)
         );
     }
 
     public UnsafeConstructorAccessor GetOrBuildConstructor(IMethodSymbol ctorSymbol)
     {
-        return GetOrBuild(
-            UnsafeAccessorType.Constructor,
-            ctorSymbol,
-            static (s, className, methodName) => new UnsafeConstructorAccessor(s, className, methodName)
+        return GetOrBuild(UnsafeAccessorType.Constructor, ctorSymbol, static (s, className, methodName) =>
+            new UnsafeConstructorAccessor(s, className, methodName)
         );
     }
 

@@ -158,8 +158,8 @@ namespace Riok.Mapperly.IntegrationTests
         /// <returns>Either an empty string or the name of the version.</returns>
         private static string GetSnapshotVersionSuffix(Type type, MethodInfo method)
         {
-            var versionedSnapshot =
-                method.GetCustomAttribute<VersionedSnapshotAttribute>() ?? type.GetCustomAttribute<VersionedSnapshotAttribute>();
+            var versionedSnapshot = method.GetCustomAttribute<VersionedSnapshotAttribute>()
+                ?? type.GetCustomAttribute<VersionedSnapshotAttribute>();
             if (versionedSnapshot == null)
                 return string.Empty;
 
@@ -203,8 +203,8 @@ namespace Riok.Mapperly.IntegrationTests
 
         private static string FindDirectoryOfFile(string fileExtension, [CallerFilePath] string baseFilePath = "")
         {
-            var dir =
-                Path.GetDirectoryName(baseFilePath) ?? throw new InvalidOperationException($"Could not get directory from {baseFilePath}");
+            var dir = Path.GetDirectoryName(baseFilePath)
+                ?? throw new InvalidOperationException($"Could not get directory from {baseFilePath}");
 
             while (Directory.GetFiles(dir, "*" + fileExtension, SearchOption.TopDirectoryOnly).Length == 0)
             {

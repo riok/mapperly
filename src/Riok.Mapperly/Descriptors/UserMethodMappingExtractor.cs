@@ -21,8 +21,7 @@ public static class UserMethodMappingExtractor
         var methods = mapperSymbol.GetMembers().OfType<IMethodSymbol>().Where(method => IsMappingMethodCandidate(ctx, method));
         foreach (var method in methods)
         {
-            var mapping =
-                BuildUserDefinedMapping(ctx, method)
+            var mapping = BuildUserDefinedMapping(ctx, method)
                 ?? BuildUserImplementedMapping(
                     ctx,
                     method,
