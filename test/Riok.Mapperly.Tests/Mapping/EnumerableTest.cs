@@ -658,6 +658,21 @@ public class EnumerableTest
         return TestHelper.VerifyGenerator(source);
     }
 
+    [Theory]
+    [InlineData("IEnumerable<int>", "ICollection<long>")]
+    [InlineData("IDictionary<int, int>", "IDictionary<int, long>")]
+    public void CustomCollectionInterfaceWithoutFactoryCannotBeConstructed(string sourceType, string baseInterface)
+    {
+        var source = TestSourceBuilder.Mapping(sourceType, "ITarget", $"public interface ITarget : {baseInterface} {{ }}");
+
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.NoConstructorFound)
+            .HaveMapMethodBody("""throw new global::System.NotImplementedException("Mapperly: Could not generate mapping");""")
+            .HaveAssertedAllDiagnostics();
+    }
+
     [Fact]
     public void EnumerableMappingDisabledShouldDiagnostic()
     {

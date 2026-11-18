@@ -70,6 +70,9 @@ public static class DictionaryMappingBuilder
             ctx.InstanceConstructors.TryBuildObjectFactory(collectionInfos.Source.Type, ctx.Target, out constructor);
         }
 
+        if (constructor == null && !ctx.SymbolAccessor.HasAnyAccessibleConstructor(ctx.Target))
+            return null;
+
         return new ForEachSetDictionaryMapping(
             constructor,
             collectionInfos,
