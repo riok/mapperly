@@ -1317,6 +1317,28 @@ public class UserMethodTest
     }
 
     [Fact]
+    public Task WithGenericUserImplementedExistingTargetAndExistingTargetDispatcherShouldWork()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            public partial void Map<TSource, TTarget>(TSource source, TTarget target);
+
+            public partial void MapA(A source, B target);
+
+            private void MapContainer<TSource, TTarget>(IContainer<TSource> source, IContainer<TTarget> target)
+            {
+                Map<IContainer<TSource>, IContainer<TTarget>>(source, target);
+            }
+            """,
+            "public interface IContainer<T> { T Value { get; set; } }",
+            "class A { public int Value { get; set; } }",
+            "class B { public int Value { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task WithGenericUserImplementedExistingTargetAndReferenceHandling()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
