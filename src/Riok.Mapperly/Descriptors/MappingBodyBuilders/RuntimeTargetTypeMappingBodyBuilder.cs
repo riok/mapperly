@@ -64,8 +64,13 @@ public static class RuntimeTargetTypeMappingBodyBuilder
             .Where(x => x is not UserDefinedNewInstanceRuntimeTargetTypeMapping)
             .OfType<INewInstanceUserMapping>();
 
+    // Generic dispatchers and generic user-implemented templates are open generic methods
+    // which cannot be invoked directly in a type switch arm.
+    // Concrete instantiations of the templates are registered as separate mappings once they are built.
     private static IEnumerable<IExistingTargetUserMapping> GetExistingTargetUserMappingCandidates(MappingBuilderContext ctx) =>
-        ctx.ExistingTargetUserMappings.Where(x => x is not UserDefinedExistingTargetGenericTypeMapping);
+        ctx.ExistingTargetUserMappings.Where(x =>
+            x is not (UserDefinedExistingTargetGenericTypeMapping or GenericUserImplementedExistingTargetMethodMapping)
+        );
 
     private static void BuildExistingTargetMappingBody(
         MappingBuilderContext ctx,
