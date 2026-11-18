@@ -185,10 +185,15 @@ public class DictionaryCustomTest
     }
 
     [Fact]
-    public Task DictionaryToCustomDictionaryWithPrivateCtorShouldDiagnostic()
+    public void DictionaryToCustomDictionaryWithPrivateCtorShouldDiagnostic()
     {
         var source = TestSourceBuilder.Mapping("IDictionary<string, int>", "A", "class A : Dictionary<string, int> { private A(){} }");
-        return TestHelper.VerifyGenerator(source);
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowDiagnostics)
+            .Should()
+            .HaveDiagnostic(DiagnosticDescriptors.NoConstructorFound, "A has no accessible constructor with mappable arguments")
+            .HaveAssertedAllDiagnostics()
+            .HaveMapMethodBody("""throw new global::System.NotImplementedException("Mapperly: Could not generate mapping");""");
     }
 
     [Fact]

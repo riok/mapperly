@@ -402,6 +402,9 @@ public static class EnumerableMappingBuilder
             ctx.InstanceConstructors.TryBuildObjectFactory(collectionInfos.Source.Type, ctx.Target, out constructor);
         }
 
+        if (constructor == null && !ctx.SymbolAccessor.HasAnyAccessibleConstructor(ctx.Target))
+            return null;
+
         return new ForEachAddEnumerableMapping(
             constructor,
             collectionInfos,
