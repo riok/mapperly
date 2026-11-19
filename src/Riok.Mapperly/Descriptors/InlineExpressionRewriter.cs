@@ -146,6 +146,18 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
         return node;
     }
 
+    public override SyntaxNode? VisitParenthesizedLambdaExpression(ParenthesizedLambdaExpressionSyntax node)
+    {
+        // the lambda symbol keeps the nullable annotation of an explicit return type,
+        // the type info of the return type syntax does not.
+        var returnType = node.ReturnType == null ? null : (semanticModel.GetSymbolInfo(node).Symbol as IMethodSymbol)?.ReturnType;
+        node = (ParenthesizedLambdaExpressionSyntax)base.VisitParenthesizedLambdaExpression(node)!;
+        if (returnType == null || node.ReturnType == null)
+            return node;
+
+        return node.WithReturnType(FullyQualifiedIdentifier(returnType).WithTriviaFrom(node.ReturnType));
+    }
+
     public override SyntaxNode? VisitInvocationExpression(InvocationExpressionSyntax node)
     {
         // expand static method invocation type names

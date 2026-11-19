@@ -184,6 +184,44 @@ public class InlineExpressionRewriterTest
         result.ShouldBe("global::System.Array.Empty<global::AnotherAssembly.A>()");
     }
 
+    [Theory]
+    [InlineData("DateTime? (x) => x.DateCreated", "global::System.DateTime? (x) => x.DateCreated")]
+    [InlineData("B (x) => x.Value", "global::AnotherAssembly.B (x) => x.Value")]
+    [InlineData("B? (x) => x.Value", "global::AnotherAssembly.B? (x) => x.Value")]
+    [InlineData("List<B> (x) => x.Values", "global::System.Collections.Generic.List<global::AnotherAssembly.B> (x) => x.Values")]
+    [InlineData("B[] (x) => x.Values.ToArray()", "global::AnotherAssembly.B[] (x) => x.Values.ToArray()")]
+    [InlineData(
+        "List<B?> (x) => x.NullableValues",
+        "global::System.Collections.Generic.List<global::AnotherAssembly.B?> (x) => x.NullableValues"
+    )]
+    [InlineData("object (x) => (B)x.Value", "object (x) => (global::AnotherAssembly.B)x.Value")]
+    [InlineData("(x) => x.DateCreated", "(x) => x.DateCreated")]
+    public void RewriteExpressionContainingLambdaWithExplicitReturnType(string lambda, string inlinedLambda)
+    {
+        var (result, inlineOk) = Rewrite(
+            $$"""
+            #nullable enable
+            using AnotherAssembly;
+            using System;
+            using System.Collections.Generic;
+            using System.Linq;
+
+            public class Test
+            {
+                public int MapExpression(List<A> values) => values.Select({{lambda}}).Count();
+            }
+
+            namespace AnotherAssembly {
+                record A(DateTime DateCreated, B Value, List<B> Values, List<B?> NullableValues);
+                record B;
+            }
+            """
+        );
+
+        inlineOk.ShouldBeTrue();
+        result.ShouldBe($"global::System.Linq.Enumerable.Count(global::System.Linq.Enumerable.Select(values, {inlinedLambda}))");
+    }
+
     private (string Result, bool CanBeInlined) Rewrite([StringSyntax(StringSyntax.CSharp)] string source)
     {
         var compilation = TestHelper.BuildCompilation(source);

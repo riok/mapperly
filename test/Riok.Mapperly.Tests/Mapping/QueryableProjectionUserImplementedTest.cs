@@ -172,6 +172,24 @@ public class QueryableProjectionUserImplementedTest
     }
 
     [Fact]
+    public Task ClassToClassUserImplementedLambdaWithExplicitReturnType()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            private partial System.Linq.IQueryable<B> Map(System.Linq.IQueryable<A> source);
+
+            private DateTime? LastCreated(List<C> v)
+                => v.Select(DateTime? (x) => x.DateCreated).Max();
+            """,
+            "class A { public string StringValue { get; set; } public List<C> Created { get; set; } }",
+            "class B { public string StringValue { get; set; } public DateTime? Created { get; set; } }",
+            "class C { public DateTime DateCreated { get; set; } }"
+        );
+
+        return TestHelper.VerifyGenerator(source);
+    }
+
+    [Fact]
     public Task ClassToClassUserImplementedOrderingWithMappingAndParameterHiding()
     {
         var source = TestSourceBuilder.MapperWithBodyAndTypes(
