@@ -222,3 +222,14 @@ This lets the method use the existing destination value e.g. as a fallback when 
     ```
   </TabItem>
 </Tabs>
+
+Mapperly passes the current value only when all of the following apply:
+
+- The target member is set by an assignment.
+  Init-only members, constructor parameters and queryable projections are not.
+- The target member is readable.
+- The target member type converts implicitly to the parameter type.
+
+Otherwise the parameter receives its default value.
+For a target member set by an assignment, Mapperly reports `RMG102` if the member is not readable
+and `RMG101` if its type does not fit.

@@ -58,7 +58,7 @@ public readonly record struct TypeMappingBuildContext
     public TypeMappingBuildContext AddIndentation() =>
         new(Source, ReferenceHandler, NameBuilder, SyntaxFactory.AddIndentation(), AdditionalParameters, OriginalTargetValueExpression);
 
-    public TypeMappingBuildContext WithTargetValue(ExpressionSyntax targetValue) =>
+    public TypeMappingBuildContext WithTargetValue(ExpressionSyntax? targetValue) =>
         new(Source, ReferenceHandler, NameBuilder, SyntaxFactory, AdditionalParameters, targetValue);
 
     /// <summary>
