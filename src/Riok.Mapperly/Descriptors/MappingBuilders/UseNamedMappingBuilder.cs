@@ -47,20 +47,16 @@ public static class UseNamedMappingBuilder
         var differentSourceType = !SymbolEqualityComparer.IncludeNullability.Equals(ctx.Source, mapping.SourceType);
         var differentTargetType = !SymbolEqualityComparer.IncludeNullability.Equals(ctx.Target, mapping.TargetType);
 
-        // use a delegate mapping,
-        // otherwise the user-defined method mapping may get built twice
-        // (if it is returned here directly, it is re-added to the mappings to be built)
-        if (!differentSourceType && !differentTargetType)
-            return new DelegateMapping(mapping.SourceType, mapping.TargetType, mapping);
+        var inputMapping = differentSourceType ? TryMapSource(ctx, mapping) : null;
+        if (differentSourceType && inputMapping == null)
+            return null;
 
-        if (differentSourceType)
-        {
-            mapping = TryMapSource(ctx, mapping);
-            if (mapping == null)
-                return null;
-        }
+        var outputMapping = differentTargetType ? TryMapTarget(ctx, mapping) : null;
+        if (differentTargetType && outputMapping == null)
+            return null;
 
-        return differentTargetType ? TryMapTarget(ctx, mapping) : mapping;
+        // Wrap even exact matches to avoid re-adding the named mapping to the mappings to be built.
+        return new CompositeMapping(mapping, inputMapping, outputMapping);
     }
 
     public static IExistingTargetMapping? TryBuildExistingTargetMapping(MappingBuilderContext ctx)
@@ -182,7 +178,7 @@ public static class UseNamedMappingBuilder
             return null;
         }
 
-        return new CompositeMapping(outputMapping, mapping);
+        return outputMapping;
     }
 
     private static INewInstanceMapping? TryMapSource(MappingBuilderContext ctx, INewInstanceMapping mapping)
@@ -205,6 +201,6 @@ public static class UseNamedMappingBuilder
             return null;
         }
 
-        return new CompositeMapping(mapping, inputMapping);
+        return inputMapping;
     }
 }

@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Riok.Mapperly.Descriptors.MappingBodyBuilders.BuilderContext;
 using Riok.Mapperly.Descriptors.Mappings;
 using Riok.Mapperly.Descriptors.Mappings.MemberMappings;
@@ -104,7 +105,7 @@ internal static class MemberMappingBuilder
             );
         }
 
-        var targetValueGetter = GetTargetValueGetterIfNeeded(ctx, delegateMapping, memberMappingInfo.TargetMember);
+        var targetValueGetter = GetTargetValueGetterIfNeeded(ctx, delegateMapping, memberMappingInfo.TargetMember, codeStyle);
 
         if (
             (memberSourceNullable == delegateSourceNullable && memberTargetAcceptsNull == delegateTargetNullable)
@@ -174,11 +175,51 @@ internal static class MemberMappingBuilder
     private static MemberPathGetter? GetTargetValueGetterIfNeeded(
         IMembersBuilderContext<IMapping> ctx,
         INewInstanceMapping delegateMapping,
-        NonEmptyMemberPath targetMember
-    ) =>
-        delegateMapping is UserImplementedMethodMapping { TargetOriginalValueParameter: not null }
-            ? targetMember.BuildGetter(ctx.BuilderContext)
-            : null;
+        NonEmptyMemberPath targetMember,
+        CodeStyle codeStyle
+    )
+    {
+        if (delegateMapping is CompositeMapping composite)
+            delegateMapping = composite.NamedMapping;
+
+        if (delegateMapping is not UserImplementedMethodMapping { TargetOriginalValueParameter: { } parameter } userMapping)
+            return null;
+
+        // An initializer never passes the target value, so a diagnostic only helps for an assignment.
+        var reportDiagnostics = codeStyle == CodeStyle.Statement;
+
+        if (!targetMember.Member.CanGet)
+        {
+            if (reportDiagnostics)
+            {
+                ctx.BuilderContext.ReportDiagnostic(
+                    DiagnosticDescriptors.MappingTargetOriginalValueMemberNotReadable,
+                    targetMember.ToDisplayString(),
+                    parameter.Name,
+                    userMapping.Method.Name
+                );
+            }
+
+            return null;
+        }
+
+        // The getter reads the member itself, so its type decides whether the parameter accepts the value.
+        if (ctx.BuilderContext.Compilation.ClassifyConversion(targetMember.Member.Type, parameter.Type).IsImplicit)
+            return targetMember.BuildGetter(ctx.BuilderContext);
+
+        if (reportDiagnostics)
+        {
+            ctx.BuilderContext.ReportDiagnostic(
+                DiagnosticDescriptors.MappingTargetOriginalValueTypeMismatch,
+                targetMember.ToDisplayString(),
+                parameter.Name,
+                parameter.Type.ToDisplayString(),
+                userMapping.Method.Name
+            );
+        }
+
+        return null;
+    }
 
     private static bool ValidateLoopMapping(
         IMembersBuilderContext<IMapping> ctx,
