@@ -6,11 +6,11 @@ public static partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public static partial global::System.Linq.Expressions.Expression<global::System.Func<global::A, global::B>> CreateProjection()
     {
-#nullable disable
+#nullable disable warnings
         return x => new global::B()
         {
             StringValue = x.StringValue,
         };
-#nullable enable
+#nullable enable warnings
     }
 }

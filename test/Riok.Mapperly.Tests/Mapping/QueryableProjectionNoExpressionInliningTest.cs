@@ -24,9 +24,9 @@ public class QueryableProjectionNoExpressionInliningTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(q, x => MapSingle(x));
-                #nullable enable
+                #nullable enable warnings
                 """
             )
             .HaveMethodBody(
@@ -68,7 +68,7 @@ public class QueryableProjectionNoExpressionInliningTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             q,
                             x => new global::B()
@@ -76,7 +76,7 @@ public class QueryableProjectionNoExpressionInliningTest
                                 Value = MapValue(x.Value),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -110,7 +110,7 @@ public class QueryableProjectionNoExpressionInliningTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             q,
                             x => new global::B()
@@ -118,7 +118,7 @@ public class QueryableProjectionNoExpressionInliningTest
                                 Value = ((global::IMapperBase)this).MapValue(x.Value),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -149,7 +149,7 @@ public class QueryableProjectionNoExpressionInliningTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             q,
                             x => new global::B()
@@ -157,7 +157,7 @@ public class QueryableProjectionNoExpressionInliningTest
                                 Value = MapValue(x.Value),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }

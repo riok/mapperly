@@ -6,7 +6,7 @@ public static partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public static partial global::System.Linq.IQueryable<global::CarDto> ProjectToCarDto(this global::System.Linq.IQueryable<global::Car> query)
     {
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(
             query,
             x => new global::CarDto()
@@ -20,7 +20,7 @@ public static partial class Mapper
                 },
             }
         );
-#nullable enable
+#nullable enable warnings
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

@@ -6,7 +6,7 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::System.Linq.IQueryable<global::B> ProjectAToB(global::System.Linq.IQueryable<global::A> query)
     {
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(
             query,
             x => new global::B(
@@ -14,6 +14,6 @@ public partial class Mapper
                     x.ChangedOn != global::System.DateTime.MinValue ? new global::System.DateTimeOffset(global::System.DateTime.SpecifyKind(x.ChangedOn, global::System.DateTimeKind.Utc)) : global::System.DateTimeOffset.MinValue
             )
         );
-#nullable enable
+#nullable enable warnings
     }
 }

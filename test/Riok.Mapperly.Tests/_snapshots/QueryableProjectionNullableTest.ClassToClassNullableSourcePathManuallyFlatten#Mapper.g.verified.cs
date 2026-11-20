@@ -6,7 +6,7 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::System.Linq.IQueryable<global::B> Map(global::System.Linq.IQueryable<global::A> q)
     {
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(
             q,
             x => new global::B()
@@ -14,7 +14,7 @@ public partial class Mapper
                 NestedValue4 = x.Nested != null && x.Nested.Nested2 != null ? x.Nested.Nested2.Value3 : default,
             }
         );
-#nullable enable
+#nullable enable warnings
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

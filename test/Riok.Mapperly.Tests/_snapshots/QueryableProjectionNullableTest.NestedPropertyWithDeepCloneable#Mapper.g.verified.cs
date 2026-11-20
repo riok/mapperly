@@ -9,7 +9,7 @@ public partial class Mapper
     {
         if (source == null)
             return default;
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(
             source,
             x => new global::B()
@@ -18,7 +18,7 @@ public partial class Mapper
                 Value = x.Nested != null && x.Nested.Value != null ? x.Nested.Value : default,
             }
         );
-#nullable enable
+#nullable enable warnings
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

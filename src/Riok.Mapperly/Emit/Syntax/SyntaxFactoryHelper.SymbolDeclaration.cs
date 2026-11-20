@@ -1,7 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Riok.Mapperly.Helpers;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Riok.Mapperly.Emit.Syntax;
@@ -36,45 +35,65 @@ public partial struct SyntaxFactoryHelper
             return syntax;
 
         var typeParams = TypeParameterList(SeparatedList(type.TypeParameters.Select(tp => TypeParameter(Identifier(tp.Name)))));
-        syntax = syntax.WithTypeParameterList(typeParams);
+        var indentation = Indentation + 1;
+        var constraintClauses = TypeParameterConstraintClauses(type.TypeParameters).Select(c => c.AddLeadingLineFeed(indentation));
 
-        foreach (var typeParam in type.TypeParameters)
+        return syntax.WithTypeParameterList(typeParams).WithConstraintClauses(List(constraintClauses));
+    }
+
+    public static IEnumerable<TypeParameterConstraintClauseSyntax> TypeParameterConstraintClauses(
+        IEnumerable<ITypeParameterSymbol> typeParameters
+    )
+    {
+        foreach (var tp in typeParameters)
         {
             var constraints = new List<TypeParameterConstraintSyntax>();
 
-            if (typeParam.HasNotNullConstraint)
-                constraints.Add(TypeConstraint(IdentifierName("notnull")));
-
-            if (typeParam.HasReferenceTypeConstraint)
-                constraints.Add(ClassOrStructConstraint(SyntaxKind.ClassConstraint));
-
-            if (typeParam.HasUnmanagedTypeConstraint)
-                constraints.Add(TypeConstraint(IdentifierName("unmanaged")));
-
-            if (typeParam.HasValueTypeConstraint)
-                constraints.Add(ClassOrStructConstraint(SyntaxKind.StructConstraint));
-
-            foreach (var constraintType in typeParam.ConstraintTypes)
+            if (tp.HasUnmanagedTypeConstraint)
             {
-                var typeConstraint = TypeConstraint(ParseTypeName(constraintType.FullyQualifiedIdentifierName()));
-                constraints.Add(typeConstraint);
+                constraints.Add(TypeConstraint(IdentifierName("unmanaged")).AddLeadingSpace());
+            }
+            else if (tp.HasValueTypeConstraint)
+            {
+                constraints.Add(ClassOrStructConstraint(SyntaxKind.StructConstraint).AddLeadingSpace());
+            }
+            else if (tp.HasNotNullConstraint)
+            {
+                constraints.Add(TypeConstraint(IdentifierName("notnull")).AddLeadingSpace());
+            }
+            else if (tp.HasReferenceTypeConstraint)
+            {
+                constraints.Add(
+                    ClassOrStructConstraint(SyntaxKind.ClassConstraint)
+                        .WithQuestionToken(
+                            tp.ReferenceTypeConstraintNullableAnnotation == NullableAnnotation.Annotated
+                                ? Token(SyntaxKind.QuestionToken)
+                                : default
+                        )
+                        .AddLeadingSpace()
+                );
             }
 
-            if (typeParam.HasConstructorConstraint)
-                constraints.Add(ConstructorConstraint());
+            foreach (var c in tp.ConstraintTypes)
+            {
+                constraints.Add(TypeConstraint(FullyQualifiedIdentifier(c)).AddLeadingSpace());
+            }
+
+            if (tp.HasConstructorConstraint)
+            {
+                constraints.Add(ConstructorConstraint().AddLeadingSpace());
+            }
 
             if (constraints.Count == 0)
+            {
                 continue;
+            }
 
-            var constraintClause = TypeParameterConstraintClause(
-                IdentifierName(typeParam.Name).AddLeadingSpace().AddTrailingSpace(),
-                SeparatedList(constraints.Select(c => c.AddLeadingSpace()))
+            yield return TypeParameterConstraintClause(
+                IdentifierName(tp.Name).AddLeadingSpace().AddTrailingSpace(),
+                SeparatedList(constraints)
             );
-
-            syntax = syntax.AddConstraintClauses(constraintClause.AddLeadingLineFeed(Indentation + 1));
         }
-
-        return syntax;
     }
 
     public TypeDeclarationSyntax TypeDeclaration(TypeDeclarationSyntax syntax, SyntaxList<MemberDeclarationSyntax> members)

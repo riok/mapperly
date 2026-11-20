@@ -9,8 +9,8 @@ public partial class Mapper
     {
         if (source == null)
             return default;
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(source, x => new global::B(x.Value));
-#nullable enable
+#nullable enable warnings
     }
 }

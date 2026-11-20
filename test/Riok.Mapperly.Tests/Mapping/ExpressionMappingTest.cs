@@ -24,9 +24,9 @@ public class ExpressionMappingTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return x => MapEnum(x);
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -54,9 +54,9 @@ public class ExpressionMappingTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return x => MapEnum(x);
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
