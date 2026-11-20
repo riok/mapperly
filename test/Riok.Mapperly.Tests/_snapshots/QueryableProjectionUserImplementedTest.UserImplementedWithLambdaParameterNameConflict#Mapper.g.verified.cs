@@ -6,14 +6,14 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public static partial global::System.Linq.IQueryable<global::BlogDto> ProjectToDto(this global::System.Linq.IQueryable<global::Blog> q)
     {
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(
             q,
             x => new global::BlogDto(
                 global::System.Linq.Enumerable.Count(x.Posts, x1 => x1.Id == x.Posts.Count)
             )
         );
-#nullable enable
+#nullable enable warnings
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

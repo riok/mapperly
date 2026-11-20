@@ -491,7 +491,7 @@ public class UseMapperTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             q,
                             x => new global::B()
@@ -499,7 +499,7 @@ public class UseMapperTest
                                 Value = _other.MapEnum(x.Value),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -523,7 +523,7 @@ public class UseMapperTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             q,
                             x => new global::B()
@@ -531,7 +531,7 @@ public class UseMapperTest
                                 Value = _other.MapValue(x.Value),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }

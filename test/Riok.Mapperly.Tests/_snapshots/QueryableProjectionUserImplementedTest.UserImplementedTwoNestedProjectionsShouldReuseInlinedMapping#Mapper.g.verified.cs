@@ -6,7 +6,7 @@ public static partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public static partial global::System.Linq.IQueryable<global::VendorResponse> ProjectToDto(this global::System.Linq.IQueryable<global::Vendor> query)
     {
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(
             query,
             x => new global::VendorResponse()
@@ -19,13 +19,13 @@ public static partial class Mapper
                 })),
             }
         );
-#nullable enable
+#nullable enable warnings
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public static partial global::System.Linq.IQueryable<global::ScopeResponse> ProjectToDto(this global::System.Linq.IQueryable<global::Scope> q)
     {
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(
             q,
             x => new global::ScopeResponse()
@@ -38,7 +38,7 @@ public static partial class Mapper
                 })),
             }
         );
-#nullable enable
+#nullable enable warnings
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

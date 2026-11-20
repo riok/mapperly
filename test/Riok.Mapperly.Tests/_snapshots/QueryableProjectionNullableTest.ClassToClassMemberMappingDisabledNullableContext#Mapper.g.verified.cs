@@ -9,7 +9,7 @@ public partial class Mapper
     {
         if (q == null)
             return default;
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(
             q,
             x => new global::B()
@@ -17,7 +17,7 @@ public partial class Mapper
                 OtherValue = x.Value,
             }
         );
-#nullable enable
+#nullable enable warnings
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

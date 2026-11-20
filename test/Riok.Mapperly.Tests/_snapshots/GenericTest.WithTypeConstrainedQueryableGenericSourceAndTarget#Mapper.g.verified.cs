@@ -17,16 +17,16 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::System.Linq.IQueryable<global::B> MapToB(global::System.Linq.IQueryable<global::A> source)
     {
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(source, x => new global::B(x.Value));
-#nullable enable
+#nullable enable warnings
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::System.Linq.IQueryable<global::D> MapToD(global::System.Linq.IQueryable<global::C> source)
     {
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(source, x => new global::D(x.Value1));
-#nullable enable
+#nullable enable warnings
     }
 }

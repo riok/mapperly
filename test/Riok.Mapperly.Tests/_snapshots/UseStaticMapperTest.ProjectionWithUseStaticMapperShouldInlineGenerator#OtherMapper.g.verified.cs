@@ -6,7 +6,7 @@ public static partial class OtherMapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public static partial global::System.Linq.IQueryable<global::MakerDto> ProjectToMakerDto(this global::System.Linq.IQueryable<global::Maker> query)
     {
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(
             query,
             x => new global::MakerDto()
@@ -15,7 +15,7 @@ public static partial class OtherMapper
                 MakerName = x.Name,
             }
         );
-#nullable enable
+#nullable enable warnings
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

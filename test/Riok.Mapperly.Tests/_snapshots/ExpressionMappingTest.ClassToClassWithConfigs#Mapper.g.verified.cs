@@ -6,7 +6,7 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::System.Linq.Expressions.Expression<global::System.Func<global::A, global::B>> Map()
     {
-#nullable disable
+#nullable disable warnings
         return x => new global::B()
         {
             StringValue2 = x.StringValue,
@@ -19,7 +19,7 @@ public partial class Mapper
                 },
             },
         };
-#nullable enable
+#nullable enable warnings
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

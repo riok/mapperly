@@ -25,7 +25,7 @@ public class QueryableProjectionNullHandlingTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             source,
                             x => new global::B()
@@ -36,7 +36,7 @@ public class QueryableProjectionNullHandlingTest
                                 },
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -81,7 +81,7 @@ public class QueryableProjectionNullHandlingTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             source,
                             x => new global::B()
@@ -89,7 +89,7 @@ public class QueryableProjectionNullHandlingTest
                                 Name = x.Name,
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -131,7 +131,7 @@ public class QueryableProjectionNullHandlingTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             source,
                             x => new global::B()
@@ -139,7 +139,7 @@ public class QueryableProjectionNullHandlingTest
                                 IntValue = x.IntValue.Value,
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -203,7 +203,7 @@ public class QueryableProjectionNullHandlingTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             source,
                             x => new global::B()
@@ -211,7 +211,7 @@ public class QueryableProjectionNullHandlingTest
                                 Value = x.Value,
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -254,7 +254,7 @@ public class QueryableProjectionNullHandlingTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             source,
                             x => new global::B()
@@ -262,7 +262,7 @@ public class QueryableProjectionNullHandlingTest
                                 Items = global::System.Linq.Enumerable.ToList(global::System.Linq.Enumerable.Select(x.Items, x1 => x1.Value)),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }

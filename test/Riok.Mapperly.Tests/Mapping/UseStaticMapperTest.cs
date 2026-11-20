@@ -469,7 +469,7 @@ public class UseStaticMapperTest
             .HaveMethodBody(
                 "ProjectToTarget",
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             source,
                             x => new global::Mapper.Target()
@@ -477,7 +477,7 @@ public class UseStaticMapperTest
                                 DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -497,7 +497,7 @@ public class UseStaticMapperTest
             .HaveMethodBody(
                 "ProjectToTarget",
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             source,
                             x => new global::Mapper.Target()
@@ -505,7 +505,7 @@ public class UseStaticMapperTest
                                 DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -523,7 +523,7 @@ public class UseStaticMapperTest
             .HaveMethodBody(
                 "ProjectToTarget",
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             source,
                             x => new global::Mapper.Target()
@@ -531,7 +531,7 @@ public class UseStaticMapperTest
                                 DateTime = global::Riok.Mapperly.TestDependency.Mapper.DateTimeMapper.MapToDateTimeOffset(x.DateTime),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -612,7 +612,7 @@ public class UseStaticMapperTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             q,
                             x => new global::B()
@@ -620,7 +620,7 @@ public class UseStaticMapperTest
                                 Value = global::OtherMapper.ToName(x.Value),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -920,7 +920,7 @@ public class UseStaticMapperTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             q,
                             x => new global::B()
@@ -928,7 +928,7 @@ public class UseStaticMapperTest
                                 Status = global::EnumMapper.MapToStatus(x.Status),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -976,7 +976,7 @@ public class UseStaticMapperTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             q,
                             x => new global::B()
@@ -984,7 +984,7 @@ public class UseStaticMapperTest
                                 Value = global::EnumMapper.MapEnum(x.Value),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -1029,7 +1029,7 @@ public class UseStaticMapperTest
             .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             q,
                             x => new global::B()
@@ -1037,7 +1037,7 @@ public class UseStaticMapperTest
                                 Status = global::EnumMapper.MapToStatus(x.Status),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -1075,7 +1075,7 @@ public class UseStaticMapperTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             q,
                             x => new global::B()
@@ -1083,7 +1083,7 @@ public class UseStaticMapperTest
                                 Value = x.Value.Name,
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -1164,9 +1164,9 @@ public class UseStaticMapperTest
             .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(source, x => new global::B(x.Item != null ? x.Item.Value : default));
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }

@@ -24,6 +24,6 @@ public static class QueryableMappingBuilder
         if (mapping == null)
             return null;
 
-        return new QueryableProjectionMapping(ctx.Source, ctx.Target, mapping, ctx.Configuration.SupportedFeatures.NullableAttributes);
+        return new QueryableProjectionMapping(ctx.Source, ctx.Target, mapping);
     }
 }
