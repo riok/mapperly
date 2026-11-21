@@ -7,7 +7,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection> ProjectToDto(this global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjection> q)
         {
-#nullable disable
+#nullable disable warnings
             return global::System.Linq.Queryable.Select(
                 q,
                 x => new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection(x.CtorValue)
@@ -64,13 +64,13 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                     })),
                 }
             );
-#nullable enable
+#nullable enable warnings
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionBaseType> ProjectToDto(this global::System.Linq.IQueryable<global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionBaseType> q)
         {
-#nullable disable
+#nullable disable warnings
             return global::System.Linq.Queryable.Select(
                 q,
                 x => (global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionBaseType)(x is global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeA ? new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjectionTypeA()
@@ -85,13 +85,13 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                     BaseValue = ((global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjectionTypeB)x).BaseValue,
                 } : default)
             );
-#nullable enable
+#nullable enable warnings
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
         public static partial global::System.Linq.Expressions.Expression<global::System.Func<global::Riok.Mapperly.IntegrationTests.Models.TestObjectProjection, global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection>> ProjectToDtoExpression()
         {
-#nullable disable
+#nullable disable warnings
             return x => new global::Riok.Mapperly.IntegrationTests.Dto.TestObjectDtoProjection(x.CtorValue)
             {
                 IntValue = x.IntValue,
@@ -145,7 +145,7 @@ namespace Riok.Mapperly.IntegrationTests.Mapper
                     Value = x1.Value,
                 })),
             };
-#nullable enable
+#nullable enable warnings
         }
 
         [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

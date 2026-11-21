@@ -597,9 +597,9 @@ public class ValueTupleTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(source, x => new global::System.ValueTuple<int, string>(x.A, x.B));
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -617,9 +617,9 @@ public class ValueTupleTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(source, x => new global::System.ValueTuple<int, string>(x.A, x.B));
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }

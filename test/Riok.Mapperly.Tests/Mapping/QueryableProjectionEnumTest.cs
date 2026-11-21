@@ -37,7 +37,7 @@ public class QueryableProjectionEnumTest
             .Should()
             .HaveSingleMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             source,
                             x => new global::B()
@@ -45,7 +45,7 @@ public class QueryableProjectionEnumTest
                                 Value = (global::D)x.Value,
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -115,7 +115,7 @@ public class QueryableProjectionEnumTest
             .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             q,
                             x => new global::B()
@@ -123,7 +123,7 @@ public class QueryableProjectionEnumTest
                                 Value = MapEnum(x.Value),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -153,7 +153,7 @@ public class QueryableProjectionEnumTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             q,
                             x => new global::B()
@@ -161,7 +161,7 @@ public class QueryableProjectionEnumTest
                                 Value = MapEnum(x.Value),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -186,9 +186,9 @@ public class QueryableProjectionEnumTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(q, x => MapEnum(x));
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -216,9 +216,9 @@ public class QueryableProjectionEnumTest
             .Should()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(q, x => MapEnum(x));
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }

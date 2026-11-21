@@ -146,16 +146,13 @@ public class InlineExpressionRewriter(SemanticModel semanticModel, Func<IMethodS
         return node;
     }
 
-    public override SyntaxNode? VisitParenthesizedLambdaExpression(ParenthesizedLambdaExpressionSyntax node)
+    public override SyntaxNode VisitParenthesizedLambdaExpression(ParenthesizedLambdaExpressionSyntax node)
     {
-        // the lambda symbol keeps the nullable annotation of an explicit return type,
-        // the type info of the return type syntax does not.
-        var returnType = node.ReturnType == null ? null : (semanticModel.GetSymbolInfo(node).Symbol as IMethodSymbol)?.ReturnType;
-        node = (ParenthesizedLambdaExpressionSyntax)base.VisitParenthesizedLambdaExpression(node)!;
-        if (returnType == null || node.ReturnType == null)
-            return node;
+        var rewritten = (ParenthesizedLambdaExpressionSyntax)base.VisitParenthesizedLambdaExpression(node)!;
+        if (node.ReturnType == null || semanticModel.GetSymbolInfo(node).Symbol is not IMethodSymbol lambda)
+            return rewritten;
 
-        return node.WithReturnType(FullyQualifiedIdentifier(returnType).WithTriviaFrom(node.ReturnType));
+        return rewritten.WithReturnType(FullyQualifiedIdentifier(lambda.ReturnType).WithTriviaFrom(node.ReturnType));
     }
 
     public override SyntaxNode? VisitInvocationExpression(InvocationExpressionSyntax node)
