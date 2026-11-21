@@ -19,28 +19,36 @@ public class NullDelegateExistingTargetMapping(
 {
     private const string NullableValueProperty = nameof(Nullable<>.Value);
 
-    public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target)
+    public override IEnumerable<StatementSyntax> Build(TypeMappingBuildContext ctx, ExpressionSyntax target) =>
+        Build(ctx, target, ctx.Source, unwrapNullableSource: true);
+
+    public IEnumerable<StatementSyntax> Build(
+        TypeMappingBuildContext ctx,
+        ExpressionSyntax target,
+        ExpressionSyntax nullSafeSource,
+        bool unwrapNullableSource = false
+    )
     {
         // if the source or target type is nullable, add a null guard.
         if (!SourceType.IsNullable() && !TargetType.IsNullable())
             return delegateMapping.Build(ctx, target);
 
-        var body = BuildBody(ctx, target);
+        var body = BuildBody(ctx, target, unwrapNullableSource);
 
         // if body is empty don't generate an if statement
         if (body.Length == 0)
             return [];
 
         // if (source != null && target != null) { body }
-        var condition = IfNoneNull((SourceType, ctx.Source), (TargetType, target));
+        var condition = IfNoneNull((SourceType, nullSafeSource), (TargetType, target));
         var ifStatement = ctx.SyntaxFactory.If(condition, body);
         return [ifStatement];
     }
 
-    private StatementSyntax[] BuildBody(TypeMappingBuildContext ctx, ExpressionSyntax target)
+    private StatementSyntax[] BuildBody(TypeMappingBuildContext ctx, ExpressionSyntax target, bool unwrapNullableSource)
     {
         ctx = ctx.AddIndentation();
-        if (SourceType.IsNullableValueType())
+        if (unwrapNullableSource && SourceType.IsNullableValueType())
         {
             ctx = ctx.WithSource(MemberAccess(ctx.Source, NullableValueProperty));
         }
