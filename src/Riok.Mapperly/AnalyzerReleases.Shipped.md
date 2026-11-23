@@ -226,6 +226,8 @@ RMG097 | Mapper | Error   | MapValue Use method parameters cannot be satisfied
 RMG098 | Mapper | Error   | Named mapping additional parameters cannot be satisfied
 RMG099 | Mapper | Error   | Duplicate additional parameter names differing only in casing
 RMG100 | Mapper | Error   | [MappingTargetOriginalValue] is not supported on generated (partial) mapping methods.
+RMG101 | Mapper | Warning | The target member type does not match the [MappingTargetOriginalValue] parameter type
+RMG102 | Mapper | Warning | The target member cannot be read for the [MappingTargetOriginalValue] parameter
 
 ### Changed Rules
 

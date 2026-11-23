@@ -857,6 +857,24 @@ public static class DiagnosticDescriptors
         isEnabledByDefault: true
     );
 
+    public static readonly DiagnosticDescriptor MappingTargetOriginalValueTypeMismatch = new(
+        "RMG101",
+        "The target member type does not match the [MappingTargetOriginalValue] parameter type",
+        "The target member {0} cannot be passed to the [MappingTargetOriginalValue] parameter {1} of type {2} in {3}, the default value is used instead",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true
+    );
+
+    public static readonly DiagnosticDescriptor MappingTargetOriginalValueMemberNotReadable = new(
+        "RMG102",
+        "The target member cannot be read for the [MappingTargetOriginalValue] parameter",
+        "The target member {0} cannot be read and cannot be passed to the [MappingTargetOriginalValue] parameter {1} in {2}, the default value is used instead",
+        DiagnosticCategories.Mapper,
+        DiagnosticSeverity.Warning,
+        isEnabledByDefault: true
+    );
+
     private static string BuildHelpUri(string id)
     {
 #if ENV_NEXT
