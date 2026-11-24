@@ -169,4 +169,169 @@ public class EnumerableExistingTargetTest
         );
         return TestHelper.VerifyGenerator(source);
     }
+
+    [Fact]
+    public void MapNestedEnumerableToReadOnlyListWithDisabledNullable()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(@A.Nested.Items), nameof(B.Items))]
+            partial B Map(A source);
+            """,
+            "class A { public Nested Nested { get; set; } }",
+            "class Nested { public IEnumerable<int> Items { get; set; } }",
+            "class B { public readonly List<int> Items = []; }"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.DisabledNullable)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                if (source == null)
+                    return default;
+                var target = new global::B();
+                if (source.Nested?.Items != null && target.Items != null)
+                {
+                    if (global::System.Linq.Enumerable.TryGetNonEnumeratedCount(source.Nested.Items, out var sourceCount))
+                    {
+                        target.Items.EnsureCapacity(sourceCount + target.Items.Count);
+                    }
+                    foreach (var item in source.Nested.Items)
+                    {
+                        target.Items.Add(item);
+                    }
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MapNestedNullableParentEnumerableToReadOnlyList()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(@A.Nested.Items), nameof(B.Items))]
+            partial B Map(A source);
+            """,
+            "class A { public Nested? Nested { get; set; } }",
+            "class Nested { public IEnumerable<int> Items { get; set; } = []; }",
+            "class B { public readonly List<int> Items = []; }"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.Nested?.Items != null)
+                {
+                    if (global::System.Linq.Enumerable.TryGetNonEnumeratedCount(source.Nested.Items, out var sourceCount))
+                    {
+                        target.Items.EnsureCapacity(sourceCount + target.Items.Count);
+                    }
+                    foreach (var item in source.Nested.Items)
+                    {
+                        target.Items.Add(item);
+                    }
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MapNestedNullableStructParentEnumerableToReadOnlyList()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(@A.Nested.Items), nameof(B.Items))]
+            partial B Map(A source);
+            """,
+            "class A { public Nested? Nested { get; set; } }",
+            "struct Nested { public C? Items { get; set; } }",
+            "struct C : IEnumerable<int> { public IEnumerator<int> GetEnumerator() => throw null!; System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => throw null!; }",
+            "class B { public readonly List<int> Items = []; }"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.Nested?.Items != null)
+                {
+                    if (global::System.Linq.Enumerable.TryGetNonEnumeratedCount(source.Nested.Value.Items.Value, out var sourceCount))
+                    {
+                        target.Items.EnsureCapacity(sourceCount + target.Items.Count);
+                    }
+                    foreach (var item in source.Nested.Value.Items.Value)
+                    {
+                        target.Items.Add(item);
+                    }
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MapNestedNullableParentNonNullableValueTypeEnumerableToReadOnlyList()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(@A.Nested.Items), nameof(B.Items))]
+            partial B Map(A source);
+            """,
+            "class A { public Nested? Nested { get; set; } }",
+            "class Nested { public C Items { get; set; } }",
+            "struct C : IEnumerable<int> { public IEnumerator<int> GetEnumerator() => throw null!; System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => throw null!; }",
+            "class B { public readonly List<int> Items = []; }"
+        );
+        TestHelper
+            .GenerateMapper(source, TestHelperOptions.AllowInfoDiagnostics)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                if (source.Nested?.Items != null)
+                {
+                    if (global::System.Linq.Enumerable.TryGetNonEnumeratedCount(source.Nested.Items, out var sourceCount))
+                    {
+                        target.Items.EnsureCapacity(sourceCount + target.Items.Count);
+                    }
+                    foreach (var item in source.Nested.Items)
+                    {
+                        target.Items.Add(item);
+                    }
+                }
+                return target;
+                """
+            );
+    }
+
+    [Fact]
+    public void MapNestedNullableParentWithUserImplementedExistingTargetMethod()
+    {
+        var source = TestSourceBuilder.MapperWithBodyAndTypes(
+            """
+            [MapProperty(nameof(@A.Nested.Items), nameof(B.Items), Use = nameof(MapItems))]
+            partial B Map(A source);
+            private void MapItems(IEnumerable<int>? source, List<int> target) {}
+            """,
+            "class A { public Nested? Nested { get; set; } }",
+            "class Nested { public IEnumerable<int>? Items { get; set; } }",
+            "class B { public readonly List<int> Items = []; }"
+        );
+        TestHelper
+            .GenerateMapper(source)
+            .Should()
+            .HaveSingleMethodBody(
+                """
+                var target = new global::B();
+                MapItems(source.Nested?.Items, target.Items);
+                return target;
+                """
+            );
+    }
 }
