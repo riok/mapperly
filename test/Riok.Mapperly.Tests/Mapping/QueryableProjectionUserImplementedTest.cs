@@ -121,7 +121,7 @@ public class QueryableProjectionUserImplementedTest
             .HaveAssertedAllDiagnostics()
             .HaveMapMethodBody(
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             source,
                             x => new global::B()
@@ -130,7 +130,7 @@ public class QueryableProjectionUserImplementedTest
                                 NestedValue = global::IBaseMapper.MapToD(x.NestedValue),
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }

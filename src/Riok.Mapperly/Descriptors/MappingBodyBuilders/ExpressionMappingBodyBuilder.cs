@@ -22,8 +22,7 @@ public static class ExpressionMappingBodyBuilder
             var expressionMapping = new ExpressionMapping(
                 sourceType,
                 mapping.TargetType, // The return type (Expression<Func<TSource, TTarget>>)
-                delegateMapping,
-                ctx.Configuration.SupportedFeatures.NullableAttributes
+                delegateMapping
             );
             mapping.SetDelegateMapping(expressionMapping);
             return;

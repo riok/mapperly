@@ -349,7 +349,7 @@ public class GenericTest
                 };
                 """
             )
-            .HaveMapMethodWithGenericConstraints("where TSource : class");
+            .HaveMapMethodWithGenericConstraints("where TSource : class?");
     }
 
     [Fact]
@@ -382,7 +382,7 @@ public class GenericTest
                 };
                 """
             )
-            .HaveMapMethodWithGenericConstraints("where TSource : class where TTarget : class");
+            .HaveMapMethodWithGenericConstraints("where TSource : class? where TTarget : class?");
     }
 
     [Fact]

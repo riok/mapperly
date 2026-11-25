@@ -9,6 +9,13 @@ namespace Riok.Mapperly.Emit.Syntax;
 
 public partial struct SyntaxFactoryHelper
 {
+    public enum NullableTarget
+    {
+        All,
+        Annotations,
+        Warnings,
+    }
+
     public static AssignmentExpressionSyntax CoalesceAssignment(ExpressionSyntax target, ExpressionSyntax source)
     {
         return AssignmentExpression(
@@ -19,19 +26,37 @@ public partial struct SyntaxFactoryHelper
         );
     }
 
-    public static SyntaxTrivia Nullable(bool enabled, bool annotationsOnly = false)
+    public static SyntaxTrivia Nullable(bool enabled, NullableTarget target = NullableTarget.All)
     {
         var nullableDirective = NullableDirectiveTrivia(
             LeadingSpacedToken(enabled ? SyntaxKind.EnableKeyword : SyntaxKind.DisableKeyword),
             true
         );
 
-        if (annotationsOnly)
+        nullableDirective = target switch
         {
-            nullableDirective = nullableDirective.WithTargetToken(LeadingSpacedToken(SyntaxKind.AnnotationsKeyword));
-        }
+            NullableTarget.Annotations => nullableDirective.WithTargetToken(LeadingSpacedToken(SyntaxKind.AnnotationsKeyword)),
+            NullableTarget.Warnings => nullableDirective.WithTargetToken(LeadingSpacedToken(SyntaxKind.WarningsKeyword)),
+            _ => nullableDirective,
+        };
 
         return Trivia(nullableDirective);
+    }
+
+    public StatementSyntax DisableNullableWarnings(StatementSyntax statement)
+    {
+        if (!supportedFeatures.NullableAttributes)
+            return statement;
+
+        var leadingTrivia = statement
+            .GetLeadingTrivia()
+            .Insert(0, ElasticCarriageReturnLineFeed)
+            .Insert(1, Nullable(false, NullableTarget.Warnings));
+        var trailingTrivia = statement
+            .GetTrailingTrivia()
+            .Insert(0, ElasticCarriageReturnLineFeed)
+            .Insert(1, Nullable(true, NullableTarget.Warnings));
+        return statement.WithLeadingTrivia(leadingTrivia).WithTrailingTrivia(trailingTrivia);
     }
 
     public static BinaryExpressionSyntax Coalesce(ExpressionSyntax expr, ExpressionSyntax coalesceExpr) =>

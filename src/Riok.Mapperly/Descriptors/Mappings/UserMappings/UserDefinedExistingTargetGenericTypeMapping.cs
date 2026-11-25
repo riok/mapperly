@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Riok.Mapperly.Abstractions.ReferenceHandling;
 using Riok.Mapperly.Descriptors.Mappings.ExistingTarget;
@@ -76,7 +75,7 @@ public class UserDefinedExistingTargetGenericTypeMapping(
         var methodSyntax = (MethodDeclarationSyntax)Method.DeclaringSyntaxReferences.First().GetSyntax();
         return base.BuildMethod(ctx)
             .WithTypeParameterList(methodSyntax.TypeParameterList)
-            .WithConstraintClauses(List(GetTypeParameterConstraintClauses()));
+            .WithConstraintClauses(List(TypeParameterConstraintClauses(Method.TypeParameters).Select(c => c.AddLeadingSpace())));
     }
 
     public override IEnumerable<StatementSyntax> BuildBody(TypeMappingBuildContext ctx)
@@ -125,52 +124,6 @@ public class UserDefinedExistingTargetGenericTypeMapping(
     internal override void EnableReferenceHandling(INamedTypeSymbol iReferenceHandlerType)
     {
         // the parameters of user defined methods should not be manipulated
-    }
-
-    private IEnumerable<TypeParameterConstraintClauseSyntax> GetTypeParameterConstraintClauses()
-    {
-        foreach (var tp in Method.TypeParameters)
-        {
-            var constraints = new List<TypeParameterConstraintSyntax>();
-
-            if (tp.HasUnmanagedTypeConstraint)
-            {
-                constraints.Add(TypeConstraint(IdentifierName("unmanaged")).AddLeadingSpace());
-            }
-            else if (tp.HasValueTypeConstraint)
-            {
-                constraints.Add(ClassOrStructConstraint(SyntaxKind.StructConstraint).AddLeadingSpace());
-            }
-            else if (tp.HasNotNullConstraint)
-            {
-                constraints.Add(TypeConstraint(IdentifierName("notnull")).AddLeadingSpace());
-            }
-            else if (tp.HasReferenceTypeConstraint)
-            {
-                constraints.Add(ClassOrStructConstraint(SyntaxKind.ClassConstraint).AddLeadingSpace());
-            }
-
-            foreach (var c in tp.ConstraintTypes)
-            {
-                constraints.Add(TypeConstraint(FullyQualifiedIdentifier(c)).AddLeadingSpace());
-            }
-
-            if (tp.HasConstructorConstraint)
-            {
-                constraints.Add(ConstructorConstraint().AddLeadingSpace());
-            }
-
-            if (!constraints.Any())
-            {
-                continue;
-            }
-
-            yield return TypeParameterConstraintClause(
-                    IdentifierName(tp.Name).AddLeadingSpace().AddTrailingSpace(),
-                    SeparatedList(constraints)
-                )
-                .AddLeadingSpace();
-        }
     }
 
     private SwitchSectionSyntax BuildSwitchSection(

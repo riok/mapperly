@@ -17,7 +17,7 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::System.Linq.IQueryable<global::B> ProjectToB(global::System.Linq.IQueryable<global::A> q)
     {
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(
             q,
             x => new global::B()
@@ -25,13 +25,13 @@ public partial class Mapper
                 Value = x.Value,
             }
         );
-#nullable enable
+#nullable enable warnings
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     private partial global::System.Linq.IQueryable<global::D> ProjectToD(global::System.Linq.IQueryable<global::C> q)
     {
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(
             q,
             x => new global::D()
@@ -39,6 +39,6 @@ public partial class Mapper
                 Value2 = x.Value2,
             }
         );
-#nullable enable
+#nullable enable warnings
     }
 }

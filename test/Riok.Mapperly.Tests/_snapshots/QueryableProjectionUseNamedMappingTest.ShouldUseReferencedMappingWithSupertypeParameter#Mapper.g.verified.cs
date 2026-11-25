@@ -6,7 +6,7 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public partial global::System.Linq.IQueryable<global::Target> Map(global::System.Linq.IQueryable<global::Source> source)
     {
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(
             source,
             x => new global::Target()
@@ -15,7 +15,7 @@ public partial class Mapper
                 Result = ((global::IBase)x).Value,
             }
         );
-#nullable enable
+#nullable enable warnings
     }
 
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]

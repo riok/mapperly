@@ -14,7 +14,7 @@ partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     internal partial global::System.Linq.IQueryable<global::MyEntityDto> ProjectToDto(global::System.Linq.IQueryable<global::MyEntity> source)
     {
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(
             source,
             x => new global::MyEntityDto()
@@ -22,6 +22,6 @@ partial class Mapper
                 Id = global::Extensions.WithOneAdded(x.Id),
             }
         );
-#nullable enable
+#nullable enable warnings
     }
 }

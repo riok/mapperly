@@ -318,7 +318,7 @@ public class QueryableProjectionTest
                 // SourceValue → TargetValue mapping is NOT applied (no matching element mapping),
                 // instead TargetValue is mapped by name from A.TargetValue, and currentUserId by name.
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             source,
                             x => new global::B()
@@ -327,7 +327,7 @@ public class QueryableProjectionTest
                                 CurrentUserId = currentUserId,
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }
@@ -357,7 +357,7 @@ public class QueryableProjectionTest
                 // the projection has no params and the element mapping is non-default (has params).
                 // SourceValue has no matching target, Name maps by name.
                 """
-                #nullable disable
+                #nullable disable warnings
                         return global::System.Linq.Queryable.Select(
                             source,
                             x => new global::B()
@@ -365,7 +365,7 @@ public class QueryableProjectionTest
                                 Name = x.Name,
                             }
                         );
-                #nullable enable
+                #nullable enable warnings
                 """
             );
     }

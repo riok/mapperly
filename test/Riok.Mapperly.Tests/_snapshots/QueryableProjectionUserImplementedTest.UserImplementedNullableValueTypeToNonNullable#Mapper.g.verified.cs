@@ -6,8 +6,8 @@ public partial class Mapper
     [global::System.CodeDom.Compiler.GeneratedCode("Riok.Mapperly", "0.0.1.0")]
     public static partial global::System.Linq.IQueryable<global::B> Map(this global::System.Linq.IQueryable<global::A> query)
     {
-#nullable disable
+#nullable disable warnings
         return global::System.Linq.Queryable.Select(query, x => new global::B(x.Value ?? 0));
-#nullable enable
+#nullable enable warnings
     }
 }
